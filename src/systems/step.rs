@@ -6,6 +6,20 @@ use rl_traits::{Environment, EpisodeStatus, Experience};
 use crate::components::{CurrentObservation, EnvId, EnvStats, EnvironmentComponent, PendingAction};
 use crate::events::{ActionRequestEvent, EpisodeEndEvent, ExperienceEvent};
 
+/// Query data needed to advance one environment by one action.
+type StepQuery<'world, 'state, E> = Query<
+    'world,
+    'state,
+    (
+        Entity,
+        &'static EnvId,
+        &'static mut EnvironmentComponent<E>,
+        &'static mut PendingAction<E>,
+        &'static mut CurrentObservation<E>,
+        &'static mut EnvStats,
+    ),
+>;
+
 /// The core RL tick system. Runs in `FixedUpdate`.
 ///
 /// For each environment entity that has a `PendingAction`:
@@ -26,19 +40,11 @@ use crate::events::{ActionRequestEvent, EpisodeEndEvent, ExperienceEvent};
 /// Solution: collect step results into a `Mutex<Vec>` in parallel,
 /// then drain and fire events serially. The serial phase is O(n) over
 /// only the envs that actually stepped -- the expensive part ran in parallel.
-#[allow(clippy::type_complexity)]
 pub fn step_system<E: Environment + Send + Sync + 'static>(
-    mut query: Query<(
-        Entity,
-        &EnvId,
-        &mut EnvironmentComponent<E>,
-        &mut PendingAction<E>,
-        &mut CurrentObservation<E>,
-        &mut EnvStats,
-    )>,
-    mut exp_writer: MessageWriter<ExperienceEvent<E::Observation, E::Action>>,
-    mut episode_writer: MessageWriter<EpisodeEndEvent>,
-    mut action_req_writer: MessageWriter<ActionRequestEvent>,
+    mut query: StepQuery<'_, '_, E>,
+    mut exp_writer: MessageWriter<'_, ExperienceEvent<E::Observation, E::Action>>,
+    mut episode_writer: MessageWriter<'_, EpisodeEndEvent>,
+    mut action_req_writer: MessageWriter<'_, ActionRequestEvent>,
 ) {
     struct StepOutcome<O, A> {
         entity: Entity,
@@ -51,8 +57,7 @@ pub fn step_system<E: Environment + Send + Sync + 'static>(
         episode_extras: std::collections::HashMap<String, f64>,
     }
 
-    let outcomes: Mutex<Vec<StepOutcome<E::Observation, E::Action>>> =
-        Mutex::new(Vec::new());
+    let outcomes: Mutex<Vec<StepOutcome<E::Observation, E::Action>>> = Mutex::new(Vec::new());
 
     query.par_iter_mut().for_each(
         |(entity, id, mut env_comp, mut pending, mut obs, mut stats)| {
@@ -75,30 +80,32 @@ pub fn step_system<E: Environment + Send + Sync + 'static>(
             // since par_iter_mut already has exclusive access to these components.
             let episode_reward = stats.episode_reward;
             let episode_steps = stats.episode_steps;
-            let episode_extras = if episode_done { env_comp.env.episode_extras() } else { std::collections::HashMap::new() };
+            let episode_extras = if episode_done {
+                env_comp.env.episode_extras()
+            } else {
+                std::collections::HashMap::new()
+            };
 
-            let experience = Experience::new(
-                prev_obs,
-                action,
-                reward,
-                result.observation,
-                result.status,
-            );
+            let experience =
+                Experience::new(prev_obs, action, reward, result.observation, result.status);
 
-            outcomes.lock().unwrap().push(StepOutcome {
-                entity,
-                env_id: id.0,
-                experience,
-                episode_done,
-                episode_status: status,
-                episode_reward,
-                episode_steps,
-                episode_extras,
-            });
+            outcomes
+                .lock()
+                .expect("step outcome mutex poisoned")
+                .push(StepOutcome {
+                    entity,
+                    env_id: id.0,
+                    experience,
+                    episode_done,
+                    episode_status: status,
+                    episode_reward,
+                    episode_steps,
+                    episode_extras,
+                });
         },
     );
 
-    for outcome in outcomes.into_inner().unwrap() {
+    for outcome in outcomes.into_inner().expect("step outcome mutex poisoned") {
         exp_writer.write(ExperienceEvent {
             env_id: outcome.env_id,
             experience: outcome.experience,

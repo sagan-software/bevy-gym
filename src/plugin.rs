@@ -2,12 +2,9 @@ use std::marker::PhantomData;
 use std::sync::Arc;
 
 use bevy::prelude::*;
-use bevy::time::Fixed;
 use rl_traits::Environment;
 
-use crate::components::{
-    CurrentObservation, EnvId, EnvStats, EnvironmentComponent, PendingAction,
-};
+use crate::components::{CurrentObservation, EnvId, EnvStats, EnvironmentComponent, PendingAction};
 use crate::events::{ActionRequestEvent, EpisodeEndEvent, ExperienceEvent};
 use crate::systems::{
     reset::{auto_reset_system, manual_reset_system},
@@ -15,7 +12,7 @@ use crate::systems::{
 };
 
 /// Configuration for how the gym plugin runs.
-#[derive(Resource, Clone)]
+#[derive(Resource, Debug, Clone, Copy)]
 pub struct GymConfig {
     /// Number of parallel environment instances.
     pub num_envs: usize,
@@ -43,10 +40,15 @@ impl Default for GymConfig {
 ///
 /// This ensures resets happen in the same tick as episode completion,
 /// and manual resets are processed after automatic ones.
-#[derive(SystemSet, Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(SystemSet, Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum GymSet {
+    /// Step environments that have pending actions.
     Step,
+
+    /// Reset environments that just finished an episode.
     AutoReset,
+
+    /// Reset environments marked with `ResetRequested`.
     ManualReset,
 }
 
@@ -76,11 +78,31 @@ pub enum GymSet {
 /// `Fn(usize) -> E` where the argument is the environment index `0..num_envs`.
 /// This lets you seed environments differently, give them different configs, etc.
 pub struct BevyGymPlugin<E: Environment> {
+    /// Factory used to construct each environment instance.
     env_factory: Arc<dyn Fn(usize) -> E + Send + Sync>,
+
+    /// Number of parallel environment instances to spawn.
     num_envs: usize,
+
+    /// Fixed tick rate in Hz, or `None` for uncapped headless execution.
     tick_rate: Option<f64>,
+
+    /// Whether this plugin is configured for headless execution.
     headless: bool,
+
+    /// Retains the generic environment type.
     _phantom: PhantomData<E>,
+}
+
+impl<E: Environment> std::fmt::Debug for BevyGymPlugin<E> {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        formatter
+            .debug_struct("BevyGymPlugin")
+            .field("num_envs", &self.num_envs)
+            .field("tick_rate", &self.tick_rate)
+            .field("headless", &self.headless)
+            .finish_non_exhaustive()
+    }
 }
 
 impl<E: Environment + Send + Sync + 'static> BevyGymPlugin<E> {
@@ -136,8 +158,14 @@ impl<E: Environment + Send + Sync + 'static> Plugin for BevyGymPlugin<E> {
         );
 
         app.add_systems(FixedUpdate, step_system::<E>.in_set(GymSet::Step));
-        app.add_systems(FixedUpdate, auto_reset_system::<E>.in_set(GymSet::AutoReset));
-        app.add_systems(FixedUpdate, manual_reset_system::<E>.in_set(GymSet::ManualReset));
+        app.add_systems(
+            FixedUpdate,
+            auto_reset_system::<E>.in_set(GymSet::AutoReset),
+        );
+        app.add_systems(
+            FixedUpdate,
+            manual_reset_system::<E>.in_set(GymSet::ManualReset),
+        );
 
         let factory = Arc::clone(&self.env_factory);
         let num_envs = self.num_envs;
@@ -152,8 +180,9 @@ impl<E: Environment + Send + Sync + 'static> Plugin for BevyGymPlugin<E> {
 pub fn spawn_environments<E: Environment + Send + Sync + 'static>(
     factory: impl Fn(usize) -> E + Send + Sync + 'static,
     num_envs: usize,
-) -> impl FnMut(Commands, MessageWriter<ActionRequestEvent>) {
-    move |mut commands: Commands, mut action_req_writer: MessageWriter<ActionRequestEvent>| {
+) -> impl FnMut(Commands<'_, '_>, MessageWriter<'_, ActionRequestEvent>) {
+    move |mut commands: Commands<'_, '_>,
+          mut action_req_writer: MessageWriter<'_, ActionRequestEvent>| {
         for i in 0..num_envs {
             let mut env = factory(i);
             let (initial_obs, initial_info) = env.reset(Some(i as u64));
@@ -171,10 +200,7 @@ pub fn spawn_environments<E: Environment + Send + Sync + 'static>(
                 ))
                 .id();
 
-            action_req_writer.write(ActionRequestEvent {
-                env_id: i,
-                entity,
-            });
+            action_req_writer.write(ActionRequestEvent { env_id: i, entity });
         }
     }
 }

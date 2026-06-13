@@ -8,39 +8,207 @@ repository = "https://github.com/vidarrio/bevy-gym"
 keywords = ["bevy", "gym", "ecs", "simulation", "rl"]
 categories = ["game-engines", "science"]
 
+[lints]
+workspace = true
+
 [package.metadata.docs.rs]
-features = ["x11"]
+features = ["render", "x11"]
 
 [features]
 default = []
-# Linux windowing backends — one is required when building on Linux.
-x11 = ["bevy/x11"]
-wayland = ["bevy/wayland"]
 # Enable Bevy rendering support. Without this, bevy-gym is fully headless.
 render = [
-    "bevy/bevy_core_pipeline",
-    "bevy/bevy_render",
-    "bevy/bevy_winit",
-    "bevy/bevy_asset",
-    "bevy/bevy_sprite",
-    "bevy/bevy_sprite_render",
+  "bevy/bevy_asset",
+  "bevy/bevy_core_pipeline",
+  "bevy/bevy_render",
+  "bevy/bevy_sprite",
+  "bevy/bevy_sprite_render",
+  "bevy/bevy_window",
 ]
+# Enable Bevy's winit backend on targets supported by winit. Unix targets also
+# need at least one display backend (`x11` or `wayland`).
+winit = ["bevy/bevy_winit"]
+x11 = ["winit", "bevy/x11"]
+wayland = ["winit", "bevy/wayland"]
+# Burn backend switches for examples. Keep GPU opt-in so default examples stay
+# portable on machines without a working native GPU adapter.
+cpu-accelerate = ["burn/accelerate"]
+gpu = ["burn/wgpu"]
+gpu-metal = ["gpu", "burn/metal"]
+gpu-vulkan = ["gpu", "burn/vulkan"]
+gpu-webgpu = ["gpu", "burn/webgpu"]
+# Local iteration only. Bevy dynamic linking is the largest rebuild-time win,
+# but should not be enabled for published or shipping builds.
+fast-compile = ["bevy/dynamic_linking"]
 
 [dependencies]
 rl-traits = "0.2.2"
-rand = "0.8"
 
 # Minimal Bevy — only what's needed for ECS + scheduling.
-# The `render` feature adds windowing and rendering on top.
+# The `render` feature adds rendering on top; `winit`, `x11`, and `wayland`
+# add real window backends for supported targets.
 [dependencies.bevy]
-version = "0.18"
 default-features = false
-features = [
-    "default_app",
-    "multi_threaded",
-]
+features = ["bevy_log", "multi_threaded"]
+version = "0.18"
 
+[target.'cfg(all(target_arch = "wasm32", target_os = "unknown"))'.dependencies]
+# rl-traits depends on rand/getrandom, which needs an explicit JS backend on
+# wasm32-unknown-unknown.
+getrandom = { version = "0.2", features = ["js"] }
+
+[[example]]
+name = "cartpole"
+path = "examples/classic-control/cart_pole.rs"
 
 [dev-dependencies]
-ember-rl = { version = "0.3.4", features = ["envs"] }
 burn = { version = "0.20.1", features = ["ndarray", "autodiff"] }
+ember-rl = { version = "0.3.4", features = ["envs"] }
+rand = "0.8"
+
+[profile.dev]
+# Bevy's recommended dev profile: lightly optimize local code and heavily
+# optimize dependencies so Bevy runs well without release-mode rebuild costs.
+opt-level = 1
+
+[profile.dev.package."*"]
+opt-level = 3
+
+[profile.release]
+# Bevy's optional release tuning: better runtime performance at the cost of
+# longer release builds.
+codegen-units = 1
+lto = "thin"
+
+# https://doc.rust-lang.org/rustc/lints/listing/index.html
+[workspace.lints.rust]
+absolute-paths-not-starting-with-crate = "warn"
+ambiguous-negative-literals = "warn"
+closure-returning-async-block = "warn"
+deprecated-safe-2024 = "warn"
+deref-into-dyn-supertrait = "warn"
+edition-2024-expr-fragment-specifier = "warn"
+elided-lifetimes-in-paths = { level = "allow", priority = 1 }
+explicit-outlives-requirements = "warn"
+ffi-unwind-calls = "warn"
+if-let-rescope = "warn"
+impl-trait-overcaptures = "warn"
+impl-trait-redundant-captures = "warn"
+keyword-idents-2018 = "warn"
+keyword-idents-2024 = "warn"
+let-underscore-drop = "warn"
+linker-messages = "warn"
+macro-use-extern-crate = "warn"
+meta-variable-misuse = "warn"
+missing-copy-implementations = { level = "allow", priority = 1 }
+missing-debug-implementations = { level = "allow", priority = 1 }
+missing-docs = "warn"
+missing-unsafe-on-extern = "warn"
+# multiple-supertrait-upcastable = "warn"
+# must-not-suspend = "warn"
+non-ascii-idents = "warn"
+# non-exhaustive-omitted-patterns = "warn"
+redundant-imports = "warn"
+redundant-lifetimes = "warn"
+rust-2021-incompatible-closure-captures = "warn"
+rust-2021-incompatible-or-patterns = "warn"
+rust-2021-prefixes-incompatible-syntax = "warn"
+rust-2021-prelude-collisions = "warn"
+rust-2024-guarded-string-incompatible-syntax = "warn"
+rust-2024-incompatible-pat = "warn"
+rust-2024-prelude-collisions = "warn"
+single-use-lifetimes = "warn"
+# supertrait-item-shadowing-definition = "warn"
+# supertrait-item-shadowing-usage = "warn"
+tail-expr-drop-order = "warn"
+trivial-casts = "warn"
+trivial-numeric-casts = "warn"
+unit-bindings = "warn"
+unknown-lints = "forbid"
+unnameable-types = "warn"
+# unqualified-local-imports = "warn"
+unreachable-pub = { level = "warn", priority = 1 }
+unsafe-attr-outside-unsafe = "warn"
+unsafe-code = "warn"
+unsafe-op-in-unsafe-fn = "warn"
+unstable-features = { level = "allow", priority = 1 }
+unused-crate-dependencies = "warn"
+unused-extern-crates = "warn"
+unused-import-braces = "warn"
+unused-lifetimes = "warn"
+unused-macro-rules = "warn"
+unused-qualifications = "warn"
+unused-results = { level = "allow", priority = 1 }
+variant-size-differences = "warn"
+
+# https://doc.rust-lang.org/rustdoc/lints.html
+[workspace.lints.rustdoc]
+bare_urls = "warn"
+broken_intra_doc_links = "warn"
+invalid_codeblock_attributes = "warn"
+invalid_html_tags = "warn"
+invalid_rust_codeblocks = "warn"
+private_intra_doc_links = "warn"
+redundant_explicit_links = "warn"
+unescaped_backticks = "warn"
+
+# https://rust-lang.github.io/rust-clippy/master/index.html
+[workspace.lints.clippy]
+all = "warn"
+allow_attributes = { level = "warn", priority = 2 }
+allow_attributes_without_reason = { level = "warn", priority = 2 }
+arithmetic_side_effects = { level = "allow", priority = 2 }
+assertions_on_result_states = { level = "warn", priority = 2 }
+await_holding_lock = { level = "warn", priority = 2 }
+await_holding_refcell_ref = { level = "warn", priority = 2 }
+cargo = { level = "allow", priority = 1 }
+cast_possible_truncation = { level = "allow", priority = 2 }
+cast_possible_wrap = { level = "allow", priority = 2 }
+cast_precision_loss = { level = "allow", priority = 2 }
+cast_sign_loss = { level = "warn", priority = 2 }
+complexity = "warn"
+correctness = "warn"
+dbg_macro = { level = "warn", priority = 2 }
+debug_assert_with_mut_call = { level = "warn", priority = 2 }
+expect_used = { level = "allow", priority = 2 }
+expl_impl_clone_on_copy = { level = "warn", priority = 2 }
+float_cmp = { level = "warn", priority = 2 }
+float_cmp_const = { level = "warn", priority = 2 }
+get_unwrap = { level = "warn", priority = 2 }
+if_let_mutex = { level = "warn", priority = 2 }
+indexing_slicing = { level = "warn", priority = 2 }
+infallible_try_from = { level = "warn", priority = 2 }
+invalid_upcast_comparisons = { level = "warn", priority = 2 }
+iter_not_returning_iterator = { level = "warn", priority = 2 }
+large_futures = { level = "warn", priority = 2 }
+let_underscore_future = { level = "warn", priority = 2 }
+let_underscore_must_use = { level = "warn", priority = 2 }
+lossy_float_literal = { level = "warn", priority = 2 }
+map_err_ignore = { level = "warn", priority = 2 }
+mem_forget = { level = "warn", priority = 2 }
+missing_docs_in_private_items = { level = "warn", priority = 2 }
+multiple_unsafe_ops_per_block = { level = "warn", priority = 2 }
+needless_pass_by_value = { level = "allow", priority = 1 }
+nursery = "warn"
+panic = { level = "warn", priority = 2 }
+panic_in_result_fn = { level = "warn", priority = 2 }
+pedantic = "warn"
+perf = "warn"
+rc_mutex = { level = "warn", priority = 2 }
+redundant_pub_crate = { level = "allow", priority = 1 }
+restriction = { level = "allow", priority = 1 }
+string_slice = { level = "warn", priority = 2 }
+style = "warn"
+suspicious = "warn"
+too_many_arguments = { level = "allow", priority = 1 }
+todo = { level = "warn", priority = 2 }
+type_complexity = { level = "allow", priority = 1 }
+unchecked_time_subtraction = { level = "warn", priority = 2 }
+undocumented_unsafe_blocks = { level = "warn", priority = 2 }
+unimplemented = { level = "warn", priority = 2 }
+unnecessary_safety_comment = { level = "warn", priority = 2 }
+unnecessary_safety_doc = { level = "warn", priority = 2 }
+unreachable = { level = "warn", priority = 2 }
+unused_result_ok = { level = "warn", priority = 2 }
+unwrap_in_result = { level = "warn", priority = 2 }
+unwrap_used = { level = "warn", priority = 2 }

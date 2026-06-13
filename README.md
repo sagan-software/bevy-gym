@@ -12,11 +12,11 @@ giving you N parallel environment instances stepped in parallel via `par_iter_mu
 
 ## Ecosystem
 
-| Crate | Role |
-|---|---|
-| [`rl-traits`](https://crates.io/crates/rl-traits) | Shared traits and types |
-| [`ember-rl`](https://crates.io/crates/ember-rl) | Algorithm implementations (DQN, PPO, SAC) using Burn |
-| **bevy-gym** | Bevy ECS plugin for parallelised environment simulation (this crate) |
+| Crate                                             | Role                                                                 |
+| ------------------------------------------------- | -------------------------------------------------------------------- |
+| [`rl-traits`](https://crates.io/crates/rl-traits) | Shared traits and types                                              |
+| [`ember-rl`](https://crates.io/crates/ember-rl)   | Algorithm implementations (DQN, PPO, SAC) using Burn                 |
+| **bevy-gym**                                      | Bevy ECS plugin for parallelised environment simulation (this crate) |
 
 ## Design goals
 
@@ -28,8 +28,8 @@ all available CPU cores without any extra synchronisation.
 (if enabled) runs in `Update` at frame rate. The two are completely independent.
 
 **Headless training mode.** Disable rendering entirely and run at maximum CPU throughput via
-`ScheduleRunnerPlugin`. The `render` feature adds windowing and rendering on top of the headless
-baseline.
+`ScheduleRunnerPlugin`. The `render` feature adds Bevy rendering support on top of the headless
+baseline; pair it with `winit`, `x11`, or `wayland` for live windows.
 
 **Message-driven policy integration.** `ActionRequestEvent` tells your policy system when to
 provide the next action. `ExperienceEvent` delivers the full `(s, a, r, s', status)` transition
@@ -45,7 +45,7 @@ Add to `Cargo.toml`:
 ```toml
 [dependencies]
 bevy-gym = "0.3"
-bevy = { version = "0.18", default-features = false, features = ["default_app", "multi_threaded"] }
+bevy = { version = "0.18", default-features = false, features = ["multi_threaded"] }
 ```
 
 ### Headless training with 4 parallel environments
@@ -149,22 +149,29 @@ commands.entity(env_entity).insert(ResetRequested { seed: Some(42) });
 
 ## Feature flags
 
-| Feature | Description |
-|---|---|
-| *(default)* | Headless ECS only -- no window, no rendering |
-| `render` | Adds `bevy_render`, `bevy_winit`, `bevy_core_pipeline`, `bevy_asset`, `bevy_sprite`, `bevy_sprite_render` |
+| Feature     | Description                                                                                         |
+| ----------- | --------------------------------------------------------------------------------------------------- |
+| *(default)* | Headless ECS only -- no window, no rendering                                                        |
+| `render`    | Adds Bevy rendering, sprite, asset, and window types without enabling a platform event-loop backend |
+| `winit`     | Adds Bevy's winit backend for targets supported by winit                                            |
+| `x11`       | Adds `winit` plus the X11 backend for Linux/BSD desktop builds                                      |
+| `wayland`   | Adds `winit` plus the Wayland backend for Linux/BSD desktop builds                                  |
+
+For live rendering on Linux, use `--features render,x11` or `--features render,wayland`.
+For live rendering on Windows, macOS, Android, iOS, or wasm, use `--features render,winit`.
 
 ## Examples
 
-| Example | Notes |
-|---|---|
+| Example                                 | Notes                                                             |
+| --------------------------------------- | ----------------------------------------------------------------- |
 | [`cartpole`](docs/examples/cartpole.md) | 4 parallel envs, DQN via TrainingSession, optional live rendering |
 
 ## Plugin docs
 
 Detailed reference for each plugin:
 
-- [BevyGymPlugin](docs/plugins/bevy_gym_plugin.md) -- core plugin, factory, headless/render modes, system ordering
+- [BevyGymPlugin](docs/plugins/bevy_gym_plugin.md) -- core plugin, factory, headless/render modes,
+  system ordering
 - [GymRender / GymRenderPlugin](docs/plugins/gym_render.md) -- optional 2D visualisation
 
 ## Development

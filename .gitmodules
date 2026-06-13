@@ -1,0 +1,15 @@
+[submodule "ref/gymnasium"]
+	path = ref/gymnasium
+	url = https://github.com/Farama-Foundation/Gymnasium.git
+[submodule "ref/godot-rl-agents-examples"]
+	path = ref/godot-rl-agents-examples
+	url = https://github.com/edbeeching/godot_rl_agents_examples.git
+[submodule "ref/bevy"]
+	path = ref/bevy
+	url = https://github.com/bevyengine/bevy.git
+[submodule "ref/ember-rl"]
+	path = ref/ember-rl
+	url = https://github.com/vidarrio/ember-rl.git
+[submodule "ref/rl-traits"]
+	path = ref/rl-traits
+	url = https://github.com/vidarrio/rl-traits.git

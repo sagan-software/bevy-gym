@@ -49,16 +49,19 @@
 //! }
 //! ```
 
+/// ECS components used to store environment state.
 pub mod components;
+/// Messages emitted by the gym systems.
 pub mod events;
+/// Bevy plugin and startup helpers.
 pub mod plugin;
 #[cfg(feature = "render")]
+/// Optional rendering helpers.
 pub mod render;
+/// Fixed-update systems that step and reset environments.
 pub mod systems;
 
-pub use components::{
-    CurrentObservation, EnvId, EnvStats, EnvironmentComponent, PendingAction,
-};
+pub use components::{CurrentObservation, EnvId, EnvStats, EnvironmentComponent, PendingAction};
 pub use events::{ActionRequestEvent, EpisodeEndEvent, ExperienceEvent};
-pub use plugin::{spawn_environments, BevyGymPlugin, GymConfig, GymSet};
+pub use plugin::{BevyGymPlugin, GymConfig, GymSet, spawn_environments};
 pub use systems::reset::ResetRequested;

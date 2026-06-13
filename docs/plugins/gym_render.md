@@ -51,8 +51,10 @@ impl GymRender for MyEnv {
 
 `GymRenderPlugin` adds two systems:
 
-- **Setup** (`First`): calls `setup_visuals` once per newly spawned environment entity (runs before `FixedUpdate`).
-- **Sync** (`Update`): calls `sync_visuals` every render frame, reading `CurrentObservation` which is updated by `FixedUpdate`.
+- **Setup** (`First`): calls `setup_visuals` once per newly spawned environment entity (runs before
+  `FixedUpdate`).
+- **Sync** (`Update`): calls `sync_visuals` every render frame, reading `CurrentObservation` which
+  is updated by `FixedUpdate`.
 
 The two schedules are independent -- simulation runs at `FixedUpdate` Hz, rendering at frame rate.
 
@@ -60,15 +62,16 @@ The two schedules are independent -- simulation runs at `FixedUpdate` Hz, render
 
 Bundles the resources needed to spawn 2D mesh entities:
 
-| Field | Type |
-|---|---|
-| `commands` | `&mut Commands` |
-| `meshes` | `&mut Assets<Mesh>` |
+| Field       | Type                         |
+| ----------- | ---------------------------- |
+| `commands`  | `&mut Commands`              |
+| `meshes`    | `&mut Assets<Mesh>`          |
 | `materials` | `&mut Assets<ColorMaterial>` |
 
 ## Multiple environments
 
-`env_id` (0..num_envs) is passed to `setup_visuals`. Use it to position environments at different screen locations -- e.g. stack them vertically by offsetting `y` by `env_id * SPACING`.
+`env_id` (0..num_envs) is passed to `setup_visuals`. Use it to position environments at different
+screen locations -- e.g. stack them vertically by offsetting `y` by `env_id * SPACING`.
 
 ## Simulation speed
 

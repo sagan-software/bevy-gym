@@ -1,10 +1,22 @@
 use bevy::prelude::*;
 use rl_traits::Environment;
 
-use crate::components::{
-    CurrentObservation, EnvId, EnvStats, EnvironmentComponent, PendingAction,
-};
+use crate::components::{CurrentObservation, EnvId, EnvStats, EnvironmentComponent, PendingAction};
 use crate::events::{ActionRequestEvent, EpisodeEndEvent};
+
+/// Query data needed to reset an environment after episode completion.
+type AutoResetQuery<'world, 'state, E> = Query<
+    'world,
+    'state,
+    (
+        Entity,
+        &'static EnvId,
+        &'static mut EnvironmentComponent<E>,
+        &'static mut CurrentObservation<E>,
+        &'static mut EnvStats,
+        &'static mut PendingAction<E>,
+    ),
+>;
 
 /// Watches for `EpisodeEndEvent`s and automatically resets the
 /// corresponding environment, then fires `ActionRequestEvent` so the
@@ -13,18 +25,10 @@ use crate::events::{ActionRequestEvent, EpisodeEndEvent};
 /// This runs in `FixedUpdate`, ordered *after* `step_system`. The reset
 /// happens within the same tick that the episode ended, so there is never
 /// a tick where an environment sits idle between episodes.
-#[allow(clippy::type_complexity)]
 pub fn auto_reset_system<E: Environment + Send + Sync + 'static>(
-    mut episode_end_events: MessageReader<EpisodeEndEvent>,
-    mut query: Query<(
-        Entity,
-        &EnvId,
-        &mut EnvironmentComponent<E>,
-        &mut CurrentObservation<E>,
-        &mut EnvStats,
-        &mut PendingAction<E>,
-    )>,
-    mut action_req_writer: MessageWriter<ActionRequestEvent>,
+    mut episode_end_events: MessageReader<'_, '_, EpisodeEndEvent>,
+    mut query: AutoResetQuery<'_, '_, E>,
+    mut action_req_writer: MessageWriter<'_, ActionRequestEvent>,
 ) {
     for event in episode_end_events.read() {
         for (entity, id, mut env_comp, mut obs, mut stats, mut pending) in query.iter_mut() {
@@ -55,26 +59,32 @@ pub fn auto_reset_system<E: Environment + Send + Sync + 'static>(
 ///
 /// Useful for curriculum learning (reset to a specific state), evaluation
 /// (reset with a fixed seed), or recovering from invalid states.
-#[derive(Component)]
+#[derive(Component, Debug, Clone, Copy)]
 pub struct ResetRequested {
     /// Optional seed for deterministic reset. `None` for random.
     pub seed: Option<u64>,
 }
 
-/// Handles manually-requested resets via the `ResetRequested` marker component.
-#[allow(clippy::type_complexity)]
-pub fn manual_reset_system<E: Environment + Send + Sync + 'static>(
-    mut commands: Commands,
-    mut query: Query<(
+/// Query data needed to perform a manually requested environment reset.
+type ManualResetQuery<'world, 'state, E> = Query<
+    'world,
+    'state,
+    (
         Entity,
-        &EnvId,
-        &mut EnvironmentComponent<E>,
-        &mut CurrentObservation<E>,
-        &mut EnvStats,
-        &mut PendingAction<E>,
-        &ResetRequested,
-    )>,
-    mut action_req_writer: MessageWriter<ActionRequestEvent>,
+        &'static EnvId,
+        &'static mut EnvironmentComponent<E>,
+        &'static mut CurrentObservation<E>,
+        &'static mut EnvStats,
+        &'static mut PendingAction<E>,
+        &'static ResetRequested,
+    ),
+>;
+
+/// Handles manually-requested resets via the `ResetRequested` marker component.
+pub fn manual_reset_system<E: Environment + Send + Sync + 'static>(
+    mut commands: Commands<'_, '_>,
+    mut query: ManualResetQuery<'_, '_, E>,
+    mut action_req_writer: MessageWriter<'_, ActionRequestEvent>,
 ) {
     for (entity, id, mut env_comp, mut obs, mut stats, mut pending, reset_req) in query.iter_mut() {
         let (new_obs, new_info) = env_comp.env.reset(reset_req.seed);

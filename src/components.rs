@@ -11,12 +11,14 @@ use rl_traits::Environment;
 /// Because `E` is `Send + Sync + 'static` (required by bevy-gym), and because
 /// each entity's components are independent, `Query<&mut EnvironmentComponent<E>>`
 /// can be iterated with `par_iter_mut()` at no extra cost.
-#[derive(Component)]
+#[derive(Component, Debug)]
 pub struct EnvironmentComponent<E: Environment + Send + Sync + 'static> {
+    /// The wrapped reinforcement-learning environment.
     pub env: E,
 }
 
 impl<E: Environment + Send + Sync + 'static> EnvironmentComponent<E> {
+    /// Wrap an environment as a Bevy component.
     pub fn new(env: E) -> Self {
         Self { env }
     }
@@ -28,8 +30,9 @@ impl<E: Environment + Send + Sync + 'static> EnvironmentComponent<E> {
 /// or the random exploration system). Consumed and cleared each tick by
 /// `step_system`. If `None`, the step system skips this environment for
 /// this tick -- the action has not arrived yet.
-#[derive(Component)]
+#[derive(Component, Debug)]
 pub struct PendingAction<E: Environment + Send + Sync + 'static> {
+    /// The action to consume on the next simulation step.
     pub action: Option<E::Action>,
 }
 
@@ -44,16 +47,19 @@ impl<E: Environment + Send + Sync + 'static> Default for PendingAction<E> {
 /// Updated every tick by `step_system` and after resets by `reset_system`.
 /// Read by policy systems to produce the next action, and by rendering
 /// systems to visualise the current state.
-#[derive(Component)]
+#[derive(Component, Debug)]
 pub struct CurrentObservation<E: Environment + Send + Sync + 'static> {
+    /// Latest observation emitted by the environment.
     pub observation: E::Observation,
+
+    /// Latest auxiliary info emitted by the environment.
     pub info: E::Info,
 }
 
 /// Per-episode and overall statistics for this environment instance.
 ///
 /// Useful for logging, debugging, and deciding when to start training.
-#[derive(Component, Default)]
+#[derive(Component, Debug, Clone, Copy, Default)]
 pub struct EnvStats {
     /// Total reward accumulated in the current episode.
     pub episode_reward: f64,
@@ -69,12 +75,14 @@ pub struct EnvStats {
 }
 
 impl EnvStats {
+    /// Accumulate reward and step counters for one environment step.
     pub(crate) fn record_step(&mut self, reward: f64) {
         self.episode_reward += reward;
         self.episode_steps += 1;
         self.total_steps += 1;
     }
 
+    /// Finish the current episode and reset per-episode counters.
     pub(crate) fn record_episode_end(&mut self) {
         self.total_episodes += 1;
         self.episode_reward = 0.0;

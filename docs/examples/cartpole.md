@@ -1,6 +1,7 @@
 # cartpole
 
-Full-stack CartPole-v1 example: 4 parallel environments, DQN from ember-rl via `TrainingSession`, live stats, optional 2D rendering.
+Full-stack CartPole-v1 example: 4 parallel environments, DQN from ember-rl via `TrainingSession`,
+live stats, optional 2D rendering.
 
 ## Usage
 
@@ -9,22 +10,26 @@ Full-stack CartPole-v1 example: 4 parallel environments, DQN from ember-rl via `
 cargo run --example cartpole --release
 
 # Train with live 2D rendering
-cargo run --example cartpole --features render --release -- --render
+cargo run --example cartpole --features render,x11 --release -- --render
 
 # Train with rendering at half speed
-cargo run --example cartpole --features render --release -- --render --speed 0.5
+cargo run --example cartpole --features render,x11 --release -- --render --speed 0.5
 
 # Evaluate a saved checkpoint (headless)
 cargo run --example cartpole --release -- --eval runs/bevy_cartpole/v1
 
 # Evaluate with live rendering
-cargo run --example cartpole --features render --release -- --eval runs/bevy_cartpole/v1 --render
+cargo run --example cartpole --features render,x11 --release -- --eval runs/bevy_cartpole/v1 --render
 ```
+
+Use `render,wayland` instead of `render,x11` for Wayland, or `render,winit` on non-Unix winit
+targets.
 
 ## What it demonstrates
 
 - `BevyGymPlugin` with 4 parallel environments stepped each `FixedUpdate` tick
-- `TrainingSession` from ember-rl as a `NonSendMut` resource -- automatic checkpointing, JSONL logging, and `best.mpk` saving
+- `TrainingSession` from ember-rl as a `NonSendMut` resource -- automatic checkpointing, JSONL
+  logging, and `best.mpk` saving
 - `GymStatsPlugin` for rolling mean/max reward and steps/sec across all envs
 - `GymRender` + `GymRenderPlugin` for live 2D visualisation (cart, pole, danger colouring)
 - Headless mode: `MinimalPlugins` + `ScheduleRunnerPlugin` + virtual time at maximum speed
@@ -32,7 +37,8 @@ cargo run --example cartpole --features render --release -- --eval runs/bevy_car
 
 ## Rendering details
 
-Each environment is drawn as a cart (blue rectangle) + pole (green rectangle) stacked vertically on screen. Colours shift as state approaches failure:
+Each environment is drawn as a cart (blue rectangle) + pole (green rectangle) stacked vertically on
+screen. Colours shift as state approaches failure:
 
 - Pole: green -> red as angle approaches the 12 degree limit
 - Cart: blue -> orange as position approaches the +/-2.4 boundary

@@ -47,8 +47,11 @@ use crate::components::{CurrentObservation, EnvId, EnvironmentComponent};
 /// `Assets<ColorMaterial>` so implementations can spawn
 /// `Mesh2d` + `MeshMaterial2d` entities for solid-colored 2D shapes.
 pub struct SpawnCtx<'w, 's, 'a> {
+    /// Command buffer used to spawn visual entities and attach render state.
     pub commands: &'a mut Commands<'w, 's>,
+    /// Mesh assets used by render implementations for generated geometry.
     pub meshes: &'a mut Assets<Mesh>,
+    /// Color material assets used by render implementations for simple 2D visuals.
     pub materials: &'a mut Assets<ColorMaterial>,
 }
 
@@ -109,6 +112,7 @@ impl<E: GymRender> Default for GymRenderPlugin<E> {
 }
 
 impl<E: GymRender> GymRenderPlugin<E> {
+    /// Create a render plugin for the environment type `E`.
     pub fn new() -> Self {
         Self::default()
     }
@@ -124,10 +128,7 @@ impl<E: GymRender> Plugin for GymRenderPlugin<E> {
 }
 
 fn setup_visuals_system<E: GymRender>(
-    query: Query<
-        (Entity, &EnvId),
-        (With<EnvironmentComponent<E>>, Without<E::Visuals>),
-    >,
+    query: Query<(Entity, &EnvId), (With<EnvironmentComponent<E>>, Without<E::Visuals>)>,
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,

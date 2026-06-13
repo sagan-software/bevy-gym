@@ -21,7 +21,7 @@ use rl_traits::{EpisodeStatus, Experience};
 ///     }
 /// }
 /// ```
-#[derive(Message)]
+#[derive(Message, Debug, Clone)]
 pub struct ExperienceEvent<O, A>
 where
     O: Clone + Send + Sync + 'static,
