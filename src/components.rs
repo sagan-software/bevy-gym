@@ -1,42 +1,36 @@
 use bevy::prelude::*;
-use rl_traits::Environment;
 
-/// The environment simulation state for one environment instance.
+use crate::Env;
+
+/// The simulation state for one environment instance.
 ///
-/// Wraps any `rl-traits` `Environment` implementation as a Bevy `Component`.
 /// One entity per environment instance is spawned by `BevyGymPlugin`.
 ///
 /// # Bevy ECS parallelism
 ///
-/// Because `E` is `Send + Sync + 'static` (required by bevy-gym), and because
-/// each entity's components are independent, `Query<&mut EnvironmentComponent<E>>`
-/// can be iterated with `par_iter_mut()` at no extra cost.
+/// Each entity's components are independent, so `Query<&mut EnvComponent<E>>`
+/// can step many environments in parallel.
 #[derive(Component, Debug)]
-pub struct EnvironmentComponent<E: Environment + Send + Sync + 'static> {
+pub struct EnvComponent<E: Env + Send + Sync + 'static> {
     /// The wrapped reinforcement-learning environment.
     pub env: E,
 }
 
-impl<E: Environment + Send + Sync + 'static> EnvironmentComponent<E> {
+impl<E: Env + Send + Sync + 'static> EnvComponent<E> {
     /// Wrap an environment as a Bevy component.
-    pub fn new(env: E) -> Self {
+    pub const fn new(env: E) -> Self {
         Self { env }
     }
 }
 
 /// The action queued for this environment's next `step()` call.
-///
-/// Written by whoever is providing the policy (ember-rl, a user system,
-/// or the random exploration system). Consumed and cleared each tick by
-/// `step_system`. If `None`, the step system skips this environment for
-/// this tick -- the action has not arrived yet.
 #[derive(Component, Debug)]
-pub struct PendingAction<E: Environment + Send + Sync + 'static> {
+pub(crate) struct QueuedAction<E: Env + Send + Sync + 'static> {
     /// The action to consume on the next simulation step.
-    pub action: Option<E::Action>,
+    pub(crate) action: Option<E::Action>,
 }
 
-impl<E: Environment + Send + Sync + 'static> Default for PendingAction<E> {
+impl<E: Env + Send + Sync + 'static> Default for QueuedAction<E> {
     fn default() -> Self {
         Self { action: None }
     }
@@ -44,11 +38,11 @@ impl<E: Environment + Send + Sync + 'static> Default for PendingAction<E> {
 
 /// The most recent observation from this environment.
 ///
-/// Updated every tick by `step_system` and after resets by `reset_system`.
-/// Read by policy systems to produce the next action, and by rendering
-/// systems to visualise the current state.
+/// Updated after steps and resets. `ActionRequest<E>` carries cloned values for
+/// the beginner policy path; this component remains useful for advanced ECS
+/// systems that need direct state access.
 #[derive(Component, Debug)]
-pub struct CurrentObservation<E: Environment + Send + Sync + 'static> {
+pub struct CurrentObservation<E: Env + Send + Sync + 'static> {
     /// Latest observation emitted by the environment.
     pub observation: E::Observation,
 
@@ -56,9 +50,9 @@ pub struct CurrentObservation<E: Environment + Send + Sync + 'static> {
     pub info: E::Info,
 }
 
-/// Per-episode and overall statistics for this environment instance.
+/// Per-episode and overall statistics for one environment instance.
 ///
-/// Useful for logging, debugging, and deciding when to start training.
+/// Useful for logging, debugging, and external trainer integration.
 #[derive(Component, Debug, Clone, Copy, Default)]
 pub struct EnvStats {
     /// Total reward accumulated in the current episode.
@@ -83,7 +77,7 @@ impl EnvStats {
     }
 
     /// Finish the current episode and reset per-episode counters.
-    pub(crate) fn record_episode_end(&mut self) {
+    pub(crate) const fn record_episode_end(&mut self) {
         self.total_episodes += 1;
         self.episode_reward = 0.0;
         self.episode_steps = 0;

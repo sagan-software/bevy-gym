@@ -1,43 +1,26 @@
 use std::collections::HashMap;
 
 use bevy::prelude::*;
-use rl_traits::{EpisodeStatus, Experience};
 
-/// Fired after every successful `step()` call.
-///
-/// Carries the complete `(s, a, r, s', status)` transition so ember-rl
-/// (or any other subscriber) can push it into a replay buffer, update
-/// a trajectory store, or log it -- without coupling to Bevy internals.
-///
-/// # Usage in ember-rl
-///
-/// ```rust,ignore
-/// fn collect_experience<E: Environment>(
-///     mut events: MessageReader<ExperienceEvent<E::Observation, E::Action>>,
-///     mut buffer: ResMut<MyReplayBuffer<E>>,
-/// ) {
-///     for event in events.read() {
-///         buffer.push(event.experience.clone());
-///     }
-/// }
-/// ```
-#[derive(Message, Debug, Clone)]
-pub struct ExperienceEvent<O, A>
-where
-    O: Clone + Send + Sync + 'static,
-    A: Clone + Send + Sync + 'static,
-{
-    /// Which environment instance produced this experience.
+use crate::{Env, EpisodeStatus, Transition};
+
+/// Fired after every successful environment step.
+#[derive(Message, Clone)]
+pub struct TransitionEvent<E: Env + Send + Sync + 'static> {
+    /// Which environment instance produced this transition.
     pub env_id: usize,
 
-    /// The full transition tuple.
-    pub experience: Experience<O, A>,
+    /// Entity that owns the environment components.
+    pub entity: Entity,
+
+    /// Full transition data.
+    pub transition: Transition<E::Observation, E::Action, E::Info>,
 }
 
 /// Fired when an episode ends, whether by termination or truncation.
 ///
 /// Carries the final episode statistics. Useful for logging training
-/// progress without having to subscribe to every `ExperienceEvent`.
+/// progress without having to subscribe to every transition.
 #[derive(Message, Debug, Clone)]
 pub struct EpisodeEndEvent {
     /// Which environment instance finished.
@@ -52,46 +35,32 @@ pub struct EpisodeEndEvent {
     /// Number of steps the episode lasted.
     pub episode_steps: usize,
 
-    /// Optional per-episode metrics from the environment (e.g. collisions, distance).
-    ///
-    /// Populated from [`rl_traits::Environment::episode_extras`] if the environment
-    /// overrides that method. Empty by default.
+    /// Optional per-episode metrics from the environment.
     pub extras: HashMap<String, f64>,
 }
 
-/// Fired after each step (or reset) requesting the next action.
-///
-/// This is how bevy-gym asks for the next action from the policy.
-/// A system listens for these messages, runs inference, and writes
-/// the result into `PendingAction` on the entity.
-///
-/// Separating "request action" from "receive action" allows the policy
-/// system to batch multiple requests, run them through a neural network
-/// together, and write results back -- a common optimisation in deep RL.
-///
-/// # Usage
-///
-/// ```rust,ignore
-/// fn policy_system<E: Environment>(
-///     mut requests: MessageReader<ActionRequestEvent>,
-///     mut query: Query<(&EnvId, &CurrentObservation<E>, &mut PendingAction<E>)>,
-///     policy: Res<MyPolicy>,
-/// ) {
-///     for req in requests.read() {
-///         if let Some((_, obs, mut pending)) = query.iter_mut()
-///             .find(|(id, _, _)| id.0 == req.env_id)
-///         {
-///             pending.action = Some(policy.act(&obs.observation));
-///         }
-///     }
-/// }
-/// ```
-#[derive(Message, Debug, Clone, Copy)]
-pub struct ActionRequestEvent {
+/// Request for the next action for one environment.
+#[derive(Message, Clone)]
+pub struct ActionRequest<E: Env + Send + Sync + 'static> {
     /// Which environment instance needs an action.
     pub env_id: usize,
 
-    /// The entity that holds this environment's components, for direct
-    /// lookup without scanning the query.
+    /// Entity that should receive the action response.
     pub entity: Entity,
+
+    /// Observation to pass to the policy.
+    pub observation: E::Observation,
+
+    /// Auxiliary observation metadata.
+    pub info: E::Info,
+}
+
+/// Response carrying an action for one environment entity.
+#[derive(Message, Clone)]
+pub struct ActionResponse<E: Env + Send + Sync + 'static> {
+    /// Entity from the matching [`ActionRequest`].
+    pub entity: Entity,
+
+    /// Action to apply on the next runner step.
+    pub action: E::Action,
 }

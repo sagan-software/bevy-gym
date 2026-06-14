@@ -11,60 +11,35 @@ categories = ["game-engines", "science"]
 [lints]
 workspace = true
 
-[package.metadata.docs.rs]
-features = ["render", "x11"]
-
 [features]
 default = []
-# Enable Bevy rendering support. Without this, bevy-gym is fully headless.
-render = [
-  "bevy/bevy_asset",
-  "bevy/bevy_core_pipeline",
-  "bevy/bevy_render",
-  "bevy/bevy_sprite",
-  "bevy/bevy_sprite_render",
-  "bevy/bevy_window",
-]
-# Enable Bevy's winit backend on targets supported by winit. Unix targets also
-# need at least one display backend (`x11` or `wayland`).
-winit = ["bevy/bevy_winit"]
-x11 = ["winit", "bevy/x11"]
-wayland = ["winit", "bevy/wayland"]
-# Burn backend switches for examples. Keep GPU opt-in so default examples stay
-# portable on machines without a working native GPU adapter.
-cpu-accelerate = ["burn/accelerate"]
-gpu = ["burn/wgpu"]
-gpu-metal = ["gpu", "burn/metal"]
-gpu-vulkan = ["gpu", "burn/vulkan"]
-gpu-webgpu = ["gpu", "burn/webgpu"]
 # Local iteration only. Bevy dynamic linking is the largest rebuild-time win,
 # but should not be enabled for published or shipping builds.
 fast-compile = ["bevy/dynamic_linking"]
-
-[dependencies]
-rl-traits = "0.2.2"
+render = ["bevy/2d", "bevy/bevy_remote", "bevy/png"]
+bevy-mcp = ["render", "dep:bevy_brp_extras"]
+# Name expected by Bevy BRP MCP launch tooling.
+bevy_remote = ["bevy-mcp"]
 
 # Minimal Bevy — only what's needed for ECS + scheduling.
-# The `render` feature adds rendering on top; `winit`, `x11`, and `wayland`
-# add real window backends for supported targets.
 [dependencies.bevy]
 default-features = false
 features = ["bevy_log", "multi_threaded"]
 version = "0.18"
 
-[target.'cfg(all(target_arch = "wasm32", target_os = "unknown"))'.dependencies]
-# rl-traits depends on rand/getrandom, which needs an explicit JS backend on
-# wasm32-unknown-unknown.
-getrandom = { version = "0.2", features = ["js"] }
+[dependencies.burn]
+default-features = false
+features = ["std", "autodiff", "flex"]
+version = "0.21"
+
+[dependencies.bevy_brp_extras]
+default-features = true
+optional = true
+version = "0.18"
 
 [[example]]
 name = "cartpole"
 path = "examples/classic-control/cart_pole.rs"
-
-[dev-dependencies]
-burn = { version = "0.20.1", features = ["ndarray", "autodiff"] }
-ember-rl = { version = "0.3.4", features = ["envs"] }
-rand = "0.8"
 
 [profile.dev]
 # Bevy's recommended dev profile: lightly optimize local code and heavily

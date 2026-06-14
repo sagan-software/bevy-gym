@@ -12,6 +12,8 @@ web_research_enabled: true
 source_verification: true
 ---
 
+> **Supersession notice (2026-06-13):** The approved Sprint Change Proposal at `../sprint-change-proposal-2026-06-13.md` supersedes this report's prior Burn-agnostic product recommendation for `bevy-gym`. Current planning treats Burn-backed training as required crate functionality while preserving the small environment contract as the trainer input boundary.
+
 # Research Report: technical
 
 **Date:** 2026-06-12

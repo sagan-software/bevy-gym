@@ -6,7 +6,7 @@ spec: SPEC-bevy-gym-api-redesign
 
 # API Contract
 
-## Core Types
+## Core Environment Types
 
 The crate owns the environment contract:
 
@@ -61,11 +61,11 @@ pub struct Transition<O, A, I = ()> {
 }
 ```
 
-The event name can be `TransitionEvent<E>` or `StepEvent<E>`, but it must not mention `ember-rl`, replay buffers, or `rl-traits` in the core contract.
+The event name can be `TransitionEvent<E>` or `StepEvent<E>`, but it must not mention `ember-rl` or `rl-traits` in the core contract. Replay and rollout storage consume transitions at the trainer layer.
 
 ## Action Request Flow
 
-The beginner path is typed message in, typed message out:
+The beginner manual-control path is typed message in, typed message out:
 
 ```rust
 pub struct ActionRequest<E: Env> {
@@ -81,7 +81,7 @@ pub struct ActionResponse<E: Env> {
 }
 ```
 
-Policy systems should look like this:
+Manual policy systems should look like this:
 
 ```rust
 fn policy(
@@ -99,12 +99,25 @@ fn policy(
 
 The low-level component path may remain public for advanced users who need zero-copy observations, custom batching, or direct ECS coordination. It must not be the primary README or quick-start path.
 
+## Trainer Boundary
+
+The required Burn trainer consumes the same environment contract and runner transitions. Burn types, model modules, optimizer state, replay buffers, rollout buffers, metrics, and checkpoint recorders belong in trainer modules, not in `Env`.
+
+The trainer boundary may add algorithm-specific requirements such as:
+
+- a discrete action spec for DQN;
+- tensorization for observations and actions;
+- a box or discrete action spec for PPO;
+- fixed seed/config metadata for reproducible train/eval runs.
+
+These requirements are trainer concerns. A basic environment that only implements `Env` remains valid even if it cannot be trained until it supplies the specs or tensorization required by a chosen algorithm.
+
 ## Optional Specs And Spaces
 
-Specs are optional, not part of the minimal `Env` trait:
+Specs are optional for the minimal `Env` trait and required only when a trainer or checker needs them:
 
 - `HasSpaces` or `EnvSpec` can describe action shape, observation shape, sampling, and validation.
-- `Discrete` and `BoxSpace` helpers should cover beginner examples.
+- `DiscreteSpace` and `BoxSpace` helpers should cover beginner examples.
 - An env checker can validate reset observation, sampled-action stepping, reward/status/info sanity, and terminal/truncated handling.
 - Environments that do not need spaces must still be valid first-class environments.
 
@@ -146,4 +159,4 @@ impl Env for Counter {
 }
 ```
 
-Everything beyond this - spaces, render helpers, trainer adapters, and low-level ECS access - is optional composition.
+Everything beyond this - spaces, render helpers, Burn trainer modules, and low-level ECS access - is layered composition. Burn training is required product surface in the crate, but the single-environment contract stays this small.

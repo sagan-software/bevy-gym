@@ -25,6 +25,8 @@ web_research_enabled: true
 source_verification: true
 ---
 
+> **Supersession notice (2026-06-13):** The approved Sprint Change Proposal at `../sprint-change-proposal-2026-06-13.md` supersedes any environment-runner-only product framing in this report. Current planning keeps the small `Env` / `Reset` / `Step` / `EpisodeStatus` contract, but makes Burn-backed training required crate functionality.
+
 # Research Report: Modern RL Custom Environment APIs
 
 **Date:** 2026-06-12

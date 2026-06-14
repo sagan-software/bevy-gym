@@ -1,46 +1,68 @@
-# cartpole
+# CartPole DQN trainer and visualizer
 
-Full-stack CartPole-v1 example: 4 parallel environments, DQN from ember-rl via `TrainingSession`,
-live stats, optional 2D rendering.
+Self-contained CartPole-v1-style example using `bevy-gym`, Burn, and an optional Bevy visualizer.
+The trainer writes run metadata, metrics, eval records, and Burn `best.mpk` checkpoints under
+`runs/cartpole-dqn/<run-id>/`.
 
 ## Usage
 
+Train a policy from a random initial network with DQN replay updates:
+
 ```sh
-# Train headless at maximum speed
-cargo run --example cartpole --release
-
-# Train with live 2D rendering
-cargo run --example cartpole --features render,x11 --release -- --render
-
-# Train with rendering at half speed
-cargo run --example cartpole --features render,x11 --release -- --render --speed 0.5
-
-# Evaluate a saved checkpoint (headless)
-cargo run --example cartpole --release -- --eval runs/bevy_cartpole/v1
-
-# Evaluate with live rendering
-cargo run --example cartpole --features render,x11 --release -- --eval runs/bevy_cartpole/v1 --render
+cargo run --example cartpole --release -- train
 ```
 
-Use `render,wayland` instead of `render,x11` for Wayland, or `render,winit` on non-Unix winit
-targets.
+Evaluate a saved policy:
+
+```sh
+cargo run --example cartpole --release -- eval --checkpoint runs/cartpole-dqn/<run-id>/best.mpk
+```
+
+Create a 30-second training timelapse video from periodic eval checkpoints:
+
+```sh
+cargo run --example cartpole --release -- video \
+  --checkpoint runs/cartpole-dqn/<run-id> \
+  --output runs/cartpole-dqn/<run-id>/cartpole-training-timelapse.mp4
+```
+
+The video renderer uses Gymnasium's CartPole cadence: 50 FPS, matching the environment's 0.02 second
+state update interval. The first 20 seconds sample the run's `checkpoints/step-*.mpk` policies; the
+last 10 seconds show the final `best.mpk` policy at real-time speed.
+
+Run the realtime visualizer with Bevy Remote Protocol and BRP extras enabled:
+
+```sh
+cargo run --example cartpole --features bevy_remote --release -- watch \
+  --checkpoint runs/cartpole-dqn/<run-id>/best.mpk
+```
+
+Capture a visual verification image from the app itself:
+
+```sh
+cargo run --example cartpole --features bevy_remote --release -- watch \
+  --checkpoint runs/cartpole-dqn/<run-id>/best.mpk \
+  --screenshot runs/cartpole-dqn/<run-id>/cartpole.png
+```
+
+`bevy_remote` enables BRP on port `15702` by default and includes `bevy_brp_extras`, so MCP/BRP
+tools can inspect the scene and request screenshots. Override the port with `BRP_EXTRAS_PORT`.
 
 ## What it demonstrates
 
-- `BevyGymPlugin` with 4 parallel environments stepped each `FixedUpdate` tick
-- `TrainingSession` from ember-rl as a `NonSendMut` resource -- automatic checkpointing, JSONL
-  logging, and `best.mpk` saving
-- `GymStatsPlugin` for rolling mean/max reward and steps/sec across all envs
-- `GymRender` + `GymRenderPlugin` for live 2D visualisation (cart, pole, danger colouring)
-- Headless mode: `MinimalPlugins` + `ScheduleRunnerPlugin` + virtual time at maximum speed
-- `--eval` flag: loads `best.mpk` into a `DqnPolicy`, runs 20 greedy episodes, prints summary
+- `Env` implemented directly for a local `CartPole` type
+- Burn `Flex` inference and `Autodiff<Flex>` training with a small DQN policy network
+- A step-0 `initial_mean_reward` eval, followed by replay-buffer DQN updates and periodic evals
+- `NamedMpkFileRecorder` checkpoints saved as `best.mpk` and `checkpoints/latest.mpk`
+- Periodic `checkpoints/step-*.mpk` snapshots for training timelapse videos
+- `BevyGymPlugin` stepping the environment at 50 Hz in the visualizer
+- `ActionRequest<CartPole>` and `ActionResponse<CartPole>` as the model-policy boundary
+- Gymnasium-style 2D visuals: white background, black track/cart/pole, hinge, wheels, and boundary markers
+- BRP/MCP inspection of named entities such as `CartPole Cart`, `CartPole Pole`, and `CartPole Hinge`
 
-## Rendering details
+## Notes
 
-Each environment is drawn as a cart (blue rectangle) + pole (green rectangle) stacked vertically on
-screen. Colours shift as state approaches failure:
-
-- Pole: green -> red as angle approaches the 12 degree limit
-- Cart: blue -> orange as position approaches the +/-2.4 boundary
-
-Red boundary markers are drawn at x = +/-2.4 (240 px at 100 px/unit scale).
+Default training does not use heuristic imitation. `warmup_batches` defaults to `0`, so the saved
+`best.mpk` should be justified by eval improvement from the initial random-policy score. Use
+`--smoke` for a fast compile/runtime check. `--warmup-batches N` is available only as an explicit
+experiment when comparing heuristic behavior cloning against DQN-from-scratch runs.
