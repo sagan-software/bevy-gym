@@ -131,6 +131,17 @@
 
               touch "$out"
             '';
+
+        renderNativeBuildInputs = [
+          pkgs.libxkbcommon
+          pkgs.libx11
+          pkgs.libxcursor
+          pkgs.libxi
+          pkgs.libxrandr
+          pkgs.vulkan-loader
+          pkgs.wayland
+        ];
+        renderRuntimeLibraryPath = lib.makeLibraryPath renderNativeBuildInputs;
       in
       {
         packages = {
@@ -151,6 +162,9 @@
 
         checks = {
           cargo-check = mkCargoCheck "cargo-check" "cargo check --locked" [ ];
+          cargo-check-render =
+            mkCargoCheck "cargo-check-render" "cargo check --example cartpole --features render"
+              renderNativeBuildInputs;
           cargo-clippy = mkCargoCheck "cargo-clippy" "cargo clippy --locked" [ pkgs.clippy ];
           taplo = mkRepoCheck "taplo-lint" [ pkgs.taplo ] taploLintCommand;
           rumdl = mkRepoCheck "rumdl-lint" [
@@ -169,6 +183,9 @@
             pkgs.rustfmt
             pkgs.clippy
             pkgs.pkg-config
+          ]
+          ++ renderNativeBuildInputs
+          ++ [
             treefmtEval.config.build.wrapper
             pkgs.deadnix
             pkgs.dprint
@@ -179,6 +196,12 @@
           ];
 
           shellHook = ''
+            if [ -n "''${LD_LIBRARY_PATH:-}" ]; then
+              export LD_LIBRARY_PATH="${renderRuntimeLibraryPath}:$LD_LIBRARY_PATH"
+            else
+              export LD_LIBRARY_PATH="${renderRuntimeLibraryPath}"
+            fi
+
             ${aiHarness.activate}/bin/ai-harness-activate
           '';
         };

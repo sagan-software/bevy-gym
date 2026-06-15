@@ -37,6 +37,15 @@ cargo run --example cartpole --features bevy_remote --release -- watch \
   --checkpoint runs/cartpole-dqn/<run-id>/best.mpk
 ```
 
+With the lighter `render` feature, a no-subcommand run opens the latest saved checkpoint directly:
+
+```sh
+cargo run --example cartpole --features render --release
+```
+
+Use `train-watch` explicitly when you want one command to train a fresh policy and then open the
+visualizer.
+
 Capture a visual verification image from the app itself:
 
 ```sh

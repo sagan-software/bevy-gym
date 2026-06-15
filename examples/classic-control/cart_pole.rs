@@ -10,6 +10,7 @@
 //! Realtime visualization and Bevy MCP/BRP inspection are feature-gated:
 //!
 //! ```text
+//! cargo run --example cartpole --features render --release
 //! cargo run --example cartpole --features bevy_remote --release -- watch
 //! ```
 #![allow(
@@ -53,6 +54,11 @@ use burn::tensor::{Int, Tensor};
 use bevy::remote::{http::RemoteHttpPlugin, RemotePlugin};
 #[cfg(feature = "render")]
 use bevy::render::view::screenshot::{save_to_disk, Capturing, Screenshot};
+#[cfg(feature = "render")]
+use bevy::render::{
+    settings::{Backends, RenderCreation, WgpuSettings},
+    RenderPlugin,
+};
 #[cfg(feature = "render")]
 use bevy::window::{PresentMode, WindowResolution};
 #[cfg(feature = "bevy-mcp")]
@@ -628,7 +634,7 @@ impl Args {
         }
 
         let default_mode = if cfg!(feature = "render") {
-            Mode::TrainWatch
+            Mode::Watch
         } else {
             Mode::Train
         };
@@ -1718,7 +1724,7 @@ where
 }
 
 fn help_text() -> &'static str {
-    "Usage: cargo run --example cartpole [--features bevy_remote] -- [train|eval|video|watch|train-watch]\n\
+    "Usage: cargo run --example cartpole [--features render] -- [train|eval|video|watch|train-watch]\n\
      Flags: --steps N --eval-episodes N --eval-interval N --warmup-batches N --run-id ID\n\
      Flags: --runs-root PATH --checkpoint PATH --seed N --screenshot PATH --screenshot-frames N\n\
      Flags: --output PATH --video-seconds N --final-seconds N --smoke"
@@ -1771,15 +1777,25 @@ fn run_visual(
         device: inference_device(),
     })
     .insert_resource(ClearColor(Color::srgb(1.0, 1.0, 1.0)))
-    .add_plugins(DefaultPlugins.set(WindowPlugin {
-        primary_window: Some(Window {
-            title: "bevy-gym CartPole DQN policy".into(),
-            resolution: WindowResolution::new(820, 520),
-            present_mode: PresentMode::AutoVsync,
-            ..default()
-        }),
-        ..default()
-    }))
+    .add_plugins(
+        DefaultPlugins
+            .set(WindowPlugin {
+                primary_window: Some(Window {
+                    title: "bevy-gym CartPole DQN policy".into(),
+                    resolution: WindowResolution::new(820, 520),
+                    present_mode: PresentMode::AutoVsync,
+                    ..default()
+                }),
+                ..default()
+            })
+            .set(RenderPlugin {
+                render_creation: RenderCreation::Automatic(WgpuSettings {
+                    backends: Some(Backends::PRIMARY),
+                    ..default()
+                }),
+                ..default()
+            }),
+    )
     .add_plugins(BevyGymPlugin::new(|_| CartPole::default()).with_tick_rate(50.0))
     .add_systems(Startup, setup_visuals)
     .add_systems(

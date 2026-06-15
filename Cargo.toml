@@ -16,7 +16,14 @@ default = []
 # Local iteration only. Bevy dynamic linking is the largest rebuild-time win,
 # but should not be enabled for published or shipping builds.
 fast-compile = ["bevy/dynamic_linking"]
-render = ["bevy/2d", "bevy/bevy_remote", "bevy/png"]
+render = [
+    "bevy/2d_bevy_render",
+    "bevy/default_app",
+    "bevy/bevy_remote",
+    "bevy/bevy_winit",
+    "bevy/wayland",
+    "bevy/x11",
+]
 bevy-mcp = ["render", "dep:bevy_brp_extras"]
 # Name expected by Bevy BRP MCP launch tooling.
 bevy_remote = ["bevy-mcp"]
