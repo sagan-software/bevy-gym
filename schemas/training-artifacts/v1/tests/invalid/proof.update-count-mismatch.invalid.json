@@ -1,0 +1,8 @@
+{
+  "fixture": "proof.valid.json",
+  "mutation": {
+    "op": "replace",
+    "path": "/qualification/combined_update_count",
+    "value": 78999
+  }
+}

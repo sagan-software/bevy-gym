@@ -1,0 +1,94 @@
+{
+  "artifact_type": "run-config",
+  "schema_version": "1.0.0",
+  "run": {
+    "id": "cartpole-proof-20260711t120000z-a1b2c3d4e5f6",
+    "uuid": "018f1a56-3779-7701-93ef-fa1398226d17",
+    "created_at": "2026-07-11T12:00:00Z",
+    "directory": "runs/cartpole-dqn/cartpole-proof-20260711t120000z-a1b2c3d4e5f6",
+    "collision_policy": "reject-existing",
+    "prior_run_uuid": null
+  },
+  "environment": {
+    "registry_id": "CartPole-v1",
+    "name": "CartPole",
+    "version": "v1",
+    "variant": null,
+    "parameters": {
+      "max_episode_steps": 500
+    }
+  },
+  "algorithm": {
+    "id": "dqn",
+    "family": "dqn",
+    "implementation": "bevy_gym::training::dqn",
+    "version": "1",
+    "parameters": {
+      "gamma": 0.99,
+      "learning_rate": 0.0003
+    }
+  },
+  "created_at": "2026-07-11T12:00:00Z",
+  "command": {
+    "argv": [
+      "cargo",
+      "run",
+      "--release",
+      "--example",
+      "cartpole",
+      "--",
+      "train",
+      "--preset",
+      "proof",
+      "--seed",
+      "42"
+    ],
+    "rendered": "cargo run --release --example cartpole -- train --preset proof --seed 42",
+    "working_directory": "/workspace/bevy-gym"
+  },
+  "preset": "proof",
+  "qualification_mode": "qualifying",
+  "budget": {
+    "primary_unit": "environment-steps",
+    "primary_limit": 100000,
+    "max_wall_time_seconds": 3600,
+    "parallel_environments": 8
+  },
+  "training_constraints": {
+    "reward_shaping": false,
+    "heuristic_fallback": false,
+    "behavior_cloning": false,
+    "warmup_imitation_updates": 0,
+    "official_semantics": true
+  },
+  "checkpoint_schedule": {
+    "budget_percent_milestones": [
+      0,
+      5,
+      20,
+      50,
+      80,
+      100
+    ],
+    "save_first_threshold_crossing": true,
+    "save_step_zero": true,
+    "save_latest": true
+  },
+  "trainer_parameters": {
+    "batch_size": 64,
+    "replay_capacity": 50000,
+    "target_update_interval": 500
+  },
+  "artifact_paths": {
+    "config": "config.json",
+    "seeds": "seeds.json",
+    "provenance": "provenance.json",
+    "metrics": "metrics.jsonl",
+    "eval": "eval.jsonl",
+    "summary": "summary.json",
+    "proof": "proof.json",
+    "best_checkpoint": "best.mpk",
+    "checkpoints_directory": "checkpoints",
+    "demo_directory": "demo"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "fixture": "seeds.valid.json",
+  "mutation": {
+    "op": "replace",
+    "path": "/partitions/test/seeds/0",
+    "value": "2000"
+  }
+}

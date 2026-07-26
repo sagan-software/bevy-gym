@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "oracle_commit": "7a1191388aa4aa973d3a5e4b039899cd99cc991f",
+  "requirements": [
+    {
+      "id": "gymnasium_oracle_regeneration",
+      "status": "requires_generator_support",
+      "source_paths": [
+        "ref/gymnasium/gymnasium/envs/__init__.py",
+        "ref/gymnasium/gymnasium/envs/classic_control",
+        "ref/gymnasium/gymnasium/envs/toy_text"
+      ],
+      "required_output": "A dependency-pinned generator that imports the oracle checkout, regenerates catalog metadata and state-injected results, and fails on a semantic diff before any oracle commit update.",
+      "reason": "The checkout is pinned, but its Python package cannot currently be imported in the repository development shell because NumPy is not available. Checked-in literals are reviewed against source at the pinned commit."
+    },
+    {
+      "id": "blackjack_hidden_hand_transition_enumeration",
+      "status": "requires_generator_support",
+      "source_paths": [
+        "ref/gymnasium/gymnasium/envs/toy_text/blackjack.py"
+      ],
+      "required_output": "Enumerate transitions over augmented hidden state (ordered player and dealer hands), action, forced deck outcome, sab, and natural; aggregate card probabilities without collapsing distinct hidden hands that share an observation.",
+      "reason": "The public observation is not sufficient to determine Blackjack transitions, and stand actions may consume an unbounded sequence of dealer draws. Diagnostic forced-draw cases are checked in, but an exhaustive hidden-state oracle is not."
+    },
+    {
+      "id": "taxi_fickle_augmented_state_enumeration",
+      "status": "requires_generator_support",
+      "source_paths": [
+        "ref/gymnasium/gymnasium/envs/toy_text/taxi.py"
+      ],
+      "required_output": "Enumerate Taxi transitions over encoded state, action, fickle_step, is_rainy, and both probability parameters, including destination resampling after the first successful post-pickup move.",
+      "reason": "Taxi's 500-state P table excludes the episode-local fickle_step flag and applies destination resampling after sampling the base transition. The checked-in dry and rainy P tables plus explicit fickle cases do not exhaust that augmented state."
+    },
+    {
+      "id": "statistical_reset_and_stochastic_transition_checks",
+      "status": "requires_generator_support",
+      "source_paths": [
+        "ref/gymnasium/gymnasium/envs/classic_control",
+        "ref/gymnasium/gymnasium/envs/toy_text"
+      ],
+      "required_output": "Versioned sample plans and acceptance intervals for reset distributions, Acrobot torque noise when enabled, Frozen Lake slip, Cliff Walking slip, Blackjack card draws, Taxi rain, and Taxi fickleness.",
+      "reason": "The project deliberately does not claim NumPy RNG sequence identity. Reset and stochastic sampling parity therefore needs distribution-level tests with declared sample counts, confidence methods, and tolerances."
+    }
+  ]
+}

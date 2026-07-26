@@ -80,6 +80,8 @@ pub mod plugin;
 pub mod systems;
 /// Burn-backed trainer API boundary.
 pub mod training;
+/// Reusable environment wrappers.
+pub mod wrappers;
 
 pub use components::{CurrentObservation, EnvComponent, EnvId, EnvStats};
 pub use core::{
@@ -89,3 +91,4 @@ pub use core::{
 pub use events::{ActionRequest, ActionResponse, EpisodeEndEvent, TransitionEvent};
 pub use plugin::{spawn_environments, BevyGymPlugin, GymConfig, GymSet};
 pub use systems::reset::ResetRequested;
+pub use wrappers::time_limit::{TimeLimit, TimeLimitError};

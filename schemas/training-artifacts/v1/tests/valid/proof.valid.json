@@ -1,0 +1,234 @@
+{
+  "artifact_type": "learning-proof",
+  "schema_version": "1.0.0",
+  "generated_at": "2026-07-11T12:46:00Z",
+  "status": "passed",
+  "run": {
+    "id": "cartpole-proof-20260711t120000z-a1b2c3d4e5f6",
+    "uuid": "018f1a56-3779-7701-93ef-fa1398226d17",
+    "created_at": "2026-07-11T12:00:00Z",
+    "directory": "runs/cartpole-dqn/cartpole-proof-20260711t120000z-a1b2c3d4e5f6",
+    "collision_policy": "reject-existing",
+    "prior_run_uuid": null
+  },
+  "environment": {
+    "registry_id": "CartPole-v1",
+    "name": "CartPole",
+    "version": "v1",
+    "variant": null,
+    "parameters": {
+      "max_episode_steps": 500
+    }
+  },
+  "algorithm": {
+    "id": "dqn",
+    "family": "dqn",
+    "implementation": "bevy_gym::training::dqn",
+    "version": "1",
+    "parameters": {
+      "gamma": 0.99
+    }
+  },
+  "source_commit": "1111111111111111111111111111111111111111",
+  "gymnasium_oracle_commit": "7a1191388aa4aa973d3a5e4b039899cd99cc991f",
+  "training_command": {
+    "argv": [
+      "cargo",
+      "run",
+      "--release",
+      "--example",
+      "cartpole",
+      "--",
+      "train",
+      "--preset",
+      "proof"
+    ],
+    "rendered": "cargo run --release --example cartpole -- train --preset proof",
+    "working_directory": "/workspace/bevy-gym"
+  },
+  "elapsed_seconds": 2700,
+  "counts": {
+    "environment_steps": 80000,
+    "episodes": 710,
+    "optimizer_updates": 79000,
+    "q_table_updates": 0
+  },
+  "stop_reason": {
+    "code": "threshold-reached",
+    "detail": "Fixed validation mean return reached 500."
+  },
+  "qualification": {
+    "official_semantics": true,
+    "reward_shaping": false,
+    "heuristic_fallback": false,
+    "behavior_cloning": false,
+    "warmup_imitation_updates": 0,
+    "all_recorded_seeds_applied": true,
+    "combined_update_count": 79000,
+    "policy_changed": true,
+    "step_zero_policy_sha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+    "best_policy_sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+  },
+  "validation_selection": {
+    "suite": {
+      "id": "cartpole-validation-v1",
+      "split": "validation",
+      "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "sample_count": 100
+    },
+    "record": {
+      "path": "eval.jsonl",
+      "line_number": 17,
+      "row_sha256": "5555555555555555555555555555555555555555555555555555555555555555",
+      "suite": "validation",
+      "global_step": 80000,
+      "checkpoint_sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+    },
+    "selected_best_only_on_validation": true,
+    "gate": {
+      "metric": "mean_return",
+      "comparator": "gte",
+      "threshold": 475,
+      "observed": 500,
+      "passed": true,
+      "sample_count": 100,
+      "confidence": null,
+      "raw_counts": {
+        "sample_count": 100,
+        "success_count": 100,
+        "failure_count": 0,
+        "event_counts": {
+          "ceiling_hits": 100
+        }
+      }
+    }
+  },
+  "held_out_test": {
+    "suite": {
+      "id": "cartpole-test-v1",
+      "split": "test",
+      "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "sample_count": 100
+    },
+    "record": {
+      "path": "eval.jsonl",
+      "line_number": 18,
+      "row_sha256": "6666666666666666666666666666666666666666666666666666666666666666",
+      "suite": "test",
+      "global_step": 80000,
+      "checkpoint_sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+    },
+    "fresh_process": {
+      "command": {
+        "argv": [
+          "cargo",
+          "run",
+          "--release",
+          "--example",
+          "cartpole",
+          "--",
+          "eval",
+          "--suite",
+          "test"
+        ],
+        "rendered": "cargo run --release --example cartpole -- eval --suite test",
+        "working_directory": "/workspace/bevy-gym"
+      },
+      "exit_code": 0,
+      "checkpoint_loaded_from_disk": true,
+      "checkpoint_sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+    },
+    "gate": {
+      "metric": "mean_return",
+      "comparator": "gte",
+      "threshold": 475,
+      "observed": 500,
+      "passed": true,
+      "sample_count": 100,
+      "confidence": {
+        "method": "bootstrap",
+        "level": 0.95,
+        "lower": 500,
+        "upper": 500
+      },
+      "raw_counts": {
+        "sample_count": 100,
+        "success_count": 100,
+        "failure_count": 0,
+        "event_counts": {
+          "ceiling_hits": 100
+        }
+      }
+    }
+  },
+  "validation_test_separation": {
+    "validation_suite_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "test_suite_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "overlap_count": 0,
+    "disjoint": true
+  },
+  "best_checkpoint": {
+    "path": "best.mpk",
+    "sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "byte_length": 19004,
+    "kind": "best",
+    "global_step": 80000,
+    "episode_count": 710,
+    "update_count": 79000
+  },
+  "result": {
+    "metric": "mean_return",
+    "comparator": "gte",
+    "threshold": 475,
+    "observed": 500,
+    "passed": true,
+    "sample_count": 100,
+    "confidence": {
+      "method": "bootstrap",
+      "level": 0.95,
+      "lower": 500,
+      "upper": 500
+    },
+    "raw_counts": {
+      "sample_count": 100,
+      "success_count": 100,
+      "failure_count": 0,
+      "event_counts": {
+        "ceiling_hits": 100
+      }
+    }
+  },
+  "artifacts": {
+    "config": {
+      "path": "config.json",
+      "sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+      "byte_length": 2048
+    },
+    "seeds": {
+      "path": "seeds.json",
+      "sha256": "3333333333333333333333333333333333333333333333333333333333333333",
+      "byte_length": 1536
+    },
+    "provenance": {
+      "path": "provenance.json",
+      "sha256": "7777777777777777777777777777777777777777777777777777777777777777",
+      "byte_length": 2500
+    },
+    "metrics": {
+      "path": "metrics.jsonl",
+      "sha256": "8888888888888888888888888888888888888888888888888888888888888888",
+      "byte_length": 12000
+    },
+    "eval": {
+      "path": "eval.jsonl",
+      "sha256": "9999999999999999999999999999999999999999999999999999999999999999",
+      "byte_length": 5000
+    },
+    "summary": {
+      "path": "summary.json",
+      "sha256": "abababababababababababababababababababababababababababababababab",
+      "byte_length": 3500
+    }
+  },
+  "release_cohort": null
+}

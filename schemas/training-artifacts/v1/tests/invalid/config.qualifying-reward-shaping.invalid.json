@@ -1,0 +1,8 @@
+{
+  "fixture": "config.valid.json",
+  "mutation": {
+    "op": "replace",
+    "path": "/training_constraints/reward_shaping",
+    "value": true
+  }
+}

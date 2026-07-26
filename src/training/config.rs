@@ -2,6 +2,8 @@
 
 use std::error::Error;
 use std::fmt;
+use std::fs;
+use std::io;
 use std::path::{Path, PathBuf};
 
 /// Supported trainer algorithm families.
@@ -171,6 +173,12 @@ pub struct RunPaths {
     /// `summary.json` path.
     pub summary_json: PathBuf,
 
+    /// `provenance.json` path.
+    pub provenance_json: PathBuf,
+
+    /// `proof.json` path.
+    pub proof_json: PathBuf,
+
     /// `checkpoints/` directory path.
     pub checkpoints_dir: PathBuf,
 
@@ -179,6 +187,18 @@ pub struct RunPaths {
 
     /// Root `best.mpk` path.
     pub best_checkpoint: PathBuf,
+
+    /// `demo/` directory path.
+    pub demo_dir: PathBuf,
+
+    /// `demo/training-timelapse.mp4` path.
+    pub demo_video: PathBuf,
+
+    /// `demo/poster.png` path.
+    pub demo_poster: PathBuf,
+
+    /// `demo/manifest.json` path.
+    pub demo_manifest: PathBuf,
 }
 
 impl RunPaths {
@@ -198,10 +218,35 @@ impl RunPaths {
         Ok(Self::from_valid_parts(runs_root, &run_name, run_id))
     }
 
+    /// Create a new run and checkpoint directory without reusing old data.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`io::ErrorKind::AlreadyExists`] when the run directory already
+    /// exists, or another I/O error when its parent or checkpoint directory
+    /// cannot be created.
+    #[expect(
+        clippy::allow_attributes,
+        reason = "the repository disallows synchronous filesystem helpers by default"
+    )]
+    #[allow(
+        clippy::disallowed_methods,
+        reason = "run setup is synchronous and has no async runtime"
+    )]
+    pub fn create_new(&self) -> io::Result<()> {
+        if let Some(parent) = self.run_dir.parent() {
+            fs::create_dir_all(parent)?;
+        }
+        fs::create_dir(&self.run_dir)?;
+        fs::create_dir(&self.checkpoints_dir)?;
+        fs::create_dir(&self.demo_dir)
+    }
+
     /// Build paths from already validated run-name and run-id segments.
     fn from_valid_parts(runs_root: impl AsRef<Path>, run_name: &str, run_id: &RunId) -> Self {
         let run_dir = runs_root.as_ref().join(run_name).join(run_id.as_str());
         let checkpoints_dir = run_dir.join("checkpoints");
+        let demo_dir = run_dir.join("demo");
 
         Self {
             config_json: run_dir.join("config.json"),
@@ -209,8 +254,14 @@ impl RunPaths {
             metrics_jsonl: run_dir.join("metrics.jsonl"),
             eval_jsonl: run_dir.join("eval.jsonl"),
             summary_json: run_dir.join("summary.json"),
+            provenance_json: run_dir.join("provenance.json"),
+            proof_json: run_dir.join("proof.json"),
             latest_checkpoint: checkpoints_dir.join("latest.mpk"),
             best_checkpoint: run_dir.join("best.mpk"),
+            demo_video: demo_dir.join("training-timelapse.mp4"),
+            demo_poster: demo_dir.join("poster.png"),
+            demo_manifest: demo_dir.join("manifest.json"),
+            demo_dir,
             checkpoints_dir,
             run_dir,
         }
@@ -362,12 +413,24 @@ mod tests {
         assert_eq!(paths.metrics_jsonl, paths.run_dir.join("metrics.jsonl"));
         assert_eq!(paths.eval_jsonl, paths.run_dir.join("eval.jsonl"));
         assert_eq!(paths.summary_json, paths.run_dir.join("summary.json"));
+        assert_eq!(paths.provenance_json, paths.run_dir.join("provenance.json"));
+        assert_eq!(paths.proof_json, paths.run_dir.join("proof.json"));
         assert_eq!(paths.checkpoints_dir, paths.run_dir.join("checkpoints"));
         assert_eq!(
             paths.latest_checkpoint,
             paths.run_dir.join("checkpoints/latest.mpk")
         );
         assert_eq!(paths.best_checkpoint, paths.run_dir.join("best.mpk"));
+        assert_eq!(paths.demo_dir, paths.run_dir.join("demo"));
+        assert_eq!(
+            paths.demo_video,
+            paths.run_dir.join("demo/training-timelapse.mp4")
+        );
+        assert_eq!(paths.demo_poster, paths.run_dir.join("demo/poster.png"));
+        assert_eq!(
+            paths.demo_manifest,
+            paths.run_dir.join("demo/manifest.json")
+        );
     }
 
     #[test]
@@ -404,5 +467,39 @@ mod tests {
                 value: "...".into(),
             })
         );
+    }
+
+    #[test]
+    #[expect(
+        clippy::allow_attributes,
+        reason = "the repository disallows synchronous filesystem helpers by default"
+    )]
+    #[allow(
+        clippy::disallowed_methods,
+        reason = "the synchronous filesystem test owns its temporary directory"
+    )]
+    fn run_creation_is_exclusive_and_creates_checkpoint_directory() {
+        let root = std::env::temp_dir().join(format!("bevy-gym-run-create-{}", std::process::id()));
+        drop(fs::remove_dir_all(&root));
+        let paths = RunConfig::new(
+            "cartpole",
+            AlgorithmKind::Dqn,
+            RunId::new("exclusive").expect("valid run id"),
+            &root,
+        )
+        .expect("valid run config")
+        .paths();
+
+        paths.create_new().expect("new run directory is created");
+        assert!(paths.run_dir.is_dir());
+        assert!(paths.checkpoints_dir.is_dir());
+        assert!(paths.demo_dir.is_dir());
+
+        let error = paths
+            .create_new()
+            .expect_err("existing run directory is rejected");
+        assert_eq!(error.kind(), io::ErrorKind::AlreadyExists);
+
+        drop(fs::remove_dir_all(root));
     }
 }

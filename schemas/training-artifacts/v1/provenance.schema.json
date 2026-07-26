@@ -1,0 +1,281 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.bevy-gym.dev/training-artifacts/v1/provenance.schema.json",
+  "title": "bevy-gym run provenance",
+  "description": "Source, oracle, invocation, runtime, host, timing, count, checkpoint, and reproducibility evidence for one run.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "artifact_type",
+    "schema_version",
+    "run",
+    "environment",
+    "algorithm",
+    "source",
+    "oracle",
+    "invocation",
+    "runtime",
+    "host",
+    "timing",
+    "counts",
+    "stop_reason",
+    "inputs",
+    "best_checkpoint",
+    "reproducibility"
+  ],
+  "properties": {
+    "artifact_type": {
+      "type": "string",
+      "const": "run-provenance"
+    },
+    "schema_version": {
+      "$ref": "common.schema.json#/$defs/schemaVersion"
+    },
+    "run": {
+      "$ref": "common.schema.json#/$defs/runIdentity"
+    },
+    "environment": {
+      "$ref": "common.schema.json#/$defs/environment"
+    },
+    "algorithm": {
+      "$ref": "common.schema.json#/$defs/algorithm"
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repository",
+        "git_commit",
+        "dirty",
+        "dirty_diff_sha256"
+      ],
+      "properties": {
+        "repository": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "git_commit": {
+          "$ref": "common.schema.json#/$defs/gitCommit"
+        },
+        "dirty": {
+          "type": "boolean"
+        },
+        "dirty_diff_sha256": {
+          "oneOf": [
+            {
+              "$ref": "common.schema.json#/$defs/sha256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "x-bevy-gym-invariants": [
+        "dirty=false requires dirty_diff_sha256=null",
+        "dirty=true requires the SHA-256 of the exact diff"
+      ]
+    },
+    "oracle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "version",
+        "git_commit",
+        "source_path"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "const": "Gymnasium"
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32
+        },
+        "git_commit": {
+          "$ref": "common.schema.json#/$defs/gitCommit"
+        },
+        "source_path": {
+          "$ref": "common.schema.json#/$defs/relativePath"
+        }
+      }
+    },
+    "invocation": {
+      "$ref": "common.schema.json#/$defs/command"
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "crate_version",
+        "rustc_version",
+        "bevy_version",
+        "burn_version",
+        "target_triple",
+        "training_backend",
+        "inference_backend",
+        "device"
+      ],
+      "properties": {
+        "crate_version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32
+        },
+        "rustc_version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "bevy_version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32
+        },
+        "burn_version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32
+        },
+        "target_triple": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "training_backend": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "inference_backend": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "device": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      }
+    },
+    "host": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "operating_system",
+        "architecture",
+        "cpu_count"
+      ],
+      "properties": {
+        "operating_system": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "architecture": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "cpu_count": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "timing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "started_at",
+        "finished_at",
+        "elapsed_seconds"
+      ],
+      "properties": {
+        "started_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "finished_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "elapsed_seconds": {
+          "type": "number",
+          "minimum": 0
+        }
+      },
+      "x-bevy-gym-invariants": [
+        "finished_at is not earlier than started_at",
+        "elapsed_seconds agrees with the monotonic timer used by the process"
+      ]
+    },
+    "counts": {
+      "$ref": "common.schema.json#/$defs/countSnapshot"
+    },
+    "stop_reason": {
+      "$ref": "common.schema.json#/$defs/stopReason"
+    },
+    "inputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "config",
+        "seeds"
+      ],
+      "properties": {
+        "config": {
+          "$ref": "common.schema.json#/$defs/artifactRef"
+        },
+        "seeds": {
+          "$ref": "common.schema.json#/$defs/artifactRef"
+        }
+      }
+    },
+    "best_checkpoint": {
+      "$ref": "common.schema.json#/$defs/checkpointRef"
+    },
+    "reproducibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "all_recorded_seeds_applied",
+        "same_seed_replay_checked",
+        "same_seed_checkpoint_sha256",
+        "backend_determinism_notes"
+      ],
+      "properties": {
+        "all_recorded_seeds_applied": {
+          "type": "boolean"
+        },
+        "same_seed_replay_checked": {
+          "type": "boolean"
+        },
+        "same_seed_checkpoint_sha256": {
+          "oneOf": [
+            {
+              "$ref": "common.schema.json#/$defs/sha256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "backend_determinism_notes": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        }
+      }
+    }
+  },
+  "x-bevy-gym-invariants": [
+    "best_checkpoint counts do not exceed completed run counts",
+    "same_seed_replay_checked is true exactly when same_seed_checkpoint_sha256 is present"
+  ]
+}

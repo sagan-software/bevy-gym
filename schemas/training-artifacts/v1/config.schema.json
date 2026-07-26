@@ -1,0 +1,216 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.bevy-gym.dev/training-artifacts/v1/config.schema.json",
+  "title": "bevy-gym run configuration",
+  "description": "The exact immutable configuration and command requested for one training run.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "artifact_type",
+    "schema_version",
+    "run",
+    "environment",
+    "algorithm",
+    "created_at",
+    "command",
+    "preset",
+    "qualification_mode",
+    "budget",
+    "training_constraints",
+    "checkpoint_schedule",
+    "trainer_parameters",
+    "artifact_paths"
+  ],
+  "properties": {
+    "artifact_type": {
+      "type": "string",
+      "const": "run-config"
+    },
+    "schema_version": {
+      "$ref": "common.schema.json#/$defs/schemaVersion"
+    },
+    "run": {
+      "$ref": "common.schema.json#/$defs/runIdentity"
+    },
+    "environment": {
+      "$ref": "common.schema.json#/$defs/environment"
+    },
+    "algorithm": {
+      "$ref": "common.schema.json#/$defs/algorithm"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "command": {
+      "$ref": "common.schema.json#/$defs/command"
+    },
+    "preset": {
+      "type": "string",
+      "enum": [
+        "smoke",
+        "proof",
+        "demo",
+        "custom"
+      ]
+    },
+    "qualification_mode": {
+      "type": "string",
+      "enum": [
+        "qualifying",
+        "non-solution-smoke",
+        "experiment"
+      ]
+    },
+    "budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "primary_unit",
+        "primary_limit",
+        "max_wall_time_seconds",
+        "parallel_environments"
+      ],
+      "properties": {
+        "primary_unit": {
+          "type": "string",
+          "enum": [
+            "environment-steps",
+            "episodes",
+            "updates"
+          ]
+        },
+        "primary_limit": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "max_wall_time_seconds": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "parallel_environments": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "training_constraints": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reward_shaping",
+        "heuristic_fallback",
+        "behavior_cloning",
+        "warmup_imitation_updates",
+        "official_semantics"
+      ],
+      "properties": {
+        "reward_shaping": {
+          "type": "boolean"
+        },
+        "heuristic_fallback": {
+          "type": "boolean"
+        },
+        "behavior_cloning": {
+          "type": "boolean"
+        },
+        "warmup_imitation_updates": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "official_semantics": {
+          "type": "boolean"
+        }
+      },
+      "x-bevy-gym-invariants": [
+        "qualifying runs require official_semantics=true and all shaping, fallback, cloning, and imitation values disabled"
+      ]
+    },
+    "checkpoint_schedule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "budget_percent_milestones",
+        "save_first_threshold_crossing",
+        "save_step_zero",
+        "save_latest"
+      ],
+      "properties": {
+        "budget_percent_milestones": {
+          "type": "array",
+          "const": [
+            0,
+            5,
+            20,
+            50,
+            80,
+            100
+          ]
+        },
+        "save_first_threshold_crossing": {
+          "type": "boolean",
+          "const": true
+        },
+        "save_step_zero": {
+          "type": "boolean",
+          "const": true
+        },
+        "save_latest": {
+          "type": "boolean",
+          "const": true
+        }
+      }
+    },
+    "trainer_parameters": {
+      "$ref": "common.schema.json#/$defs/parameterMap"
+    },
+    "artifact_paths": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "config",
+        "seeds",
+        "provenance",
+        "metrics",
+        "eval",
+        "summary",
+        "proof",
+        "best_checkpoint",
+        "checkpoints_directory",
+        "demo_directory"
+      ],
+      "properties": {
+        "config": {
+          "$ref": "common.schema.json#/$defs/relativePath"
+        },
+        "seeds": {
+          "$ref": "common.schema.json#/$defs/relativePath"
+        },
+        "provenance": {
+          "$ref": "common.schema.json#/$defs/relativePath"
+        },
+        "metrics": {
+          "$ref": "common.schema.json#/$defs/relativePath"
+        },
+        "eval": {
+          "$ref": "common.schema.json#/$defs/relativePath"
+        },
+        "summary": {
+          "$ref": "common.schema.json#/$defs/relativePath"
+        },
+        "proof": {
+          "$ref": "common.schema.json#/$defs/relativePath"
+        },
+        "best_checkpoint": {
+          "$ref": "common.schema.json#/$defs/relativePath"
+        },
+        "checkpoints_directory": {
+          "$ref": "common.schema.json#/$defs/relativePath"
+        },
+        "demo_directory": {
+          "$ref": "common.schema.json#/$defs/relativePath"
+        }
+      }
+    }
+  }
+}

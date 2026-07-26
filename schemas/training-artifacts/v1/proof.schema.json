@@ -1,0 +1,417 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.bevy-gym.dev/training-artifacts/v1/proof.schema.json",
+  "title": "bevy-gym learning proof receipt",
+  "description": "A strict receipt binding a qualifying run, fixed validation selection, disjoint fresh-process test evaluation, threshold/confidence result, and exact checkpoint bytes.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "artifact_type",
+    "schema_version",
+    "generated_at",
+    "status",
+    "run",
+    "environment",
+    "algorithm",
+    "source_commit",
+    "gymnasium_oracle_commit",
+    "training_command",
+    "elapsed_seconds",
+    "counts",
+    "stop_reason",
+    "qualification",
+    "validation_selection",
+    "held_out_test",
+    "validation_test_separation",
+    "best_checkpoint",
+    "result",
+    "artifacts",
+    "release_cohort"
+  ],
+  "properties": {
+    "artifact_type": {
+      "type": "string",
+      "const": "learning-proof"
+    },
+    "schema_version": {
+      "$ref": "common.schema.json#/$defs/schemaVersion"
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "passed",
+        "failed"
+      ]
+    },
+    "run": {
+      "$ref": "common.schema.json#/$defs/runIdentity"
+    },
+    "environment": {
+      "$ref": "common.schema.json#/$defs/environment"
+    },
+    "algorithm": {
+      "$ref": "common.schema.json#/$defs/algorithm"
+    },
+    "source_commit": {
+      "$ref": "common.schema.json#/$defs/gitCommit"
+    },
+    "gymnasium_oracle_commit": {
+      "$ref": "common.schema.json#/$defs/gitCommit"
+    },
+    "training_command": {
+      "$ref": "common.schema.json#/$defs/command"
+    },
+    "elapsed_seconds": {
+      "type": "number",
+      "minimum": 0
+    },
+    "counts": {
+      "$ref": "common.schema.json#/$defs/countSnapshot"
+    },
+    "stop_reason": {
+      "$ref": "common.schema.json#/$defs/stopReason"
+    },
+    "qualification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "official_semantics",
+        "reward_shaping",
+        "heuristic_fallback",
+        "behavior_cloning",
+        "warmup_imitation_updates",
+        "all_recorded_seeds_applied",
+        "combined_update_count",
+        "policy_changed",
+        "step_zero_policy_sha256",
+        "best_policy_sha256"
+      ],
+      "properties": {
+        "official_semantics": {
+          "type": "boolean",
+          "const": true
+        },
+        "reward_shaping": {
+          "type": "boolean",
+          "const": false
+        },
+        "heuristic_fallback": {
+          "type": "boolean",
+          "const": false
+        },
+        "behavior_cloning": {
+          "type": "boolean",
+          "const": false
+        },
+        "warmup_imitation_updates": {
+          "type": "integer",
+          "const": 0
+        },
+        "all_recorded_seeds_applied": {
+          "type": "boolean",
+          "const": true
+        },
+        "combined_update_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "policy_changed": {
+          "type": "boolean",
+          "const": true
+        },
+        "step_zero_policy_sha256": {
+          "$ref": "common.schema.json#/$defs/sha256"
+        },
+        "best_policy_sha256": {
+          "$ref": "common.schema.json#/$defs/sha256"
+        }
+      },
+      "x-bevy-gym-invariants": [
+        "step_zero_policy_sha256 differs from best_policy_sha256"
+      ]
+    },
+    "validation_selection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "suite",
+        "record",
+        "selected_best_only_on_validation",
+        "gate"
+      ],
+      "properties": {
+        "suite": {
+          "$ref": "#/$defs/validationSuiteRef"
+        },
+        "record": {
+          "$ref": "common.schema.json#/$defs/evaluationRecordRef"
+        },
+        "selected_best_only_on_validation": {
+          "type": "boolean",
+          "const": true
+        },
+        "gate": {
+          "$ref": "common.schema.json#/$defs/gateResult"
+        }
+      }
+    },
+    "held_out_test": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "suite",
+        "record",
+        "fresh_process",
+        "gate"
+      ],
+      "properties": {
+        "suite": {
+          "$ref": "#/$defs/testSuiteRef"
+        },
+        "record": {
+          "$ref": "common.schema.json#/$defs/evaluationRecordRef"
+        },
+        "fresh_process": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "command",
+            "exit_code",
+            "checkpoint_loaded_from_disk",
+            "checkpoint_sha256"
+          ],
+          "properties": {
+            "command": {
+              "$ref": "common.schema.json#/$defs/command"
+            },
+            "exit_code": {
+              "type": "integer",
+              "const": 0
+            },
+            "checkpoint_loaded_from_disk": {
+              "type": "boolean",
+              "const": true
+            },
+            "checkpoint_sha256": {
+              "$ref": "common.schema.json#/$defs/sha256"
+            }
+          }
+        },
+        "gate": {
+          "$ref": "common.schema.json#/$defs/gateResult"
+        }
+      }
+    },
+    "validation_test_separation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "validation_suite_sha256",
+        "test_suite_sha256",
+        "overlap_count",
+        "disjoint"
+      ],
+      "properties": {
+        "validation_suite_sha256": {
+          "$ref": "common.schema.json#/$defs/sha256"
+        },
+        "test_suite_sha256": {
+          "$ref": "common.schema.json#/$defs/sha256"
+        },
+        "overlap_count": {
+          "type": "integer",
+          "const": 0
+        },
+        "disjoint": {
+          "type": "boolean",
+          "const": true
+        }
+      },
+      "x-bevy-gym-invariants": [
+        "validation_suite_sha256 differs from test_suite_sha256"
+      ]
+    },
+    "best_checkpoint": {
+      "$ref": "common.schema.json#/$defs/checkpointRef"
+    },
+    "result": {
+      "$ref": "common.schema.json#/$defs/gateResult"
+    },
+    "artifacts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "config",
+        "seeds",
+        "provenance",
+        "metrics",
+        "eval",
+        "summary"
+      ],
+      "properties": {
+        "config": {
+          "$ref": "common.schema.json#/$defs/artifactRef"
+        },
+        "seeds": {
+          "$ref": "common.schema.json#/$defs/artifactRef"
+        },
+        "provenance": {
+          "$ref": "common.schema.json#/$defs/artifactRef"
+        },
+        "metrics": {
+          "$ref": "common.schema.json#/$defs/artifactRef"
+        },
+        "eval": {
+          "$ref": "common.schema.json#/$defs/artifactRef"
+        },
+        "summary": {
+          "$ref": "common.schema.json#/$defs/artifactRef"
+        }
+      }
+    },
+    "release_cohort": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/releaseCohort"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "$defs": {
+    "validationSuiteRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "split",
+        "sha256",
+        "sample_count"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "split": {
+          "type": "string",
+          "const": "validation"
+        },
+        "sha256": {
+          "$ref": "common.schema.json#/$defs/sha256"
+        },
+        "sample_count": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "testSuiteRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "split",
+        "sha256",
+        "sample_count"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "split": {
+          "type": "string",
+          "const": "test"
+        },
+        "sha256": {
+          "$ref": "common.schema.json#/$defs/sha256"
+        },
+        "sample_count": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "releaseCohort": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "declared_seed_count",
+        "required_pass_count",
+        "actual_pass_count",
+        "median_gate",
+        "members"
+      ],
+      "properties": {
+        "declared_seed_count": {
+          "type": "integer",
+          "const": 5
+        },
+        "required_pass_count": {
+          "type": "integer",
+          "const": 4
+        },
+        "actual_pass_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "median_gate": {
+          "$ref": "common.schema.json#/$defs/gateResult"
+        },
+        "members": {
+          "type": "array",
+          "minItems": 5,
+          "maxItems": 5,
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "root_seed",
+              "run_uuid",
+              "summary",
+              "passed"
+            ],
+            "properties": {
+              "root_seed": {
+                "$ref": "common.schema.json#/$defs/u64"
+              },
+              "run_uuid": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "summary": {
+                "$ref": "common.schema.json#/$defs/artifactRef"
+              },
+              "passed": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "x-bevy-gym-invariants": [
+        "actual_pass_count equals the number of members with passed=true",
+        "release pass requires actual_pass_count >= required_pass_count and median_gate.passed=true"
+      ]
+    }
+  },
+  "x-bevy-gym-invariants": [
+    "status agrees with result.passed and every qualifying invariant",
+    "validation and test suite hashes match the separation object and are distinct",
+    "all checkpoint_sha256 fields equal best_checkpoint.sha256 for selected and held-out results",
+    "qualification.combined_update_count equals the completed optimizer plus Q-table updates",
+    "result exactly equals the held-out test gate",
+    "best_checkpoint counts do not exceed completed run counts"
+  ]
+}

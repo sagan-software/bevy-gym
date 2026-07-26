@@ -190,4 +190,75 @@ mod tests {
         assert!(requests.is_empty());
         assert_eq!(observation, 100);
     }
+
+    #[derive(Clone, Debug)]
+    struct SeedEchoEnv;
+
+    impl Env for SeedEchoEnv {
+        type Observation = u64;
+        type Action = ();
+        type Info = ();
+
+        fn reset(&mut self, seed: Option<u64>) -> Reset<Self::Observation> {
+            Reset {
+                observation: seed.unwrap_or(u64::MAX),
+                info: (),
+            }
+        }
+
+        fn step(&mut self, (): Self::Action) -> Step<Self::Observation> {
+            Step {
+                observation: 0,
+                reward: 0.0,
+                status: EpisodeStatus::Terminated,
+                info: (),
+            }
+        }
+    }
+
+    #[test]
+    fn automatic_resets_use_per_environment_episode_seed_schedule() {
+        let mut app = App::new();
+        app.add_plugins(MinimalPlugins).add_plugins(
+            BevyGymPlugin::new(|_| SeedEchoEnv)
+                .with_envs(2)
+                .with_reset_seeds(|env_id, episode| Some(1_000 + env_id as u64 * 100 + episode)),
+        );
+        app.update();
+
+        let initial: Vec<_> = app
+            .world_mut()
+            .resource_mut::<Messages<ActionRequest<SeedEchoEnv>>>()
+            .drain()
+            .collect();
+        // Bevy does not guarantee query or message order by environment ID.
+        let mut initial_observations = initial
+            .iter()
+            .map(|request| (request.env_id, request.observation))
+            .collect::<Vec<_>>();
+        initial_observations.sort_unstable();
+        assert_eq!(initial_observations, vec![(0, 1_000), (1, 1_100)]);
+
+        for request in initial {
+            app.world_mut()
+                .resource_mut::<Messages<ActionResponse<SeedEchoEnv>>>()
+                .write(ActionResponse {
+                    entity: request.entity,
+                    action: (),
+                });
+        }
+        app.world_mut().run_schedule(FixedUpdate);
+
+        let next: Vec<_> = app
+            .world_mut()
+            .resource_mut::<Messages<ActionRequest<SeedEchoEnv>>>()
+            .drain()
+            .collect();
+        let mut next_observations = next
+            .iter()
+            .map(|request| (request.env_id, request.observation))
+            .collect::<Vec<_>>();
+        next_observations.sort_unstable();
+        assert_eq!(next_observations, vec![(0, 1_001), (1, 1_101)]);
+    }
 }

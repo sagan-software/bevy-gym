@@ -1,0 +1,8 @@
+{
+  "fixture": "proof.valid.json",
+  "mutation": {
+    "op": "replace",
+    "path": "/held_out_test/fresh_process/exit_code",
+    "value": 1
+  }
+}

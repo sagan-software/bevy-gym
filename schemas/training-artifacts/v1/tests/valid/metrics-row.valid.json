@@ -1,0 +1,32 @@
+{
+  "artifact_type": "metrics-row",
+  "schema_version": "1.0.0",
+  "run_uuid": "018f1a56-3779-7701-93ef-fa1398226d17",
+  "environment_registry_id": "CartPole-v1",
+  "algorithm_id": "dqn",
+  "sequence": 17,
+  "recorded_at": "2026-07-11T12:10:00Z",
+  "phase": "checkpoint",
+  "elapsed_seconds": 600.5,
+  "counts": {
+    "environment_steps": 20000,
+    "episodes": 142,
+    "optimizer_updates": 19000,
+    "q_table_updates": 0
+  },
+  "policy_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+  "checkpoint": {
+    "path": "checkpoints/step-020000.mpk",
+    "sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+    "byte_length": 19004,
+    "kind": "periodic",
+    "global_step": 20000,
+    "episode_count": 142,
+    "update_count": 19000
+  },
+  "values": {
+    "train/loss": 0.042,
+    "train/epsilon": 0.01,
+    "checkpoint/saved": true
+  }
+}

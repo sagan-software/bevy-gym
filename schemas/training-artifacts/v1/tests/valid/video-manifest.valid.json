@@ -1,0 +1,233 @@
+{
+  "artifact_type": "video-manifest",
+  "schema_version": "1.0.0",
+  "generated_at": "2026-07-11T13:00:00Z",
+  "run": {
+    "id": "cartpole-proof-20260711t120000z-a1b2c3d4e5f6",
+    "uuid": "018f1a56-3779-7701-93ef-fa1398226d17",
+    "created_at": "2026-07-11T12:00:00Z",
+    "directory": "runs/cartpole-dqn/cartpole-proof-20260711t120000z-a1b2c3d4e5f6",
+    "collision_policy": "reject-existing",
+    "prior_run_uuid": null
+  },
+  "environment": {
+    "registry_id": "CartPole-v1",
+    "name": "CartPole",
+    "version": "v1",
+    "variant": null,
+    "parameters": {
+      "max_episode_steps": 500
+    }
+  },
+  "algorithm": {
+    "id": "dqn",
+    "family": "dqn",
+    "implementation": "bevy_gym::training::dqn",
+    "version": "1",
+    "parameters": {
+      "gamma": 0.99
+    }
+  },
+  "root_seed": "12345678901234567890",
+  "source_commit": "1111111111111111111111111111111111111111",
+  "proof": {
+    "path": "proof.json",
+    "sha256": "1212121212121212121212121212121212121212121212121212121212121212",
+    "byte_length": 6000
+  },
+  "generation": {
+    "command": {
+      "argv": [
+        "cargo",
+        "run",
+        "--release",
+        "--features",
+        "render",
+        "--example",
+        "cartpole",
+        "--",
+        "video"
+      ],
+      "rendered": "cargo run --release --features render --example cartpole -- video",
+      "working_directory": "/workspace/bevy-gym"
+    },
+    "renderer_id": "cartpole-official-bevy",
+    "renderer_version": "1",
+    "ffmpeg_version": "7.1",
+    "ffprobe_version": "7.1"
+  },
+  "demo_suite": {
+    "id": "cartpole-demo-v1",
+    "split": "demo",
+    "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    "sample_count": 2,
+    "case_ids": [
+      "cartpole-reset-4000",
+      "cartpole-reset-4001"
+    ]
+  },
+  "canvas": {
+    "width": 1280,
+    "height": 720
+  },
+  "official_viewport": {
+    "width": 600,
+    "height": 400
+  },
+  "official_cadence": {
+    "numerator": 50,
+    "denominator": 1
+  },
+  "output": {
+    "file": {
+      "path": "demo/training-timelapse.mp4",
+      "sha256": "1313131313131313131313131313131313131313131313131313131313131313",
+      "byte_length": 136887
+    },
+    "container": "mp4",
+    "video_codec": "h264",
+    "pixel_format": "yuv420p",
+    "frame_rate": {
+      "numerator": 50,
+      "denominator": 1
+    },
+    "frame_count": 1500,
+    "duration_seconds": 30
+  },
+  "poster": {
+    "file": {
+      "path": "demo/poster.png",
+      "sha256": "1414141414141414141414141414141414141414141414141414141414141414",
+      "byte_length": 24000
+    },
+    "source_frame": 1250
+  },
+  "layout": {
+    "timelapse_seconds": 20,
+    "final_best_seconds": 10,
+    "timelapse_frames": 1000,
+    "final_best_frames": 500
+  },
+  "segments": [
+    {
+      "index": 0,
+      "phase": "chronological-training",
+      "frame_start": 0,
+      "frame_end_exclusive": 1000,
+      "checkpoint": {
+        "path": "checkpoints/step-000000.mpk",
+        "sha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+        "byte_length": 19004,
+        "kind": "step-zero",
+        "global_step": 0,
+        "episode_count": 0,
+        "update_count": 0
+      },
+      "metrics_record": {
+        "path": "metrics.jsonl",
+        "line_number": 1,
+        "row_sha256": "1515151515151515151515151515151515151515151515151515151515151515",
+        "global_step": 0,
+        "policy_sha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+      },
+      "evaluation_record": {
+        "path": "eval.jsonl",
+        "line_number": 1,
+        "row_sha256": "4444444444444444444444444444444444444444444444444444444444444444",
+        "suite": "validation",
+        "global_step": 0,
+        "checkpoint_sha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+      },
+      "demo_suite_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "demo_seeds": [
+        "4000",
+        "4001"
+      ],
+      "demo_case_ids": [
+        "cartpole-reset-4000",
+        "cartpole-reset-4001"
+      ],
+      "playback_speed": 20,
+      "label": {
+        "environment_registry_id": "CartPole-v1",
+        "algorithm_id": "dqn",
+        "root_seed": "12345678901234567890",
+        "global_step": 0,
+        "episode_count": 0,
+        "update_count": 0,
+        "checkpoint_short_sha256": "ffffffffffff",
+        "metric": "mean_return",
+        "score": 34.2,
+        "confidence_lower": null,
+        "confidence_upper": null,
+        "passed": false
+      },
+      "reloaded_best": false
+    },
+    {
+      "index": 1,
+      "phase": "final-best",
+      "frame_start": 1000,
+      "frame_end_exclusive": 1500,
+      "checkpoint": {
+        "path": "best.mpk",
+        "sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+        "byte_length": 19004,
+        "kind": "best",
+        "global_step": 80000,
+        "episode_count": 710,
+        "update_count": 79000
+      },
+      "metrics_record": {
+        "path": "metrics.jsonl",
+        "line_number": 1200,
+        "row_sha256": "1616161616161616161616161616161616161616161616161616161616161616",
+        "global_step": 80000,
+        "policy_sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+      },
+      "evaluation_record": {
+        "path": "eval.jsonl",
+        "line_number": 18,
+        "row_sha256": "6666666666666666666666666666666666666666666666666666666666666666",
+        "suite": "test",
+        "global_step": 80000,
+        "checkpoint_sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+      },
+      "demo_suite_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "demo_seeds": [
+        "4000",
+        "4001"
+      ],
+      "demo_case_ids": [
+        "cartpole-reset-4000",
+        "cartpole-reset-4001"
+      ],
+      "playback_speed": 1,
+      "label": {
+        "environment_registry_id": "CartPole-v1",
+        "algorithm_id": "dqn",
+        "root_seed": "12345678901234567890",
+        "global_step": 80000,
+        "episode_count": 710,
+        "update_count": 79000,
+        "checkpoint_short_sha256": "eeeeeeeeeeee",
+        "metric": "mean_return",
+        "score": 500,
+        "confidence_lower": 500,
+        "confidence_upper": 500,
+        "passed": true
+      },
+      "reloaded_best": true
+    }
+  ],
+  "verification": {
+    "ffprobe_passed": true,
+    "checkpoint_links_passed": true,
+    "frames_manually_inspected": true,
+    "inspected_frame_indices": [
+      0,
+      750,
+      1499
+    ]
+  }
+}

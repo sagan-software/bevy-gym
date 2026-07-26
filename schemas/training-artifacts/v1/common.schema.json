@@ -1,0 +1,584 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.bevy-gym.dev/training-artifacts/v1/common.schema.json",
+  "title": "bevy-gym training artifact common definitions",
+  "description": "Shared strict definitions for version 1 run, proof, evaluation, checkpoint, and video artifacts.",
+  "$defs": {
+    "schemaVersion": {
+      "type": "string",
+      "const": "1.0.0"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "gitCommit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "u64": {
+      "description": "An unsigned 64-bit value encoded as decimal text so JSON consumers never lose precision.",
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]{0,19})$",
+      "maxLength": 20,
+      "format": "uint64-decimal"
+    },
+    "relativePath": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512,
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*\\\\)[^\\u0000-\\u001f]+$"
+    },
+    "runIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "uuid",
+        "created_at",
+        "directory",
+        "collision_policy",
+        "prior_run_uuid"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 96,
+          "pattern": "^[a-z0-9][a-z0-9._-]*$"
+        },
+        "uuid": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "directory": {
+          "$ref": "#/$defs/relativePath"
+        },
+        "collision_policy": {
+          "type": "string",
+          "enum": [
+            "reject-existing",
+            "resume",
+            "overwrite"
+          ]
+        },
+        "prior_run_uuid": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid"
+        }
+      },
+      "x-bevy-gym-invariants": [
+        "uuid is the collision-safe identity; id is only a human-readable label",
+        "reject-existing requires prior_run_uuid=null",
+        "resume and overwrite require the UUID of the prior run"
+      ]
+    },
+    "environment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "registry_id",
+        "name",
+        "version",
+        "variant",
+        "parameters"
+      ],
+      "properties": {
+        "registry_id": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9_/-]+-v[0-9]+$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 96
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^v[0-9]+$"
+        },
+        "variant": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 96
+        },
+        "parameters": {
+          "$ref": "#/$defs/parameterMap"
+        }
+      }
+    },
+    "algorithm": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "family",
+        "implementation",
+        "version",
+        "parameters"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "pattern": "^[a-z0-9][a-z0-9._-]*$"
+        },
+        "family": {
+          "type": "string",
+          "enum": [
+            "dqn",
+            "ppo",
+            "tabular-q",
+            "monte-carlo-control",
+            "custom"
+          ]
+        },
+        "implementation": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "parameters": {
+          "$ref": "#/$defs/parameterMap"
+        }
+      }
+    },
+    "command": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "argv",
+        "rendered",
+        "working_directory"
+      ],
+      "properties": {
+        "argv": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "rendered": {
+          "type": "string",
+          "minLength": 1
+        },
+        "working_directory": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "artifactRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256",
+        "byte_length"
+      ],
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/relativePath"
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "byte_length": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "checkpointRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256",
+        "byte_length",
+        "kind",
+        "global_step",
+        "episode_count",
+        "update_count"
+      ],
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/relativePath"
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "byte_length": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "step-zero",
+            "periodic",
+            "threshold-crossing",
+            "latest",
+            "best"
+          ]
+        },
+        "global_step": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "episode_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "update_count": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "seedSuiteRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "split",
+        "sha256",
+        "sample_count"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-z0-9][a-z0-9._-]*$"
+        },
+        "split": {
+          "type": "string",
+          "enum": [
+            "validation",
+            "test",
+            "demo"
+          ]
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "sample_count": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "countSnapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "environment_steps",
+        "episodes",
+        "optimizer_updates",
+        "q_table_updates"
+      ],
+      "properties": {
+        "environment_steps": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "episodes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "optimizer_updates": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "q_table_updates": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "x-bevy-gym-invariants": [
+        "a qualifying run has optimizer_updates + q_table_updates > 0"
+      ]
+    },
+    "stopReason": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "detail"
+      ],
+      "properties": {
+        "code": {
+          "type": "string",
+          "enum": [
+            "threshold-reached",
+            "budget-exhausted",
+            "interrupted",
+            "error",
+            "manual"
+          ]
+        },
+        "detail": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        }
+      }
+    },
+    "confidenceInterval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "level",
+        "lower",
+        "upper"
+      ],
+      "properties": {
+        "method": {
+          "type": "string",
+          "enum": [
+            "none",
+            "normal",
+            "student-t",
+            "bootstrap",
+            "wilson"
+          ]
+        },
+        "level": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "exclusiveMaximum": 1
+        },
+        "lower": {
+          "type": "number"
+        },
+        "upper": {
+          "type": "number"
+        }
+      },
+      "x-bevy-gym-invariants": [
+        "lower <= upper"
+      ]
+    },
+    "rawCounts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sample_count",
+        "success_count",
+        "failure_count",
+        "event_counts"
+      ],
+      "properties": {
+        "sample_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "success_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "failure_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "event_counts": {
+          "type": "object",
+          "patternProperties": {
+            "^[a-z][a-z0-9_/-]*$": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "x-bevy-gym-invariants": [
+        "success_count + failure_count = sample_count"
+      ]
+    },
+    "gateResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "metric",
+        "comparator",
+        "threshold",
+        "observed",
+        "passed",
+        "sample_count",
+        "confidence",
+        "raw_counts"
+      ],
+      "properties": {
+        "metric": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "comparator": {
+          "type": "string",
+          "enum": [
+            "gte",
+            "lte",
+            "gt",
+            "lt",
+            "eq"
+          ]
+        },
+        "threshold": {
+          "type": "number"
+        },
+        "observed": {
+          "type": "number"
+        },
+        "passed": {
+          "type": "boolean"
+        },
+        "sample_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "confidence": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/confidenceInterval"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "raw_counts": {
+          "$ref": "#/$defs/rawCounts"
+        }
+      },
+      "x-bevy-gym-invariants": [
+        "passed agrees with comparator, threshold, observed, and any confidence-bound rule"
+      ]
+    },
+    "evaluationRecordRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "line_number",
+        "row_sha256",
+        "suite",
+        "global_step",
+        "checkpoint_sha256"
+      ],
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/relativePath"
+        },
+        "line_number": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "row_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "suite": {
+          "type": "string",
+          "enum": [
+            "validation",
+            "test",
+            "demo"
+          ]
+        },
+        "global_step": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "checkpoint_sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "metricsRecordRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "line_number",
+        "row_sha256",
+        "global_step",
+        "policy_sha256"
+      ],
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/relativePath"
+        },
+        "line_number": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "row_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "global_step": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "policy_sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "parameterMap": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/jsonValue"
+      }
+    },
+    "jsonValue": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "string"
+        },
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/jsonValue"
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/jsonValue"
+          }
+        }
+      ]
+    }
+  }
+}

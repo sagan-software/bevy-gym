@@ -1,0 +1,190 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.bevy-gym.dev/training-artifacts/v1/summary.schema.json",
+  "title": "bevy-gym run summary",
+  "description": "A concise run outcome that preserves initial, best-validation, and fresh held-out test results without replacing the full proof receipt.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "artifact_type",
+    "schema_version",
+    "run",
+    "environment",
+    "algorithm",
+    "completed_at",
+    "elapsed_seconds",
+    "counts",
+    "stop_reason",
+    "qualification",
+    "policy_change",
+    "initial_validation",
+    "best_validation",
+    "final_test",
+    "best_checkpoint",
+    "artifacts"
+  ],
+  "properties": {
+    "artifact_type": {
+      "type": "string",
+      "const": "run-summary"
+    },
+    "schema_version": {
+      "$ref": "common.schema.json#/$defs/schemaVersion"
+    },
+    "run": {
+      "$ref": "common.schema.json#/$defs/runIdentity"
+    },
+    "environment": {
+      "$ref": "common.schema.json#/$defs/environment"
+    },
+    "algorithm": {
+      "$ref": "common.schema.json#/$defs/algorithm"
+    },
+    "completed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "elapsed_seconds": {
+      "type": "number",
+      "minimum": 0
+    },
+    "counts": {
+      "$ref": "common.schema.json#/$defs/countSnapshot"
+    },
+    "stop_reason": {
+      "$ref": "common.schema.json#/$defs/stopReason"
+    },
+    "qualification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "status",
+        "reasons"
+      ],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": [
+            "qualifying",
+            "non-solution-smoke",
+            "experiment"
+          ]
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "passed",
+            "failed",
+            "pending"
+          ]
+        },
+        "reasons": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          }
+        }
+      }
+    },
+    "policy_change": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "step_zero_sha256",
+        "best_sha256",
+        "changed",
+        "optimizer_updates",
+        "q_table_updates"
+      ],
+      "properties": {
+        "step_zero_sha256": {
+          "$ref": "common.schema.json#/$defs/sha256"
+        },
+        "best_sha256": {
+          "$ref": "common.schema.json#/$defs/sha256"
+        },
+        "changed": {
+          "type": "boolean"
+        },
+        "optimizer_updates": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "q_table_updates": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "x-bevy-gym-invariants": [
+        "qualifying runs require changed=true, distinct hashes, and at least one optimizer or Q-table update"
+      ]
+    },
+    "initial_validation": {
+      "$ref": "#/$defs/evaluationSnapshot"
+    },
+    "best_validation": {
+      "$ref": "#/$defs/evaluationSnapshot"
+    },
+    "final_test": {
+      "$ref": "#/$defs/evaluationSnapshot"
+    },
+    "best_checkpoint": {
+      "$ref": "common.schema.json#/$defs/checkpointRef"
+    },
+    "artifacts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "config",
+        "seeds",
+        "provenance",
+        "metrics",
+        "eval"
+      ],
+      "properties": {
+        "config": {
+          "$ref": "common.schema.json#/$defs/artifactRef"
+        },
+        "seeds": {
+          "$ref": "common.schema.json#/$defs/artifactRef"
+        },
+        "provenance": {
+          "$ref": "common.schema.json#/$defs/artifactRef"
+        },
+        "metrics": {
+          "$ref": "common.schema.json#/$defs/artifactRef"
+        },
+        "eval": {
+          "$ref": "common.schema.json#/$defs/artifactRef"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "evaluationSnapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "record",
+        "gate"
+      ],
+      "properties": {
+        "record": {
+          "$ref": "common.schema.json#/$defs/evaluationRecordRef"
+        },
+        "gate": {
+          "$ref": "common.schema.json#/$defs/gateResult"
+        }
+      }
+    }
+  },
+  "x-bevy-gym-invariants": [
+    "initial_validation and best_validation reference the validation split",
+    "final_test references the test split",
+    "best_validation and final_test use best_checkpoint.sha256",
+    "best_checkpoint counts do not exceed completed run counts"
+  ]
+}

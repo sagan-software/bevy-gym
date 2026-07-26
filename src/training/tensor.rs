@@ -67,11 +67,66 @@ impl DiscreteActionSpec {
     }
 }
 
+/// Bounded continuous action-space tensorization requirement.
+#[derive(Debug, Clone, PartialEq)]
+pub struct ContinuousActionSpec {
+    /// Inclusive lower bound per action dimension.
+    pub low: Vec<f32>,
+
+    /// Inclusive upper bound per action dimension.
+    pub high: Vec<f32>,
+}
+
+impl ContinuousActionSpec {
+    /// Create validated finite bounds with `low < high` in every dimension.
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`TensorizationError`] when the bounds are empty, have
+    /// different lengths, contain non-finite values, or are not ordered.
+    pub fn new(
+        low: impl Into<Vec<f32>>,
+        high: impl Into<Vec<f32>>,
+    ) -> Result<Self, TensorizationError> {
+        let low = low.into();
+        let high = high.into();
+        if low.is_empty() {
+            return Err(TensorizationError::EmptyContinuousActionShape);
+        }
+        if low.len() != high.len() {
+            return Err(TensorizationError::ActionBoundLengthMismatch {
+                low: low.len(),
+                high: high.len(),
+            });
+        }
+
+        for (dimension, (low_bound, high_bound)) in low.iter().zip(&high).enumerate() {
+            if !low_bound.is_finite() || !high_bound.is_finite() {
+                return Err(TensorizationError::NonFiniteActionBound { dimension });
+            }
+            if low_bound >= high_bound {
+                return Err(TensorizationError::InvalidActionBounds { dimension });
+            }
+        }
+
+        Ok(Self { low, high })
+    }
+
+    /// Return the number of continuous action dimensions.
+    #[must_use]
+    pub const fn dimensions(&self) -> usize {
+        self.low.len()
+    }
+}
+
 /// Algorithm-facing action-space tensorization requirement.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum ActionSpec {
     /// Discrete action space.
     Discrete(DiscreteActionSpec),
+
+    /// Bounded continuous action space.
+    Continuous(ContinuousActionSpec),
 }
 
 /// Errors raised before trainer tensor construction.
@@ -91,6 +146,30 @@ pub enum TensorizationError {
 
     /// Discrete action count must be at least one.
     InvalidActionCount,
+
+    /// Continuous action bounds must contain at least one dimension.
+    EmptyContinuousActionShape,
+
+    /// Continuous lower and upper bound vectors must have the same length.
+    ActionBoundLengthMismatch {
+        /// Number of lower bounds.
+        low: usize,
+
+        /// Number of upper bounds.
+        high: usize,
+    },
+
+    /// Continuous action bounds must be finite.
+    NonFiniteActionBound {
+        /// Invalid dimension index.
+        dimension: usize,
+    },
+
+    /// Each continuous lower bound must be strictly less than its upper bound.
+    InvalidActionBounds {
+        /// Invalid dimension index.
+        dimension: usize,
+    },
 
     /// Observation or action shape did not match the trainer boundary spec.
     ShapeMismatch {
@@ -119,6 +198,21 @@ impl fmt::Display for TensorizationError {
             ),
             Self::InvalidActionCount => formatter.write_str(
                 "trainer boundary discrete action spec must contain at least one action",
+            ),
+            Self::EmptyContinuousActionShape => formatter.write_str(
+                "trainer boundary continuous action spec must include at least one dimension",
+            ),
+            Self::ActionBoundLengthMismatch { low, high } => write!(
+                formatter,
+                "trainer boundary continuous action bounds differ in length: low={low}, high={high}"
+            ),
+            Self::NonFiniteActionBound { dimension } => write!(
+                formatter,
+                "trainer boundary continuous action bound at dimension {dimension} is not finite"
+            ),
+            Self::InvalidActionBounds { dimension } => write!(
+                formatter,
+                "trainer boundary continuous action bounds at dimension {dimension} require low < high"
             ),
             Self::ShapeMismatch { expected, actual } => write!(
                 formatter,
@@ -168,6 +262,36 @@ mod tests {
                 .expect("valid action count")
                 .actions,
             2
+        );
+    }
+
+    #[test]
+    fn continuous_action_specs_require_finite_ordered_bounds() {
+        let spec = ContinuousActionSpec::new([-2.0, -1.0], [2.0, 3.0])
+            .expect("finite ordered action bounds");
+        assert_eq!(spec.dimensions(), 2);
+        assert_eq!(spec.low, vec![-2.0, -1.0]);
+        assert_eq!(spec.high, vec![2.0, 3.0]);
+        assert_eq!(
+            ActionSpec::Continuous(spec.clone()),
+            ActionSpec::Continuous(spec)
+        );
+
+        assert_eq!(
+            ContinuousActionSpec::new([], []),
+            Err(TensorizationError::EmptyContinuousActionShape)
+        );
+        assert_eq!(
+            ContinuousActionSpec::new([-1.0], [1.0, 2.0]),
+            Err(TensorizationError::ActionBoundLengthMismatch { low: 1, high: 2 })
+        );
+        assert_eq!(
+            ContinuousActionSpec::new([f32::NAN], [1.0]),
+            Err(TensorizationError::NonFiniteActionBound { dimension: 0 })
+        );
+        assert_eq!(
+            ContinuousActionSpec::new([1.0], [1.0]),
+            Err(TensorizationError::InvalidActionBounds { dimension: 0 })
         );
     }
 }

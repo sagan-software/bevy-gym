@@ -1,0 +1,8 @@
+{
+  "fixture": "metrics-row.valid.json",
+  "mutation": {
+    "op": "replace",
+    "path": "/checkpoint/global_step",
+    "value": 19999
+  }
+}

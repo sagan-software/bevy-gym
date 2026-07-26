@@ -1,0 +1,8 @@
+{
+  "fixture": "proof.valid.json",
+  "mutation": {
+    "op": "replace",
+    "path": "/result/observed",
+    "value": 499
+  }
+}

@@ -1,0 +1,325 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.bevy-gym.dev/training-artifacts/v1/seeds.schema.json",
+  "title": "bevy-gym deterministic seed partitions",
+  "description": "Independent, precision-safe seed streams and fixed validation, test, and demo suites for one run.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "artifact_type",
+    "schema_version",
+    "run",
+    "root_seed",
+    "derivation",
+    "partitions",
+    "validation_test_separation",
+    "application_status"
+  ],
+  "properties": {
+    "artifact_type": {
+      "type": "string",
+      "const": "seed-partitions"
+    },
+    "schema_version": {
+      "$ref": "common.schema.json#/$defs/schemaVersion"
+    },
+    "run": {
+      "$ref": "common.schema.json#/$defs/runIdentity"
+    },
+    "root_seed": {
+      "$ref": "common.schema.json#/$defs/u64"
+    },
+    "derivation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "algorithm",
+        "version",
+        "domain_separator"
+      ],
+      "properties": {
+        "algorithm": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32
+        },
+        "domain_separator": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        }
+      }
+    },
+    "partitions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "model_initialization",
+        "environment_construction",
+        "environment_resets",
+        "action_exploration",
+        "replay_rollout_sampling",
+        "validation",
+        "test",
+        "demo"
+      ],
+      "properties": {
+        "model_initialization": {
+          "$ref": "common.schema.json#/$defs/u64"
+        },
+        "environment_construction": {
+          "$ref": "common.schema.json#/$defs/u64"
+        },
+        "environment_resets": {
+          "$ref": "#/$defs/environmentResetSeeds"
+        },
+        "action_exploration": {
+          "$ref": "common.schema.json#/$defs/u64"
+        },
+        "replay_rollout_sampling": {
+          "$ref": "common.schema.json#/$defs/u64"
+        },
+        "validation": {
+          "$ref": "#/$defs/validationSuite"
+        },
+        "test": {
+          "$ref": "#/$defs/testSuite"
+        },
+        "demo": {
+          "$ref": "#/$defs/demoSuite"
+        }
+      }
+    },
+    "validation_test_separation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "validation_label",
+        "test_label",
+        "validation_sha256",
+        "test_sha256",
+        "overlap_count",
+        "disjoint"
+      ],
+      "properties": {
+        "method": {
+          "type": "string",
+          "enum": [
+            "independent-domain-separated-derivation",
+            "explicit-disjoint-lists"
+          ]
+        },
+        "validation_label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "test_label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "validation_sha256": {
+          "$ref": "common.schema.json#/$defs/sha256"
+        },
+        "test_sha256": {
+          "$ref": "common.schema.json#/$defs/sha256"
+        },
+        "overlap_count": {
+          "type": "integer",
+          "const": 0
+        },
+        "disjoint": {
+          "type": "boolean",
+          "const": true
+        }
+      },
+      "x-bevy-gym-invariants": [
+        "validation_label differs from test_label",
+        "validation_sha256 differs from test_sha256",
+        "the two seed arrays have no shared values"
+      ]
+    },
+    "application_status": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "model_initialization",
+        "environment_construction",
+        "environment_resets",
+        "action_exploration",
+        "replay_rollout_sampling",
+        "validation",
+        "test",
+        "demo"
+      ],
+      "properties": {
+        "model_initialization": {
+          "type": "boolean"
+        },
+        "environment_construction": {
+          "type": "boolean"
+        },
+        "environment_resets": {
+          "type": "boolean"
+        },
+        "action_exploration": {
+          "type": "boolean"
+        },
+        "replay_rollout_sampling": {
+          "type": "boolean"
+        },
+        "validation": {
+          "type": "boolean"
+        },
+        "test": {
+          "type": "boolean"
+        },
+        "demo": {
+          "type": "boolean"
+        }
+      },
+      "x-bevy-gym-invariants": [
+        "a qualifying proof requires every application-status value to be true"
+      ]
+    }
+  },
+  "$defs": {
+    "environmentResetSeeds": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "base_seed",
+        "per_environment"
+      ],
+      "properties": {
+        "base_seed": {
+          "$ref": "common.schema.json#/$defs/u64"
+        },
+        "per_environment": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "environment_id",
+              "seed"
+            ],
+            "properties": {
+              "environment_id": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "seed": {
+                "$ref": "common.schema.json#/$defs/u64"
+              }
+            }
+          }
+        }
+      },
+      "x-bevy-gym-invariants": [
+        "environment_id values are unique"
+      ]
+    },
+    "validationSuite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "split",
+        "sha256",
+        "seeds"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-z0-9][a-z0-9._-]*$"
+        },
+        "split": {
+          "type": "string",
+          "const": "validation"
+        },
+        "sha256": {
+          "$ref": "common.schema.json#/$defs/sha256"
+        },
+        "seeds": {
+          "$ref": "#/$defs/seedArray"
+        }
+      }
+    },
+    "testSuite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "split",
+        "sha256",
+        "seeds"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-z0-9][a-z0-9._-]*$"
+        },
+        "split": {
+          "type": "string",
+          "const": "test"
+        },
+        "sha256": {
+          "$ref": "common.schema.json#/$defs/sha256"
+        },
+        "seeds": {
+          "$ref": "#/$defs/seedArray"
+        }
+      }
+    },
+    "demoSuite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "split",
+        "sha256",
+        "seeds"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-z0-9][a-z0-9._-]*$"
+        },
+        "split": {
+          "type": "string",
+          "const": "demo"
+        },
+        "sha256": {
+          "$ref": "common.schema.json#/$defs/sha256"
+        },
+        "seeds": {
+          "$ref": "#/$defs/seedArray"
+        }
+      }
+    },
+    "seedArray": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "common.schema.json#/$defs/u64"
+      }
+    }
+  }
+}

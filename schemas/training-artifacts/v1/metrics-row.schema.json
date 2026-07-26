@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.bevy-gym.dev/training-artifacts/v1/metrics-row.schema.json",
+  "title": "bevy-gym metrics JSONL row",
+  "description": "One append-only metrics row with enough identity and count context to join it to checkpoints and proof artifacts.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "artifact_type",
+    "schema_version",
+    "run_uuid",
+    "environment_registry_id",
+    "algorithm_id",
+    "sequence",
+    "recorded_at",
+    "phase",
+    "elapsed_seconds",
+    "counts",
+    "policy_sha256",
+    "checkpoint",
+    "values"
+  ],
+  "properties": {
+    "artifact_type": {
+      "type": "string",
+      "const": "metrics-row"
+    },
+    "schema_version": {
+      "$ref": "common.schema.json#/$defs/schemaVersion"
+    },
+    "run_uuid": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "environment_registry_id": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 128
+    },
+    "algorithm_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "sequence": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "recorded_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "phase": {
+      "type": "string",
+      "enum": [
+        "train",
+        "validation",
+        "test",
+        "checkpoint",
+        "system"
+      ]
+    },
+    "elapsed_seconds": {
+      "type": "number",
+      "minimum": 0
+    },
+    "counts": {
+      "$ref": "common.schema.json#/$defs/countSnapshot"
+    },
+    "policy_sha256": {
+      "oneOf": [
+        {
+          "$ref": "common.schema.json#/$defs/sha256"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "checkpoint": {
+      "oneOf": [
+        {
+          "$ref": "common.schema.json#/$defs/checkpointRef"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "values": {
+      "type": "object",
+      "minProperties": 1,
+      "patternProperties": {
+        "^[a-z][a-z0-9_.-]*(?:/[a-z][a-z0-9_.-]*)*$": {
+          "type": [
+            "number",
+            "integer",
+            "boolean",
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "x-bevy-gym-invariants": [
+    "sequence and all count fields never decrease within one metrics.jsonl file",
+    "checkpoint.global_step equals counts.environment_steps when checkpoint is non-null",
+    "checkpoint and policy hashes identify the bytes active for this row"
+  ]
+}

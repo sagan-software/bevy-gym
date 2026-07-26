@@ -1,0 +1,179 @@
+{
+  "artifact_type": "run-summary",
+  "schema_version": "1.0.0",
+  "run": {
+    "id": "cartpole-proof-20260711t120000z-a1b2c3d4e5f6",
+    "uuid": "018f1a56-3779-7701-93ef-fa1398226d17",
+    "created_at": "2026-07-11T12:00:00Z",
+    "directory": "runs/cartpole-dqn/cartpole-proof-20260711t120000z-a1b2c3d4e5f6",
+    "collision_policy": "reject-existing",
+    "prior_run_uuid": null
+  },
+  "environment": {
+    "registry_id": "CartPole-v1",
+    "name": "CartPole",
+    "version": "v1",
+    "variant": null,
+    "parameters": {
+      "max_episode_steps": 500
+    }
+  },
+  "algorithm": {
+    "id": "dqn",
+    "family": "dqn",
+    "implementation": "bevy_gym::training::dqn",
+    "version": "1",
+    "parameters": {
+      "gamma": 0.99
+    }
+  },
+  "completed_at": "2026-07-11T12:45:00Z",
+  "elapsed_seconds": 2700,
+  "counts": {
+    "environment_steps": 80000,
+    "episodes": 710,
+    "optimizer_updates": 79000,
+    "q_table_updates": 0
+  },
+  "stop_reason": {
+    "code": "threshold-reached",
+    "detail": "Fixed validation mean return reached 500."
+  },
+  "qualification": {
+    "mode": "qualifying",
+    "status": "passed",
+    "reasons": [
+      "Held-out mean return passed the declared gate.",
+      "Fresh-process checkpoint reload succeeded."
+    ]
+  },
+  "policy_change": {
+    "step_zero_sha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+    "best_sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "changed": true,
+    "optimizer_updates": 79000,
+    "q_table_updates": 0
+  },
+  "initial_validation": {
+    "record": {
+      "path": "eval.jsonl",
+      "line_number": 1,
+      "row_sha256": "4444444444444444444444444444444444444444444444444444444444444444",
+      "suite": "validation",
+      "global_step": 0,
+      "checkpoint_sha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+    },
+    "gate": {
+      "metric": "mean_return",
+      "comparator": "gte",
+      "threshold": 475,
+      "observed": 34.2,
+      "passed": false,
+      "sample_count": 100,
+      "confidence": null,
+      "raw_counts": {
+        "sample_count": 100,
+        "success_count": 0,
+        "failure_count": 100,
+        "event_counts": {
+          "ceiling_hits": 0
+        }
+      }
+    }
+  },
+  "best_validation": {
+    "record": {
+      "path": "eval.jsonl",
+      "line_number": 17,
+      "row_sha256": "5555555555555555555555555555555555555555555555555555555555555555",
+      "suite": "validation",
+      "global_step": 80000,
+      "checkpoint_sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+    },
+    "gate": {
+      "metric": "mean_return",
+      "comparator": "gte",
+      "threshold": 475,
+      "observed": 500,
+      "passed": true,
+      "sample_count": 100,
+      "confidence": null,
+      "raw_counts": {
+        "sample_count": 100,
+        "success_count": 100,
+        "failure_count": 0,
+        "event_counts": {
+          "ceiling_hits": 100
+        }
+      }
+    }
+  },
+  "final_test": {
+    "record": {
+      "path": "eval.jsonl",
+      "line_number": 18,
+      "row_sha256": "6666666666666666666666666666666666666666666666666666666666666666",
+      "suite": "test",
+      "global_step": 80000,
+      "checkpoint_sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+    },
+    "gate": {
+      "metric": "mean_return",
+      "comparator": "gte",
+      "threshold": 475,
+      "observed": 500,
+      "passed": true,
+      "sample_count": 100,
+      "confidence": {
+        "method": "bootstrap",
+        "level": 0.95,
+        "lower": 500,
+        "upper": 500
+      },
+      "raw_counts": {
+        "sample_count": 100,
+        "success_count": 100,
+        "failure_count": 0,
+        "event_counts": {
+          "ceiling_hits": 100
+        }
+      }
+    }
+  },
+  "best_checkpoint": {
+    "path": "best.mpk",
+    "sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "byte_length": 19004,
+    "kind": "best",
+    "global_step": 80000,
+    "episode_count": 710,
+    "update_count": 79000
+  },
+  "artifacts": {
+    "config": {
+      "path": "config.json",
+      "sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+      "byte_length": 2048
+    },
+    "seeds": {
+      "path": "seeds.json",
+      "sha256": "3333333333333333333333333333333333333333333333333333333333333333",
+      "byte_length": 1536
+    },
+    "provenance": {
+      "path": "provenance.json",
+      "sha256": "7777777777777777777777777777777777777777777777777777777777777777",
+      "byte_length": 2500
+    },
+    "metrics": {
+      "path": "metrics.jsonl",
+      "sha256": "8888888888888888888888888888888888888888888888888888888888888888",
+      "byte_length": 12000
+    },
+    "eval": {
+      "path": "eval.jsonl",
+      "sha256": "9999999999999999999999999999999999999999999999999999999999999999",
+      "byte_length": 5000
+    }
+  }
+}

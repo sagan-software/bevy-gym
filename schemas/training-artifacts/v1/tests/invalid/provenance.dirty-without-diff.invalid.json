@@ -1,0 +1,8 @@
+{
+  "fixture": "provenance.valid.json",
+  "mutation": {
+    "op": "replace",
+    "path": "/source/dirty",
+    "value": true
+  }
+}

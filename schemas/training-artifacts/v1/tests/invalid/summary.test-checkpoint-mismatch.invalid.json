@@ -1,0 +1,8 @@
+{
+  "fixture": "summary.valid.json",
+  "mutation": {
+    "op": "replace",
+    "path": "/final_test/record/checkpoint_sha256",
+    "value": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+  }
+}

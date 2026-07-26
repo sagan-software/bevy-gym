@@ -1,0 +1,8 @@
+{
+  "fixture": "summary.valid.json",
+  "mutation": {
+    "op": "replace",
+    "path": "/qualification/status",
+    "value": "solved"
+  }
+}

@@ -16,8 +16,10 @@
 #![allow(
     clippy::missing_docs_in_private_items,
     clippy::too_many_lines,
+    clippy::disallowed_methods,
+    clippy::disallowed_types,
     unused_crate_dependencies,
-    reason = "examples optimize for readability and demonstrate the full workflow in one target"
+    reason = "the synchronous example keeps its complete workflow readable in one target"
 )]
 
 use std::env;
@@ -30,25 +32,16 @@ use std::process::{Command, Stdio};
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use bevy::prelude::*;
-use bevy_gym::training::backend::{InferenceDevice, TrainingDevice};
 use bevy_gym::training::{
-    inference_device, policy_recorder, training_device, AlgorithmKind, InferenceBackend,
-    MetricRecord, MetricValue, MetricsWriter, RunConfig, RunId, RunPaths, SeedConfig,
-    TrainingBackend,
+    AlgorithmKind, BevyTransitionCollector, DqnAgent, DqnConfig, DqnPolicy, MetricRecord,
+    MetricValue, MetricsWriter, RunConfig, RunId, RunPaths, SeedConfig,
 };
 #[cfg(feature = "render")]
 use bevy_gym::{
     ActionRequest, ActionResponse, BevyGymPlugin, CurrentObservation, EnvComponent, EnvStats,
     GymSet,
 };
-use bevy_gym::{Env, EpisodeStatus, Reset, Step};
-use burn::module::{AutodiffModule, Module};
-use burn::nn::loss::{CrossEntropyLossConfig, HuberLossConfig, Reduction};
-use burn::nn::{Linear, LinearConfig, Relu};
-use burn::optim::adaptor::OptimizerAdaptor;
-use burn::optim::{Adam, AdamConfig, GradientsParams, Optimizer};
-use burn::prelude::{Backend, ElementConversion};
-use burn::tensor::{Int, Tensor};
+use bevy_gym::{Env, EpisodeStatus, Reset, Step, TimeLimit};
 
 #[cfg(all(feature = "render", not(feature = "bevy-mcp")))]
 use bevy::remote::{http::RemoteHttpPlugin, RemotePlugin};
@@ -82,28 +75,52 @@ const THETA_THRESHOLD_RADIANS: f32 = 12.0 * std::f32::consts::PI / 180.0;
 const DEFAULT_TRAIN_STEPS: usize = 100_000;
 const DEFAULT_EVAL_EPISODES: usize = 12;
 const DEFAULT_EVAL_INTERVAL: usize = 5_000;
+const DEFAULT_NUM_ENVS: usize = 8;
 const DEFAULT_ROOT_SEED: u64 = 42;
 const SOLVED_MEAN_REWARD: f64 = 475.0;
 const DEFAULT_VIDEO_SECONDS: usize = 30;
 const DEFAULT_VIDEO_FINAL_SECONDS: usize = 10;
 const DEFAULT_VIDEO_FPS: usize = 50;
-const DEFAULT_VIDEO_WIDTH: usize = 600;
-const DEFAULT_VIDEO_HEIGHT: usize = 400;
+const DEFAULT_VIDEO_WIDTH: usize = 1_280;
+const DEFAULT_VIDEO_HEIGHT: usize = 720;
+const OFFICIAL_VIEWPORT_WIDTH: i32 = 600;
+const OFFICIAL_VIEWPORT_HEIGHT: i32 = 400;
+const CART_SCREEN_SCALE: f32 = 125.0;
+const TRACK_Y: f32 = -100.0;
+const CART_Y: f32 = TRACK_Y;
+const CART_W: f32 = 50.0;
+const CART_H: f32 = 30.0;
+const POLE_LEN: f32 = 125.0;
+const POLE_W: f32 = 10.0;
+const AXLE_OFFSET: f32 = CART_H / 4.0;
+const POLE_CENTER_OFFSET: f32 = (POLE_LEN - POLE_W) / 2.0;
 
-#[cfg(feature = "render")]
-const CART_SCREEN_SCALE: f32 = 145.0;
-#[cfg(feature = "render")]
-const TRACK_Y: f32 = -140.0;
-#[cfg(feature = "render")]
-const CART_Y: f32 = TRACK_Y + 26.0;
-#[cfg(feature = "render")]
-const CART_W: f32 = 78.0;
-#[cfg(feature = "render")]
-const CART_H: f32 = 34.0;
-#[cfg(feature = "render")]
-const POLE_LEN: f32 = 190.0;
-#[cfg(feature = "render")]
-const POLE_W: f32 = 12.0;
+#[derive(Debug, Clone, Copy, PartialEq)]
+struct CartPoleScene {
+    cart_center: [f32; 2],
+    pivot: [f32; 2],
+    pole_center: [f32; 2],
+    pole_rotation: f32,
+}
+
+impl CartPoleScene {
+    fn from_observation(observation: &[f32; OBS_SIZE]) -> Self {
+        let [x, _, theta, _] = *observation;
+        let cart_x = x * CART_SCREEN_SCALE;
+        let pivot = [cart_x, CART_Y + AXLE_OFFSET];
+        let pole_center = [
+            theta.sin().mul_add(POLE_CENTER_OFFSET, pivot[0]),
+            theta.cos().mul_add(POLE_CENTER_OFFSET, pivot[1]),
+        ];
+
+        Self {
+            cart_center: [cart_x, CART_Y],
+            pivot,
+            pole_center,
+            pole_rotation: -theta,
+        }
+    }
+}
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 enum CartAction {
@@ -131,16 +148,23 @@ impl CartAction {
 #[derive(Debug, Clone)]
 struct CartPole {
     state: [f32; OBS_SIZE],
-    steps: usize,
+    rng: SplitMix64,
 }
 
 impl Default for CartPole {
     fn default() -> Self {
         Self {
             state: [0.0; OBS_SIZE],
-            steps: 0,
+            rng: SplitMix64::new(0),
         }
     }
+}
+
+type CartPoleV1 = TimeLimit<CartPole>;
+
+fn cartpole_v1() -> CartPoleV1 {
+    TimeLimit::new(CartPole::default(), MAX_STEPS_PER_EPISODE)
+        .expect("CartPole-v1 has a positive time limit")
 }
 
 impl Env for CartPole {
@@ -149,12 +173,14 @@ impl Env for CartPole {
     type Info = ();
 
     fn reset(&mut self, seed: Option<u64>) -> Reset<Self::Observation> {
-        self.steps = 0;
+        if let Some(seed) = seed {
+            self.rng = SplitMix64::new(seed);
+        }
         self.state = [
-            jitter(seed, 0),
-            jitter(seed, 1),
-            jitter(seed, 2),
-            jitter(seed, 3),
+            self.rng.f32_between(-0.05, 0.05),
+            self.rng.f32_between(-0.05, 0.05),
+            self.rng.f32_between(-0.05, 0.05),
+            self.rng.f32_between(-0.05, 0.05),
         ];
 
         Reset {
@@ -183,15 +209,12 @@ impl Env for CartPole {
             TAU.mul_add(theta_dot, theta),
             TAU.mul_add(theta_acc, theta_dot),
         ];
-        self.steps += 1;
 
         let [x, _, theta, _] = self.state;
         let status = if !(-X_THRESHOLD..=X_THRESHOLD).contains(&x)
             || !(-THETA_THRESHOLD_RADIANS..=THETA_THRESHOLD_RADIANS).contains(&theta)
         {
             EpisodeStatus::Terminated
-        } else if self.steps >= MAX_STEPS_PER_EPISODE {
-            EpisodeStatus::Truncated
         } else {
             EpisodeStatus::Continuing
         };
@@ -205,45 +228,12 @@ impl Env for CartPole {
     }
 }
 
-#[derive(Module, Debug)]
-struct QNetwork<B: Backend> {
-    layers: Vec<Linear<B>>,
-    activation: Relu,
-}
-
-impl<B: Backend> QNetwork<B> {
-    fn new(device: &B::Device) -> Self {
-        let layers = [OBS_SIZE, 64, 64, NUM_ACTIONS]
-            .windows(2)
-            .map(|window| LinearConfig::new(window[0], window[1]).init(device))
-            .collect();
-
-        Self {
-            layers,
-            activation: Relu::new(),
-        }
-    }
-
-    fn forward(&self, input: Tensor<B, 2>) -> Tensor<B, 2> {
-        let last_layer = self.layers.len() - 1;
-        let mut output = input;
-
-        for (index, layer) in self.layers.iter().enumerate() {
-            output = layer.forward(output);
-            if index < last_layer {
-                output = self.activation.forward(output);
-            }
-        }
-
-        output
-    }
-}
-
 #[derive(Debug, Clone)]
 struct CartPoleDqnConfig {
     train_steps: usize,
     eval_interval: usize,
     eval_episodes: usize,
+    num_envs: usize,
     batch_size: usize,
     replay_capacity: usize,
     min_replay_size: usize,
@@ -253,8 +243,6 @@ struct CartPoleDqnConfig {
     epsilon_start: f64,
     epsilon_end: f64,
     epsilon_decay_steps: usize,
-    warmup_batches: usize,
-    warmup_batch_size: usize,
 }
 
 impl Default for CartPoleDqnConfig {
@@ -263,6 +251,7 @@ impl Default for CartPoleDqnConfig {
             train_steps: DEFAULT_TRAIN_STEPS,
             eval_interval: DEFAULT_EVAL_INTERVAL,
             eval_episodes: DEFAULT_EVAL_EPISODES,
+            num_envs: DEFAULT_NUM_ENVS,
             batch_size: 64,
             replay_capacity: 50_000,
             min_replay_size: 1_000,
@@ -272,57 +261,25 @@ impl Default for CartPoleDqnConfig {
             epsilon_start: 0.15,
             epsilon_end: 0.01,
             epsilon_decay_steps: 10_000,
-            warmup_batches: 0,
-            warmup_batch_size: 128,
         }
     }
 }
 
-#[derive(Debug, Clone)]
-struct Experience {
-    observation: [f32; OBS_SIZE],
-    action_index: usize,
-    reward: f64,
-    next_observation: [f32; OBS_SIZE],
-    status: EpisodeStatus,
-}
-
-#[derive(Debug)]
-struct ReplayBuffer {
-    data: Vec<Experience>,
-    capacity: usize,
-    next_index: usize,
-}
-
-impl ReplayBuffer {
-    fn new(capacity: usize) -> Self {
-        Self {
-            data: Vec::with_capacity(capacity),
-            capacity,
-            next_index: 0,
+impl CartPoleDqnConfig {
+    fn learner_config(&self) -> DqnConfig {
+        DqnConfig {
+            hidden_sizes: vec![64, 64],
+            gamma: self.gamma,
+            learning_rate: self.learning_rate,
+            replay_capacity: self.replay_capacity,
+            min_replay_size: self.min_replay_size,
+            batch_size: self.batch_size,
+            target_update_interval: self.target_update_interval,
+            epsilon_start: self.epsilon_start,
+            epsilon_end: self.epsilon_end,
+            epsilon_decay_steps: self.epsilon_decay_steps as u64,
+            ..DqnConfig::default()
         }
-    }
-
-    fn push(&mut self, experience: Experience) {
-        if self.data.len() < self.capacity {
-            self.data.push(experience);
-        } else {
-            self.data[self.next_index] = experience;
-            self.next_index = (self.next_index + 1) % self.capacity;
-        }
-    }
-
-    fn len(&self) -> usize {
-        self.data.len()
-    }
-
-    fn sample(&self, batch_size: usize, rng: &mut SplitMix64) -> Vec<Experience> {
-        (0..batch_size)
-            .map(|_| {
-                let index = rng.usize_below(self.data.len());
-                self.data[index].clone()
-            })
-            .collect()
     }
 }
 
@@ -336,7 +293,7 @@ impl SplitMix64 {
         Self { state: seed }
     }
 
-    fn next_u64(&mut self) -> u64 {
+    const fn next_u64(&mut self) -> u64 {
         self.state = self.state.wrapping_add(0x9e37_79b9_7f4a_7c15);
         let mut value = self.state;
         value = (value ^ (value >> 30)).wrapping_mul(0xbf58_476d_1ce4_e5b9);
@@ -350,173 +307,7 @@ impl SplitMix64 {
 
     fn f32_between(&mut self, low: f32, high: f32) -> f32 {
         let unit = self.f64() as f32;
-        low + unit * (high - low)
-    }
-
-    fn usize_below(&mut self, upper: usize) -> usize {
-        (self.next_u64() as usize) % upper
-    }
-}
-
-struct DqnAgent {
-    online_net: QNetwork<TrainingBackend>,
-    target_net: QNetwork<InferenceBackend>,
-    optimizer: OptimizerAdaptor<Adam, QNetwork<TrainingBackend>, TrainingBackend>,
-    replay: ReplayBuffer,
-    device: TrainingDevice,
-    config: CartPoleDqnConfig,
-    action_rng: SplitMix64,
-    replay_rng: SplitMix64,
-    warmup_rng: SplitMix64,
-    total_steps: usize,
-    last_loss: Option<f64>,
-    last_warmup_loss: Option<f64>,
-}
-
-impl DqnAgent {
-    fn new(config: CartPoleDqnConfig, seeds: SeedConfig) -> Self {
-        let device = training_device();
-        let online_net = QNetwork::<TrainingBackend>::new(&device);
-        let target_net = online_net.valid();
-        let optimizer = AdamConfig::new()
-            .with_epsilon(1e-8)
-            .init::<TrainingBackend, QNetwork<TrainingBackend>>();
-
-        Self {
-            online_net,
-            target_net,
-            optimizer,
-            replay: ReplayBuffer::new(config.replay_capacity),
-            device,
-            config,
-            action_rng: SplitMix64::new(seeds.action),
-            replay_rng: SplitMix64::new(seeds.replay),
-            warmup_rng: SplitMix64::new(seeds.model),
-            total_steps: 0,
-            last_loss: None,
-            last_warmup_loss: None,
-        }
-    }
-
-    fn epsilon(&self) -> f64 {
-        let progress =
-            (self.total_steps as f64 / self.config.epsilon_decay_steps as f64).clamp(0.0, 1.0);
-        self.config
-            .epsilon_start
-            .mul_add(1.0 - progress, self.config.epsilon_end * progress)
-    }
-
-    fn act_explore(&mut self, observation: &[f32; OBS_SIZE]) -> CartAction {
-        if self.action_rng.f64() < self.epsilon() {
-            return CartAction::from_index(self.action_rng.usize_below(NUM_ACTIONS));
-        }
-
-        greedy_action(&self.online_net.valid(), observation, &inference_device())
-    }
-
-    fn observe(&mut self, experience: Experience) -> Result<(), Box<dyn Error>> {
-        self.replay.push(experience);
-        self.total_steps += 1;
-
-        if self.total_steps % self.config.target_update_interval == 0 {
-            self.target_net = self.online_net.valid();
-        }
-
-        if self.replay.len() >= self.config.min_replay_size {
-            self.last_loss = Some(self.train_step()?);
-        }
-
-        Ok(())
-    }
-
-    fn behavior_clone_warmup(&mut self) -> Result<(), Box<dyn Error>> {
-        let loss = CrossEntropyLossConfig::new().init(&self.device);
-
-        for _ in 0..self.config.warmup_batches {
-            let mut observations = Vec::with_capacity(self.config.warmup_batch_size);
-            let mut labels = Vec::with_capacity(self.config.warmup_batch_size);
-
-            for _ in 0..self.config.warmup_batch_size {
-                let observation = [
-                    self.warmup_rng.f32_between(-X_THRESHOLD, X_THRESHOLD),
-                    self.warmup_rng.f32_between(-2.0, 2.0),
-                    self.warmup_rng
-                        .f32_between(-THETA_THRESHOLD_RADIANS, THETA_THRESHOLD_RADIANS),
-                    self.warmup_rng.f32_between(-2.0, 2.0),
-                ];
-                observations.push(observation);
-                labels.push(heuristic_action(&observation).as_index() as i32);
-            }
-
-            let logits = self
-                .online_net
-                .forward(encode_batch_train(&observations, &self.device));
-            let targets =
-                Tensor::<TrainingBackend, 1, Int>::from_ints(labels.as_slice(), &self.device);
-            let batch_loss = loss.forward(logits, targets);
-
-            let loss_value = batch_loss.clone().into_scalar().elem::<f64>();
-            let grads = batch_loss.backward();
-            let grads = GradientsParams::from_grads(grads, &self.online_net);
-            self.online_net =
-                self.optimizer
-                    .step(self.config.learning_rate, self.online_net.clone(), grads);
-            self.last_warmup_loss = Some(loss_value);
-        }
-
-        self.target_net = self.online_net.valid();
-        Ok(())
-    }
-
-    fn train_step(&mut self) -> Result<f64, Box<dyn Error>> {
-        let batch = self
-            .replay
-            .sample(self.config.batch_size, &mut self.replay_rng);
-        let batch_size = batch.len();
-
-        let observations: Vec<_> = batch.iter().map(|item| item.observation).collect();
-        let next_observations: Vec<_> = batch.iter().map(|item| item.next_observation).collect();
-        let rewards: Vec<f32> = batch.iter().map(|item| item.reward as f32).collect();
-        let masks: Vec<f32> = batch
-            .iter()
-            .map(|item| item.status.bootstrap_mask() as f32)
-            .collect();
-        let action_indices: Vec<i32> = batch.iter().map(|item| item.action_index as i32).collect();
-
-        let rewards_t = Tensor::<TrainingBackend, 1>::from_floats(rewards.as_slice(), &self.device);
-        let masks_t = Tensor::<TrainingBackend, 1>::from_floats(masks.as_slice(), &self.device);
-
-        let next_q_values = self
-            .target_net
-            .forward(encode_batch_infer(&next_observations, &inference_device()));
-        let max_next_q = next_q_values.max_dim(1).squeeze::<1>();
-        let max_next_q = Tensor::<TrainingBackend, 1>::from_inner(max_next_q);
-        let targets = rewards_t + masks_t * max_next_q * self.config.gamma;
-
-        let q_values = self
-            .online_net
-            .forward(encode_batch_train(&observations, &self.device));
-        let action_indices_t =
-            Tensor::<TrainingBackend, 1, Int>::from_ints(action_indices.as_slice(), &self.device);
-        let q_taken = q_values
-            .gather(1, action_indices_t.reshape([batch_size, 1]))
-            .squeeze::<1>();
-
-        let loss =
-            HuberLossConfig::new(1.0)
-                .init()
-                .forward(q_taken, targets.detach(), Reduction::Mean);
-        let loss_value = loss.clone().into_scalar().elem::<f64>();
-        let grads = GradientsParams::from_grads(loss.backward(), &self.online_net);
-        self.online_net =
-            self.optimizer
-                .step(self.config.learning_rate, self.online_net.clone(), grads);
-
-        Ok(loss_value)
-    }
-
-    fn policy(&self) -> QNetwork<InferenceBackend> {
-        self.online_net.valid()
+        unit.mul_add(high - low, low)
     }
 }
 
@@ -546,6 +337,31 @@ enum Mode {
     TrainWatch,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum EvalSuiteArg {
+    Validation,
+    Test,
+    Demo,
+}
+
+impl EvalSuiteArg {
+    const fn seed(self, seeds: SeedConfig) -> u64 {
+        match self {
+            Self::Validation => seeds.validation,
+            Self::Test => seeds.test,
+            Self::Demo => seeds.demo,
+        }
+    }
+
+    const fn as_str(self) -> &'static str {
+        match self {
+            Self::Validation => "validation",
+            Self::Test => "test",
+            Self::Demo => "demo",
+        }
+    }
+}
+
 #[derive(Debug, Clone)]
 struct Args {
     mode: Mode,
@@ -554,6 +370,7 @@ struct Args {
     run_id: Option<String>,
     checkpoint: Option<PathBuf>,
     seed: u64,
+    eval_suite: EvalSuiteArg,
     screenshot: Option<PathBuf>,
     screenshot_frames: u32,
     video_output: Option<PathBuf>,
@@ -570,6 +387,7 @@ impl Args {
         let mut run_id = None;
         let mut checkpoint = None;
         let mut seed = DEFAULT_ROOT_SEED;
+        let mut eval_suite = EvalSuiteArg::Test;
         let mut screenshot = None;
         let mut screenshot_frames = 90;
         let mut video_output = None;
@@ -590,31 +408,42 @@ impl Args {
                 "--eval-interval" => {
                     config.eval_interval = parse_next(&mut raw, "--eval-interval")?;
                 }
-                "--warmup-batches" => {
-                    config.warmup_batches = parse_next(&mut raw, "--warmup-batches")?;
-                }
+                "--num-envs" => config.num_envs = parse_next(&mut raw, "--num-envs")?,
                 "--run-id" => run_id = Some(parse_next::<String>(&mut raw, "--run-id")?),
                 "--runs-root" => {
-                    runs_root = PathBuf::from(parse_next::<String>(&mut raw, "--runs-root")?)
+                    runs_root = PathBuf::from(parse_next::<String>(&mut raw, "--runs-root")?);
                 }
                 "--checkpoint" => {
                     checkpoint = Some(PathBuf::from(parse_next::<String>(
                         &mut raw,
                         "--checkpoint",
-                    )?))
+                    )?));
                 }
                 "--seed" => seed = parse_next(&mut raw, "--seed")?,
+                "--suite" => {
+                    let value = parse_next::<String>(&mut raw, "--suite")?;
+                    eval_suite = match value.as_str() {
+                        "validation" => EvalSuiteArg::Validation,
+                        "test" => EvalSuiteArg::Test,
+                        "demo" => EvalSuiteArg::Demo,
+                        _ => {
+                            return Err(CliError::Invalid(format!(
+                                "--suite must be validation, test, or demo; got {value:?}"
+                            )))
+                        }
+                    };
+                }
                 "--screenshot" => {
                     screenshot = Some(PathBuf::from(parse_next::<String>(
                         &mut raw,
                         "--screenshot",
-                    )?))
+                    )?));
                 }
                 "--screenshot-frames" => {
                     screenshot_frames = parse_next(&mut raw, "--screenshot-frames")?;
                 }
                 "--output" | "--video-output" => {
-                    video_output = Some(PathBuf::from(parse_next::<String>(&mut raw, "--output")?))
+                    video_output = Some(PathBuf::from(parse_next::<String>(&mut raw, "--output")?));
                 }
                 "--video-seconds" => video_seconds = parse_next(&mut raw, "--video-seconds")?,
                 "--final-seconds" => {
@@ -624,7 +453,6 @@ impl Args {
                     config.train_steps = 512;
                     config.eval_interval = 256;
                     config.eval_episodes = 2;
-                    config.warmup_batches = 4;
                     config.min_replay_size = 64;
                     config.batch_size = 32;
                 }
@@ -646,6 +474,7 @@ impl Args {
             run_id,
             checkpoint,
             seed,
+            eval_suite,
             screenshot,
             screenshot_frames,
             video_output,
@@ -690,10 +519,12 @@ fn main() -> Result<(), Box<dyn Error>> {
         Mode::Eval => {
             let checkpoint = resolve_checkpoint(args.checkpoint.as_deref(), &args.runs_root)?;
             let policy = load_policy(&checkpoint)?;
-            let summary = eval_policy(&policy, args.config.eval_episodes, args.seed);
+            let eval_seed = args.eval_suite.seed(SeedConfig::from_root(args.seed));
+            let summary = eval_policy(&policy, args.config.eval_episodes, eval_seed);
             println!(
-                "eval checkpoint={} episodes={} mean_reward={:.1} mean_length={:.1} min={:.1} max={:.1}",
+                "eval checkpoint={} suite={} episodes={} mean_reward={:.1} mean_length={:.1} min={:.1} max={:.1}",
                 checkpoint.display(),
+                args.eval_suite.as_str(),
                 summary.episodes,
                 summary.mean_reward,
                 summary.mean_length,
@@ -716,7 +547,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                     fps: DEFAULT_VIDEO_FPS,
                     width: DEFAULT_VIDEO_WIDTH,
                     height: DEFAULT_VIDEO_HEIGHT,
-                    seed: args.seed,
+                    seed: SeedConfig::from_root(args.seed).demo,
                 },
             )?;
             println!("video={}", output.display());
@@ -751,13 +582,12 @@ fn train(args: Args) -> Result<TrainReport, Box<dyn Error>> {
     };
     let run = RunConfig::new("cartpole", AlgorithmKind::Dqn, run_id, args.runs_root)?;
     let paths = run.paths();
-    fs::create_dir_all(&paths.checkpoints_dir)?;
+    paths.create_new()?;
     write_train_config(&paths, &args.config, seeds)?;
 
-    let mut agent = DqnAgent::new(args.config.clone(), seeds);
-    agent.behavior_clone_warmup()?;
+    let mut agent = DqnAgent::new(OBS_SIZE, NUM_ACTIONS, args.config.learner_config(), seeds)?;
 
-    let initial = eval_policy(&agent.policy(), args.config.eval_episodes, seeds.eval);
+    let initial = eval_policy(&agent.policy(), args.config.eval_episodes, seeds.validation);
     let mut best = initial.clone();
     save_policy(&agent.policy(), &paths.best_checkpoint)?;
     save_policy(&agent.policy(), &paths.latest_checkpoint)?;
@@ -769,69 +599,97 @@ fn train(args: Args) -> Result<TrainReport, Box<dyn Error>> {
         &MetricRecord::new(0)
             .with_field("eval/mean_reward", MetricValue::Number(initial.mean_reward))
             .with_field("eval/mean_length", MetricValue::Number(initial.mean_length))
-            .with_field(
-                "warmup/batches",
-                MetricValue::Number(args.config.warmup_batches as f64),
-            ),
+            .with_field("train/optimizer_updates", MetricValue::Number(0.0))
+            .with_field("qualification/behavior_cloning", MetricValue::Bool(false))
+            .with_field("qualification/reward_shaping", MetricValue::Bool(false)),
     )?;
-    let mut env = CartPole::default();
-    let mut observation = env.reset(Some(seeds.env_reset)).observation;
-    let mut episode_reward = 0.0;
-    let mut episode_steps = 0usize;
+    if args.config.num_envs < 2 {
+        return Err("CartPole training requires at least two Bevy environment entities".into());
+    }
+    if args.config.eval_interval == 0 {
+        return Err("--eval-interval must be greater than zero".into());
+    }
+    if !args.config.train_steps.is_multiple_of(args.config.num_envs) {
+        return Err("--steps must be divisible by --num-envs for an exact training budget".into());
+    }
+
+    let reset_seeds = seeds;
+    let mut collector = BevyTransitionCollector::new(
+        |_| cartpole_v1(),
+        args.config.num_envs,
+        move |env_id, episode| Some(reset_seeds.environment_episode(env_id, episode)),
+    )?;
     let mut episodes = 0usize;
+    let mut last_loss = None;
+    let mut last_policy_delta = None;
+    let mut next_eval = args.config.eval_interval;
 
-    for step in 1..=args.config.train_steps {
-        let action = agent.act_explore(&observation);
-        let result = env.step(action);
-        let experience = Experience {
-            observation,
-            action_index: action.as_index(),
-            reward: result.reward,
-            next_observation: result.observation,
-            status: result.status,
-        };
-        agent.observe(experience)?;
+    while agent.global_steps() < args.config.train_steps as u64 {
+        let requested_observations = collector
+            .requests()
+            .iter()
+            .map(|request| request.observation)
+            .collect::<Vec<_>>();
+        let actions = requested_observations
+            .iter()
+            .map(|observation| {
+                agent
+                    .select_action(observation)
+                    .map(|selection| CartAction::from_index(selection.action_index))
+            })
+            .collect::<Result<Vec<_>, _>>()?;
+        let batch = collector.step(actions)?;
 
-        episode_reward += result.reward;
-        episode_steps += 1;
+        for event in &batch.transitions {
+            let transition = &event.transition;
+            if let Some(update) = agent.observe(
+                &transition.observation,
+                transition.action.as_index(),
+                transition.reward,
+                &transition.next_observation,
+                transition.status,
+            )? {
+                last_loss = Some(update.loss);
+                last_policy_delta = Some(update.policy_output_delta_l1);
+            }
+        }
 
-        if result.status.is_done() {
+        let step = agent.global_steps() as usize;
+        for episode in batch.episode_ends {
             episodes += 1;
-            if episodes % 10 == 0 {
+            if episodes.is_multiple_of(10) {
                 let mut record = MetricRecord::new(step as u64)
                     .with_field("train/episode", MetricValue::Number(episodes as f64))
-                    .with_field("train/reward", MetricValue::Number(episode_reward))
-                    .with_field("train/length", MetricValue::Number(episode_steps as f64))
-                    .with_field("train/epsilon", MetricValue::Number(agent.epsilon()));
-                if let Some(loss) = agent.last_loss {
+                    .with_field("train/reward", MetricValue::Number(episode.total_reward))
+                    .with_field(
+                        "train/length",
+                        MetricValue::Number(episode.episode_steps as f64),
+                    )
+                    .with_field("train/epsilon", MetricValue::Number(agent.epsilon()))
+                    .with_field(
+                        "train/optimizer_updates",
+                        MetricValue::Number(agent.optimizer_steps() as f64),
+                    );
+                if let Some(loss) = last_loss {
                     record = record.with_field("train/loss", MetricValue::Number(loss));
                 }
-                if let Some(loss) = agent.last_warmup_loss {
-                    record = record.with_field("warmup/loss", MetricValue::Number(loss));
+                if let Some(delta) = last_policy_delta {
+                    record = record
+                        .with_field("train/policy_output_delta_l1", MetricValue::Number(delta));
                 }
                 metrics.write_record(&record)?;
                 println!(
-                    "step {step:>6} episode {episodes:>4} reward {episode_reward:>6.1} length {episode_steps:>3} epsilon {:.3}",
+                    "step {step:>6} episode {episodes:>4} reward {:>6.1} length {:>3} epsilon {:.3}",
+                    episode.total_reward,
+                    episode.episode_steps,
                     agent.epsilon()
                 );
             }
-
-            observation = env
-                .reset(Some(seeds.env_reset.wrapping_add(episodes as u64)))
-                .observation;
-            episode_reward = 0.0;
-            episode_steps = 0;
-        } else {
-            observation = result.observation;
         }
 
-        if step % args.config.eval_interval == 0 || step == args.config.train_steps {
+        if step >= next_eval || step == args.config.train_steps {
             let policy = agent.policy();
-            let summary = eval_policy(
-                &policy,
-                args.config.eval_episodes,
-                seeds.eval.wrapping_add(step as u64),
-            );
+            let summary = eval_policy(&policy, args.config.eval_episodes, seeds.validation);
             append_eval_record(&paths, step, &summary)?;
             save_policy(&policy, &paths.latest_checkpoint)?;
             save_policy(&policy, &step_checkpoint_path(&paths, step))?;
@@ -858,7 +716,7 @@ fn train(args: Args) -> Result<TrainReport, Box<dyn Error>> {
                     "solved threshold reached: best_mean_reward={:.1} >= {:.1}",
                     best.mean_reward, SOLVED_MEAN_REWARD
                 );
-                write_summary(&paths, step, &initial, &best, &args.config)?;
+                write_summary(&paths, step, &initial, &best)?;
                 return Ok(TrainReport {
                     paths,
                     initial,
@@ -866,16 +724,12 @@ fn train(args: Args) -> Result<TrainReport, Box<dyn Error>> {
                     global_steps: step,
                 });
             }
+
+            next_eval = next_eval.saturating_add(args.config.eval_interval);
         }
     }
 
-    write_summary(
-        &paths,
-        args.config.train_steps,
-        &initial,
-        &best,
-        &args.config,
-    )?;
+    write_summary(&paths, args.config.train_steps, &initial, &best)?;
     Ok(TrainReport {
         paths,
         initial,
@@ -885,15 +739,14 @@ fn train(args: Args) -> Result<TrainReport, Box<dyn Error>> {
 }
 
 fn resolve_or_train_checkpoint(args: &Args) -> Result<PathBuf, Box<dyn Error>> {
-    match resolve_checkpoint(args.checkpoint.as_deref(), &args.runs_root) {
-        Ok(checkpoint) => Ok(checkpoint),
-        Err(_) => {
-            let mut train_args = args.clone();
-            train_args.mode = Mode::Train;
-            let report = train(train_args)?;
-            Ok(report.paths.best_checkpoint)
-        }
+    if let Ok(checkpoint) = resolve_checkpoint(args.checkpoint.as_deref(), &args.runs_root) {
+        return Ok(checkpoint);
     }
+
+    let mut train_args = args.clone();
+    train_args.mode = Mode::Train;
+    let report = train(train_args)?;
+    Ok(report.paths.best_checkpoint)
 }
 
 fn resolve_checkpoint(
@@ -1064,7 +917,7 @@ fn render_training_video(
                 &policy,
                 segment_frames,
                 &config,
-                config.seed.wrapping_add(checkpoint.global_step as u64),
+                config.seed,
                 &label,
                 &mut frame_index,
                 timelapse_frames,
@@ -1072,13 +925,13 @@ fn render_training_video(
         }
 
         let final_policy = load_policy(&best_checkpoint)?;
-        let label = format!("FINAL BEST  MEAN {:>5.1}  REAL TIME", final_mean);
+        let label = format!("FINAL BEST  MEAN {final_mean:>5.1}  REAL TIME");
         write_policy_video_segment(
             &mut stdin,
             &final_policy,
             final_frames,
             &config,
-            config.seed.wrapping_add(0xfeed_babe),
+            config.seed,
             &label,
             &mut frame_index,
             timelapse_frames,
@@ -1121,6 +974,12 @@ fn sampled_checkpoints(
     checkpoints: &[VideoCheckpoint],
     frame_budget: usize,
 ) -> Vec<VideoCheckpoint> {
+    if frame_budget == 0 {
+        return Vec::new();
+    }
+    if frame_budget == 1 {
+        return checkpoints.first().cloned().into_iter().collect();
+    }
     if checkpoints.len() <= frame_budget {
         return checkpoints.to_vec();
     }
@@ -1128,7 +987,10 @@ fn sampled_checkpoints(
     (0..frame_budget)
         .map(|index| {
             let source_index = index * (checkpoints.len() - 1) / (frame_budget - 1);
-            checkpoints[source_index].clone()
+            checkpoints
+                .get(source_index)
+                .expect("sampled checkpoint index stays in bounds")
+                .clone()
         })
         .collect()
 }
@@ -1176,16 +1038,16 @@ fn json_f64_field(line: &str, key: &str) -> Option<f64> {
 fn json_number_field<'a>(line: &'a str, key: &str) -> Option<&'a str> {
     let needle = format!("\"{key}\":");
     let start = line.find(&needle)? + needle.len();
-    let rest = line[start..].trim_start();
+    let rest = line.get(start..)?.trim_start();
     let end = rest
         .find(|ch: char| !(ch.is_ascii_digit() || matches!(ch, '.' | '-' | '+' | 'e' | 'E')))
         .unwrap_or(rest.len());
-    Some(&rest[..end])
+    rest.get(..end)
 }
 
 fn write_policy_video_segment(
     writer: &mut impl Write,
-    policy: &QNetwork<InferenceBackend>,
+    policy: &DqnPolicy,
     frames: usize,
     config: &VideoConfig,
     seed: u64,
@@ -1193,10 +1055,9 @@ fn write_policy_video_segment(
     frame_index: &mut usize,
     timelapse_frames: usize,
 ) -> Result<(), Box<dyn Error>> {
-    let mut env = CartPole::default();
+    let mut env = cartpole_v1();
     let mut episode = 0u64;
     let mut observation = env.reset(Some(seed)).observation;
-    let device = inference_device();
 
     for _ in 0..frames {
         let progress = if timelapse_frames == 0 {
@@ -1208,7 +1069,7 @@ fn write_policy_video_segment(
         draw_cartpole_frame(&mut frame, &observation, label, progress);
         frame.write_ppm(writer)?;
 
-        let action = greedy_action(policy, &observation, &device);
+        let action = greedy_action(policy, &observation);
         let result = env.step(action);
         if result.status.is_done() {
             episode += 1;
@@ -1250,17 +1111,17 @@ impl RgbFrame {
     }
 
     fn set_pixel(&mut self, x: i32, y: i32, color: [u8; 3]) {
-        if x < 0 || y < 0 {
+        let (Ok(x), Ok(y)) = (usize::try_from(x), usize::try_from(y)) else {
             return;
-        }
-        let x = x as usize;
-        let y = y as usize;
+        };
         if x >= self.width || y >= self.height {
             return;
         }
 
         let index = (y * self.width + x) * 3;
-        self.pixels[index..index + 3].copy_from_slice(&color);
+        if let Some(pixel) = self.pixels.get_mut(index..index + 3) {
+            pixel.copy_from_slice(&color);
+        }
     }
 
     fn fill_rect(&mut self, x: i32, y: i32, width: i32, height: i32, color: [u8; 3]) {
@@ -1284,16 +1145,50 @@ impl RgbFrame {
         }
     }
 
-    fn draw_thick_line(&mut self, x0: f32, y0: f32, x1: f32, y1: f32, radius: i32, color: [u8; 3]) {
-        let dx = x1 - x0;
-        let dy = y1 - y0;
-        let steps = dx.abs().max(dy.abs()).ceil().max(1.0) as i32;
+    fn fill_convex_quad(&mut self, points: [[f32; 2]; 4], color: [u8; 3]) {
+        let min_x = points
+            .iter()
+            .map(|point| point[0])
+            .fold(f32::INFINITY, f32::min)
+            .floor() as i32;
+        let max_x = points
+            .iter()
+            .map(|point| point[0])
+            .fold(f32::NEG_INFINITY, f32::max)
+            .ceil() as i32;
+        let min_y = points
+            .iter()
+            .map(|point| point[1])
+            .fold(f32::INFINITY, f32::min)
+            .floor() as i32;
+        let max_y = points
+            .iter()
+            .map(|point| point[1])
+            .fold(f32::NEG_INFINITY, f32::max)
+            .ceil() as i32;
 
-        for step in 0..=steps {
-            let t = step as f32 / steps as f32;
-            let x = dx.mul_add(t, x0).round() as i32;
-            let y = dy.mul_add(t, y0).round() as i32;
-            self.fill_circle(x, y, radius, color);
+        for y in min_y..=max_y {
+            for x in min_x..=max_x {
+                let sample = [x as f32 + 0.5, y as f32 + 0.5];
+                let mut has_positive = false;
+                let mut has_negative = false;
+                for (start, end) in points
+                    .iter()
+                    .copied()
+                    .zip(points.iter().copied().cycle().skip(1))
+                    .take(points.len())
+                {
+                    let cross = (end[0] - start[0]).mul_add(
+                        sample[1] - start[1],
+                        -((end[1] - start[1]) * (sample[0] - start[0])),
+                    );
+                    has_positive |= cross > 0.0;
+                    has_negative |= cross < 0.0;
+                }
+                if !(has_positive && has_negative) {
+                    self.set_pixel(x, y, color);
+                }
+            }
         }
     }
 }
@@ -1304,69 +1199,85 @@ fn draw_cartpole_frame(
     label: &str,
     progress: f32,
 ) {
-    let black = [18, 18, 18];
-    let gray = [110, 110, 110];
+    let black = [0, 0, 0];
     let blue = [47, 111, 184];
-    let width = frame.width as f32;
-    let height = frame.height as f32;
-    let [x, _, theta, _] = *observation;
+    let tan = [202, 152, 101];
+    let lavender = [129, 132, 203];
+    let viewport_x = if frame.width as i32 > OFFICIAL_VIEWPORT_WIDTH {
+        40
+    } else {
+        0
+    };
+    let viewport_y = ((frame.height as i32 - OFFICIAL_VIEWPORT_HEIGHT) / 2).max(0);
+    let scene = CartPoleScene::from_observation(observation);
+    let viewport_center_x = (OFFICIAL_VIEWPORT_WIDTH as f32).mul_add(0.5, viewport_x as f32);
+    let viewport_center_y = (OFFICIAL_VIEWPORT_HEIGHT as f32).mul_add(0.5, viewport_y as f32);
+    let to_screen = |point: [f32; 2]| [viewport_center_x + point[0], viewport_center_y - point[1]];
 
-    let track_y = (height * 0.79).round() as i32;
-    let cart_w = (width * 0.13).round() as i32;
-    let cart_h = (height * 0.075).round() as i32;
-    let wheel_r = (height * 0.018).round() as i32;
-    let pole_len = height * 0.42;
-    let pole_radius = (width * 0.008).round().max(4.0) as i32;
-    let world_scale = width * 0.42 / X_THRESHOLD;
-    let cart_x = width * 0.5 + x * world_scale;
-    let cart_y = track_y as f32 - cart_h as f32 * 0.5 - 2.0;
-    let hinge_y = cart_y - cart_h as f32 * 0.5;
-    let hinge_x = cart_x;
-    let pole_tip_x = hinge_x + theta.sin() * pole_len;
-    let pole_tip_y = hinge_y - theta.cos() * pole_len;
-
-    frame.fill_rect(22, track_y, frame.width as i32 - 44, 5, black);
-    for marker_x in [
-        width * 0.5 - X_THRESHOLD * world_scale,
-        width * 0.5 + X_THRESHOLD * world_scale,
-    ] {
-        frame.fill_rect(marker_x.round() as i32 - 2, track_y - 32, 4, 32, gray);
-    }
-
-    frame.draw_thick_line(hinge_x, hinge_y, pole_tip_x, pole_tip_y, pole_radius, black);
     frame.fill_rect(
-        cart_x.round() as i32 - cart_w / 2,
-        cart_y.round() as i32 - cart_h / 2,
-        cart_w,
-        cart_h,
+        0,
+        0,
+        frame.width as i32,
+        frame.height as i32,
+        [242, 244, 248],
+    );
+    frame.fill_rect(
+        viewport_x,
+        viewport_y,
+        OFFICIAL_VIEWPORT_WIDTH,
+        OFFICIAL_VIEWPORT_HEIGHT,
+        [255, 255, 255],
+    );
+
+    let cart = to_screen(scene.cart_center);
+    frame.fill_rect(
+        CART_W.mul_add(-0.5, cart[0]).round() as i32,
+        CART_H.mul_add(-0.5, cart[1]).round() as i32,
+        CART_W as i32,
+        CART_H as i32,
         black,
     );
-    frame.fill_circle(
-        cart_x.round() as i32 - cart_w / 4,
-        track_y - wheel_r,
-        wheel_r,
-        [0, 0, 0],
-    );
-    frame.fill_circle(
-        cart_x.round() as i32 + cart_w / 4,
-        track_y - wheel_r,
-        wheel_r,
-        [0, 0, 0],
-    );
-    frame.fill_circle(
-        hinge_x.round() as i32,
-        hinge_y.round() as i32,
-        wheel_r + 1,
-        [0, 0, 0],
+
+    let pole = to_screen(scene.pole_center);
+    let sin = scene.pole_rotation.sin();
+    let cos = scene.pole_rotation.cos();
+    let half_width = POLE_W * 0.5;
+    let half_length = POLE_LEN * 0.5;
+    let rotate = |local_x: f32, local_y: f32| {
+        [
+            local_y.mul_add(-sin, local_x.mul_add(cos, pole[0])),
+            local_x.mul_add(-sin, local_y.mul_add(-cos, pole[1])),
+        ]
+    };
+    frame.fill_convex_quad(
+        [
+            rotate(-half_width, -half_length),
+            rotate(-half_width, half_length),
+            rotate(half_width, half_length),
+            rotate(half_width, -half_length),
+        ],
+        tan,
     );
 
-    draw_text(frame, 14, 16, 2, label, black);
-    frame.fill_rect(14, 42, frame.width as i32 - 28, 5, [220, 220, 220]);
+    let pivot = to_screen(scene.pivot);
+    frame.fill_circle(
+        pivot[0].round() as i32,
+        pivot[1].round() as i32,
+        (POLE_W * 0.5) as i32,
+        lavender,
+    );
+
+    let track_y = to_screen([0.0, TRACK_Y])[1].round() as i32;
+    frame.fill_rect(viewport_x, track_y, OFFICIAL_VIEWPORT_WIDTH, 1, black);
+
+    let panel_x = viewport_x + OFFICIAL_VIEWPORT_WIDTH + 36;
+    draw_text(frame, panel_x, viewport_y + 40, 2, label, black);
+    frame.fill_rect(panel_x, viewport_y + 72, 520, 6, [220, 220, 220]);
     frame.fill_rect(
-        14,
-        42,
-        ((frame.width as f32 - 28.0) * progress.clamp(0.0, 1.0)).round() as i32,
-        5,
+        panel_x,
+        viewport_y + 72,
+        (520.0 * progress.clamp(0.0, 1.0)).round() as i32,
+        6,
         blue,
     );
 }
@@ -1392,7 +1303,7 @@ fn draw_text(frame: &mut RgbFrame, x: i32, y: i32, scale: i32, text: &str, color
     }
 }
 
-fn glyph_rows(ch: char) -> [&'static str; 7] {
+const fn glyph_rows(ch: char) -> [&'static str; 7] {
     match ch {
         'A' => [
             " XXX ", "X   X", "X   X", "XXXXX", "X   X", "X   X", "X   X",
@@ -1484,14 +1395,14 @@ fn glyph_rows(ch: char) -> [&'static str; 7] {
     }
 }
 
-fn eval_policy(policy: &QNetwork<InferenceBackend>, episodes: usize, seed: u64) -> EvalSummary {
+fn eval_policy(policy: &DqnPolicy, episodes: usize, seed: u64) -> EvalSummary {
     let mut total_reward = 0.0;
     let mut total_length = 0usize;
     let mut min_reward = f64::INFINITY;
     let mut max_reward = f64::NEG_INFINITY;
 
     for episode in 0..episodes {
-        let mut env = CartPole::default();
+        let mut env = cartpole_v1();
         let mut observation = env
             .reset(Some(seed.wrapping_add(episode as u64)))
             .observation;
@@ -1499,7 +1410,7 @@ fn eval_policy(policy: &QNetwork<InferenceBackend>, episodes: usize, seed: u64) 
         let mut episode_length = 0usize;
 
         loop {
-            let action = greedy_action(policy, &observation, &inference_device());
+            let action = greedy_action(policy, &observation);
             let result = env.step(action);
             episode_reward += result.reward;
             episode_length += 1;
@@ -1525,21 +1436,14 @@ fn eval_policy(policy: &QNetwork<InferenceBackend>, episodes: usize, seed: u64) 
     }
 }
 
-fn greedy_action(
-    policy: &QNetwork<InferenceBackend>,
-    observation: &[f32; OBS_SIZE],
-    device: &InferenceDevice,
-) -> CartAction {
-    let input = encode_one_infer(observation, device);
-    let values = policy.forward(input);
-    let index = values
-        .argmax(1)
-        .into_data()
-        .to_vec::<i32>()
-        .expect("argmax tensor converts to i32")[0] as usize;
+fn greedy_action(policy: &DqnPolicy, observation: &[f32; OBS_SIZE]) -> CartAction {
+    let index = policy
+        .greedy_action(observation)
+        .expect("CartPole observation width matches the saved DQN policy");
     CartAction::from_index(index)
 }
 
+#[cfg(test)]
 fn heuristic_action(observation: &[f32; OBS_SIZE]) -> CartAction {
     let [x, x_dot, theta, theta_dot] = *observation;
     let balance = 0.005_f32.mul_add(
@@ -1553,60 +1457,13 @@ fn heuristic_action(observation: &[f32; OBS_SIZE]) -> CartAction {
     }
 }
 
-fn encode_one_infer(
-    observation: &[f32; OBS_SIZE],
-    device: &InferenceDevice,
-) -> Tensor<InferenceBackend, 2> {
-    Tensor::<InferenceBackend, 1>::from_floats(observation.as_slice(), device)
-        .reshape([1, OBS_SIZE])
-}
-
-fn encode_batch_infer(
-    observations: &[[f32; OBS_SIZE]],
-    device: &InferenceDevice,
-) -> Tensor<InferenceBackend, 2> {
-    let flat: Vec<f32> = observations.iter().flatten().copied().collect();
-    Tensor::<InferenceBackend, 1>::from_floats(flat.as_slice(), device)
-        .reshape([observations.len(), OBS_SIZE])
-}
-
-fn encode_batch_train(
-    observations: &[[f32; OBS_SIZE]],
-    device: &TrainingDevice,
-) -> Tensor<TrainingBackend, 2> {
-    let flat: Vec<f32> = observations.iter().flatten().copied().collect();
-    Tensor::<TrainingBackend, 1>::from_floats(flat.as_slice(), device)
-        .reshape([observations.len(), OBS_SIZE])
-}
-
-fn save_policy(policy: &QNetwork<InferenceBackend>, path: &Path) -> Result<(), Box<dyn Error>> {
-    policy
-        .clone()
-        .save_file(path.to_path_buf(), &policy_recorder())?;
+fn save_policy(policy: &DqnPolicy, path: &Path) -> Result<(), Box<dyn Error>> {
+    policy.save(path)?;
     Ok(())
 }
 
-fn load_policy(path: &Path) -> Result<QNetwork<InferenceBackend>, Box<dyn Error>> {
-    let device = inference_device();
-    let policy = QNetwork::<InferenceBackend>::new(&device).load_file(
-        path.to_path_buf(),
-        &policy_recorder(),
-        &device,
-    )?;
-    Ok(policy)
-}
-
-fn jitter(seed: Option<u64>, lane: u64) -> f32 {
-    let mut value = seed
-        .unwrap_or(0)
-        .wrapping_add(lane.wrapping_mul(0x9e37_79b9_7f4a_7c15));
-    value ^= value >> 30;
-    value = value.wrapping_mul(0xbf58_476d_1ce4_e5b9);
-    value ^= value >> 27;
-    value = value.wrapping_mul(0x94d0_49bb_1331_11eb);
-    value ^= value >> 31;
-    let normalized = (value as f64 / u64::MAX as f64) as f32;
-    normalized.mul_add(0.1, -0.05)
+fn load_policy(path: &Path) -> Result<DqnPolicy, Box<dyn Error>> {
+    Ok(DqnPolicy::load(path, OBS_SIZE, NUM_ACTIONS, &[64, 64])?)
 }
 
 fn write_train_config(
@@ -1617,10 +1474,11 @@ fn write_train_config(
     let mut file = File::create(&paths.config_json)?;
     writeln!(
         file,
-        "{{\n  \"algorithm\": \"dqn\",\n  \"env\": \"cartpole\",\n  \"train_steps\": {},\n  \"eval_interval\": {},\n  \"eval_episodes\": {},\n  \"batch_size\": {},\n  \"replay_capacity\": {},\n  \"min_replay_size\": {},\n  \"target_update_interval\": {},\n  \"gamma\": {},\n  \"learning_rate\": {},\n  \"epsilon_start\": {},\n  \"epsilon_end\": {},\n  \"epsilon_decay_steps\": {},\n  \"warmup_batches\": {},\n  \"warmup_batch_size\": {}\n}}",
+        "{{\n  \"algorithm\": \"dqn\",\n  \"env\": \"cartpole\",\n  \"train_steps\": {},\n  \"eval_interval\": {},\n  \"eval_episodes\": {},\n  \"num_envs\": {},\n  \"batch_size\": {},\n  \"replay_capacity\": {},\n  \"min_replay_size\": {},\n  \"target_update_interval\": {},\n  \"gamma\": {},\n  \"learning_rate\": {},\n  \"epsilon_start\": {},\n  \"epsilon_end\": {},\n  \"epsilon_decay_steps\": {},\n  \"behavior_cloning\": false,\n  \"reward_shaping\": false\n}}",
         config.train_steps,
         config.eval_interval,
         config.eval_episodes,
+        config.num_envs,
         config.batch_size,
         config.replay_capacity,
         config.min_replay_size,
@@ -1629,16 +1487,23 @@ fn write_train_config(
         config.learning_rate,
         config.epsilon_start,
         config.epsilon_end,
-        config.epsilon_decay_steps,
-        config.warmup_batches,
-        config.warmup_batch_size
+        config.epsilon_decay_steps
     )?;
 
     let mut seeds_file = File::create(&paths.seeds_json)?;
     writeln!(
         seeds_file,
-        "{{\n  \"root\": {},\n  \"env_reset\": {},\n  \"action\": {},\n  \"replay\": {},\n  \"model\": {},\n  \"eval\": {}\n}}",
-        seeds.root, seeds.env_reset, seeds.action, seeds.replay, seeds.model, seeds.eval
+        "{{\n  \"root\": {},\n  \"env_construction\": {},\n  \"env_reset\": {},\n  \"action\": {},\n  \"replay\": {},\n  \"rollout\": {},\n  \"model\": {},\n  \"validation\": {},\n  \"test\": {},\n  \"demo\": {}\n}}",
+        seeds.root,
+        seeds.env_construction,
+        seeds.env_reset,
+        seeds.action,
+        seeds.replay,
+        seeds.rollout,
+        seeds.model,
+        seeds.validation,
+        seeds.test,
+        seeds.demo
     )?;
 
     Ok(())
@@ -1671,18 +1536,16 @@ fn write_summary(
     global_steps: usize,
     initial: &EvalSummary,
     best: &EvalSummary,
-    config: &CartPoleDqnConfig,
 ) -> Result<(), Box<dyn Error>> {
     let mut file = File::create(&paths.summary_json)?;
     writeln!(
         file,
-        "{{\n  \"global_steps\": {},\n  \"initial_mean_reward\": {},\n  \"best_mean_reward\": {},\n  \"best_mean_length\": {},\n  \"learned_reward_delta\": {},\n  \"warmup_batches\": {},\n  \"solved_threshold\": {},\n  \"best_checkpoint\": \"{}\"\n}}",
+        "{{\n  \"global_steps\": {},\n  \"initial_mean_reward\": {},\n  \"best_mean_reward\": {},\n  \"best_mean_length\": {},\n  \"learned_reward_delta\": {},\n  \"behavior_cloning\": false,\n  \"reward_shaping\": false,\n  \"solved_threshold\": {},\n  \"best_checkpoint\": \"{}\"\n}}",
         global_steps,
         initial.mean_reward,
         best.mean_reward,
         best.mean_length,
         best.mean_reward - initial.mean_reward,
-        config.warmup_batches,
         SOLVED_MEAN_REWARD,
         json_escape(&paths.best_checkpoint.display().to_string())
     )?;
@@ -1723,9 +1586,9 @@ where
         .map_err(|error| CliError::Invalid(format!("invalid value for {flag}: {error}")))
 }
 
-fn help_text() -> &'static str {
+const fn help_text() -> &'static str {
     "Usage: cargo run --example cartpole [--features render] -- [train|eval|video|watch|train-watch]\n\
-     Flags: --steps N --eval-episodes N --eval-interval N --warmup-batches N --run-id ID\n\
+     Flags: --steps N --eval-episodes N --eval-interval N --num-envs N --run-id ID\n\
      Flags: --runs-root PATH --checkpoint PATH --seed N --screenshot PATH --screenshot-frames N\n\
      Flags: --output PATH --video-seconds N --final-seconds N --smoke"
 }
@@ -1733,8 +1596,7 @@ fn help_text() -> &'static str {
 #[cfg(feature = "render")]
 #[derive(Resource)]
 struct VisualPolicy {
-    policy: QNetwork<InferenceBackend>,
-    device: InferenceDevice,
+    policy: DqnPolicy,
 }
 
 #[cfg(feature = "render")]
@@ -1758,12 +1620,6 @@ struct PoleBody;
 struct PivotBody;
 
 #[cfg(feature = "render")]
-#[derive(Component)]
-struct Wheel {
-    offset: f32,
-}
-
-#[cfg(feature = "render")]
 fn run_visual(
     checkpoint: &Path,
     screenshot: Option<&Path>,
@@ -1772,37 +1628,34 @@ fn run_visual(
     let policy = load_policy(checkpoint)?;
     let mut app = App::new();
 
-    app.insert_resource(VisualPolicy {
-        policy,
-        device: inference_device(),
-    })
-    .insert_resource(ClearColor(Color::srgb(1.0, 1.0, 1.0)))
-    .add_plugins(
-        DefaultPlugins
-            .set(WindowPlugin {
-                primary_window: Some(Window {
-                    title: "bevy-gym CartPole DQN policy".into(),
-                    resolution: WindowResolution::new(820, 520),
-                    present_mode: PresentMode::AutoVsync,
+    app.insert_resource(VisualPolicy { policy })
+        .insert_resource(ClearColor(Color::srgb(1.0, 1.0, 1.0)))
+        .add_plugins(
+            DefaultPlugins
+                .set(WindowPlugin {
+                    primary_window: Some(Window {
+                        title: "bevy-gym CartPole DQN policy".into(),
+                        resolution: WindowResolution::new(600, 400),
+                        present_mode: PresentMode::AutoVsync,
+                        ..default()
+                    }),
+                    ..default()
+                })
+                .set(RenderPlugin {
+                    render_creation: RenderCreation::Automatic(WgpuSettings {
+                        backends: Some(Backends::PRIMARY),
+                        ..default()
+                    }),
                     ..default()
                 }),
-                ..default()
-            })
-            .set(RenderPlugin {
-                render_creation: RenderCreation::Automatic(WgpuSettings {
-                    backends: Some(Backends::PRIMARY),
-                    ..default()
-                }),
-                ..default()
-            }),
-    )
-    .add_plugins(BevyGymPlugin::new(|_| CartPole::default()).with_tick_rate(50.0))
-    .add_systems(Startup, setup_visuals)
-    .add_systems(
-        FixedUpdate,
-        model_policy_system.in_set(GymSet::RequestActions),
-    )
-    .add_systems(Update, update_visuals);
+        )
+        .add_plugins(BevyGymPlugin::new(|_| cartpole_v1()).with_tick_rate(50.0))
+        .add_systems(Startup, setup_visuals)
+        .add_systems(
+            FixedUpdate,
+            model_policy_system.in_set(GymSet::RequestActions),
+        )
+        .add_systems(Update, update_visuals);
 
     #[cfg(feature = "bevy-mcp")]
     app.add_plugins(BrpExtrasPlugin::with_port(brp_port()));
@@ -1847,50 +1700,29 @@ fn setup_visuals(
     commands.spawn((Camera2d, Name::new("CartPole Camera")));
 
     commands.spawn((
-        Sprite::from_color(Color::srgb(0.12, 0.12, 0.12), Vec2::new(760.0, 6.0)),
+        Sprite::from_color(Color::BLACK, Vec2::new(600.0, 2.0)),
         Transform::from_xyz(0.0, TRACK_Y, 0.0),
         Name::new("CartPole Track"),
     ));
 
-    for x in [
-        -X_THRESHOLD * CART_SCREEN_SCALE,
-        X_THRESHOLD * CART_SCREEN_SCALE,
-    ] {
-        commands.spawn((
-            Sprite::from_color(Color::srgb(0.45, 0.45, 0.45), Vec2::new(4.0, 36.0)),
-            Transform::from_xyz(x, TRACK_Y + 16.0, 0.1),
-            Name::new("CartPole Boundary Marker"),
-        ));
-    }
-
     commands.spawn((
-        Sprite::from_color(Color::srgb(0.08, 0.08, 0.08), Vec2::new(CART_W, CART_H)),
+        Sprite::from_color(Color::BLACK, Vec2::new(CART_W, CART_H)),
         Transform::from_xyz(0.0, CART_Y, 2.0),
         CartBody,
         Name::new("CartPole Cart"),
     ));
 
-    for offset in [-24.0, 24.0] {
-        commands.spawn((
-            Mesh2d(meshes.add(Circle::new(8.0))),
-            MeshMaterial2d(materials.add(Color::srgb(0.02, 0.02, 0.02))),
-            Transform::from_xyz(offset, CART_Y - 20.0, 2.2),
-            Wheel { offset },
-            Name::new("CartPole Wheel"),
-        ));
-    }
-
     commands.spawn((
-        Sprite::from_color(Color::srgb(0.08, 0.08, 0.08), Vec2::new(POLE_W, POLE_LEN)),
-        Transform::from_xyz(0.0, CART_Y + CART_H * 0.5 + POLE_LEN * 0.5, 3.0),
+        Sprite::from_color(Color::srgb_u8(202, 152, 101), Vec2::new(POLE_W, POLE_LEN)),
+        Transform::from_xyz(0.0, CART_Y + AXLE_OFFSET + POLE_CENTER_OFFSET, 3.0),
         PoleBody,
         Name::new("CartPole Pole"),
     ));
 
     commands.spawn((
-        Mesh2d(meshes.add(Circle::new(7.0))),
-        MeshMaterial2d(materials.add(Color::srgb(0.0, 0.0, 0.0))),
-        Transform::from_xyz(0.0, CART_Y + CART_H * 0.5, 3.2),
+        Mesh2d(meshes.add(Circle::new(POLE_W / 2.0))),
+        MeshMaterial2d(materials.add(Color::srgb_u8(129, 132, 203))),
+        Transform::from_xyz(0.0, CART_Y + AXLE_OFFSET, 3.2),
         PivotBody,
         Name::new("CartPole Hinge"),
     ));
@@ -1899,54 +1731,45 @@ fn setup_visuals(
 #[cfg(feature = "render")]
 fn model_policy_system(
     policy: Res<VisualPolicy>,
-    mut requests: MessageReader<ActionRequest<CartPole>>,
-    mut responses: MessageWriter<ActionResponse<CartPole>>,
+    mut requests: MessageReader<ActionRequest<CartPoleV1>>,
+    mut responses: MessageWriter<ActionResponse<CartPoleV1>>,
 ) {
     for request in requests.read() {
         responses.write(ActionResponse {
             entity: request.entity,
-            action: greedy_action(&policy.policy, &request.observation, &policy.device),
+            action: greedy_action(&policy.policy, &request.observation),
         });
     }
 }
 
 #[cfg(feature = "render")]
 fn update_visuals(
-    env_query: Query<(&CurrentObservation<CartPole>, &EnvStats), With<EnvComponent<CartPole>>>,
+    env_query: Query<(&CurrentObservation<CartPoleV1>, &EnvStats), With<EnvComponent<CartPoleV1>>>,
     mut transforms: ParamSet<(
         Query<&mut Transform, With<CartBody>>,
         Query<&mut Transform, With<PivotBody>>,
         Query<&mut Transform, With<PoleBody>>,
-        Query<(&Wheel, &mut Transform)>,
     )>,
 ) {
     let Ok((observation, _stats)) = env_query.single() else {
         return;
     };
-    let [x, _, theta, _] = observation.observation;
-    let cart_x = x * CART_SCREEN_SCALE;
-    let pivot = Vec2::new(cart_x, CART_Y + CART_H * 0.5);
+    let scene = CartPoleScene::from_observation(&observation.observation);
 
     if let Ok(mut transform) = transforms.p0().single_mut() {
-        transform.translation.x = cart_x;
-        transform.translation.y = CART_Y;
+        transform.translation.x = scene.cart_center[0];
+        transform.translation.y = scene.cart_center[1];
     }
 
     if let Ok(mut transform) = transforms.p1().single_mut() {
-        transform.translation.x = pivot.x;
-        transform.translation.y = pivot.y;
+        transform.translation.x = scene.pivot[0];
+        transform.translation.y = scene.pivot[1];
     }
 
     if let Ok(mut transform) = transforms.p2().single_mut() {
-        let center = pivot + Vec2::new(theta.sin(), theta.cos()) * (POLE_LEN * 0.5);
-        transform.translation.x = center.x;
-        transform.translation.y = center.y;
-        transform.rotation = Quat::from_rotation_z(-theta);
-    }
-
-    for (wheel, mut transform) in &mut transforms.p3() {
-        transform.translation.x = cart_x + wheel.offset;
-        transform.translation.y = CART_Y - 20.0;
+        transform.translation.x = scene.pole_center[0];
+        transform.translation.y = scene.pole_center[1];
+        transform.rotation = Quat::from_rotation_z(scene.pole_rotation);
     }
 }
 
@@ -1983,4 +1806,166 @@ fn brp_port() -> u16 {
         .or_else(|| env::var("BEVY_GYM_BRP_PORT").ok())
         .and_then(|value| value.parse().ok())
         .unwrap_or(15_702)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn model_initialization_uses_the_recorded_seed() {
+        let config = CartPoleDqnConfig::default();
+        let observation = [0.01, -0.02, 0.03, -0.04];
+
+        let first = DqnAgent::new(
+            OBS_SIZE,
+            NUM_ACTIONS,
+            config.learner_config(),
+            SeedConfig::from_root(7),
+        )
+        .expect("valid first CartPole DQN")
+        .policy();
+        let second = DqnAgent::new(
+            OBS_SIZE,
+            NUM_ACTIONS,
+            config.learner_config(),
+            SeedConfig::from_root(7),
+        )
+        .expect("valid second CartPole DQN")
+        .policy();
+        let different = DqnAgent::new(
+            OBS_SIZE,
+            NUM_ACTIONS,
+            config.learner_config(),
+            SeedConfig::from_root(8),
+        )
+        .expect("valid different CartPole DQN")
+        .policy();
+
+        let values = |policy: &DqnPolicy| {
+            policy
+                .q_values(&observation)
+                .expect("CartPole observation has four values")
+        };
+
+        assert_eq!(values(&first), values(&second));
+        assert_ne!(values(&first), values(&different));
+    }
+
+    #[test]
+    fn cartpole_v1_time_limit_truncates_without_masking_natural_failures() {
+        let mut env = cartpole_v1();
+        let mut observation = env.reset(Some(42)).observation;
+
+        for step_index in 1..=MAX_STEPS_PER_EPISODE {
+            let result = env.step(heuristic_action(&observation));
+            if step_index < MAX_STEPS_PER_EPISODE {
+                assert_eq!(result.status, EpisodeStatus::Continuing);
+            } else {
+                assert_eq!(result.status, EpisodeStatus::Truncated);
+            }
+            observation = result.observation;
+        }
+
+        let mut failed = cartpole_v1();
+        failed.inner_mut().state = [X_THRESHOLD, 5.0, 0.0, 0.0];
+        assert_eq!(
+            failed.step(CartAction::Right).status,
+            EpisodeStatus::Terminated
+        );
+    }
+
+    #[test]
+    fn official_scene_mapping_and_video_viewport_keep_expected_anchors() {
+        let observation = [0.0; OBS_SIZE];
+        let scene = CartPoleScene::from_observation(&observation);
+        assert_eq!(scene.cart_center, [0.0, -100.0]);
+        assert_eq!(scene.pivot, [0.0, -92.5]);
+        assert_eq!(scene.pole_center, [0.0, -35.0]);
+        assert!(scene.pole_rotation.abs() < f32::EPSILON);
+
+        let mut frame = RgbFrame::new(DEFAULT_VIDEO_WIDTH, DEFAULT_VIDEO_HEIGHT, [0, 0, 0]);
+        draw_cartpole_frame(&mut frame, &observation, "STEP 0", 0.0);
+        let pixel = |x: usize, y: usize| {
+            let index = (y * frame.width + x) * 3;
+            frame.pixels[index..index + 3].to_vec()
+        };
+
+        assert_eq!(pixel(340, 460), vec![0, 0, 0]);
+        assert_eq!(pixel(340, 453), vec![129, 132, 203]);
+        assert_eq!(pixel(340, 400), vec![202, 152, 101]);
+        assert_eq!(pixel(54, 176), vec![255, 255, 255]);
+    }
+
+    #[test]
+    fn cartpole_collects_parallel_transitions_through_bevy_runner() {
+        let seeds = SeedConfig::from_root(11);
+        let mut collector = bevy_gym::training::BevyTransitionCollector::new(
+            |_| cartpole_v1(),
+            4,
+            move |env_id, episode| Some(seeds.environment_episode(env_id, episode)),
+        )
+        .expect("parallel CartPole collector starts");
+        let actions = collector
+            .requests()
+            .iter()
+            .map(|request| heuristic_action(&request.observation))
+            .collect::<Vec<_>>();
+
+        let batch = collector
+            .step(actions)
+            .expect("parallel runner step succeeds");
+
+        assert_eq!(batch.environment_steps(), 4);
+        assert_eq!(collector.requests().len(), 4);
+        assert!(batch
+            .transitions
+            .iter()
+            .all(|event| event.transition.reward == 1.0));
+    }
+
+    #[test]
+    fn cartpole_dynamics_match_pinned_gymnasium_state_injection_cases() {
+        let cases = [
+            (
+                [0.0, 0.0, 0.0, 0.0],
+                CartAction::Right,
+                [0.0, 0.195_121_94, 0.0, -0.292_682_92],
+            ),
+            (
+                [0.1, -0.2, 0.05, 0.3],
+                CartAction::Left,
+                [0.096, -0.395_797_64, 0.056, 0.608_023_3],
+            ),
+        ];
+
+        for (state, action, expected) in cases {
+            let mut env = CartPole {
+                state,
+                rng: SplitMix64::new(0),
+            };
+            let result = env.step(action);
+            for (actual, expected) in result.observation.into_iter().zip(expected) {
+                assert!((actual - expected).abs() <= 1e-6);
+            }
+            assert_eq!(result.reward, 1.0);
+            assert_eq!(result.status, EpisodeStatus::Continuing);
+        }
+    }
+
+    #[test]
+    fn reset_seed_restarts_rng_while_none_continues_the_stream() {
+        let mut env = CartPole::default();
+        let seeded = env.reset(Some(7)).observation;
+        assert_eq!(seeded, env.reset(Some(7)).observation);
+
+        let next = env.reset(None).observation;
+        let following = env.reset(None).observation;
+        assert_ne!(next, following);
+        assert!(seeded
+            .into_iter()
+            .chain(next)
+            .chain(following)
+            .all(|value| (-0.05..=0.05).contains(&value)));
+    }
 }

@@ -1,0 +1,1060 @@
+{
+  "schema_version": 1,
+  "oracle_commit": "7a1191388aa4aa973d3a5e4b039899cd99cc991f",
+  "oracle_version": "1.3.0",
+  "catalog": [
+    {
+      "contract_id": "acrobot_v1",
+      "family": "classic_control",
+      "cargo_target": "acrobot",
+      "registry_id": "Acrobot-v1",
+      "registry": {
+        "entry_point": "gymnasium.envs.classic_control.acrobot:AcrobotEnv",
+        "default_kwargs": {},
+        "max_episode_steps": 500,
+        "reward_threshold": -100,
+        "source": "gymnasium/envs/__init__.py"
+      },
+      "constructor_default_kwargs": {},
+      "spaces": {
+        "observation": {
+          "type": "Box",
+          "low": [
+            -1,
+            -1,
+            -1,
+            -1,
+            -12.566371,
+            -28.274334
+          ],
+          "high": [
+            1,
+            1,
+            1,
+            1,
+            12.566371,
+            28.274334
+          ],
+          "shape": [
+            6
+          ],
+          "dtype": "float32"
+        },
+        "action": {
+          "type": "Discrete",
+          "n": 3,
+          "start": 0
+        }
+      },
+      "render": {
+        "viewport": [
+          500,
+          500
+        ],
+        "fps": 15,
+        "render_modes": [
+          "human",
+          "rgb_array"
+        ],
+        "source": "gymnasium/envs/classic_control/acrobot.py"
+      },
+      "project_gate": {
+        "suite": "held_out",
+        "policy": "greedy",
+        "episodes": 100,
+        "conditions": {
+          "mean_return": -100,
+          "target_reach_rate": 0.95
+        },
+        "operators": {
+          "mean_return": ">=",
+          "target_reach_rate": ">="
+        },
+        "target_reach_definition": "official terminal height"
+      }
+    },
+    {
+      "contract_id": "cartpole_v1",
+      "family": "classic_control",
+      "cargo_target": "cartpole",
+      "registry_id": "CartPole-v1",
+      "registry": {
+        "entry_point": "gymnasium.envs.classic_control.cartpole:CartPoleEnv",
+        "default_kwargs": {},
+        "max_episode_steps": 500,
+        "reward_threshold": 475,
+        "source": "gymnasium/envs/__init__.py"
+      },
+      "constructor_default_kwargs": {
+        "sutton_barto_reward": false
+      },
+      "spaces": {
+        "observation": {
+          "type": "Box",
+          "low": [
+            -4.8,
+            "-Infinity",
+            -0.41887903,
+            "-Infinity"
+          ],
+          "high": [
+            4.8,
+            "Infinity",
+            0.41887903,
+            "Infinity"
+          ],
+          "shape": [
+            4
+          ],
+          "dtype": "float32"
+        },
+        "action": {
+          "type": "Discrete",
+          "n": 2,
+          "start": 0
+        }
+      },
+      "render": {
+        "viewport": [
+          600,
+          400
+        ],
+        "fps": 50,
+        "render_modes": [
+          "human",
+          "rgb_array"
+        ],
+        "source": "gymnasium/envs/classic_control/cartpole.py"
+      },
+      "project_gate": {
+        "suite": "held_out",
+        "episodes": 100,
+        "conditions": {
+          "mean_return": 475,
+          "ceiling_hit_rate": 0.9
+        },
+        "operators": {
+          "mean_return": ">=",
+          "ceiling_hit_rate": ">="
+        },
+        "ceiling_steps": 500
+      }
+    },
+    {
+      "contract_id": "mountain_car_v0",
+      "family": "classic_control",
+      "cargo_target": "mountain_car",
+      "registry_id": "MountainCar-v0",
+      "registry": {
+        "entry_point": "gymnasium.envs.classic_control.mountain_car:MountainCarEnv",
+        "default_kwargs": {},
+        "max_episode_steps": 200,
+        "reward_threshold": -110,
+        "source": "gymnasium/envs/__init__.py"
+      },
+      "constructor_default_kwargs": {
+        "goal_velocity": 0
+      },
+      "spaces": {
+        "observation": {
+          "type": "Box",
+          "low": [
+            -1.2,
+            -0.07
+          ],
+          "high": [
+            0.6,
+            0.07
+          ],
+          "shape": [
+            2
+          ],
+          "dtype": "float32"
+        },
+        "action": {
+          "type": "Discrete",
+          "n": 3,
+          "start": 0
+        }
+      },
+      "render": {
+        "viewport": [
+          600,
+          400
+        ],
+        "fps": 30,
+        "render_modes": [
+          "human",
+          "rgb_array"
+        ],
+        "source": "gymnasium/envs/classic_control/mountain_car.py"
+      },
+      "project_gate": {
+        "suite": "held_out",
+        "episodes": 100,
+        "conditions": {
+          "mean_return": -110,
+          "position_0_5_reach_rate": 0.95
+        },
+        "operators": {
+          "mean_return": ">=",
+          "position_0_5_reach_rate": ">="
+        }
+      }
+    },
+    {
+      "contract_id": "mountain_car_continuous_v0",
+      "family": "classic_control",
+      "cargo_target": "mountain_car_continuous",
+      "registry_id": "MountainCarContinuous-v0",
+      "registry": {
+        "entry_point": "gymnasium.envs.classic_control.continuous_mountain_car:Continuous_MountainCarEnv",
+        "default_kwargs": {},
+        "max_episode_steps": 999,
+        "reward_threshold": 90,
+        "source": "gymnasium/envs/__init__.py"
+      },
+      "constructor_default_kwargs": {
+        "goal_velocity": 0
+      },
+      "spaces": {
+        "observation": {
+          "type": "Box",
+          "low": [
+            -1.2,
+            -0.07
+          ],
+          "high": [
+            0.6,
+            0.07
+          ],
+          "shape": [
+            2
+          ],
+          "dtype": "float32"
+        },
+        "action": {
+          "type": "Box",
+          "low": [
+            -1
+          ],
+          "high": [
+            1
+          ],
+          "shape": [
+            1
+          ],
+          "dtype": "float32"
+        }
+      },
+      "render": {
+        "viewport": [
+          600,
+          400
+        ],
+        "fps": 30,
+        "render_modes": [
+          "human",
+          "rgb_array"
+        ],
+        "source": "gymnasium/envs/classic_control/continuous_mountain_car.py"
+      },
+      "project_gate": {
+        "suite": "held_out",
+        "episodes": 100,
+        "conditions": {
+          "mean_return": 90,
+          "position_0_45_reach_rate": 0.95
+        },
+        "operators": {
+          "mean_return": ">=",
+          "position_0_45_reach_rate": ">="
+        }
+      }
+    },
+    {
+      "contract_id": "pendulum_v1",
+      "family": "classic_control",
+      "cargo_target": "pendulum",
+      "registry_id": "Pendulum-v1",
+      "registry": {
+        "entry_point": "gymnasium.envs.classic_control.pendulum:PendulumEnv",
+        "default_kwargs": {},
+        "max_episode_steps": 200,
+        "reward_threshold": null,
+        "source": "gymnasium/envs/__init__.py"
+      },
+      "constructor_default_kwargs": {
+        "g": 10
+      },
+      "spaces": {
+        "observation": {
+          "type": "Box",
+          "low": [
+            -1,
+            -1,
+            -8
+          ],
+          "high": [
+            1,
+            1,
+            8
+          ],
+          "shape": [
+            3
+          ],
+          "dtype": "float32"
+        },
+        "action": {
+          "type": "Box",
+          "low": [
+            -2
+          ],
+          "high": [
+            2
+          ],
+          "shape": [
+            1
+          ],
+          "dtype": "float32"
+        }
+      },
+      "render": {
+        "viewport": [
+          500,
+          500
+        ],
+        "fps": 30,
+        "render_modes": [
+          "human",
+          "rgb_array"
+        ],
+        "source": "gymnasium/envs/classic_control/pendulum.py"
+      },
+      "project_gate": {
+        "suite": "held_out",
+        "episodes": 100,
+        "conditions": {
+          "mean_return": -200,
+          "upright_dwell_rate": 0.7
+        },
+        "operators": {
+          "mean_return": ">=",
+          "upright_dwell_rate": ">="
+        },
+        "upright_dwell_window": {
+          "start_step": 50,
+          "end_step_inclusive": 199,
+          "absolute_angle_degrees_lte": 15,
+          "absolute_angular_velocity_rad_s_lte": 1
+        }
+      }
+    },
+    {
+      "contract_id": "blackjack_v1",
+      "family": "toy_text",
+      "cargo_target": "blackjack",
+      "registry_id": "Blackjack-v1",
+      "registry": {
+        "entry_point": "gymnasium.envs.toy_text.blackjack:BlackjackEnv",
+        "default_kwargs": {
+          "sab": true,
+          "natural": false
+        },
+        "max_episode_steps": null,
+        "reward_threshold": null,
+        "source": "gymnasium/envs/__init__.py"
+      },
+      "constructor_default_kwargs": {
+        "natural": false,
+        "sab": false
+      },
+      "spaces": {
+        "observation": {
+          "type": "Tuple",
+          "spaces": [
+            {
+              "type": "Discrete",
+              "n": 32,
+              "start": 0
+            },
+            {
+              "type": "Discrete",
+              "n": 11,
+              "start": 0
+            },
+            {
+              "type": "Discrete",
+              "n": 2,
+              "start": 0
+            }
+          ]
+        },
+        "action": {
+          "type": "Discrete",
+          "n": 2,
+          "start": 0
+        }
+      },
+      "render": {
+        "viewport": [
+          600,
+          500
+        ],
+        "fps": 4,
+        "render_modes": [
+          "human",
+          "rgb_array"
+        ],
+        "source": "gymnasium/envs/toy_text/blackjack.py"
+      },
+      "project_gate": {
+        "suite": "held_out",
+        "games": 100000,
+        "confidence_level": 0.95,
+        "conditions": {
+          "mean_return_lower_95_confidence_bound": -0.08,
+          "improvement_over_random": 0.25
+        },
+        "operators": {
+          "mean_return_lower_95_confidence_bound": ">=",
+          "improvement_over_random": ">="
+        }
+      }
+    },
+    {
+      "contract_id": "cliff_walking_v1",
+      "family": "toy_text",
+      "cargo_target": "cliff_walking",
+      "registry_id": "CliffWalking-v1",
+      "registry": {
+        "entry_point": "gymnasium.envs.toy_text.cliffwalking:CliffWalkingEnv",
+        "default_kwargs": {},
+        "max_episode_steps": null,
+        "reward_threshold": null,
+        "source": "gymnasium/envs/__init__.py"
+      },
+      "constructor_default_kwargs": {
+        "is_slippery": false
+      },
+      "spaces": {
+        "observation": {
+          "type": "Discrete",
+          "n": 48,
+          "start": 0
+        },
+        "action": {
+          "type": "Discrete",
+          "n": 4,
+          "start": 0
+        }
+      },
+      "render": {
+        "viewport": [
+          720,
+          240
+        ],
+        "fps": 4,
+        "render_modes": [
+          "human",
+          "rgb_array",
+          "ansi"
+        ],
+        "source": "gymnasium/envs/toy_text/cliffwalking.py"
+      },
+      "project_gate": {
+        "project_safety_cap_steps": 200,
+        "conditions": {
+          "return": -13,
+          "goal_completion_rate": 1,
+          "cliff_entries": 0
+        },
+        "operators": {
+          "return": "==",
+          "goal_completion_rate": "==",
+          "cliff_entries": "=="
+        }
+      }
+    },
+    {
+      "contract_id": "frozen_lake_v1",
+      "family": "toy_text",
+      "cargo_target": "frozen_lake",
+      "registry_id": "FrozenLake-v1",
+      "registry": {
+        "entry_point": "gymnasium.envs.toy_text.frozen_lake:FrozenLakeEnv",
+        "default_kwargs": {
+          "map_name": "4x4"
+        },
+        "max_episode_steps": 100,
+        "reward_threshold": 0.7,
+        "source": "gymnasium/envs/__init__.py"
+      },
+      "constructor_default_kwargs": {
+        "desc": null,
+        "map_name": "4x4",
+        "is_slippery": true,
+        "success_rate": 0.3333333333333333,
+        "reward_schedule": [
+          1,
+          0,
+          0
+        ]
+      },
+      "spaces": {
+        "observation": {
+          "type": "Discrete",
+          "n": 16,
+          "start": 0
+        },
+        "action": {
+          "type": "Discrete",
+          "n": 4,
+          "start": 0
+        }
+      },
+      "render": {
+        "viewport": [
+          256,
+          256
+        ],
+        "fps": 4,
+        "render_modes": [
+          "human",
+          "rgb_array",
+          "ansi"
+        ],
+        "source": "gymnasium/envs/toy_text/frozen_lake.py"
+      },
+      "project_gate": {
+        "episodes": 10000,
+        "confidence_method": "Wilson",
+        "confidence_level": 0.95,
+        "conditions": {
+          "success_lower_wilson_95_bound": 0.7
+        },
+        "operators": {
+          "success_lower_wilson_95_bound": ">="
+        }
+      }
+    },
+    {
+      "contract_id": "taxi_v4",
+      "family": "toy_text",
+      "cargo_target": "taxi",
+      "registry_id": "Taxi-v4",
+      "registry": {
+        "entry_point": "gymnasium.envs.toy_text.taxi:TaxiEnv",
+        "default_kwargs": {},
+        "max_episode_steps": 200,
+        "reward_threshold": 8,
+        "source": "gymnasium/envs/__init__.py"
+      },
+      "constructor_default_kwargs": {
+        "is_rainy": false,
+        "fickle_passenger": false,
+        "rainy_probability": 0.8,
+        "fickle_probability": 0.3
+      },
+      "spaces": {
+        "observation": {
+          "type": "Discrete",
+          "n": 500,
+          "start": 0
+        },
+        "action": {
+          "type": "Discrete",
+          "n": 6,
+          "start": 0
+        }
+      },
+      "render": {
+        "viewport": [
+          550,
+          350
+        ],
+        "fps": 4,
+        "render_modes": [
+          "human",
+          "rgb_array",
+          "ansi"
+        ],
+        "source": "gymnasium/envs/toy_text/taxi.py"
+      },
+      "project_gate": {
+        "initial_states": 300,
+        "max_steps": 200,
+        "conditions": {
+          "mean_return": 8,
+          "delivery_rate": 1,
+          "illegal_pickup_dropoff_actions": 0
+        },
+        "operators": {
+          "mean_return": ">=",
+          "delivery_rate": "==",
+          "illegal_pickup_dropoff_actions": "=="
+        }
+      }
+    }
+  ],
+  "registered_variants": [
+    {
+      "contract_id": "frozen_lake_8x8_v1",
+      "family": "toy_text",
+      "cargo_target": "frozen_lake",
+      "registry_id": "FrozenLake8x8-v1",
+      "registry": {
+        "entry_point": "gymnasium.envs.toy_text.frozen_lake:FrozenLakeEnv",
+        "default_kwargs": {
+          "map_name": "8x8"
+        },
+        "max_episode_steps": 200,
+        "reward_threshold": 0.85,
+        "source": "gymnasium/envs/__init__.py"
+      },
+      "constructor_default_kwargs": {
+        "desc": null,
+        "map_name": "4x4",
+        "is_slippery": true,
+        "success_rate": 0.3333333333333333,
+        "reward_schedule": [
+          1,
+          0,
+          0
+        ]
+      },
+      "effective_kwargs": {
+        "map_name": "8x8",
+        "is_slippery": true,
+        "success_rate": 0.3333333333333333,
+        "reward_schedule": [
+          1,
+          0,
+          0
+        ]
+      },
+      "spaces": {
+        "observation": {
+          "type": "Discrete",
+          "n": 64,
+          "start": 0
+        },
+        "action": {
+          "type": "Discrete",
+          "n": 4,
+          "start": 0
+        }
+      },
+      "render": {
+        "viewport": [
+          512,
+          512
+        ],
+        "fps": 4,
+        "render_modes": [
+          "human",
+          "rgb_array",
+          "ansi"
+        ],
+        "source": "gymnasium/envs/toy_text/frozen_lake.py"
+      },
+      "project_gate": {
+        "episodes": 10000,
+        "confidence_method": "Wilson",
+        "confidence_level": 0.95,
+        "conditions": {
+          "success_lower_wilson_95_bound": 0.85
+        },
+        "operators": {
+          "success_lower_wilson_95_bound": ">="
+        }
+      }
+    },
+    {
+      "contract_id": "cliff_walking_slippery_v1",
+      "family": "toy_text",
+      "cargo_target": "cliff_walking",
+      "registry_id": "CliffWalkingSlippery-v1",
+      "registry": {
+        "entry_point": "gymnasium.envs.toy_text.cliffwalking:CliffWalkingEnv",
+        "default_kwargs": {
+          "is_slippery": true
+        },
+        "max_episode_steps": null,
+        "reward_threshold": null,
+        "source": "gymnasium/envs/__init__.py"
+      },
+      "constructor_default_kwargs": {
+        "is_slippery": false
+      },
+      "effective_kwargs": {
+        "is_slippery": true
+      },
+      "spaces": {
+        "observation": {
+          "type": "Discrete",
+          "n": 48,
+          "start": 0
+        },
+        "action": {
+          "type": "Discrete",
+          "n": 4,
+          "start": 0
+        }
+      },
+      "render": {
+        "viewport": [
+          720,
+          240
+        ],
+        "fps": 4,
+        "render_modes": [
+          "human",
+          "rgb_array",
+          "ansi"
+        ],
+        "source": "gymnasium/envs/toy_text/cliffwalking.py"
+      },
+      "project_gate": {
+        "episodes": 10000,
+        "confidence_method": "Wilson",
+        "confidence_level": 0.95,
+        "conditions": {
+          "success_lower_wilson_95_bound": 0.9
+        },
+        "operators": {
+          "success_lower_wilson_95_bound": ">="
+        }
+      }
+    }
+  ],
+  "configuration_variants": [
+    {
+      "contract_id": "blackjack_legacy",
+      "registry_id": "Blackjack-v1",
+      "entry_point": "gymnasium.envs.toy_text.blackjack:BlackjackEnv",
+      "registry_default_kwargs": {
+        "sab": true,
+        "natural": false
+      },
+      "constructor_default_kwargs": {
+        "natural": false,
+        "sab": false
+      },
+      "effective_kwargs": {
+        "sab": false,
+        "natural": false
+      },
+      "spaces": {
+        "observation": {
+          "type": "Tuple",
+          "spaces": [
+            {
+              "type": "Discrete",
+              "n": 32,
+              "start": 0
+            },
+            {
+              "type": "Discrete",
+              "n": 11,
+              "start": 0
+            },
+            {
+              "type": "Discrete",
+              "n": 2,
+              "start": 0
+            }
+          ]
+        },
+        "action": {
+          "type": "Discrete",
+          "n": 2,
+          "start": 0
+        }
+      },
+      "max_episode_steps": null,
+      "reward_threshold": null,
+      "render": {
+        "viewport": [
+          600,
+          500
+        ],
+        "fps": 4,
+        "render_modes": [
+          "human",
+          "rgb_array"
+        ],
+        "source": "gymnasium/envs/toy_text/blackjack.py"
+      },
+      "project_gate": null,
+      "verification": "conformance_only",
+      "note": "Legacy rules without a natural bonus."
+    },
+    {
+      "contract_id": "blackjack_natural_bonus",
+      "registry_id": "Blackjack-v1",
+      "entry_point": "gymnasium.envs.toy_text.blackjack:BlackjackEnv",
+      "registry_default_kwargs": {
+        "sab": true,
+        "natural": false
+      },
+      "constructor_default_kwargs": {
+        "natural": false,
+        "sab": false
+      },
+      "effective_kwargs": {
+        "sab": false,
+        "natural": true
+      },
+      "spaces": {
+        "observation": {
+          "type": "Tuple",
+          "spaces": [
+            {
+              "type": "Discrete",
+              "n": 32,
+              "start": 0
+            },
+            {
+              "type": "Discrete",
+              "n": 11,
+              "start": 0
+            },
+            {
+              "type": "Discrete",
+              "n": 2,
+              "start": 0
+            }
+          ]
+        },
+        "action": {
+          "type": "Discrete",
+          "n": 2,
+          "start": 0
+        }
+      },
+      "max_episode_steps": null,
+      "reward_threshold": null,
+      "render": {
+        "viewport": [
+          600,
+          500
+        ],
+        "fps": 4,
+        "render_modes": [
+          "human",
+          "rgb_array"
+        ],
+        "source": "gymnasium/envs/toy_text/blackjack.py"
+      },
+      "project_gate": null,
+      "verification": "conformance_only",
+      "note": "Legacy rules with a 1.5 natural-win payout."
+    },
+    {
+      "contract_id": "blackjack_sab_natural_ignored",
+      "registry_id": "Blackjack-v1",
+      "entry_point": "gymnasium.envs.toy_text.blackjack:BlackjackEnv",
+      "registry_default_kwargs": {
+        "sab": true,
+        "natural": false
+      },
+      "constructor_default_kwargs": {
+        "natural": false,
+        "sab": false
+      },
+      "effective_kwargs": {
+        "sab": true,
+        "natural": true
+      },
+      "spaces": {
+        "observation": {
+          "type": "Tuple",
+          "spaces": [
+            {
+              "type": "Discrete",
+              "n": 32,
+              "start": 0
+            },
+            {
+              "type": "Discrete",
+              "n": 11,
+              "start": 0
+            },
+            {
+              "type": "Discrete",
+              "n": 2,
+              "start": 0
+            }
+          ]
+        },
+        "action": {
+          "type": "Discrete",
+          "n": 2,
+          "start": 0
+        }
+      },
+      "max_episode_steps": null,
+      "reward_threshold": null,
+      "render": {
+        "viewport": [
+          600,
+          500
+        ],
+        "fps": 4,
+        "render_modes": [
+          "human",
+          "rgb_array"
+        ],
+        "source": "gymnasium/envs/toy_text/blackjack.py"
+      },
+      "project_gate": null,
+      "verification": "conformance_only",
+      "note": "Sutton-Barto rules override and ignore natural."
+    },
+    {
+      "contract_id": "taxi_rainy",
+      "registry_id": "Taxi-v4",
+      "entry_point": "gymnasium.envs.toy_text.taxi:TaxiEnv",
+      "registry_default_kwargs": {},
+      "constructor_default_kwargs": {
+        "is_rainy": false,
+        "fickle_passenger": false,
+        "rainy_probability": 0.8,
+        "fickle_probability": 0.3
+      },
+      "effective_kwargs": {
+        "is_rainy": true,
+        "fickle_passenger": false,
+        "rainy_probability": 0.8,
+        "fickle_probability": 0.3
+      },
+      "spaces": {
+        "observation": {
+          "type": "Discrete",
+          "n": 500,
+          "start": 0
+        },
+        "action": {
+          "type": "Discrete",
+          "n": 6,
+          "start": 0
+        }
+      },
+      "max_episode_steps": 200,
+      "reward_threshold": 8,
+      "render": {
+        "viewport": [
+          550,
+          350
+        ],
+        "fps": 4,
+        "render_modes": [
+          "human",
+          "rgb_array",
+          "ansi"
+        ],
+        "source": "gymnasium/envs/toy_text/taxi.py"
+      },
+      "project_gate": null,
+      "verification": "conformance_only",
+      "note": "Rainy movement conformance with 0.8 intended and 0.1 per lateral outcome."
+    },
+    {
+      "contract_id": "taxi_fickle_passenger",
+      "registry_id": "Taxi-v4",
+      "entry_point": "gymnasium.envs.toy_text.taxi:TaxiEnv",
+      "registry_default_kwargs": {},
+      "constructor_default_kwargs": {
+        "is_rainy": false,
+        "fickle_passenger": false,
+        "rainy_probability": 0.8,
+        "fickle_probability": 0.3
+      },
+      "effective_kwargs": {
+        "is_rainy": false,
+        "fickle_passenger": true,
+        "rainy_probability": 0.8,
+        "fickle_probability": 0.3
+      },
+      "spaces": {
+        "observation": {
+          "type": "Discrete",
+          "n": 500,
+          "start": 0
+        },
+        "action": {
+          "type": "Discrete",
+          "n": 6,
+          "start": 0
+        }
+      },
+      "max_episode_steps": 200,
+      "reward_threshold": 8,
+      "render": {
+        "viewport": [
+          550,
+          350
+        ],
+        "fps": 4,
+        "render_modes": [
+          "human",
+          "rgb_array",
+          "ansi"
+        ],
+        "source": "gymnasium/envs/toy_text/taxi.py"
+      },
+      "project_gate": null,
+      "verification": "conformance_only",
+      "note": "Fickle-passenger conformance with the default 0.3 reset-time flag probability."
+    },
+    {
+      "contract_id": "taxi_rainy_fickle_passenger",
+      "registry_id": "Taxi-v4",
+      "entry_point": "gymnasium.envs.toy_text.taxi:TaxiEnv",
+      "registry_default_kwargs": {},
+      "constructor_default_kwargs": {
+        "is_rainy": false,
+        "fickle_passenger": false,
+        "rainy_probability": 0.8,
+        "fickle_probability": 0.3
+      },
+      "effective_kwargs": {
+        "is_rainy": true,
+        "fickle_passenger": true,
+        "rainy_probability": 0.8,
+        "fickle_probability": 0.3
+      },
+      "spaces": {
+        "observation": {
+          "type": "Discrete",
+          "n": 500,
+          "start": 0
+        },
+        "action": {
+          "type": "Discrete",
+          "n": 6,
+          "start": 0
+        }
+      },
+      "max_episode_steps": 200,
+      "reward_threshold": 8,
+      "render": {
+        "viewport": [
+          550,
+          350
+        ],
+        "fps": 4,
+        "render_modes": [
+          "human",
+          "rgb_array",
+          "ansi"
+        ],
+        "source": "gymnasium/envs/toy_text/taxi.py"
+      },
+      "project_gate": null,
+      "verification": "conformance_only",
+      "note": "Interaction conformance for both supported Taxi options."
+    }
+  ]
+}

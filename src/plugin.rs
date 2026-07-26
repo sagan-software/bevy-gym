@@ -24,6 +24,20 @@ pub struct GymConfig {
     pub auto_reset: bool,
 }
 
+/// Deterministic seed schedule used by automatic environment resets.
+#[derive(Resource, Clone)]
+pub(crate) struct ResetSeedSchedule {
+    /// Maps `(environment id, zero-based episode index)` to a reset seed.
+    seed_for: Arc<dyn Fn(usize, u64) -> Option<u64> + Send + Sync>,
+}
+
+impl ResetSeedSchedule {
+    /// Resolve the reset seed for one environment episode.
+    pub(crate) fn seed_for(&self, env_id: usize, episode: u64) -> Option<u64> {
+        (self.seed_for)(env_id, episode)
+    }
+}
+
 impl Default for GymConfig {
     fn default() -> Self {
         Self {
@@ -93,6 +107,9 @@ pub struct BevyGymPlugin<E: Env> {
     /// Whether ended episodes reset automatically.
     auto_reset: bool,
 
+    /// Seed schedule for initial and automatic resets.
+    reset_seed_schedule: ResetSeedSchedule,
+
     /// Retains the generic environment type.
     _phantom: PhantomData<E>,
 }
@@ -104,6 +121,7 @@ impl<E: Env> std::fmt::Debug for BevyGymPlugin<E> {
             .field("num_envs", &self.num_envs)
             .field("tick_rate", &self.tick_rate)
             .field("auto_reset", &self.auto_reset)
+            .field("reset_seed_schedule", &"<closure>")
             .finish_non_exhaustive()
     }
 }
@@ -119,6 +137,9 @@ impl<E: Env + Send + Sync + 'static> BevyGymPlugin<E> {
             num_envs: 1,
             tick_rate: Some(60.0),
             auto_reset: true,
+            reset_seed_schedule: ResetSeedSchedule {
+                seed_for: Arc::new(|env_id, episode| (episode == 0).then_some(env_id as u64)),
+            },
             _phantom: PhantomData,
         }
     }
@@ -157,6 +178,21 @@ impl<E: Env + Send + Sync + 'static> BevyGymPlugin<E> {
         self.auto_reset = false;
         self
     }
+
+    /// Set the reset seed schedule for every environment and episode.
+    ///
+    /// `episode` is zero for the initial reset and increments after each
+    /// completed episode. The schedule is independent of ECS execution order.
+    #[must_use]
+    pub fn with_reset_seeds(
+        mut self,
+        seed_for: impl Fn(usize, u64) -> Option<u64> + Send + Sync + 'static,
+    ) -> Self {
+        self.reset_seed_schedule = ResetSeedSchedule {
+            seed_for: Arc::new(seed_for),
+        };
+        self
+    }
 }
 
 impl<E: Env + Send + Sync + 'static> Plugin for BevyGymPlugin<E> {
@@ -170,6 +206,7 @@ impl<E: Env + Send + Sync + 'static> Plugin for BevyGymPlugin<E> {
             tick_rate: self.tick_rate,
             auto_reset: self.auto_reset,
         });
+        app.insert_resource(self.reset_seed_schedule.clone());
 
         app.add_message::<TransitionEvent<E>>();
         app.add_message::<EpisodeEndEvent>();
@@ -200,8 +237,12 @@ impl<E: Env + Send + Sync + 'static> Plugin for BevyGymPlugin<E> {
         );
 
         let factory = Arc::clone(&self.env_factory);
+        let reset_seed_schedule = self.reset_seed_schedule.clone();
         let num_envs = self.num_envs;
-        app.add_systems(Startup, spawn_environments(move |i| factory(i), num_envs));
+        app.add_systems(
+            Startup,
+            spawn_environments_seeded(move |i| factory(i), num_envs, reset_seed_schedule),
+        );
     }
 }
 
@@ -213,10 +254,25 @@ pub fn spawn_environments<E: Env + Send + Sync + 'static>(
     factory: impl Fn(usize) -> E + Send + Sync + 'static,
     num_envs: usize,
 ) -> impl FnMut(Commands<'_, '_>, MessageWriter<'_, ActionRequest<E>>) {
+    spawn_environments_seeded(
+        factory,
+        num_envs,
+        ResetSeedSchedule {
+            seed_for: Arc::new(|env_id, _episode| Some(env_id as u64)),
+        },
+    )
+}
+
+/// Spawn environments using the plugin's episode seed schedule.
+fn spawn_environments_seeded<E: Env + Send + Sync + 'static>(
+    factory: impl Fn(usize) -> E + Send + Sync + 'static,
+    num_envs: usize,
+    reset_seed_schedule: ResetSeedSchedule,
+) -> impl FnMut(Commands<'_, '_>, MessageWriter<'_, ActionRequest<E>>) {
     move |mut commands: Commands<'_, '_>, mut action_writer: MessageWriter<'_, ActionRequest<E>>| {
         for i in 0..num_envs {
             let mut env = factory(i);
-            let initial = env.reset(Some(i as u64));
+            let initial = env.reset(reset_seed_schedule.seed_for(i, 0));
 
             let entity = commands
                 .spawn((

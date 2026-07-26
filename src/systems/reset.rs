@@ -2,6 +2,7 @@ use bevy::prelude::*;
 
 use crate::components::{CurrentObservation, EnvComponent, EnvId, EnvStats, QueuedAction};
 use crate::events::{ActionRequest, EpisodeEndEvent};
+use crate::plugin::ResetSeedSchedule;
 use crate::Env;
 
 /// Query data needed to reset an environment after episode completion.
@@ -29,6 +30,7 @@ pub(crate) fn auto_reset_system<E: Env + Send + Sync + 'static>(
     mut episode_end_events: MessageReader<'_, '_, EpisodeEndEvent>,
     mut query: AutoResetQuery<'_, '_, E>,
     mut action_writer: MessageWriter<'_, ActionRequest<E>>,
+    reset_seed_schedule: Res<'_, ResetSeedSchedule>,
 ) {
     for event in episode_end_events.read() {
         for (entity, id, mut env_comp, mut obs, mut stats, mut pending) in &mut query {
@@ -36,7 +38,10 @@ pub(crate) fn auto_reset_system<E: Env + Send + Sync + 'static>(
                 continue;
             }
 
-            let reset = env_comp.env.reset(None);
+            let episode = stats.total_episodes.saturating_add(1) as u64;
+            let reset = env_comp
+                .env
+                .reset(reset_seed_schedule.seed_for(id.0, episode));
             obs.observation = reset.observation.clone();
             obs.info = reset.info.clone();
             pending.action = None;

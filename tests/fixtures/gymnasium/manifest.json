@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "oracle": {
+    "project": "Farama-Foundation/Gymnasium",
+    "version": "1.3.0",
+    "commit": "7a1191388aa4aa973d3a5e4b039899cd99cc991f",
+    "checkout": "ref/gymnasium"
+  },
+  "scope": {
+    "catalog_environment_count": 9,
+    "registered_variant_count": 2,
+    "configuration_variant_count": 6
+  },
+  "global_release_gate": {
+    "independent_training_seeds": 5,
+    "minimum_passing_seeds": 4,
+    "median_final_result_must_pass_environment_gate": true
+  },
+  "files": {
+    "catalog": "catalog.json",
+    "explicit_transition_cases": "transition_cases.json",
+    "generator_support": "generator_support.json",
+    "validator": "test_contracts.py"
+  },
+  "transition_tables": [
+    "transitions/frozen_lake_4x4.json",
+    "transitions/frozen_lake_8x8.json",
+    "transitions/cliff_walking.json",
+    "transitions/cliff_walking_slippery.json",
+    "transitions/taxi_dry.json",
+    "transitions/taxi_rainy.json"
+  ],
+  "auxiliary_tables": [
+    "transitions/taxi_action_masks.json"
+  ],
+  "rng_policy": {
+    "numpy_sequence_identity": false,
+    "rule": "Compare deterministic state-injected transitions exactly or within declared numeric tolerances. Validate stochastic behavior by transition probabilities and statistical tests, not by matching NumPy seed sequences."
+  }
+}

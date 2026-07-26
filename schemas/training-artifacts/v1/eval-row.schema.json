@@ -1,0 +1,165 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.bevy-gym.dev/training-artifacts/v1/eval-row.schema.json",
+  "title": "bevy-gym evaluation JSONL row",
+  "description": "One fixed-suite evaluation result joined to exact checkpoint bytes and a declared threshold/confidence gate.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "artifact_type",
+    "schema_version",
+    "run_uuid",
+    "environment_registry_id",
+    "algorithm_id",
+    "sequence",
+    "recorded_at",
+    "suite",
+    "process",
+    "checkpoint",
+    "elapsed_seconds",
+    "counts",
+    "statistics",
+    "gate",
+    "auxiliary_metrics"
+  ],
+  "properties": {
+    "artifact_type": {
+      "type": "string",
+      "const": "eval-row"
+    },
+    "schema_version": {
+      "$ref": "common.schema.json#/$defs/schemaVersion"
+    },
+    "run_uuid": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "environment_registry_id": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 128
+    },
+    "algorithm_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "sequence": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "recorded_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "suite": {
+      "$ref": "common.schema.json#/$defs/seedSuiteRef"
+    },
+    "process": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "command",
+        "exit_code",
+        "checkpoint_loaded_from_disk"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "in-process",
+            "fresh-process"
+          ]
+        },
+        "command": {
+          "$ref": "common.schema.json#/$defs/command"
+        },
+        "exit_code": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "checkpoint_loaded_from_disk": {
+          "type": "boolean"
+        }
+      },
+      "x-bevy-gym-invariants": [
+        "test-suite proof rows require kind=fresh-process, exit_code=0, and checkpoint_loaded_from_disk=true"
+      ]
+    },
+    "checkpoint": {
+      "$ref": "common.schema.json#/$defs/checkpointRef"
+    },
+    "elapsed_seconds": {
+      "type": "number",
+      "minimum": 0
+    },
+    "counts": {
+      "$ref": "common.schema.json#/$defs/countSnapshot"
+    },
+    "statistics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sample_count",
+        "return_sum",
+        "mean_return",
+        "median_return",
+        "minimum_return",
+        "maximum_return",
+        "standard_deviation",
+        "mean_episode_length"
+      ],
+      "properties": {
+        "sample_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "return_sum": {
+          "type": "number"
+        },
+        "mean_return": {
+          "type": "number"
+        },
+        "median_return": {
+          "type": "number"
+        },
+        "minimum_return": {
+          "type": "number"
+        },
+        "maximum_return": {
+          "type": "number"
+        },
+        "standard_deviation": {
+          "type": "number",
+          "minimum": 0
+        },
+        "mean_episode_length": {
+          "type": "number",
+          "minimum": 0
+        }
+      },
+      "x-bevy-gym-invariants": [
+        "sample_count agrees with gate.sample_count and gate.raw_counts.sample_count",
+        "minimum_return <= mean_return <= maximum_return"
+      ]
+    },
+    "gate": {
+      "$ref": "common.schema.json#/$defs/gateResult"
+    },
+    "auxiliary_metrics": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-z][a-z0-9_/-]*$": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "x-bevy-gym-invariants": [
+    "checkpoint.global_step equals counts.environment_steps",
+    "all validation rows in a run use one unchanged validation suite hash",
+    "the final test row uses the exact checkpoint hash selected by validation"
+  ]
+}

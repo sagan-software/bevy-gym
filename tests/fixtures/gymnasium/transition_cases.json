@@ -1,0 +1,816 @@
+{
+  "schema_version": 1,
+  "oracle_commit": "7a1191388aa4aa973d3a5e4b039899cd99cc991f",
+  "numeric_policy": {
+    "classic_internal_state": "float64 unless the oracle explicitly stores float32",
+    "observations": "Gymnasium-returned float32 values",
+    "numpy_sequence_identity": false
+  },
+  "cases": [
+    {
+      "case_id": "acrobot_zero_state_negative_torque",
+      "registry_id": "Acrobot-v1",
+      "contract_id": "acrobot_v1",
+      "source": "gymnasium/envs/classic_control/acrobot.py",
+      "injection": {
+        "internal_state": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "action": 0,
+        "torque_noise_max": 0
+      },
+      "expected": {
+        "internal_state": [
+          0.013262967177227778,
+          -0.03428722934738542,
+          0.12866185280996087,
+          -0.33450108998660183
+        ],
+        "observation": [
+          0.9999120235443115,
+          0.013262578286230564,
+          0.9994122385978699,
+          -0.03428051248192787,
+          0.1286618560552597,
+          -0.33450108766555786
+        ],
+        "reward": -1,
+        "terminated": false,
+        "truncated": false
+      },
+      "tolerance": {
+        "internal_absolute": 1e-10,
+        "observation_absolute": 0.000001
+      }
+    },
+    {
+      "case_id": "acrobot_nonzero_state_zero_torque",
+      "registry_id": "Acrobot-v1",
+      "contract_id": "acrobot_v1",
+      "source": "gymnasium/envs/classic_control/acrobot.py",
+      "injection": {
+        "internal_state": [
+          0.1,
+          -0.2,
+          0.3,
+          -0.4
+        ],
+        "action": 1,
+        "torque_noise_max": 0
+      },
+      "expected": {
+        "internal_state": [
+          0.14133727125464293,
+          -0.24579623350293564,
+          0.10409525473601286,
+          -0.044953761560451166
+        ],
+        "observation": [
+          0.9900285005569458,
+          0.1408671736717224,
+          0.9699438810348511,
+          -0.24332870543003082,
+          0.10409525781869888,
+          -0.044953759759664536
+        ],
+        "reward": -1,
+        "terminated": false,
+        "truncated": false
+      },
+      "tolerance": {
+        "internal_absolute": 1e-10,
+        "observation_absolute": 0.000001
+      }
+    },
+    {
+      "case_id": "cartpole_zero_state_push_right",
+      "registry_id": "CartPole-v1",
+      "contract_id": "cartpole_v1",
+      "source": "gymnasium/envs/classic_control/cartpole.py",
+      "injection": {
+        "internal_state": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "action": 1,
+        "kinematics_integrator": "euler",
+        "sutton_barto_reward": false
+      },
+      "expected": {
+        "internal_state": [
+          0,
+          0.1951219512195122,
+          0,
+          -0.2926829268292683
+        ],
+        "observation": [
+          0,
+          0.19512194395065308,
+          0,
+          -0.2926829159259796
+        ],
+        "reward": 1,
+        "terminated": false,
+        "truncated": false
+      },
+      "tolerance": {
+        "internal_absolute": 1e-12,
+        "observation_absolute": 0.000001
+      }
+    },
+    {
+      "case_id": "cartpole_nonzero_state_push_left",
+      "registry_id": "CartPole-v1",
+      "contract_id": "cartpole_v1",
+      "source": "gymnasium/envs/classic_control/cartpole.py",
+      "injection": {
+        "internal_state": [
+          0.1,
+          -0.2,
+          0.05,
+          0.3
+        ],
+        "action": 0,
+        "kinematics_integrator": "euler",
+        "sutton_barto_reward": false
+      },
+      "expected": {
+        "internal_state": [
+          0.096,
+          -0.3957976546439626,
+          0.056,
+          0.6080233136061515
+        ],
+        "observation": [
+          0.09600000083446503,
+          -0.39579764008522034,
+          0.0560000017285347,
+          0.6080232858657837
+        ],
+        "reward": 1,
+        "terminated": false,
+        "truncated": false
+      },
+      "tolerance": {
+        "internal_absolute": 1e-12,
+        "observation_absolute": 0.000001
+      }
+    },
+    {
+      "case_id": "mountain_car_accelerate_right",
+      "registry_id": "MountainCar-v0",
+      "contract_id": "mountain_car_v0",
+      "source": "gymnasium/envs/classic_control/mountain_car.py",
+      "injection": {
+        "internal_state": [
+          -0.5,
+          0
+        ],
+        "action": 2
+      },
+      "expected": {
+        "internal_state": [
+          -0.49917684300416926,
+          0.0008231569958307428
+        ],
+        "observation": [
+          -0.49917683005332947,
+          0.0008231570245698094
+        ],
+        "reward": -1,
+        "terminated": false,
+        "truncated": false
+      },
+      "tolerance": {
+        "internal_absolute": 1e-12,
+        "observation_absolute": 0.000001
+      }
+    },
+    {
+      "case_id": "mountain_car_left_wall_is_inelastic",
+      "registry_id": "MountainCar-v0",
+      "contract_id": "mountain_car_v0",
+      "source": "gymnasium/envs/classic_control/mountain_car.py",
+      "injection": {
+        "internal_state": [
+          -1.2,
+          -0.01
+        ],
+        "action": 0
+      },
+      "expected": {
+        "internal_state": [
+          -1.2,
+          0
+        ],
+        "observation": [
+          -1.2000000476837158,
+          0
+        ],
+        "reward": -1,
+        "terminated": false,
+        "truncated": false
+      },
+      "tolerance": {
+        "internal_absolute": 1e-12,
+        "observation_absolute": 0.000001
+      }
+    },
+    {
+      "case_id": "mountain_car_continuous_raw_action_penalty",
+      "registry_id": "MountainCarContinuous-v0",
+      "contract_id": "mountain_car_continuous_v0",
+      "source": "gymnasium/envs/classic_control/continuous_mountain_car.py",
+      "injection": {
+        "internal_state": [
+          -0.5,
+          0
+        ],
+        "action": [
+          2
+        ]
+      },
+      "expected": {
+        "internal_state": [
+          -0.4986768364906311,
+          0.0013231569901108742
+        ],
+        "observation": [
+          -0.4986768364906311,
+          0.0013231569901108742
+        ],
+        "reward": -0.4,
+        "terminated": false,
+        "truncated": false,
+        "detail": "Dynamics clips force to 1.0, while the reward penalty uses the raw action value 2.0."
+      },
+      "tolerance": {
+        "internal_absolute": 0.000001,
+        "observation_absolute": 0.000001,
+        "reward_absolute": 1e-12
+      }
+    },
+    {
+      "case_id": "pendulum_upright_max_torque",
+      "registry_id": "Pendulum-v1",
+      "contract_id": "pendulum_v1",
+      "source": "gymnasium/envs/classic_control/pendulum.py",
+      "injection": {
+        "internal_state": [
+          0,
+          0
+        ],
+        "action": [
+          2
+        ]
+      },
+      "expected": {
+        "internal_state": [
+          0.015000000000000003,
+          0.30000000000000004
+        ],
+        "observation": [
+          0.9998875260353088,
+          0.014999437145888805,
+          0.30000001192092896
+        ],
+        "reward": -0.004,
+        "terminated": false,
+        "truncated": false
+      },
+      "tolerance": {
+        "internal_absolute": 1e-12,
+        "observation_absolute": 0.000001,
+        "reward_absolute": 1e-12
+      }
+    },
+    {
+      "case_id": "blackjack_forced_hit_bust",
+      "registry_id": "Blackjack-v1",
+      "contract_id": "blackjack_v1",
+      "source": "gymnasium/envs/toy_text/blackjack.py",
+      "injection": {
+        "player_hand": [
+          10,
+          6
+        ],
+        "dealer_hand": [
+          10,
+          7
+        ],
+        "action": 1,
+        "forced_draws": [
+          10
+        ],
+        "kwargs": {
+          "sab": true,
+          "natural": false
+        }
+      },
+      "expected": {
+        "observation": [
+          26,
+          10,
+          0
+        ],
+        "reward": -1,
+        "terminated": true,
+        "truncated": false
+      }
+    },
+    {
+      "case_id": "blackjack_natural_bonus_rule",
+      "registry_id": "Blackjack-v1",
+      "contract_id": "blackjack_natural_bonus",
+      "source": "gymnasium/envs/toy_text/blackjack.py",
+      "injection": {
+        "player_hand": [
+          1,
+          10
+        ],
+        "dealer_hand": [
+          10,
+          9
+        ],
+        "action": 0,
+        "forced_draws": [],
+        "kwargs": {
+          "sab": false,
+          "natural": true
+        }
+      },
+      "expected": {
+        "observation": [
+          21,
+          10,
+          1
+        ],
+        "reward": 1.5,
+        "terminated": true,
+        "truncated": false
+      }
+    },
+    {
+      "case_id": "blackjack_legacy_natural_has_no_bonus",
+      "registry_id": "Blackjack-v1",
+      "contract_id": "blackjack_legacy",
+      "source": "gymnasium/envs/toy_text/blackjack.py",
+      "injection": {
+        "player_hand": [
+          1,
+          10
+        ],
+        "dealer_hand": [
+          10,
+          9
+        ],
+        "action": 0,
+        "forced_draws": [],
+        "kwargs": {
+          "sab": false,
+          "natural": false
+        }
+      },
+      "expected": {
+        "observation": [
+          21,
+          10,
+          1
+        ],
+        "reward": 1,
+        "terminated": true,
+        "truncated": false
+      }
+    },
+    {
+      "case_id": "blackjack_sab_ignores_natural_bonus",
+      "registry_id": "Blackjack-v1",
+      "contract_id": "blackjack_sab_natural_ignored",
+      "source": "gymnasium/envs/toy_text/blackjack.py",
+      "injection": {
+        "player_hand": [
+          1,
+          10
+        ],
+        "dealer_hand": [
+          10,
+          9
+        ],
+        "action": 0,
+        "forced_draws": [],
+        "kwargs": {
+          "sab": true,
+          "natural": true
+        }
+      },
+      "expected": {
+        "observation": [
+          21,
+          10,
+          1
+        ],
+        "reward": 1,
+        "terminated": true,
+        "truncated": false
+      }
+    },
+    {
+      "case_id": "cliff_walking_step_into_cliff",
+      "registry_id": "CliffWalking-v1",
+      "contract_id": "cliff_walking_v1",
+      "source": "gymnasium/envs/toy_text/cliffwalking.py",
+      "injection": {
+        "state": 36,
+        "action": 1
+      },
+      "expected": {
+        "outcomes": [
+          {
+            "probability": {
+              "numerator": 1,
+              "denominator": 1
+            },
+            "next_state": 36,
+            "reward": -100,
+            "terminated": false
+          }
+        ],
+        "truncated": false
+      }
+    },
+    {
+      "case_id": "cliff_walking_slippery_from_start",
+      "registry_id": "CliffWalkingSlippery-v1",
+      "contract_id": "cliff_walking_slippery_v1",
+      "source": "gymnasium/envs/toy_text/cliffwalking.py",
+      "injection": {
+        "state": 36,
+        "action": 0
+      },
+      "expected": {
+        "outcomes": [
+          {
+            "probability": {
+              "numerator": 1,
+              "denominator": 3
+            },
+            "next_state": 36,
+            "reward": -1,
+            "terminated": false
+          },
+          {
+            "probability": {
+              "numerator": 1,
+              "denominator": 3
+            },
+            "next_state": 24,
+            "reward": -1,
+            "terminated": false
+          },
+          {
+            "probability": {
+              "numerator": 1,
+              "denominator": 3
+            },
+            "next_state": 36,
+            "reward": -100,
+            "terminated": false
+          }
+        ],
+        "truncated": false
+      }
+    },
+    {
+      "case_id": "frozen_lake_4x4_goal_transition",
+      "registry_id": "FrozenLake-v1",
+      "contract_id": "frozen_lake_v1",
+      "source": "gymnasium/envs/toy_text/frozen_lake.py",
+      "injection": {
+        "state": 14,
+        "action": 2
+      },
+      "expected": {
+        "outcomes": [
+          {
+            "probability": {
+              "numerator": 1,
+              "denominator": 3
+            },
+            "next_state": 14,
+            "reward": 0,
+            "terminated": false
+          },
+          {
+            "probability": {
+              "numerator": 1,
+              "denominator": 3
+            },
+            "next_state": 15,
+            "reward": 1,
+            "terminated": true
+          },
+          {
+            "probability": {
+              "numerator": 1,
+              "denominator": 3
+            },
+            "next_state": 10,
+            "reward": 0,
+            "terminated": false
+          }
+        ],
+        "truncated": false
+      }
+    },
+    {
+      "case_id": "frozen_lake_8x8_goal_and_hole_transition",
+      "registry_id": "FrozenLake8x8-v1",
+      "contract_id": "frozen_lake_8x8_v1",
+      "source": "gymnasium/envs/toy_text/frozen_lake.py",
+      "injection": {
+        "state": 62,
+        "action": 2
+      },
+      "expected": {
+        "outcomes": [
+          {
+            "probability": {
+              "numerator": 1,
+              "denominator": 3
+            },
+            "next_state": 62,
+            "reward": 0,
+            "terminated": false
+          },
+          {
+            "probability": {
+              "numerator": 1,
+              "denominator": 3
+            },
+            "next_state": 63,
+            "reward": 1,
+            "terminated": true
+          },
+          {
+            "probability": {
+              "numerator": 1,
+              "denominator": 3
+            },
+            "next_state": 54,
+            "reward": 0,
+            "terminated": true
+          }
+        ],
+        "truncated": false
+      }
+    },
+    {
+      "case_id": "taxi_legal_pickup_at_red",
+      "registry_id": "Taxi-v4",
+      "contract_id": "taxi_v4",
+      "source": "gymnasium/envs/toy_text/taxi.py",
+      "injection": {
+        "decoded_state": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "state": 1,
+        "action": 4
+      },
+      "expected": {
+        "outcomes": [
+          {
+            "probability": {
+              "numerator": 1,
+              "denominator": 1
+            },
+            "next_state": 17,
+            "reward": -1,
+            "terminated": false
+          }
+        ],
+        "action_mask_after": [
+          1,
+          0,
+          1,
+          0,
+          0,
+          1
+        ],
+        "truncated": false
+      }
+    },
+    {
+      "case_id": "taxi_rainy_south_from_red",
+      "registry_id": "Taxi-v4",
+      "contract_id": "taxi_rainy",
+      "source": "gymnasium/envs/toy_text/taxi.py",
+      "injection": {
+        "decoded_state": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "state": 1,
+        "action": 0,
+        "kwargs": {
+          "is_rainy": true,
+          "rainy_probability": 0.8
+        }
+      },
+      "expected": {
+        "outcomes": [
+          {
+            "probability": {
+              "numerator": 4,
+              "denominator": 5
+            },
+            "next_state": 101,
+            "reward": -1,
+            "terminated": false
+          },
+          {
+            "probability": {
+              "numerator": 1,
+              "denominator": 10
+            },
+            "next_state": 21,
+            "reward": -1,
+            "terminated": false
+          },
+          {
+            "probability": {
+              "numerator": 1,
+              "denominator": 10
+            },
+            "next_state": 1,
+            "reward": -1,
+            "terminated": false
+          }
+        ],
+        "truncated": false
+      }
+    },
+    {
+      "case_id": "taxi_fickle_destination_resample_after_move",
+      "registry_id": "Taxi-v4",
+      "contract_id": "taxi_fickle_passenger",
+      "source": "gymnasium/envs/toy_text/taxi.py",
+      "injection": {
+        "decoded_state": [
+          0,
+          0,
+          4,
+          1
+        ],
+        "state": 17,
+        "action": 0,
+        "fickle_step": true,
+        "kwargs": {
+          "fickle_passenger": true,
+          "fickle_probability": 0.3
+        }
+      },
+      "expected": {
+        "outcomes": [
+          {
+            "probability": {
+              "numerator": 1,
+              "denominator": 3
+            },
+            "next_state": 116,
+            "reward": -1,
+            "terminated": false
+          },
+          {
+            "probability": {
+              "numerator": 1,
+              "denominator": 3
+            },
+            "next_state": 118,
+            "reward": -1,
+            "terminated": false
+          },
+          {
+            "probability": {
+              "numerator": 1,
+              "denominator": 3
+            },
+            "next_state": 119,
+            "reward": -1,
+            "terminated": false
+          }
+        ],
+        "truncated": false,
+        "detail": "Destination 1 is excluded; destination choices 0, 2, and 3 are equiprobable once fickle_step is explicitly true."
+      }
+    },
+    {
+      "case_id": "taxi_rainy_fickle_augmented_transition",
+      "registry_id": "Taxi-v4",
+      "contract_id": "taxi_rainy_fickle_passenger",
+      "source": "gymnasium/envs/toy_text/taxi.py",
+      "injection": {
+        "decoded_state": [
+          0,
+          0,
+          4,
+          1
+        ],
+        "state": 17,
+        "action": 0,
+        "fickle_step": true,
+        "kwargs": {
+          "is_rainy": true,
+          "rainy_probability": 0.8,
+          "fickle_passenger": true,
+          "fickle_probability": 0.3
+        }
+      },
+      "expected": {
+        "outcomes": [
+          {
+            "probability": {
+              "numerator": 4,
+              "denominator": 15
+            },
+            "next_state": 116,
+            "next_fickle_step": false,
+            "reward": -1,
+            "terminated": false
+          },
+          {
+            "probability": {
+              "numerator": 4,
+              "denominator": 15
+            },
+            "next_state": 118,
+            "next_fickle_step": false,
+            "reward": -1,
+            "terminated": false
+          },
+          {
+            "probability": {
+              "numerator": 4,
+              "denominator": 15
+            },
+            "next_state": 119,
+            "next_fickle_step": false,
+            "reward": -1,
+            "terminated": false
+          },
+          {
+            "probability": {
+              "numerator": 1,
+              "denominator": 30
+            },
+            "next_state": 36,
+            "next_fickle_step": false,
+            "reward": -1,
+            "terminated": false
+          },
+          {
+            "probability": {
+              "numerator": 1,
+              "denominator": 30
+            },
+            "next_state": 38,
+            "next_fickle_step": false,
+            "reward": -1,
+            "terminated": false
+          },
+          {
+            "probability": {
+              "numerator": 1,
+              "denominator": 30
+            },
+            "next_state": 39,
+            "next_fickle_step": false,
+            "reward": -1,
+            "terminated": false
+          },
+          {
+            "probability": {
+              "numerator": 1,
+              "denominator": 10
+            },
+            "next_state": 17,
+            "next_fickle_step": true,
+            "reward": -1,
+            "terminated": false
+          }
+        ],
+        "truncated": false,
+        "detail": "Rain drift is sampled first. Destination resampling only follows outcomes that actually move the taxi; a blocked lateral outcome keeps fickle_step armed."
+      }
+    }
+  ]
+}

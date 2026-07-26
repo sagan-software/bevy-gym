@@ -1,0 +1,8 @@
+{
+  "fixture": "config.valid.json",
+  "mutation": {
+    "op": "add",
+    "path": "/untracked_note",
+    "value": "must be rejected"
+  }
+}

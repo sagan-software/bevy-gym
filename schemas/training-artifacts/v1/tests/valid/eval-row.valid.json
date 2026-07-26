@@ -1,0 +1,88 @@
+{
+  "artifact_type": "eval-row",
+  "schema_version": "1.0.0",
+  "run_uuid": "018f1a56-3779-7701-93ef-fa1398226d17",
+  "environment_registry_id": "CartPole-v1",
+  "algorithm_id": "dqn",
+  "sequence": 9,
+  "recorded_at": "2026-07-11T12:45:00Z",
+  "suite": {
+    "id": "cartpole-test-v1",
+    "split": "test",
+    "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "sample_count": 100
+  },
+  "process": {
+    "kind": "fresh-process",
+    "command": {
+      "argv": [
+        "cargo",
+        "run",
+        "--release",
+        "--example",
+        "cartpole",
+        "--",
+        "eval",
+        "--suite",
+        "test"
+      ],
+      "rendered": "cargo run --release --example cartpole -- eval --suite test",
+      "working_directory": "/workspace/bevy-gym"
+    },
+    "exit_code": 0,
+    "checkpoint_loaded_from_disk": true
+  },
+  "checkpoint": {
+    "path": "best.mpk",
+    "sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "byte_length": 19004,
+    "kind": "best",
+    "global_step": 80000,
+    "episode_count": 710,
+    "update_count": 79000
+  },
+  "elapsed_seconds": 40.25,
+  "counts": {
+    "environment_steps": 80000,
+    "episodes": 710,
+    "optimizer_updates": 79000,
+    "q_table_updates": 0
+  },
+  "statistics": {
+    "sample_count": 100,
+    "return_sum": 50000,
+    "mean_return": 500,
+    "median_return": 500,
+    "minimum_return": 500,
+    "maximum_return": 500,
+    "standard_deviation": 0,
+    "mean_episode_length": 500
+  },
+  "gate": {
+    "metric": "mean_return",
+    "comparator": "gte",
+    "threshold": 475,
+    "observed": 500,
+    "passed": true,
+    "sample_count": 100,
+    "confidence": {
+      "method": "bootstrap",
+      "level": 0.95,
+      "lower": 500,
+      "upper": 500
+    },
+    "raw_counts": {
+      "sample_count": 100,
+      "success_count": 100,
+      "failure_count": 0,
+      "event_counts": {
+        "ceiling_hits": 100,
+        "terminations": 0
+      }
+    }
+  },
+  "auxiliary_metrics": {
+    "ceiling_hit_rate": 1,
+    "mean_episode_length": 500
+  }
+}

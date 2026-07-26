@@ -1,0 +1,6383 @@
+{
+  "schema_version": 1,
+  "oracle_commit": "7a1191388aa4aa973d3a5e4b039899cd99cc991f",
+  "contract_id": "CliffWalkingSlippery-v1",
+  "source": "gymnasium/envs/toy_text/cliffwalking.py",
+  "configuration": {
+    "shape": [
+      4,
+      12
+    ],
+    "start_state": 36,
+    "goal_state": 47,
+    "cliff_states": [
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46
+    ],
+    "is_slippery": true
+  },
+  "state_encoding": "row * 12 + column",
+  "state_count": 48,
+  "action_encoding": {
+    "0": "up",
+    "1": "right",
+    "2": "down",
+    "3": "left"
+  },
+  "action_count": 4,
+  "initial_states": [
+    {
+      "state": 36,
+      "probability": {
+        "numerator": 1,
+        "denominator": 1
+      }
+    }
+  ],
+  "entries": [
+    {
+      "state": 0,
+      "action": 0,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 0,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 0,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 1,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 0,
+      "action": 1,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 0,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 1,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 12,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 0,
+      "action": 2,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 1,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 12,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 0,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 0,
+      "action": 3,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 12,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 0,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 0,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 1,
+      "action": 0,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 0,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 1,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 2,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 1,
+      "action": 1,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 1,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 2,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 13,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 1,
+      "action": 2,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 2,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 13,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 0,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 1,
+      "action": 3,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 13,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 0,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 1,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 2,
+      "action": 0,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 1,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 2,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 3,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 2,
+      "action": 1,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 2,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 3,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 14,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 2,
+      "action": 2,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 3,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 14,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 1,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 2,
+      "action": 3,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 14,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 1,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 2,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 3,
+      "action": 0,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 2,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 3,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 4,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 3,
+      "action": 1,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 3,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 4,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 15,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 3,
+      "action": 2,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 4,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 15,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 2,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 3,
+      "action": 3,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 15,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 2,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 3,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 4,
+      "action": 0,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 3,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 4,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 5,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 4,
+      "action": 1,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 4,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 5,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 16,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 4,
+      "action": 2,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 5,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 16,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 3,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 4,
+      "action": 3,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 16,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 3,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 4,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 5,
+      "action": 0,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 4,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 5,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 6,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 5,
+      "action": 1,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 5,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 6,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 17,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 5,
+      "action": 2,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 6,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 17,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 4,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 5,
+      "action": 3,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 17,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 4,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 5,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 6,
+      "action": 0,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 5,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 6,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 7,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 6,
+      "action": 1,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 6,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 7,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 18,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 6,
+      "action": 2,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 7,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 18,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 5,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 6,
+      "action": 3,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 18,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 5,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 6,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 7,
+      "action": 0,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 6,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 7,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 8,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 7,
+      "action": 1,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 7,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 8,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 19,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 7,
+      "action": 2,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 8,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 19,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 6,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 7,
+      "action": 3,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 19,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 6,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 7,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 8,
+      "action": 0,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 7,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 8,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 9,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 8,
+      "action": 1,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 8,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 9,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 20,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 8,
+      "action": 2,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 9,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 20,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 7,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 8,
+      "action": 3,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 20,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 7,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 8,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 9,
+      "action": 0,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 8,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 9,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 10,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 9,
+      "action": 1,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 9,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 10,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 21,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 9,
+      "action": 2,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 10,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 21,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 8,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 9,
+      "action": 3,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 21,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 8,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 9,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 10,
+      "action": 0,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 9,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 10,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 11,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 10,
+      "action": 1,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 10,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 11,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 22,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 10,
+      "action": 2,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 11,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 22,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 9,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 10,
+      "action": 3,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 22,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 9,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 10,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 11,
+      "action": 0,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 10,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 11,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 11,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 11,
+      "action": 1,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 11,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 11,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 23,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 11,
+      "action": 2,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 11,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 23,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 10,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 11,
+      "action": 3,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 23,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 10,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 11,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 12,
+      "action": 0,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 12,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 0,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 13,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 12,
+      "action": 1,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 0,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 13,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 24,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 12,
+      "action": 2,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 13,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 24,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 12,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 12,
+      "action": 3,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 24,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 12,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 0,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 13,
+      "action": 0,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 12,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 1,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 14,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 13,
+      "action": 1,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 1,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 14,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 25,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 13,
+      "action": 2,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 14,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 25,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 12,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 13,
+      "action": 3,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 25,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 12,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 1,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 14,
+      "action": 0,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 13,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 2,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 15,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 14,
+      "action": 1,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 2,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 15,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 26,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 14,
+      "action": 2,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 15,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 26,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 13,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 14,
+      "action": 3,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 26,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 13,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 2,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 15,
+      "action": 0,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 14,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 3,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 16,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 15,
+      "action": 1,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 3,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 16,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 27,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 15,
+      "action": 2,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 16,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 27,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 14,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 15,
+      "action": 3,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 27,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 14,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 3,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 16,
+      "action": 0,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 15,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 4,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 17,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 16,
+      "action": 1,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 4,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 17,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 28,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 16,
+      "action": 2,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 17,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 28,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 15,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 16,
+      "action": 3,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 28,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 15,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 4,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 17,
+      "action": 0,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 16,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 5,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 18,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 17,
+      "action": 1,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 5,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 18,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 29,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 17,
+      "action": 2,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 18,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 29,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 16,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 17,
+      "action": 3,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 29,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 16,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 5,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 18,
+      "action": 0,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 17,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 6,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 19,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 18,
+      "action": 1,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 6,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 19,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 30,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 18,
+      "action": 2,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 19,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 30,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 17,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 18,
+      "action": 3,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 30,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 17,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 6,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 19,
+      "action": 0,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 18,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 7,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 20,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 19,
+      "action": 1,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 7,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 20,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 31,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 19,
+      "action": 2,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 20,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 31,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 18,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 19,
+      "action": 3,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 31,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 18,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 7,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 20,
+      "action": 0,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 19,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 8,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 21,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 20,
+      "action": 1,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 8,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 21,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 32,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 20,
+      "action": 2,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 21,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 32,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 19,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 20,
+      "action": 3,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 32,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 19,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 8,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 21,
+      "action": 0,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 20,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 9,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 22,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 21,
+      "action": 1,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 9,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 22,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 33,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 21,
+      "action": 2,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 22,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 33,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 20,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 21,
+      "action": 3,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 33,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 20,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 9,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 22,
+      "action": 0,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 21,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 10,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 23,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 22,
+      "action": 1,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 10,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 23,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 34,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 22,
+      "action": 2,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 23,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 34,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 21,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 22,
+      "action": 3,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 34,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 21,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 10,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 23,
+      "action": 0,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 22,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 11,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 23,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 23,
+      "action": 1,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 11,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 23,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 35,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 23,
+      "action": 2,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 23,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 35,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 22,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 23,
+      "action": 3,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 35,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 22,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 11,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 24,
+      "action": 0,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 24,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 12,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 25,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 24,
+      "action": 1,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 12,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 25,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 24,
+      "action": 2,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 25,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 24,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 24,
+      "action": 3,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 24,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 12,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 25,
+      "action": 0,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 24,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 13,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 26,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 25,
+      "action": 1,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 13,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 26,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 25,
+      "action": 2,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 26,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 24,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 25,
+      "action": 3,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 24,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 13,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 26,
+      "action": 0,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 25,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 14,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 27,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 26,
+      "action": 1,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 14,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 27,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 26,
+      "action": 2,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 27,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 25,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 26,
+      "action": 3,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 25,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 14,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 27,
+      "action": 0,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 26,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 15,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 28,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 27,
+      "action": 1,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 15,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 28,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 27,
+      "action": 2,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 28,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 26,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 27,
+      "action": 3,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 26,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 15,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 28,
+      "action": 0,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 27,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 16,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 29,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 28,
+      "action": 1,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 16,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 29,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 28,
+      "action": 2,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 29,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 27,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 28,
+      "action": 3,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 27,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 16,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 29,
+      "action": 0,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 28,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 17,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 30,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 29,
+      "action": 1,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 17,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 30,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 29,
+      "action": 2,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 30,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 28,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 29,
+      "action": 3,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 28,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 17,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 30,
+      "action": 0,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 29,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 18,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 31,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 30,
+      "action": 1,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 18,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 31,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 30,
+      "action": 2,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 31,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 29,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 30,
+      "action": 3,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 29,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 18,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 31,
+      "action": 0,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 30,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 19,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 32,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 31,
+      "action": 1,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 19,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 32,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 31,
+      "action": 2,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 32,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 30,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 31,
+      "action": 3,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 30,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 19,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 32,
+      "action": 0,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 31,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 20,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 33,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 32,
+      "action": 1,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 20,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 33,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 32,
+      "action": 2,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 33,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 31,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 32,
+      "action": 3,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 31,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 20,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 33,
+      "action": 0,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 32,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 21,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 34,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 33,
+      "action": 1,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 21,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 34,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 33,
+      "action": 2,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 34,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 32,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 33,
+      "action": 3,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 32,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 21,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 34,
+      "action": 0,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 33,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 22,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 35,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 34,
+      "action": 1,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 22,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 35,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 34,
+      "action": 2,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 35,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 33,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 34,
+      "action": 3,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 33,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 22,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 35,
+      "action": 0,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 34,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 23,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 35,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 35,
+      "action": 1,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 23,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 35,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 47,
+          "reward": -1,
+          "terminated": true
+        }
+      ]
+    },
+    {
+      "state": 35,
+      "action": 2,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 35,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 47,
+          "reward": -1,
+          "terminated": true
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 34,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 35,
+      "action": 3,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 47,
+          "reward": -1,
+          "terminated": true
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 34,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 23,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 36,
+      "action": 0,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 24,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 36,
+      "action": 1,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 24,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 36,
+      "action": 2,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 36,
+      "action": 3,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 24,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 37,
+      "action": 0,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 25,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 37,
+      "action": 1,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 25,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 37,
+      "action": 2,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 37,
+      "action": 3,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 25,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 38,
+      "action": 0,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 26,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 38,
+      "action": 1,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 26,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 38,
+      "action": 2,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 38,
+      "action": 3,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 26,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 39,
+      "action": 0,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 27,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 39,
+      "action": 1,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 27,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 39,
+      "action": 2,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 39,
+      "action": 3,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 27,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 40,
+      "action": 0,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 28,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 40,
+      "action": 1,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 28,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 40,
+      "action": 2,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 40,
+      "action": 3,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 28,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 41,
+      "action": 0,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 29,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 41,
+      "action": 1,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 29,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 41,
+      "action": 2,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 41,
+      "action": 3,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 29,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 42,
+      "action": 0,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 30,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 42,
+      "action": 1,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 30,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 42,
+      "action": 2,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 42,
+      "action": 3,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 30,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 43,
+      "action": 0,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 31,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 43,
+      "action": 1,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 31,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 43,
+      "action": 2,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 43,
+      "action": 3,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 31,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 44,
+      "action": 0,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 32,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 44,
+      "action": 1,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 32,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 44,
+      "action": 2,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 44,
+      "action": 3,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 32,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 45,
+      "action": 0,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 33,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 45,
+      "action": 1,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 33,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 45,
+      "action": 2,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 45,
+      "action": 3,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 33,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 46,
+      "action": 0,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 34,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 47,
+          "reward": -1,
+          "terminated": true
+        }
+      ]
+    },
+    {
+      "state": 46,
+      "action": 1,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 34,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 47,
+          "reward": -1,
+          "terminated": true
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 46,
+      "action": 2,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 47,
+          "reward": -1,
+          "terminated": true
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 46,
+      "action": 3,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 34,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 47,
+      "action": 0,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 35,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 47,
+          "reward": -1,
+          "terminated": true
+        }
+      ]
+    },
+    {
+      "state": 47,
+      "action": 1,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 35,
+          "reward": -1,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 47,
+          "reward": -1,
+          "terminated": true
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 47,
+          "reward": -1,
+          "terminated": true
+        }
+      ]
+    },
+    {
+      "state": 47,
+      "action": 2,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 47,
+          "reward": -1,
+          "terminated": true
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 47,
+          "reward": -1,
+          "terminated": true
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        }
+      ]
+    },
+    {
+      "state": 47,
+      "action": 3,
+      "outcomes": [
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 47,
+          "reward": -1,
+          "terminated": true
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 36,
+          "reward": -100,
+          "terminated": false
+        },
+        {
+          "probability": {
+            "numerator": 1,
+            "denominator": 3
+          },
+          "next_state": 35,
+          "reward": -1,
+          "terminated": false
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,474 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.bevy-gym.dev/training-artifacts/v1/video-manifest.schema.json",
+  "title": "bevy-gym training timelapse manifest",
+  "description": "A frame-accurate manifest joining a shareable video and poster to chronological checkpoint hashes, evaluation rows, and one fixed demo suite.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "artifact_type",
+    "schema_version",
+    "generated_at",
+    "run",
+    "environment",
+    "algorithm",
+    "root_seed",
+    "source_commit",
+    "proof",
+    "generation",
+    "demo_suite",
+    "canvas",
+    "official_viewport",
+    "official_cadence",
+    "output",
+    "poster",
+    "layout",
+    "segments",
+    "verification"
+  ],
+  "properties": {
+    "artifact_type": {
+      "type": "string",
+      "const": "video-manifest"
+    },
+    "schema_version": {
+      "$ref": "common.schema.json#/$defs/schemaVersion"
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "run": {
+      "$ref": "common.schema.json#/$defs/runIdentity"
+    },
+    "environment": {
+      "$ref": "common.schema.json#/$defs/environment"
+    },
+    "algorithm": {
+      "$ref": "common.schema.json#/$defs/algorithm"
+    },
+    "root_seed": {
+      "$ref": "common.schema.json#/$defs/u64"
+    },
+    "source_commit": {
+      "$ref": "common.schema.json#/$defs/gitCommit"
+    },
+    "proof": {
+      "$ref": "common.schema.json#/$defs/artifactRef"
+    },
+    "generation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "command",
+        "renderer_id",
+        "renderer_version",
+        "ffmpeg_version",
+        "ffprobe_version"
+      ],
+      "properties": {
+        "command": {
+          "$ref": "common.schema.json#/$defs/command"
+        },
+        "renderer_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "renderer_version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "ffmpeg_version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "ffprobe_version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        }
+      }
+    },
+    "demo_suite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "split",
+        "sha256",
+        "sample_count",
+        "case_ids"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "split": {
+          "type": "string",
+          "const": "demo"
+        },
+        "sha256": {
+          "$ref": "common.schema.json#/$defs/sha256"
+        },
+        "sample_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "case_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        }
+      }
+    },
+    "canvas": {
+      "$ref": "#/$defs/dimensions"
+    },
+    "official_viewport": {
+      "$ref": "#/$defs/dimensions"
+    },
+    "official_cadence": {
+      "$ref": "#/$defs/frameRate"
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "file",
+        "container",
+        "video_codec",
+        "pixel_format",
+        "frame_rate",
+        "frame_count",
+        "duration_seconds"
+      ],
+      "properties": {
+        "file": {
+          "$ref": "common.schema.json#/$defs/artifactRef"
+        },
+        "container": {
+          "type": "string",
+          "const": "mp4"
+        },
+        "video_codec": {
+          "type": "string",
+          "const": "h264"
+        },
+        "pixel_format": {
+          "type": "string",
+          "const": "yuv420p"
+        },
+        "frame_rate": {
+          "$ref": "#/$defs/frameRate"
+        },
+        "frame_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "duration_seconds": {
+          "type": "number",
+          "const": 30
+        }
+      }
+    },
+    "poster": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "file",
+        "source_frame"
+      ],
+      "properties": {
+        "file": {
+          "$ref": "common.schema.json#/$defs/artifactRef"
+        },
+        "source_frame": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "layout": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "timelapse_seconds",
+        "final_best_seconds",
+        "timelapse_frames",
+        "final_best_frames"
+      ],
+      "properties": {
+        "timelapse_seconds": {
+          "type": "number",
+          "const": 20
+        },
+        "final_best_seconds": {
+          "type": "number",
+          "const": 10
+        },
+        "timelapse_frames": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "final_best_frames": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "segments": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "$ref": "#/$defs/segment"
+      }
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ffprobe_passed",
+        "checkpoint_links_passed",
+        "frames_manually_inspected",
+        "inspected_frame_indices"
+      ],
+      "properties": {
+        "ffprobe_passed": {
+          "type": "boolean",
+          "const": true
+        },
+        "checkpoint_links_passed": {
+          "type": "boolean",
+          "const": true
+        },
+        "frames_manually_inspected": {
+          "type": "boolean",
+          "const": true
+        },
+        "inspected_frame_indices": {
+          "type": "array",
+          "minItems": 3,
+          "uniqueItems": true,
+          "items": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "dimensions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "width",
+        "height"
+      ],
+      "properties": {
+        "width": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "frameRate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "numerator",
+        "denominator"
+      ],
+      "properties": {
+        "numerator": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "denominator": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "segment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "index",
+        "phase",
+        "frame_start",
+        "frame_end_exclusive",
+        "checkpoint",
+        "metrics_record",
+        "evaluation_record",
+        "demo_suite_sha256",
+        "demo_seeds",
+        "demo_case_ids",
+        "playback_speed",
+        "label",
+        "reloaded_best"
+      ],
+      "properties": {
+        "index": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "phase": {
+          "type": "string",
+          "enum": [
+            "chronological-training",
+            "final-best"
+          ]
+        },
+        "frame_start": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "frame_end_exclusive": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "checkpoint": {
+          "$ref": "common.schema.json#/$defs/checkpointRef"
+        },
+        "metrics_record": {
+          "$ref": "common.schema.json#/$defs/metricsRecordRef"
+        },
+        "evaluation_record": {
+          "$ref": "common.schema.json#/$defs/evaluationRecordRef"
+        },
+        "demo_suite_sha256": {
+          "$ref": "common.schema.json#/$defs/sha256"
+        },
+        "demo_seeds": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "common.schema.json#/$defs/u64"
+          }
+        },
+        "demo_case_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        },
+        "playback_speed": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "label": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "environment_registry_id",
+            "algorithm_id",
+            "root_seed",
+            "global_step",
+            "episode_count",
+            "update_count",
+            "checkpoint_short_sha256",
+            "metric",
+            "score",
+            "confidence_lower",
+            "confidence_upper",
+            "passed"
+          ],
+          "properties": {
+            "environment_registry_id": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 128
+            },
+            "algorithm_id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            },
+            "root_seed": {
+              "$ref": "common.schema.json#/$defs/u64"
+            },
+            "global_step": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "episode_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "update_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "checkpoint_short_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{12}$"
+            },
+            "metric": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            "score": {
+              "type": "number"
+            },
+            "confidence_lower": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "confidence_upper": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "passed": {
+              "type": "boolean"
+            }
+          }
+        },
+        "reloaded_best": {
+          "type": "boolean"
+        }
+      },
+      "x-bevy-gym-invariants": [
+        "frame_end_exclusive > frame_start",
+        "checkpoint.global_step, metrics_record.global_step, evaluation_record.global_step, and label.global_step are equal",
+        "checkpoint.sha256, metrics_record.policy_sha256, evaluation_record.checkpoint_sha256, and label checkpoint prefix agree",
+        "every segment uses the manifest demo suite and same ordered demo seeds/case IDs",
+        "label environment, algorithm, root seed, episode count, and update count agree with the manifest/checkpoint",
+        "only final-best segments set reloaded_best=true and those segments use the best checkpoint at official real-time cadence"
+      ]
+    }
+  },
+  "x-bevy-gym-invariants": [
+    "canvas is 1280x720",
+    "segments are ordered, contiguous, non-overlapping, and cover output.frame_count",
+    "chronological-training segments preserve nondecreasing original checkpoint global steps and begin at step zero",
+    "all chronological segments precede final-best segments and exactly fill the 20/10 second layout",
+    "layout frame counts sum to output.frame_count",
+    "output.frame_count divided by frame rate equals 30 seconds",
+    "poster.source_frame is within the output frame range"
+  ]
+}

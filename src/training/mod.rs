@@ -6,8 +6,10 @@
 
 pub mod backend;
 pub mod checkpoint;
+pub mod collector;
 pub mod config;
 pub mod dqn;
+pub mod evaluation;
 pub mod metrics;
 pub mod ppo;
 pub mod rng;
@@ -17,11 +19,19 @@ pub use backend::{inference_device, training_device, InferenceBackend, TrainingB
 pub use checkpoint::{
     policy_recorder, CheckpointError, CheckpointOperation, CheckpointPaths, PolicyRecorder,
 };
+pub use collector::{BevyTransitionCollector, CollectionError, TransitionBatch};
 pub use config::{run_name, AlgorithmKind, RunConfig, RunConfigError, RunId, RunPaths};
-pub use dqn::{DqnConfig, DqnReport, DqnTrainer};
+pub use dqn::{
+    DqnActionSelection, DqnAgent, DqnConfig, DqnError, DqnPolicy, DqnReport, DqnTrainer, DqnUpdate,
+};
+pub use evaluation::{
+    ConfidenceInterval, EpisodeOutcome, EvaluationError, EvaluationGate, EvaluationSuite,
+    EvaluationSuiteKind, EvaluationSummary, GateAssessment,
+};
 pub use metrics::{MetricRecord, MetricValue, MetricsError, MetricsWriter};
 pub use ppo::{PpoConfig, PpoReport, PpoTrainer};
 pub use rng::SeedConfig;
 pub use tensor::{
-    ActionSpec, DiscreteActionSpec, ObservationSpec, TensorDType, TensorizationError,
+    ActionSpec, ContinuousActionSpec, DiscreteActionSpec, ObservationSpec, TensorDType,
+    TensorizationError,
 };

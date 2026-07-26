@@ -1,0 +1,8 @@
+{
+  "fixture": "eval-row.valid.json",
+  "mutation": {
+    "op": "replace",
+    "path": "/process/kind",
+    "value": "in-process"
+  }
+}

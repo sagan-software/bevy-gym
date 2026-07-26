@@ -1,0 +1,8 @@
+{
+  "fixture": "metrics-row.valid.json",
+  "mutation": {
+    "op": "replace",
+    "path": "/checkpoint/sha256",
+    "value": "not-a-sha256"
+  }
+}
