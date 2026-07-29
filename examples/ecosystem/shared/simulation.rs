@@ -39,11 +39,11 @@ const WELL_RADIUS: f32 = 1.25;
 /// Radius in which an agent automatically drinks.
 const WELL_SENSOR_RADIUS: f32 = 2.25;
 
-/// Forward distance from the survival bunny to its first food sensor.
-const SURVIVAL_FIRST_FOOD_DISTANCE: f32 = 1.35;
+/// Forward distance from the survival bunny to both initial resource choices.
+const SURVIVAL_RESOURCE_FORWARD_DISTANCE: f32 = 5.5;
 
-/// Forward distance from the survival bunny to the solid well center.
-const SURVIVAL_WELL_DISTANCE: f32 = 3.55;
+/// Lateral distance separating the initial food and well routes.
+const SURVIVAL_RESOURCE_LATERAL_DISTANCE: f32 = 2.0;
 
 /// Maximum distance represented by every semantic sector.
 const SIGHT_RANGE: f32 = 18.0;
@@ -693,9 +693,9 @@ impl Ecosystem {
         Ok(())
     }
 
-    /// Spawn a rotated food-then-water route for the single-agent lesson.
+    /// Spawn separated visible resource choices for the single-agent lesson.
     fn spawn_survival_lesson(&mut self) {
-        // Rotate the whole route per episode so the actor must use egocentric
+        // Rotate the whole layout per episode so the actor must use egocentric
         // perception instead of memorizing one world-space direction.
         let route_angle = self
             .rng
@@ -703,12 +703,15 @@ impl Ecosystem {
         let forward = Vec2::from_angle(route_angle);
         let lateral = forward.perp();
         let bunny_position = forward * -4.0;
-        let well_position = bunny_position + forward * SURVIVAL_WELL_DISTANCE;
+        let resource_center = bunny_position + forward * SURVIVAL_RESOURCE_FORWARD_DISTANCE;
+        let route_offset = lateral * SURVIVAL_RESOURCE_LATERAL_DISTANCE;
+        let well_position = resource_center + route_offset;
+        let first_food_position = resource_center - route_offset;
         self.spawn_well(well_position);
         self.spawn_agent_facing(AgentId(0), Species::Bunny, bunny_position, route_angle);
-        self.spawn_food_at(bunny_position + forward * SURVIVAL_FIRST_FOOD_DISTANCE);
+        self.spawn_food_at(first_food_position);
         if self.config.initial_food > 1 {
-            self.spawn_food_at(bunny_position + forward * 6.0 + lateral * 2.2);
+            self.spawn_food_at(bunny_position + forward * 8.0 - lateral * 3.0);
         }
     }
 
@@ -2082,33 +2085,54 @@ mod tests {
         assert_eq!(initial_state(first), initial_state(second));
     }
 
-    /// Survival reset must begin with visible food on a rotated tutorial route.
+    /// Survival reset must show separated food and water choices before contact.
     #[test]
-    fn survival_reset_faces_visible_food_then_water() {
-        let config = SimulationConfig::for_stage(CurriculumStage::Survival)
-            .expect("survival defaults are valid");
-        let mut ecosystem = Ecosystem::new(config, 29).expect("world spawns");
-        let id = ecosystem.living_agents()[0];
-        let entity = ecosystem.agent_entities()[&id];
-        let position = ecosystem
-            .app
-            .world()
-            .get::<Position>(entity)
-            .expect("position exists")
-            .0;
-        let rotation = ecosystem
-            .app
-            .world()
-            .get::<Rotation>(entity)
-            .expect("rotation exists");
-        let well = ecosystem.app.world().resource::<WellState>().position;
-        let forward = Vec2::new(rotation.cos, rotation.sin);
-        let to_well = (well - position).normalize();
-        let observation = ecosystem.state().agents[0].2;
+    fn survival_reset_faces_visible_food_and_water() {
+        // Sample several world rotations while preserving the same egocentric contract.
+        for seed in [1, 29, 197, 4_099] {
+            let config = SimulationConfig::for_stage(CurriculumStage::Survival)
+                .expect("survival defaults are valid");
+            let mut ecosystem = Ecosystem::new(config, seed).expect("world spawns");
+            let id = ecosystem.living_agents()[0];
+            let entity = ecosystem.agent_entities()[&id];
+            let position = ecosystem
+                .app
+                .world()
+                .get::<Position>(entity)
+                .expect("position exists")
+                .0;
+            let rotation = *ecosystem
+                .app
+                .world()
+                .get::<Rotation>(entity)
+                .expect("rotation exists");
+            let well = ecosystem.app.world().resource::<WellState>().position;
+            let observation = ecosystem.state().agents[0].2;
+            let food_hit_angles = observation_hit_angles(&observation, PerceptKind::Food);
+            let well_hit_angles = observation_hit_angles(&observation, PerceptKind::Well);
+            let nearest_food = food_positions(&mut ecosystem)
+                .into_iter()
+                .min_by(|left, right| left.distance(position).total_cmp(&right.distance(position)))
+                .expect("survival lesson has food");
+            let forward = Vec2::new(rotation.cos, rotation.sin);
+            let food_bearing = relative_bearing(forward, nearest_food - position);
+            let well_bearing = relative_bearing(forward, well - position);
 
-        assert!(forward.dot(to_well) > 0.999);
-        assert!(observation_contains(&observation, PerceptKind::Food));
-        assert_eq!(food_count(&mut ecosystem), 2);
+            assert!(observation_contains(&observation, PerceptKind::Food));
+            assert!(observation_contains(&observation, PerceptKind::Well));
+            assert!(food_hit_angles.iter().any(|angle| *angle < -0.1));
+            assert!(well_hit_angles.iter().any(|angle| *angle > 0.1));
+            assert!(food_bearing < -0.1);
+            assert!(well_bearing > 0.1);
+            assert!(nearest_food.distance(position) > AGENT_RADIUS + FOOD_RADIUS);
+            assert!(well.distance(position) > AGENT_RADIUS + WELL_SENSOR_RADIUS);
+            assert!(!resource_contacts_agent::<FoodSlot>(&mut ecosystem, entity));
+            assert!(!resource_contacts_agent::<WellSensor>(
+                &mut ecosystem,
+                entity
+            ));
+            assert_eq!(food_count(&mut ecosystem), 2);
+        }
     }
 
     /// One action must be supplied for every and only living agent.
@@ -2248,9 +2272,9 @@ mod tests {
         assert!(velocity.0.dot(gaze_forward) > 0.0);
     }
 
-    /// Food sensors must be traversable and consumed by a forward-moving agent.
+    /// Food sensors must be traversable and consumed by a steering agent.
     #[test]
-    fn forward_agent_crosses_and_collects_food_sensor() {
+    fn steering_agent_crosses_and_collects_food_sensor() {
         let config = SimulationConfig::for_stage(CurriculumStage::Survival)
             .expect("survival defaults are valid");
         let mut ecosystem = Ecosystem::new(config, 37).expect("world spawns");
@@ -2268,11 +2292,40 @@ mod tests {
             .get::<Rotation>(entity)
             .expect("agent rotation exists");
         let body_forward = Vec2::new(rotation.cos, rotation.sin);
-        let forward = LocomotionAction::new(1.0, 0.0, 0.0).expect("forward action is valid");
+        // Select the first lesson target before collection can despawn it.
+        let target = food_positions(&mut ecosystem)
+            .into_iter()
+            .min_by(|left, right| left.distance(start).total_cmp(&right.distance(start)))
+            .expect("survival lesson has food");
         let mut largest_reward = f64::NEG_INFINITY;
-        for _ in 0..20 {
-            let step = ecosystem.step(&[(id, forward)]).expect("world advances");
+        for _ in 0..40 {
+            let position = ecosystem
+                .app
+                .world()
+                .get::<Position>(entity)
+                .expect("agent position exists")
+                .0;
+            let rotation = *ecosystem
+                .app
+                .world()
+                .get::<Rotation>(entity)
+                .expect("agent rotation exists");
+            let heading = Vec2::new(rotation.cos, rotation.sin);
+            let bearing = relative_bearing(heading, target - position);
+            let forward = if bearing.abs() < 0.2 { 1.0 } else { -1.0 };
+            let turn = (bearing / 0.35).clamp(-1.0, 1.0);
+            let action =
+                LocomotionAction::new(forward, turn, 0.0).expect("steering action is valid");
+            let step = ecosystem.step(&[(id, action)]).expect("world advances");
             largest_reward = largest_reward.max(step.agents[0].reward);
+            let has_eaten = ecosystem
+                .app
+                .world()
+                .get::<AgentBody>(entity)
+                .is_some_and(|agent| agent.metrics.food_eaten > 0);
+            if has_eaten {
+                break;
+            }
         }
         let agent = ecosystem
             .app
@@ -2288,7 +2341,9 @@ mod tests {
         assert!(agent.metrics.food_eaten > 0);
         assert!(agent.metrics.food_reward_units > 0.0);
         assert!(largest_reward > 7.0);
-        assert!((end - start).dot(body_forward) > SURVIVAL_FIRST_FOOD_DISTANCE);
+        let expected_forward_progress =
+            SURVIVAL_RESOURCE_FORWARD_DISTANCE - AGENT_RADIUS - FOOD_RADIUS - 0.25;
+        assert!((end - start).dot(body_forward) > expected_forward_progress);
     }
 
     /// Excess reserves slow translation, remain capped, and damage health.
@@ -3036,6 +3091,40 @@ mod tests {
             let start = PROPRIOCEPTION_SIZE + ray_index * (2 + RAY_KIND_COUNT);
             observation[start + 1] > 0.5 && observation[start + 2 + kind.index()] > 0.5
         })
+    }
+
+    /// Return configured ray bearings containing one semantic class.
+    fn observation_hit_angles(observation: &[f32], kind: PerceptKind) -> Vec<f32> {
+        // Decode only active semantic hits while retaining their configured bearings.
+        (0..RAY_COUNT)
+            .filter(|ray_index| {
+                let start = PROPRIOCEPTION_SIZE + ray_index * (2 + RAY_KIND_COUNT);
+                observation[start + 1] > 0.5 && observation[start + 2 + kind.index()] > 0.5
+            })
+            .filter_map(|ray_index| RAY_ANGLES.get(ray_index).copied())
+            .collect()
+    }
+
+    /// Return the signed angle from one heading to a target offset.
+    fn relative_bearing(forward: Vec2, offset: Vec2) -> f32 {
+        let direction = offset.normalize();
+        forward.perp_dot(direction).atan2(forward.dot(direction))
+    }
+
+    /// Return every live food position in query order.
+    fn food_positions(ecosystem: &mut Ecosystem) -> Vec<Vec2> {
+        let world = ecosystem.app.world_mut();
+        let mut query = world.query_filtered::<&Position, With<FoodSlot>>();
+        query.iter(world).map(|position| position.0).collect()
+    }
+
+    /// Return whether one resource class starts in contact with an agent.
+    fn resource_contacts_agent<T: Component>(ecosystem: &mut Ecosystem, agent: Entity) -> bool {
+        let world = ecosystem.app.world_mut();
+        let mut query = world.query_filtered::<&CollidingEntities, With<T>>();
+        query
+            .iter(world)
+            .any(|contacts| contacts.0.contains(&agent))
     }
 
     /// Assign isolated motion components for physiology-cost assertions.
