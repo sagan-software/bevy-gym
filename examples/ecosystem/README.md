@@ -28,7 +28,9 @@ count, gain from the random-policy baseline, and durable run directory. It also
 controls world playback speed, world pause, world reset, training pause, and
 training stop.
 
-The perception overlay starts enabled for agent 0. Each line is an active
+The perception overlay starts enabled for agent 0. Each agent has two forward
+eye origins with dense frontal rays and sparse peripheral rays. Conjugate gaze
+turns both eyes within the configured head-relative limit. Each line is an active
 post-physics semantic sector stored in that agent's next observation. A dim line
 marks an empty sector. A colored line stops at the perceived hit: food is
 yellow, water is blue, agents are white or orange, obstacles are gray, thorns
@@ -38,35 +40,46 @@ agent dies, the filter follows the first living agent.
 
 The collapsed `Experiment tuning` panel provides these live controls:
 
-- active perception rays from 1 through 36;
+- active perception rays in even pairs from 2 through 36;
 - alive, food or prey, and absorbed-water reward weights;
-- starting health;
-- hunger and thirst speed;
-- health damage speed;
+- starting health and food or water reserves;
+- hunger and thirst speed plus translation-only movement drain;
+- movement speed and eye-gaze range;
+- reserve capacity, fullness slowdown threshold and speed, and overfill damage;
+- deprivation and thorn damage speed;
 - episode step limit.
 
-Ray counts select an evenly spaced subset of the 36 reserved directions. Each
-ray keeps its narrow sensing arc, so lower counts create real blind gaps.
-Inactive observation slots remain zero and the actor input stays 339 values
-wide. Existing policies and recurrent memory therefore remain compatible.
+Ray counts remove sparse peripheral pairs before dense frontal pairs. Each ray
+keeps its narrow sensing arc, so lower counts create real blind gaps. Inactive
+observation slots remain zero and the actor input stays 340 values wide. The
+policy emits forward, body-turn, and gaze actions. Checkpoints created for the
+old 339-input, two-action profile are incompatible with this profile.
 
 Training accepts a changed profile only between complete PPO iterations. This
 keeps one rollout batch on one reward and dynamics definition. Use `Apply +
 restart visible world` to apply the same profile to the rendered evaluation
 world. Every applied profile is written into the run metrics. Purple graph
-markers identify training changes. The learning graph uses survival time, so
-its points remain comparable when reward weights change. Episodic reward does
-not remain comparable across reward profiles.
+markers identify training changes. A settings change resets the displayed
+survival-learning curve and fixed-seed checkpoint-selection baseline. The run
+config stores the complete latest profile, and `eval` or `watch` loads it beside
+the checkpoint. Episodic reward does not remain comparable across reward
+profiles.
 
 Alive reward provides dense feedback and usually improves early credit, but a
 large value can reward passive survival. Food and water bonuses make resource
-discovery more important, but sparse bonuses increase variance. Lower starting
-health, faster need drain, and faster damage create urgency while reducing time
-for exploration. Fewer rays reduce spatial detail and usually slow resource
-discovery, but they make learned scanning behavior easier to see. Shorter
-episodes produce PPO updates sooner but can cut off delayed consequences. These
-controls are intended for short visual experiments, not production model
-selection.
+discovery more important. Their pre-consumption reserve multiplier is 125% at
+or below 10%, 100% through 50%, 90% through 75%, 75% below 90%, and zero from
+90% upward. Lower starting health, lower starting reserves, faster need drain,
+and faster damage create
+urgency while reducing time for exploration. Movement drain favors direct
+routes without shaping reward. The signed policy output maps to forward throttle,
+so `-1` stops and every larger value moves forward without reversing away from
+the eye cones. Body rotation and gaze
+retain only baseline drain. Fewer rays reduce spatial detail and usually slow resource discovery,
+but they make learned scanning behavior easier to see. A low fullness threshold
+or speed multiplier discourages overconsumption, while high overfill damage can
+shorten exploration. Shorter episodes produce PPO updates sooner but can cut
+off delayed consequences. These controls are for short visual experiments.
 
 ```sh
 cargo run --example ecosystem-survival
@@ -87,10 +100,11 @@ cargo run --example ecosystem-survival -- demo \
   --max-steps 1200 --seed 42 --speed 8
 ```
 
-Use WASD or arrow keys to pan. Use the mouse wheel or `+` and `-` to zoom.
-Press space to pause the world, `R` to reset it, and `F1` to open the Bevy
-world inspector. The HUD controls remain available while Burn trains on its
-worker thread.
+Use WASD, arrow keys, left drag, or middle drag to pan. Use the mouse wheel or
+`+` and `-` to zoom. Pointer input over the HUD does not move the camera. Press
+space to pause the world, `R` to reset it, and `F1` to open the Bevy world
+inspector. The HUD controls remain available while Burn trains on its worker
+thread.
 
 Headless training requires an explicit command. Disabling default features
 also excludes the rendering and Inspector-egui dependencies:
@@ -102,10 +116,12 @@ cargo run --no-default-features --release --example ecosystem-survival -- \
 ```
 
 The first command is the verified no-argument headless profile. Its recorded
-seed-157 run improved fixed-seed mean survival from 56.181 to 78.768 seconds in
-six updates. Fresh-process evaluation on 100 disjoint episodes improved from
-54.367 to 79.427 seconds. See [EVIDENCE.md](EVIDENCE.md) for confidence
-intervals and resource-use measurements.
+seed-157 run reaches 41.719 seconds by update 4 from a 38.087-second baseline,
+a 9.5% gain. Fresh-process evaluation on 100 disjoint
+episodes improved from 39.124 seconds to 42.445 seconds, an 8.5% gain. Both
+policies ate and drank in every episode, food pickups rose from 104 to 118, and
+overconsumption deaths fell from 27 to 18. See [EVIDENCE.md](EVIDENCE.md) for confidence intervals, resource-use
+measurements, and rendered screenshots.
 
 To inspect an existing checkpoint without training, use `watch`:
 

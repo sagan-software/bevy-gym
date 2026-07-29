@@ -71,13 +71,12 @@ use bevy_brp_extras as _;
 // tests own the actual Avian use, while this keeps per-target dependency linting exact.
 #[cfg(test)]
 use avian2d as _;
-// Render-only ecosystem examples own these serialization dependencies. Keep
-// library builds under the same feature free of false unused-dependency noise.
+// Ecosystem examples own these serialization dependencies. Keep library builds
+// free of false unused-dependency diagnostics.
 #[cfg(feature = "render")]
 use bevy_inspector_egui as _;
 #[cfg(feature = "render")]
 use serde as _;
-#[cfg(feature = "render")]
 use serde_json as _;
 #[cfg(feature = "render")]
 use tokio as _;

@@ -83,7 +83,7 @@ struct EvalOptions {
     episodes: usize,
 
     /// Per-episode joint-step horizon.
-    max_steps: u32,
+    max_steps: Option<u32>,
 
     /// Root of the evaluation-only seed stream.
     seed: u64,
@@ -166,6 +166,9 @@ struct EvaluationSummary {
     /// Total thorn hit-point damage across all evaluation agents.
     thorn_damage: f32,
 
+    /// Total overconsumption hit-point damage across evaluation agents.
+    overconsumption_damage: f32,
+
     /// Compatible food or prey events across evaluation agents.
     food_events: u64,
 
@@ -202,6 +205,9 @@ struct EvaluationDeathCounts {
 
     /// Thorn hazard deaths.
     thorns: u32,
+
+    /// Excess food or water deaths.
+    overconsumption: u32,
 
     /// Invalid physics-state deaths.
     invalid_physics: u32,
@@ -268,6 +274,12 @@ pub(super) struct TrainingProgress {
 
     /// Mean Gaussian policy entropy from the latest update.
     pub(super) entropy: f64,
+
+    /// Effective actor learning rate from the latest update.
+    pub(super) actor_learning_rate: f64,
+
+    /// Effective critic learning rate from the latest update.
+    pub(super) critic_learning_rate: f64,
 
     /// Whether fixed-seed selection accepted this iteration.
     pub(super) is_best: bool,
@@ -345,6 +357,8 @@ fn training_progress(
         actor_loss: update.actor_loss,
         critic_loss: update.critic_loss,
         entropy: update.entropy,
+        actor_learning_rate: update.actor_learning_rate,
+        critic_learning_rate: update.critic_learning_rate,
         is_best,
         has_evaluation,
         bunny: learners.bunny.policy(),
@@ -445,6 +459,41 @@ struct TrainingSetup {
 
     /// Append-only metrics stream owned by the trainer.
     metrics: MetricsWriter,
+}
+
+/// Stable resources needed to persist one live tuning transition.
+#[cfg(feature = "render")]
+struct TuningPersistence<'a> {
+    /// Current policy learners saved as the new same-profile baseline.
+    learners: &'a Learners,
+    /// Durable artifact paths for config and checkpoint replacement.
+    paths: &'a RunPaths,
+    /// Evaluation budget and run settings retained in the config.
+    options: &'a TrainOptions,
+    /// Optimizer settings retained in the config.
+    algorithm: &'a RecurrentPpoConfig,
+    /// Independent random streams used by evaluation.
+    seeds: SeedConfig,
+    /// Curriculum stage retained in the config.
+    stage: CurriculumStage,
+}
+
+/// Stable resources used by one scheduled fixed-seed evaluation.
+struct EvaluationPass<'a> {
+    /// Current trainable policies under evaluation.
+    learners: &'a Learners,
+    /// Current stationary simulation profile.
+    config: &'a SimulationConfig,
+    /// Durable checkpoint paths.
+    paths: &'a RunPaths,
+    /// Evaluation episode count and interval settings.
+    options: &'a TrainOptions,
+    /// Durable metrics writer.
+    metrics: &'a mut MetricsWriter,
+    /// Validation random stream.
+    validation_seed: u64,
+    /// Whether checkpoint selection balances both species.
+    has_foxes: bool,
 }
 
 impl std::fmt::Debug for Learners {
@@ -567,7 +616,7 @@ fn report_initial_evaluation(
             0.0,
             evaluation,
             UpdateSummary::empty(algorithm),
-            true,
+            false,
             true,
         ))
     })
@@ -588,6 +637,7 @@ fn report_training_update(
     evaluation: EvaluationSummary,
     update: UpdateSummary,
     is_best: bool,
+    has_evaluation: bool,
 ) -> bool {
     reporter.as_mut().is_none_or(|callback| {
         callback(training_progress(
@@ -602,7 +652,7 @@ fn report_training_update(
             evaluation,
             update,
             is_best,
-            true,
+            has_evaluation,
         ))
     })
 }
@@ -642,7 +692,7 @@ fn prepare_training(
     )?;
     let paths = run.paths();
     paths.create_new()?;
-    write_run_config(&paths, stage, &options, &algorithm, seeds)?;
+    write_run_config(&paths, stage, &options, &algorithm, seeds, &config)?;
     let metrics = MetricsWriter::append(&paths.metrics_jsonl)?;
     Ok(TrainingSetup {
         options,
@@ -680,6 +730,10 @@ fn initialize_baseline(
 }
 
 /// Execute the shared trainer with an optional visual progress boundary.
+#[expect(
+    clippy::too_many_lines,
+    reason = "the coordinator keeps batch, evaluation, checkpoint, and UI publication order explicit"
+)]
 fn run_training_inner(
     stage: CurriculumStage,
     arguments: impl Iterator<Item = String>,
@@ -703,9 +757,7 @@ fn run_training_inner(
     let mut config = prepared_config;
     #[cfg(not(feature = "render"))]
     let config = prepared_config;
-
-    // Open the visual world before fixed-seed evaluation so the example never
-    // hides a responsive window behind an initial batch of inference work.
+    // Open the visual world before evaluation to keep startup responsive.
     #[cfg(feature = "render")]
     if !report_training_start(
         &mut reporter,
@@ -717,15 +769,16 @@ fn run_training_inner(
     ) {
         return Ok(());
     }
-
     let has_foxes = config.fox_count > 0;
     let initial_evaluation =
         initialize_baseline(&learners, &config, seeds, &options, &paths, &mut metrics)?;
     let mut best_evaluation = initial_evaluation;
-
+    #[cfg(feature = "render")]
+    let mut profile_baseline = initial_evaluation;
+    #[cfg(not(feature = "render"))]
+    let profile_baseline = initial_evaluation;
     let mut output = io::BufWriter::new(io::stdout().lock());
     write_initial_output(&mut output, stage, initial_evaluation, &algorithm)?;
-
     // Publish the random initialization before the first optimizer update so
     // the visual demo can show a truthful learning baseline.
     #[cfg(feature = "render")]
@@ -748,7 +801,21 @@ fn run_training_inner(
         // update retains one stationary reward and dynamics definition.
         #[cfg(feature = "render")]
         if let Some(provider) = tuning_provider.as_mut() {
-            config.apply_experiment_tuning(provider())?;
+            if let Some(baseline) = apply_training_tuning(
+                provider,
+                &mut config,
+                TuningPersistence {
+                    learners: &learners,
+                    paths: &paths,
+                    options: &options,
+                    algorithm: &algorithm,
+                    seeds,
+                    stage,
+                },
+            )? {
+                best_evaluation = baseline;
+                profile_baseline = baseline;
+            }
         }
         let batch = collect_batch(
             &learners,
@@ -765,7 +832,6 @@ fn run_training_inner(
         } else {
             None
         };
-
         let bunny_lifetime = mean(&batch.bunny_lifetimes);
         let fox_lifetime = mean(&batch.fox_lifetimes);
         let update = combine_updates(bunny_update, fox_update);
@@ -778,34 +844,30 @@ fn run_training_inner(
             update,
             config.experiment_tuning(),
         )?;
-
         let should_evaluate = (iteration + 1).is_multiple_of(options.eval_interval)
             || iteration + 1 == options.iterations;
         let mut evaluation = None;
         let mut is_best = false;
         if should_evaluate {
-            let summary = evaluate_learners(
-                &learners,
-                config.clone(),
-                seeds.validation,
-                options.eval_episodes,
-            )?;
-            save_checkpoint_set(&learners, &paths, CheckpointKind::Latest)?;
-            save_checkpoint_set(&learners, &paths, CheckpointKind::Step(global_steps))?;
-            is_best =
-                summary.selection_score(has_foxes) > best_evaluation.selection_score(has_foxes);
-            if is_best {
-                best_evaluation = summary;
-                save_checkpoint_set(&learners, &paths, CheckpointKind::Best)?;
-            }
-            write_evaluation_metric(
-                &mut metrics,
+            let result = evaluate_training_iteration(
+                EvaluationPass {
+                    learners: &learners,
+                    config: &config,
+                    paths: &paths,
+                    options: &options,
+                    metrics: &mut metrics,
+                    validation_seed: seeds.validation,
+                    has_foxes,
+                },
                 global_steps,
-                summary,
-                is_best,
-                config.experiment_tuning(),
+                best_evaluation,
             )?;
-            evaluation = Some(summary);
+            is_best = result.1;
+            if result.1 {
+                let summary = result.0;
+                best_evaluation = summary;
+            }
+            evaluation = Some(result.0);
         }
         let displayed_evaluation = evaluation.unwrap_or(best_evaluation);
         write_iteration_output(
@@ -819,7 +881,6 @@ fn run_training_inner(
             update,
             is_best,
         )?;
-
         // Send the current policy after its metrics and checkpoint are durable.
         #[cfg(feature = "render")]
         if !report_training_update(
@@ -835,6 +896,7 @@ fn run_training_inner(
             displayed_evaluation,
             update,
             is_best,
+            evaluation.is_some(),
         ) {
             break;
         }
@@ -843,11 +905,78 @@ fn run_training_inner(
         &paths,
         stage,
         global_steps,
-        initial_evaluation,
+        profile_baseline,
         best_evaluation,
     )?;
     writeln!(output, "run_dir={}", paths.run_dir.display())?;
     Ok(())
+}
+
+/// Evaluate, persist, and classify one scheduled policy snapshot.
+fn evaluate_training_iteration(
+    pass: EvaluationPass<'_>,
+    global_steps: u64,
+    prior_best: EvaluationSummary,
+) -> Result<(EvaluationSummary, bool), Box<dyn Error>> {
+    let summary = evaluate_learners(
+        pass.learners,
+        pass.config.clone(),
+        pass.validation_seed,
+        pass.options.eval_episodes,
+    )?;
+    save_checkpoint_set(pass.learners, pass.paths, CheckpointKind::Latest)?;
+    save_checkpoint_set(
+        pass.learners,
+        pass.paths,
+        CheckpointKind::Step(global_steps),
+    )?;
+    let is_best =
+        summary.selection_score(pass.has_foxes) > prior_best.selection_score(pass.has_foxes);
+    if is_best {
+        save_checkpoint_set(pass.learners, pass.paths, CheckpointKind::Best)?;
+    }
+    write_evaluation_metric(
+        pass.metrics,
+        global_steps,
+        summary,
+        is_best,
+        pass.config.experiment_tuning(),
+    )?;
+    Ok((summary, is_best))
+}
+
+/// Apply a changed HUD profile and restart checkpoint selection on that profile.
+#[cfg(feature = "render")]
+fn apply_training_tuning(
+    provider: &mut dyn FnMut() -> ExperimentTuning,
+    config: &mut SimulationConfig,
+    persistence: TuningPersistence<'_>,
+) -> Result<Option<EvaluationSummary>, Box<dyn Error>> {
+    let next_tuning = provider();
+    if next_tuning == config.experiment_tuning() {
+        return Ok(None);
+    }
+    config.apply_experiment_tuning(next_tuning)?;
+    write_run_config(
+        persistence.paths,
+        persistence.stage,
+        persistence.options,
+        persistence.algorithm,
+        persistence.seeds,
+        config,
+    )?;
+    let baseline = evaluate_learners(
+        persistence.learners,
+        config.clone(),
+        persistence.seeds.validation,
+        persistence.options.eval_episodes,
+    )?;
+    save_checkpoint_set(
+        persistence.learners,
+        persistence.paths,
+        CheckpointKind::Best,
+    )?;
+    Ok(Some(baseline))
 }
 
 /// Write the column names and random-policy evaluation row.
@@ -918,17 +1047,22 @@ pub(super) fn run_evaluation(
     arguments: impl Iterator<Item = String>,
 ) -> Result<(), Box<dyn Error>> {
     let options = parse_eval_options(arguments)?;
-    let mut config = SimulationConfig::for_stage(stage)?;
-    config.max_steps = options.max_steps;
-    let algorithm = ecosystem_algorithm();
     let bunny_path = resolve_bunny_checkpoint(&options.checkpoint);
+    let mut config = SimulationConfig::for_stage(stage)?;
+    if let Some(tuning) = checkpoint_experiment_tuning(&bunny_path)? {
+        config.apply_experiment_tuning(tuning)?;
+    }
+    if let Some(max_steps) = options.max_steps {
+        config.max_steps = max_steps;
+    }
+    let algorithm = ecosystem_algorithm();
     let bunny = RecurrentPpoPolicy::load(
         &bunny_path,
         LOCAL_OBSERVATION_SIZE,
         GLOBAL_STATE_SIZE,
         MAX_AGENTS,
-        &[-1.0, -1.0],
-        &[1.0, 1.0],
+        &[-1.0, -1.0, -1.0],
+        &[1.0, 1.0, 1.0],
         &algorithm,
     )?;
     let fox = if config.fox_count > 0 {
@@ -940,8 +1074,8 @@ pub(super) fn run_evaluation(
             LOCAL_OBSERVATION_SIZE,
             GLOBAL_STATE_SIZE,
             MAX_AGENTS,
-            &[-1.0, -1.0],
-            &[1.0, 1.0],
+            &[-1.0, -1.0, -1.0],
+            &[1.0, 1.0, 1.0],
             &algorithm,
         )?)
     } else {
@@ -950,7 +1084,7 @@ pub(super) fn run_evaluation(
     let summary = evaluate_policies(&bunny, fox.as_ref(), config, options.seed, options.episodes)?;
     writeln!(
         io::stdout().lock(),
-        "stage={} episodes={} bunny_mean_lifetime={:.3} bunny_ci95=[{:.3},{:.3}] bunny_food_and_water={:.3} bunny_resource_consumers={} bunny_index_advantage={:.3} fox_mean_lifetime={:.3} fox_ci95=[{:.3},{:.3}] fox_prey_and_water={:.3} food_events={} predation_events={} predation_episodes={}/{} water_consumed={:.3} collision_contacts={} thorn_damage={:.3} deaths=[starvation:{},dehydration:{},deprivation:{},predation:{},thorns:{},invalid_physics:{}] checkpoint={}",
+        "stage={} episodes={} bunny_mean_lifetime={:.3} bunny_ci95=[{:.3},{:.3}] bunny_food_and_water={:.3} bunny_resource_consumers={} bunny_index_advantage={:.3} fox_mean_lifetime={:.3} fox_ci95=[{:.3},{:.3}] fox_prey_and_water={:.3} food_events={} predation_events={} predation_episodes={}/{} water_consumed={:.3} collision_contacts={} thorn_damage={:.3} overconsumption_damage={:.3} deaths=[starvation:{},dehydration:{},deprivation:{},predation:{},thorns:{},overconsumption:{},invalid_physics:{}] checkpoint={}",
         stage.as_key(),
         options.episodes,
         summary.bunny_mean_lifetime,
@@ -970,11 +1104,13 @@ pub(super) fn run_evaluation(
         summary.water_consumed,
         summary.collision_contacts,
         summary.thorn_damage,
+        summary.overconsumption_damage,
         summary.deaths.starvation,
         summary.deaths.dehydration,
         summary.deaths.deprivation,
         summary.deaths.predation,
         summary.deaths.thorns,
+        summary.deaths.overconsumption,
         summary.deaths.invalid_physics,
         bunny_path.display(),
     )?;
@@ -987,7 +1123,7 @@ pub(super) fn ecosystem_algorithm() -> RecurrentPpoConfig {
     RecurrentPpoConfig {
         gamma: 0.999,
         gae_lambda: 1.0,
-        actor_learning_rate: 1e-4,
+        actor_learning_rate: 3e-4,
         critic_learning_rate: 3e-4,
         entropy_coefficient: 0.005,
         epochs: 3,
@@ -1054,7 +1190,7 @@ fn parse_eval_options(
     let mut checkpoint = None;
     let mut fox_checkpoint = None;
     let mut episodes = 32;
-    let mut max_steps = 1_200;
+    let mut max_steps = None;
     let mut seed = 101;
     while let Some(flag) = arguments.next() {
         let value = arguments
@@ -1064,12 +1200,12 @@ fn parse_eval_options(
             "--checkpoint" => checkpoint = Some(PathBuf::from(value)),
             "--fox-checkpoint" => fox_checkpoint = Some(PathBuf::from(value)),
             "--episodes" => episodes = value.parse()?,
-            "--max-steps" => max_steps = value.parse()?,
+            "--max-steps" => max_steps = Some(value.parse()?),
             "--seed" => seed = value.parse()?,
             _ => return Err(format!("unknown eval option {flag:?}").into()),
         }
     }
-    if episodes == 0 || max_steps == 0 {
+    if episodes == 0 || max_steps == Some(0) {
         return Err("--episodes and --max-steps must be greater than zero".into());
     }
     Ok(EvalOptions {
@@ -1177,6 +1313,7 @@ fn evaluate_policies(
     let mut fox_count = 0_u32;
     let mut collision_contacts = 0_u64;
     let mut thorn_damage = 0.0;
+    let mut overconsumption_damage = 0.0;
     let mut food_events = 0_u64;
     let mut predation_events = 0_u64;
     let mut water_consumed = 0.0;
@@ -1196,6 +1333,7 @@ fn evaluate_policies(
             collision_contacts =
                 collision_contacts.saturating_add(u64::from(agent.collision_contacts));
             thorn_damage += agent.thorn_damage;
+            overconsumption_damage += agent.overconsumption_damage;
             food_events = food_events.saturating_add(u64::from(agent.food_eaten));
             predation_events = predation_events.saturating_add(u64::from(agent.kills));
             water_consumed += agent.water_consumed;
@@ -1214,6 +1352,9 @@ fn evaluate_policies(
                 }
                 Some(super::domain::DeathCause::Thorns) => {
                     deaths.thorns = deaths.thorns.saturating_add(1);
+                }
+                Some(super::domain::DeathCause::Overconsumption) => {
+                    deaths.overconsumption = deaths.overconsumption.saturating_add(1);
                 }
                 Some(super::domain::DeathCause::InvalidPhysics) => {
                     deaths.invalid_physics = deaths.invalid_physics.saturating_add(1);
@@ -1272,6 +1413,7 @@ fn evaluate_policies(
         fox_food_and_water_fraction: fraction(fox_resource_successes, fox_count),
         collision_contacts,
         thorn_damage,
+        overconsumption_damage,
         food_events,
         predation_events,
         water_consumed,
@@ -1304,10 +1446,10 @@ fn deterministic_episode(
                 .entry(*id)
                 .or_insert_with(|| policy.initial_memory());
             let action = policy.mean_action(observation, memory)?;
-            let [forward, turn] = action.action.as_slice() else {
-                return Err("ecosystem policy must emit exactly two action axes".into());
+            let [forward, turn, gaze] = action.action.as_slice() else {
+                return Err("ecosystem policy must emit exactly three action axes".into());
             };
-            actions.push((*id, LocomotionAction::new(*forward, *turn)?));
+            actions.push((*id, LocomotionAction::new(*forward, *turn, *gaze)?));
             next_memories.insert(*id, action.next_memory);
         }
         let result = ecosystem.step(&actions)?;
@@ -1393,8 +1535,40 @@ fn with_experiment_metrics(record: MetricRecord, tuning: ExperimentTuning) -> Me
             MetricValue::Number(f64::from(tuning.initial_health_fraction)),
         )
         .with_field(
+            "experiment/initial_reserve_fraction",
+            MetricValue::Number(f64::from(tuning.initial_reserve_fraction)),
+        )
+        .with_field(
             "experiment/need_drain_multiplier",
             MetricValue::Number(f64::from(tuning.need_drain_multiplier)),
+        )
+        .with_field(
+            "experiment/movement_need_drain",
+            MetricValue::Number(f64::from(tuning.movement_need_drain)),
+        )
+        .with_field(
+            "experiment/movement_speed_multiplier",
+            MetricValue::Number(f64::from(tuning.movement_speed_multiplier)),
+        )
+        .with_field(
+            "experiment/reserve_capacity",
+            MetricValue::Number(f64::from(tuning.reserve_capacity)),
+        )
+        .with_field(
+            "experiment/fullness_slow_threshold",
+            MetricValue::Number(f64::from(tuning.fullness_slow_threshold)),
+        )
+        .with_field(
+            "experiment/overfull_speed_multiplier",
+            MetricValue::Number(f64::from(tuning.overfull_speed_multiplier)),
+        )
+        .with_field(
+            "experiment/overfull_damage_rate",
+            MetricValue::Number(f64::from(tuning.overfull_damage_rate)),
+        )
+        .with_field(
+            "experiment/gaze_yaw_limit_degrees",
+            MetricValue::Number(f64::from(tuning.gaze_yaw_limit_degrees)),
         )
         .with_field(
             "experiment/damage_multiplier",
@@ -1514,6 +1688,10 @@ fn write_evaluation_metric(
             MetricValue::Number(f64::from(summary.thorn_damage)),
         )
         .with_field(
+            "eval/overconsumption_damage",
+            MetricValue::Number(f64::from(summary.overconsumption_damage)),
+        )
+        .with_field(
             "eval/food_events",
             MetricValue::Number(summary.food_events as f64),
         )
@@ -1533,36 +1711,49 @@ fn write_evaluation_metric(
             "eval/water_consumed",
             MetricValue::Number(f64::from(summary.water_consumed)),
         )
-        .with_field(
-            "eval/deaths_starvation",
-            MetricValue::Number(f64::from(summary.deaths.starvation)),
-        )
-        .with_field(
-            "eval/deaths_dehydration",
-            MetricValue::Number(f64::from(summary.deaths.dehydration)),
-        )
-        .with_field(
-            "eval/deaths_deprivation",
-            MetricValue::Number(f64::from(summary.deaths.deprivation)),
-        )
-        .with_field(
-            "eval/deaths_predation",
-            MetricValue::Number(f64::from(summary.deaths.predation)),
-        )
-        .with_field(
-            "eval/deaths_thorns",
-            MetricValue::Number(f64::from(summary.deaths.thorns)),
-        )
-        .with_field(
-            "eval/deaths_invalid_physics",
-            MetricValue::Number(f64::from(summary.deaths.invalid_physics)),
-        )
         .with_field("checkpoint/best", MetricValue::Bool(is_best));
+    let record = with_evaluation_death_metrics(record, summary.deaths);
     metrics.write_record(&with_experiment_metrics(record, tuning))?;
     Ok(())
 }
 
-/// Write reproducibility settings before any optimizer update.
+/// Attach terminal-cause counts to one fixed-seed evaluation row.
+fn with_evaluation_death_metrics(
+    record: MetricRecord,
+    deaths: EvaluationDeathCounts,
+) -> MetricRecord {
+    record
+        .with_field(
+            "eval/deaths_starvation",
+            MetricValue::Number(f64::from(deaths.starvation)),
+        )
+        .with_field(
+            "eval/deaths_dehydration",
+            MetricValue::Number(f64::from(deaths.dehydration)),
+        )
+        .with_field(
+            "eval/deaths_deprivation",
+            MetricValue::Number(f64::from(deaths.deprivation)),
+        )
+        .with_field(
+            "eval/deaths_predation",
+            MetricValue::Number(f64::from(deaths.predation)),
+        )
+        .with_field(
+            "eval/deaths_thorns",
+            MetricValue::Number(f64::from(deaths.thorns)),
+        )
+        .with_field(
+            "eval/deaths_overconsumption",
+            MetricValue::Number(f64::from(deaths.overconsumption)),
+        )
+        .with_field(
+            "eval/deaths_invalid_physics",
+            MetricValue::Number(f64::from(deaths.invalid_physics)),
+        )
+}
+
+/// Write the latest reproducibility settings at a stationary batch boundary.
 #[expect(
     clippy::allow_attributes,
     reason = "the repository disallows synchronous filesystem helpers by default"
@@ -1577,13 +1768,14 @@ fn write_run_config(
     options: &TrainOptions,
     algorithm: &RecurrentPpoConfig,
     seeds: SeedConfig,
+    config: &SimulationConfig,
 ) -> Result<(), Box<dyn Error>> {
     let mut config_file = File::create(&paths.config_json)?;
     let resume = json_optional_path(options.resume.as_deref());
     let fox_resume = json_optional_path(options.fox_resume.as_deref());
     writeln!(
         config_file,
-        "{{\"stage\":\"{}\",\"iterations\":{},\"rollout_episodes\":{},\"max_steps\":{},\"eval_episodes\":{},\"eval_interval\":{},\"actor_hidden_size\":{},\"actor_learning_rate\":{},\"critic_learning_rate\":{},\"entropy_coefficient\":{},\"initial_log_std\":{},\"log_std_max\":{},\"gamma\":{},\"gae_lambda\":{},\"epochs\":{},\"minibatch_sequences\":{},\"resume\":{},\"fox_resume\":{}}}",
+        "{{\"checkpoint_profile\":2,\"stage\":\"{}\",\"iterations\":{},\"rollout_episodes\":{},\"max_steps\":{},\"eval_episodes\":{},\"eval_interval\":{},\"actor_hidden_size\":{},\"actor_learning_rate\":{},\"critic_learning_rate\":{},\"entropy_coefficient\":{},\"initial_log_std\":{},\"log_std_max\":{},\"gamma\":{},\"gae_lambda\":{},\"epochs\":{},\"minibatch_sequences\":{},\"resume\":{},\"fox_resume\":{},\"experiment_tuning\":{}}}",
         stage.as_key(),
         options.iterations,
         options.rollout_episodes,
@@ -1602,6 +1794,7 @@ fn write_run_config(
         algorithm.minibatch_sequences,
         resume,
         fox_resume,
+        experiment_tuning_json(config.experiment_tuning()),
     )?;
     let mut seed_file = File::create(&paths.seeds_json)?;
     writeln!(
@@ -1634,6 +1827,102 @@ fn json_optional_path(path: Option<&Path>) -> String {
     )
 }
 
+/// Encode the complete live playground profile in the durable run config.
+fn experiment_tuning_json(tuning: ExperimentTuning) -> serde_json::Value {
+    serde_json::json!({
+        "perception_ray_count": tuning.perception_ray_count.get(),
+        "survival_reward_per_second": tuning.survival_reward_per_second,
+        "food_reward": tuning.food_reward,
+        "water_reward_per_unit": tuning.water_reward_per_unit,
+        "initial_health_fraction": tuning.initial_health_fraction,
+        "initial_reserve_fraction": tuning.initial_reserve_fraction,
+        "need_drain_multiplier": tuning.need_drain_multiplier,
+        "movement_need_drain": tuning.movement_need_drain,
+        "movement_speed_multiplier": tuning.movement_speed_multiplier,
+        "reserve_capacity": tuning.reserve_capacity,
+        "fullness_slow_threshold": tuning.fullness_slow_threshold,
+        "overfull_speed_multiplier": tuning.overfull_speed_multiplier,
+        "overfull_damage_rate": tuning.overfull_damage_rate,
+        "gaze_yaw_limit_degrees": tuning.gaze_yaw_limit_degrees,
+        "damage_multiplier": tuning.damage_multiplier,
+        "episode_step_limit": tuning.episode_step_limit,
+    })
+}
+
+/// Load the saved playground profile beside a run checkpoint when available.
+pub(super) fn checkpoint_experiment_tuning(
+    checkpoint: &Path,
+) -> Result<Option<ExperimentTuning>, Box<dyn Error>> {
+    let config_path = checkpoint_config_path(checkpoint);
+    if !config_path.exists() {
+        return Ok(None);
+    }
+    let value: serde_json::Value = serde_json::from_reader(File::open(config_path)?)?;
+    let Some(tuning) = value.get("experiment_tuning") else {
+        return Ok(None);
+    };
+    parse_experiment_tuning(tuning).map(Some)
+}
+
+/// Decode and validate one saved playground profile.
+fn parse_experiment_tuning(tuning: &serde_json::Value) -> Result<ExperimentTuning, Box<dyn Error>> {
+    let ray_count = tuning
+        .get("perception_ray_count")
+        .and_then(serde_json::Value::as_u64)
+        .ok_or("run config lacks experiment_tuning.perception_ray_count")?;
+    let ray_count = u8::try_from(ray_count)?;
+    let number = |key| json_f32(tuning, key);
+    let step_limit = tuning
+        .get("episode_step_limit")
+        .and_then(serde_json::Value::as_u64)
+        .ok_or("run config lacks experiment_tuning.episode_step_limit")?;
+    Ok(ExperimentTuning {
+        perception_ray_count: super::domain::PerceptionRayCount::try_from(ray_count)?,
+        survival_reward_per_second: number("survival_reward_per_second")?,
+        food_reward: number("food_reward")?,
+        water_reward_per_unit: number("water_reward_per_unit")?,
+        initial_health_fraction: number("initial_health_fraction")?,
+        initial_reserve_fraction: number("initial_reserve_fraction")?,
+        need_drain_multiplier: number("need_drain_multiplier")?,
+        movement_need_drain: number("movement_need_drain")?,
+        movement_speed_multiplier: number("movement_speed_multiplier")?,
+        reserve_capacity: number("reserve_capacity")?,
+        fullness_slow_threshold: number("fullness_slow_threshold")?,
+        overfull_speed_multiplier: number("overfull_speed_multiplier")?,
+        overfull_damage_rate: number("overfull_damage_rate")?,
+        gaze_yaw_limit_degrees: number("gaze_yaw_limit_degrees")?,
+        damage_multiplier: number("damage_multiplier")?,
+        episode_step_limit: u32::try_from(step_limit)?,
+    })
+}
+
+/// Resolve the stable run config beside a root or step checkpoint.
+fn checkpoint_config_path(checkpoint: &Path) -> PathBuf {
+    let parent = checkpoint.parent().unwrap_or_else(|| Path::new("."));
+    if parent.file_name().is_some_and(|name| name == "checkpoints") {
+        parent
+            .parent()
+            .unwrap_or_else(|| Path::new("."))
+            .join("config.json")
+    } else {
+        parent.join("config.json")
+    }
+}
+
+/// Read one finite number from the saved playground profile.
+fn json_f32(value: &serde_json::Value, key: &str) -> Result<f32, Box<dyn Error>> {
+    let number = value
+        .get(key)
+        .and_then(serde_json::Value::as_f64)
+        .ok_or_else(|| format!("run config lacks experiment_tuning.{key}"))?;
+    let number = number as f32;
+    if number.is_finite() {
+        Ok(number)
+    } else {
+        Err(format!("run config has non-finite experiment_tuning.{key}").into())
+    }
+}
+
 /// Write the current evidence boundary at the end of training.
 #[expect(
     clippy::allow_attributes,
@@ -1653,7 +1942,7 @@ fn write_summary(
     let mut file = File::create(&paths.summary_json)?;
     writeln!(
         file,
-        "{{\"stage\":\"{}\",\"global_steps\":{},\"initial_bunny_mean_lifetime\":{},\"best_bunny_mean_lifetime\":{},\"best_bunny_ci95_lower\":{},\"best_bunny_ci95_upper\":{},\"best_bunny_food_and_water_fraction\":{},\"best_bunny_resource_consumer_count\":{},\"best_bunny_index_lifetime_advantage_fraction\":{},\"initial_fox_mean_lifetime\":{},\"best_fox_mean_lifetime\":{},\"best_fox_ci95_lower\":{},\"best_fox_ci95_upper\":{},\"best_fox_prey_and_water_fraction\":{},\"best_collision_contacts\":{},\"best_thorn_damage\":{},\"qualification\":\"not yet final multi-seed held-out evidence\"}}",
+        "{{\"stage\":\"{}\",\"global_steps\":{},\"initial_bunny_mean_lifetime\":{},\"best_bunny_mean_lifetime\":{},\"best_bunny_ci95_lower\":{},\"best_bunny_ci95_upper\":{},\"best_bunny_food_and_water_fraction\":{},\"best_bunny_resource_consumer_count\":{},\"best_bunny_index_lifetime_advantage_fraction\":{},\"initial_fox_mean_lifetime\":{},\"best_fox_mean_lifetime\":{},\"best_fox_ci95_lower\":{},\"best_fox_ci95_upper\":{},\"best_fox_prey_and_water_fraction\":{},\"best_collision_contacts\":{},\"best_thorn_damage\":{},\"best_overconsumption_damage\":{},\"qualification\":\"fixed validation-seed demo evidence; disjoint test-seed qualification is reported separately\"}}",
         stage.as_key(),
         global_steps,
         initial.bunny_mean_lifetime,
@@ -1670,6 +1959,7 @@ fn write_summary(
         best.fox_food_and_water_fraction,
         best.collision_contacts,
         best.thorn_damage,
+        best.overconsumption_damage,
     )?;
     Ok(())
 }
@@ -1710,8 +2000,8 @@ fn create_learners(
             LOCAL_OBSERVATION_SIZE,
             GLOBAL_STATE_SIZE,
             MAX_AGENTS,
-            &[-1.0, -1.0],
-            &[1.0, 1.0],
+            &[-1.0, -1.0, -1.0],
+            &[1.0, 1.0, 1.0],
             algorithm.clone(),
             SeedConfig::from_root(seed),
         )
@@ -1722,8 +2012,8 @@ fn create_learners(
             LOCAL_OBSERVATION_SIZE,
             GLOBAL_STATE_SIZE,
             MAX_AGENTS,
-            &[-1.0, -1.0],
-            &[1.0, 1.0],
+            &[-1.0, -1.0, -1.0],
+            &[1.0, 1.0, 1.0],
             algorithm.clone(),
             SeedConfig::from_root(seed),
         )
@@ -1835,10 +2125,10 @@ fn collect_episode(
                 .clone();
             let action = policy.sample_action(observation, &memory, sampler)?;
             let value = policy.value(&current.global_state, usize::from(id.0))?;
-            let [forward, turn] = action.action.as_slice() else {
-                return Err("ecosystem policy must emit exactly two action axes".into());
+            let [forward, turn, gaze] = action.action.as_slice() else {
+                return Err("ecosystem policy must emit exactly three action axes".into());
             };
-            let locomotion = LocomotionAction::new(*forward, *turn)?;
+            let locomotion = LocomotionAction::new(*forward, *turn, *gaze)?;
             actions.push((*id, locomotion));
             selected.insert(*id, (*species, observation, memory, action, value));
         }
@@ -2070,6 +2360,15 @@ mod tests {
         assert!((options.log_std_max + 0.5).abs() < f32::EPSILON);
     }
 
+    /// Durable tuning JSON must preserve every runtime-adjustable field.
+    #[test]
+    fn experiment_tuning_json_round_trips_the_complete_profile() {
+        let expected = ExperimentTuning::default();
+        let value = experiment_tuning_json(expected);
+        let actual = parse_experiment_tuning(&value).expect("saved tuning parses");
+        assert_eq!(actual, expected);
+    }
+
     /// Ecosystem exploration must start at the scale used by qualifying runs.
     #[test]
     fn ecosystem_actor_starts_with_the_qualified_exploration_scale() {
@@ -2185,7 +2484,7 @@ mod tests {
         let transition = RolloutTransition {
             observation: [0.0; LOCAL_OBSERVATION_SIZE],
             global_state: [0.0; GLOBAL_STATE_SIZE],
-            pre_tanh_action: vec![0.0, 0.0],
+            pre_tanh_action: vec![0.0, 0.0, 0.0],
             old_log_probability: 0.0,
             reward: 2.0,
             value: 1.0,
@@ -2209,7 +2508,7 @@ mod tests {
         RolloutTransition {
             observation: [0.0; LOCAL_OBSERVATION_SIZE],
             global_state: [0.0; GLOBAL_STATE_SIZE],
-            pre_tanh_action: vec![0.0, 0.0],
+            pre_tanh_action: vec![0.0, 0.0, 0.0],
             old_log_probability: 0.0,
             reward: 2.0,
             value: 1.0,

@@ -5,14 +5,14 @@ use std::fmt;
 
 use bevy_gym::EpisodeStatus;
 
-/// Number of uniform all-around semantic sectors emitted by every agent.
+/// Fixed binocular semantic-ray capacity emitted by every agent.
 pub(super) const RAY_COUNT: usize = 36;
 
 /// Semantic channels encoded after every ray distance and presence value.
 pub(super) const RAY_KIND_COUNT: usize = 7;
 
 /// Scalar features reserved for proprioception.
-pub(super) const PROPRIOCEPTION_SIZE: usize = 11;
+pub(super) const PROPRIOCEPTION_SIZE: usize = 12;
 
 /// One-hot curriculum lesson width.
 pub(super) const LESSON_COUNT: usize = 4;
@@ -47,44 +47,104 @@ pub(super) const GLOBAL_STATE_SIZE: usize = MAX_AGENTS * GLOBAL_AGENT_FEATURES
     + 1
     + LESSON_COUNT;
 
-/// Fixed 360-degree sector centers in radians, alternating around forward.
+/// One side of the binocular perception system.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(super) enum EyeSide {
+    /// Eye offset to the agent's left.
+    Left,
+
+    /// Eye offset to the agent's right.
+    Right,
+}
+
+impl EyeSide {
+    /// Return the signed lateral offset from the body centerline.
+    pub(super) const fn lateral_sign(self) -> f32 {
+        match self {
+            Self::Left => 1.0,
+            Self::Right => -1.0,
+        }
+    }
+}
+
+/// Ray eye assignment ordered from frontal to peripheral importance.
+pub(super) const RAY_EYES: [EyeSide; RAY_COUNT] = [
+    EyeSide::Left,
+    EyeSide::Right,
+    EyeSide::Left,
+    EyeSide::Right,
+    EyeSide::Left,
+    EyeSide::Right,
+    EyeSide::Left,
+    EyeSide::Right,
+    EyeSide::Left,
+    EyeSide::Right,
+    EyeSide::Left,
+    EyeSide::Right,
+    EyeSide::Left,
+    EyeSide::Right,
+    EyeSide::Left,
+    EyeSide::Right,
+    EyeSide::Left,
+    EyeSide::Right,
+    EyeSide::Left,
+    EyeSide::Right,
+    EyeSide::Left,
+    EyeSide::Right,
+    EyeSide::Left,
+    EyeSide::Right,
+    EyeSide::Left,
+    EyeSide::Right,
+    EyeSide::Left,
+    EyeSide::Right,
+    EyeSide::Left,
+    EyeSide::Right,
+    EyeSide::Left,
+    EyeSide::Right,
+    EyeSide::Left,
+    EyeSide::Right,
+    EyeSide::Left,
+    EyeSide::Right,
+];
+
+/// Eye-relative ray angles, dense near gaze and sparse at the periphery.
 pub(super) const RAY_ANGLES: [f32; RAY_COUNT] = [
-    0.0,
-    10.0_f32.to_radians(),
-    (-10.0_f32).to_radians(),
+    2.0_f32.to_radians(),
+    2.0_f32.to_radians(),
+    (-2.0_f32).to_radians(),
+    (-2.0_f32).to_radians(),
+    5.0_f32.to_radians(),
+    5.0_f32.to_radians(),
+    (-5.0_f32).to_radians(),
+    (-5.0_f32).to_radians(),
+    9.0_f32.to_radians(),
+    9.0_f32.to_radians(),
+    (-9.0_f32).to_radians(),
+    (-9.0_f32).to_radians(),
+    14.0_f32.to_radians(),
+    14.0_f32.to_radians(),
+    (-14.0_f32).to_radians(),
+    (-14.0_f32).to_radians(),
+    20.0_f32.to_radians(),
     20.0_f32.to_radians(),
     (-20.0_f32).to_radians(),
-    30.0_f32.to_radians(),
-    (-30.0_f32).to_radians(),
-    40.0_f32.to_radians(),
-    (-40.0_f32).to_radians(),
-    50.0_f32.to_radians(),
-    (-50.0_f32).to_radians(),
-    60.0_f32.to_radians(),
-    (-60.0_f32).to_radians(),
-    70.0_f32.to_radians(),
-    (-70.0_f32).to_radians(),
-    80.0_f32.to_radians(),
-    (-80.0_f32).to_radians(),
-    90.0_f32.to_radians(),
-    (-90.0_f32).to_radians(),
-    100.0_f32.to_radians(),
-    (-100.0_f32).to_radians(),
-    110.0_f32.to_radians(),
-    (-110.0_f32).to_radians(),
-    120.0_f32.to_radians(),
-    (-120.0_f32).to_radians(),
-    130.0_f32.to_radians(),
-    (-130.0_f32).to_radians(),
-    140.0_f32.to_radians(),
-    (-140.0_f32).to_radians(),
-    150.0_f32.to_radians(),
-    (-150.0_f32).to_radians(),
-    160.0_f32.to_radians(),
-    (-160.0_f32).to_radians(),
-    170.0_f32.to_radians(),
-    (-170.0_f32).to_radians(),
-    180.0_f32.to_radians(),
+    (-20.0_f32).to_radians(),
+    28.0_f32.to_radians(),
+    28.0_f32.to_radians(),
+    (-28.0_f32).to_radians(),
+    (-28.0_f32).to_radians(),
+    37.0_f32.to_radians(),
+    37.0_f32.to_radians(),
+    (-37.0_f32).to_radians(),
+    (-37.0_f32).to_radians(),
+    47.0_f32.to_radians(),
+    47.0_f32.to_radians(),
+    (-47.0_f32).to_radians(),
+    (-47.0_f32).to_radians(),
+    55.0_f32.to_radians(),
+    55.0_f32.to_radians(),
+    (-55.0_f32).to_radians(),
+    (-55.0_f32).to_radians(),
 ];
 
 /// Ordered ecosystem curriculum lessons.
@@ -185,6 +245,9 @@ pub(super) enum DeathCause {
     /// Thorn damage exhausted hit points.
     Thorns,
 
+    /// Excess food or water exhausted hit points.
+    Overconsumption,
+
     /// Non-finite or escaped physics state invalidated the trajectory.
     InvalidPhysics,
 }
@@ -232,11 +295,14 @@ impl PerceptKind {
 /// Bounded continuous locomotion command applied for one physics step.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub(super) struct LocomotionAction {
-    /// Forward or reverse acceleration in `[-1, 1]`.
+    /// Forward throttle control in `[-1, 1]`; `-1` stops and `1` reaches full throttle.
     pub(super) forward: f32,
 
     /// Counterclockwise turn rate in `[-1, 1]`.
     pub(super) turn: f32,
+
+    /// Conjugate left/right eye yaw in `[-1, 1]`.
+    pub(super) gaze: f32,
 }
 
 impl LocomotionAction {
@@ -244,12 +310,17 @@ impl LocomotionAction {
     ///
     /// # Errors
     ///
-    /// Returns [`ActionError`] if either axis is non-finite or outside
+    /// Returns [`ActionError`] if any axis is non-finite or outside
     /// `[-1, 1]`.
-    pub(super) fn new(forward: f32, turn: f32) -> Result<Self, ActionError> {
+    pub(super) fn new(forward: f32, turn: f32, gaze: f32) -> Result<Self, ActionError> {
         validate_action_axis("forward", forward)?;
         validate_action_axis("turn", turn)?;
-        Ok(Self { forward, turn })
+        validate_action_axis("gaze", gaze)?;
+        Ok(Self {
+            forward,
+            turn,
+            gaze,
+        })
     }
 }
 
@@ -290,13 +361,13 @@ pub(super) type LocalObservation = [f32; LOCAL_OBSERVATION_SIZE];
 /// Fixed-shape centralized training-only critic state.
 pub(super) type GlobalState = [f32; GLOBAL_STATE_SIZE];
 
-/// Valid number of evenly spaced perception sectors sampled by each agent.
+/// Valid number of binocular perception rays sampled by each agent.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(super) struct PerceptionRayCount(u8);
 
 impl PerceptionRayCount {
-    /// Smallest supported all-around perception profile.
-    pub(super) const MIN: u8 = 1;
+    /// Smallest profile with one ray from each eye.
+    pub(super) const MIN: u8 = 2;
 
     /// Fixed actor-tensor capacity reserved for perception sectors.
     pub(super) const MAX: u8 = RAY_COUNT as u8;
@@ -319,12 +390,12 @@ impl TryFrom<u8> for PerceptionRayCount {
     fn try_from(value: u8) -> Result<Self, Self::Error> {
         // Reject counts above the reserved tensor slots so every accepted value
         // can be applied without rebuilding a policy.
-        if (Self::MIN..=Self::MAX).contains(&value) {
+        if (Self::MIN..=Self::MAX).contains(&value) && value.is_multiple_of(2) {
             Ok(Self(value))
         } else {
             Err(ConfigError::new(
                 "perception_ray_count",
-                "must be in 1..=36 sectors",
+                "must be an even count in 2..=36 binocular rays",
             ))
         }
     }
@@ -333,7 +404,7 @@ impl TryFrom<u8> for PerceptionRayCount {
 /// Runtime-adjustable perception, reward, physiology, and horizon settings.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub(super) struct ExperimentTuning {
-    /// Evenly spaced semantic sectors sampled within the fixed tensor capacity.
+    /// Paired binocular sectors sampled within the fixed tensor capacity.
     pub(super) perception_ray_count: PerceptionRayCount,
 
     /// Reward earned for each simulated second alive.
@@ -348,8 +419,32 @@ pub(super) struct ExperimentTuning {
     /// Normalized health and hit-point fraction assigned at reset.
     pub(super) initial_health_fraction: f32,
 
+    /// Food and water reserve assigned at reset, where `1` is comfortably full.
+    pub(super) initial_reserve_fraction: f32,
+
     /// Multiplier applied to hunger and thirst drain rates.
     pub(super) need_drain_multiplier: f32,
+
+    /// Additional need drain at maximum translational speed.
+    pub(super) movement_need_drain: f32,
+
+    /// Multiplier applied to the base movement speed and acceleration.
+    pub(super) movement_speed_multiplier: f32,
+
+    /// Maximum food and water reserve, including uncomfortable excess.
+    pub(super) reserve_capacity: f32,
+
+    /// Reserve level where overfull movement slowdown begins.
+    pub(super) fullness_slow_threshold: f32,
+
+    /// Movement-speed multiplier at or above comfortable fullness.
+    pub(super) overfull_speed_multiplier: f32,
+
+    /// Health and hit points lost per second at maximum configured excess.
+    pub(super) overfull_damage_rate: f32,
+
+    /// Maximum conjugate eye yaw relative to the body, in degrees.
+    pub(super) gaze_yaw_limit_degrees: f32,
 
     /// Multiplier applied to deprivation and thorn damage rates.
     pub(super) damage_multiplier: f32,
@@ -360,15 +455,23 @@ pub(super) struct ExperimentTuning {
 
 impl Default for ExperimentTuning {
     fn default() -> Self {
-        // Preserve the established survival task unless the user moves a demo
-        // control or supplies a shorter command-line horizon.
+        // Start agents under visible resource pressure while retaining enough
+        // exploration time for the demo policy to discover food and water.
         Self {
             perception_ray_count: PerceptionRayCount::default(),
             survival_reward_per_second: 1.0,
-            food_reward: 0.0,
-            water_reward_per_unit: 0.0,
+            food_reward: 8.0,
+            water_reward_per_unit: 10.0,
             initial_health_fraction: 1.0,
-            need_drain_multiplier: 1.0,
+            initial_reserve_fraction: 0.65,
+            need_drain_multiplier: 1.5,
+            movement_need_drain: 1.0,
+            movement_speed_multiplier: 1.0,
+            reserve_capacity: 1.25,
+            fullness_slow_threshold: 0.9,
+            overfull_speed_multiplier: 0.5,
+            overfull_damage_rate: 2.0,
+            gaze_yaw_limit_degrees: 30.0,
             damage_multiplier: 1.0,
             episode_step_limit: 1_200,
         }
@@ -394,14 +497,30 @@ impl ExperimentTuning {
         }
         if !self.initial_health_fraction.is_finite()
             || !(0.1..=1.0).contains(&self.initial_health_fraction)
+            || !self.initial_reserve_fraction.is_finite()
+            || !(0.1..=1.0).contains(&self.initial_reserve_fraction)
             || !self.need_drain_multiplier.is_finite()
             || !(0.25..=4.0).contains(&self.need_drain_multiplier)
+            || !self.movement_need_drain.is_finite()
+            || !(0.0..=3.0).contains(&self.movement_need_drain)
+            || !self.movement_speed_multiplier.is_finite()
+            || !(0.5..=2.0).contains(&self.movement_speed_multiplier)
+            || !self.reserve_capacity.is_finite()
+            || !(1.05..=2.0).contains(&self.reserve_capacity)
+            || !self.fullness_slow_threshold.is_finite()
+            || !(0.5..=1.0).contains(&self.fullness_slow_threshold)
+            || !self.overfull_speed_multiplier.is_finite()
+            || !(0.1..=1.0).contains(&self.overfull_speed_multiplier)
+            || !self.overfull_damage_rate.is_finite()
+            || !(0.0..=50.0).contains(&self.overfull_damage_rate)
+            || !self.gaze_yaw_limit_degrees.is_finite()
+            || !(10.0..=35.0).contains(&self.gaze_yaw_limit_degrees)
             || !self.damage_multiplier.is_finite()
             || !(0.25..=4.0).contains(&self.damage_multiplier)
         {
             return Err(ConfigError::new(
                 "physiology_tuning",
-                "health and rate multipliers must be finite and within their demo bounds",
+                "health, reserve, movement, gaze, and rate values must be finite and within their demo bounds",
             ));
         }
         if !(100..=3_000).contains(&self.episode_step_limit) {
@@ -471,8 +590,32 @@ pub(super) struct SimulationConfig {
     /// Normalized health and hit-point fraction assigned at reset.
     pub(super) initial_health_fraction: f32,
 
+    /// Food and water reserve assigned at reset.
+    pub(super) initial_reserve_fraction: f32,
+
     /// Multiplier applied to hunger and thirst drain rates.
     pub(super) need_drain_multiplier: f32,
+
+    /// Additional need drain at maximum translational speed.
+    pub(super) movement_need_drain: f32,
+
+    /// Multiplier applied to movement speed and acceleration.
+    pub(super) movement_speed_multiplier: f32,
+
+    /// Maximum food and water reserve.
+    pub(super) reserve_capacity: f32,
+
+    /// Reserve level where movement slowdown begins.
+    pub(super) fullness_slow_threshold: f32,
+
+    /// Movement-speed multiplier at or above comfortable fullness.
+    pub(super) overfull_speed_multiplier: f32,
+
+    /// Hit points lost per second at maximum configured excess.
+    pub(super) overfull_damage_rate: f32,
+
+    /// Maximum conjugate gaze yaw, in degrees.
+    pub(super) gaze_yaw_limit_degrees: f32,
 
     /// Multiplier applied to deprivation and thorn damage rates.
     pub(super) damage_multiplier: f32,
@@ -535,7 +678,15 @@ impl SimulationConfig {
             food_reward: tuning.food_reward,
             water_reward_per_unit: tuning.water_reward_per_unit,
             initial_health_fraction: tuning.initial_health_fraction,
+            initial_reserve_fraction: tuning.initial_reserve_fraction,
             need_drain_multiplier: tuning.need_drain_multiplier,
+            movement_need_drain: tuning.movement_need_drain,
+            movement_speed_multiplier: tuning.movement_speed_multiplier,
+            reserve_capacity: tuning.reserve_capacity,
+            fullness_slow_threshold: tuning.fullness_slow_threshold,
+            overfull_speed_multiplier: tuning.overfull_speed_multiplier,
+            overfull_damage_rate: tuning.overfull_damage_rate,
+            gaze_yaw_limit_degrees: tuning.gaze_yaw_limit_degrees,
             damage_multiplier: tuning.damage_multiplier,
             perception_ray_count: tuning.perception_ray_count,
         };
@@ -600,7 +751,15 @@ impl SimulationConfig {
         self.food_reward = tuning.food_reward;
         self.water_reward_per_unit = tuning.water_reward_per_unit;
         self.initial_health_fraction = tuning.initial_health_fraction;
+        self.initial_reserve_fraction = tuning.initial_reserve_fraction;
         self.need_drain_multiplier = tuning.need_drain_multiplier;
+        self.movement_need_drain = tuning.movement_need_drain;
+        self.movement_speed_multiplier = tuning.movement_speed_multiplier;
+        self.reserve_capacity = tuning.reserve_capacity;
+        self.fullness_slow_threshold = tuning.fullness_slow_threshold;
+        self.overfull_speed_multiplier = tuning.overfull_speed_multiplier;
+        self.overfull_damage_rate = tuning.overfull_damage_rate;
+        self.gaze_yaw_limit_degrees = tuning.gaze_yaw_limit_degrees;
         self.damage_multiplier = tuning.damage_multiplier;
         self.perception_ray_count = tuning.perception_ray_count;
         self.max_steps = tuning.episode_step_limit;
@@ -617,7 +776,15 @@ impl SimulationConfig {
             food_reward: self.food_reward,
             water_reward_per_unit: self.water_reward_per_unit,
             initial_health_fraction: self.initial_health_fraction,
+            initial_reserve_fraction: self.initial_reserve_fraction,
             need_drain_multiplier: self.need_drain_multiplier,
+            movement_need_drain: self.movement_need_drain,
+            movement_speed_multiplier: self.movement_speed_multiplier,
+            reserve_capacity: self.reserve_capacity,
+            fullness_slow_threshold: self.fullness_slow_threshold,
+            overfull_speed_multiplier: self.overfull_speed_multiplier,
+            overfull_damage_rate: self.overfull_damage_rate,
+            gaze_yaw_limit_degrees: self.gaze_yaw_limit_degrees,
             damage_multiplier: self.damage_multiplier,
             episode_step_limit: self.max_steps,
         }
@@ -725,7 +892,7 @@ pub(super) enum VisualObjectKind {
     /// Refillable drinking well.
     Well,
 
-    /// Solid circular tree.
+    /// Solid square tree.
     Tree,
 
     /// Solid rock.
@@ -750,6 +917,9 @@ pub(super) struct VisualAgent {
 
     /// Counterclockwise heading in radians.
     pub(super) heading: f32,
+
+    /// Conjugate eye yaw relative to the head in radians.
+    pub(super) gaze_yaw: f32,
 
     /// Whether the agent can still act.
     pub(super) is_alive: bool,
@@ -839,6 +1009,9 @@ pub(super) struct AgentEpisodeMetrics {
     /// Hit points lost to thorn contact.
     pub(super) thorn_damage: f32,
 
+    /// Hit points lost to excess food or water.
+    pub(super) overconsumption_damage: f32,
+
     /// Agent-agent overlap contacts observed across physics steps.
     pub(super) collision_contacts: u32,
 
@@ -864,7 +1037,7 @@ mod tests {
             assert!(config.max_food <= MAX_FOOD);
             assert!(config.solid_obstacles + config.thorn_obstacles <= MAX_OBSTACLES);
         }
-        assert_eq!(LOCAL_OBSERVATION_SIZE, 339);
+        assert_eq!(LOCAL_OBSERVATION_SIZE, 340);
         assert_eq!(GLOBAL_STATE_SIZE, 357);
     }
 
@@ -880,7 +1053,15 @@ mod tests {
             food_reward: 4.0,
             water_reward_per_unit: 2.0,
             initial_health_fraction: 0.4,
+            initial_reserve_fraction: 0.6,
             need_drain_multiplier: 1.5,
+            movement_need_drain: 0.75,
+            movement_speed_multiplier: 1.25,
+            reserve_capacity: 1.4,
+            fullness_slow_threshold: 0.8,
+            overfull_speed_multiplier: 0.4,
+            overfull_damage_rate: 20.0,
+            gaze_yaw_limit_degrees: 25.0,
             damage_multiplier: 2.0,
             episode_step_limit: 300,
         };
@@ -912,6 +1093,8 @@ mod tests {
     fn perception_ray_count_validates_fixed_capacity() {
         // Check both rejected edges and one small demo-friendly profile.
         assert!(PerceptionRayCount::try_from(0_u8).is_err());
+        assert!(PerceptionRayCount::try_from(1_u8).is_err());
+        assert!(PerceptionRayCount::try_from(3_u8).is_err());
         assert!(PerceptionRayCount::try_from(37_u8).is_err());
         assert_eq!(
             PerceptionRayCount::try_from(4_u8)
@@ -924,13 +1107,15 @@ mod tests {
     /// Invalid action scalars must not reach physics.
     #[test]
     fn action_boundary_rejects_non_finite_and_unbounded_values() {
-        assert!(LocomotionAction::new(f32::NAN, 0.0).is_err());
-        assert!(LocomotionAction::new(0.0, 1.01).is_err());
+        assert!(LocomotionAction::new(f32::NAN, 0.0, 0.0).is_err());
+        assert!(LocomotionAction::new(0.0, 1.01, 0.0).is_err());
+        assert!(LocomotionAction::new(0.0, 0.0, -1.01).is_err());
         assert_eq!(
-            LocomotionAction::new(-1.0, 1.0).expect("closed endpoints are valid"),
+            LocomotionAction::new(-1.0, 1.0, 0.5).expect("bounded gaze is valid"),
             LocomotionAction {
                 forward: -1.0,
                 turn: 1.0,
+                gaze: 0.5,
             }
         );
     }

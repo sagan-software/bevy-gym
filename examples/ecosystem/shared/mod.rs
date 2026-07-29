@@ -105,6 +105,7 @@ fn run_smoke(stage: CurriculumStage) -> Result<(), Box<dyn Error>> {
                 let action = LocomotionAction::new(
                     action_rng.f32_between(-1.0, 1.0),
                     action_rng.f32_between(-1.0, 1.0),
+                    action_rng.f32_between(-1.0, 1.0),
                 )?;
                 Ok((agent, action))
             })

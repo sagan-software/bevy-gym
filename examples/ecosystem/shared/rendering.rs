@@ -9,13 +9,14 @@ use std::sync::{mpsc, Arc};
 use std::time::Instant;
 
 use bevy::input::common_conditions::input_toggle_active;
-use bevy::input::mouse::MouseWheel;
+use bevy::input::mouse::{AccumulatedMouseMotion, MouseWheel};
 use bevy::prelude::*;
 use bevy::window::{PresentMode, WindowResolution};
 use bevy_gym::training::{RecurrentMemory, RecurrentPpoPolicy};
 use bevy_gym::EpisodeStatus;
 use bevy_inspector_egui::bevy_egui::{
-    EguiContext, EguiPlugin, EguiPrimaryContextPass, PrimaryEguiContext,
+    input::EguiWantsInput, EguiContext, EguiPlugin, EguiPostUpdateSet, EguiPrimaryContextPass,
+    PrimaryEguiContext,
 };
 use bevy_inspector_egui::egui;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
@@ -27,9 +28,10 @@ use super::domain::{
     LocomotionAction, PerceptKind, PerceptionRayCount, SimulationConfig, Species, VisualObjectKind,
     VisualWorldSnapshot, GLOBAL_STATE_SIZE, LOCAL_OBSERVATION_SIZE, MAX_AGENTS,
 };
-use super::simulation::Ecosystem;
+use super::simulation::{Ecosystem, AGENT_SIZE};
 use super::training::{
-    ecosystem_algorithm, resolve_bunny_checkpoint, sibling_fox_checkpoint, TrainingProgress,
+    checkpoint_experiment_tuning, ecosystem_algorithm, resolve_bunny_checkpoint,
+    sibling_fox_checkpoint, TrainingProgress,
 };
 
 /// Simulation units to rendered world units.
@@ -51,7 +53,7 @@ struct WatchOptions {
     speed: f32,
 
     /// Per-episode horizon.
-    max_steps: u32,
+    max_steps: Option<u32>,
 }
 
 /// Visual trainer lifecycle displayed in the Inspector-egui panel.
@@ -93,6 +95,15 @@ struct DemoDashboard {
     /// Fox fixed-seed return curve when predators exist.
     fox_eval_curve: Vec<[f64; 2]>,
 
+    /// Change in bunny fixed-seed survival per optimizer iteration.
+    learning_velocity_curve: Vec<[f64; 2]>,
+
+    /// Effective actor learning-rate curve.
+    actor_learning_rate_curve: Vec<[f64; 2]>,
+
+    /// Effective critic learning-rate curve.
+    critic_learning_rate_curve: Vec<[f64; 2]>,
+
     /// Iterations whose rollout profile differs from the preceding point.
     tuning_markers: Vec<f64>,
 
@@ -118,23 +129,29 @@ impl DemoDashboard {
             bunny_train_curve: Vec::new(),
             bunny_eval_curve: Vec::new(),
             fox_eval_curve: Vec::new(),
+            learning_velocity_curve: Vec::new(),
+            actor_learning_rate_curve: Vec::new(),
+            critic_learning_rate_curve: Vec::new(),
             tuning_markers: Vec::new(),
             status: TrainingStatus::Running,
             started_at: Instant::now(),
         };
         if dashboard.progress.has_evaluation {
-            dashboard.record_current_point();
+            dashboard.record_evaluation_point();
         }
+        dashboard.record_update_point();
         dashboard
     }
 
     /// Retain one point per completed optimizer iteration.
-    fn record_current_point(&mut self) {
-        // Iteration zero has an evaluation return but no training-batch return.
+    fn record_evaluation_point(&mut self) {
         let iteration = self.progress.iteration as f64;
-        if self.progress.iteration > 0 {
-            self.bunny_train_curve
-                .push([iteration, f64::from(self.progress.bunny_train_return)]);
+        if let Some(previous) = self.bunny_eval_curve.last() {
+            let iteration_delta = (iteration - previous[0]).max(1.0);
+            let survival_delta =
+                (f64::from(self.progress.bunny_eval_return) - previous[1]) / iteration_delta;
+            self.learning_velocity_curve
+                .push([iteration, survival_delta]);
         }
         self.bunny_eval_curve
             .push([iteration, f64::from(self.progress.bunny_eval_return)]);
@@ -142,6 +159,19 @@ impl DemoDashboard {
             self.fox_eval_curve
                 .push([iteration, f64::from(self.progress.fox_eval_return)]);
         }
+    }
+
+    /// Retain optimizer and rollout values for every completed update.
+    fn record_update_point(&mut self) {
+        let iteration = self.progress.iteration as f64;
+        if self.progress.iteration > 0 {
+            self.bunny_train_curve
+                .push([iteration, f64::from(self.progress.bunny_train_return)]);
+        }
+        self.actor_learning_rate_curve
+            .push([iteration, self.progress.actor_learning_rate]);
+        self.critic_learning_rate_curve
+            .push([iteration, self.progress.critic_learning_rate]);
     }
 }
 
@@ -226,12 +256,17 @@ pub(super) fn run_watch(
 ) -> Result<(), Box<dyn Error>> {
     // Watch mode resolves one immutable checkpoint before creating a window.
     let options = parse_watch_options(arguments)?;
+    let bunny_path = resolve_bunny_checkpoint(&options.checkpoint);
     let config = {
         let mut config = SimulationConfig::for_stage(stage)?;
-        config.max_steps = options.max_steps;
+        if let Some(tuning) = checkpoint_experiment_tuning(&bunny_path)? {
+            config.apply_experiment_tuning(tuning)?;
+        }
+        if let Some(max_steps) = options.max_steps {
+            config.max_steps = max_steps;
+        }
         config
     };
-    let bunny_path = resolve_bunny_checkpoint(&options.checkpoint);
     let algorithm = ecosystem_algorithm();
     let bunny = load_policy(&bunny_path, &algorithm)?;
     let fox = if config.fox_count > 0 {
@@ -305,9 +340,12 @@ fn launch_viewer(session: WatchSession) {
                 advance_policy,
                 redraw_scene,
                 draw_perception_rays,
-                camera_controls,
             )
                 .chain(),
+        )
+        .add_systems(
+            PostUpdate,
+            camera_controls.after(EguiPostUpdateSet::ProcessOutput),
         )
         .add_systems(EguiPrimaryContextPass, ecosystem_hud_ui);
     app.run();
@@ -324,8 +362,8 @@ pub(super) fn load_policy(
         LOCAL_OBSERVATION_SIZE,
         GLOBAL_STATE_SIZE,
         MAX_AGENTS,
-        &[-1.0, -1.0],
-        &[1.0, 1.0],
+        &[-1.0, -1.0, -1.0],
+        &[1.0, 1.0, 1.0],
         algorithm,
     )?)
 }
@@ -339,7 +377,7 @@ fn parse_watch_options(
     let mut fox_checkpoint = None;
     let mut environment_seed = 101;
     let mut playback_speed: f32 = 4.0;
-    let mut max_steps = 1_200;
+    let mut max_steps = None;
     while let Some(flag) = arguments.next() {
         let value = arguments
             .next()
@@ -349,11 +387,11 @@ fn parse_watch_options(
             "--fox-checkpoint" => fox_checkpoint = Some(PathBuf::from(value)),
             "--seed" => environment_seed = value.parse()?,
             "--speed" => playback_speed = value.parse()?,
-            "--max-steps" => max_steps = value.parse()?,
+            "--max-steps" => max_steps = Some(value.parse()?),
             _ => return Err(format!("unknown watch option {flag:?}").into()),
         }
     }
-    if !playback_speed.is_finite() || playback_speed <= 0.0 || max_steps == 0 {
+    if !playback_speed.is_finite() || playback_speed <= 0.0 || max_steps == Some(0) {
         return Err("--speed must be finite and positive; --max-steps must exceed zero".into());
     }
     Ok(WatchOptions {
@@ -453,10 +491,14 @@ fn apply_training_progress(mut session: NonSendMut<'_, WatchSession>) {
                     if dashboard.tuning_markers.last().copied() != Some(marker) {
                         dashboard.tuning_markers.push(marker);
                     }
+                    dashboard.bunny_eval_curve.clear();
+                    dashboard.fox_eval_curve.clear();
+                    dashboard.learning_velocity_curve.clear();
                 }
                 dashboard.progress = progress;
+                dashboard.record_update_point();
                 if dashboard.progress.has_evaluation {
-                    dashboard.record_current_point();
+                    dashboard.record_evaluation_point();
                 }
                 dashboard.status = TrainingStatus::Running;
             }
@@ -523,10 +565,10 @@ impl WatchSession {
                 .entry(*id)
                 .or_insert_with(|| policy.initial_memory());
             let output = policy.mean_action(observation, memory)?;
-            let [forward, turn] = output.action.as_slice() else {
-                return Err("ecosystem policy must emit two action axes".into());
+            let [forward, turn, gaze] = output.action.as_slice() else {
+                return Err("ecosystem policy must emit three action axes".into());
             };
-            actions.push((*id, LocomotionAction::new(*forward, *turn)?));
+            actions.push((*id, LocomotionAction::new(*forward, *turn, *gaze)?));
             next_memories.insert(*id, output.next_memory);
         }
 
@@ -698,15 +740,15 @@ fn spawn_snapshot(
     }
 
     for object in &snapshot.objects {
-        let (color, scale, depth) = match object.kind {
-            VisualObjectKind::Food => (Color::srgb_u8(244, 211, 94), 0.9, 1.0),
-            VisualObjectKind::Well => (Color::srgb_u8(54, 162, 235), 2.0, 0.5),
-            VisualObjectKind::Tree => (Color::srgb_u8(25, 94, 55), 2.0, 0.2),
-            VisualObjectKind::Rock => (Color::srgb_u8(123, 130, 137), 2.0, 0.2),
-            VisualObjectKind::Thorn => (Color::srgb_u8(191, 64, 128), 2.0, 0.3),
+        let (color, depth) = match object.kind {
+            VisualObjectKind::Food => (Color::srgb_u8(244, 211, 94), 1.0),
+            VisualObjectKind::Well => (Color::srgb_u8(54, 162, 235), 0.5),
+            VisualObjectKind::Tree => (Color::srgb_u8(25, 94, 55), 0.2),
+            VisualObjectKind::Rock => (Color::srgb_u8(123, 130, 137), 0.2),
+            VisualObjectKind::Thorn => (Color::srgb_u8(191, 64, 128), 0.3),
         };
         commands.spawn((
-            Sprite::from_color(color, Vec2::splat(object.radius * WORLD_SCALE * scale)),
+            Sprite::from_color(color, Vec2::splat(object.radius * WORLD_SCALE * 2.0)),
             Transform::from_xyz(
                 object.position[0] * WORLD_SCALE,
                 object.position[1] * WORLD_SCALE,
@@ -740,7 +782,7 @@ fn spawn_snapshot(
             Color::srgb_u8(70, 70, 70)
         };
         commands.spawn((
-            Sprite::from_color(color, Vec2::new(26.0, 20.0)),
+            Sprite::from_color(color, AGENT_SIZE * WORLD_SCALE),
             Transform::from_xyz(
                 agent.position[0] * WORLD_SCALE,
                 agent.position[1] * WORLD_SCALE,
@@ -778,11 +820,14 @@ pub(super) fn ecosystem_hud_ui(world: &mut World) {
         .show(egui_context.get_mut(), |ui| {
             ui.heading(session.stage.title());
             ui.label(format!(
-                "Reward: {:.2}/s alive + {:.2}/food or prey + {:.2}/water unit",
+                "Reward: {:.2}/s alive + up to {:.2}/food or prey + up to {:.2}/water unit",
                 session.config.survival_reward_per_second,
-                session.config.food_reward,
-                session.config.water_reward_per_unit,
+                session.config.food_reward * 1.25,
+                session.config.water_reward_per_unit * 1.25,
             ));
+            ui.small(
+                "Need multiplier: <=10% 125%, <=50% 100%, <=75% 90%, <90% 75%, >=90% 0%",
+            );
             ui.separator();
             show_perception_controls(ui, &mut session, &snapshot);
 
@@ -796,7 +841,9 @@ pub(super) fn ecosystem_hud_ui(world: &mut World) {
 
             show_world_dashboard(ui, &mut session, &snapshot, &episode_metrics);
             ui.separator();
-            ui.small("WASD/arrows pan | wheel/+/- zoom | space pause | R reset | F1 inspector");
+            ui.small(
+                "WASD/arrows or left/middle drag pan | wheel/+/- zoom | space pause | R reset | F1 inspector",
+            );
         });
 }
 
@@ -837,10 +884,14 @@ fn show_world_dashboard(
         .iter()
         .map(|metric| metric.thorn_damage)
         .sum::<f32>();
+    let overconsumption_damage = episode_metrics
+        .iter()
+        .map(|metric| metric.overconsumption_damage)
+        .sum::<f32>();
 
     show_experiment_tuning(ui, session);
     show_world_controls(ui, session);
-    ui.add(egui::Slider::new(&mut session.speed, 0.25..=32.0).text("Playback speed"));
+    ui.add(egui::Slider::new(&mut session.speed, 0.25..=128.0).text("Playback speed"));
     egui::Grid::new("ecosystem-world-metrics")
         .num_columns(2)
         .striped(true)
@@ -884,6 +935,11 @@ fn show_world_dashboard(
             if session.stage == CurriculumStage::Obstacles {
                 ui.label("Thorn damage");
                 ui.label(format!("{thorn_damage:.1}"));
+                ui.end_row();
+            }
+            if overconsumption_damage > 0.0 {
+                ui.label("Overfull damage");
+                ui.label(format!("{overconsumption_damage:.1}"));
                 ui.end_row();
             }
             ui.label("Hunger / thirst / HP");
@@ -984,7 +1040,7 @@ fn show_experiment_tuning(ui: &mut egui::Ui, session: &mut WatchSession) {
                 }
             }
             ui.small("Vertical graph markers show when training settings changed.");
-            ui.small("Survival-time points remain comparable; reward totals do not.");
+            ui.small("A settings change starts a new survival-learning curve.");
         });
 
     // Publish only profiles that pass the same domain validation used by the
@@ -1008,28 +1064,33 @@ fn show_perception_tuning(ui: &mut egui::Ui, tuning: &mut ExperimentTuning) -> b
     // Edit a primitive copy because the validated domain count cannot represent
     // the temporary out-of-range states that a general slider API permits.
     let mut ray_count = tuning.perception_ray_count.get();
-    let changed = ui
+    let ray_count_changed = ui
         .add(
             egui::Slider::new(
                 &mut ray_count,
                 PerceptionRayCount::MIN..=PerceptionRayCount::MAX,
             )
+            .step_by(2.0)
             .text("Perception rays"),
         )
-        .on_hover_text(
-            "Fewer evenly spaced rays reduce spatial detail; inactive network inputs stay zero.",
-        )
+        .on_hover_text("Fewer rays retain frontal detail first; inactive network inputs stay zero.")
         .changed();
-    if !changed {
-        return false;
+    if ray_count_changed {
+        let Ok(validated_count) = PerceptionRayCount::try_from(ray_count) else {
+            return false;
+        };
+        tuning.perception_ray_count = validated_count;
     }
-    let Ok(validated_count) = PerceptionRayCount::try_from(ray_count) else {
-        return false;
-    };
-    tuning.perception_ray_count = validated_count;
-    true
+    let mut changed = ray_count_changed;
+    changed |= ui
+        .add(
+            egui::Slider::new(&mut tuning.gaze_yaw_limit_degrees, 10.0..=35.0)
+                .text("Eye motion limit"),
+        )
+        .on_hover_text("Both eyes move together without rotating the body or seeing behind it.")
+        .changed();
+    changed
 }
-
 /// Draw reward shaping controls and concise learning tradeoffs.
 fn show_reward_tuning(ui: &mut egui::Ui, tuning: &mut ExperimentTuning) -> bool {
     // Fold every slider response into one change flag before publishing the
@@ -1045,11 +1106,13 @@ fn show_reward_tuning(ui: &mut egui::Ui, tuning: &mut ExperimentTuning) -> bool 
         .changed();
     changed |= ui
         .add(egui::Slider::new(&mut tuning.food_reward, 0.0..=20.0).text("Food / prey"))
-        .on_hover_text("A sparse bonus makes resource discovery more valuable.")
+        .on_hover_text("Base bonus multiplied by hunger need; reward reaches zero at 90% reserve.")
         .changed();
     changed |= ui
         .add(egui::Slider::new(&mut tuning.water_reward_per_unit, 0.0..=10.0).text("Water unit"))
-        .on_hover_text("Rewards only conserved water the agent actually absorbs.")
+        .on_hover_text(
+            "Base bonus multiplied by thirst need; only absorbed water earns reward, and reward reaches zero at 90% reserve.",
+        )
         .changed();
     changed
 }
@@ -1069,11 +1132,53 @@ fn show_dynamics_tuning(ui: &mut egui::Ui, tuning: &mut ExperimentTuning, time_s
         .changed();
     changed |= ui
         .add(
+            egui::Slider::new(&mut tuning.initial_reserve_fraction, 0.1..=1.0)
+                .text("Starting food/water"),
+        )
+        .on_hover_text("Lower reserves shorten random-policy survival and create earlier urgency.")
+        .changed();
+    changed |= ui
+        .add(
             egui::Slider::new(&mut tuning.need_drain_multiplier, 0.25..=4.0)
                 .logarithmic(true)
                 .text("Hunger/thirst speed"),
         )
         .on_hover_text("Faster drain creates urgency but makes resource discovery less forgiving.")
+        .changed();
+    changed |= ui
+        .add(egui::Slider::new(&mut tuning.movement_need_drain, 0.0..=3.0).text("Movement cost"))
+        .on_hover_text("Translation drains extra food and water; body rotation and gaze stay free.")
+        .changed();
+    changed |= ui
+        .add(
+            egui::Slider::new(&mut tuning.movement_speed_multiplier, 0.5..=2.0)
+                .text("Movement speed"),
+        )
+        .on_hover_text("Scales both forward acceleration and maximum translation speed.")
+        .changed();
+    changed |= ui
+        .add(egui::Slider::new(&mut tuning.reserve_capacity, 1.05..=2.0).text("Reserve capacity"))
+        .on_hover_text("Food and water can exceed comfortable fullness up to this cap.")
+        .changed();
+    changed |= ui
+        .add(
+            egui::Slider::new(&mut tuning.fullness_slow_threshold, 0.5..=1.0)
+                .text("Slowdown starts"),
+        )
+        .on_hover_text("High food or water reserves begin reducing translation at this level.")
+        .changed();
+    changed |= ui
+        .add(
+            egui::Slider::new(&mut tuning.overfull_speed_multiplier, 0.1..=1.0)
+                .text("Overfull speed"),
+        )
+        .on_hover_text("Translation uses this multiplier at comfortable fullness and above.")
+        .changed();
+    changed |= ui
+        .add(
+            egui::Slider::new(&mut tuning.overfull_damage_rate, 0.0..=50.0).text("Overfull damage"),
+        )
+        .on_hover_text("Excess above 100% causes up to this many hit points of damage per second.")
         .changed();
     changed |= ui
         .add(
@@ -1175,6 +1280,32 @@ fn show_training_dashboard(ui: &mut egui::Ui, dashboard: &mut DemoDashboard) {
             ui.colored_label(egui::Color32::from_rgb(190, 125, 235), "settings changed");
         }
     });
+    ui.label("Learning velocity (fixed-seed survival seconds per iteration)");
+    draw_two_series_graph(
+        ui,
+        &dashboard.learning_velocity_curve,
+        &[],
+        egui::Color32::from_rgb(105, 195, 245),
+        egui::Color32::TRANSPARENT,
+        false,
+    );
+    ui.colored_label(
+        egui::Color32::from_rgb(105, 195, 245),
+        "bunny evaluation change",
+    );
+    ui.label("Bunny optimizer learning rates");
+    draw_two_series_graph(
+        ui,
+        &dashboard.actor_learning_rate_curve,
+        &dashboard.critic_learning_rate_curve,
+        egui::Color32::from_rgb(244, 196, 74),
+        egui::Color32::from_rgb(190, 125, 235),
+        true,
+    );
+    ui.horizontal(|ui| {
+        ui.colored_label(egui::Color32::from_rgb(244, 196, 74), "actor");
+        ui.colored_label(egui::Color32::from_rgb(190, 125, 235), "critic");
+    });
     ui.small(format!("Artifacts: {}", progress.run_dir.display()));
 }
 
@@ -1228,6 +1359,12 @@ fn show_training_metrics(ui: &mut egui::Ui, dashboard: &DemoDashboard) {
             ui.end_row();
             ui.label("Entropy");
             ui.label(format!("{:.4}", progress.entropy));
+            ui.end_row();
+            ui.label("Actor / critic learning rate");
+            ui.label(format!(
+                "{:.2e} / {:.2e}",
+                progress.actor_learning_rate, progress.critic_learning_rate
+            ));
             ui.end_row();
             ui.label("Selected as best");
             ui.label(if progress.is_best { "yes" } else { "no" });
@@ -1371,45 +1508,181 @@ fn paint_curve(
     }
 }
 
+/// Draw two metric series with a shared signed or positive vertical range.
+fn draw_two_series_graph(
+    ui: &mut egui::Ui,
+    first: &[[f64; 2]],
+    second: &[[f64; 2]],
+    first_color: egui::Color32,
+    second_color: egui::Color32,
+    scientific_labels: bool,
+) {
+    let desired_size = egui::vec2(ui.available_width(), 105.0);
+    let (response, painter) = ui.allocate_painter(desired_size, egui::Sense::hover());
+    let graph = response.rect.shrink2(egui::vec2(8.0, 8.0));
+    painter.rect_filled(graph, 4.0, egui::Color32::from_rgb(20, 28, 23));
+    let max_iteration = first
+        .iter()
+        .chain(second)
+        .map(|point| point[0])
+        .fold(1.0_f64, f64::max);
+    let mut minimum = first
+        .iter()
+        .chain(second)
+        .map(|point| point[1])
+        .fold(0.0_f64, f64::min);
+    let mut maximum = first
+        .iter()
+        .chain(second)
+        .map(|point| point[1])
+        .fold(0.0_f64, f64::max);
+    if (maximum - minimum).abs() < f64::EPSILON {
+        let padding = maximum.abs().max(1e-6) * 0.1;
+        minimum -= padding;
+        maximum += padding;
+    }
+    let zero_fraction = ((0.0 - minimum) / (maximum - minimum)).clamp(0.0, 1.0) as f32;
+    let zero_y = graph.height().mul_add(-zero_fraction, graph.bottom());
+    painter.line_segment(
+        [
+            egui::pos2(graph.left(), zero_y),
+            egui::pos2(graph.right(), zero_y),
+        ],
+        egui::Stroke::new(1.0_f32, egui::Color32::GRAY),
+    );
+    paint_curve_in_range(
+        &painter,
+        graph,
+        first,
+        max_iteration,
+        minimum,
+        maximum,
+        first_color,
+    );
+    paint_curve_in_range(
+        &painter,
+        graph,
+        second,
+        max_iteration,
+        minimum,
+        maximum,
+        second_color,
+    );
+    let label = if scientific_labels {
+        format!("{maximum:.1e}")
+    } else {
+        format!("{maximum:+.2}")
+    };
+    painter.text(
+        graph.left_top() + egui::vec2(4.0, 4.0),
+        egui::Align2::LEFT_TOP,
+        label,
+        egui::FontId::monospace(10.0),
+        egui::Color32::LIGHT_GRAY,
+    );
+}
+
+/// Project one metric series into an arbitrary shared vertical range.
+fn paint_curve_in_range(
+    painter: &egui::Painter,
+    graph: egui::Rect,
+    points: &[[f64; 2]],
+    max_iteration: f64,
+    minimum: f64,
+    maximum: f64,
+    color: egui::Color32,
+) {
+    let mut previous = None;
+    for point in points {
+        let x = graph
+            .width()
+            .mul_add((point[0] / max_iteration) as f32, graph.left());
+        let normalized = ((point[1] - minimum) / (maximum - minimum)) as f32;
+        let position = egui::pos2(x, graph.height().mul_add(-normalized, graph.bottom()));
+        painter.circle_filled(position, 2.5, color);
+        if let Some(start) = previous {
+            painter.line_segment([start, position], egui::Stroke::new(2.0_f32, color));
+        }
+        previous = Some(position);
+    }
+}
+
 /// Pan and zoom the top-down camera without affecting simulation state.
 fn camera_controls(
     keys: Res<'_, ButtonInput<KeyCode>>,
+    mouse_buttons: Res<'_, ButtonInput<MouseButton>>,
+    mouse_motion: Res<'_, AccumulatedMouseMotion>,
+    egui_wants_input: Res<'_, EguiWantsInput>,
     mut wheel: MessageReader<'_, '_, MouseWheel>,
     time: Res<'_, Time>,
     mut camera: Single<'_, '_, (&mut Transform, &mut Projection), With<WorldCamera>>,
 ) {
     // Camera movement changes presentation only; policy observations stay fixed.
+    let keyboard_captured = egui_wants_input.wants_any_keyboard_input();
     let mut direction = Vec2::ZERO;
-    if keys.pressed(KeyCode::KeyA) || keys.pressed(KeyCode::ArrowLeft) {
+    if !keyboard_captured && (keys.pressed(KeyCode::KeyA) || keys.pressed(KeyCode::ArrowLeft)) {
         direction.x -= 1.0;
     }
-    if keys.pressed(KeyCode::KeyD) || keys.pressed(KeyCode::ArrowRight) {
+    if !keyboard_captured && (keys.pressed(KeyCode::KeyD) || keys.pressed(KeyCode::ArrowRight)) {
         direction.x += 1.0;
     }
-    if keys.pressed(KeyCode::KeyS) || keys.pressed(KeyCode::ArrowDown) {
+    if !keyboard_captured && (keys.pressed(KeyCode::KeyS) || keys.pressed(KeyCode::ArrowDown)) {
         direction.y -= 1.0;
     }
-    if keys.pressed(KeyCode::KeyW) || keys.pressed(KeyCode::ArrowUp) {
+    if !keyboard_captured && (keys.pressed(KeyCode::KeyW) || keys.pressed(KeyCode::ArrowUp)) {
         direction.y += 1.0;
     }
     let (transform, projection) = &mut *camera;
-    transform.translation +=
-        (direction.normalize_or_zero() * 420.0 * time.delta_secs()).extend(0.0);
     let Projection::Orthographic(orthographic) = &mut **projection else {
         return;
     };
     let wheel_delta = wheel.read().map(|event| event.y).sum::<f32>();
-    let keyboard_delta = if keys.pressed(KeyCode::Minus) {
+    let pointer_captured = egui_wants_input.wants_any_pointer_input();
+    let dragging =
+        mouse_buttons.pressed(MouseButton::Left) || mouse_buttons.pressed(MouseButton::Middle);
+    let pointer = camera_pointer_input(pointer_captured, dragging, mouse_motion.delta, wheel_delta);
+    let keyboard_delta = if !keyboard_captured && keys.pressed(KeyCode::Minus) {
         1.0
-    } else if keys.pressed(KeyCode::Equal) {
+    } else if !keyboard_captured && keys.pressed(KeyCode::Equal) {
         -1.0
     } else {
         0.0
     };
-    let zoom = wheel_delta
+    transform.translation +=
+        (direction.normalize_or_zero() * 420.0 * time.delta_secs()).extend(0.0);
+    transform.translation +=
+        Vec2::new(-pointer.drag_delta.x, pointer.drag_delta.y).extend(0.0) * orthographic.scale;
+    let zoom = pointer
+        .wheel_delta
         .mul_add(-0.12, keyboard_delta * time.delta_secs())
         .exp();
     orthographic.scale = (orthographic.scale * zoom).clamp(0.25, 5.0);
+}
+
+/// Pointer input accepted by the scene camera after HUD capture filtering.
+#[derive(Debug, Clone, Copy, Default, PartialEq)]
+struct CameraPointerInput {
+    /// Screen-space drag delta for hand-style panning.
+    drag_delta: Vec2,
+
+    /// Mouse-wheel zoom delta.
+    wheel_delta: f32,
+}
+
+/// Filter scene pointer input when egui owns the pointer.
+fn camera_pointer_input(
+    hud_captured: bool,
+    dragging: bool,
+    motion: Vec2,
+    wheel_delta: f32,
+) -> CameraPointerInput {
+    if hud_captured {
+        return CameraPointerInput::default();
+    }
+    CameraPointerInput {
+        drag_delta: if dragging { motion } else { Vec2::ZERO },
+        wheel_delta,
+    }
 }
 
 #[cfg(test)]
@@ -1435,5 +1708,26 @@ mod tests {
         .expect("valid watch arguments parse");
         assert_eq!(parsed.seed, 7);
         assert_eq!(parsed.speed, 8.0);
+    }
+
+    /// HUD pointer capture must block wheel zoom and drag panning together.
+    #[test]
+    fn hud_capture_blocks_all_scene_pointer_input() {
+        let motion = Vec2::new(12.0, -4.0);
+        assert_eq!(
+            camera_pointer_input(true, true, motion, 3.0),
+            CameraPointerInput::default()
+        );
+        assert_eq!(
+            camera_pointer_input(false, true, motion, 3.0),
+            CameraPointerInput {
+                drag_delta: motion,
+                wheel_delta: 3.0,
+            }
+        );
+        assert_eq!(
+            camera_pointer_input(false, false, motion, 0.0).drag_delta,
+            Vec2::ZERO
+        );
     }
 }

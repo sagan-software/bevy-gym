@@ -33,11 +33,13 @@ silently starting over.
 - `CurriculumStage`: `Survival`, `Competition`, `PredatorPrey`, `Obstacles`.
 - `Species`: `Bunny`, `Fox`.
 - `AgentLife`: `Alive`, `Dead(DeathCause)`.
-- `DeathCause`: `Starvation`, `Dehydration`, `Thorns`, `Predation`.
+- `DeathCause`: `Starvation`, `Dehydration`, `Deprivation`, `Thorns`,
+  `Predation`, `Overconsumption`, `InvalidPhysics`.
 - `PerceptKind`: `Food`, `Well`, `Bunny`, `Fox`, `SolidObstacle`, `Thorns`.
 - `RunMode`: `Train`, `Eval`, `Watch`, `Video`.
 - `EvalSuite`: `Validation`, `Test`, `Demo`.
-- `LocomotionAction`: bounded forward acceleration and turn rate.
+- `LocomotionAction`: bounded forward acceleration, body turn rate, and
+  conjugate gaze yaw.
 
 ### Boundary validation and domain values
 
@@ -56,7 +58,8 @@ silently starting over.
 
 - Alive agent lists derive from lifecycle state.
 - Health status, starvation, and dehydration derive from the current needs.
-- Episode reward derives only from simulated seconds alive.
+- Episode reward derives from simulated seconds alive and need-weighted
+  resource consumption.
 - Recurrent runtime state derives only from the ordered local observation
   history and resets at lifecycle boundaries.
 - Map bounds, HUD counts, and evaluation aggregates derive from world state.
@@ -78,8 +81,8 @@ silently starting over.
 
 Add a Burn recurrent PPO trainer with a decentralized actor and centralized,
 training-only critic. The local actor encodes one observation, advances an
-LSTM, and emits a bounded continuous action: forward acceleration and turn
-rate. The critic receives the fixed padded global state and is absent from the
+LSTM, and emits a bounded continuous action: forward acceleration, body turn
+rate, and conjugate gaze. The critic receives the fixed padded global state and is absent from the
 evaluation actor API.
 
 Stage 1 and stage 2 use one shared bunny actor/critic. Stage 3 and stage 4 use
@@ -89,11 +92,12 @@ Learning happens only after the joint environment step, preventing entity
 iteration order from granting one agent a reaction advantage.
 
 The procedural map expands with the curriculum: half-extents 10, 14, 20, and
-25 from survival through obstacles. Survival starts with 12 food items and a
-20-step spawn interval. These early densities make both resource loops
-discoverable under exploration before later lessons add scarcity, agents,
-predation, and obstacles. Evaluation uses the same declared settings; actor
-input never receives coordinates or resource-placement hints.
+25 from survival through obstacles. Survival starts with two food items and a
+20-step spawn interval. Its food-then-water route rotates with each reset, so
+both resource loops remain discoverable without a fixed world direction.
+Later lessons add scarcity, agents, predation, and obstacles. Evaluation uses
+the same declared settings; actor input never receives coordinates or
+resource-placement hints.
 
 Every living same-species agent contributes its contiguous sequence to that
 species update. Losses normalize by valid agent-time samples, not ecosystem
@@ -103,10 +107,11 @@ entropy, advantage normalization, and metrics.
 ### Perception and memory
 
 Policies never receive absolute resource, opponent, predator, or obstacle
-coordinates. Each agent has thirteen Avian2D raycasts at 0, +/-5, +/-10,
-+/-20, +/-35, +/-55, and +/-80 degrees. A ray returns normalized distance,
-hit presence, and a one-hot perceived kind. This makes forward vision denser
-than peripheral vision while allowing solid bodies to occlude targets.
+coordinates. Each agent has two offset eye origins and 36 reserved Avian2D
+raycasts. Paired rays are dense in front and sparse toward the edge of forward
+peripheral vision. A bounded conjugate gaze action turns both cones without
+allowing rear vision. A ray returns normalized distance, hit presence, and a
+one-hot perceived kind. Solid bodies occlude targets.
 
 Each environment instance, species, and living agent ID owns an independent
 Burn LSTM cell and hidden state. State starts at zero, carries across rollout
@@ -123,11 +128,11 @@ include a no-memory ablation that zeros recurrent state every step.
 
 - Use `avian2d` 0.6.1, compatible with Bevy 0.18.
 - Run a fixed 10 Hz simulation with zero gravity.
-- Agents are dynamic circular rigid bodies with rotation locked, bounded speed,
-  damping, friction, and sleeping disabled.
+- Agents are dynamic rectangular rigid bodies with bounded speed, damping,
+  friction, and sleeping disabled. Their bodies rotate with their heading.
 - Agents collide with map boundaries, solid obstacles, and each other.
 - Food, wells, and thorns have queryable sensor colliders.
-- Trees use circles. Rocks and walls use solid boxes or convex shapes.
+- Trees and rocks use solid square colliders. Walls use solid rectangles.
 - Thorn overlap damages health and hit points without blocking motion.
 - Contact tests must prove that two driven agents cannot pass through each
   other and that one can displace the other.
@@ -144,10 +149,10 @@ Low hunger or thirst reduces both health and hit points. A zero need by itself
 does not bypass those explicit damage paths. Zero hit points terminates that
 agent with the applicable cause. Fox contact terminates a bunny as predation.
 
-Reward is exactly simulated seconds alive. Consumption, approaching a target,
-dealing damage, and exploration do not add reward. These events are metrics,
-which prevents the implementation from claiming survival learning when it has
-only learned a shaping reward.
+Reward combines simulated seconds alive with need-weighted food and absorbed
+water. The pre-consumption reserve multiplier is 125% at or below 10%, 100%
+through 50%, 90% through 75%, 75% below 90%, and zero from 90% upward.
+Approaching a target, moving, dealing damage, and exploration do not add reward.
 
 ### Stable curriculum contract
 

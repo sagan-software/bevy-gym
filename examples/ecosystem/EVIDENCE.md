@@ -530,3 +530,91 @@ A contact sheet was inspected at original resolution. Every frame showed the
 top-down environment and HUD with the correct checkpoint label. The video
 window uses a 1.0 scale-factor override so desktop HiDPI settings cannot change
 the output dimensions.
+
+## Energy-aware binocular survival proof
+
+On 2026-07-29, the final 340-input, three-action checkpoint profile was trained
+from a fresh process with the no-render command below. Checkpoint profile 2 is
+incompatible with earlier 339-input, two-action ecosystem checkpoints.
+
+```sh
+cargo run --no-default-features --release --example ecosystem-survival -- \
+  train --run-id need-weighted-lr3-20260729
+```
+
+The fixed validation-seed curve was:
+
+```text
+iteration 0: 38.087 s
+iteration 1: 40.431 s
+iteration 2: 38.462 s
+iteration 3: 40.281 s
+iteration 4: 41.719 s, selected best
+iteration 5: 40.450 s
+iteration 6: 40.781 s
+```
+
+The selected checkpoint gained 9.5% within four updates and the run completed
+six updates in 38,521 joint
+steps. A prior random-layout candidate regressed from 27.950 to 25.669 seconds.
+A rotated route with resources farther away stayed flat at 27.656 to 27.644
+seconds. Placing the first food and well inside the initial binocular search
+route produced the fast learning curve. Food and absorbed-water rewards now
+use the reserve before consumption: 125% at or below 10%, 100% through 50%,
+90% through 75%, 75% below 90%, and zero from 90% upward. The base defaults are
+8 per food event and 10 per absorbed water unit. The final action mapping
+converts the signed network output to throttle: `-1` stops, `0` uses half
+throttle, and `1` uses full throttle. Physical velocity, body heading, and the eye-cone centerline
+agree, so the policy can move while turning and cannot move backward while
+looking forward. Agent, food, well, tree, rock, and thorn colliders are
+rectangles or squares with the same dimensions as their rendered visuals.
+
+Fresh processes then evaluated the random step-zero checkpoint and selected
+checkpoint on 100 disjoint seed-907 episodes:
+
+```sh
+cargo run --no-default-features --release --example ecosystem-survival -- eval \
+  --checkpoint runs/ecosystem-survival-ppo/need-weighted-lr3-20260729/checkpoints/step-000000.mpk \
+  --episodes 100 --seed 907
+cargo run --no-default-features --release --example ecosystem-survival -- eval \
+  --checkpoint runs/ecosystem-survival-ppo/need-weighted-lr3-20260729/best.mpk \
+  --episodes 100 --seed 907
+```
+
+```text
+random:  39.124 s, 95% CI [38.566, 39.752], ate+drank 100.0%
+learned: 42.445 s, 95% CI [41.530, 43.474], ate+drank 100.0%
+```
+
+The disjoint gain is 8.5%. Food events increased from 104 to 118. The learned
+evaluation consumed 136.481 water units and recorded 4,619.696 overconsumption
+damage, down from 7,196.906 for the random policy. Training reduced
+overconsumption deaths from 27 to 18 while increasing mean survival. The other
+learned deaths were 18 from starvation and 64 from combined deprivation. These
+diagnostics prove that agents can traverse the square food sensors, consume
+both resources, and improve under the need-weighted reward.
+
+The exact rendered command completed the same six-update visual demo with
+binocular rays enabled, two eye origins, the learning graph, optimizer rates,
+and live controls:
+
+```sh
+cargo run --example ecosystem-survival
+```
+
+The inspected captures are [live training](../../ai/bmad-output/implementation-artifacts/screenshots/ecosystem-training-live.png)
+and [completed training](../../ai/bmad-output/implementation-artifacts/screenshots/ecosystem-training-complete.png).
+The focused tests cover translation-only drain, free body turn and gaze,
+forward binocular limits, paired live ray counts, exact fullness boundaries,
+overconsumption damage and attribution, profile persistence, HUD pointer
+capture, world drag input filtering, forward-only throttle, and traversable food
+pickup sensors and every need-reward zone boundary. The final headless example
+suite passed 50 tests. The final all-feature example suite passed 61 tests.
+`cargo test` passed 54 library tests
+and one documentation test, with one documentation test ignored. Strict
+all-target, all-feature Clippy passed with warnings denied.
+
+The personal-lint workflow reported no candidate-local diagnostic. Its first
+stage remains blocked by 15 pre-existing CartPole lifetime diagnostics and
+three pre-existing ecosystem 100-line diagnostics. Its Dylint stage remains
+blocked because the isolated tool environment lacks `wayland-client.pc`.
