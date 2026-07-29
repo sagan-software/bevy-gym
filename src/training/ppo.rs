@@ -4,7 +4,6 @@ use std::collections::HashMap;
 use std::error::Error;
 use std::fmt;
 use std::marker::PhantomData;
-use std::sync::Mutex;
 
 use burn::module::{AutodiffModule, Module};
 use burn::nn::{Linear, LinearConfig, Relu};
@@ -13,13 +12,12 @@ use burn::tensor::Tensor;
 
 use crate::{Env, EpisodeStatus};
 
-use super::backend::{inference_device, training_device, InferenceBackend, TrainingBackend};
+use super::backend::{
+    inference_device, training_device, InferenceBackend, TrainingBackend, MODEL_INITIALIZATION_LOCK,
+};
 use super::checkpoint::CheckpointError;
 use super::config::{RunConfig, RunPaths};
 use super::rng::SeedConfig;
-
-/// Serializes Flex seeding and lazy PPO parameter materialization.
-static MODEL_INITIALIZATION_LOCK: Mutex<()> = Mutex::new(());
 
 /// Configuration for the PPO trainer boundary.
 #[derive(Debug, Clone, PartialEq)]

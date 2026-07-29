@@ -5,7 +5,7 @@ use bevy::prelude::*;
 use crate::{Env, EpisodeStatus, Transition};
 
 /// Fired after every successful environment step.
-#[derive(Message, Clone)]
+#[derive(Message, Debug, Clone)]
 pub struct TransitionEvent<E: Env + Send + Sync + 'static> {
     /// Which environment instance produced this transition.
     pub env_id: usize,
@@ -40,7 +40,7 @@ pub struct EpisodeEndEvent {
 }
 
 /// Request for the next action for one environment.
-#[derive(Message, Clone)]
+#[derive(Message, Debug, Clone)]
 pub struct ActionRequest<E: Env + Send + Sync + 'static> {
     /// Which environment instance needs an action.
     pub env_id: usize,
@@ -56,7 +56,7 @@ pub struct ActionRequest<E: Env + Send + Sync + 'static> {
 }
 
 /// Response carrying an action for one environment entity.
-#[derive(Message, Clone)]
+#[derive(Message, Debug, Clone)]
 pub struct ActionResponse<E: Env + Send + Sync + 'static> {
     /// Entity from the matching [`ActionRequest`].
     pub entity: Entity,

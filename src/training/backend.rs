@@ -2,6 +2,10 @@
 
 use burn::backend::flex::FlexDevice;
 use burn::tensor::{backend::Backend, Device};
+use std::sync::Mutex;
+
+/// Serializes process-global backend seeding and lazy model materialization.
+pub(super) static MODEL_INITIALIZATION_LOCK: Mutex<()> = Mutex::new(());
 
 /// Default inference backend for CPU/headless policy execution.
 pub type InferenceBackend = burn::backend::Flex;

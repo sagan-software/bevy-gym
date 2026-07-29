@@ -4,7 +4,6 @@ use std::error::Error;
 use std::fmt;
 use std::marker::PhantomData;
 use std::path::{Path, PathBuf};
-use std::sync::Mutex;
 
 use burn::module::{AutodiffModule, Module};
 use burn::nn::loss::{HuberLossConfig, Reduction};
@@ -16,13 +15,12 @@ use burn::tensor::{Int, Tensor};
 
 use crate::{Env, EpisodeStatus};
 
-use super::backend::{inference_device, training_device, InferenceBackend, TrainingBackend};
+use super::backend::{
+    inference_device, training_device, InferenceBackend, TrainingBackend, MODEL_INITIALIZATION_LOCK,
+};
 use super::checkpoint::{policy_recorder, CheckpointError, CheckpointOperation};
 use super::config::{RunConfig, RunPaths};
 use super::rng::SeedConfig;
-
-/// Serializes backend seeding and lazy parameter materialization.
-static MODEL_INITIALIZATION_LOCK: Mutex<()> = Mutex::new(());
 
 /// Environment-neutral configuration for the DQN learner.
 #[derive(Debug, Clone, PartialEq)]

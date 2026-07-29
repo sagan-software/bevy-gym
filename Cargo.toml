@@ -12,17 +12,27 @@ categories = ["game-engines", "science"]
 workspace = true
 
 [features]
-default = []
+default = ["render"]
 # Local iteration only. Bevy dynamic linking is the largest rebuild-time win,
 # but should not be enabled for published or shipping builds.
 fast-compile = ["bevy/dynamic_linking"]
 render = [
     "bevy/2d_bevy_render",
     "bevy/default_app",
+    "bevy/default_font",
     "bevy/bevy_remote",
+    "bevy/bevy_gizmos",
+    "bevy/bevy_mikktspace",
+    "bevy/bevy_text",
+    "bevy/bevy_ui",
+    "bevy/bevy_ui_render",
     "bevy/bevy_winit",
     "bevy/wayland",
     "bevy/x11",
+    "dep:bevy-inspector-egui",
+    "dep:serde",
+    "dep:serde_json",
+    "dep:tokio",
 ]
 bevy-mcp = ["render", "dep:bevy_brp_extras"]
 # Name expected by Bevy BRP MCP launch tooling.
@@ -39,14 +49,57 @@ default-features = false
 features = ["std", "autodiff", "flex"]
 version = "0.21"
 
+# Avian 0.6 is the Bevy 0.18-compatible line. Its rendering features remain
+# off because the ecosystem examples own their visual presentation.
+[dev-dependencies.avian2d]
+default-features = false
+features = ["2d", "f32", "parry-f32", "parallel"]
+version = "0.6.1"
+
 [dependencies.bevy_brp_extras]
 default-features = true
 optional = true
 version = "0.18"
 
+[dependencies.bevy-inspector-egui]
+default-features = false
+features = ["bevy_render"]
+optional = true
+version = "0.36"
+
+[dependencies.serde]
+features = ["derive"]
+optional = true
+version = "1"
+
+[dependencies.serde_json]
+optional = true
+version = "1"
+
+[dependencies.tokio]
+features = ["fs", "io-util", "process", "rt"]
+optional = true
+version = "1"
+
 [[example]]
 name = "cartpole"
 path = "examples/classic-control/cart_pole.rs"
+
+[[example]]
+name = "ecosystem-survival"
+path = "examples/ecosystem/survival.rs"
+
+[[example]]
+name = "ecosystem-competition"
+path = "examples/ecosystem/competition.rs"
+
+[[example]]
+name = "ecosystem-predator-prey"
+path = "examples/ecosystem/predator_prey.rs"
+
+[[example]]
+name = "ecosystem-obstacles"
+path = "examples/ecosystem/obstacles.rs"
 
 [profile.dev]
 # Bevy's recommended dev profile: lightly optimize local code and heavily

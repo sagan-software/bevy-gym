@@ -1900,7 +1900,7 @@ mod tests {
     #[test]
     fn cartpole_collects_parallel_transitions_through_bevy_runner() {
         let seeds = SeedConfig::from_root(11);
-        let mut collector = bevy_gym::training::BevyTransitionCollector::new(
+        let mut collector = BevyTransitionCollector::new(
             |_| cartpole_v1(),
             4,
             move |env_id, episode| Some(seeds.environment_episode(env_id, episode)),

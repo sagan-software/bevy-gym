@@ -119,7 +119,7 @@ commands.entity(env_entity).insert(ResetRequested { seed: Some(42) });
 | Feature        | Description                                                       |
 | -------------- | ----------------------------------------------------------------- |
 | `fast-compile` | Enables Bevy dynamic linking for local iteration. Do not ship it. |
-| `render`       | Enables 2D Bevy rendering, PNG screenshots, and BRP transport.    |
+| `render`       | Default. Enables 2D rendering and Inspector-egui example HUDs.     |
 | `bevy-mcp`     | Adds `bevy_brp_extras` for screenshots, shutdown, and MCP tooling. |
 | `bevy_remote`  | Alias expected by Bevy BRP MCP launch tooling.                    |
 
@@ -135,6 +135,7 @@ roots. CartPole DQN train/eval is the first accepted behavioral path.
 | Example                                 | Notes                                                    |
 | --------------------------------------- | -------------------------------------------------------- |
 | [`cartpole`](docs/examples/cartpole.md) | CartPole Burn DQN trainer, eval, BRP/MCP visualizer, and screenshots |
+| [`ecosystem`](examples/ecosystem/README.md) | Four visual-first recurrent PPO curriculum examples             |
 
 ## Plugin docs
 

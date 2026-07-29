@@ -188,6 +188,8 @@ fn push_json_control_escape(output: &mut String, ch: char) {
 
 #[cfg(test)]
 mod tests {
+    use std::io::Read as _;
+
     use super::*;
 
     #[test]
@@ -215,6 +217,14 @@ mod tests {
     }
 
     #[test]
+    #[expect(
+        clippy::allow_attributes,
+        reason = "the repository disallows synchronous filesystem helpers by default"
+    )]
+    #[allow(
+        clippy::disallowed_methods,
+        reason = "bounded synchronous cleanup keeps the metrics file test runtime-independent"
+    )]
     fn metrics_writer_appends_record() {
         let path = std::env::temp_dir().join(format!(
             "bevy-gym-metrics-{}-{}.jsonl",
@@ -227,7 +237,11 @@ mod tests {
         let mut writer = MetricsWriter::append(&path).expect("metrics writer opens");
         writer.write_record(&record).expect("metrics record writes");
 
-        let contents = std::fs::read_to_string(&path).expect("metrics file is readable");
+        let mut contents = String::new();
+        File::open(&path)
+            .expect("metrics file opens")
+            .read_to_string(&mut contents)
+            .expect("metrics file is readable");
         assert_eq!(contents, "{\"global_step\":1,\"eval/mean_reward\":42}\n");
 
         drop(std::fs::remove_file(path));

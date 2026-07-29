@@ -67,6 +67,20 @@
 
 #[cfg(feature = "bevy-mcp")]
 use bevy_brp_extras as _;
+// Cargo exposes dev-dependencies to the library test target. Ecosystem example
+// tests own the actual Avian use, while this keeps per-target dependency linting exact.
+#[cfg(test)]
+use avian2d as _;
+// Render-only ecosystem examples own these serialization dependencies. Keep
+// library builds under the same feature free of false unused-dependency noise.
+#[cfg(feature = "render")]
+use bevy_inspector_egui as _;
+#[cfg(feature = "render")]
+use serde as _;
+#[cfg(feature = "render")]
+use serde_json as _;
+#[cfg(feature = "render")]
+use tokio as _;
 
 /// ECS components used to store environment state.
 pub mod components;
