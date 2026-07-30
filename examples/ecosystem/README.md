@@ -22,11 +22,10 @@ and recurrent shapes remain stable across stages so checkpoint transfer is
 real weight reuse.
 
 Running an example without arguments starts live training and opens its visual
-demo. The Bevy Inspector egui panel shows the current policy, exact episodic
-reward, training and evaluation survival time, PPO losses, entropy, iteration
-count, gain from the random-policy baseline, and durable run directory. It also
-controls world playback speed, world pause, world reset, training pause, and
-training stop.
+demo. The Bevy Inspector egui panel shows mean training and evaluation reward,
+fixed-seed survival time, reward change per iteration, PPO diagnostics, and the
+durable run directory. It also controls world playback, training, perception,
+reward weights, physiology, movement, and episode duration.
 
 The perception overlay starts enabled for agent 0. Each agent has two forward
 eye origins with dense frontal rays and sparse peripheral rays. Conjugate gaze
@@ -41,13 +40,12 @@ agent dies, the filter follows the first living agent.
 The collapsed `Experiment tuning` panel provides these live controls:
 
 - active perception rays in even pairs from 2 through 36;
-- alive, food or prey, and absorbed-water reward weights;
-- starting health and food or water reserves;
-- hunger and thirst speed plus translation-only movement drain;
-- movement speed and eye-gaze range;
-- reserve capacity, fullness slowdown threshold and speed, and overfill damage;
-- deprivation and thorn damage speed;
-- episode step limit.
+- food or prey and completed-drink reward weights;
+- maximum and starting HP, satiation, and hydration points;
+- need-loss, starvation-damage, and dehydration-damage intervals in seconds;
+- translation-only need cost and movement speed;
+- eye-gaze range;
+- episode duration in seconds.
 
 Ray counts remove sparse peripheral pairs before dense frontal pairs. Each ray
 keeps its narrow sensing arc, so lower counts create real blind gaps. Inactive
@@ -60,26 +58,27 @@ keeps one rollout batch on one reward and dynamics definition. Use `Apply +
 restart visible world` to apply the same profile to the rendered evaluation
 world. Every applied profile is written into the run metrics. Purple graph
 markers identify training changes. A settings change resets the displayed
-survival-learning curve and fixed-seed checkpoint-selection baseline. The run
-config stores the complete latest profile, and `eval` or `watch` loads it beside
-the checkpoint. Episodic reward does not remain comparable across reward
-profiles.
+reward curve and fixed-seed checkpoint-selection baseline. The run config stores
+the latest profile, and `eval` or `watch` loads it with the checkpoint. Rewards
+from different profiles are not directly comparable.
 
-Alive reward provides dense feedback and usually improves early credit, but a
-large value can reward passive survival. Food and water bonuses make resource
-discovery more important. Their pre-consumption reserve multiplier is 125% at
-or below 10%, 100% through 50%, 90% through 75%, 75% below 90%, and zero from
-90% upward. Lower starting health, lower starting reserves, faster need drain,
-and faster damage create
-urgency while reducing time for exploration. Movement drain favors direct
-routes without shaping reward. The signed policy output maps to forward throttle,
-so `-1` stops and every larger value moves forward without reversing away from
-the eye cones. Body rotation and gaze
-retain only baseline drain. Fewer rays reduce spatial detail and usually slow resource discovery,
-but they make learned scanning behavior easier to see. A low fullness threshold
-or speed multiplier discourages overconsumption, while high overfill damage can
-shorten exploration. Shorter episodes produce PPO updates sooner but can cut
-off delayed consequences. These controls are for short visual experiments.
+The default survival profile has 5 maximum HP and starts with 5 HP. Satiation
+and hydration each have 5 maximum points and start at 3. Both needs lose one
+point every five simulated seconds. Starvation deals 1 HP every three seconds,
+and dehydration deals 1 HP every two seconds while the matching need is zero.
+Food adds one satiation point. A completed one-second drink adds one hydration
+point. Translation advances the need clock 25% faster; body rotation and gaze
+do not add movement cost.
+
+The episode ends after 20 simulated seconds by default. Its terminal survival
+reward is `survived_seconds * remaining_hp / maximum_hp`. Food and drink bonuses
+are added when those events occur. Their pre-consumption need multiplier is
+125% at or below 10%, 100% through 50%, 90% through 75%, 75% below 90%, and zero
+from 90% upward. The signed locomotion output maps to forward throttle: `-1`
+stops, `0` uses half throttle, and `1` uses full throttle. Fewer rays remove
+peripheral pairs before frontal pairs. Shorter episodes produce updates sooner
+but can remove delayed consequences. These controls are intended for visual
+experiments.
 
 ```sh
 cargo run --example ecosystem-survival
@@ -90,14 +89,14 @@ cargo run --example ecosystem-obstacles
 
 The survival demo uses the verified seed-157 profile: six PPO updates, 16
 rollout episodes per update, 16 fixed-seed evaluation episodes after every
-update, a 1,200-step horizon, and 8x visual playback. The other stages retain
+update, a 20-second horizon, and 8x visual playback. The other stages retain
 their shorter seed-42 demo budgets. Override these settings after the mode name
 when needed:
 
 ```sh
 cargo run --example ecosystem-survival -- demo \
   --iterations 12 --rollout-episodes 4 --eval-episodes 6 \
-  --max-steps 1200 --seed 42 --speed 8
+  --episode-seconds 20 --seed 42 --speed 8
 ```
 
 Use WASD, arrow keys, left drag, or middle drag to pan. Use the mouse wheel or
@@ -112,16 +111,16 @@ also excludes the rendering and Inspector-egui dependencies:
 ```sh
 cargo run --no-default-features --release --example ecosystem-survival -- train
 cargo run --no-default-features --release --example ecosystem-survival -- \
-  train --iterations 32 --rollout-episodes 4 --max-steps 1200 --seed 42
+  train --iterations 32 --rollout-episodes 4 --episode-seconds 20 --seed 42
 ```
 
-The first command is the verified no-argument headless profile. Its recorded
-seed-157 run reaches 41.719 seconds by update 4 from a 38.087-second baseline,
-a 9.5% gain. Fresh-process evaluation on 100 disjoint
-episodes improved from 39.124 seconds to 42.445 seconds, an 8.5% gain. Both
-policies ate and drank in every episode, food pickups rose from 104 to 118, and
-overconsumption deaths fell from 27 to 18. See [EVIDENCE.md](EVIDENCE.md) for confidence intervals, resource-use
-measurements, and rendered screenshots.
+The current seed-157 headless run improved fixed-seed mean reward from 0.000 to
+44.150 within six updates. On 100 disjoint seed-907 episodes, the random
+checkpoint scored 0.400 and survived 18.708 seconds on average. The selected
+checkpoint scored 44.240, survived the complete 20 seconds in every episode,
+and collected both food and water in every episode. See
+[EVIDENCE.md](EVIDENCE.md) for the commands, per-update results, confidence
+intervals, resource events, and rendered screenshots.
 
 To inspect an existing checkpoint without training, use `watch`:
 

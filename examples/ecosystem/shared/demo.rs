@@ -18,8 +18,8 @@ struct DemoOptions {
     /// Independent ecosystems pooled into one PPO update.
     rollout_episodes: usize,
 
-    /// Joint simulation steps allowed in one episode.
-    max_steps: u32,
+    /// Simulated seconds allowed in one episode.
+    episode_seconds: u16,
 
     /// Fixed-seed episodes used for each visible evaluation point.
     eval_episodes: usize,
@@ -56,7 +56,7 @@ impl DemoOptions {
             } else {
                 2
             },
-            max_steps: 1_200,
+            episode_seconds: 20,
             eval_episodes: if stage == CurriculumStage::Survival {
                 16
             } else {
@@ -78,7 +78,7 @@ impl DemoOptions {
         [
             ("--iterations", self.iterations.to_string()),
             ("--rollout-episodes", self.rollout_episodes.to_string()),
-            ("--max-steps", self.max_steps.to_string()),
+            ("--episode-seconds", self.episode_seconds.to_string()),
             ("--eval-episodes", self.eval_episodes.to_string()),
             ("--eval-interval", "1".to_owned()),
             ("--seed", self.seed.to_string()),
@@ -155,7 +155,7 @@ pub(super) fn run_demo(
     let playback_speed = options.playback_speed;
     let training_arguments = options.training_arguments();
     let tuning = ExperimentTuning {
-        episode_step_limit: options.max_steps,
+        episode_seconds: options.episode_seconds,
         ..ExperimentTuning::default()
     };
     let control = Arc::new(DemoTrainingControl::new(tuning));
@@ -221,7 +221,7 @@ fn parse_options(
         match flag.as_str() {
             "--iterations" => options.iterations = value.parse()?,
             "--rollout-episodes" => options.rollout_episodes = value.parse()?,
-            "--max-steps" => options.max_steps = value.parse()?,
+            "--episode-seconds" => options.episode_seconds = value.parse()?,
             "--eval-episodes" => options.eval_episodes = value.parse()?,
             "--seed" => options.seed = value.parse()?,
             "--speed" => options.playback_speed = value.parse()?,
@@ -231,12 +231,15 @@ fn parse_options(
     }
     if options.iterations == 0
         || options.rollout_episodes == 0
-        || options.max_steps == 0
+        || !(5..=300).contains(&options.episode_seconds)
         || options.eval_episodes == 0
         || !options.playback_speed.is_finite()
         || options.playback_speed <= 0.0
     {
-        return Err("demo counts and playback speed must be positive".into());
+        return Err(
+            "demo counts and playback speed must be positive; --episode-seconds must be in 5..=300"
+                .into(),
+        );
     }
     Ok(options)
 }
@@ -270,7 +273,7 @@ mod tests {
 
         assert_eq!(options.iterations, 6);
         assert_eq!(options.rollout_episodes, 16);
-        assert_eq!(options.max_steps, 1_200);
+        assert_eq!(options.episode_seconds, 20);
         assert_eq!(options.eval_episodes, 16);
         assert_eq!(options.seed, 157);
     }
@@ -285,6 +288,18 @@ mod tests {
         .is_err());
     }
 
+    /// Demo horizons use the same bounds as live Inspector tuning.
+    #[test]
+    fn demo_options_reject_out_of_range_episode_seconds() {
+        for value in ["1", "301"] {
+            assert!(parse_options(
+                CurriculumStage::Survival,
+                ["--episode-seconds", value].map(str::to_owned).into_iter(),
+            )
+            .is_err());
+        }
+    }
+
     /// The render thread must publish one complete tuning profile atomically.
     #[test]
     fn training_control_retains_latest_tuning_profile() {
@@ -293,7 +308,7 @@ mod tests {
         let control = DemoTrainingControl::new(ExperimentTuning::default());
         let changed = ExperimentTuning {
             food_reward: 7.0,
-            damage_multiplier: 1.5,
+            dehydration_damage_interval_seconds: 4,
             ..ExperimentTuning::default()
         };
 

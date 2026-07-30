@@ -4,7 +4,126 @@ This log separates implementation proof, exploratory probes, and qualifying
 evaluation. Raw run directories remain ignored under `runs/`; the commands and
 results needed to interpret them are recorded here.
 
-## Current implementation proof
+## Current rounded-geometry and integer-physiology proof
+
+This 2026-07-29 section supersedes the historical mechanics and learning runs
+below. Earlier checkpoints use different physiology, reward, geometry, or
+tensor contracts and are not evidence for the current example.
+
+The short-ray defect came from the well's drinking sensor. It was a semantic
+square collider, so a ray cast while the agent was inside it returned the
+sensor's nearby exit boundary. The drinking sensor is now a nonsemantic circle.
+Perception ray queries also accept only entities with a semantic collider, so
+interaction triggers cannot clip or occlude perception. Agents use oval
+colliders and visuals. Food, wells, trees, rocks, and thorns use circular
+colliders and matching circular visuals. The square map retains rectangular
+boundary walls.
+
+The current survival profile uses 5 maximum HP, 5 maximum satiation, and 5
+maximum hydration. An episode starts at 5 HP and 3 points in each need. Both
+needs lose one point every five simulated seconds. Starvation deals 1 HP every
+three seconds, and dehydration deals 1 HP every two seconds while the matching
+need is zero. Food adds one satiation point. Each completed one-second drink
+adds one hydration point. Translation advances the need clock by an additional
+25%; rotation and gaze do not add movement cost.
+
+The default horizon is 20 simulated seconds. The final transition adds
+`survived_seconds * remaining_hp / maximum_hp` to resource bonuses. Food and
+drink bonuses use the need before consumption. The multiplier is 125% at or
+below 10%, 100% through 50%, 90% through 75%, 75% below 90%, and zero from 90%
+upward. Checkpoint selection uses mean episode reward rather than survival time,
+which avoids arbitrary selection when all policies reach the 20-second horizon.
+
+Fresh headless training used this command:
+
+```sh
+cargo run --no-default-features --release --example ecosystem-survival -- \
+  train --run-id integer-survival-final-v6-20260729
+```
+
+The fixed-seed evaluation curve was:
+
+```text
+iteration 0: evaluation reward 0.000, survival 18.450 s
+iteration 1: training reward 7.806, evaluation reward 0.500, survival 18.544 s
+iteration 2: training reward 10.950, evaluation reward 4.125, survival 19.381 s
+iteration 3: training reward 18.312, evaluation reward 40.619, survival 20.000 s
+iteration 4: training reward 26.569, evaluation reward 43.450, survival 20.000 s
+iteration 5: training reward 23.100, evaluation reward 44.150, survival 20.000 s
+iteration 6: training reward 37.644, evaluation reward 44.150, survival 20.000 s
+```
+
+The six updates completed in 18,634 joint steps. The initial food and well are
+separate, visible from the spawn, outside contact range, and ordered along one
+learnable route. This prevents the water-only local optimum found in two
+discarded exploratory runs.
+
+Fresh processes evaluated the random and selected checkpoints on 100 disjoint
+seed-907 episodes:
+
+```sh
+cargo run --no-default-features --release --example ecosystem-survival -- eval \
+  --checkpoint runs/ecosystem-survival-ppo/integer-survival-final-v6-20260729/checkpoints/step-000000.mpk \
+  --episodes 100 --seed 907
+cargo run --no-default-features --release --example ecosystem-survival -- eval \
+  --checkpoint runs/ecosystem-survival-ppo/integer-survival-final-v6-20260729/best.mpk \
+  --episodes 100 --seed 907
+```
+
+```text
+random:  reward 0.400, survival 18.708 s, 95% CI [18.587, 18.825]
+         ate and drank 0.0%, food events 0, water 0.000, deprivation deaths 95
+learned: reward 44.240, survival 20.000 s, 95% CI [20.000, 20.000]
+         ate and drank 100.0%, food events 108, water 120.000, deaths 0
+```
+
+Rendered checkpoint playback used the same selected checkpoint and seed:
+
+```sh
+cargo run --release --example ecosystem-survival -- watch \
+  --checkpoint runs/ecosystem-survival-ppo/integer-survival-final-v6-20260729/best.mpk \
+  --seed 907 --speed 4
+```
+
+The inspected [final perception rays](../../ai/bmad-output/implementation-artifacts/screenshots/ecosystem-integer-survival-final-v6-rays.png)
+show both visible resources, the oval agent, the circular well, and rays that
+continue to the wall instead of stopping at the drinking sensor. The exact
+rendered training command was also run:
+
+```sh
+cargo run --release --example ecosystem-survival
+```
+
+The [completed training HUD](../../ai/bmad-output/implementation-artifacts/screenshots/ecosystem-integer-survival-final-v6-complete.png)
+shows iteration 6, 18,634 steps, a 44.15-point fixed-seed reward gain, and
+20.00-second survival. The [final rendered learning graph](../../ai/bmad-output/implementation-artifacts/screenshots/ecosystem-integer-survival-final-v6-learning-graph.png)
+shows mean reward, reward change per iteration, and fixed-seed survival under
+the same profile-3 mechanics. Scrolling this HUD left the camera scale
+unchanged.
+
+The post-training review also verifies complete-drink allocation under scarce
+water, fair recipient rotation, full deprivation intervals after a need reaches
+zero, zero bootstrap after terminal reward, profile-3 checkpoint validation,
+bounded CLI horizons, full final-step age accounting, and explicit attribution
+for combined deprivation and thorn damage. Every saved policy now has an
+immutable tuning sidecar. Watch, evaluation, resume, and video reject mismatched
+bunny and fox profiles. Evaluation, watch, and video require the exact stage;
+training resume permits only the current stage or its direct predecessor. Video
+also rejects profile changes between segments and records the effective tuning
+in its manifest. Failed checkpoint replacement invalidates the complete policy
+set before any policy overwrite.
+
+The final rendered ecosystem example suite passed 79 tests. The headless
+ecosystem example suite passed 64 tests. `cargo test` passed 54
+library tests and one documentation test, with one documentation test ignored.
+Strict all-target, all-feature Clippy passed with warnings denied. The
+personal-lint workflow found no new candidate-local diagnostic. Its Cargo stage
+remains blocked by 15 pre-existing CartPole lifetime diagnostics and three
+pre-existing ecosystem 100-line diagnostics. Its Dylint stage remains blocked
+because the isolated environment lacks `wayland-client.pc`. The latest log is
+stored outside the repository under `~/.cache/rust-personal-lints/logs/`.
+
+## Historical implementation proof
 
 All four stages construct deterministic Avian2D worlds and complete random
 joint-action smoke rollouts. The shared simulation currently includes dynamic
@@ -57,7 +176,7 @@ entry. The current log is outside the repository at
 `~/.cache/rust-personal-lints/logs/run-1918738-1785314414995`. The configured
 strict Cargo Clippy gate remains clean.
 
-## Current default survival learning proof
+## Historical default survival learning proof
 
 The current actor has separate observation-dependent means and one learned
 state-independent log standard deviation per action dimension. That actor
@@ -531,7 +650,7 @@ top-down environment and HUD with the correct checkpoint label. The video
 window uses a 1.0 scale-factor override so desktop HiDPI settings cannot change
 the output dimensions.
 
-## Energy-aware binocular survival proof
+## Historical energy-aware binocular survival proof
 
 On 2026-07-29, the final 340-input, three-action checkpoint profile was trained
 from a fresh process with the no-render command below. Checkpoint profile 2 is

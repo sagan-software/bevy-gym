@@ -2,6 +2,7 @@
 
 use std::error::Error;
 use std::fmt;
+use std::time::Duration;
 
 use bevy_gym::EpisodeStatus;
 
@@ -230,13 +231,13 @@ pub(super) struct AgentId(pub(super) u16);
 /// Natural cause that ended an agent trajectory.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub(super) enum DeathCause {
-    /// Hunger damage exhausted hit points.
+    /// Zero satiation exhausted hit points.
     Starvation,
 
-    /// Thirst damage exhausted hit points.
+    /// Zero hydration exhausted hit points.
     Dehydration,
 
-    /// Combined hunger and thirst damage exhausted hit points.
+    /// Combined zero satiation and hydration exhausted hit points.
     Deprivation,
 
     /// A fox consumed a bunny.
@@ -245,8 +246,8 @@ pub(super) enum DeathCause {
     /// Thorn damage exhausted hit points.
     Thorns,
 
-    /// Excess food or water exhausted hit points.
-    Overconsumption,
+    /// Concurrent deprivation and thorn damage exhausted hit points.
+    CombinedDamage,
 
     /// Non-finite or escaped physics state invalidated the trajectory.
     InvalidPhysics,
@@ -407,50 +408,50 @@ pub(super) struct ExperimentTuning {
     /// Paired binocular sectors sampled within the fixed tensor capacity.
     pub(super) perception_ray_count: PerceptionRayCount,
 
-    /// Reward earned for each simulated second alive.
-    pub(super) survival_reward_per_second: f32,
-
     /// Reward earned for one compatible food or prey event.
     pub(super) food_reward: f32,
 
-    /// Reward earned per conserved unit of well water consumed.
-    pub(super) water_reward_per_unit: f32,
+    /// Base reward earned by one completed drink event.
+    pub(super) drink_reward: f32,
 
-    /// Normalized health and hit-point fraction assigned at reset.
-    pub(super) initial_health_fraction: f32,
+    /// Maximum discrete HP available to an agent.
+    pub(super) maximum_hit_points: u8,
 
-    /// Food and water reserve assigned at reset, where `1` is comfortably full.
-    pub(super) initial_reserve_fraction: f32,
+    /// Discrete HP assigned at reset.
+    pub(super) initial_hit_points: u8,
 
-    /// Multiplier applied to hunger and thirst drain rates.
-    pub(super) need_drain_multiplier: f32,
+    /// Maximum discrete satiation points.
+    pub(super) maximum_satiation: u8,
 
-    /// Additional need drain at maximum translational speed.
-    pub(super) movement_need_drain: f32,
+    /// Discrete satiation points assigned at reset.
+    pub(super) initial_satiation: u8,
+
+    /// Maximum discrete hydration points.
+    pub(super) maximum_hydration: u8,
+
+    /// Discrete hydration points assigned at reset.
+    pub(super) initial_hydration: u8,
+
+    /// Simulated seconds between one-point need losses.
+    pub(super) need_loss_interval_seconds: u16,
+
+    /// Simulated seconds at zero satiation between HP losses.
+    pub(super) starvation_damage_interval_seconds: u16,
+
+    /// Simulated seconds at zero hydration between HP losses.
+    pub(super) dehydration_damage_interval_seconds: u16,
+
+    /// Extra need-clock progress while translating, as a percentage.
+    pub(super) movement_need_cost_percent: u8,
 
     /// Multiplier applied to the base movement speed and acceleration.
     pub(super) movement_speed_multiplier: f32,
 
-    /// Maximum food and water reserve, including uncomfortable excess.
-    pub(super) reserve_capacity: f32,
-
-    /// Reserve level where overfull movement slowdown begins.
-    pub(super) fullness_slow_threshold: f32,
-
-    /// Movement-speed multiplier at or above comfortable fullness.
-    pub(super) overfull_speed_multiplier: f32,
-
-    /// Health and hit points lost per second at maximum configured excess.
-    pub(super) overfull_damage_rate: f32,
-
     /// Maximum conjugate eye yaw relative to the body, in degrees.
     pub(super) gaze_yaw_limit_degrees: f32,
 
-    /// Multiplier applied to deprivation and thorn damage rates.
-    pub(super) damage_multiplier: f32,
-
-    /// Maximum joint steps before time-limit truncation.
-    pub(super) episode_step_limit: u32,
+    /// Maximum simulated episode duration.
+    pub(super) episode_seconds: u16,
 }
 
 impl Default for ExperimentTuning {
@@ -459,74 +460,71 @@ impl Default for ExperimentTuning {
         // exploration time for the demo policy to discover food and water.
         Self {
             perception_ray_count: PerceptionRayCount::default(),
-            survival_reward_per_second: 1.0,
             food_reward: 8.0,
-            water_reward_per_unit: 10.0,
-            initial_health_fraction: 1.0,
-            initial_reserve_fraction: 0.65,
-            need_drain_multiplier: 1.5,
-            movement_need_drain: 1.0,
+            drink_reward: 10.0,
+            maximum_hit_points: 5,
+            initial_hit_points: 5,
+            maximum_satiation: 5,
+            initial_satiation: 3,
+            maximum_hydration: 5,
+            initial_hydration: 3,
+            need_loss_interval_seconds: 5,
+            starvation_damage_interval_seconds: 3,
+            dehydration_damage_interval_seconds: 2,
+            movement_need_cost_percent: 25,
             movement_speed_multiplier: 1.0,
-            reserve_capacity: 1.25,
-            fullness_slow_threshold: 0.9,
-            overfull_speed_multiplier: 0.5,
-            overfull_damage_rate: 2.0,
             gaze_yaw_limit_degrees: 30.0,
-            damage_multiplier: 1.0,
-            episode_step_limit: 1_200,
+            episode_seconds: 20,
         }
     }
 }
 
 impl ExperimentTuning {
     /// Validate the bounded playground surface before applying it to a world.
-    fn validate(self) -> Result<(), ConfigError> {
+    pub(super) fn validate(self) -> Result<(), ConfigError> {
         // Bounds prevent an accidental slider value from creating non-finite
         // rewards, immortal agents, or an impractically long demo episode.
-        if !self.survival_reward_per_second.is_finite()
-            || !(0.0..=5.0).contains(&self.survival_reward_per_second)
-            || !self.food_reward.is_finite()
+        if !self.food_reward.is_finite()
             || !(0.0..=20.0).contains(&self.food_reward)
-            || !self.water_reward_per_unit.is_finite()
-            || !(0.0..=10.0).contains(&self.water_reward_per_unit)
+            || !self.drink_reward.is_finite()
+            || !(0.0..=10.0).contains(&self.drink_reward)
         {
             return Err(ConfigError::new(
                 "reward_tuning",
                 "reward weights must be finite and within their demo bounds",
             ));
         }
-        if !self.initial_health_fraction.is_finite()
-            || !(0.1..=1.0).contains(&self.initial_health_fraction)
-            || !self.initial_reserve_fraction.is_finite()
-            || !(0.1..=1.0).contains(&self.initial_reserve_fraction)
-            || !self.need_drain_multiplier.is_finite()
-            || !(0.25..=4.0).contains(&self.need_drain_multiplier)
-            || !self.movement_need_drain.is_finite()
-            || !(0.0..=3.0).contains(&self.movement_need_drain)
+        if self.maximum_hit_points == 0
+            || self.maximum_hit_points > 20
+            || self.initial_hit_points == 0
+            || self.initial_hit_points > self.maximum_hit_points
+            || self.maximum_satiation == 0
+            || self.maximum_satiation > 20
+            || self.initial_satiation > self.maximum_satiation
+            || self.maximum_hydration == 0
+            || self.maximum_hydration > 20
+            || self.initial_hydration > self.maximum_hydration
+            || self.need_loss_interval_seconds == 0
+            || self.need_loss_interval_seconds > 60
+            || self.starvation_damage_interval_seconds == 0
+            || self.starvation_damage_interval_seconds > 60
+            || self.dehydration_damage_interval_seconds == 0
+            || self.dehydration_damage_interval_seconds > 60
+            || self.movement_need_cost_percent > 100
             || !self.movement_speed_multiplier.is_finite()
             || !(0.5..=2.0).contains(&self.movement_speed_multiplier)
-            || !self.reserve_capacity.is_finite()
-            || !(1.05..=2.0).contains(&self.reserve_capacity)
-            || !self.fullness_slow_threshold.is_finite()
-            || !(0.5..=1.0).contains(&self.fullness_slow_threshold)
-            || !self.overfull_speed_multiplier.is_finite()
-            || !(0.1..=1.0).contains(&self.overfull_speed_multiplier)
-            || !self.overfull_damage_rate.is_finite()
-            || !(0.0..=50.0).contains(&self.overfull_damage_rate)
             || !self.gaze_yaw_limit_degrees.is_finite()
             || !(10.0..=35.0).contains(&self.gaze_yaw_limit_degrees)
-            || !self.damage_multiplier.is_finite()
-            || !(0.25..=4.0).contains(&self.damage_multiplier)
         {
             return Err(ConfigError::new(
                 "physiology_tuning",
-                "health, reserve, movement, gaze, and rate values must be finite and within their demo bounds",
+                "point, interval, movement, and gaze values must be within their demo bounds",
             ));
         }
-        if !(100..=3_000).contains(&self.episode_step_limit) {
+        if !(5..=300).contains(&self.episode_seconds) {
             return Err(ConfigError::new(
-                "episode_step_limit",
-                "must be in 100..=3000 steps",
+                "episode_seconds",
+                "must be in 5..=300 seconds",
             ));
         }
         Ok(())
@@ -551,8 +549,8 @@ pub(super) struct SimulationConfig {
     /// Exact simulated seconds per joint action.
     pub(super) time_step: f32,
 
-    /// External time-limit step count.
-    pub(super) max_steps: u32,
+    /// External time limit in simulated seconds.
+    pub(super) episode_seconds: u16,
 
     /// Food items placed during reset.
     pub(super) initial_food: usize,
@@ -578,47 +576,47 @@ pub(super) struct SimulationConfig {
     /// Number of traversable thorn bushes.
     pub(super) thorn_obstacles: usize,
 
-    /// Reward earned for each simulated second alive.
-    pub(super) survival_reward_per_second: f32,
-
     /// Reward earned for one compatible food or prey event.
     pub(super) food_reward: f32,
 
-    /// Reward earned per conserved unit of well water consumed.
-    pub(super) water_reward_per_unit: f32,
+    /// Base reward earned by one completed drink event.
+    pub(super) drink_reward: f32,
 
-    /// Normalized health and hit-point fraction assigned at reset.
-    pub(super) initial_health_fraction: f32,
+    /// Maximum discrete HP available to an agent.
+    pub(super) maximum_hit_points: u8,
 
-    /// Food and water reserve assigned at reset.
-    pub(super) initial_reserve_fraction: f32,
+    /// Discrete HP assigned at reset.
+    pub(super) initial_hit_points: u8,
 
-    /// Multiplier applied to hunger and thirst drain rates.
-    pub(super) need_drain_multiplier: f32,
+    /// Maximum discrete satiation points.
+    pub(super) maximum_satiation: u8,
 
-    /// Additional need drain at maximum translational speed.
-    pub(super) movement_need_drain: f32,
+    /// Discrete satiation points assigned at reset.
+    pub(super) initial_satiation: u8,
+
+    /// Maximum discrete hydration points.
+    pub(super) maximum_hydration: u8,
+
+    /// Discrete hydration points assigned at reset.
+    pub(super) initial_hydration: u8,
+
+    /// Simulated seconds between one-point need losses.
+    pub(super) need_loss_interval_seconds: u16,
+
+    /// Simulated seconds at zero satiation between HP losses.
+    pub(super) starvation_damage_interval_seconds: u16,
+
+    /// Simulated seconds at zero hydration between HP losses.
+    pub(super) dehydration_damage_interval_seconds: u16,
+
+    /// Extra need-clock progress while translating, as a percentage.
+    pub(super) movement_need_cost_percent: u8,
 
     /// Multiplier applied to movement speed and acceleration.
     pub(super) movement_speed_multiplier: f32,
 
-    /// Maximum food and water reserve.
-    pub(super) reserve_capacity: f32,
-
-    /// Reserve level where movement slowdown begins.
-    pub(super) fullness_slow_threshold: f32,
-
-    /// Movement-speed multiplier at or above comfortable fullness.
-    pub(super) overfull_speed_multiplier: f32,
-
-    /// Hit points lost per second at maximum configured excess.
-    pub(super) overfull_damage_rate: f32,
-
     /// Maximum conjugate gaze yaw, in degrees.
     pub(super) gaze_yaw_limit_degrees: f32,
-
-    /// Multiplier applied to deprivation and thorn damage rates.
-    pub(super) damage_multiplier: f32,
 
     /// Active perception sectors within the fixed actor tensor capacity.
     pub(super) perception_ray_count: PerceptionRayCount,
@@ -665,7 +663,7 @@ impl SimulationConfig {
             fox_count,
             map_half_extent,
             time_step: 0.1,
-            max_steps: tuning.episode_step_limit,
+            episode_seconds: tuning.episode_seconds,
             initial_food,
             max_food,
             food_spawn_interval,
@@ -674,20 +672,20 @@ impl SimulationConfig {
             well_drink_rate: 0.6,
             solid_obstacles,
             thorn_obstacles,
-            survival_reward_per_second: tuning.survival_reward_per_second,
             food_reward: tuning.food_reward,
-            water_reward_per_unit: tuning.water_reward_per_unit,
-            initial_health_fraction: tuning.initial_health_fraction,
-            initial_reserve_fraction: tuning.initial_reserve_fraction,
-            need_drain_multiplier: tuning.need_drain_multiplier,
-            movement_need_drain: tuning.movement_need_drain,
+            drink_reward: tuning.drink_reward,
+            maximum_hit_points: tuning.maximum_hit_points,
+            initial_hit_points: tuning.initial_hit_points,
+            maximum_satiation: tuning.maximum_satiation,
+            initial_satiation: tuning.initial_satiation,
+            maximum_hydration: tuning.maximum_hydration,
+            initial_hydration: tuning.initial_hydration,
+            need_loss_interval_seconds: tuning.need_loss_interval_seconds,
+            starvation_damage_interval_seconds: tuning.starvation_damage_interval_seconds,
+            dehydration_damage_interval_seconds: tuning.dehydration_damage_interval_seconds,
+            movement_need_cost_percent: tuning.movement_need_cost_percent,
             movement_speed_multiplier: tuning.movement_speed_multiplier,
-            reserve_capacity: tuning.reserve_capacity,
-            fullness_slow_threshold: tuning.fullness_slow_threshold,
-            overfull_speed_multiplier: tuning.overfull_speed_multiplier,
-            overfull_damage_rate: tuning.overfull_damage_rate,
             gaze_yaw_limit_degrees: tuning.gaze_yaw_limit_degrees,
-            damage_multiplier: tuning.damage_multiplier,
             perception_ray_count: tuning.perception_ray_count,
         };
         config.validate()?;
@@ -721,7 +719,7 @@ impl SimulationConfig {
         if !self.time_step.is_finite() || self.time_step <= 0.0 {
             return Err(ConfigError::new("time_step", "must be finite and positive"));
         }
-        if self.max_steps == 0 || self.food_spawn_interval == 0 {
+        if self.episode_seconds == 0 || self.food_spawn_interval == 0 {
             return Err(ConfigError::new("step_counts", "must be greater than zero"));
         }
         if !self.well_capacity.is_finite()
@@ -747,22 +745,22 @@ impl SimulationConfig {
         // Validate before mutation so a rejected profile leaves the prior
         // simulation contract intact.
         tuning.validate()?;
-        self.survival_reward_per_second = tuning.survival_reward_per_second;
         self.food_reward = tuning.food_reward;
-        self.water_reward_per_unit = tuning.water_reward_per_unit;
-        self.initial_health_fraction = tuning.initial_health_fraction;
-        self.initial_reserve_fraction = tuning.initial_reserve_fraction;
-        self.need_drain_multiplier = tuning.need_drain_multiplier;
-        self.movement_need_drain = tuning.movement_need_drain;
+        self.drink_reward = tuning.drink_reward;
+        self.maximum_hit_points = tuning.maximum_hit_points;
+        self.initial_hit_points = tuning.initial_hit_points;
+        self.maximum_satiation = tuning.maximum_satiation;
+        self.initial_satiation = tuning.initial_satiation;
+        self.maximum_hydration = tuning.maximum_hydration;
+        self.initial_hydration = tuning.initial_hydration;
+        self.need_loss_interval_seconds = tuning.need_loss_interval_seconds;
+        self.starvation_damage_interval_seconds = tuning.starvation_damage_interval_seconds;
+        self.dehydration_damage_interval_seconds = tuning.dehydration_damage_interval_seconds;
+        self.movement_need_cost_percent = tuning.movement_need_cost_percent;
         self.movement_speed_multiplier = tuning.movement_speed_multiplier;
-        self.reserve_capacity = tuning.reserve_capacity;
-        self.fullness_slow_threshold = tuning.fullness_slow_threshold;
-        self.overfull_speed_multiplier = tuning.overfull_speed_multiplier;
-        self.overfull_damage_rate = tuning.overfull_damage_rate;
         self.gaze_yaw_limit_degrees = tuning.gaze_yaw_limit_degrees;
-        self.damage_multiplier = tuning.damage_multiplier;
         self.perception_ray_count = tuning.perception_ray_count;
-        self.max_steps = tuning.episode_step_limit;
+        self.episode_seconds = tuning.episode_seconds;
         self.validate()
     }
 
@@ -772,22 +770,35 @@ impl SimulationConfig {
         // metrics cannot report a profile that the world does not use.
         ExperimentTuning {
             perception_ray_count: self.perception_ray_count,
-            survival_reward_per_second: self.survival_reward_per_second,
             food_reward: self.food_reward,
-            water_reward_per_unit: self.water_reward_per_unit,
-            initial_health_fraction: self.initial_health_fraction,
-            initial_reserve_fraction: self.initial_reserve_fraction,
-            need_drain_multiplier: self.need_drain_multiplier,
-            movement_need_drain: self.movement_need_drain,
+            drink_reward: self.drink_reward,
+            maximum_hit_points: self.maximum_hit_points,
+            initial_hit_points: self.initial_hit_points,
+            maximum_satiation: self.maximum_satiation,
+            initial_satiation: self.initial_satiation,
+            maximum_hydration: self.maximum_hydration,
+            initial_hydration: self.initial_hydration,
+            need_loss_interval_seconds: self.need_loss_interval_seconds,
+            starvation_damage_interval_seconds: self.starvation_damage_interval_seconds,
+            dehydration_damage_interval_seconds: self.dehydration_damage_interval_seconds,
+            movement_need_cost_percent: self.movement_need_cost_percent,
             movement_speed_multiplier: self.movement_speed_multiplier,
-            reserve_capacity: self.reserve_capacity,
-            fullness_slow_threshold: self.fullness_slow_threshold,
-            overfull_speed_multiplier: self.overfull_speed_multiplier,
-            overfull_damage_rate: self.overfull_damage_rate,
             gaze_yaw_limit_degrees: self.gaze_yaw_limit_degrees,
-            damage_multiplier: self.damage_multiplier,
-            episode_step_limit: self.max_steps,
+            episode_seconds: self.episode_seconds,
         }
+    }
+
+    /// Return the joint-step horizon derived from seconds and fixed-step time.
+    pub(super) fn max_steps(&self) -> u32 {
+        self.steps_for_seconds(self.episode_seconds)
+    }
+
+    /// Convert simulated seconds to the nearest positive fixed-step count.
+    pub(super) fn steps_for_seconds(&self, seconds: u16) -> u32 {
+        let duration_nanos = Duration::from_secs(u64::from(seconds)).as_nanos();
+        let step_nanos = Duration::from_secs_f32(self.time_step).as_nanos().max(1);
+        let rounded_steps = duration_nanos.saturating_add(step_nanos / 2) / step_nanos;
+        u32::try_from(rounded_steps).unwrap_or(u32::MAX).max(1)
     }
 
     /// Return the fixed possible-agent population.
@@ -892,7 +903,7 @@ pub(super) enum VisualObjectKind {
     /// Refillable drinking well.
     Well,
 
-    /// Solid square tree.
+    /// Solid circular tree.
     Tree,
 
     /// Solid rock.
@@ -924,14 +935,14 @@ pub(super) struct VisualAgent {
     /// Whether the agent can still act.
     pub(super) is_alive: bool,
 
-    /// Current normalized hunger reserve.
-    pub(super) hunger: f32,
+    /// Current satiation points.
+    pub(super) satiation: u8,
 
-    /// Current normalized thirst reserve.
-    pub(super) thirst: f32,
+    /// Current hydration points.
+    pub(super) hydration: u8,
 
     /// Current hit points.
-    pub(super) hit_points: f32,
+    pub(super) hit_points: u8,
 }
 
 /// One exact actor perception sector projected into world coordinates.
@@ -997,6 +1008,9 @@ pub(super) struct AgentEpisodeMetrics {
     /// Simulated lifetime through death or horizon.
     pub(super) lifetime_seconds: f32,
 
+    /// Total undiscounted reward earned during the episode.
+    pub(super) episode_return: f32,
+
     /// Compatible food or prey consumed.
     pub(super) food_eaten: u32,
 
@@ -1049,21 +1063,21 @@ mod tests {
             .expect("stage defaults are valid");
         let tuning = ExperimentTuning {
             perception_ray_count: PerceptionRayCount::try_from(8_u8).expect("eight rays fit"),
-            survival_reward_per_second: 0.5,
             food_reward: 4.0,
-            water_reward_per_unit: 2.0,
-            initial_health_fraction: 0.4,
-            initial_reserve_fraction: 0.6,
-            need_drain_multiplier: 1.5,
-            movement_need_drain: 0.75,
+            drink_reward: 2.0,
+            maximum_hit_points: 8,
+            initial_hit_points: 4,
+            maximum_satiation: 7,
+            initial_satiation: 3,
+            maximum_hydration: 6,
+            initial_hydration: 2,
+            need_loss_interval_seconds: 4,
+            starvation_damage_interval_seconds: 2,
+            dehydration_damage_interval_seconds: 1,
+            movement_need_cost_percent: 50,
             movement_speed_multiplier: 1.25,
-            reserve_capacity: 1.4,
-            fullness_slow_threshold: 0.8,
-            overfull_speed_multiplier: 0.4,
-            overfull_damage_rate: 20.0,
             gaze_yaw_limit_degrees: 25.0,
-            damage_multiplier: 2.0,
-            episode_step_limit: 300,
+            episode_seconds: 30,
         };
 
         config
@@ -1071,7 +1085,7 @@ mod tests {
             .expect("bounded tuning is valid");
 
         assert_eq!(config.experiment_tuning(), tuning);
-        assert_eq!(config.max_steps, 300);
+        assert_eq!(config.max_steps(), 300);
     }
 
     /// Unsafe or non-finite demo settings must not enter a simulation.
@@ -1081,7 +1095,7 @@ mod tests {
         let mut config = SimulationConfig::for_stage(CurriculumStage::Survival)
             .expect("stage defaults are valid");
         let invalid = ExperimentTuning {
-            damage_multiplier: f32::NAN,
+            maximum_hit_points: 0,
             ..ExperimentTuning::default()
         };
 

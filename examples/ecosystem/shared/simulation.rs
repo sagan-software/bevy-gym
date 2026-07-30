@@ -42,8 +42,11 @@ const WELL_SENSOR_RADIUS: f32 = 2.25;
 /// Forward distance from the survival bunny to both initial resource choices.
 const SURVIVAL_RESOURCE_FORWARD_DISTANCE: f32 = 5.5;
 
-/// Lateral distance separating the initial food and well routes.
+/// Lateral offset of the initial resource route from the body centerline.
 const SURVIVAL_RESOURCE_LATERAL_DISTANCE: f32 = 2.0;
+
+/// Distance that places tutorial food before the well on one learnable route.
+const SURVIVAL_FOOD_LEAD_DISTANCE: f32 = 2.4;
 
 /// Maximum distance represented by every semantic sector.
 const SIGHT_RANGE: f32 = 18.0;
@@ -66,38 +69,8 @@ const MAX_ANGULAR_SPEED: f32 = 3.0;
 /// Local forward acceleration at a unit action.
 const FORWARD_ACCELERATION: f32 = 28.0;
 
-/// Hunger reserve lost per simulated second.
-const HUNGER_DRAIN_RATE: f32 = 0.025;
-
-/// Thirst reserve lost per simulated second.
-const THIRST_DRAIN_RATE: f32 = 0.035;
-
-/// Need level below which health and hit-point damage begins.
-const NEED_DAMAGE_THRESHOLD: f32 = 0.25;
-
-/// Health fraction lost per fully depleted need-second.
-const HEALTH_DAMAGE_RATE: f32 = 0.12;
-
-/// Hit points lost per fully depleted need-second.
-const HIT_POINT_DAMAGE_RATE: f32 = 3.0;
-
-/// Health fraction restored per nourished second.
-const HEALTH_RECOVERY_RATE: f32 = 0.02;
-
-/// Hit points restored when a bunny eats food.
-const FOOD_HIT_POINT_RECOVERY: f32 = 4.0;
-
-/// Hunger reserve restored by one food item or predation event.
-const FOOD_HUNGER_RECOVERY: f32 = 0.7;
-
-/// Thirst reserve restored per full-rate drinking second.
-const DRINK_THIRST_RECOVERY: f32 = 0.8;
-
-/// Hit points lost per second inside at least one thorn sensor.
-const THORN_HIT_POINT_DAMAGE_RATE: f32 = 8.0;
-
-/// Health fraction lost per second inside thorn sensors.
-const THORN_HEALTH_DAMAGE_RATE: f32 = 0.08;
+/// Simulated thorn-contact seconds between one-point HP losses.
+const THORN_DAMAGE_INTERVAL_SECONDS: u16 = 1;
 
 /// Placement attempts before deterministic generation fails.
 const MAX_SPAWN_ATTEMPTS: usize = 256;
@@ -134,30 +107,50 @@ enum LifeState {
     Dead(DeathCause),
 }
 
-/// Hunger, thirst, health, and hit-point state.
-#[derive(Debug, Clone, Copy, PartialEq)]
+/// Discrete needs, HP, and their fixed-step clocks.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 struct Physiology {
-    /// Normalized food reserve.
-    hunger: f32,
+    /// Current satiation points.
+    satiation: u8,
 
-    /// Normalized water reserve.
-    thirst: f32,
+    /// Current hydration points.
+    hydration: u8,
 
-    /// Normalized general health condition.
-    health: f32,
+    /// Current HP.
+    hit_points: u8,
 
-    /// Hit points in `0..=100`.
-    hit_points: f32,
+    /// Steps elapsed toward the next need loss.
+    need_steps: u32,
+
+    /// Fractional extra need-clock progress caused by translation.
+    movement_need_progress: u16,
+
+    /// Steps elapsed at zero satiation.
+    starvation_steps: u32,
+
+    /// Steps elapsed at zero hydration.
+    dehydration_steps: u32,
+
+    /// Steps elapsed during continuous thorn contact.
+    thorn_steps: u32,
+
+    /// Steps elapsed during continuous well contact.
+    drinking_steps: u32,
 }
 
 impl Physiology {
-    /// Construct reset physiology from the configured starting fraction.
-    fn new(initial_health_fraction: f32, initial_reserve_fraction: f32) -> Self {
+    /// Construct reset physiology from validated integer settings.
+    const fn new(hit_points: u8, satiation: u8, hydration: u8) -> Self {
         Self {
-            hunger: initial_reserve_fraction,
-            thirst: initial_reserve_fraction,
-            health: initial_health_fraction,
-            hit_points: initial_health_fraction * 100.0,
+            satiation,
+            hydration,
+            hit_points,
+            need_steps: 0,
+            movement_need_progress: 0,
+            starvation_steps: 0,
+            dehydration_steps: 0,
+            thorn_steps: 0,
+            drinking_steps: 0,
         }
     }
 }
@@ -192,8 +185,8 @@ struct AgentMetrics {
     /// Need-weighted food events used only to calculate transition reward.
     food_reward_units: f32,
 
-    /// Need-weighted well-water units used only to calculate transition reward.
-    water_reward_units: f32,
+    /// Need-weighted drink events used only to calculate transition reward.
+    drink_reward_units: f32,
 
     /// Bunnies consumed by a fox.
     kills: u32,
@@ -201,7 +194,7 @@ struct AgentMetrics {
     /// Hit points lost to thorn contact.
     thorn_damage: f32,
 
-    /// Hit points lost to excess food or water.
+    /// Legacy metric retained at zero for artifact compatibility.
     overconsumption_damage: f32,
 
     /// Agent-agent overlap contacts observed across physics steps.
@@ -223,8 +216,8 @@ struct AgentBody {
     /// Current needs and damage buffers.
     physiology: Physiology,
 
-    /// Seconds elapsed since episode spawn.
-    age_seconds: f32,
+    /// Fixed simulation steps elapsed since episode spawn.
+    age_steps: u16,
 
     /// Conjugate eye yaw relative to the body heading.
     gaze_yaw: f32,
@@ -241,15 +234,16 @@ impl AgentBody {
     fn new(
         id: AgentId,
         species: Species,
-        initial_health_fraction: f32,
-        initial_reserve_fraction: f32,
+        initial_hit_points: u8,
+        initial_satiation: u8,
+        initial_hydration: u8,
     ) -> Self {
         Self {
             id,
             species,
             life: LifeState::Alive,
-            physiology: Physiology::new(initial_health_fraction, initial_reserve_fraction),
-            age_seconds: 0.0,
+            physiology: Physiology::new(initial_hit_points, initial_satiation, initial_hydration),
+            age_steps: 0,
             gaze_yaw: 0.0,
             rays: [RaySample::MISS; RAY_COUNT],
             metrics: AgentMetrics::default(),
@@ -259,6 +253,11 @@ impl AgentBody {
     /// Return whether the agent can still act and earn survival reward.
     const fn is_alive(&self) -> bool {
         matches!(self.life, LifeState::Alive)
+    }
+
+    /// Return exact simulated age at the configured fixed time step.
+    fn age_seconds(&self, time_step: f32) -> f32 {
+        f32::from(self.age_steps) * time_step
     }
 }
 
@@ -284,10 +283,10 @@ enum ObstacleKind {
     /// Circular solid tree.
     Tree,
 
-    /// Rectangular solid rock.
+    /// Circular solid rock.
     Rock,
 
-    /// Traversable damaging sensor.
+    /// Circular traversable damaging sensor.
     Thorn,
 }
 
@@ -454,7 +453,7 @@ impl Ecosystem {
     ) -> Result<JointStep, SimulationError> {
         let living_before = self.living_agents();
         let actions = validate_joint_actions(&living_before, actions)?;
-        if living_before.is_empty() || self.step >= self.config.max_steps {
+        if living_before.is_empty() || self.step >= self.config.max_steps() {
             return Err(SimulationError::EpisodeFinished);
         }
         let metrics_before = self.agent_metrics_by_id();
@@ -466,6 +465,7 @@ impl Ecosystem {
         // action semantics independent of entity query order.
         self.apply_actions(&actions);
         self.app.update();
+        self.advance_agent_ages();
 
         let contacts = self.collect_contacts();
         self.resolve_food(&contacts.food_winners);
@@ -477,7 +477,7 @@ impl Ecosystem {
 
         self.app.world_mut().run_schedule(PerceptionSchedule);
 
-        let horizon = self.step >= self.config.max_steps;
+        let horizon = self.step >= self.config.max_steps();
         let metrics_after = self.agent_metrics_by_id();
         let mut results = Vec::with_capacity(living_before.len());
         for id in living_before {
@@ -487,15 +487,28 @@ impl Ecosystem {
                     LifeState::Alive => (EpisodeStatus::Continuing, None),
                     LifeState::Dead(cause) => (EpisodeStatus::Terminated, Some(cause)),
                 };
+                let event_reward = transition_reward(
+                    &self.config,
+                    metrics_before.get(&id).copied().unwrap_or_default(),
+                    metrics_after.get(&id).copied().unwrap_or_default(),
+                );
+                let survival_reward = if status == EpisodeStatus::Continuing {
+                    0.0
+                } else {
+                    self.agent_survival_state(id)
+                        .map_or(0.0, |(age, hit_points)| {
+                            terminal_survival_reward(
+                                age,
+                                hit_points,
+                                self.config.maximum_hit_points,
+                            )
+                        })
+                };
                 results.push(AgentStep {
                     id,
                     species,
                     observation,
-                    reward: transition_reward(
-                        &self.config,
-                        metrics_before.get(&id).copied().unwrap_or_default(),
-                        metrics_after.get(&id).copied().unwrap_or_default(),
-                    ),
+                    reward: event_reward + f64::from(survival_reward),
                     status,
                     death_cause,
                 });
@@ -509,6 +522,17 @@ impl Ecosystem {
             global_state: self.global_state(),
             is_done,
         })
+    }
+
+    /// Count the completed fixed step for every agent alive at its start.
+    fn advance_agent_ages(&mut self) {
+        let world = self.app.world_mut();
+        let mut query = world.query::<&mut AgentBody>();
+        for mut agent in query.iter_mut(world) {
+            if agent.is_alive() {
+                agent.age_steps = agent.age_steps.saturating_add(1);
+            }
+        }
     }
 
     /// Return the compact current world counts used by smoke and HUD paths.
@@ -548,8 +572,8 @@ impl Ecosystem {
                 heading,
                 gaze_yaw: agent.gaze_yaw,
                 is_alive: agent.is_alive(),
-                hunger: agent.physiology.hunger,
-                thirst: agent.physiology.thirst,
+                satiation: agent.physiology.satiation,
+                hydration: agent.physiology.hydration,
                 hit_points: agent.physiology.hit_points,
             });
             if agent.is_alive() {
@@ -620,6 +644,7 @@ impl Ecosystem {
 
     /// Return final behavior evidence for every possible agent slot.
     pub(super) fn episode_metrics(&mut self) -> Vec<AgentEpisodeMetrics> {
+        let config = &self.config;
         let world = self.app.world_mut();
         let mut query = world.query::<&AgentBody>();
         let mut metrics = query
@@ -627,7 +652,13 @@ impl Ecosystem {
             .map(|agent| AgentEpisodeMetrics {
                 id: agent.id,
                 species: agent.species,
-                lifetime_seconds: agent.age_seconds,
+                lifetime_seconds: agent.age_seconds(config.time_step),
+                episode_return: resource_reward(config, AgentMetrics::default(), agent.metrics)
+                    + terminal_survival_reward(
+                        agent.age_seconds(config.time_step),
+                        agent.physiology.hit_points,
+                        config.maximum_hit_points,
+                    ),
                 food_eaten: agent.metrics.food_eaten,
                 water_consumed: agent.metrics.water_consumed,
                 kills: agent.metrics.kills,
@@ -706,7 +737,7 @@ impl Ecosystem {
         let resource_center = bunny_position + forward * SURVIVAL_RESOURCE_FORWARD_DISTANCE;
         let route_offset = lateral * SURVIVAL_RESOURCE_LATERAL_DISTANCE;
         let well_position = resource_center + route_offset;
-        let first_food_position = resource_center - route_offset;
+        let first_food_position = well_position - forward * SURVIVAL_FOOD_LEAD_DISTANCE;
         self.spawn_well(well_position);
         self.spawn_agent_facing(AgentId(0), Species::Bunny, bunny_position, route_angle);
         self.spawn_food_at(first_food_position);
@@ -762,7 +793,7 @@ impl Ecosystem {
             RigidBody::Static,
             Position(position),
             Transform::from_translation(position.extend(0.0)),
-            Collider::rectangle(WELL_RADIUS * 2.0, WELL_RADIUS * 2.0),
+            Collider::circle(WELL_RADIUS),
             solid_layers(),
             SemanticCollider(PerceptKind::Well),
             SpawnBlocker(WELL_SENSOR_RADIUS),
@@ -771,11 +802,10 @@ impl Ecosystem {
             RigidBody::Static,
             Position(position),
             Transform::from_translation(position.extend(0.0)),
-            Collider::rectangle(WELL_SENSOR_RADIUS * 2.0, WELL_SENSOR_RADIUS * 2.0),
+            Collider::circle(WELL_SENSOR_RADIUS),
             Sensor,
             sensor_layers(),
             CollidingEntities::default(),
-            SemanticCollider(PerceptKind::Well),
             WellSensor,
         ));
     }
@@ -794,8 +824,9 @@ impl Ecosystem {
             AgentBody::new(
                 id,
                 species,
-                self.config.initial_health_fraction,
-                self.config.initial_reserve_fraction,
+                self.config.initial_hit_points,
+                self.config.initial_satiation,
+                self.config.initial_hydration,
             ),
             RigidBody::Dynamic,
             Position(position),
@@ -805,7 +836,7 @@ impl Ecosystem {
                 rotation: Quat::from_rotation_z(facing),
                 ..default()
             },
-            Collider::rectangle(AGENT_SIZE.x, AGENT_SIZE.y),
+            Collider::ellipse(AGENT_SIZE.x * 0.5, AGENT_SIZE.y * 0.5),
             agent_layers(),
             LinearVelocity::ZERO,
             AngularVelocity(0.0),
@@ -833,7 +864,7 @@ impl Ecosystem {
         } else {
             ObstacleKind::Rock
         };
-        let collider = Collider::rectangle(radius * 2.0, radius * 2.0);
+        let collider = Collider::circle(radius);
         self.app.world_mut().spawn((
             RigidBody::Static,
             Position(position),
@@ -853,7 +884,7 @@ impl Ecosystem {
             RigidBody::Static,
             Position(position),
             Transform::from_translation(position.extend(0.0)),
-            Collider::rectangle(radius * 2.0, radius * 2.0),
+            Collider::circle(radius),
             Sensor,
             sensor_layers(),
             CollidingEntities::default(),
@@ -896,7 +927,7 @@ impl Ecosystem {
             RigidBody::Static,
             Position(position),
             Transform::from_translation(position.extend(0.0)),
-            Collider::rectangle(FOOD_RADIUS * 2.0, FOOD_RADIUS * 2.0),
+            Collider::circle(FOOD_RADIUS),
             Sensor,
             sensor_layers(),
             CollidingEntities::default(),
@@ -974,13 +1005,7 @@ impl Ecosystem {
                 continue;
             }
             if let Some(action) = actions.get(&agent.id) {
-                let fullness = agent.physiology.hunger.max(agent.physiology.thirst);
-                let fullness_speed = fullness_speed_multiplier(
-                    fullness,
-                    self.config.fullness_slow_threshold,
-                    self.config.overfull_speed_multiplier,
-                );
-                let movement_scale = self.config.movement_speed_multiplier * fullness_speed;
+                let movement_scale = self.config.movement_speed_multiplier;
                 let forward_throttle = action.forward.mul_add(0.5, 0.5).clamp(0.0, 1.0);
                 acceleration.0 = Vec2::X * forward_throttle * FORWARD_ACCELERATION * movement_scale;
                 max_speed.0 = MAX_LINEAR_SPEED * movement_scale;
@@ -1126,17 +1151,18 @@ impl Ecosystem {
     /// Consume each contested food entity exactly once.
     fn resolve_food(&mut self, winners: &[(Entity, AgentId)]) {
         let entity_by_id = self.agent_entities();
+        let maximum_satiation = self.config.maximum_satiation;
         for (food, winner) in winners {
             if let Some(agent_entity) = entity_by_id.get(winner).copied() {
                 if let Some(mut agent) = self.app.world_mut().get_mut::<AgentBody>(agent_entity) {
                     if agent.is_alive() && agent.species == Species::Bunny {
-                        let reward_multiplier = need_reward_multiplier(agent.physiology.hunger);
-                        agent.physiology.hunger = (agent.physiology.hunger + FOOD_HUNGER_RECOVERY)
-                            .min(self.config.reserve_capacity);
-                        if agent.physiology.hunger <= 1.0 {
-                            agent.physiology.hit_points =
-                                (agent.physiology.hit_points + FOOD_HIT_POINT_RECOVERY).min(100.0);
-                        }
+                        let reward_multiplier =
+                            need_reward_multiplier(agent.physiology.satiation, maximum_satiation);
+                        agent.physiology.satiation = agent
+                            .physiology
+                            .satiation
+                            .saturating_add(1)
+                            .min(maximum_satiation);
                         agent.metrics.food_eaten = agent.metrics.food_eaten.saturating_add(1);
                         agent.metrics.food_reward_units += reward_multiplier;
                     }
@@ -1148,44 +1174,49 @@ impl Ecosystem {
 
     /// Divide scarce well water fairly without withdrawing more than agents absorb.
     fn resolve_drinking(&mut self, drinkers: &BTreeSet<AgentId>) {
-        if drinkers.is_empty() {
+        let entity_by_id = self.agent_entities();
+        let requested = self.config.well_drink_rate;
+        let maximum_hydration = self.config.maximum_hydration;
+        let drinking_interval = self.config.steps_for_seconds(1);
+        let completed_drinks = entity_by_id
+            .iter()
+            .filter_map(|(id, entity)| {
+                let mut agent = self.app.world_mut().get_mut::<AgentBody>(*entity)?;
+                let active = agent.is_alive()
+                    && drinkers.contains(id)
+                    && agent.physiology.hydration < maximum_hydration;
+                damage_clock_due(
+                    active,
+                    &mut agent.physiology.drinking_steps,
+                    drinking_interval,
+                )
+                .then_some(*id)
+            })
+            .collect::<BTreeSet<_>>();
+        if completed_drinks.is_empty() {
             return;
         }
-        let entity_by_id = self.agent_entities();
-        let requested = self.config.well_drink_rate * self.config.time_step;
-        let mut demands = drinkers
-            .iter()
-            .filter_map(|id| {
-                let entity = entity_by_id.get(id).copied()?;
-                let agent = self.app.world().get::<AgentBody>(entity)?;
-                if !agent.is_alive() {
-                    return None;
-                }
-                let absorbable = (self.config.reserve_capacity - agent.physiology.thirst).max(0.0)
-                    * self.config.well_drink_rate
-                    / DRINK_THIRST_RECOVERY;
-                Some((*id, requested.min(absorbable)))
-            })
-            .collect::<Vec<_>>();
         let available = self.app.world().resource::<WellState>().water;
-        let allocations = fair_water_allocations(&mut demands, available);
-        let withdrawn = allocations.iter().map(|(_, amount)| amount).sum::<f32>();
+        let mut candidates = completed_drinks.into_iter().collect::<Vec<_>>();
+        let completed_drink_index = self.step / drinking_interval;
+        let rotation = usize::try_from(completed_drink_index).unwrap_or(usize::MAX);
+        let recipients = complete_drink_recipients(&mut candidates, available, requested, rotation);
+        let withdrawn = requested * recipients.len() as f32;
         self.app.world_mut().resource_mut::<WellState>().water = (available - withdrawn).max(0.0);
 
-        // Apply only the conserved allocation so metrics equal useful withdrawal.
-        for (id, allocation) in allocations {
-            if allocation <= 0.0 {
-                continue;
-            }
+        // A discrete hydration point requires one complete conserved drink.
+        for id in recipients {
             if let Some(entity) = entity_by_id.get(&id).copied() {
                 if let Some(mut agent) = self.app.world_mut().get_mut::<AgentBody>(entity) {
-                    let reward_multiplier = need_reward_multiplier(agent.physiology.thirst);
-                    let recovery = allocation / self.config.well_drink_rate * DRINK_THIRST_RECOVERY;
-                    agent.physiology.thirst =
-                        (agent.physiology.thirst + recovery).min(self.config.reserve_capacity);
-                    agent.metrics.water_consumed += allocation;
-                    agent.metrics.water_reward_units =
-                        allocation.mul_add(reward_multiplier, agent.metrics.water_reward_units);
+                    let reward_multiplier =
+                        need_reward_multiplier(agent.physiology.hydration, maximum_hydration);
+                    agent.physiology.hydration = agent
+                        .physiology
+                        .hydration
+                        .saturating_add(1)
+                        .min(maximum_hydration);
+                    agent.metrics.water_consumed += requested;
+                    agent.metrics.drink_reward_units += reward_multiplier;
                 }
             }
         }
@@ -1211,18 +1242,19 @@ impl Ecosystem {
             }
             if let Some(mut bunny) = self.app.world_mut().get_mut::<AgentBody>(bunny_entity) {
                 bunny.life = LifeState::Dead(DeathCause::Predation);
-                bunny.physiology.health = 0.0;
-                bunny.physiology.hit_points = 0.0;
+                bunny.physiology.hit_points = 0;
             }
             if let Some(mut fox) = self.app.world_mut().get_mut::<AgentBody>(fox_entity) {
                 if fox.is_alive() {
-                    let reward_multiplier = need_reward_multiplier(fox.physiology.hunger);
-                    fox.physiology.hunger = (fox.physiology.hunger + FOOD_HUNGER_RECOVERY)
-                        .min(self.config.reserve_capacity);
-                    if fox.physiology.hunger <= 1.0 {
-                        fox.physiology.hit_points =
-                            (fox.physiology.hit_points + FOOD_HIT_POINT_RECOVERY).min(100.0);
-                    }
+                    let reward_multiplier = need_reward_multiplier(
+                        fox.physiology.satiation,
+                        self.config.maximum_satiation,
+                    );
+                    fox.physiology.satiation = fox
+                        .physiology
+                        .satiation
+                        .saturating_add(1)
+                        .min(self.config.maximum_satiation);
                     fox.metrics.food_eaten = fox.metrics.food_eaten.saturating_add(1);
                     fox.metrics.food_reward_units += reward_multiplier;
                     fox.metrics.kills = fox.metrics.kills.saturating_add(1);
@@ -1233,8 +1265,16 @@ impl Ecosystem {
 
     /// Advance needs and apply starvation, dehydration, and thorn damage.
     fn resolve_physiology(&mut self, thorn_agents: &BTreeSet<AgentId>) {
-        let time_step = self.config.time_step;
-        let damage_time_step = time_step * self.config.damage_multiplier;
+        let need_interval = self
+            .config
+            .steps_for_seconds(self.config.need_loss_interval_seconds);
+        let starvation_interval = self
+            .config
+            .steps_for_seconds(self.config.starvation_damage_interval_seconds);
+        let dehydration_interval = self
+            .config
+            .steps_for_seconds(self.config.dehydration_damage_interval_seconds);
+        let thorn_interval = self.config.steps_for_seconds(THORN_DAMAGE_INTERVAL_SECONDS);
         let extent = self.config.map_half_extent + 2.0;
         let world = self.app.world_mut();
         let mut query = world.query::<(&mut AgentBody, &Position, Option<&LinearVelocity>)>();
@@ -1242,92 +1282,69 @@ impl Ecosystem {
             if !agent.is_alive() {
                 continue;
             }
-            agent.age_seconds += time_step;
-            let translation_fraction = velocity
-                .map_or(0.0, |linear| {
-                    linear.length() / (MAX_LINEAR_SPEED * self.config.movement_speed_multiplier)
-                })
-                .clamp(0.0, 1.0);
-            let movement_drain = self
-                .config
-                .movement_need_drain
-                .mul_add(translation_fraction, 1.0);
-            let need_time_step = time_step * self.config.need_drain_multiplier * movement_drain;
-            agent.physiology.hunger = HUNGER_DRAIN_RATE
-                .mul_add(-need_time_step, agent.physiology.hunger)
-                .max(0.0);
-            agent.physiology.thirst = THIRST_DRAIN_RATE
-                .mul_add(-need_time_step, agent.physiology.thirst)
-                .max(0.0);
+            let was_starving = agent.physiology.satiation == 0;
+            let was_dehydrated = agent.physiology.hydration == 0;
+            // Integer percentage units retain a small movement cost without
+            // charging rotation or eye motion as translation.
+            let is_translating = velocity.is_some_and(|linear| linear.length_squared() > 1.0e-4);
+            if is_translating {
+                agent.physiology.movement_need_progress = agent
+                    .physiology
+                    .movement_need_progress
+                    .saturating_add(u16::from(self.config.movement_need_cost_percent));
+            }
+            let extra_need_steps = agent.physiology.movement_need_progress / 100;
+            agent.physiology.movement_need_progress %= 100;
+            agent.physiology.need_steps = agent
+                .physiology
+                .need_steps
+                .saturating_add(1 + u32::from(extra_need_steps));
+            while agent.physiology.need_steps >= need_interval {
+                agent.physiology.need_steps -= need_interval;
+                agent.physiology.satiation = agent.physiology.satiation.saturating_sub(1);
+                agent.physiology.hydration = agent.physiology.hydration.saturating_sub(1);
+            }
 
-            let starvation = need_deficit(agent.physiology.hunger);
-            let dehydration = need_deficit(agent.physiology.thirst);
-            let deprivation = starvation + dehydration;
-            let excess = overfull_fraction(
-                agent.physiology.hunger.max(agent.physiology.thirst),
-                self.config.reserve_capacity,
+            let starvation_due = damage_clock_due(
+                was_starving,
+                &mut agent.physiology.starvation_steps,
+                starvation_interval,
             );
-            let overconsumption_damage = excess * self.config.overfull_damage_rate * time_step;
-            let mut lethal_cause = None;
-            if overconsumption_damage > 0.0 {
-                let hit_points_before = agent.physiology.hit_points;
-                agent.physiology.hit_points =
-                    (agent.physiology.hit_points - overconsumption_damage).max(0.0);
-                agent.physiology.health =
-                    (agent.physiology.health - overconsumption_damage / 100.0).max(0.0);
-                agent.metrics.overconsumption_damage += overconsumption_damage;
-                if hit_points_before > 0.0 && agent.physiology.hit_points <= 0.0 {
-                    lethal_cause = Some(DeathCause::Overconsumption);
-                }
-            }
-            if deprivation > 0.0 {
-                let hit_points_before = agent.physiology.hit_points;
-                agent.physiology.health = (deprivation * HEALTH_DAMAGE_RATE)
-                    .mul_add(-damage_time_step, agent.physiology.health)
-                    .max(0.0);
-                agent.physiology.hit_points = (deprivation * HIT_POINT_DAMAGE_RATE)
-                    .mul_add(-damage_time_step, agent.physiology.hit_points)
-                    .max(0.0);
-                if lethal_cause.is_none()
-                    && hit_points_before > 0.0
-                    && agent.physiology.hit_points <= 0.0
-                {
-                    lethal_cause = Some(if starvation > 0.0 && dehydration > 0.0 {
-                        DeathCause::Deprivation
-                    } else if starvation > 0.0 {
-                        DeathCause::Starvation
-                    } else {
-                        DeathCause::Dehydration
-                    });
-                }
-            } else if overconsumption_damage <= 0.0 {
-                agent.physiology.health = HEALTH_RECOVERY_RATE
-                    .mul_add(time_step, agent.physiology.health)
-                    .min(1.0);
+            let dehydration_due = damage_clock_due(
+                was_dehydrated,
+                &mut agent.physiology.dehydration_steps,
+                dehydration_interval,
+            );
+            let thorn_due = damage_clock_due(
+                thorn_agents.contains(&agent.id),
+                &mut agent.physiology.thorn_steps,
+                thorn_interval,
+            );
+            let deprivation_damage = u8::from(starvation_due) + u8::from(dehydration_due);
+            let total_damage = deprivation_damage.saturating_add(u8::from(thorn_due));
+            agent.physiology.hit_points = agent.physiology.hit_points.saturating_sub(total_damage);
+            if thorn_due {
+                agent.metrics.thorn_damage += 1.0;
             }
 
-            if thorn_agents.contains(&agent.id) {
-                let hit_points_before = agent.physiology.hit_points;
-                let hit_point_damage = THORN_HIT_POINT_DAMAGE_RATE * damage_time_step;
-                agent.physiology.health = THORN_HEALTH_DAMAGE_RATE
-                    .mul_add(-damage_time_step, agent.physiology.health)
-                    .max(0.0);
-                agent.physiology.hit_points =
-                    (agent.physiology.hit_points - hit_point_damage).max(0.0);
-                agent.metrics.thorn_damage += hit_point_damage;
-                if lethal_cause.is_none()
-                    && hit_points_before > 0.0
-                    && agent.physiology.hit_points <= 0.0
-                {
-                    lethal_cause = Some(DeathCause::Thorns);
-                }
-            }
+            let lethal_cause = if thorn_due && (starvation_due || dehydration_due) {
+                Some(DeathCause::CombinedDamage)
+            } else if starvation_due && dehydration_due {
+                Some(DeathCause::Deprivation)
+            } else if starvation_due {
+                Some(DeathCause::Starvation)
+            } else if dehydration_due {
+                Some(DeathCause::Dehydration)
+            } else if thorn_due {
+                Some(DeathCause::Thorns)
+            } else {
+                None
+            };
 
             if !position.0.is_finite() || position.x.abs() > extent || position.y.abs() > extent {
                 agent.life = LifeState::Dead(DeathCause::InvalidPhysics);
-                agent.physiology.health = 0.0;
-                agent.physiology.hit_points = 0.0;
-            } else if agent.physiology.hit_points <= 0.0 {
+                agent.physiology.hit_points = 0;
+            } else if agent.physiology.hit_points == 0 {
                 let cause = lethal_cause.unwrap_or(DeathCause::Deprivation);
                 agent.life = LifeState::Dead(cause);
             }
@@ -1380,13 +1397,27 @@ impl Ecosystem {
             .collect()
     }
 
+    /// Return elapsed seconds and HP for one terminal reward calculation.
+    fn agent_survival_state(&mut self, id: AgentId) -> Option<(f32, u8)> {
+        let time_step = self.config.time_step;
+        let world = self.app.world_mut();
+        let mut query = world.query::<&AgentBody>();
+        query
+            .iter(world)
+            .find(|agent| agent.id == id)
+            .map(|agent| (agent.age_seconds(time_step), agent.physiology.hit_points))
+    }
+
     /// Return one agent's local output after interaction resolution.
     fn agent_output(&mut self, id: AgentId) -> Option<(Species, LocalObservation, LifeState)> {
-        let max_age = self.config.max_steps as f32 * self.config.time_step;
+        let max_age = f32::from(self.config.episode_seconds);
         let stage = self.config.stage;
         let max_linear_speed = MAX_LINEAR_SPEED * self.config.movement_speed_multiplier;
         let gaze_yaw_limit = self.config.gaze_yaw_limit_degrees.to_radians();
-        let reserve_capacity = self.config.reserve_capacity;
+        let maximum_satiation = self.config.maximum_satiation;
+        let maximum_hydration = self.config.maximum_hydration;
+        let maximum_hit_points = self.config.maximum_hit_points;
+        let time_step = self.config.time_step;
         let world = self.app.world_mut();
         let mut query = world.query::<(
             &AgentBody,
@@ -1405,10 +1436,13 @@ impl Ecosystem {
                     rotation.copied().unwrap_or_default(),
                     velocity.copied().unwrap_or_default(),
                     angular_velocity.copied().unwrap_or_default(),
+                    agent.age_seconds(time_step),
                     max_age,
                     max_linear_speed,
                     gaze_yaw_limit,
-                    reserve_capacity,
+                    maximum_satiation,
+                    maximum_hydration,
+                    maximum_hit_points,
                     stage,
                 );
                 (agent.species, observation, agent.life)
@@ -1420,7 +1454,9 @@ impl Ecosystem {
         let mut state = [0.0; super::domain::GLOBAL_STATE_SIZE];
         let extent = self.config.map_half_extent;
         let max_linear_speed = MAX_LINEAR_SPEED * self.config.movement_speed_multiplier;
-        let reserve_capacity = self.config.reserve_capacity;
+        let maximum_satiation = self.config.maximum_satiation;
+        let maximum_hydration = self.config.maximum_hydration;
+        let maximum_hit_points = self.config.maximum_hit_points;
         let world = self.app.world_mut();
 
         let mut agent_query = world.query::<(&AgentBody, &Position, Option<&LinearVelocity>)>();
@@ -1456,15 +1492,17 @@ impl Ecosystem {
             write_feature(
                 &mut state,
                 start + 7,
-                agent.physiology.hunger / reserve_capacity,
+                f32::from(agent.physiology.satiation) / f32::from(maximum_satiation),
             );
             write_feature(
                 &mut state,
                 start + 8,
-                agent.physiology.thirst / reserve_capacity,
+                f32::from(agent.physiology.hydration) / f32::from(maximum_hydration),
             );
-            write_feature(&mut state, start + 9, agent.physiology.health);
-            write_feature(&mut state, start + 10, agent.physiology.hit_points / 100.0);
+            let health_fraction =
+                f32::from(agent.physiology.hit_points) / f32::from(maximum_hit_points);
+            write_feature(&mut state, start + 9, health_fraction);
+            write_feature(&mut state, start + 10, health_fraction);
         }
 
         let well_start = MAX_AGENTS * GLOBAL_AGENT_FEATURES;
@@ -1529,7 +1567,7 @@ impl Ecosystem {
         write_feature(
             &mut state,
             time_start,
-            1.0 - self.step as f32 / self.config.max_steps as f32,
+            1.0 - self.step as f32 / self.config.max_steps() as f32,
         );
         write_feature(&mut state, time_start + 1 + self.config.stage.index(), 1.0);
         state
@@ -1618,23 +1656,46 @@ fn rotated_priority(id: AgentId, base: usize, count: usize, rotation: usize) -> 
     (local_identity + count - rotation % count) % count
 }
 
-/// Compute one configured transition reward from need-weighted event deltas.
+/// Compute one configured transition reward from need-weighted resource events.
 fn transition_reward(config: &SimulationConfig, before: AgentMetrics, after: AgentMetrics) -> f64 {
+    f64::from(resource_reward(config, before, after))
+}
+
+/// Compute resource-event reward while preserving the trainer's scalar boundary.
+fn resource_reward(config: &SimulationConfig, before: AgentMetrics, after: AgentMetrics) -> f32 {
     // Monotonic weighted units prevent reset or diagnostic mutations from
     // manufacturing negative reward events.
     let food_reward_units = (after.food_reward_units - before.food_reward_units).max(0.0);
-    let water_reward_units = (after.water_reward_units - before.water_reward_units).max(0.0);
-    let survival_and_food = config
-        .survival_reward_per_second
-        .mul_add(config.time_step, config.food_reward * food_reward_units);
-    let reward = config
-        .water_reward_per_unit
-        .mul_add(water_reward_units, survival_and_food);
-    f64::from(reward)
+    let drink_reward_units = (after.drink_reward_units - before.drink_reward_units).max(0.0);
+    let food_reward = config.food_reward * food_reward_units;
+    config.drink_reward.mul_add(drink_reward_units, food_reward)
 }
 
-/// Return the reward multiplier for consuming a resource at one reserve level.
-fn need_reward_multiplier(reserve: f32) -> f32 {
+/// Return terminal seconds weighted by the remaining HP fraction.
+fn terminal_survival_reward(age_seconds: f32, hit_points: u8, maximum_hit_points: u8) -> f32 {
+    if maximum_hit_points == 0 {
+        return 0.0;
+    }
+    age_seconds * f32::from(hit_points) / f32::from(maximum_hit_points)
+}
+
+/// Advance or reset one deprivation clock and report one due damage point.
+const fn damage_clock_due(active: bool, elapsed_steps: &mut u32, interval: u32) -> bool {
+    if !active {
+        *elapsed_steps = 0;
+        return false;
+    }
+    *elapsed_steps = elapsed_steps.saturating_add(1);
+    if *elapsed_steps < interval {
+        return false;
+    }
+    *elapsed_steps -= interval;
+    true
+}
+
+/// Return the reward multiplier for consuming a resource at one need level.
+fn need_reward_multiplier(points: u8, maximum: u8) -> f32 {
+    let reserve = f32::from(points) / f32::from(maximum.max(1));
     if reserve <= 0.10 {
         1.25
     } else if reserve <= 0.50 {
@@ -1648,44 +1709,29 @@ fn need_reward_multiplier(reserve: f32) -> f32 {
     }
 }
 
-/// Return normalized need deficit below the damage threshold.
-fn need_deficit(value: f32) -> f32 {
-    ((NEED_DAMAGE_THRESHOLD - value) / NEED_DAMAGE_THRESHOLD).clamp(0.0, 1.0)
-}
-
-/// Return the movement multiplier for one current reserve level.
-fn fullness_speed_multiplier(fullness: f32, threshold: f32, minimum: f32) -> f32 {
-    if fullness <= threshold {
-        return 1.0;
+/// Select rotating recipients that can each withdraw one complete drink.
+fn complete_drink_recipients(
+    candidates: &mut [AgentId],
+    available: f32,
+    requested: f32,
+    rotation: usize,
+) -> Vec<AgentId> {
+    if candidates.is_empty() || !requested.is_finite() || requested <= 0.0 {
+        return Vec::new();
     }
-    let discomfort = ((fullness - threshold) / (1.0 - threshold)).clamp(0.0, 1.0);
-    (1.0 - minimum).mul_add(-discomfort, 1.0)
-}
-
-/// Return normalized excess above comfortable fullness.
-fn overfull_fraction(fullness: f32, capacity: f32) -> f32 {
-    ((fullness - 1.0) / (capacity - 1.0)).clamp(0.0, 1.0)
-}
-
-/// Max-min fair allocations capped by each drinker's absorbable demand.
-fn fair_water_allocations(demands: &mut [(AgentId, f32)], available: f32) -> Vec<(AgentId, f32)> {
-    demands.sort_by(|left, right| {
-        left.1
-            .total_cmp(&right.1)
-            .then_with(|| left.0.cmp(&right.0))
-    });
+    candidates.sort_unstable();
+    let candidate_count = candidates.len();
+    candidates.rotate_left(rotation % candidate_count);
     let mut remaining = available.max(0.0);
-    let count = demands.len();
-    demands
-        .iter()
-        .enumerate()
-        .map(|(index, (id, demand))| {
-            let equal_share = remaining / (count - index) as f32;
-            let allocation = demand.max(0.0).min(equal_share);
-            remaining -= allocation;
-            (*id, allocation)
-        })
-        .collect()
+    let mut recipients = Vec::with_capacity(candidate_count);
+    for id in candidates.iter().copied() {
+        if remaining + f32::EPSILON < requested {
+            break;
+        }
+        remaining -= requested;
+        recipients.push(id);
+    }
+    recipients
 }
 
 /// Encode one decentralized actor observation without global coordinates.
@@ -1695,30 +1741,30 @@ fn encode_local_observation(
     rotation: Rotation,
     velocity: LinearVelocity,
     angular_velocity: AngularVelocity,
+    age_seconds: f32,
     max_age: f32,
     max_linear_speed: f32,
     gaze_yaw_limit: f32,
-    reserve_capacity: f32,
+    maximum_satiation: u8,
+    maximum_hydration: u8,
+    maximum_hit_points: u8,
     stage: CurriculumStage,
 ) -> LocalObservation {
     let mut observation = [0.0; LOCAL_OBSERVATION_SIZE];
     write_feature(
         &mut observation,
         0,
-        agent.physiology.hunger / reserve_capacity,
+        f32::from(agent.physiology.satiation) / f32::from(maximum_satiation),
     );
     write_feature(
         &mut observation,
         1,
-        agent.physiology.thirst / reserve_capacity,
+        f32::from(agent.physiology.hydration) / f32::from(maximum_hydration),
     );
-    write_feature(&mut observation, 2, agent.physiology.health);
-    write_feature(&mut observation, 3, agent.physiology.hit_points / 100.0);
-    write_feature(
-        &mut observation,
-        4,
-        (agent.age_seconds / max_age).clamp(0.0, 1.0),
-    );
+    let health_fraction = f32::from(agent.physiology.hit_points) / f32::from(maximum_hit_points);
+    write_feature(&mut observation, 2, health_fraction);
+    write_feature(&mut observation, 3, health_fraction);
+    write_feature(&mut observation, 4, (age_seconds / max_age).clamp(0.0, 1.0));
     write_feature(
         &mut observation,
         5,
@@ -1812,7 +1858,14 @@ fn update_perceptions(
             let sample = Dir2::new(direction)
                 .ok()
                 .and_then(|direction| {
-                    spatial_query.cast_ray(origin, direction, SIGHT_RANGE, false, &filter)
+                    spatial_query.cast_ray_predicate(
+                        origin,
+                        direction,
+                        SIGHT_RANGE,
+                        false,
+                        &filter,
+                        &|candidate| semantics.contains(candidate),
+                    )
                 })
                 .and_then(|hit| {
                     semantics
@@ -1847,7 +1900,14 @@ fn update_perceptions(
                     continue;
                 };
                 let visible = spatial_query
-                    .cast_ray(origin, direction, distance + 0.01, false, &filter)
+                    .cast_ray_predicate(
+                        origin,
+                        direction,
+                        distance + 0.01,
+                        false,
+                        &filter,
+                        &|candidate| semantics.contains(candidate),
+                    )
                     .is_some_and(|hit| hit.entity == target);
                 if !visible {
                     continue;
@@ -1914,6 +1974,140 @@ mod tests {
 
     use super::*;
 
+    /// Survival defaults must use the requested small integer physiology profile.
+    #[test]
+    fn survival_defaults_use_integer_points_and_seconds() {
+        let config = SimulationConfig::for_stage(CurriculumStage::Survival)
+            .expect("survival defaults are valid");
+
+        assert_eq!(config.maximum_hit_points, 5);
+        assert_eq!(config.initial_hit_points, 5);
+        assert_eq!(config.maximum_satiation, 5);
+        assert_eq!(config.initial_satiation, 3);
+        assert_eq!(config.maximum_hydration, 5);
+        assert_eq!(config.initial_hydration, 3);
+        assert_eq!(config.need_loss_interval_seconds, 5);
+        assert_eq!(config.starvation_damage_interval_seconds, 3);
+        assert_eq!(config.dehydration_damage_interval_seconds, 2);
+        assert_eq!(config.episode_seconds, 20);
+    }
+
+    /// Terminal survival reward must weight elapsed seconds by remaining HP.
+    #[test]
+    fn terminal_survival_reward_weights_seconds_by_health() {
+        assert!((terminal_survival_reward(20.0, 9, 10) - 18.0).abs() < f32::EPSILON);
+        assert!((terminal_survival_reward(7.5, 4, 5) - 6.0).abs() < f32::EPSILON);
+        assert_eq!(terminal_survival_reward(20.0, 0, 5), 0.0);
+    }
+
+    /// The horizon transition and episode metrics must expose the same return.
+    #[test]
+    fn horizon_emits_health_weighted_return_once() {
+        let mut config = SimulationConfig::for_stage(CurriculumStage::Survival)
+            .expect("survival defaults are valid");
+        config.episode_seconds = 5;
+        config.initial_hit_points = 4;
+        let expected_steps = config.max_steps();
+        let mut ecosystem = Ecosystem::new(config, 73).expect("ecosystem initializes");
+        let id = ecosystem.living_agents()[0];
+        let idle = LocomotionAction::new(-1.0, 0.0, 0.0).expect("idle action is valid");
+        let mut rewards = Vec::new();
+        let mut final_status = EpisodeStatus::Continuing;
+        for _ in 0..expected_steps {
+            let step = ecosystem.step(&[(id, idle)]).expect("world advances");
+            rewards.push(step.agents[0].reward);
+            final_status = step.agents[0].status;
+        }
+
+        assert!(rewards[..rewards.len() - 1]
+            .iter()
+            .all(|reward| reward.abs() < f64::EPSILON));
+        assert!((rewards[rewards.len() - 1] - 4.0).abs() < f64::EPSILON);
+        assert_eq!(final_status, EpisodeStatus::Truncated);
+        let metrics = ecosystem.episode_metrics();
+        assert!((metrics[0].episode_return - 4.0).abs() < f32::EPSILON);
+    }
+
+    /// The invisible drinking radius must not be encoded as visible water.
+    #[test]
+    fn well_drinking_sensor_is_nonsemantic_and_round() {
+        let config = SimulationConfig::for_stage(CurriculumStage::Survival)
+            .expect("survival defaults are valid");
+        let mut ecosystem = Ecosystem::new(config, 91).expect("ecosystem initializes");
+        let world = ecosystem.app.world_mut();
+        let mut query =
+            world.query_filtered::<(&Collider, Has<SemanticCollider>), With<WellSensor>>();
+        let (collider, has_semantic) = query.single(world).expect("one drinking sensor exists");
+
+        assert!(!has_semantic);
+        assert!(collider.shape().as_ball().is_some());
+    }
+
+    /// A drinking sensor must not hide semantic targets beyond its boundary.
+    #[test]
+    fn well_drinking_sensor_does_not_clip_or_occlude_perception() {
+        let config = SimulationConfig::for_stage(CurriculumStage::Survival)
+            .expect("survival defaults are valid");
+        let mut ecosystem = Ecosystem::new(config, 91).expect("ecosystem initializes");
+        let well_position = ecosystem.app.world().resource::<WellState>().position;
+        let agent_id = ecosystem.living_agents()[0];
+        let agent_entity = ecosystem.agent_entities()[&agent_id];
+        let removable_entities = {
+            let world = ecosystem.app.world_mut();
+            let mut query = world.query::<(Entity, Option<&SemanticCollider>, Option<&FoodSlot>)>();
+            query
+                .iter(world)
+                .filter_map(|(entity, semantic, food)| {
+                    (food.is_some()
+                        || semantic.is_some_and(|semantic| semantic.0 == PerceptKind::Well))
+                    .then_some(entity)
+                })
+                .collect::<Vec<_>>()
+        };
+        for entity in removable_entities {
+            let _despawned = ecosystem.app.world_mut().despawn(entity);
+        }
+        ecosystem.app.world_mut().entity_mut(agent_entity).insert((
+            Position(well_position),
+            Rotation::radians(0.0),
+            Transform::from_translation(well_position.extend(0.0)),
+            LinearVelocity::ZERO,
+        ));
+        ecosystem.spawn_food_at(well_position + Vec2::X * 4.0);
+        ecosystem.app.update();
+        ecosystem.app.world_mut().run_schedule(PerceptionSchedule);
+
+        let agent = ecosystem
+            .app
+            .world()
+            .get::<AgentBody>(agent_entity)
+            .expect("agent remains present");
+        assert!(agent
+            .rays
+            .iter()
+            .any(|sample| sample.kind == Some(PerceptKind::Food)));
+        assert!(agent
+            .rays
+            .iter()
+            .all(|sample| sample.kind != Some(PerceptKind::Well)));
+    }
+
+    /// Dynamic agents must use smooth oval colliders instead of cornered boxes.
+    #[test]
+    fn agent_collider_is_oval() {
+        let config = SimulationConfig::for_stage(CurriculumStage::Survival)
+            .expect("survival defaults are valid");
+        let mut ecosystem = Ecosystem::new(config, 91).expect("ecosystem initializes");
+        let world = ecosystem.app.world_mut();
+        let mut query = world.query_filtered::<&Collider, With<AgentBody>>();
+        let collider = query.single(world).expect("one survival agent exists");
+
+        assert!(collider
+            .shape()
+            .as_shape::<avian2d::collision::collider::EllipseColliderShape>()
+            .is_some());
+    }
+
     /// Reward shaping must combine survival, food, and conserved water events.
     #[test]
     fn configured_reward_weights_combine_exact_event_deltas() {
@@ -1922,9 +2116,8 @@ mod tests {
             .expect("stage defaults are valid");
         config
             .apply_experiment_tuning(ExperimentTuning {
-                survival_reward_per_second: 0.5,
                 food_reward: 3.0,
-                water_reward_per_unit: 2.0,
+                drink_reward: 2.0,
                 ..ExperimentTuning::default()
             })
             .expect("bounded tuning is valid");
@@ -1937,31 +2130,20 @@ mod tests {
             food_eaten: 2,
             water_consumed: 0.75,
             food_reward_units: 1.25,
-            water_reward_units: 0.45,
+            drink_reward_units: 0.45,
             ..before
         };
 
-        assert!((transition_reward(&config, before, after) - 4.70).abs() < 1e-6);
+        assert!((transition_reward(&config, before, after) - 4.65).abs() < 1e-6);
     }
 
     /// Resource reward must decline through the requested reserve zones.
     #[test]
     fn need_reward_multiplier_uses_declared_satiation_zones() {
-        let cases = [
-            (0.0, 1.25),
-            (0.10, 1.25),
-            (0.100_001, 1.0),
-            (0.50, 1.0),
-            (0.500_001, 0.9),
-            (0.75, 0.9),
-            (0.750_001, 0.75),
-            (0.899_999, 0.75),
-            (0.90, 0.0),
-            (1.25, 0.0),
-        ];
+        let cases = [(0, 1.25), (1, 1.0), (2, 1.0), (3, 0.9), (4, 0.75), (5, 0.0)];
 
-        for (reserve, expected) in cases {
-            assert!((need_reward_multiplier(reserve) - expected).abs() < f32::EPSILON);
+        for (points, expected) in cases {
+            assert!((need_reward_multiplier(points, 5) - expected).abs() < f32::EPSILON);
         }
     }
 
@@ -2039,10 +2221,8 @@ mod tests {
             .expect("stage defaults are valid");
         config
             .apply_experiment_tuning(ExperimentTuning {
-                initial_health_fraction: 0.4,
-                need_drain_multiplier: 0.25,
-                damage_multiplier: 0.25,
-                episode_step_limit: 100,
+                initial_hit_points: 2,
+                episode_seconds: 10,
                 ..ExperimentTuning::default()
             })
             .expect("bounded tuning is valid");
@@ -2071,7 +2251,7 @@ mod tests {
                 .status;
         }
 
-        assert!((agent.hit_points - 40.0).abs() < f32::EPSILON);
+        assert_eq!(agent.hit_points, 2);
         assert_eq!(final_status, EpisodeStatus::Truncated);
     }
 
@@ -2085,7 +2265,7 @@ mod tests {
         assert_eq!(initial_state(first), initial_state(second));
     }
 
-    /// Survival reset must show separated food and water choices before contact.
+    /// Survival reset must show food before water on one learnable route.
     #[test]
     fn survival_reset_faces_visible_food_and_water() {
         // Sample several world rotations while preserving the same egocentric contract.
@@ -2120,9 +2300,9 @@ mod tests {
 
             assert!(observation_contains(&observation, PerceptKind::Food));
             assert!(observation_contains(&observation, PerceptKind::Well));
-            assert!(food_hit_angles.iter().any(|angle| *angle < -0.1));
+            assert!(food_hit_angles.iter().any(|angle| *angle > 0.1));
             assert!(well_hit_angles.iter().any(|angle| *angle > 0.1));
-            assert!(food_bearing < -0.1);
+            assert!(food_bearing > well_bearing + 0.1);
             assert!(well_bearing > 0.1);
             assert!(nearest_food.distance(position) > AGENT_RADIUS + FOOD_RADIUS);
             assert!(well.distance(position) > AGENT_RADIUS + WELL_SENSOR_RADIUS);
@@ -2198,11 +2378,13 @@ mod tests {
         assert!(observation.iter().all(|value| (-1.0..=1.0).contains(value)));
     }
 
-    /// Translation increases need drain while body rotation and gaze remain free.
+    /// Translation must accelerate need loss while rotation remains free.
     #[test]
-    fn translation_costs_reserves_but_turning_and_gaze_do_not() {
-        let config = SimulationConfig::for_stage(CurriculumStage::Survival)
+    fn movement_accelerates_need_loss_without_charging_for_looking() {
+        let mut config = SimulationConfig::for_stage(CurriculumStage::Survival)
             .expect("survival defaults are valid");
+        config.need_loss_interval_seconds = 1;
+        config.movement_need_cost_percent = 25;
         let mut idle = Ecosystem::new(config.clone(), 19).expect("idle world spawns");
         let mut looking = Ecosystem::new(config.clone(), 19).expect("looking world spawns");
         let mut moving = Ecosystem::new(config, 19).expect("moving world spawns");
@@ -2210,16 +2392,18 @@ mod tests {
 
         set_agent_motion(&mut looking, id, Vec2::ZERO, MAX_ANGULAR_SPEED);
         set_agent_motion(&mut moving, id, Vec2::X * MAX_LINEAR_SPEED, 0.0);
-        idle.resolve_physiology(&BTreeSet::new());
-        looking.resolve_physiology(&BTreeSet::new());
-        moving.resolve_physiology(&BTreeSet::new());
+        for _ in 0..8 {
+            idle.resolve_physiology(&BTreeSet::new());
+            looking.resolve_physiology(&BTreeSet::new());
+            moving.resolve_physiology(&BTreeSet::new());
+        }
 
         let idle_needs = agent_needs(&mut idle, id);
         let looking_needs = agent_needs(&mut looking, id);
         let moving_needs = agent_needs(&mut moving, id);
         assert_eq!(idle_needs, looking_needs);
-        assert!(moving_needs.0 < idle_needs.0);
-        assert!(moving_needs.1 < idle_needs.1);
+        assert_eq!(idle_needs, (3, 3));
+        assert_eq!(moving_needs, (2, 2));
     }
 
     /// Forward throttle must never accelerate behind the body or eye cones.
@@ -2275,8 +2459,9 @@ mod tests {
     /// Food sensors must be traversable and consumed by a steering agent.
     #[test]
     fn steering_agent_crosses_and_collects_food_sensor() {
-        let config = SimulationConfig::for_stage(CurriculumStage::Survival)
+        let mut config = SimulationConfig::for_stage(CurriculumStage::Survival)
             .expect("survival defaults are valid");
+        config.initial_satiation = 0;
         let mut ecosystem = Ecosystem::new(config, 37).expect("world spawns");
         let id = ecosystem.living_agents()[0];
         let entity = ecosystem.agent_entities()[&id];
@@ -2341,89 +2526,20 @@ mod tests {
         assert!(agent.metrics.food_eaten > 0);
         assert!(agent.metrics.food_reward_units > 0.0);
         assert!(largest_reward > 7.0);
-        let expected_forward_progress =
-            SURVIVAL_RESOURCE_FORWARD_DISTANCE - AGENT_RADIUS - FOOD_RADIUS - 0.25;
+        let expected_forward_progress = SURVIVAL_RESOURCE_FORWARD_DISTANCE
+            - SURVIVAL_FOOD_LEAD_DISTANCE
+            - AGENT_RADIUS
+            - FOOD_RADIUS
+            - 0.25;
         assert!((end - start).dot(body_forward) > expected_forward_progress);
     }
 
-    /// Excess reserves slow translation, remain capped, and damage health.
+    /// Dehydration retains terminal attribution at its exact integer boundary.
     #[test]
-    fn overconsumption_is_capped_slowing_and_damaging() {
+    fn dehydration_damage_has_explicit_terminal_attribution() {
         let config = SimulationConfig::for_stage(CurriculumStage::Survival)
             .expect("survival defaults are valid");
-        let capacity = config.reserve_capacity;
-        let expected_speed =
-            MAX_LINEAR_SPEED * config.movement_speed_multiplier * config.overfull_speed_multiplier;
-        let mut ecosystem = Ecosystem::new(config, 23).expect("world spawns");
-        let id = ecosystem.living_agents()[0];
-        let entity = ecosystem.agent_entities()[&id];
-        {
-            let mut agent = ecosystem
-                .app
-                .world_mut()
-                .get_mut::<AgentBody>(entity)
-                .expect("agent exists");
-            agent.physiology.hunger = capacity;
-            agent.physiology.thirst = capacity;
-        }
-        let forward = LocomotionAction::new(1.0, 0.0, 0.0).expect("forward action is valid");
-        ecosystem.apply_actions(&BTreeMap::from([(id, forward)]));
-        let speed = ecosystem
-            .app
-            .world()
-            .get::<MaxLinearSpeed>(entity)
-            .expect("speed limit exists")
-            .0;
-        let hit_points_before = ecosystem
-            .app
-            .world()
-            .get::<AgentBody>(entity)
-            .expect("agent exists")
-            .physiology
-            .hit_points;
-        let health_before = ecosystem
-            .app
-            .world()
-            .get::<AgentBody>(entity)
-            .expect("agent exists")
-            .physiology
-            .health;
-
-        ecosystem.resolve_physiology(&BTreeSet::new());
-
-        let agent = ecosystem
-            .app
-            .world()
-            .get::<AgentBody>(entity)
-            .expect("agent exists");
-        assert!((speed - expected_speed).abs() < 1e-5);
-        assert!(agent.physiology.hunger <= capacity);
-        assert!(agent.physiology.thirst <= capacity);
-        assert!(agent.physiology.hit_points < hit_points_before);
-        assert!(agent.physiology.health < health_before);
-        assert!(agent.metrics.overconsumption_damage > 0.0);
-    }
-
-    /// Fullness slowdown starts exactly after its threshold and reaches its floor at one.
-    #[test]
-    fn fullness_slowdown_obeys_both_configured_boundaries() {
-        let threshold = 0.9;
-        let minimum = 0.5;
-        assert_eq!(
-            fullness_speed_multiplier(threshold, threshold, minimum),
-            1.0
-        );
-        assert!(fullness_speed_multiplier(threshold + 0.001, threshold, minimum) < 1.0);
-        assert_eq!(fullness_speed_multiplier(1.0, threshold, minimum), minimum);
-        assert_eq!(fullness_speed_multiplier(1.2, threshold, minimum), minimum);
-    }
-
-    /// Deprivation retains terminal attribution when harmless excess is also present.
-    #[test]
-    fn deprivation_death_is_not_misattributed_to_harmless_excess() {
-        let mut config = SimulationConfig::for_stage(CurriculumStage::Survival)
-            .expect("survival defaults are valid");
-        config.overfull_damage_rate = 0.0;
+        let damage_interval = config.steps_for_seconds(config.dehydration_damage_interval_seconds);
         let mut ecosystem = Ecosystem::new(config, 29).expect("world spawns");
         let id = ecosystem.living_agents()[0];
         let entity = ecosystem.agent_entities()[&id];
@@ -2433,9 +2549,10 @@ mod tests {
                 .world_mut()
                 .get_mut::<AgentBody>(entity)
                 .expect("agent exists");
-            agent.physiology.hunger = 1.1;
-            agent.physiology.thirst = 0.0;
-            agent.physiology.hit_points = 0.01;
+            agent.physiology.satiation = 1;
+            agent.physiology.hydration = 0;
+            agent.physiology.hit_points = 1;
+            agent.physiology.dehydration_steps = damage_interval - 1;
         }
 
         ecosystem.resolve_physiology(&BTreeSet::new());
@@ -2446,6 +2563,192 @@ mod tests {
             .get::<AgentBody>(entity)
             .expect("agent exists");
         assert_eq!(agent.life, LifeState::Dead(DeathCause::Dehydration));
+    }
+
+    /// Concurrent deprivation and thorn damage must not claim one sole cause.
+    #[test]
+    fn combined_deprivation_and_thorn_damage_has_combined_attribution() {
+        let config = SimulationConfig::for_stage(CurriculumStage::Obstacles)
+            .expect("obstacle defaults are valid");
+        let starvation_interval =
+            config.steps_for_seconds(config.starvation_damage_interval_seconds);
+        let thorn_interval = config.steps_for_seconds(THORN_DAMAGE_INTERVAL_SECONDS);
+        let mut ecosystem = Ecosystem::new(config, 31).expect("world spawns");
+        let id = ecosystem.living_agents()[0];
+        let entity = ecosystem.agent_entities()[&id];
+        {
+            let mut agent = ecosystem
+                .app
+                .world_mut()
+                .get_mut::<AgentBody>(entity)
+                .expect("agent exists");
+            agent.physiology.satiation = 0;
+            agent.physiology.hydration = 1;
+            agent.physiology.hit_points = 2;
+            agent.physiology.starvation_steps = starvation_interval - 1;
+            agent.physiology.thorn_steps = thorn_interval - 1;
+        }
+
+        ecosystem.resolve_physiology(&BTreeSet::from([id]));
+
+        let agent = ecosystem
+            .app
+            .world()
+            .get::<AgentBody>(entity)
+            .expect("agent exists");
+        assert_eq!(agent.life, LifeState::Dead(DeathCause::CombinedDamage));
+    }
+
+    /// Need loss and deprivation damage must occur only at exact whole-second boundaries.
+    #[test]
+    fn integer_physiology_clocks_fire_at_configured_boundaries() {
+        let config = SimulationConfig::for_stage(CurriculumStage::Survival)
+            .expect("survival defaults are valid");
+        let need_interval = config.steps_for_seconds(config.need_loss_interval_seconds);
+        let dehydration_interval =
+            config.steps_for_seconds(config.dehydration_damage_interval_seconds);
+        let starvation_interval =
+            config.steps_for_seconds(config.starvation_damage_interval_seconds);
+        let initial_satiation = config.initial_satiation;
+        let initial_hydration = config.initial_hydration;
+        let mut ecosystem = Ecosystem::new(config, 97).expect("world spawns");
+        let id = ecosystem.living_agents()[0];
+        let entity = ecosystem.agent_entities()[&id];
+
+        for _ in 1..need_interval {
+            ecosystem.resolve_physiology(&BTreeSet::new());
+        }
+        let before_need_loss = ecosystem
+            .app
+            .world()
+            .get::<AgentBody>(entity)
+            .expect("agent exists");
+        assert_eq!(before_need_loss.physiology.satiation, initial_satiation);
+        assert_eq!(before_need_loss.physiology.hydration, initial_hydration);
+
+        ecosystem.resolve_physiology(&BTreeSet::new());
+        {
+            let mut agent = ecosystem
+                .app
+                .world_mut()
+                .get_mut::<AgentBody>(entity)
+                .expect("agent exists");
+            assert_eq!(
+                agent.physiology.satiation,
+                initial_satiation.saturating_sub(1)
+            );
+            assert_eq!(
+                agent.physiology.hydration,
+                initial_hydration.saturating_sub(1)
+            );
+            agent.physiology.satiation = 0;
+            agent.physiology.hydration = 0;
+            agent.physiology.hit_points = 5;
+            agent.physiology.need_steps = 0;
+            agent.physiology.starvation_steps = 0;
+            agent.physiology.dehydration_steps = 0;
+        }
+
+        for _ in 1..dehydration_interval {
+            ecosystem.resolve_physiology(&BTreeSet::new());
+        }
+        assert_eq!(
+            ecosystem
+                .app
+                .world()
+                .get::<AgentBody>(entity)
+                .expect("agent exists")
+                .physiology
+                .hit_points,
+            5
+        );
+
+        ecosystem.resolve_physiology(&BTreeSet::new());
+        assert_eq!(
+            ecosystem
+                .app
+                .world()
+                .get::<AgentBody>(entity)
+                .expect("agent exists")
+                .physiology
+                .hit_points,
+            4
+        );
+
+        for _ in dehydration_interval..starvation_interval {
+            ecosystem.resolve_physiology(&BTreeSet::new());
+        }
+        assert_eq!(
+            ecosystem
+                .app
+                .world()
+                .get::<AgentBody>(entity)
+                .expect("agent exists")
+                .physiology
+                .hit_points,
+            3
+        );
+    }
+
+    /// A need that reaches zero starts its damage interval on the next step.
+    #[test]
+    fn deprivation_interval_starts_after_need_reaches_zero() {
+        let config = SimulationConfig::for_stage(CurriculumStage::Survival)
+            .expect("survival defaults are valid");
+        let need_interval = config.steps_for_seconds(config.need_loss_interval_seconds);
+        let starvation_interval =
+            config.steps_for_seconds(config.starvation_damage_interval_seconds);
+        let mut ecosystem = Ecosystem::new(config, 98).expect("world spawns");
+        let id = ecosystem.living_agents()[0];
+        let entity = ecosystem.agent_entities()[&id];
+        {
+            let mut agent = ecosystem
+                .app
+                .world_mut()
+                .get_mut::<AgentBody>(entity)
+                .expect("agent exists");
+            agent.physiology.satiation = 1;
+            agent.physiology.hydration = ecosystem.config.maximum_hydration;
+            agent.physiology.hit_points = ecosystem.config.maximum_hit_points;
+            agent.physiology.need_steps = need_interval - 1;
+            agent.physiology.starvation_steps = 0;
+        }
+
+        ecosystem.resolve_physiology(&BTreeSet::new());
+        let depleted = ecosystem
+            .app
+            .world()
+            .get::<AgentBody>(entity)
+            .expect("agent exists");
+        assert_eq!(depleted.physiology.satiation, 0);
+        assert_eq!(depleted.physiology.starvation_steps, 0);
+        let initial_hit_points = depleted.physiology.hit_points;
+
+        for _ in 1..starvation_interval {
+            ecosystem.resolve_physiology(&BTreeSet::new());
+        }
+        assert_eq!(
+            ecosystem
+                .app
+                .world()
+                .get::<AgentBody>(entity)
+                .expect("agent exists")
+                .physiology
+                .hit_points,
+            initial_hit_points
+        );
+
+        ecosystem.resolve_physiology(&BTreeSet::new());
+        assert_eq!(
+            ecosystem
+                .app
+                .world()
+                .get::<AgentBody>(entity)
+                .expect("agent exists")
+                .physiology
+                .hit_points,
+            initial_hit_points - 1
+        );
     }
 
     /// Unrewarded movement and physiology diagnostics cannot change reward.
@@ -2461,7 +2764,7 @@ mod tests {
             ..before
         };
 
-        assert!((transition_reward(&config, before, after) - 0.1).abs() < 1e-6);
+        assert_eq!(transition_reward(&config, before, after), 0.0);
     }
 
     /// Forward binocular perception must leave a true rear blind area.
@@ -2566,8 +2869,16 @@ mod tests {
     /// An immobile bunny must eventually die and lose all physics capability.
     #[test]
     fn unmet_needs_terminate_agent_and_remove_collider() {
-        let config = SimulationConfig::for_stage(CurriculumStage::Survival)
+        let mut config = SimulationConfig::for_stage(CurriculumStage::Survival)
             .expect("survival defaults are valid");
+        config
+            .apply_experiment_tuning(ExperimentTuning {
+                initial_satiation: 0,
+                initial_hydration: 0,
+                episode_seconds: 60,
+                ..ExperimentTuning::default()
+            })
+            .expect("deprivation profile is valid");
         let mut ecosystem = Ecosystem::new(config, 43).expect("world spawns");
         let id = ecosystem
             .living_agents()
@@ -2596,7 +2907,7 @@ mod tests {
         assert!(!has_collider);
     }
 
-    /// Thorn contact must reduce both health representations by simulated time.
+    /// One full thorn interval must remove one discrete HP.
     #[test]
     fn thorn_damage_reduces_health_and_hit_points() {
         let config = SimulationConfig::for_stage(CurriculumStage::Obstacles)
@@ -2612,7 +2923,12 @@ mod tests {
             .into_iter()
             .find(|metrics| metrics.id == id)
             .expect("bunny metrics exist");
-        ecosystem.resolve_physiology(&BTreeSet::from([id]));
+        for _ in 0..ecosystem
+            .config
+            .steps_for_seconds(THORN_DAMAGE_INTERVAL_SECONDS)
+        {
+            ecosystem.resolve_physiology(&BTreeSet::from([id]));
+        }
         let entity = ecosystem
             .agent_entities()
             .get(&id)
@@ -2623,28 +2939,28 @@ mod tests {
             .world()
             .get::<AgentBody>(entity)
             .expect("bunny body exists");
-        assert!(agent.physiology.health < 1.0);
-        assert!(agent.physiology.hit_points < 100.0);
+        assert_eq!(agent.physiology.hit_points, 4);
         assert!(agent.metrics.thorn_damage > before.thorn_damage);
     }
 
     /// A fully hydrated agent must not remove unusable water from the well.
     #[test]
-    fn full_thirst_contact_preserves_well_water() {
+    fn full_hydration_contact_preserves_well_water() {
         let config = SimulationConfig::for_stage(CurriculumStage::Survival)
             .expect("survival defaults are valid");
         let mut ecosystem = Ecosystem::new(config, 51).expect("world spawns");
         let id = ecosystem.living_agents()[0];
         let entity = ecosystem.agent_entities()[&id];
-        let capacity = ecosystem.config.reserve_capacity;
+        let capacity = ecosystem.config.maximum_hydration;
         ecosystem
             .app
             .world_mut()
             .get_mut::<AgentBody>(entity)
             .expect("bunny exists")
             .physiology
-            .thirst = capacity;
+            .hydration = capacity;
         let before = ecosystem.app.world().resource::<WellState>().water;
+        prime_drinking_event(&mut ecosystem, id);
 
         ecosystem.resolve_drinking(&BTreeSet::from([id]));
 
@@ -2658,25 +2974,64 @@ mod tests {
         assert!(agent.metrics.water_consumed.abs() < f32::EPSILON);
     }
 
-    /// A partially thirsty agent withdraws exactly the water it can absorb.
+    /// Hydration and reward must advance once per completed contact second.
     #[test]
-    fn partial_thirst_contact_withdraws_only_absorbable_water() {
+    fn drinking_requires_one_continuous_second_per_event() {
         let config = SimulationConfig::for_stage(CurriculumStage::Survival)
             .expect("survival defaults are valid");
-        let drink_rate = config.well_drink_rate;
-        let mut ecosystem = Ecosystem::new(config, 52).expect("world spawns");
+        let interval = config.steps_for_seconds(1);
+        let mut ecosystem = Ecosystem::new(config, 61).expect("world spawns");
         let id = ecosystem.living_agents()[0];
         let entity = ecosystem.agent_entities()[&id];
-        let capacity = ecosystem.config.reserve_capacity;
         ecosystem
             .app
             .world_mut()
             .get_mut::<AgentBody>(entity)
             .expect("bunny exists")
             .physiology
-            .thirst = capacity - 0.01;
-        let expected = 0.01 * drink_rate / DRINK_THIRST_RECOVERY;
+            .hydration = 0;
+
+        for _ in 1..interval {
+            ecosystem.resolve_drinking(&BTreeSet::from([id]));
+        }
+        let before_event = ecosystem
+            .app
+            .world()
+            .get::<AgentBody>(entity)
+            .expect("bunny exists");
+        assert_eq!(before_event.physiology.hydration, 0);
+        assert_eq!(before_event.metrics.drink_reward_units, 0.0);
+
+        ecosystem.resolve_drinking(&BTreeSet::from([id]));
+        let after_event = ecosystem
+            .app
+            .world()
+            .get::<AgentBody>(entity)
+            .expect("bunny exists");
+        assert_eq!(after_event.physiology.hydration, 1);
+        assert_eq!(after_event.metrics.drink_reward_units, 1.25);
+    }
+
+    /// One drinking event withdraws one fixed allocation and adds one hydration point.
+    #[test]
+    fn partial_hydration_contact_withdraws_only_absorbable_water() {
+        let config = SimulationConfig::for_stage(CurriculumStage::Survival)
+            .expect("survival defaults are valid");
+        let drink_rate = config.well_drink_rate;
+        let mut ecosystem = Ecosystem::new(config, 52).expect("world spawns");
+        let id = ecosystem.living_agents()[0];
+        let entity = ecosystem.agent_entities()[&id];
+        let capacity = ecosystem.config.maximum_hydration;
+        ecosystem
+            .app
+            .world_mut()
+            .get_mut::<AgentBody>(entity)
+            .expect("bunny exists")
+            .physiology
+            .hydration = capacity - 1;
+        let expected = drink_rate;
         let before = ecosystem.app.world().resource::<WellState>().water;
+        prime_drinking_event(&mut ecosystem, id);
 
         ecosystem.resolve_drinking(&BTreeSet::from([id]));
 
@@ -2688,15 +3043,15 @@ mod tests {
             .expect("bunny exists");
         assert!((before - after - expected).abs() < 1e-6);
         assert!((agent.metrics.water_consumed - expected).abs() < 1e-6);
-        assert!((agent.physiology.thirst - capacity).abs() < f32::EPSILON);
+        assert_eq!(agent.physiology.hydration, capacity);
     }
 
-    /// Drinking reward must use thirst before the absorbed water raises it.
+    /// Drinking reward must use hydration before the absorbed water raises it.
     #[test]
-    fn thirsty_drinker_earns_need_weighted_water_reward() {
+    fn dehydrated_drinker_earns_need_weighted_water_reward() {
         let config = SimulationConfig::for_stage(CurriculumStage::Survival)
             .expect("survival defaults are valid");
-        let expected_water = config.well_drink_rate * config.time_step;
+        let expected_water = config.well_drink_rate;
         let mut ecosystem = Ecosystem::new(config, 59).expect("world spawns");
         let id = ecosystem.living_agents()[0];
         let entity = ecosystem.agent_entities()[&id];
@@ -2706,13 +3061,14 @@ mod tests {
             .get_mut::<AgentBody>(entity)
             .expect("bunny exists")
             .physiology
-            .thirst = 0.10;
+            .hydration = 0;
         let before = ecosystem
             .app
             .world()
             .get::<AgentBody>(entity)
             .expect("bunny exists")
             .metrics;
+        prime_drinking_event(&mut ecosystem, id);
 
         ecosystem.resolve_drinking(&BTreeSet::from([id]));
 
@@ -2723,10 +3079,8 @@ mod tests {
             .expect("bunny exists")
             .metrics;
         assert!((after.water_consumed - expected_water).abs() < f32::EPSILON);
-        assert!((after.water_reward_units - expected_water * 1.25).abs() < f32::EPSILON);
-        let expected_reward = ecosystem.config.survival_reward_per_second
-            * ecosystem.config.time_step
-            + ecosystem.config.water_reward_per_unit * expected_water * 1.25;
+        assert!((after.drink_reward_units - 1.25).abs() < f32::EPSILON);
+        let expected_reward = ecosystem.config.drink_reward * 1.25;
         assert!(
             (transition_reward(&ecosystem.config, before, after) - f64::from(expected_reward))
                 .abs()
@@ -2734,12 +3088,12 @@ mod tests {
         );
     }
 
-    /// Scarce well water is shared equally and the well refills over time.
+    /// Scarce well water grants only complete drinks and retains the remainder.
     #[test]
     fn finite_well_depletes_and_refills() {
         let config = SimulationConfig::for_stage(CurriculumStage::Competition)
             .expect("competition defaults are valid");
-        let requested = config.well_drink_rate * config.time_step;
+        let requested = config.well_drink_rate;
         let refill = config.well_refill_rate * config.time_step;
         let mut ecosystem = Ecosystem::new(config, 53).expect("world spawns");
         let ids = ecosystem.living_agents();
@@ -2753,14 +3107,15 @@ mod tests {
                 .get_mut::<AgentBody>(entities[&id])
                 .expect("agent exists")
                 .physiology
-                .thirst = 0.0;
+                .hydration = 0;
+            prime_drinking_event(&mut ecosystem, id);
         }
         ecosystem.app.world_mut().resource_mut::<WellState>().water = requested * 1.5;
 
         ecosystem.resolve_drinking(&BTreeSet::from([first, second]));
 
         let water = ecosystem.app.world().resource::<WellState>().water;
-        assert!(water.abs() < f32::EPSILON);
+        assert!((water - requested * 0.5).abs() < f32::EPSILON);
         let first_agent = ecosystem
             .app
             .world()
@@ -2771,13 +3126,15 @@ mod tests {
             .world()
             .get::<AgentBody>(entities[&second])
             .expect("second agent exists");
-        let expected_share = requested * 0.75;
-        assert!((first_agent.metrics.water_consumed - expected_share).abs() < f32::EPSILON);
-        assert!((second_agent.metrics.water_consumed - expected_share).abs() < f32::EPSILON);
+        assert!((first_agent.metrics.water_consumed - requested).abs() < f32::EPSILON);
+        assert_eq!(first_agent.physiology.hydration, 1);
+        assert!(second_agent.metrics.water_consumed.abs() < f32::EPSILON);
+        assert_eq!(second_agent.physiology.hydration, 0);
 
         ecosystem.refill_well();
         assert!(
-            (ecosystem.app.world().resource::<WellState>().water - refill).abs() < f32::EPSILON
+            (ecosystem.app.world().resource::<WellState>().water - requested * 0.5 - refill).abs()
+                < f32::EPSILON
         );
     }
 
@@ -2794,6 +3151,17 @@ mod tests {
             })
             .collect::<BTreeSet<_>>();
         assert_eq!(winners, BTreeSet::from(identities));
+
+        let requested = 1.0;
+        let mut drinkers = [AgentId(0), AgentId(1)];
+        assert_eq!(
+            complete_drink_recipients(&mut drinkers, requested, requested, 0),
+            vec![AgentId(0)]
+        );
+        assert_eq!(
+            complete_drink_recipients(&mut drinkers, requested, requested, 1),
+            vec![AgentId(1)]
+        );
 
         let foxes = [AgentId(6), AgentId(7)];
         let fox_winners = (0..foxes.len())
@@ -2905,6 +3273,7 @@ mod tests {
         let bunny = AgentId(0);
         let fox = AgentId(6);
 
+        ecosystem.advance_agent_ages();
         ecosystem.resolve_predation(&[(fox, bunny)]);
 
         let bunny_body = ecosystem
@@ -2913,7 +3282,8 @@ mod tests {
             .get::<AgentBody>(entities[&bunny])
             .expect("bunny exists");
         assert_eq!(bunny_body.life, LifeState::Dead(DeathCause::Predation));
-        assert_eq!(bunny_body.physiology.hit_points, 0.0);
+        assert_eq!(bunny_body.physiology.hit_points, 0);
+        assert_eq!(bunny_body.age_steps, 1);
         let fox_body = ecosystem
             .app
             .world()
@@ -3071,7 +3441,7 @@ mod tests {
             RigidBody::Static,
             Position(food_position),
             Transform::from_translation(food_position.extend(0.0)),
-            Collider::rectangle(FOOD_RADIUS * 2.0, FOOD_RADIUS * 2.0),
+            Collider::circle(FOOD_RADIUS),
             Sensor,
             sensor_layers(),
             SemanticCollider(PerceptKind::Food),
@@ -3137,15 +3507,28 @@ mod tests {
             .insert((LinearVelocity(linear), AngularVelocity(angular)));
     }
 
+    /// Advance one drink clock to the step before a completed event.
+    fn prime_drinking_event(ecosystem: &mut Ecosystem, id: AgentId) {
+        let interval = ecosystem.config.steps_for_seconds(1);
+        let entity = ecosystem.agent_entities()[&id];
+        ecosystem
+            .app
+            .world_mut()
+            .get_mut::<AgentBody>(entity)
+            .expect("agent exists")
+            .physiology
+            .drinking_steps = interval - 1;
+    }
+
     /// Read one agent's food and water reserves.
-    fn agent_needs(ecosystem: &mut Ecosystem, id: AgentId) -> (f32, f32) {
+    fn agent_needs(ecosystem: &mut Ecosystem, id: AgentId) -> (u8, u8) {
         let entity = ecosystem.agent_entities()[&id];
         let agent = ecosystem
             .app
             .world()
             .get::<AgentBody>(entity)
             .expect("agent exists");
-        (agent.physiology.hunger, agent.physiology.thirst)
+        (agent.physiology.satiation, agent.physiology.hydration)
     }
 
     /// Return stable agent positions for spawn-slot assertions.

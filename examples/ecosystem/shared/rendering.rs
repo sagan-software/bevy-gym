@@ -31,7 +31,8 @@ use super::domain::{
 use super::simulation::{Ecosystem, AGENT_SIZE};
 use super::training::{
     checkpoint_experiment_tuning, ecosystem_algorithm, resolve_bunny_checkpoint,
-    sibling_fox_checkpoint, TrainingProgress,
+    sibling_fox_checkpoint, validate_checkpoint_stage, validate_checkpoint_tuning_match,
+    TrainingProgress,
 };
 
 /// Simulation units to rendered world units.
@@ -52,8 +53,8 @@ struct WatchOptions {
     /// Simulated seconds advanced per wall-clock second.
     speed: f32,
 
-    /// Per-episode horizon.
-    max_steps: Option<u32>,
+    /// Optional per-episode simulated-second horizon.
+    episode_seconds: Option<u16>,
 }
 
 /// Visual trainer lifecycle displayed in the Inspector-egui panel.
@@ -86,6 +87,9 @@ struct DemoDashboard {
     /// Most recent policy and optimizer snapshot.
     progress: TrainingProgress,
 
+    /// Whether this curriculum stage contains a fox policy.
+    has_fox: bool,
+
     /// Bunny batch-return curve in iteration order.
     bunny_train_curve: Vec<[f64; 2]>,
 
@@ -95,7 +99,13 @@ struct DemoDashboard {
     /// Fox fixed-seed return curve when predators exist.
     fox_eval_curve: Vec<[f64; 2]>,
 
-    /// Change in bunny fixed-seed survival per optimizer iteration.
+    /// Bunny fixed-seed survival-time curve.
+    bunny_survival_curve: Vec<[f64; 2]>,
+
+    /// Fox fixed-seed survival-time curve when predators exist.
+    fox_survival_curve: Vec<[f64; 2]>,
+
+    /// Change in bunny fixed-seed reward per optimizer iteration.
     learning_velocity_curve: Vec<[f64; 2]>,
 
     /// Effective actor learning-rate curve.
@@ -120,15 +130,19 @@ impl DemoDashboard {
         progress: TrainingProgress,
         receiver: mpsc::Receiver<DemoTrainingEvent>,
         control: Arc<DemoTrainingControl>,
+        has_fox: bool,
     ) -> Self {
         // Start with empty curves because the first event may precede evaluation.
         let mut dashboard = Self {
             receiver,
             control,
             progress,
+            has_fox,
             bunny_train_curve: Vec::new(),
             bunny_eval_curve: Vec::new(),
             fox_eval_curve: Vec::new(),
+            bunny_survival_curve: Vec::new(),
+            fox_survival_curve: Vec::new(),
             learning_velocity_curve: Vec::new(),
             actor_learning_rate_curve: Vec::new(),
             critic_learning_rate_curve: Vec::new(),
@@ -148,16 +162,21 @@ impl DemoDashboard {
         let iteration = self.progress.iteration as f64;
         if let Some(previous) = self.bunny_eval_curve.last() {
             let iteration_delta = (iteration - previous[0]).max(1.0);
-            let survival_delta =
+            let return_delta =
                 (f64::from(self.progress.bunny_eval_return) - previous[1]) / iteration_delta;
-            self.learning_velocity_curve
-                .push([iteration, survival_delta]);
+            self.learning_velocity_curve.push([iteration, return_delta]);
         }
         self.bunny_eval_curve
             .push([iteration, f64::from(self.progress.bunny_eval_return)]);
-        if self.progress.fox_eval_return > 0.0 {
+        if self.has_fox {
             self.fox_eval_curve
                 .push([iteration, f64::from(self.progress.fox_eval_return)]);
+        }
+        self.bunny_survival_curve
+            .push([iteration, f64::from(self.progress.bunny_eval_lifetime)]);
+        if self.has_fox {
+            self.fox_survival_curve
+                .push([iteration, f64::from(self.progress.fox_eval_lifetime)]);
         }
     }
 
@@ -219,6 +238,9 @@ pub(super) struct WatchSession {
     /// Whether spacebar has paused policy playback.
     is_paused: bool,
 
+    /// Whether a terminal frame is visible before the next episode reset.
+    pending_reset: bool,
+
     /// Whether exact actor perception sectors are drawn over the world.
     show_perception_rays: bool,
 
@@ -249,6 +271,40 @@ pub(super) struct SceneVisual;
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
 pub(super) struct WorldCamera;
 
+/// Cached unit mesh and solid-color materials reused by every scene redraw.
+#[derive(Resource)]
+pub(super) struct SceneAssets {
+    /// Unit-radius circle scaled into every circular or oval scene shape.
+    circle: Handle<Mesh>,
+
+    /// Food material.
+    food: Handle<ColorMaterial>,
+
+    /// Well material.
+    well: Handle<ColorMaterial>,
+
+    /// Tree material.
+    tree: Handle<ColorMaterial>,
+
+    /// Rock material.
+    rock: Handle<ColorMaterial>,
+
+    /// Thorn material.
+    thorn: Handle<ColorMaterial>,
+
+    /// Living bunny material.
+    bunny: Handle<ColorMaterial>,
+
+    /// Living fox material.
+    fox: Handle<ColorMaterial>,
+
+    /// Dead-agent material.
+    dead: Handle<ColorMaterial>,
+
+    /// Positive-reward pulse material.
+    reward: Handle<ColorMaterial>,
+}
+
 /// Launch a top-down deterministic checkpoint viewer.
 pub(super) fn run_watch(
     stage: CurriculumStage,
@@ -257,13 +313,14 @@ pub(super) fn run_watch(
     // Watch mode resolves one immutable checkpoint before creating a window.
     let options = parse_watch_options(arguments)?;
     let bunny_path = resolve_bunny_checkpoint(&options.checkpoint);
+    validate_checkpoint_stage(&bunny_path, stage)?;
     let config = {
         let mut config = SimulationConfig::for_stage(stage)?;
-        if let Some(tuning) = checkpoint_experiment_tuning(&bunny_path)? {
-            config.apply_experiment_tuning(tuning)?;
-        }
-        if let Some(max_steps) = options.max_steps {
-            config.max_steps = max_steps;
+        let tuning = checkpoint_experiment_tuning(&bunny_path)?
+            .ok_or("bunny checkpoint lacks experiment tuning")?;
+        config.apply_experiment_tuning(tuning)?;
+        if let Some(episode_seconds) = options.episode_seconds {
+            config.episode_seconds = episode_seconds;
         }
         config
     };
@@ -273,6 +330,8 @@ pub(super) fn run_watch(
         let path = options
             .fox_checkpoint
             .unwrap_or_else(|| sibling_fox_checkpoint(&bunny_path));
+        validate_checkpoint_stage(&path, stage)?;
+        validate_checkpoint_tuning_match(&bunny_path, &path)?;
         Some(load_policy(&path, &algorithm)?)
     } else {
         None
@@ -304,8 +363,9 @@ pub(super) fn run_training_demo(
     let label = initial.run_dir.display().to_string();
     let bunny = initial.bunny.clone();
     let fox = initial.fox.clone();
+    let has_fox = config.fox_count > 0;
     let mut session = WatchSession::new(stage, config, bunny, fox, 101, playback_speed, label)?;
-    session.dashboard = Some(DemoDashboard::new(initial, receiver, control));
+    session.dashboard = Some(DemoDashboard::new(initial, receiver, control, has_fox));
     launch_viewer(session);
     Ok(())
 }
@@ -377,7 +437,7 @@ fn parse_watch_options(
     let mut fox_checkpoint = None;
     let mut environment_seed = 101;
     let mut playback_speed: f32 = 4.0;
-    let mut max_steps = None;
+    let mut episode_seconds = None;
     while let Some(flag) = arguments.next() {
         let value = arguments
             .next()
@@ -387,19 +447,24 @@ fn parse_watch_options(
             "--fox-checkpoint" => fox_checkpoint = Some(PathBuf::from(value)),
             "--seed" => environment_seed = value.parse()?,
             "--speed" => playback_speed = value.parse()?,
-            "--max-steps" => max_steps = Some(value.parse()?),
+            "--episode-seconds" => episode_seconds = Some(value.parse()?),
             _ => return Err(format!("unknown watch option {flag:?}").into()),
         }
     }
-    if !playback_speed.is_finite() || playback_speed <= 0.0 || max_steps == Some(0) {
-        return Err("--speed must be finite and positive; --max-steps must exceed zero".into());
+    if !playback_speed.is_finite()
+        || playback_speed <= 0.0
+        || episode_seconds.is_some_and(|seconds| !(5..=300).contains(&seconds))
+    {
+        return Err(
+            "--speed must be finite and positive; --episode-seconds must be in 5..=300".into(),
+        );
     }
     Ok(WatchOptions {
         checkpoint: checkpoint.ok_or("watch requires --checkpoint <run-dir-or-mpk>")?,
         fox_checkpoint,
         seed: environment_seed,
         speed: playback_speed,
-        max_steps,
+        episode_seconds,
     })
 }
 
@@ -407,6 +472,8 @@ fn parse_watch_options(
 pub(super) fn setup_viewer(
     mut commands: Commands<'_, '_>,
     mut session: NonSendMut<'_, WatchSession>,
+    mut meshes: ResMut<'_, Assets<Mesh>>,
+    mut materials: ResMut<'_, Assets<ColorMaterial>>,
 ) {
     // Fit the complete fixed map before the user applies pan or zoom controls.
     let snapshot = session.ecosystem.visual_snapshot();
@@ -421,6 +488,18 @@ pub(super) fn setup_viewer(
         WorldCamera,
         Name::new("Ecosystem Camera"),
     ));
+    commands.insert_resource(SceneAssets {
+        circle: meshes.add(Circle::new(1.0)),
+        food: materials.add(Color::srgb_u8(244, 211, 94)),
+        well: materials.add(Color::srgb_u8(54, 162, 235)),
+        tree: materials.add(Color::srgb_u8(25, 94, 55)),
+        rock: materials.add(Color::srgb_u8(123, 130, 137)),
+        thorn: materials.add(Color::srgb_u8(191, 64, 128)),
+        bunny: materials.add(Color::srgb_u8(238, 238, 232)),
+        fox: materials.add(Color::srgb_u8(229, 111, 47)),
+        dead: materials.add(Color::srgb_u8(70, 70, 70)),
+        reward: materials.add(Color::srgba(0.3, 1.0, 0.4, 0.32)),
+    });
 }
 
 /// Pause, resume, or restart the deterministic evaluation episode.
@@ -441,6 +520,12 @@ fn toggle_playback(keys: Res<'_, ButtonInput<KeyCode>>, mut session: NonSendMut<
 fn advance_policy(time: Res<'_, Time>, mut session: NonSendMut<'_, WatchSession>) {
     // Accumulation preserves fixed simulation time at every playback speed.
     if session.is_paused {
+        return;
+    }
+    if session.pending_reset {
+        if session.reset_episode().is_err() {
+            session.is_paused = true;
+        }
         return;
     }
     session.accumulator = time
@@ -494,6 +579,8 @@ fn apply_training_progress(mut session: NonSendMut<'_, WatchSession>) {
                     dashboard.bunny_eval_curve.clear();
                     dashboard.fox_eval_curve.clear();
                     dashboard.learning_velocity_curve.clear();
+                    dashboard.bunny_survival_curve.clear();
+                    dashboard.fox_survival_curve.clear();
                 }
                 dashboard.progress = progress;
                 dashboard.record_update_point();
@@ -541,6 +628,7 @@ impl WatchSession {
             speed: playback_speed,
             accumulator: 0.0,
             is_paused: false,
+            pending_reset: false,
             show_perception_rays: true,
             perception_ray_agent: Some(AgentId(0)),
             pending_tuning,
@@ -553,6 +641,9 @@ impl WatchSession {
 
     /// Run one deterministic mean-action joint step and retain recurrent state.
     pub(super) fn step_once(&mut self) -> Result<bool, Box<dyn Error>> {
+        if self.pending_reset {
+            self.reset_episode()?;
+        }
         let mut actions = Vec::with_capacity(self.state.agents.len());
         let mut next_memories = BTreeMap::new();
         for (id, species, observation) in &self.state.agents {
@@ -588,7 +679,7 @@ impl WatchSession {
             }
         }
         if result.is_done {
-            self.reset_episode()?;
+            self.pending_reset = true;
             Ok(true)
         } else {
             self.state.agents = next_agents;
@@ -606,6 +697,7 @@ impl WatchSession {
         self.state = self.ecosystem.state();
         self.memories.clear();
         self.accumulator = 0.0;
+        self.pending_reset = false;
         self.episode_return = 0.0;
         self.latest_reward = 0.0;
         Ok(())
@@ -626,6 +718,7 @@ impl WatchSession {
         self.memories.clear();
         self.accumulator = 0.0;
         self.is_paused = false;
+        self.pending_reset = false;
         self.episode_return = 0.0;
         self.latest_reward = 0.0;
         Ok(())
@@ -648,6 +741,7 @@ impl WatchSession {
         self.memories.clear();
         self.accumulator = 0.0;
         self.is_paused = false;
+        self.pending_reset = false;
         self.episode_return = 0.0;
         self.latest_reward = 0.0;
         Ok(())
@@ -658,6 +752,7 @@ impl WatchSession {
 pub(super) fn redraw_scene(
     mut commands: Commands<'_, '_>,
     mut session: NonSendMut<'_, WatchSession>,
+    assets: Res<'_, SceneAssets>,
     visuals: Query<'_, '_, Entity, With<SceneVisual>>,
 ) {
     // Scene primitives are presentation projections, never simulation entities.
@@ -665,7 +760,12 @@ pub(super) fn redraw_scene(
         commands.entity(entity).despawn();
     }
     let snapshot = session.ecosystem.visual_snapshot();
-    spawn_snapshot(&mut commands, &snapshot, session.latest_reward > 0.0);
+    spawn_snapshot(
+        &mut commands,
+        &assets,
+        &snapshot,
+        session.latest_reward > 0.0,
+    );
 }
 
 /// Draw the exact post-physics semantic sectors encoded for every living actor.
@@ -710,6 +810,7 @@ const fn perception_ray_color(kind: Option<PerceptKind>) -> Color {
 /// Spawn programmer-art primitives for one complete world snapshot.
 fn spawn_snapshot(
     commands: &mut Commands<'_, '_>,
+    assets: &SceneAssets,
     snapshot: &VisualWorldSnapshot,
     reward_is_active: bool,
 ) {
@@ -740,55 +841,62 @@ fn spawn_snapshot(
     }
 
     for object in &snapshot.objects {
-        let (color, depth) = match object.kind {
-            VisualObjectKind::Food => (Color::srgb_u8(244, 211, 94), 1.0),
-            VisualObjectKind::Well => (Color::srgb_u8(54, 162, 235), 0.5),
-            VisualObjectKind::Tree => (Color::srgb_u8(25, 94, 55), 0.2),
-            VisualObjectKind::Rock => (Color::srgb_u8(123, 130, 137), 0.2),
-            VisualObjectKind::Thorn => (Color::srgb_u8(191, 64, 128), 0.3),
+        let (material, depth) = match object.kind {
+            VisualObjectKind::Food => (assets.food.clone(), 1.0),
+            VisualObjectKind::Well => (assets.well.clone(), 0.5),
+            VisualObjectKind::Tree => (assets.tree.clone(), 0.2),
+            VisualObjectKind::Rock => (assets.rock.clone(), 0.2),
+            VisualObjectKind::Thorn => (assets.thorn.clone(), 0.3),
         };
+        let scale = object.radius * WORLD_SCALE;
         commands.spawn((
-            Sprite::from_color(color, Vec2::splat(object.radius * WORLD_SCALE * 2.0)),
+            Mesh2d(assets.circle.clone()),
+            MeshMaterial2d(material),
             Transform::from_xyz(
                 object.position[0] * WORLD_SCALE,
                 object.position[1] * WORLD_SCALE,
                 depth,
-            ),
+            )
+            .with_scale(Vec3::new(scale, scale, 1.0)),
             SceneVisual,
         ));
     }
 
     for agent in &snapshot.agents {
         if agent.is_alive && reward_is_active {
-            // A green backing pulse makes the exact per-step survival reward
-            // visible without implying that food or water is shaping reward.
+            // A green backing pulse makes a positive resource or terminal
+            // reward visible at the exact transition that produced it.
             commands.spawn((
-                Sprite::from_color(Color::srgba(0.3, 1.0, 0.4, 0.32), Vec2::new(34.0, 28.0)),
+                Mesh2d(assets.circle.clone()),
+                MeshMaterial2d(assets.reward.clone()),
                 Transform::from_xyz(
                     agent.position[0] * WORLD_SCALE,
                     agent.position[1] * WORLD_SCALE,
                     1.8,
                 )
-                .with_rotation(Quat::from_rotation_z(agent.heading)),
+                .with_rotation(Quat::from_rotation_z(agent.heading))
+                .with_scale(Vec3::new(17.0, 14.0, 1.0)),
                 SceneVisual,
             ));
         }
-        let color = if agent.is_alive {
+        let material = if agent.is_alive {
             match agent.species {
-                Species::Bunny => Color::srgb_u8(238, 238, 232),
-                Species::Fox => Color::srgb_u8(229, 111, 47),
+                Species::Bunny => assets.bunny.clone(),
+                Species::Fox => assets.fox.clone(),
             }
         } else {
-            Color::srgb_u8(70, 70, 70)
+            assets.dead.clone()
         };
         commands.spawn((
-            Sprite::from_color(color, AGENT_SIZE * WORLD_SCALE),
+            Mesh2d(assets.circle.clone()),
+            MeshMaterial2d(material),
             Transform::from_xyz(
                 agent.position[0] * WORLD_SCALE,
                 agent.position[1] * WORLD_SCALE,
                 2.0,
             )
-            .with_rotation(Quat::from_rotation_z(agent.heading)),
+            .with_rotation(Quat::from_rotation_z(agent.heading))
+            .with_scale((AGENT_SIZE * WORLD_SCALE * 0.5).extend(1.0)),
             SceneVisual,
         ));
     }
@@ -820,10 +928,9 @@ pub(super) fn ecosystem_hud_ui(world: &mut World) {
         .show(egui_context.get_mut(), |ui| {
             ui.heading(session.stage.title());
             ui.label(format!(
-                "Reward: {:.2}/s alive + up to {:.2}/food or prey + up to {:.2}/water unit",
-                session.config.survival_reward_per_second,
+                "Reward: terminal seconds x HP fraction + up to {:.2}/food or prey + up to {:.2}/drink",
                 session.config.food_reward * 1.25,
-                session.config.water_reward_per_unit * 1.25,
+                session.config.drink_reward * 1.25,
             ));
             ui.small(
                 "Need multiplier: <=10% 125%, <=50% 100%, <=75% 90%, <90% 75%, >=90% 0%",
@@ -855,15 +962,15 @@ fn show_world_dashboard(
     episode_metrics: &[AgentEpisodeMetrics],
 ) {
     // Aggregate only living physiology because dead bodies are presentation data.
-    let (count, hunger, thirst, hit_points) =
+    let (count, satiation, hydration, hit_points) =
         snapshot.agents.iter().filter(|agent| agent.is_alive).fold(
             (0_usize, 0.0_f32, 0.0_f32, 0.0_f32),
-            |(count, hunger, thirst, hit_points), agent| {
+            |(count, satiation, hydration, hit_points), agent| {
                 (
                     count + 1,
-                    hunger + agent.hunger,
-                    thirst + agent.thirst,
-                    hit_points + agent.hit_points,
+                    satiation + f32::from(agent.satiation),
+                    hydration + f32::from(agent.hydration),
+                    hit_points + f32::from(agent.hit_points),
                 )
             },
         );
@@ -942,11 +1049,11 @@ fn show_world_dashboard(
                 ui.label(format!("{overconsumption_damage:.1}"));
                 ui.end_row();
             }
-            ui.label("Hunger / thirst / HP");
+            ui.label("Satiation / hydration / HP");
             ui.label(format!(
-                "{:.2} / {:.2} / {:.1}",
-                hunger / divisor,
-                thirst / divisor,
+                "{:.1} / {:.1} / {:.1}",
+                satiation / divisor,
+                hydration / divisor,
                 hit_points / divisor
             ));
             ui.end_row();
@@ -1011,7 +1118,7 @@ fn show_experiment_tuning(ui: &mut egui::Ui, session: &mut WatchSession) {
             ui.small("Training applies changes at the next PPO iteration.");
             changed |= show_perception_tuning(ui, &mut tuning);
             changed |= show_reward_tuning(ui, &mut tuning);
-            changed |= show_dynamics_tuning(ui, &mut tuning, session.config.time_step);
+            changed |= show_dynamics_tuning(ui, &mut tuning);
             ui.horizontal(|ui| {
                 if ui.button("Reset defaults").clicked() {
                     tuning = ExperimentTuning::default();
@@ -1098,56 +1205,83 @@ fn show_reward_tuning(ui: &mut egui::Ui, tuning: &mut ExperimentTuning) -> bool 
     let mut changed = false;
     ui.label("Reward weights");
     changed |= ui
-        .add(
-            egui::Slider::new(&mut tuning.survival_reward_per_second, 0.0..=5.0)
-                .text("Alive / second"),
-        )
-        .on_hover_text("Dense reward improves early credit but can favor passive survival.")
-        .changed();
-    changed |= ui
         .add(egui::Slider::new(&mut tuning.food_reward, 0.0..=20.0).text("Food / prey"))
-        .on_hover_text("Base bonus multiplied by hunger need; reward reaches zero at 90% reserve.")
+        .on_hover_text(
+            "Base bonus multiplied by satiation need; reward reaches zero at 90% reserve.",
+        )
         .changed();
     changed |= ui
-        .add(egui::Slider::new(&mut tuning.water_reward_per_unit, 0.0..=10.0).text("Water unit"))
+        .add(egui::Slider::new(&mut tuning.drink_reward, 0.0..=10.0).text("Drink event"))
         .on_hover_text(
-            "Base bonus multiplied by thirst need; only absorbed water earns reward, and reward reaches zero at 90% reserve.",
+            "Base bonus multiplied by hydration need; only completed drink events earn reward, and reward reaches zero at 90% reserve.",
         )
         .changed();
     changed
 }
 
 /// Draw reset physiology, need pressure, damage, and time-limit controls.
-fn show_dynamics_tuning(ui: &mut egui::Ui, tuning: &mut ExperimentTuning, time_step: f32) -> bool {
+fn show_dynamics_tuning(ui: &mut egui::Ui, tuning: &mut ExperimentTuning) -> bool {
     // Use bounded sliders because these values enter physics and episode
     // lifecycle calculations on the next safe boundary.
     let mut changed = false;
     ui.label("Episode dynamics");
     changed |= ui
+        .add(egui::Slider::new(&mut tuning.maximum_hit_points, 1..=20).text("Maximum HP"))
+        .changed();
+    tuning.initial_hit_points = tuning.initial_hit_points.min(tuning.maximum_hit_points);
+    changed |= ui
         .add(
-            egui::Slider::new(&mut tuning.initial_health_fraction, 0.1..=1.0)
-                .text("Starting health"),
+            egui::Slider::new(
+                &mut tuning.initial_hit_points,
+                1..=tuning.maximum_hit_points,
+            )
+            .text("Starting HP"),
         )
-        .on_hover_text("Lower health reduces exploration time before the first useful behavior.")
+        .changed();
+    changed |= ui
+        .add(egui::Slider::new(&mut tuning.maximum_satiation, 1..=20).text("Maximum satiation"))
+        .changed();
+    tuning.initial_satiation = tuning.initial_satiation.min(tuning.maximum_satiation);
+    changed |= ui
+        .add(
+            egui::Slider::new(&mut tuning.initial_satiation, 0..=tuning.maximum_satiation)
+                .text("Starting satiation"),
+        )
+        .changed();
+    changed |= ui
+        .add(egui::Slider::new(&mut tuning.maximum_hydration, 1..=20).text("Maximum hydration"))
+        .changed();
+    tuning.initial_hydration = tuning.initial_hydration.min(tuning.maximum_hydration);
+    changed |= ui
+        .add(
+            egui::Slider::new(&mut tuning.initial_hydration, 0..=tuning.maximum_hydration)
+                .text("Starting hydration"),
+        )
         .changed();
     changed |= ui
         .add(
-            egui::Slider::new(&mut tuning.initial_reserve_fraction, 0.1..=1.0)
-                .text("Starting food/water"),
+            egui::Slider::new(&mut tuning.need_loss_interval_seconds, 1..=60)
+                .text("Need loss seconds"),
         )
-        .on_hover_text("Lower reserves shorten random-policy survival and create earlier urgency.")
         .changed();
     changed |= ui
         .add(
-            egui::Slider::new(&mut tuning.need_drain_multiplier, 0.25..=4.0)
-                .logarithmic(true)
-                .text("Hunger/thirst speed"),
+            egui::Slider::new(&mut tuning.starvation_damage_interval_seconds, 1..=60)
+                .text("Starvation damage seconds"),
         )
-        .on_hover_text("Faster drain creates urgency but makes resource discovery less forgiving.")
         .changed();
     changed |= ui
-        .add(egui::Slider::new(&mut tuning.movement_need_drain, 0.0..=3.0).text("Movement cost"))
-        .on_hover_text("Translation drains extra food and water; body rotation and gaze stay free.")
+        .add(
+            egui::Slider::new(&mut tuning.dehydration_damage_interval_seconds, 1..=60)
+                .text("Dehydration damage seconds"),
+        )
+        .changed();
+    changed |= ui
+        .add(
+            egui::Slider::new(&mut tuning.movement_need_cost_percent, 0..=100)
+                .text("Movement need cost %"),
+        )
+        .on_hover_text("Translation advances the need clock by this extra percentage; rotation and eye motion remain free.")
         .changed();
     changed |= ui
         .add(
@@ -1157,48 +1291,9 @@ fn show_dynamics_tuning(ui: &mut egui::Ui, tuning: &mut ExperimentTuning, time_s
         .on_hover_text("Scales both forward acceleration and maximum translation speed.")
         .changed();
     changed |= ui
-        .add(egui::Slider::new(&mut tuning.reserve_capacity, 1.05..=2.0).text("Reserve capacity"))
-        .on_hover_text("Food and water can exceed comfortable fullness up to this cap.")
-        .changed();
-    changed |= ui
-        .add(
-            egui::Slider::new(&mut tuning.fullness_slow_threshold, 0.5..=1.0)
-                .text("Slowdown starts"),
-        )
-        .on_hover_text("High food or water reserves begin reducing translation at this level.")
-        .changed();
-    changed |= ui
-        .add(
-            egui::Slider::new(&mut tuning.overfull_speed_multiplier, 0.1..=1.0)
-                .text("Overfull speed"),
-        )
-        .on_hover_text("Translation uses this multiplier at comfortable fullness and above.")
-        .changed();
-    changed |= ui
-        .add(
-            egui::Slider::new(&mut tuning.overfull_damage_rate, 0.0..=50.0).text("Overfull damage"),
-        )
-        .on_hover_text("Excess above 100% causes up to this many hit points of damage per second.")
-        .changed();
-    changed |= ui
-        .add(
-            egui::Slider::new(&mut tuning.damage_multiplier, 0.25..=4.0)
-                .logarithmic(true)
-                .text("Health damage speed"),
-        )
-        .on_hover_text("Higher damage sharpens failure but increases return variance.")
-        .changed();
-    changed |= ui
-        .add(
-            egui::Slider::new(&mut tuning.episode_step_limit, 100..=3_000)
-                .text("Episode step limit"),
-        )
+        .add(egui::Slider::new(&mut tuning.episode_seconds, 5..=300).text("Episode seconds"))
         .on_hover_text("Short limits produce updates sooner but truncate delayed consequences.")
         .changed();
-    ui.small(format!(
-        "Current timeout: {:.1} simulated seconds",
-        tuning.episode_step_limit as f32 * time_step
-    ));
     changed
 }
 
@@ -1262,7 +1357,7 @@ fn show_training_dashboard(ui: &mut egui::Ui, dashboard: &mut DemoDashboard) {
     }
 
     show_training_metrics(ui, dashboard);
-    ui.label("Mean survival time (comparable across reward changes)");
+    ui.label("Mean episode reward");
     draw_learning_graph(
         ui,
         &dashboard.bunny_train_curve,
@@ -1280,7 +1375,7 @@ fn show_training_dashboard(ui: &mut egui::Ui, dashboard: &mut DemoDashboard) {
             ui.colored_label(egui::Color32::from_rgb(190, 125, 235), "settings changed");
         }
     });
-    ui.label("Learning velocity (fixed-seed survival seconds per iteration)");
+    ui.label("Learning velocity (fixed-seed reward points per iteration)");
     draw_two_series_graph(
         ui,
         &dashboard.learning_velocity_curve,
@@ -1293,6 +1388,21 @@ fn show_training_dashboard(ui: &mut egui::Ui, dashboard: &mut DemoDashboard) {
         egui::Color32::from_rgb(105, 195, 245),
         "bunny evaluation change",
     );
+    ui.label("Mean fixed-seed survival time");
+    draw_two_series_graph(
+        ui,
+        &dashboard.bunny_survival_curve,
+        &dashboard.fox_survival_curve,
+        egui::Color32::from_rgb(95, 210, 125),
+        egui::Color32::from_rgb(235, 120, 70),
+        false,
+    );
+    ui.horizontal(|ui| {
+        ui.colored_label(egui::Color32::from_rgb(95, 210, 125), "bunny survival");
+        if !dashboard.fox_survival_curve.is_empty() {
+            ui.colored_label(egui::Color32::from_rgb(235, 120, 70), "fox survival");
+        }
+    });
     ui.label("Bunny optimizer learning rates");
     draw_two_series_graph(
         ui,
@@ -1309,6 +1419,17 @@ fn show_training_dashboard(ui: &mut egui::Ui, dashboard: &mut DemoDashboard) {
     ui.small(format!("Artifacts: {}", progress.run_dir.display()));
 }
 
+/// Format absolute reward gain and omit undefined relative gain from zero.
+fn format_reward_gain(current: f64, baseline: f64) -> String {
+    let gain = current - baseline;
+    if baseline.abs() < f64::EPSILON {
+        format!("{gain:+.2} (n/a)")
+    } else {
+        let gain_percent = gain / baseline * 100.0;
+        format!("{gain:+.2} ({gain_percent:+.1}%)")
+    }
+}
+
 /// Draw typed return, gain, loss, entropy, and selection metrics.
 fn show_training_metrics(ui: &mut egui::Ui, dashboard: &DemoDashboard) {
     // Compare current fixed-seed returns to the iteration-zero policy.
@@ -1317,24 +1438,19 @@ fn show_training_metrics(ui: &mut egui::Ui, dashboard: &DemoDashboard) {
         .num_columns(2)
         .striped(true)
         .show(ui, |ui| {
-            ui.label("Train survival");
-            ui.label(format!("{:.2} s", progress.bunny_train_return));
+            ui.label("Train return");
+            ui.label(format!("{:.2}", progress.bunny_train_return));
             ui.end_row();
-            if progress.fox_train_return > 0.0 {
-                ui.label("Fox train survival");
-                ui.label(format!("{:.2} s", progress.fox_train_return));
+            if dashboard.has_fox {
+                ui.label("Fox train return");
+                ui.label(format!("{:.2}", progress.fox_train_return));
                 ui.end_row();
             }
-            ui.label("Fixed-seed survival");
-            ui.label(format!("{:.2} s", progress.bunny_eval_return));
+            ui.label("Fixed-seed return");
+            ui.label(format!("{:.2}", progress.bunny_eval_return));
             ui.end_row();
             if let Some([_, baseline]) = dashboard.bunny_eval_curve.first() {
                 let gain = f64::from(progress.bunny_eval_return) - baseline;
-                let gain_percent = if *baseline > 0.0 {
-                    gain / baseline * 100.0
-                } else {
-                    0.0
-                };
                 ui.label("Gain from start");
                 ui.colored_label(
                     if gain >= 0.0 {
@@ -1342,13 +1458,21 @@ fn show_training_metrics(ui: &mut egui::Ui, dashboard: &DemoDashboard) {
                     } else {
                         egui::Color32::LIGHT_RED
                     },
-                    format!("{gain:+.2} s ({gain_percent:+.1}%)"),
+                    format_reward_gain(f64::from(progress.bunny_eval_return), *baseline),
                 );
                 ui.end_row();
             }
-            if progress.fox_eval_return > 0.0 {
+            if dashboard.has_fox {
+                ui.label("Fox fixed-seed return");
+                ui.label(format!("{:.2}", progress.fox_eval_return));
+                ui.end_row();
+            }
+            ui.label("Fixed-seed survival");
+            ui.label(format!("{:.2} s", progress.bunny_eval_lifetime));
+            ui.end_row();
+            if dashboard.has_fox {
                 ui.label("Fox fixed-seed survival");
-                ui.label(format!("{:.2} s", progress.fox_eval_return));
+                ui.label(format!("{:.2} s", progress.fox_eval_lifetime));
                 ui.end_row();
             }
             ui.label("Actor / critic loss");
@@ -1708,6 +1832,14 @@ mod tests {
         .expect("valid watch arguments parse");
         assert_eq!(parsed.seed, 7);
         assert_eq!(parsed.speed, 8.0);
+        for value in ["1", "301"] {
+            assert!(parse_watch_options(
+                ["--checkpoint", "best.mpk", "--episode-seconds", value]
+                    .map(str::to_owned)
+                    .into_iter(),
+            )
+            .is_err());
+        }
     }
 
     /// HUD pointer capture must block wheel zoom and drag panning together.
@@ -1729,5 +1861,12 @@ mod tests {
             camera_pointer_input(false, false, motion, 0.0).drag_delta,
             Vec2::ZERO
         );
+    }
+
+    /// A sparse zero baseline has no defined percentage gain.
+    #[test]
+    fn zero_reward_baseline_formats_absolute_gain_only() {
+        assert_eq!(format_reward_gain(69.869, 0.0), "+69.87 (n/a)");
+        assert_eq!(format_reward_gain(15.0, 10.0), "+5.00 (+50.0%)");
     }
 }

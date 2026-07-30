@@ -24,7 +24,10 @@ use super::domain::{CurriculumStage, SimulationConfig};
 use super::rendering::{
     draw_perception_rays, ecosystem_hud_ui, load_policy, redraw_scene, setup_viewer, WatchSession,
 };
-use super::training::{ecosystem_algorithm, sibling_fox_checkpoint};
+use super::training::{
+    checkpoint_experiment_tuning, ecosystem_algorithm, experiment_tuning_json,
+    sibling_fox_checkpoint, validate_checkpoint_stage, validate_checkpoint_tuning_match,
+};
 
 /// Required output width in pixels.
 const VIDEO_WIDTH: u32 = 1280;
@@ -57,7 +60,7 @@ struct VideoOptions {
     frames_per_second: u32,
 
     /// Per-episode environment horizon.
-    max_steps: u32,
+    episode_seconds: Option<u16>,
 
     /// Opening best-checkpoint seconds.
     intro_seconds: u32,
@@ -164,6 +167,9 @@ struct VideoManifest {
     /// H.264 pixel format required for broad playback compatibility.
     pixel_format: String,
 
+    /// Exact effective environment tuning, including any CLI horizon override.
+    experiment_tuning: serde_json::Value,
+
     /// Ordered checkpoint provenance and frame ranges.
     segments: Vec<SegmentManifest>,
 }
@@ -232,9 +238,13 @@ pub(super) fn run_video(
 ) -> Result<(), Box<dyn Error>> {
     let options = parse_video_options(arguments)?;
     let mut config = SimulationConfig::for_stage(stage)?;
-    config.max_steps = options.max_steps;
     let descriptors = resolve_segments(stage, &options)?;
-    let manifest = build_manifest(stage, &options, &descriptors)?;
+    let first_tuning = validate_video_profiles(stage, &descriptors)?;
+    config.apply_experiment_tuning(first_tuning)?;
+    if let Some(episode_seconds) = options.episode_seconds {
+        config.episode_seconds = episode_seconds;
+    }
+    let manifest = build_manifest(stage, &options, &descriptors, config.experiment_tuning())?;
     let manifest_path = manifest_path(&options.output);
     if options.output.exists() || manifest_path.exists() {
         return Err("video refuses to overwrite an existing MP4 or manifest".into());
@@ -316,6 +326,37 @@ pub(super) fn run_video(
     Ok(())
 }
 
+/// Require every video policy to share one immutable environment profile.
+fn validate_video_profiles(
+    stage: CurriculumStage,
+    descriptors: &[SegmentDescriptor],
+) -> Result<super::domain::ExperimentTuning, Box<dyn Error>> {
+    let first_checkpoint = &descriptors
+        .first()
+        .ok_or("video has no checkpoint segments")?
+        .bunny_checkpoint;
+    let first_tuning = checkpoint_experiment_tuning(first_checkpoint)?
+        .ok_or("first video checkpoint lacks experiment tuning")?;
+    for descriptor in descriptors {
+        validate_checkpoint_stage(&descriptor.bunny_checkpoint, stage)?;
+        let tuning = checkpoint_experiment_tuning(&descriptor.bunny_checkpoint)?
+            .ok_or("video checkpoint lacks experiment tuning")?;
+        if tuning != first_tuning {
+            return Err(format!(
+                "video checkpoint tuning mismatch: {} differs from {}",
+                descriptor.bunny_checkpoint.display(),
+                first_checkpoint.display()
+            )
+            .into());
+        }
+        if let Some(fox_checkpoint) = &descriptor.fox_checkpoint {
+            validate_checkpoint_stage(fox_checkpoint, stage)?;
+            validate_checkpoint_tuning_match(&descriptor.bunny_checkpoint, fox_checkpoint)?;
+        }
+    }
+    Ok(first_tuning)
+}
+
 /// Parse and validate video arguments without inheriting watch-only controls.
 fn parse_video_options(
     mut arguments: impl Iterator<Item = String>,
@@ -324,7 +365,7 @@ fn parse_video_options(
     let mut output = None;
     let mut seed = 201;
     let mut frames_per_second = 30;
-    let mut max_steps = 1_200;
+    let mut episode_seconds = None;
     let mut intro_seconds = INTRO_SECONDS;
     let mut checkpoint_seconds = CHECKPOINT_SECONDS;
     let mut outro_seconds = OUTRO_SECONDS;
@@ -337,7 +378,7 @@ fn parse_video_options(
             "--output" => output = Some(PathBuf::from(value)),
             "--seed" => seed = value.parse()?,
             "--fps" => frames_per_second = value.parse()?,
-            "--max-steps" => max_steps = value.parse()?,
+            "--episode-seconds" => episode_seconds = Some(value.parse()?),
             "--intro-seconds" => intro_seconds = value.parse()?,
             "--checkpoint-seconds" => checkpoint_seconds = value.parse()?,
             "--outro-seconds" => outro_seconds = value.parse()?,
@@ -353,19 +394,19 @@ fn parse_video_options(
         return Err("video --output must end in .mp4".into());
     }
     if !(1..=60).contains(&frames_per_second)
-        || max_steps == 0
+        || episode_seconds.is_some_and(|seconds| !(5..=300).contains(&seconds))
         || intro_seconds == 0
         || checkpoint_seconds == 0
         || outro_seconds == 0
     {
-        return Err("video timing values must be positive and --fps must be in 1..=60".into());
+        return Err("video segment timing must be positive, --fps must be in 1..=60, and --episode-seconds must be in 5..=300".into());
     }
     Ok(VideoOptions {
         run_dir,
         output,
         seed,
         frames_per_second,
-        max_steps,
+        episode_seconds,
         intro_seconds,
         checkpoint_seconds,
         outro_seconds,
@@ -498,6 +539,7 @@ fn build_manifest(
     stage: CurriculumStage,
     options: &VideoOptions,
     descriptors: &[SegmentDescriptor],
+    tuning: super::domain::ExperimentTuning,
 ) -> Result<VideoManifest, Box<dyn Error>> {
     let mut start_frame = 0_u64;
     let mut segments = Vec::with_capacity(descriptors.len());
@@ -526,6 +568,7 @@ fn build_manifest(
         height: VIDEO_HEIGHT,
         frames_per_second: options.frames_per_second,
         pixel_format: "yuv420p".to_owned(),
+        experiment_tuning: experiment_tuning_json(tuning),
         segments,
     })
 }
@@ -735,6 +778,9 @@ fn write_manifest(path: &Path, manifest: &VideoManifest) -> Result<(), Box<dyn E
 
 #[cfg(test)]
 mod tests {
+    use std::fs;
+
+    use super::super::training::write_checkpoint_profile;
     use super::*;
 
     /// Default video timing exactly matches the requested evidence sequence.
@@ -758,6 +804,22 @@ mod tests {
         assert_eq!(options.intro_seconds, 10);
         assert_eq!(options.checkpoint_seconds, 5);
         assert_eq!(options.outro_seconds, 20);
+        assert_eq!(options.episode_seconds, None);
+        for value in ["1", "301"] {
+            assert!(parse_video_options(
+                [
+                    "--checkpoint",
+                    run_dir.to_str().expect("fixture path is UTF-8"),
+                    "--output",
+                    "/tmp/ecosystem.mp4",
+                    "--episode-seconds",
+                    value,
+                ]
+                .map(str::to_owned)
+                .into_iter(),
+            )
+            .is_err());
+        }
         assert_eq!(options.frames_per_second, 30);
     }
 
@@ -768,5 +830,82 @@ mod tests {
             manifest_path(Path::new("media/survival.mp4")),
             PathBuf::from("media/survival-video-manifest.json"),
         );
+    }
+
+    /// Video segments must reject policy snapshots from different mechanics.
+    #[test]
+    fn video_profiles_reject_tuning_changes_between_segments() {
+        let directory =
+            std::env::temp_dir().join(format!("bevy-gym-video-profiles-{}", std::process::id()));
+        if directory.exists() {
+            fs::remove_dir_all(&directory).expect("stale test directory is removable");
+        }
+        fs::create_dir_all(&directory).expect("test directory is creatable");
+        let first = directory.join("step-000000.mpk");
+        let second = directory.join("step-000100.mpk");
+        let tuning = super::super::domain::ExperimentTuning::default();
+        write_checkpoint_profile(&first, CurriculumStage::Survival, tuning)
+            .expect("first profile writes");
+        let mut changed = tuning;
+        changed.episode_seconds += 1;
+        write_checkpoint_profile(&second, CurriculumStage::Survival, changed)
+            .expect("second profile writes");
+        let descriptors = [
+            SegmentDescriptor {
+                kind: SegmentKind::Checkpoint,
+                bunny_checkpoint: first,
+                fox_checkpoint: None,
+                label: "first".to_owned(),
+                frames: 1,
+            },
+            SegmentDescriptor {
+                kind: SegmentKind::Checkpoint,
+                bunny_checkpoint: second,
+                fox_checkpoint: None,
+                label: "second".to_owned(),
+                frames: 1,
+            },
+        ];
+
+        assert!(validate_video_profiles(CurriculumStage::Survival, &descriptors).is_err());
+        fs::remove_dir_all(directory).expect("test directory is removable");
+    }
+
+    /// Video provenance must retain the effective horizon after a CLI override.
+    #[test]
+    fn video_manifest_records_effective_tuning() {
+        let directory =
+            std::env::temp_dir().join(format!("bevy-gym-video-manifest-{}", std::process::id()));
+        if directory.exists() {
+            fs::remove_dir_all(&directory).expect("stale test directory is removable");
+        }
+        fs::create_dir_all(&directory).expect("test directory is creatable");
+        let checkpoint = directory.join("best.mpk");
+        fs::write(&checkpoint, b"checkpoint").expect("checkpoint fixture writes");
+        let options = VideoOptions {
+            run_dir: directory.clone(),
+            output: directory.join("proof.mp4"),
+            seed: 907,
+            frames_per_second: 30,
+            episode_seconds: Some(33),
+            intro_seconds: 10,
+            checkpoint_seconds: 5,
+            outro_seconds: 20,
+        };
+        let descriptors = [SegmentDescriptor {
+            kind: SegmentKind::BestIntro,
+            bunny_checkpoint: checkpoint,
+            fox_checkpoint: None,
+            label: "best".to_owned(),
+            frames: 30,
+        }];
+        let mut tuning = super::super::domain::ExperimentTuning::default();
+        tuning.episode_seconds = 33;
+
+        let manifest = build_manifest(CurriculumStage::Survival, &options, &descriptors, tuning)
+            .expect("manifest builds");
+
+        assert_eq!(manifest.experiment_tuning["episode_seconds"], 33);
+        fs::remove_dir_all(directory).expect("test directory is removable");
     }
 }

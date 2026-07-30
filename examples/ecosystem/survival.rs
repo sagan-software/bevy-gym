@@ -2,7 +2,7 @@
 //!
 //! One bunny receives only local ray perception, physiology, and its Burn LSTM
 //! state. It must find spawned food and a finite refillable well.
-//! Hunger and thirst eventually reduce health and hit points to zero.
+//! Satiation and hydration eventually reach zero and reduce HP.
 //!
 //! Running without arguments starts live training in the visual ecosystem:
 //!

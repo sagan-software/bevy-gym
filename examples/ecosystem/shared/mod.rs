@@ -136,7 +136,7 @@ fn write_help(stage: CurriculumStage) -> Result<(), Box<dyn Error>> {
     // Repeat the concrete target so every line is ready to paste unchanged.
     writeln!(
         io::stdout().lock(),
-        "{}\n\nUsage:\n  cargo run --example ecosystem-{}\n  cargo run --example ecosystem-{} -- demo [--iterations N] [--max-steps N] [--seed N]\n  cargo run --no-default-features --release --example ecosystem-{} -- train [--iterations N] [--max-steps N] [--seed N]\n  cargo run --example ecosystem-{} -- eval --checkpoint <run-or-mpk>\n  cargo run --example ecosystem-{} -- watch --checkpoint <run-or-mpk> [--seed N] [--speed N]\n  cargo run --example ecosystem-{} -- video --checkpoint <run-dir> --output <video.mp4>\n  cargo run --example ecosystem-{} -- smoke\n\nDemo controls are in the Inspector-egui panel. Press F1 for the Bevy world inspector.",
+        "{}\n\nUsage:\n  cargo run --example ecosystem-{}\n  cargo run --example ecosystem-{} -- demo [--iterations N] [--episode-seconds N] [--seed N]\n  cargo run --no-default-features --release --example ecosystem-{} -- train [--iterations N] [--episode-seconds N] [--seed N]\n  cargo run --example ecosystem-{} -- eval --checkpoint <run-or-mpk>\n  cargo run --example ecosystem-{} -- watch --checkpoint <run-or-mpk> [--seed N] [--speed N]\n  cargo run --example ecosystem-{} -- video --checkpoint <run-dir> --output <video.mp4>\n  cargo run --example ecosystem-{} -- smoke\n\nDemo controls are in the Inspector-egui panel. Press F1 for the Bevy world inspector.",
         stage.title(),
         stage.as_key(),
         stage.as_key(),
