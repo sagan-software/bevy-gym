@@ -1,31 +1,42 @@
 const $ = (id) => document.getElementById(id);
-let worker, generation = 0, running = false, ready = false, busy = false;
-let currentMode = "inference", initialBytes, bundledBytes, latest, lastTime = 0, debt = 0;
+let worker, generation = 0;
+/** @type {"loading" | "running" | "advancing" | "pausing" | "paused" | "failed"} */
+let phase = "loading";
+let currentMode = "inference", initialBytes, initialSource, bundledBytes, latest, lastTime = 0, debt = 0;
 let returns = [], rates = [], speedWindow = { time: performance.now(), transitions: 0 };
-const controlled = ["pause", "step", "restart", "export"];
 
+function setPhase(next) {
+  phase = next;
+  const unavailable = phase === "loading" || phase === "failed";
+  $("pause").disabled = unavailable;
+  $("step").disabled = unavailable || phase === "advancing" || phase === "pausing";
+  $("export").disabled = unavailable;
+  $("restart").disabled = phase === "loading";
+  $("pause").textContent = phase === "paused" || phase === "pausing" ? "Resume" : "Pause";
+}
 function fail(message) {
-  running = false;
+  if (worker) worker.onmessage = null;
+  worker?.terminate();
+  setPhase("failed");
   $("error").textContent = `${message} Restart the session or load another policy.`;
   $("error").hidden = false;
   $("status").textContent = "Session stopped";
-  $("pause").textContent = "Resume";
 }
 function seed() {
   if (!$("seed").reportValidity()) throw new Error("Seed must be an integer from 0 to 4294967295.");
   return Number($("seed").value);
 }
 function post(command) { worker.postMessage(JSON.stringify(command)); }
-function start(mode, bytes) {
+function start(mode, bytes, source = "Bundled model") {
   let runSeed;
-  try { runSeed = seed(); } catch (error) { fail(error.message); return; }
+  try { runSeed = seed(); } catch (error) { $("error").textContent = error.message; $("error").hidden = false; return; }
   const run = ++generation;
   worker?.terminate();
-  currentMode = mode; initialBytes = bytes; latest = undefined;
-  ready = false; busy = false; running = false; debt = 0; returns = []; rates = [];
-  controlled.forEach((id) => $(id).disabled = true);
+  currentMode = mode; initialBytes = bytes; initialSource = source; latest = undefined;
+  setPhase("loading"); debt = 0; returns = []; rates = [];
   $("error").hidden = true;
   $("mode").textContent = mode === "training" ? "Training · DQN" : "Inference";
+  $("policy-source").textContent = mode === "training" ? `Fresh model · seed ${runSeed}` : source;
   $("status").textContent = "Starting Rust worker";
   $("pause").textContent = "Pause";
   ["transitions", "episodes", "return", "updates"].forEach((id) => $(id).textContent = "0");
@@ -41,27 +52,27 @@ function start(mode, bytes) {
     try { message = JSON.parse(data); } catch { fail("The worker returned an invalid message."); return; }
     switch (message.event) {
       case "ready":
+        if (message.protocol !== 1) { fail("Worker protocol changed. Reload this page."); break; }
         post(mode === "training" ? { command: "start_training", seed: runSeed }
           : { command: "start_inference", seed: runSeed, bytes: Array.from(bytes) });
         break;
       case "started":
-        ready = true; running = true; lastTime = performance.now();
+        setPhase("running"); lastTime = performance.now();
         speedWindow = { time: lastTime, transitions: 0 };
-        controlled.forEach((id) => $(id).disabled = false);
         $("status").textContent = mode === "training" ? "Collecting replay transitions" : "Running frozen policy";
         break;
-      case "snapshot": busy = false; update(message.snapshot); break;
+      case "snapshot": setPhase(phase === "pausing" ? "paused" : "running"); update(message.snapshot); break;
       case "policy": {
         const url = URL.createObjectURL(new Blob([new Uint8Array(message.bytes)], { type: "application/octet-stream" }));
         const link = document.createElement("a"); link.href = url; link.download = `cartpole-${currentMode}-${latest?.transitions ?? 0}.mpk`; link.click();
         setTimeout(() => URL.revokeObjectURL(url), 1000); break;
       }
-      case "error": busy = false; fail(message.message); break;
+      case "error": fail(message.message); break;
       default: fail("Unknown worker response.");
     }
   };
 }
-function advance(steps) { busy = true; post({ command: "advance", steps }); }
+function advance(steps) { setPhase(phase === "paused" ? "pausing" : "advancing"); post({ command: "advance", steps }); }
 function update(snapshot) {
   latest = snapshot;
   $("transitions").textContent = snapshot.transitions.toLocaleString();
@@ -82,10 +93,10 @@ function update(snapshot) {
     const mean = recent.reduce((sum, point) => sum + point[1], 0) / recent.length;
     $("return-summary").textContent = `Mean of last ${recent.length} episodes: ${mean.toFixed(1)} · raw returns and rolling mean`;
   }
-  $("status").textContent = !running ? "Paused" : currentMode === "inference" ? "Running frozen policy"
+  $("status").textContent = phase === "paused" ? "Paused" : currentMode === "inference" ? "Running frozen policy"
     : snapshot.optimizer_steps ? "Training in this browser" : `Collecting replay transitions · ${snapshot.transitions}/1,000`;
   const now = performance.now();
-  if (now - speedWindow.time >= 1000) {
+  if (phase === "running" && now - speedWindow.time >= 1000) {
     const achieved = (snapshot.transitions - speedWindow.transitions) * 20 / (now - speedWindow.time);
     $("achieved").textContent = `${achieved.toFixed(1)}× actual`;
     speedWindow = { time: now, transitions: snapshot.transitions };
@@ -94,22 +105,24 @@ function update(snapshot) {
 }
 function frame(now) {
   const elapsed = Math.min((now - lastTime) / 1000, .1); lastTime = now;
-  if (ready && running) {
+  if (phase === "running" || phase === "advancing") {
     // One in-flight batch bounds control latency. Speed never changes physics or updates per transition.
     debt = Math.min(debt + elapsed * 50 * Number($("speed").value), 64);
-    if (!busy && debt >= 1) { const steps = Math.floor(debt); debt -= steps; advance(steps); }
+    if (phase === "running" && debt >= 1) { const steps = Math.floor(debt); debt -= steps; advance(steps); }
   } else { debt = 0; }
   requestAnimationFrame(frame);
 }
 $("pause").onclick = () => {
-  running = !running; debt = 0;
-  $("pause").textContent = running ? "Pause" : "Resume";
-  $("status").textContent = running ? "Running" : busy ? "Pausing after the current batch" : "Paused";
+  const transitions = { running: "paused", advancing: "pausing", paused: "running", pausing: "advancing" };
+  const next = transitions[phase];
+  if (!next) return;
+  setPhase(next); debt = 0;
+  $("status").textContent = phase === "pausing" ? "Pausing after the current batch" : phase === "paused" ? "Paused" : "Running";
   speedWindow = { time: performance.now(), transitions: latest?.transitions ?? 0 };
-  if (!running) $("achieved").textContent = "0.0× actual";
+  if (phase === "paused" || phase === "pausing") $("achieved").textContent = "0.0× actual";
 };
-$("step").onclick = () => { if (ready && !busy) { running = false; $("pause").textContent = "Resume"; advance(1); } };
-$("restart").onclick = () => start(currentMode, initialBytes);
+$("step").onclick = () => { if (phase === "running" || phase === "paused") { setPhase("paused"); advance(1); } };
+$("restart").onclick = () => start(currentMode, initialBytes, initialSource);
 $("train").onclick = () => start("training");
 $("bundled").onclick = () => { if (bundledBytes) start("inference", bundledBytes); };
 $("export").onclick = () => post({ command: "export" });
@@ -119,7 +132,7 @@ $("import").onchange = async (event) => {
   try {
     if (file.size > 131072) throw new Error("Policy exceeds the 128 KiB limit.");
     const bytes = new Uint8Array(await file.arrayBuffer());
-    if (run === generation) start("inference", bytes);
+    if (run === generation) start("inference", bytes, `Uploaded policy: ${file.name}`);
   } catch (error) { if (run === generation) fail(error.message); }
   event.target.value = "";
 };

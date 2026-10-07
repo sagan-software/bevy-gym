@@ -38,6 +38,12 @@ jobs:
       - run: nix run .#web-check
       - run: nix develop --command trunk build --config web/Trunk.toml --release --locked --public-url /bevy-gym/ecosystem/
       - run: nix run .#gymnasium-check
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: browser-qualification
+          path: test-results/gymnasium
+          retention-days: 14
       - run: mkdir -p site/ecosystem && cp -a dist/. site/ecosystem/
       - run: touch site/.nojekyll
       - uses: actions/upload-pages-artifact@v5

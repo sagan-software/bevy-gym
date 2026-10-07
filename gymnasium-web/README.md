@@ -56,8 +56,31 @@ site under `/bevy-gym/`, exercises its controls and policy round trip, and train
 a fresh model in a real browser worker before checking held-out scores.
 
 Native coverage records 100% of the CartPole dynamics, action validation, state
-validation, batch-budget, and error-display lines. Session coverage is 78 of 85
+validation, batch-budget, and error-display lines. Session coverage is 81 of 88
 lines. Its unhit paths propagate configuration, observation, optimizer, and
 out-of-range action errors that the fixed valid session configuration does not
-produce. The native no-op worker entry point is unhit. WebAssembly worker
+produce. Native worker command handling covers 76 of 80 lines; the no-op native entry
+point and defensive error propagation remain unhit. WebAssembly worker
 behavior is checked by browser tests rather than native LLVM instrumentation.
+
+## Worker contract
+
+The worker announces protocol `1` before accepting commands. The page checks
+that version before sending work. A worker instance identifies its run;
+restarting terminates that instance and rejects its queued responses. FIFO
+message delivery orders commands. Only one advance request is outstanding;
+policy export may queue behind it.
+
+The page has six lifecycle states: loading, running, advancing, pausing, paused,
+and failed. An advance moves running to advancing. Its response returns to
+running unless a pause moved it to pausing, in which case it becomes paused.
+A worker error terminates the worker and enters failed. A new session returns
+to loading. Invalid seed input leaves the previous session intact.
+
+Commands are JSON objects tagged by `command`: `start_training` takes a `u32`
+seed, `start_inference` takes a seed and policy byte array, `advance` takes an
+integer step count from 1 through 256, and `export` takes no extra fields.
+Unknown fields and commands are rejected. The worker limits JSON messages to
+1 MiB; the page limits policy uploads to 128 KiB. Responses are tagged by
+`event`: `ready`, `started`, `snapshot`, `policy`, or `error`. An error includes
+a diagnostic message. A new worker is required after a page-handled error.

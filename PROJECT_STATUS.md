@@ -3,7 +3,8 @@
 Assessment date: 2026-10-07.
 
 Finish one Gymnasium environment at a time, including browser playback and
-browser training and measured policy quality, before expanding the catalog. Start with CartPole.
+browser training and measured policy quality, before expanding the catalog.
+CartPole is deployed; MountainCar is next.
 Keep ecosystem and PettingZoo expansion behind the Gymnasium milestones.
 
 ## Gymnasium port policy
@@ -42,11 +43,15 @@ does not turn those implementations into faithful ports.
 
 Replace those approximations one environment at a time after oracle tests
 establish the replacement's behavior. Keep existing work until its replacement
-is verified. Preserve any useful approximation under an explicit experimental
+is verified.
+
+Preserve any useful approximation under an explicit experimental
 identity; do not describe it as an Avian simulation without actual Avian use.
 The approximations now live under `examples/box2d-approximation` and
 `examples/mujoco-approximation`. Shared Avian development dependencies and the
-render feature dependency were removed. Ecosystem examples require explicit
+render feature dependency were removed.
+
+Ecosystem examples require explicit
 `--features ecosystem-inference`. Conditional unused-dependency imports remain
 only to support builds that explicitly combine Gymnasium and ecosystem features.
 Reevaluate or retrain its policies because old scores and checkpoints do not
@@ -156,40 +161,36 @@ This count excludes Atari and external environments. Official family catalogs:
   rendering. Run Chromium, Firefox, and WebKit checks and record unsupported
   browser capabilities explicitly.
 - Measure release download size, startup time, and frame time. Publish the
-  tested static artifact through a deployment compatible with private source.
-  Decide audience and hosting before enabling public access or paid hosting.
+  tested static artifact through GitHub Pages. The user authorized public
+  visibility for Sagan-software/bevy-gym.
 - Pass the required Rust, personal-lint, Nix, WASM, and browser gates. Measure
   changed-code coverage and explain any remaining uncovered path. Do not count
   a moving canvas, passing build, or recorded video as policy qualification.
 
-## First implementation slice
+## Delivered CartPole slice
 
-CartPole currently combines environment dynamics, native training, filesystem
-access, subprocess recording, and rendering in one example target. Extract its
-portable environment through focused regression tests while preserving behavior.
-Add a Gymnasium route alongside the existing ecosystem routes. Reuse checkpoint
-validation where its contract fits; do not force DQN policies into the ecosystem's
-recurrent bunny/fox schema.
+[GitHub Pages](https://sagan-software.github.io/bevy-gym/) serves CartPole
+training and inference from the public repository. The shared Rust environment
+uses the pinned Gymnasium Euler equations and float64 internal state. Reset
+uses SplitMix64, so its numeric seeds do not reproduce NumPy PCG64 sequences.
 
-Regenerate CartPole oracle cases, prove time-limit behavior, and package a policy
-that meets the existing catalog gate. Verify native/WASM actions and complete
-browser episodes. Deliver its deployed URL and test evidence before porting the
-next environment. Preserve the existing public library API during extraction.
+Three native training seeds passed qualification within 90,000 transitions.
+The selected bundled policy scored 500 across 200 held-out episodes. A separate
+Rust WebAssembly training run reached 500 across 200 held-out episodes after
+70,000 transitions, from an initial validation mean of 9.45.
 
-The fixture support manifest explicitly leaves oracle regeneration, Blackjack
-hidden-hand enumeration, Taxi fickle-state enumeration, and statistical sampling
-checks unfinished. The fixture integrity suite alone does not close those gaps.
+The page supports pause, step, restart, 1× through 16× pacing, return and
+learning-rate charts, and policy download/upload. Inference has no optimizer.
+Desktop and mobile views were inspected through the collaborative browser.
+See [the browser package](gymnasium-web/README.md) for commands and coverage gaps.
 
-## Verification on this host
+## Remaining verification and environments
 
-- `python3 tests/fixtures/gymnasium/test_contracts.py`: 8 passed.
-- `cargo test -p bevy-gym-web --locked`: 14 passed. This native test target
-  checks manifests and checkpoint boundaries, not WASM rendering or policy skill.
-- The existing August `dist/` artifact was served locally and returned HTTP 200.
-  The collaborative browser opened an error page with Electron preload errors.
-  Live browser behavior and visual quality were not verified.
-- Full Rust, personal-lint, Nix, release WASM, browser, and training qualification
-  gates were not rerun for this assessment. Earlier handoff results are historical.
-- The initial assessment did not change production source or staged work.
-  The subsequent dependency cleanup changes feature wiring and import guards;
-  validation for that cleanup is recorded in the browser implementation plan.
+MountainCar-v0 is next, followed by the delivery order above. Other Gymnasium
+environments have not passed browser acceptance. Box2D and MuJoCo browser
+engine compatibility still needs proof before their faithful ports proceed.
+
+Sustained resource use and the provisional latency budgets remain unmeasured.
+The expanded three-engine browser suite and offline qualification are pending
+verification. Fixture integrity alone does not prove environment conformance;
+Blackjack hidden-hand and Taxi fickle-state enumeration remain unfinished.

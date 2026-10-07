@@ -1267,6 +1267,11 @@ impl RecurrentPpoAgent {
             config,
             seeds,
         )?;
+        // Migration constructs a temporary actor and must not consume the
+        // backend RNG while another agent initializes from its model seed.
+        let _initialization_guard = MODEL_INITIALIZATION_LOCK
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
         let networks = RecurrentNetworks {
             actor: RecurrentActor::new(
                 source_observation_dim,

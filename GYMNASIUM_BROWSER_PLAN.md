@@ -135,7 +135,9 @@ run identity, sequence, command acknowledgement, payload limits, and errors.
 Use closed modes `Train` and `Inference`. Use closed lifecycle states `Loading`,
 `Ready`, `Running`, `Pausing`, `Paused`, `Completed`, `Stopped`, and `Failed`.
 Document permitted commands and resource ownership for every state. Derive button
-availability from state. Reject stale messages from stopped or replaced runs.
+availability from state.
+
+Reject stale messages from stopped or replaced runs.
 Serialize checkpoint activation at a safe boundary and reset recurrent memory.
 
 Split portable environment, agent, optimizer, and checkpoint bytes from native
@@ -302,7 +304,7 @@ nix run .#web-check
 
 Run the applicable personal-lint workflow from the installed skill without
 altering project lint policy. Add branch coverage for changed production code
-and close every reachable changed branch. CI must run tests, not merely compile.
+and close every reachable changed branch. CI must run tests, not just compilation.
 Add a separate browser-training build and qualification job before claiming
 that the existing ecosystem browser suite covers the new catalog.
 

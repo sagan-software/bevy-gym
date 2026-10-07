@@ -102,7 +102,10 @@ fn batching_preserves_fixed_step_dynamics_and_learning() {
             .advance(AdvanceSteps::try_from(256).expect("large batch"))
             .expect("batch advances");
     }
-    assert_eq!(small_snapshot.state, large_snapshot.state);
+    assert_eq!(
+        small_snapshot.state.map(f64::to_bits),
+        large_snapshot.state.map(f64::to_bits)
+    );
     assert_eq!(small_snapshot.transitions, large_snapshot.transitions);
     assert_eq!(
         small_snapshot.optimizer_steps,

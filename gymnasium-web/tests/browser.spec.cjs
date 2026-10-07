@@ -11,11 +11,20 @@ test("training, frozen inference, pause, step, speed, and policy round trip", as
   page.on("pageerror", error => failures.push(error.message));
   await page.goto("./");
   await expect(page.locator("#status")).toHaveText("Running frozen policy");
+  await page.setViewportSize({ width: 1280, height: 800 });
+  const chart = await page.locator("#returns-chart").boundingBox();
+  expect(chart.y + chart.height).toBeLessThanOrEqual(800);
   await page.locator("#speed").selectOption("16");
   await expect.poll(async () => Number((await page.locator("#transitions").innerText()).replaceAll(",", ""))).toBeGreaterThan(500);
   await expect(page.locator("#updates")).toHaveText("0");
   await paused(page);
   const frozen = await page.locator("#transitions").innerText();
+  await page.locator("#seed").fill("-1");
+  await page.getByRole("button", { name: "Train from scratch", exact: true }).click();
+  await expect(page.locator("#error")).toBeVisible();
+  await expect(page.locator("#mode")).toHaveText("Inference");
+  await expect(page.locator("#status")).toHaveText("Paused");
+  await page.locator("#seed").fill("42");
   await page.waitForTimeout(300);
   await expect(page.locator("#transitions")).toHaveText(frozen);
   await page.getByRole("button", { name: "Step", exact: true }).click();
@@ -29,6 +38,7 @@ test("training, frozen inference, pause, step, speed, and policy round trip", as
   await page.getByRole("button", { name: "Download policy", exact: true }).click();
   const download = await downloadEvent;
   await page.locator("#import").setInputFiles(await download.path());
+  await expect(page.locator("#policy-source")).toContainText("Uploaded policy:");
   await expect(page.locator("#status")).toHaveText("Running frozen policy");
   await expect(page.locator("#updates")).toHaveText("0");
   await expect(page.locator("#rate")).toHaveText("None");
@@ -44,18 +54,32 @@ test("training, frozen inference, pause, step, speed, and policy round trip", as
   expect(failures).toEqual([]);
 });
 
+test("late bundled-model loading cannot replace a newer training session", async ({ page }) => {
+  let pending;
+  await page.route("**/models/cartpole.mpk", route => { pending = route; });
+  await page.goto("./", { waitUntil: "commit" });
+  await expect.poll(() => Boolean(pending)).toBe(true);
+  await page.getByRole("button", { name: "Train from scratch", exact: true }).click();
+  await expect(page.locator("#mode")).toHaveText("Training · DQN");
+  await expect.poll(async () => Number((await page.locator("#transitions").innerText()).replaceAll(",", ""))).toBeGreaterThan(0);
+  await pending.continue();
+  await expect(page.locator("#model-evidence")).toContainText("mean 500");
+  await expect(page.locator("#mode")).toHaveText("Training · DQN");
+});
+
 // A separate worker can consume the full transition budget without display throttling.
 test("browser DQN learns and passes held-out scores", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "chromium", "Full score qualification runs in Chromium; all engines run optimizer and inference checks.");
   test.setTimeout(1_200_000);
   await page.goto("./");
   await expect(page.locator("#status")).toHaveText("Running frozen policy");
   await paused(page);
-  const result = await page.evaluate(async () => {
+  const evaluation = page.evaluate(async () => {
     async function client() {
       const worker = new Worker(new URL("gymnasium-worker_loader.js", document.baseURI), { type: "module" });
       await new Promise((resolve, reject) => {
         worker.onerror = event => reject(new Error(event.message));
-        worker.onmessage = event => { if (JSON.parse(event.data).event === "ready") resolve(); };
+        worker.onmessage = event => { const message = JSON.parse(event.data); if (message.event === "ready" && message.protocol === 1) resolve(); else reject(new Error("worker protocol mismatch")); };
       });
       return {
         worker,
@@ -69,6 +93,7 @@ test("browser DQN learns and passes held-out scores", async ({ page }, testInfo)
       };
     }
     const trainer = await client(), evaluator = await client();
+    await new Promise(resolve => { window.startOfflineQualification = resolve; window.offlineQualificationReady = true; });
     async function evaluate(bytes, start, count) {
       let sum = 0, full = 0;
       for (let seed = start; seed < start + count; seed++) {
@@ -96,6 +121,10 @@ test("browser DQN learns and passes held-out scores", async ({ page }, testInfo)
       return { baseline, history, test: selected ? await evaluate(selected, 100000, 200) : null };
     } finally { trainer.worker.terminate(); evaluator.worker.terminate(); }
   });
+  await expect.poll(() => page.evaluate(() => Boolean(window.offlineQualificationReady))).toBe(true);
+  await page.context().setOffline(true);
+  await page.evaluate(() => window.startOfflineQualification());
+  const result = await evaluation.finally(() => page.context().setOffline(false));
   await testInfo.attach("browser-learning.json", { body: JSON.stringify(result, null, 2), contentType: "application/json" });
   console.log(JSON.stringify(result));
   expect(result.test).not.toBeNull();

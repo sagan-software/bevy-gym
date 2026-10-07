@@ -114,12 +114,20 @@ Add `ResetRequested` to any environment entity to trigger a reset on the next fi
 commands.entity(env_entity).insert(ResetRequested { seed: Some(42) });
 ```
 
-## Gymnasium browser roadmap
+## Train in your browser
 
-See [the browser training and inference plan](GYMNASIUM_BROWSER_PLAN.md) for
-per-environment score gates, live learning curves, speed controls, and bundled
-qualified policies. Browser training is planned; the current site runs ecosystem
-inference only. Gymnasium builds do not enable Avian by default.
+[Open the Gymnasium demo](https://sagan-software.github.io/bevy-gym/).
+CartPole-v1 supports fresh DQN training, frozen-policy inference, episode-return
+and learning-rate charts, pause, single-step, and 1× through 16× speed controls.
+Download a trained policy and load it for inference. Training runs in a Rust
+WebAssembly worker on your device.
+
+The bundled CartPole policy scored 500 across 200 held-out episodes. A separate
+browser training run reached the same score after 70,000 transitions.
+See [setup and qualification evidence](gymnasium-web/README.md) and
+[the remaining environment plan](GYMNASIUM_BROWSER_PLAN.md).
+Other Gymnasium environments are not yet delivered in the browser.
+Gymnasium builds do not enable Avian by default.
 
 ## WASM ecosystem demo
 

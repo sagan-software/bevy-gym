@@ -1,6 +1,6 @@
 //! Serializable learning and simulation evidence.
 /// Return from one completed episode.
-#[derive(Debug, Clone, serde::Serialize)]
+#[derive(Debug, Clone, Copy, serde::Serialize)]
 pub struct Episode {
     /// Total transitions when this episode ended.
     pub transition: u64,

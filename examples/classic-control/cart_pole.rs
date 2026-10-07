@@ -48,7 +48,9 @@ use bevy_gym::training::{
     AlgorithmKind, BevyTransitionCollector, DqnAgent, DqnConfig, DqnPolicy, MetricRecord,
     MetricValue, MetricsWriter, RunConfig, RunId, RunPaths, SeedConfig,
 };
-use bevy_gym::{Env, EpisodeStatus, TimeLimit};
+#[cfg(test)]
+use bevy_gym::EpisodeStatus;
+use bevy_gym::{Env, TimeLimit};
 
 const OBS_SIZE: usize = 4;
 const NUM_ACTIONS: usize = 2;

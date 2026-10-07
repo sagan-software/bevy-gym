@@ -115,6 +115,11 @@ impl Session {
                 self.observation = result.observation;
             }
         }
+        Ok(self.snapshot(completed))
+    }
+
+    /// Project current counters and the bounded episode batch into a worker response.
+    fn snapshot(&self, completed: Vec<Episode>) -> Snapshot {
         let (optimizer_steps, learning_rate, epsilon) = match &self.mode {
             Mode::Training(agent) => (
                 agent.optimizer_steps(),
@@ -123,7 +128,7 @@ impl Session {
             ),
             Mode::Inference(_) => (0, None, None),
         };
-        Ok(Snapshot {
+        Snapshot {
             transitions: self.transitions,
             optimizer_steps,
             learning_rate,
@@ -133,7 +138,7 @@ impl Session {
             episode_return: self.episode_return,
             episode_count: self.episodes,
             completed,
-        })
+        }
     }
 
     /// Export policy parameters for inference in a fresh session.

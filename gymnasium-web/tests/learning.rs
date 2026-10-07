@@ -27,10 +27,6 @@ fn evaluate(bytes: &[u8], seeds: std::ops::Range<u64>) -> (f64, usize) {
 #[tokio::test]
 #[ignore = "three training seeds, up to 200000 transitions each; run explicitly for release qualification"]
 async fn cartpole_learns_within_the_transition_budget_for_three_seeds() {
-    let destination = std::path::Path::new("../runs/browser-cartpole");
-    tokio::fs::create_dir_all(destination)
-        .await
-        .expect("qualification output directory");
     for seed in [42, 43, 44] {
         let mut session = Session::train(seed).expect("fresh learner");
         let initial = session.export_policy().expect("initial model");
@@ -66,15 +62,7 @@ async fn cartpole_learns_within_the_transition_budget_for_three_seeds() {
         let report = serde_json::json!({"seed":seed,"transitions":transitions,"initial_validation_mean":initial_mean,
             "best_validation_mean":best_mean,"test_mean":mean,"test_full_length":full,"test_episodes":200,
             "history":history});
-        tokio::fs::write(
-            destination.join(format!("seed-{seed}.json")),
-            serde_json::to_vec_pretty(&report).expect("report JSON"),
-        )
-        .await
-        .expect("write qualification report");
-        tokio::fs::write(destination.join(format!("seed-{seed}.mpk")), best)
-            .await
-            .expect("write qualified candidate");
+        record_qualification(seed, &report, best).await;
         assert!(
             mean >= 475.0 && full >= 180,
             "seed {seed}: held-out mean {mean}, full={full}/200"
@@ -84,4 +72,21 @@ async fn cartpole_learns_within_the_transition_budget_for_three_seeds() {
             "seed {seed}: insufficient learning improvement"
         );
     }
+}
+
+/// Preserve each candidate and its evidence before asserting the release thresholds.
+async fn record_qualification(seed: u64, report: &serde_json::Value, best: Vec<u8>) {
+    let destination = std::path::Path::new("../runs/browser-cartpole");
+    tokio::fs::create_dir_all(destination)
+        .await
+        .expect("qualification output directory");
+    tokio::fs::write(
+        destination.join(format!("seed-{seed}.json")),
+        serde_json::to_vec_pretty(report).expect("report JSON"),
+    )
+    .await
+    .expect("write qualification report");
+    tokio::fs::write(destination.join(format!("seed-{seed}.mpk")), best)
+        .await
+        .expect("write qualified candidate");
 }

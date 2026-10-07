@@ -1,4 +1,4 @@
-//! Gymnasium CartPole contracts shared by native and browser consumers.
+//! Gymnasium `CartPole` contracts shared by native and browser consumers.
 
 #[cfg(feature = "ecosystem-inference")]
 use avian2d as _;
@@ -61,7 +61,10 @@ fn all_cartpole_fixtures_match_internal_and_observation_precision() {
         }
         let observation: [f32; 4] = serde_json::from_value(case["expected"]["observation"].clone())
             .expect("expected observation");
-        assert_eq!(result.observation, observation);
+        assert_eq!(
+            result.observation.map(f32::to_bits),
+            observation.map(f32::to_bits)
+        );
     }
 }
 

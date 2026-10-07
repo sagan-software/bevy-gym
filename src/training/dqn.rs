@@ -218,6 +218,56 @@ impl<B: Backend> QNetwork<B> {
     }
 }
 
+/// Validate checkpoint shapes and finite parameters before activating a loaded network.
+fn validate_policy_record(
+    record: &QNetworkRecord<InferenceBackend>,
+    observation_dim: usize,
+    action_dim: usize,
+    hidden_sizes: &[usize],
+) -> Result<(), DqnError> {
+    // Reject incompatible shapes before Burn can execute a mismatched matrix product.
+    if record.layers.len() != hidden_sizes.len() + 1 {
+        return Err(DqnError::invalid_config(
+            "checkpoint",
+            "layer count differs from the declared architecture",
+        ));
+    }
+    let inputs = std::iter::once(observation_dim).chain(hidden_sizes.iter().copied());
+    let outputs = hidden_sizes
+        .iter()
+        .copied()
+        .chain(std::iter::once(action_dim));
+    for (layer, (input, output)) in record.layers.iter().zip(inputs.zip(outputs)) {
+        let bias = layer.bias.as_ref().ok_or_else(|| {
+            DqnError::invalid_config("checkpoint", "every layer must contain a bias")
+        })?;
+        if layer.weight.val().dims() != [input, output] || bias.val().dims() != [output] {
+            return Err(DqnError::invalid_config(
+                "checkpoint",
+                "layer shape differs from the declared architecture",
+            ));
+        }
+        let weights = layer
+            .weight
+            .val()
+            .into_data()
+            .to_vec::<f32>()
+            .map_err(|error| DqnError::TensorConversion(error.to_string()))?;
+        let bias = bias
+            .val()
+            .into_data()
+            .to_vec::<f32>()
+            .map_err(|error| DqnError::TensorConversion(error.to_string()))?;
+        if !weights.iter().chain(&bias).all(|value| value.is_finite()) {
+            return Err(DqnError::invalid_config(
+                "checkpoint",
+                "parameters must be finite",
+            ));
+        }
+    }
+    Ok(())
+}
+
 /// Deterministic inference-only DQN policy.
 #[derive(Debug, Clone)]
 pub struct DqnPolicy {
@@ -273,46 +323,7 @@ impl DqnPolicy {
                         error.to_string(),
                     ))
                 })?;
-        // Reject incompatible shapes before Burn can execute a mismatched matrix product.
-        if record.layers.len() != hidden_sizes.len() + 1 {
-            return Err(DqnError::invalid_config(
-                "checkpoint",
-                "layer count differs from the declared architecture",
-            ));
-        }
-        let inputs = std::iter::once(observation_dim).chain(hidden_sizes.iter().copied());
-        let outputs = hidden_sizes
-            .iter()
-            .copied()
-            .chain(std::iter::once(action_dim));
-        for (layer, (input, output)) in record.layers.iter().zip(inputs.zip(outputs)) {
-            let bias = layer.bias.as_ref().ok_or_else(|| {
-                DqnError::invalid_config("checkpoint", "every layer must contain a bias")
-            })?;
-            if layer.weight.val().dims() != [input, output] || bias.val().dims() != [output] {
-                return Err(DqnError::invalid_config(
-                    "checkpoint",
-                    "layer shape differs from the declared architecture",
-                ));
-            }
-            let weights = layer
-                .weight
-                .val()
-                .into_data()
-                .to_vec::<f32>()
-                .map_err(|error| DqnError::TensorConversion(error.to_string()))?;
-            let bias = bias
-                .val()
-                .into_data()
-                .to_vec::<f32>()
-                .map_err(|error| DqnError::TensorConversion(error.to_string()))?;
-            if !weights.iter().chain(&bias).all(|value| value.is_finite()) {
-                return Err(DqnError::invalid_config(
-                    "checkpoint",
-                    "parameters must be finite",
-                ));
-            }
-        }
+        validate_policy_record(&record, observation_dim, action_dim, hidden_sizes)?;
         let _guard = MODEL_INITIALIZATION_LOCK
             .lock()
             .unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -1463,11 +1474,11 @@ mod tests {
                     layer.bias = Some(burn::module::Param::from_tensor(Tensor::zeros(
                         [9],
                         &device,
-                    )))
+                    )));
                 }
                 _ => {
                     layer.weight =
-                        burn::module::Param::from_tensor(Tensor::full([4, 8], f32::NAN, &device))
+                        burn::module::Param::from_tensor(Tensor::full([4, 8], f32::NAN, &device));
                 }
             }
             let bytes = NamedMpkBytesRecorder::<FullPrecisionSettings>::default()
