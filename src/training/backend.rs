@@ -11,12 +11,14 @@ pub(super) static MODEL_INITIALIZATION_LOCK: Mutex<()> = Mutex::new(());
 pub type InferenceBackend = burn::backend::Flex;
 
 /// Default autodiff backend for CPU/headless training.
+#[cfg(not(target_arch = "wasm32"))]
 pub type TrainingBackend = burn::backend::Autodiff<InferenceBackend>;
 
 /// Device type for the default inference backend.
 pub type InferenceDevice = Device<InferenceBackend>;
 
 /// Device type for the default training backend.
+#[cfg(not(target_arch = "wasm32"))]
 pub type TrainingDevice = Device<TrainingBackend>;
 
 /// Construct the default inference device.
@@ -27,6 +29,7 @@ pub const fn inference_device() -> InferenceDevice {
 
 /// Construct the default training device.
 #[must_use]
+#[cfg(not(target_arch = "wasm32"))]
 pub const fn training_device() -> TrainingDevice {
     FlexDevice
 }
@@ -38,6 +41,7 @@ pub struct BackendNames {
     pub inference: &'static str,
 
     /// Training backend alias name.
+    #[cfg(not(target_arch = "wasm32"))]
     pub training: &'static str,
 }
 
@@ -46,6 +50,7 @@ pub struct BackendNames {
 pub const fn backend_names() -> BackendNames {
     BackendNames {
         inference: "burn::backend::Flex",
+        #[cfg(not(target_arch = "wasm32"))]
         training: "burn::backend::Autodiff<burn::backend::Flex>",
     }
 }
@@ -55,6 +60,7 @@ pub const fn assert_default_backends_compile() {
     const fn assert_backend<B: Backend>() {}
 
     assert_backend::<InferenceBackend>();
+    #[cfg(not(target_arch = "wasm32"))]
     assert_backend::<TrainingBackend>();
 }
 
@@ -65,6 +71,7 @@ mod tests {
     #[test]
     fn default_backend_names_are_architecture_selected() {
         assert_eq!(backend_names().inference, "burn::backend::Flex");
+        #[cfg(not(target_arch = "wasm32"))]
         assert_eq!(
             backend_names().training,
             "burn::backend::Autodiff<burn::backend::Flex>"
@@ -74,6 +81,7 @@ mod tests {
     #[test]
     fn default_devices_are_constructible() {
         let _inference = inference_device();
+        #[cfg(not(target_arch = "wasm32"))]
         let _training = training_device();
         assert_default_backends_compile();
     }

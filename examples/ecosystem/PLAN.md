@@ -1,395 +1,536 @@
-# Ecosystem curriculum implementation plan
+# Ecosystem continual curriculum implementation plan
 
-Status: active
+Status: ready for implementation
 
-This plan defines the implementation and evidence required for the four
-`examples/ecosystem` environments. An environment is not complete because it
-runs or renders. It is complete only after a freshly loaded policy beats its
-fixed random-policy baseline on held-out seeds and the result is recorded.
+This plan replaces the four-stage reward-bonus curriculum with an eight-stage
+healthy-survival curriculum. Completion requires held-out quantitative evidence,
+retention evidence across earlier stages, freshly loaded checkpoints, eight
+30-second stage videos, and one 280-second aggregate video.
 
-The research behind the choices below is in [RESEARCH.md](RESEARCH.md).
+The controlling research is in
+[CONTINUAL-CURRICULUM-RESEARCH.md](CONTINUAL-CURRICULUM-RESEARCH.md). Existing
+implementation research remains in [RESEARCH.md](RESEARCH.md) and
+[RL_ECOSYSTEM_RESEARCH.md](RL_ECOSYSTEM_RESEARCH.md).
 
 ## Desired outcome
 
-Build one incremental top-down 2D curriculum:
+Build one reproducible curriculum with these Cargo examples:
 
-1. A bunny learns to find food and a refillable well before starvation or
-   dehydration kills it.
-2. A shared bunny policy learns while several physical bunnies compete for the
-   same resources.
-3. Bunnies retain that skill while foxes learn to hunt them and both species
-   must drink.
-4. Both policies transfer into procedural maps containing solid trees and
-   rocks plus traversable, damaging thorn bushes.
+1. `ecosystem-forage`: one bunny learns to perceive, approach, and eat food.
+2. `ecosystem-sprint`: the bunny reaches ephemeral food quickly and accurately.
+3. `ecosystem-gorge`: the bunny crosses a visible bridge to alternating food.
+4. `ecosystem-survival`: the bunny regulates hunger and thirst with food and water.
+5. `ecosystem-shelter`: the bunny retains foraging while using shelter during exposure.
+6. `ecosystem-competition`: a shared bunny policy survives fair resource scarcity.
+7. `ecosystem-predator-prey`: transferred bunnies and a separate fox policy co-adapt.
+8. `ecosystem-obstacles`: both species retain prior skills in the full ecosystem.
 
-Every stage uses Avian2D colliders and the same agent observation and action
-shapes. Each later stage loads the previous qualifying checkpoint instead of
-silently starting over.
+Add `ecosystem-curriculum` as the suite runner. One command trains the stages in
+order, records predecessor lineage, evaluates retention, and writes a suite
+manifest. A separate command renders every stage video and the aggregate video.
+
+The word `proof` in this plan means repeatable empirical evidence under declared
+seeds and gates. It does not mean a mathematical proof that the policies work in
+every possible world.
+
+## Acceptance checklist
+
+- [ ] Eight stage examples use one stable observation and action contract.
+- [ ] Later stages load the required qualifying predecessor actor and LSTM.
+- [ ] PPO collections contain fresh current-policy rollouts from earlier stages.
+- [ ] Reward implements one declared healthy-survival objective across all stages.
+- [ ] Raw distance, movement, collision, pushing, and attack rewards are absent.
+- [ ] Every stage passes its held-out behavior and retention gates for three seeds.
+- [ ] Every selected checkpoint reloads in a fresh process and reproduces its result.
+- [ ] Every stage has a manifest-bound 30-second progression video.
+- [ ] The aggregate video has the exact 280-second structure defined below.
+- [ ] Agents, status, perception, hitboxes, hurtboxes, and physics are visually auditable.
+- [ ] Focused tests, full tests, strict Clippy, coverage, and personal lints close.
+- [ ] `HANDOFF.md`, `EVIDENCE.md`, and `README.md` match the final artifacts.
 
 ## Invariant scratchpad
 
 ### Closed states and modes
 
-- `CurriculumStage`: `Survival`, `Competition`, `PredatorPrey`, `Obstacles`.
+- `CurriculumStage`: `Forage`, `Sprint`, `Gorge`, `Survival`, `Shelter`,
+  `Competition`, `PredatorPrey`, `Obstacles`.
 - `Species`: `Bunny`, `Fox`.
 - `AgentLife`: `Alive`, `Dead(DeathCause)`.
-- `DeathCause`: `Starvation`, `Dehydration`, `Deprivation`, `Thorns`,
-  `Predation`, `Overconsumption`, `InvalidPhysics`.
-- `PerceptKind`: `Food`, `Well`, `Bunny`, `Fox`, `SolidObstacle`, `Thorns`.
-- `RunMode`: `Train`, `Eval`, `Watch`, `Video`.
-- `EvalSuite`: `Validation`, `Test`, `Demo`.
-- `LocomotionAction`: bounded forward acceleration, body turn rate, and
-  conjugate gaze yaw.
+- `HealthPresentation`: `Healthy`, `Hurt`, `Critical`, `Dead`.
+- `DeathCause`: `Starvation`, `Dehydration`, `Exposure`, `Predation`, `Thorns`,
+  `CombinedDamage`, `InvalidPhysics`.
+- `InteractionIntent`: `Idle`, `Active`.
+- `InteractionKind`: `Eat`, `Drink`, `Shelter`, `Attack`.
+- `ColliderRole`: `SolidBody`, `Hitbox(InteractionKind)`, `Hurtbox(Species)`,
+  `Resource`, `Shelter`, `Hazard`, `Boundary`.
+- `RunMode`: `Demo`, `Train`, `Eval`, `Watch`, `Video`, `Smoke`.
+- `SuiteMode`: `Train`, `Eval`, `Video`.
+- `CheckpointRole`: `StepZero`, `Early`, `Middle`, `Best`.
+- `EvalSuite`: `Validation`, `Test`, `Retention`, `Demo`.
 
-### Boundary validation and domain values
+### Legal stage transitions
 
-- Agent counts, map size, horizons, spawn intervals, capacities, and checkpoint
-  intervals must be positive and bounded before a world is constructed.
-- CLI stage is fixed by the selected Cargo example. It is not a free-form
-  string passed into simulation logic.
-- Seeds use the existing `SeedConfig` streams. Training, validation, test, and
-  demo seeds remain disjoint.
-- `AgentId` and policy roles are distinct types. An agent cannot index the
-  wrong species policy by accident.
-- Checkpoint initialization verifies observation width, action count, and
-  hidden-layer widths before loading weights.
+```text
+Forage
+  -> Sprint
+      -> Gorge
+          -> Survival
+              -> Shelter
+                  -> Competition
+                      -> PredatorPrey
+                          -> Obstacles
+```
+
+Each transition is fallible. It requires a compatible predecessor checkpoint,
+its immutable experiment profile, and a passing predecessor evidence record.
+Diagnostic from-scratch runs are legal but cannot qualify as curriculum transfer.
+
+### Validated boundary values
+
+- Stage, checkpoint role, species, death cause, collider role, and run mode use
+  closed enums.
+- Agent count, horizon, map size, resource capacity, refill rate, checkpoint
+  interval, video duration, FPS, and curriculum mixture validate before use.
+- Seeds use disjoint training, validation, test, retention, and demo streams.
+- Checkpoint loading validates profile version, stage, observation width, action
+  width, ray order, network widths, reward version, and predecessor digest.
+- Video manifests validate every checkpoint path, SHA-256 digest, frame count,
+  stage, role, seed, playback rate, and experiment profile before capture.
 
 ### Derived values
 
-- Alive agent lists derive from lifecycle state.
-- Health status, starvation, and dehydration derive from the current needs.
-- Episode reward derives from simulated seconds alive and need-weighted
-  resource consumption.
-- Recurrent runtime state derives only from the ordered local observation
-  history and resets at lifecycle boundaries.
-- Map bounds, HUD counts, and evaluation aggregates derive from world state.
-- Curriculum predecessor paths derive from the stage graph.
+- Healthy-survival reward derives from the post-transition physiology state.
+- Resource feedback derives from actual reduction in normalized drive.
+- Health presentation derives from life state and HP fraction.
+- Alive lists derive from lifecycle state.
+- Retention status derives from frozen stage gate results.
+- Curriculum promotion derives from three consecutive validation passes.
+- Video duration derives from segment frame counts and FPS.
+- Aggregate ordering derives from the suite stage order.
 
 ### Failure boundaries
 
-- Malformed CLI/config/checkpoint input is a typed setup error.
-- A valid checkpoint with an incompatible architecture is a compatibility
-  error.
-- A policy that fails a declared evidence gate is a completed experiment, not
-  a successful curriculum stage.
-- Missing `ffmpeg`, render support, or a checkpoint is a demo-generation error;
-  it does not invalidate already recorded headless evaluation.
+- Malformed CLI, stage config, suite manifest, or checkpoint input is a setup error.
+- Incompatible checkpoint shape, reward version, or lineage is a compatibility error.
+- A failed quantitative or retention gate is a completed experiment, not success.
+- Missing `ffmpeg`, render support, frames, or checkpoints is a video error.
+- A video cannot replace quantitative evidence.
+- A mechanics change invalidates every result collected under the previous profile.
 
-## Architecture decisions
+## Module and file map
 
-### Training algorithm
-
-Add a Burn recurrent PPO trainer with a decentralized actor and centralized,
-training-only critic. The local actor encodes one observation, advances an
-LSTM, and emits a bounded continuous action: forward acceleration, body turn
-rate, and conjugate gaze. The critic receives the fixed padded global state and is absent from the
-evaluation actor API.
-
-Stage 1 and stage 2 use one shared bunny actor/critic. Stage 3 and stage 4 use
-one shared bunny actor/critic and one shared fox actor/critic. Joint actions are
-selected from the same pre-step world state and applied simultaneously.
-Learning happens only after the joint environment step, preventing entity
-iteration order from granting one agent a reaction advantage.
-
-The procedural map expands with the curriculum: half-extents 10, 14, 20, and
-25 from survival through obstacles. Survival starts with two food items and a
-20-step spawn interval. Its food-then-water route rotates with each reset, so
-both resource loops remain discoverable without a fixed world direction.
-Later lessons add scarcity, agents, predation, and obstacles. Evaluation uses
-the same declared settings; actor input never receives coordinates or
-resource-placement hints.
-
-Every living same-species agent contributes its contiguous sequence to that
-species update. Losses normalize by valid agent-time samples, not ecosystem
-steps. Sequence padding and dead slots are masked out of policy, value,
-entropy, advantage normalization, and metrics.
-
-### Perception and memory
-
-Policies never receive absolute resource, opponent, predator, or obstacle
-coordinates. Each agent has two offset eye origins and 36 reserved Avian2D
-raycasts. Paired rays are dense in front and sparse toward the edge of forward
-peripheral vision. A bounded conjugate gaze action turns both cones without
-allowing rear vision. A ray returns normalized distance, hit presence, and a
-one-hot perceived kind. Solid bodies occlude targets.
-
-Each environment instance, species, and living agent ID owns an independent
-Burn LSTM cell and hidden state. State starts at zero, carries across rollout
-chunks, and resets immediately on death, truncation rollover, or environment
-reset. Training uses contiguous sequences, initial states, padding masks, and
-truncated backpropagation through time. Runtime hidden state is not stored in
-`best.mpk`; fresh evaluation always begins at zero.
-
-The LSTM is the memory system. Do not add exact remembered world coordinates,
-which would bypass the intended partial-observation problem. Evaluation must
-include a no-memory ablation that zeros recurrent state every step.
-
-### Physics
-
-- Use `avian2d` 0.6.1, compatible with Bevy 0.18.
-- Run a fixed 10 Hz simulation with zero gravity.
-- Agents are dynamic rectangular rigid bodies with bounded speed, damping,
-  friction, and sleeping disabled. Their bodies rotate with their heading.
-- Agents collide with map boundaries, solid obstacles, and each other.
-- Food, wells, and thorns have queryable sensor colliders.
-- Trees and rocks use solid square colliders. Walls use solid rectangles.
-- Thorn overlap damages health and hit points without blocking motion.
-- Contact tests must prove that two driven agents cannot pass through each
-  other and that one can displace the other.
-
-### Physiology and reward
-
-Each living agent has hunger reserve, thirst reserve, health, and hit points.
-Food replenishes bunny hunger. Eating a bunny replenishes fox hunger. Drinking
-consumes well water and replenishes thirst. The well has finite capacity and a
-continuous refill rate. Food spawns at deterministic pseudo-random positions
-on a periodic schedule up to a cap.
-
-Low hunger or thirst reduces both health and hit points. A zero need by itself
-does not bypass those explicit damage paths. Zero hit points terminates that
-agent with the applicable cause. Fox contact terminates a bunny as predation.
-
-Reward combines simulated seconds alive with need-weighted food and absorbed
-water. The pre-consumption reserve multiplier is 125% at or below 10%, 100%
-through 50%, 90% through 75%, 75% below 90%, and zero from 90% upward.
-Approaching a target, moving, dealing damage, and exploration do not add reward.
-
-### Stable curriculum contract
-
-The local observation width, global-state width, action bounds, ray layout,
-normalization, LSTM width, and network widths remain identical across all four
-stages. Unavailable entities use zero features and explicit presence masks.
-The local observation includes species and lesson one-hot channels.
-
-Transfer graph:
+Preserve the current brownfield shared implementation. Add focused modules for
+new durable responsibilities instead of expanding the existing catch-all files.
 
 ```text
-  survival bunny actor/LSTM
-    -> competition bunny actor/LSTM
-        -> predator-prey bunny actor/LSTM -> obstacles bunny actor/LSTM
-                             new fox actor -> obstacles fox actor/LSTM
+examples/ecosystem/
+  forage.rs                      # stage entry point
+  survival.rs                   # existing stage entry point
+  shelter.rs                    # stage entry point
+  competition.rs                # existing stage entry point
+  predator_prey.rs              # existing stage entry point
+  obstacles.rs                  # existing full-ecosystem entry point
+  curriculum.rs                 # suite train/eval/video entry point
+  shared/
+    mod.rs                       # private module wiring and narrow re-exports
+    curriculum.rs               # stage graph, mixtures, promotion, suite manifest
+    reward.rs                   # normalized drive and healthy-survival reward
+    interaction.rs              # typed hitbox/hurtbox contact resolution
+    qualification.rs            # typed gates and retention evaluation
+    curriculum_video.rs         # aggregate capture and concat manifest
+    domain.rs                   # remaining established simulation values
+    simulation.rs               # Avian world lifecycle and joint step
+    training.rs                 # recurrent PPO collection and stage training
+    rendering.rs                # programmer-art world and status presentation
+    video.rs                    # one-stage checkpoint progression capture
+    demo.rs                     # interactive visual training
+    rng.rs                      # deterministic stage seed streams
+  media/
+    forage-training.mp4
+    survival-training.mp4
+    shelter-training.mp4
+    competition-training.mp4
+    predator-prey-training.mp4
+    obstacles-training.mp4
+    ecosystem-curriculum.mp4
+    *.manifest.json
 ```
 
-The predecessor checkpoint is recorded in config and provenance. A stage may
-run from scratch for diagnostics, but it cannot qualify as curriculum evidence
-without loading the declared predecessor.
+`Cargo.toml` only receives the three target registrations needed for
+`ecosystem-forage`, `ecosystem-shelter`, and `ecosystem-curriculum`. Do not edit
+other example targets while the concurrent Gymnasium agent is working.
 
-## Source layout
+## Stable policy contract
+
+### Action
+
+Use one four-value bounded continuous action in every stage:
 
 ```text
-examples/
-  README.md
-  ecosystem/
-    README.md
-    PLAN.md
-    RESEARCH.md
-    survival.rs
-    competition.rs
-    predator_prey.rs
-    obstacles.rs
-    shared/
-      mod.rs
-      cli.rs
-      domain.rs
-      perception.rs
-      simulation.rs
-      training.rs
-      rendering.rs
-    media/
-      survival-training.mp4
-      competition-training.mp4
-      predator-prey-training.mp4
-      obstacles-training.mp4
-      *.png
+[forward_acceleration, body_turn_rate, gaze_yaw, interaction_intent]
 ```
 
-The four target files are documented entry points. Shared mechanics live in
-`shared` so later examples literally build on the earlier implementation. The
-reusable recurrent PPO model, sequence rollout, update, and checkpoint logic
-live under `src/training` rather than being copied into the examples.
-Generated training runs remain under ignored `runs/`. Curated videos and poster
-frames are documentation assets only after their manifests and evaluation
-evidence have been checked.
+The first three values remain in `[-1, 1]`. `interaction_intent > 0` activates
+the species-appropriate mouth or attack hitbox subject to its cooldown. Forage
+teaches this action before it is needed for drinking or predation.
 
-## Commands and artifact contract
+### Perception
 
-Each target supports the same modes. Replace `<example>` with
-`ecosystem-survival`, `ecosystem-competition`, `ecosystem-predator-prey`, or
-`ecosystem-obstacles`.
+Replace duplicate left-eye rays with one shared ray origin centered between the
+two rendered eyes. Reserve 24 ordered rays across a 120-degree gaze-relative fan.
+Use denser central angles and sparser peripheral angles. Each ray returns nearest
+normalized hit distance and one one-hot semantic kind. The semantic channels
+also establish hit presence. Solid bodies occlude resources and agents.
+
+The actor receives no world coordinates, target identity, path distance, hidden
+resource state, species flag, curriculum stage, or other agent physiology. It
+receives typed proprioception, physiology, interaction cooldown, and ray channels.
+Food and well have no separate direction or proximity summaries. The critic may
+receive padded global state during training only.
+
+The observation width, ray order, action width, LSTM width, and network widths
+are identical in all eight stages. This change increments the checkpoint profile
+and deliberately invalidates current ecosystem checkpoints.
+
+### Memory
+
+Each living agent owns an independent LSTM state. State starts at zero and resets
+on death, truncation, or environment reset. Rollout chunks remain contiguous.
+Padding and dead slots do not contribute to losses or diagnostics. Fresh process
+evaluation starts with zero recurrent state.
+
+## Avian2D physics and interactions
+
+- Use Avian2D dynamic solid bodies for bunnies and foxes.
+- Use Avian2D static solid bodies for walls, trees, rocks, and the well base.
+- Keep agent-agent solid collision and friction so blocking and pushing emerge.
+- Attach a child hurtbox sensor to each living agent.
+- Attach a forward child hitbox sensor for eating, drinking, and fox attacks.
+- Activate interaction hitboxes only while `InteractionIntent::Active` and off cooldown.
+- Use resource, well, shelter, and thorn sensors for semantic overlap events.
+- Resolve contacts after the fixed physics step from Avian contact data.
+- Apply every joint action from the same pre-step state.
+- Resolve simultaneous claims with equal shares or rotating fair priority.
+- Disable hitboxes and hurtboxes immediately when an agent dies.
+- Keep presentation geometry aligned with every collider shape and offset.
+
+Mechanics tests must prove solid blocking, displacement through pushing, sensor
+non-blocking, mouth-range eating, well-range drinking, attack-range predation,
+cooldown enforcement, fair simultaneous claims, and dead-agent noninteraction.
+
+## Physiology and reward
+
+Define normalized drive after each transition:
+
+```text
+D(s) = w_food     * food_deficit(s)^2
+     + w_water    * water_deficit(s)^2
+     + w_hp       * injury_fraction(s)^2
+     + w_exposure * exposure_deficit(s)^2
+
+sum(active weights) = 1
+0 <= D(s) <= 1
+```
+
+Use one stable task reward:
+
+```text
+r_task(s, s') = alive(s') * (dt / reference_lifetime) * (1 - rho * D(s'))
+0 <= rho <= 1
+```
+
+Optional direct resource feedback uses only absorbed physiological benefit:
+
+```text
+r_resource = eta * max(0, D(before_consumption) - D(after_consumption))
+```
+
+The same formulas apply in every stage. An inactive need has zero weight and the
+remaining active weights renormalize. Food feeds bunnies. Prey feeds foxes.
+Shelter reduces exposure. No reward uses distance, raw motion, collision,
+pushing, damage dealt, exploration, target contact without absorption, or a
+separate kill bonus.
+
+Before implementation, add counterfactual return tests for:
+
+- full healthy survival without unnecessary consumption;
+- urgent resource use followed by death;
+- stable homeostasis versus repeated consumption;
+- cautious survival versus risky hoarding;
+- shelter recovery versus remaining exposed;
+- fox feeding versus a kill that provides no absorbed food.
+
+The intended healthy-survival behavior must have the greatest return in every
+applicable comparison. Keep total return scale comparable between stages.
+
+## Stage definitions and gates
+
+All gates use unseen test seeds after validation selects `best.mpk`. Single-agent
+stages use at least 100 test episodes. Multi-agent stages use at least 50 complete
+ecosystem episodes. Three independent training seeds must pass before a stage is
+called robust.
+
+### 1. Forage
+
+- One bunny, one food need, one or two visible food items, no water or exposure.
+- Begin with short central placement. Expand bearing and distance after promotion.
+- Randomize left, right, near, and far placement on held-out seeds.
+- Gate: at least 90% of test episodes contain one useful eating event.
+- Gate: left and right targets produce opposite median turn directions.
+- Gate: food-channel ablation reduces eating success by at least 50 percentage points.
+- Gate: no reward is earned for eating at a full setpoint.
+
+### 2. Survival
+
+- Transfer the forage bunny actor and LSTM.
+- Activate thirst, finite well water, food replenishment, and longer horizons.
+- Randomize resource order, bearing, and separation independently.
+- Gate: at least 80% of test episodes contain both eating and drinking.
+- Gate: mean healthy lifetime improves at least 30% over step zero.
+- Retention gate: forage success remains at least 90% of its predecessor result.
+
+### 3. Shelter
+
+- Transfer the survival bunny actor and LSTM.
+- Add exposure that rises during weather and falls inside shelter.
+- Keep food and water active. Randomize shelter position and weather onset.
+- Gate: at least 80% of weather episodes contain shelter use before critical exposure.
+- Gate: exposure deaths fall at least 50% relative to step zero.
+- Retention gate: eating-and-drinking success remains at least 90% of survival.
+
+### 4. Competition
+
+- Transfer the shelter bunny actor and LSTM into one shared four-bunny policy.
+- Begin with enough resources for all. Reduce per-agent supply after promotion.
+- Keep physical blocking, pushing, finite water, shelter, and fair claims.
+- Gate: mean healthy lifetime improves at least 15% over the stage's step zero.
+- Gate: every identity consumes food and water across the test suite.
+- Gate: no stable identity lifetime advantage exceeds 20% of population mean.
+- Gate: agent-agent contact and displacement events are both nonzero.
+- Retention gate: solo shelter performance remains at least 85% of predecessor.
+
+### 5. Predator-prey
+
+- Transfer the competition bunny actor and LSTM.
+- Pretrain a new fox against slow frozen or scripted prey until predation is discoverable.
+- Alternate current-species update windows after fox acquisition qualifies.
+- Sample opponents from current, early, middle, and best historical policies.
+- Gate: both species improve healthy lifetime at least 15% over their step zero.
+- Gate: bunnies eat, drink, and use shelter. Foxes eat prey, drink, and use shelter.
+- Gate: predation occurs in 10% through 90% of test ecosystems.
+- Gate: the cross-play matrix has no single historical opponent blind spot below
+  70% of the current same-generation score.
+- Retention gate: competition and solo behavior stay above their declared floors.
+
+### 6. Obstacles and full ecosystem
+
+- Transfer both predator-prey actors and LSTMs.
+- Add solid trees and rocks, traversable damaging thorns, occlusion, weather,
+  procedural resource placement, scarcity, shelter, pushing, and predation.
+- Gate: solid-obstacle penetration count is zero.
+- Gate: thorn damage per minute falls at least 20% from step zero.
+- Gate: both species improve healthy lifetime over equal-budget from-scratch controls.
+- Retention gate: each species retains at least 85% of predator-prey performance.
+- Retention gate: every earlier frozen stage suite remains above its floor.
+
+If a gate fails, keep the run and hypothesis. Change one environment or training
+factor, increment the experiment profile when mechanics change, and rerun the
+same frozen gate. Do not lower a threshold after observing failure.
+
+## Continual training and transfer
+
+PPO remains on-policy. Each iteration collects new trajectories with the current
+policy. Do not replay stale PPO transitions.
+
+Start each new stage with this rollout distribution:
+
+```text
+70% current stage
+20% direct predecessor
+10% uniformly sampled earlier stages
+```
+
+Treat this mixture as a starting experiment profile. Increase earlier-stage
+sampling when a retention gate declines. Promote difficulty after three
+consecutive validation passes. Retain easier and harder variants in the active
+distribution after promotion.
+
+At each stage transition:
+
+1. Freeze the qualifying predecessor checkpoint and evidence.
+2. Load the actor encoder and LSTM.
+3. Reset optimizer state after a material distribution change.
+4. Reset the critic when reward channels or global-state meaning change.
+5. Warm the new critic briefly with the actor frozen only if measured value error
+   destabilizes the transferred actor.
+6. Select checkpoints by current-stage score subject to every retention floor.
+
+Add regularization or modular policies only after fresh-rollout rehearsal fails
+to retain prior stages under a measured ablation.
+
+## Programmer-art presentation
+
+Use only Bevy meshes, sprites, colors, and text. Do not add external art assets.
+
+- Bunny: light oval body, two ears, two visible eyes, and a short mouth marker.
+- Fox: orange body, triangular ears, two visible eyes, and a forward attack marker.
+- Healthy: full species color with complete or near-complete bars.
+- Hurt: red outline and one brief damage pulse.
+- Critical: persistent slow red pulse below 25% HP.
+- Dead: gray body, crossed eyes, empty HP bar, and disabled hitbox marker.
+- Status bars: HP red, food brown, water blue, exposure purple.
+- Interaction: a short forward arc while the mouth or attack hitbox is active.
+- Food: green circle. Well: blue circle and visible capacity ring.
+- Shelter: tan outlined area with a roof marker. Thorns: purple circles.
+- Trees and rocks: solid green and gray shapes matching their Avian colliders.
+- Perception: toggleable rays from the shared point between the eyes.
+
+The HUD shows stage, checkpoint role, seed, playback rate, simulation time,
+species counts, deaths, resource counts, weather, reward, lifetime, retention
+status, and PPO diagnostics. Video overlays identify every stage and checkpoint.
+
+## Video evidence contract
+
+Render H.264/yuv420p at 1280x720 and 30 FPS. Every captured segment uses a fixed
+demo seed, a freshly loaded immutable checkpoint, zero LSTM state, and a visible
+label. The manifest records the exact checkpoint digest, experiment profile,
+seed, playback rate, frame range, and evaluation metrics.
+
+Each stage progression video is exactly 30 seconds:
+
+```text
+0-5s    step-zero or worst checkpoint
+5-10s   early checkpoint near one-third of training
+10-15s  middle checkpoint near two-thirds of training
+15-30s  validation-selected best checkpoint
+```
+
+If a required checkpoint role does not exist, video generation fails. It does
+not silently duplicate another role. Playback defaults to 1x. Any accelerated
+segment must display its rate and record it in the manifest.
+
+The aggregate video begins with eight best-checkpoint previews and then concatenates
+the complete stage progression videos:
+
+```text
+0-5s      forage best
+5-10s     sprint best
+10-15s    gorge best
+15-20s    survival best
+20-25s    shelter best
+25-30s    competition best
+30-35s    predator-prey best
+35-40s    obstacles best
+40-70s    forage progression
+70-100s   sprint progression
+100-130s  gorge progression
+130-160s  survival progression
+160-190s  shelter progression
+190-220s  competition progression
+220-250s  predator-prey progression
+250-280s  obstacles progression
+```
+
+The aggregate manifest references all eight stage manifests and verifies their
+SHA-256 digests. `ffprobe` must report 280 seconds within one
+frame of tolerance, H.264 video, yuv420p, 1280x720, and 30 FPS.
+
+## Implementation sequence
+
+### Slice 0: plan, baseline, and red tests
+
+- [ ] Record current ecosystem-only diff and concurrent-work boundary.
+- [ ] Run the current focused ecosystem test baseline.
+- [ ] Add failing public-seam tests for eight stages, stable tensor shape, reward
+  counterexamples, hitbox/hurtbox contacts, retention selection, and video order.
+- [ ] Record genuine failures caused by missing new behavior.
+
+### Slice 1: eight-stage domain and healthy reward
+
+- [ ] Add the stage graph, new entry points, stable four-value action, eight-stage
+  observation profile, normalized drive, and reward tests.
+- [ ] Remove the current food/drink bonus scale and terminal survival lump.
+- [ ] Search for forbidden distance and auxiliary behavior rewards.
+- [ ] Run forage and survival focused tests.
+
+### Slice 2: Avian interactions and perception
+
+- [ ] Implement shared-origin rays and occlusion tests.
+- [ ] Add solid bodies, child hitboxes, hurtboxes, interaction cooldowns, and
+  collision-layer tests.
+- [ ] Prove pushing, fair simultaneous claims, and dead-agent disablement.
+- [ ] Run every render-disabled ecosystem example test target.
+
+### Slice 3: shelter and continual collection
+
+- [ ] Add exposure, weather, shelter recovery, rendering, and tests.
+- [ ] Add current-policy stage mixtures and typed retention evaluation.
+- [ ] Add suite manifests and predecessor digest validation.
+- [ ] Prove actor transfer, critic reset policy, and earlier-stage rollout contribution.
+
+### Slice 4: competition and predator-prey
+
+- [ ] Requalify fair scarcity under the healthy reward.
+- [ ] Add fox acquisition against frozen prey, alternating updates, opponent pools,
+  and cross-play evidence.
+- [ ] Prove species-specific interactions and non-degenerate outcomes.
+
+### Slice 5: full ecosystem
+
+- [ ] Transfer both species into obstacles, hazards, weather, and procedural maps.
+- [ ] Add from-scratch equal-budget controls and all-stage retention evaluation.
+- [ ] Close every stage gate for three training seeds.
+
+### Slice 6: video and documentation
+
+- [ ] Extend stage video capture to the exact four checkpoint roles and 30 seconds.
+- [ ] Add the aggregate preview and concat pipeline with typed manifests.
+- [ ] Render and inspect every stage video and the aggregate video.
+- [ ] Update `README.md`, `EVIDENCE.md`, and repo-root `HANDOFF.md` in a final
+  prose-only edit after code and tests are green.
+
+## Required verification
+
+Run cheap focused gates after each slice. After the final edit, run every command
+again with the exact scope shown.
 
 ```sh
-cargo run --example <example>
-cargo run --example <example> -- demo
-cargo run --no-default-features --release --example <example> -- train
-cargo run --release --example <example> -- eval --checkpoint <run-or-mpk>
-cargo run --release --example <example> -- watch --checkpoint <run-or-mpk>
-cargo run --release --example <example> -- video --checkpoint <run-dir>
+cargo fmt --all -- --check
+cargo test --example ecosystem-forage --all-features
+cargo test --example ecosystem-survival --all-features
+cargo test --example ecosystem-shelter --all-features
+cargo test --example ecosystem-competition --all-features
+cargo test --example ecosystem-predator-prey --all-features
+cargo test --example ecosystem-obstacles --all-features
+cargo test --example ecosystem-curriculum --all-features
+cargo test
+cargo clippy --all-targets --all-features -- -D warnings
+personal-lints --repo .
+git diff --check
 ```
 
-The no-argument command trains visually by default. `demo` accepts safe
-runtime overrides for iteration count, rollout count, horizon, evaluation
-count, seed, playback speed, and run ID. The explicit `train` command is the
-headless path.
+Run the Rust skill audits against changed ecosystem Rust with zero unexplained
+findings. Run the repository's configured coverage workflow if one exists. If no
+coverage command exists, use `cargo llvm-cov` when installed and inspect every
+reachable production branch added by this change.
 
-Each run uses the existing `runs/<environment>-ppo/<run-id>/` structure and
-writes config, seeds, metrics, evaluation rows, latest and periodic
-checkpoints, `best.mpk`, a summary, and demo files.
+Run direct reward and artifact checks:
 
-Required training metrics:
+```sh
+rg -n 'distance.*reward|reward.*distance|movement.*reward|collision.*reward|push.*reward|kill.*reward' examples/ecosystem
+ffprobe -v error -show_entries stream=codec_name,pix_fmt,width,height,r_frame_rate -show_entries format=duration -of json examples/ecosystem/media/ecosystem-curriculum.mp4
+sha256sum examples/ecosystem/media/*.mp4 examples/ecosystem/media/*.manifest.json
+```
 
-- actor and critic learning rates;
-- valid rollout samples, optimizer updates, policy loss, and value loss;
-- entropy, approximate KL, clip fraction, explained variance, and gradient norm;
-- per-species mean, median, minimum, and maximum lifetime;
-- consumption and drinking counts;
-- starvation, dehydration, thorn, and predation deaths;
-- well empty fraction and mean food availability;
-- per-species active count;
-- collision and push contacts;
-- validation checkpoint score and best-checkpoint selection.
+Inspect the first, middle, and last frame of every stage segment. Tests and
+manifests do not prove that status bars, collision geometry, labels, and behavior
+are visually legible.
 
-Learning rates are constant for the initial recurrent PPO experiments and must
-still be written into config, every checkpoint metric row, the terminal report,
-and the HUD. A later scheduler must log its effective values, not only its
-initial values.
+## Concurrency boundary
 
-## Evaluation protocol
-
-Before training each stage, evaluate the random initialized policy on the same
-fixed validation seeds used for periodic comparison. Select `best.mpk` only on
-validation results. After training, reload `best.mpk` in a fresh process and
-evaluate on disjoint test seeds. Demo seeds are separate from both.
-
-Use at least 100 agent episodes for final single-agent test evidence and at
-least 50 ecosystem episodes for multi-agent stages. Report bootstrap 95%
-confidence intervals for mean lifetime and raw death counts. Run at least three
-training seeds before calling a stage robust. One seed can establish an
-implementation slice but cannot establish release qualification.
-
-Predeclared stage gates:
-
-| Stage | Primary held-out gate | Mechanism gate |
-| --- | --- | --- |
-| Survival | Best policy mean bunny lifetime is at least 30% above random and its 95% lower bound exceeds the random mean. | At least 70% of test episodes contain both eating and drinking before death or horizon. |
-| Competition | Curriculum policy mean lifetime is at least 15% above the stage's random baseline and at least 80% of its solo predecessor on matched physiology settings. | At least two agents consume resources, collisions occur, and no stable agent-index advantage exceeds 20% after rotating spawn assignments. |
-| Predator-prey | Each learned species exceeds its own random-policy lifetime by at least 15%. | Bunnies drink and eat food; foxes drink and eat bunnies; results remain non-degenerate with neither species winning every test episode. |
-| Obstacles | Each transferred species retains at least 85% of its predator-prey test lifetime and exceeds a from-scratch control at the same step budget. | Solid-obstacle penetrations are zero and thorn damage per minute falls by at least 20% from random without reducing predator escape events to zero. |
-
-If a gate fails, retain the run record, diagnose environment dynamics before
-changing optimization, write the hypothesis, and rerun the same gate. Do not
-move a threshold after seeing the result.
-
-## Video and HUD contract
-
-Each stage gets one top-down 1280x720 H.264/yuv420p training video. Its segment
-order is exact:
-
-1. 10 seconds from `best.mpk` on the fixed demo seed.
-2. 5 seconds from every chronological periodic checkpoint at accelerated
-   simulation time.
-3. 20 seconds from `best.mpk` on the same demo seed at normal simulation time.
-
-The middle sequence labels checkpoint step, validation lifetime, and playback
-speed. The HUD also shows stage, species counts, simulation time, learning
-actor/critic learning rates, entropy, mean lifetime, hunger/thirst summaries,
-well capacity, food count, and checkpoint identity. The opening and ending best-policy segments
-must be labelled so viewers do not mistake them for chronological training.
-
-The real-time Bevy view uses a straight-down orthographic camera. Arrow keys or
-WASD pan. Mouse wheel and `-`/`=` zoom. Programmer art uses stable colors and
-basic shapes. Perception rays and compact LSTM-state diagnostics can be toggled
-for debugging without revealing global coordinates to the actor.
-
-`examples/README.md` embeds each curated video and links its run summary. The
-suite README documents the exact reproduction commands and the limits of the
-evidence.
-
-## Incremental implementation checklist
-
-### Slice 0: research and contracts
-
-- [x] Fix stage, policy, observation, reward, and evidence invariants.
-- [x] Complete primary-source research notes.
-- [x] Register the four Cargo example targets and compatible Avian dependency.
-- [x] Add suite and examples index documentation.
-
-### Slice 1: shared deterministic simulation
-
-- [x] Add validated stage configuration and deterministic RNG streams.
-- [x] Add Avian world lifecycle, boundaries, agent bodies, and resource sensors.
-- [x] Add physiology, well depletion/refill, periodic food spawning, and death.
-- [x] Add post-physics ray perception with fixed superset feature channels.
-- [ ] Test reset determinism, local observation shape/range, resource dynamics,
-      starvation/dehydration, collision blocking/pushing, and memory expiry.
-
-### Slice 2: recurrent PPO and survival training proof
-
-- [x] Implement headless smoke, train, resume, and eval CLI modes.
-- [x] Add the recurrent local actor, centralized critic, contiguous rollout,
-      masked GAE, clipped PPO update, and actor-only evaluation API.
-- [x] Prove hidden-state isolation, carry, reset, masking, and checkpoint reload.
-- [x] Write metrics, fixed-seed eval, periodic checkpoints, and fresh reload.
-- [x] Run smoke, baseline, and tuned training experiments.
-- [x] Pass the survival held-out gates and record evidence.
-
-### Slice 3: multi-agent competition
-
-- [x] Add joint actions and individual lifecycle transitions.
-- [x] Pool all valid bunny sequences into one parameter-sharing learner.
-- [x] Implement direct predecessor checkpoint loading and lineage arguments.
-- [ ] Test simultaneous stepping, fair spawn rotation, collision contacts, and
-      valid rollout contribution from every agent.
-- [ ] Pass competition held-out gates and record evidence.
-
-### Slice 4: predator and prey
-
-- [x] Add fox physiology, local perception, memory, and predation contact.
-- [x] Train separate shared bunny and fox policies from the same joint steps.
-- [ ] Load the competition bunny checkpoint and record its lineage.
-- [x] Test species-specific food rules and terminal transitions.
-- [ ] Pass both species' held-out gates and record evidence.
-
-### Slice 5: obstacles and damage tradeoffs
-
-- [x] Generate deterministic non-overlapping trees, rocks, and thorns.
-- [x] Keep trees/rocks solid and thorns traversable.
-- [x] Implement loading both predator-prey policies for continued training.
-- [ ] Test collision penetration, thorn damage, and map reachability.
-- [ ] Pass retention, from-scratch-control, and thorn-avoidance gates.
-
-### Slice 6: visualization and durable evidence
-
-- [x] Make every example start visual training without command arguments.
-- [x] Add an Inspector-egui learning/physiology HUD, graph, and controls.
-- [x] Keep training on a worker thread so the Bevy window stays responsive.
-- [x] Require `train`, `headless`, or `--no-default-features` for headless use.
-- [ ] Add optional perception-ray and collision debug overlays.
-- [x] Add exact checkpoint video sequencing, HUD labels, checkpoint hashes,
-      H.264/yuv420p encoding, and typed manifests.
-- [ ] Produce four qualifying videos and poster frames.
-- [ ] Add video manifests, suite README embeds, and reproduction commands.
-- [ ] Inspect every video and poster, not only their metadata.
-
-### Slice 7: final repository gates
-
-- [x] `cargo fmt --all -- --check`
-- [x] `cargo test --all-targets`
-- [ ] `cargo clippy --all-targets --all-features -- -D warnings`
-- [ ] Run the unchanged personal-lint command recorded by `--dry-run`.
-- [ ] Inspect every repository-local lint warning and rerun to zero candidate
-      diagnostics.
-- [ ] Run training artifact schema and fixture validators.
-- [ ] Verify no generated cache or raw run directory is staged.
-
-## Evidence log
-
-Add one row only after a fresh-process held-out evaluation.
-
-| Stage | Training seed | Initialization | Steps | Random mean lifetime | Best test mean lifetime | 95% CI | Gate | Run summary | Video |
-| --- | ---: | --- | ---: | ---: | ---: | --- | --- | --- | --- |
-| Survival | | random model | | | | | pending | | |
-| Competition | | survival best | | | | | pending | | |
-| Predator-prey bunny | | competition best | | | | | pending | | |
-| Predator-prey fox | | random model | | | | | pending | | |
-| Obstacles bunny | | predator-prey best | | | | | pending | | |
-| Obstacles fox | | predator-prey best | | | | | pending | | |
+Another agent owns the broader Gymnasium example refinement. Before every patch,
+inspect `git status --short -- examples/ecosystem Cargo.toml`. Write only the
+ecosystem files named in this plan and the three required Cargo target blocks.
+Do not format, stage, revert, or repair unrelated example files. If a concurrent
+edit touches the same ecosystem lines, stop that slice, preserve both versions,
+and reconcile from the current file instead of overwriting it.

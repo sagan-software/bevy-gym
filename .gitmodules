@@ -13,3 +13,6 @@
 [submodule "ref/rl-traits"]
 	path = ref/rl-traits
 	url = https://github.com/vidarrio/rl-traits.git
+[submodule "ref/pettingzoo"]
+	path = ref/pettingzoo
+	url = https://github.com/Farama-Foundation/PettingZoo.git

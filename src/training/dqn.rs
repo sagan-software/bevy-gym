@@ -255,11 +255,21 @@ impl DqnPolicy {
     /// Returns an observation error from [`Self::q_values`].
     pub fn greedy_action(&self, observation: &[f32]) -> Result<usize, DqnError> {
         let q_values = self.q_values(observation)?;
-        Ok(q_values
-            .iter()
-            .enumerate()
-            .max_by(|(_, left), (_, right)| left.total_cmp(right))
-            .map_or(0, |(index, _)| index))
+        greedy_legal_action(&q_values, &vec![true; self.action_dim])
+    }
+
+    /// Select the highest-valued action allowed by an environment action mask.
+    ///
+    /// # Errors
+    ///
+    /// Returns an observation or action-mask validation error.
+    pub fn greedy_action_masked(
+        &self,
+        observation: &[f32],
+        action_mask: &[bool],
+    ) -> Result<usize, DqnError> {
+        validate_action_mask(action_mask, self.action_dim)?;
+        greedy_legal_action(&self.q_values(observation)?, action_mask)
     }
 
     /// Runtime observation width expected by this policy.
@@ -401,6 +411,12 @@ struct Experience {
 
     /// Encoded observation after the action.
     next_observation: Vec<f32>,
+
+    /// Legal actions in the next state for masked value bootstrapping.
+    next_action_mask: Vec<bool>,
+
+    /// Sign or scale applied to the discounted next-state value.
+    bootstrap_multiplier: f32,
 
     /// Episode boundary semantics for target masking.
     status: EpisodeStatus,
@@ -668,6 +684,19 @@ impl DqnAgent {
         self.policy().greedy_action(observation)
     }
 
+    /// Select the current highest-valued legal action without exploration.
+    ///
+    /// # Errors
+    ///
+    /// Returns observation or action-mask validation errors.
+    pub fn greedy_action_masked(
+        &self,
+        observation: &[f32],
+        action_mask: &[bool],
+    ) -> Result<usize, DqnError> {
+        self.policy().greedy_action_masked(observation, action_mask)
+    }
+
     /// Number of scalar trainable parameters in the online network.
     #[must_use]
     pub fn parameter_count(&self) -> usize {
@@ -745,13 +774,30 @@ impl DqnAgent {
     ///
     /// Returns an observation error when `observation` has the wrong width.
     pub fn select_action(&mut self, observation: &[f32]) -> Result<DqnActionSelection, DqnError> {
+        self.select_action_masked(observation, &vec![true; self.action_dim])
+    }
+
+    /// Select an action from the legal subset using epsilon-greedy exploration.
+    ///
+    /// # Errors
+    ///
+    /// Returns an observation or action-mask validation error.
+    pub fn select_action_masked(
+        &mut self,
+        observation: &[f32],
+        action_mask: &[bool],
+    ) -> Result<DqnActionSelection, DqnError> {
         validate_observation(observation, self.observation_dim)?;
+        let legal_actions = legal_action_indices(action_mask, self.action_dim)?;
         let epsilon = self.epsilon();
         let explored = self.action_rng.f64() < epsilon;
         let action_index = if explored {
-            self.action_rng.usize_below(self.action_dim)
+            legal_actions
+                .get(self.action_rng.usize_below(legal_actions.len()))
+                .copied()
+                .ok_or(DqnError::NoLegalActions)?
         } else {
-            self.greedy_action(observation)?
+            self.greedy_action_masked(observation, action_mask)?
         };
 
         Ok(DqnActionSelection {
@@ -777,8 +823,73 @@ impl DqnAgent {
         next_observation: &[f32],
         status: EpisodeStatus,
     ) -> Result<Option<DqnUpdate>, DqnError> {
+        self.observe_masked(
+            observation,
+            action_index,
+            reward,
+            next_observation,
+            &vec![true; self.action_dim],
+            status,
+        )
+    }
+
+    /// Store a transition with its next state's legal-action mask.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for invalid observations, actions, masks, rewards, or
+    /// tensor conversions.
+    pub fn observe_masked(
+        &mut self,
+        observation: &[f32],
+        action_index: usize,
+        reward: f64,
+        next_observation: &[f32],
+        next_action_mask: &[bool],
+        status: EpisodeStatus,
+    ) -> Result<Option<DqnUpdate>, DqnError> {
+        self.observe_masked_with_bootstrap_multiplier(
+            observation,
+            action_index,
+            reward,
+            next_observation,
+            next_action_mask,
+            status,
+            1.0,
+        )
+    }
+
+    /// Store a masked transition with an explicit next-state value multiplier.
+    ///
+    /// Use `-1.0` when a zero-sum transition changes the acting perspective,
+    /// and `1.0` when the next observation keeps the same objective.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for invalid transition data or a non-finite bootstrap
+    /// multiplier.
+    pub fn observe_masked_with_bootstrap_multiplier(
+        &mut self,
+        observation: &[f32],
+        action_index: usize,
+        reward: f64,
+        next_observation: &[f32],
+        next_action_mask: &[bool],
+        status: EpisodeStatus,
+        bootstrap_multiplier: f32,
+    ) -> Result<Option<DqnUpdate>, DqnError> {
         validate_observation(observation, self.observation_dim)?;
         validate_observation(next_observation, self.observation_dim)?;
+        if status.is_terminal() {
+            if next_action_mask.len() != self.action_dim {
+                return Err(DqnError::ActionMaskDimension {
+                    expected: self.action_dim,
+                    actual: next_action_mask.len(),
+                });
+            }
+        } else {
+            validate_action_mask(next_action_mask, self.action_dim)?;
+        }
         if action_index >= self.action_dim {
             return Err(DqnError::ActionOutOfBounds {
                 action_index,
@@ -788,12 +899,17 @@ impl DqnAgent {
         if !reward.is_finite() || !(reward as f32).is_finite() {
             return Err(DqnError::NonFiniteReward);
         }
+        if !bootstrap_multiplier.is_finite() {
+            return Err(DqnError::NonFiniteBootstrapMultiplier);
+        }
 
         self.replay.push(Experience {
             observation: observation.to_vec(),
             action_index,
             reward,
             next_observation: next_observation.to_vec(),
+            next_action_mask: next_action_mask.to_vec(),
+            bootstrap_multiplier,
             status,
         });
         self.global_steps += 1;
@@ -821,6 +937,8 @@ impl DqnAgent {
             .iter()
             .map(|item| item.status.bootstrap_mask() as f32)
             .collect();
+        let bootstrap_multipliers: Vec<f32> =
+            batch.iter().map(|item| item.bootstrap_multiplier).collect();
         let action_indices: Vec<i32> = batch.iter().map(|item| item.action_index as i32).collect();
         let probe_observation = observations
             .first()
@@ -832,13 +950,21 @@ impl DqnAgent {
             Tensor::<TrainingBackend, 1>::from_floats(rewards.as_slice(), &self.device);
         let masks_tensor =
             Tensor::<TrainingBackend, 1>::from_floats(masks.as_slice(), &self.device);
+        let bootstrap_multipliers_tensor = Tensor::<TrainingBackend, 1>::from_floats(
+            bootstrap_multipliers.as_slice(),
+            &self.device,
+        );
         let next_q_values = self.target_network.forward(encode_batch_inference(
             &next_observations,
             self.observation_dim,
         ));
-        let max_next_q = next_q_values.max_dim(1).squeeze_dim::<1>(1);
-        let max_next_q = Tensor::<TrainingBackend, 1>::from_inner(max_next_q);
-        let targets = rewards_tensor + masks_tensor * max_next_q * self.config.gamma;
+        // Apply every stored mask before the Bellman maximum so illegal moves
+        // cannot inflate an otherwise valid predecessor state's target.
+        let max_next_q = masked_bootstrap_values(&batch, next_q_values, self.action_dim)?;
+        let max_next_q =
+            Tensor::<TrainingBackend, 1>::from_floats(max_next_q.as_slice(), &self.device);
+        let targets = rewards_tensor
+            + masks_tensor * bootstrap_multipliers_tensor * max_next_q * self.config.gamma;
 
         let q_values = self.online_network.forward(encode_batch_training(
             &observations,
@@ -898,6 +1024,35 @@ impl DqnAgent {
     }
 }
 
+/// Convert a target-network batch into one legal Bellman maximum per sample.
+fn masked_bootstrap_values(
+    batch: &[Experience],
+    next_q_values: Tensor<InferenceBackend, 2>,
+    action_dim: usize,
+) -> Result<Vec<f32>, DqnError> {
+    let flat_next_q = next_q_values
+        .into_data()
+        .to_vec::<f32>()
+        .map_err(|error| DqnError::TensorConversion(error.to_string()))?;
+    batch
+        .iter()
+        .zip(flat_next_q.chunks_exact(action_dim))
+        .map(|(experience, q_values)| {
+            if experience.status.is_terminal() {
+                return Ok(0.0);
+            }
+            let index = greedy_legal_action(q_values, &experience.next_action_mask)?;
+            q_values
+                .get(index)
+                .copied()
+                .ok_or(DqnError::ActionOutOfBounds {
+                    action_index: index,
+                    action_dim: q_values.len(),
+                })
+        })
+        .collect()
+}
+
 /// Errors produced by the reusable DQN core.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum DqnError {
@@ -928,11 +1083,26 @@ pub enum DqnError {
         action_dim: usize,
     },
 
+    /// Action-mask width does not match the configured action space.
+    ActionMaskDimension {
+        /// Expected action count.
+        expected: usize,
+
+        /// Received mask width.
+        actual: usize,
+    },
+
+    /// An action mask marks every action as illegal.
+    NoLegalActions,
+
     /// Burn tensor data could not be converted to host `f32` values.
     TensorConversion(String),
 
     /// A transition reward was NaN or infinite.
     NonFiniteReward,
+
+    /// A transition bootstrap multiplier was NaN or infinite.
+    NonFiniteBootstrapMultiplier,
 
     /// Burn policy recording failed with operation and path context.
     Checkpoint(CheckpointError),
@@ -962,10 +1132,18 @@ impl fmt::Display for DqnError {
                 formatter,
                 "DQN action index {action_index} is outside 0..{action_dim}"
             ),
+            Self::ActionMaskDimension { expected, actual } => write!(
+                formatter,
+                "DQN action-mask width mismatch: expected {expected}, got {actual}"
+            ),
+            Self::NoLegalActions => formatter.write_str("DQN action mask has no legal actions"),
             Self::TensorConversion(message) => {
                 write!(formatter, "DQN tensor conversion failed: {message}")
             }
             Self::NonFiniteReward => formatter.write_str("DQN transition reward must be finite"),
+            Self::NonFiniteBootstrapMultiplier => {
+                formatter.write_str("DQN bootstrap multiplier must be finite")
+            }
             Self::Checkpoint(error) => error.fmt(formatter),
         }
     }
@@ -1024,6 +1202,49 @@ const fn validate_observation(observation: &[f32], expected: usize) -> Result<()
     }
 
     Ok(())
+}
+
+/// Validate an environment-provided legal-action mask.
+fn validate_action_mask(action_mask: &[bool], expected: usize) -> Result<(), DqnError> {
+    if action_mask.len() != expected {
+        return Err(DqnError::ActionMaskDimension {
+            expected,
+            actual: action_mask.len(),
+        });
+    }
+    if !action_mask.iter().any(|is_legal| *is_legal) {
+        return Err(DqnError::NoLegalActions);
+    }
+    Ok(())
+}
+
+/// Return the stable action indices admitted by a validated mask.
+fn legal_action_indices(action_mask: &[bool], expected: usize) -> Result<Vec<usize>, DqnError> {
+    validate_action_mask(action_mask, expected)?;
+    Ok(action_mask
+        .iter()
+        .enumerate()
+        .filter_map(|(index, is_legal)| is_legal.then_some(index))
+        .collect())
+}
+
+/// Select the highest-valued legal action with lowest-index tie breaking.
+fn greedy_legal_action(q_values: &[f32], action_mask: &[bool]) -> Result<usize, DqnError> {
+    validate_action_mask(action_mask, q_values.len())?;
+    q_values
+        .iter()
+        .zip(action_mask)
+        .enumerate()
+        .filter(|(_, (_, is_legal))| **is_legal)
+        .max_by(
+            |(left_index, (left_value, _)), (right_index, (right_value, _))| {
+                left_value
+                    .total_cmp(right_value)
+                    .then_with(|| right_index.cmp(left_index))
+            },
+        )
+        .map(|(index, _)| index)
+        .ok_or(DqnError::NoLegalActions)
 }
 
 /// Flatten encoded observations into an inference-backend batch tensor.
@@ -1250,6 +1471,55 @@ mod tests {
     }
 
     #[test]
+    fn zero_sum_transition_records_negative_opponent_bootstrap() {
+        let config = DqnConfig {
+            hidden_sizes: vec![8],
+            replay_capacity: 8,
+            min_replay_size: 2,
+            batch_size: 1,
+            ..DqnConfig::default()
+        };
+        let mut agent =
+            DqnAgent::new(2, 2, config, SeedConfig::from_root(103)).expect("valid agent");
+
+        let update = agent
+            .observe_masked_with_bootstrap_multiplier(
+                &[0.5, -0.25],
+                1,
+                0.0,
+                &[0.25, 0.75],
+                &[true, true],
+                EpisodeStatus::Continuing,
+                -1.0,
+            )
+            .expect("valid zero-sum transition");
+
+        assert!(update.is_none());
+        let multiplier = agent.replay.data[0].bootstrap_multiplier;
+        assert!((multiplier - (-1.0)).abs() < f32::EPSILON);
+    }
+
+    #[test]
+    fn non_finite_bootstrap_multiplier_is_rejected() {
+        let mut agent = DqnAgent::new(2, 2, DqnConfig::default(), SeedConfig::from_root(107))
+            .expect("valid agent");
+
+        let error = agent
+            .observe_masked_with_bootstrap_multiplier(
+                &[0.5, -0.25],
+                1,
+                0.0,
+                &[0.25, 0.75],
+                &[true, true],
+                EpisodeStatus::Continuing,
+                f32::NAN,
+            )
+            .expect_err("non-finite bootstrap multiplier must fail");
+
+        assert!(matches!(error, DqnError::NonFiniteBootstrapMultiplier));
+    }
+
+    #[test]
     fn epsilon_greedy_actions_use_the_dedicated_action_seed() {
         let config = DqnConfig {
             hidden_sizes: vec![4],
@@ -1270,5 +1540,51 @@ mod tests {
 
         assert!(first_actions.iter().all(|selection| selection.explored));
         assert_eq!(first_actions, second_actions);
+    }
+
+    #[test]
+    fn masked_epsilon_greedy_never_selects_an_illegal_action() {
+        let config = DqnConfig {
+            hidden_sizes: vec![4],
+            epsilon_start: 1.0,
+            epsilon_end: 1.0,
+            ..DqnConfig::default()
+        };
+        let mut agent =
+            DqnAgent::new(2, 4, config, SeedConfig::from_root(307)).expect("valid agent");
+
+        let selections: Vec<_> = (0..64)
+            .map(|_| {
+                agent
+                    .select_action_masked(&[0.0, 0.0], &[false, true, false, true])
+                    .expect("masked action")
+            })
+            .collect();
+
+        assert!(selections
+            .iter()
+            .all(|selection| matches!(selection.action_index, 1 | 3)));
+    }
+
+    #[test]
+    fn action_masks_reject_wrong_width_and_empty_legal_sets() {
+        let config = DqnConfig {
+            hidden_sizes: vec![4],
+            ..DqnConfig::default()
+        };
+        let mut agent =
+            DqnAgent::new(2, 3, config, SeedConfig::from_root(311)).expect("valid agent");
+
+        assert_eq!(
+            agent.select_action_masked(&[0.0, 0.0], &[true, false]),
+            Err(DqnError::ActionMaskDimension {
+                expected: 3,
+                actual: 2,
+            })
+        );
+        assert_eq!(
+            agent.select_action_masked(&[0.0, 0.0], &[false; 3]),
+            Err(DqnError::NoLegalActions)
+        );
     }
 }

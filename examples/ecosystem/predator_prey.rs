@@ -1,4 +1,4 @@
-//! Stage 3: shared-policy predator and prey training.
+//! Stage 7: shared-policy predator and prey training.
 //!
 //! Bunnies eat spawned food. Foxes eat bunnies. Both species must drink from
 //! the finite refillable well. Joint actions are applied simultaneously, then
@@ -21,6 +21,8 @@
 //!
 //! The default render feature supplies the Inspector-egui HUD, camera controls,
 //! checkpoint playback, and checkpoint video generation.
+
+use tokio as _;
 
 #[path = "shared/mod.rs"]
 mod shared;

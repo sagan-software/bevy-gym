@@ -8,18 +8,23 @@ use std::error::Error;
 use std::fmt;
 use std::path::{Path, PathBuf};
 
-use burn::module::{AutodiffModule, Initializer, Module, Param};
+#[cfg(not(target_arch = "wasm32"))]
+use burn::module::AutodiffModule;
+use burn::module::{Initializer, Module, Param};
 use burn::nn::{Linear, LinearConfig, Lstm, LstmConfig, LstmState, Relu};
+#[cfg(not(target_arch = "wasm32"))]
 use burn::optim::adaptor::OptimizerAdaptor;
+#[cfg(not(target_arch = "wasm32"))]
 use burn::optim::{Adam, AdamConfig, GradientsParams, Optimizer};
 use burn::prelude::{Backend, ElementConversion};
+use burn::record::{FullPrecisionSettings, NamedMpkBytesRecorder, Recorder};
 use burn::tensor::Tensor;
 
-use super::backend::{
-    inference_device, training_device, InferenceBackend, TrainingBackend, TrainingDevice,
-    MODEL_INITIALIZATION_LOCK,
-};
+use super::backend::{inference_device, InferenceBackend, MODEL_INITIALIZATION_LOCK};
+#[cfg(not(target_arch = "wasm32"))]
+use super::backend::{training_device, TrainingBackend, TrainingDevice};
 use super::checkpoint::{policy_recorder, CheckpointError, CheckpointOperation};
+#[cfg(not(target_arch = "wasm32"))]
 use super::rng::SeedConfig;
 
 /// Constant in the diagonal Gaussian log-density formula.
@@ -284,6 +289,73 @@ impl<B: Backend> RecurrentActor<B> {
         }
     }
 
+    /// Copy one observation feature across every recurrent input gate.
+    #[cfg(not(target_arch = "wasm32"))]
+    fn copy_input_feature(&mut self, source_feature: usize, target_feature: usize) {
+        let copy_weight = |weight: Param<Tensor<B, 2>>| {
+            weight.map(|tensor| {
+                let hidden_size = tensor.dims()[1];
+                let source = tensor
+                    .clone()
+                    .slice([source_feature..source_feature + 1, 0..hidden_size]);
+                tensor.slice_assign([target_feature..target_feature + 1, 0..hidden_size], source)
+            })
+        };
+
+        self.memory.input_gate.input_transform.weight =
+            copy_weight(self.memory.input_gate.input_transform.weight.clone());
+        self.memory.forget_gate.input_transform.weight =
+            copy_weight(self.memory.forget_gate.input_transform.weight.clone());
+        self.memory.output_gate.input_transform.weight =
+            copy_weight(self.memory.output_gate.input_transform.weight.clone());
+        self.memory.cell_gate.input_transform.weight =
+            copy_weight(self.memory.cell_gate.input_transform.weight.clone());
+    }
+
+    /// Insert one zero-weight observation row into every recurrent input gate.
+    #[cfg(not(target_arch = "wasm32"))]
+    fn insert_zero_input_feature(&mut self, feature: usize, device: &B::Device) {
+        let insert_weight = |weight: Param<Tensor<B, 2>>| {
+            weight.map(|tensor| {
+                let [observation_dim, hidden_size] = tensor.dims();
+                let mut expanded = Tensor::zeros([observation_dim + 1, hidden_size], device);
+                if feature > 0 {
+                    let prefix = tensor.clone().slice([0..feature, 0..hidden_size]);
+                    expanded = expanded.slice_assign([0..feature, 0..hidden_size], prefix);
+                }
+                if feature < observation_dim {
+                    let suffix = tensor.slice([feature..observation_dim, 0..hidden_size]);
+                    expanded = expanded
+                        .slice_assign([feature + 1..observation_dim + 1, 0..hidden_size], suffix);
+                }
+                expanded
+            })
+        };
+
+        self.memory.input_gate.input_transform.weight =
+            insert_weight(self.memory.input_gate.input_transform.weight.clone());
+        self.memory.forget_gate.input_transform.weight =
+            insert_weight(self.memory.forget_gate.input_transform.weight.clone());
+        self.memory.output_gate.input_transform.weight =
+            insert_weight(self.memory.output_gate.input_transform.weight.clone());
+        self.memory.cell_gate.input_transform.weight =
+            insert_weight(self.memory.cell_gate.input_transform.weight.clone());
+    }
+
+    /// Add one finite offset to one pre-tanh action-mean bias.
+    #[cfg(not(target_arch = "wasm32"))]
+    fn shift_mean_bias(&mut self, action_dimension: usize, delta: f32) {
+        if let Some(bias) = self.mean_head.bias.take() {
+            self.mean_head.bias = Some(bias.map(|tensor| {
+                let shifted = tensor
+                    .clone()
+                    .slice(action_dimension..action_dimension + 1)
+                    .add_scalar(delta);
+                tensor.slice_assign(action_dimension..action_dimension + 1, shifted)
+            }));
+        }
+    }
+
     /// Evaluate one batch-first contiguous sequence and return its final memory.
     fn forward(
         &self,
@@ -481,8 +553,32 @@ pub struct RecurrentPpoSequence {
     pub initial_memory: RecurrentMemory,
 }
 
+/// One expert observation and bounded environment action for actor pretraining.
+#[derive(Debug, Clone, PartialEq)]
+pub struct RecurrentBehaviorSample {
+    /// Encoded local observation at an episode boundary.
+    pub observation: Vec<f32>,
+
+    /// Expert action inside the configured environment bounds.
+    pub action: Vec<f32>,
+}
+
+/// One bounded actor target paired with an explicit recurrent state.
+#[derive(Debug, Clone, PartialEq)]
+pub struct RecurrentBehaviorMemorySample {
+    /// Encoded local actor observation.
+    pub observation: Vec<f32>,
+
+    /// LSTM state immediately before the observation.
+    pub initial_memory: RecurrentMemory,
+
+    /// Target action inside the configured environment bounds.
+    pub action: Vec<f32>,
+}
+
 impl RecurrentPpoSequence {
     /// Validate dimensions without permitting episode-boundary padding.
+    #[cfg(not(target_arch = "wasm32"))]
     fn validate(
         &self,
         observation_dim: usize,
@@ -769,6 +865,74 @@ impl RecurrentPpoPolicy {
         })
     }
 
+    /// Load actor and critic parameters from named `MessagePack` bytes.
+    ///
+    /// This is the browser-compatible equivalent of [`Self::load`]. Burn
+    /// records store parameters rather than application architecture, so the
+    /// caller still supplies the exact runtime shapes and configuration.
+    ///
+    /// # Errors
+    ///
+    /// Returns a config or checkpoint error with an in-memory source marker.
+    pub fn load_bytes(
+        bytes: Vec<u8>,
+        observation_dim: usize,
+        global_state_dim: usize,
+        value_count: usize,
+        action_low: &[f32],
+        action_high: &[f32],
+        config: &RecurrentPpoConfig,
+    ) -> Result<Self, RecurrentPpoError> {
+        config.validate(
+            observation_dim,
+            global_state_dim,
+            value_count,
+            action_low,
+            action_high,
+        )?;
+        let _initialization_guard = MODEL_INITIALIZATION_LOCK
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
+        let device = inference_device();
+        let networks = RecurrentNetworks {
+            actor: RecurrentActor::new(
+                observation_dim,
+                config.actor_hidden_size,
+                action_low.len(),
+                config.initial_log_std,
+                &device,
+            ),
+            critic: CentralCritic::new(
+                global_state_dim,
+                &config.critic_hidden_sizes,
+                value_count,
+                &device,
+            ),
+        };
+        let recorder = NamedMpkBytesRecorder::<FullPrecisionSettings>::default();
+        let record = recorder.load(bytes, &device).map_err(|error| {
+            RecurrentPpoError::Checkpoint(CheckpointError::new(
+                CheckpointOperation::Load,
+                "<memory>",
+                error.to_string(),
+            ))
+        })?;
+        let networks = networks.load_record(record);
+        Ok(Self {
+            actor: networks.actor,
+            critic: networks.critic,
+            observation_dim,
+            global_state_dim,
+            value_count,
+            hidden_size: config.actor_hidden_size,
+            action_low: action_low.to_vec(),
+            action_high: action_high.to_vec(),
+            log_std_min: config.log_std_min,
+            log_std_max: config.log_std_max,
+            log_probability_epsilon: config.log_probability_epsilon,
+        })
+    }
+
     /// Evaluate Gaussian parameters and advance one local recurrent state.
     fn distribution(
         &self,
@@ -797,6 +961,7 @@ impl RecurrentPpoPolicy {
 }
 
 /// Stateful recurrent PPO learner for one parameter-sharing group.
+#[cfg(not(target_arch = "wasm32"))]
 pub struct RecurrentPpoAgent {
     /// Autodiff local actor.
     actor: RecurrentActor<TrainingBackend>,
@@ -840,11 +1005,13 @@ pub struct RecurrentPpoAgent {
 
 /// Small independent stream used only to shuffle intact recurrent chunks.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[cfg(not(target_arch = "wasm32"))]
 struct MinibatchRng {
     /// Current `SplitMix64` state.
     state: u64,
 }
 
+#[cfg(not(target_arch = "wasm32"))]
 impl MinibatchRng {
     /// Construct the stream from the caller's dedicated rollout seed.
     const fn new(seed: u64) -> Self {
@@ -869,6 +1036,7 @@ impl MinibatchRng {
     }
 }
 
+#[cfg(not(target_arch = "wasm32"))]
 impl fmt::Debug for RecurrentPpoAgent {
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
         formatter
@@ -884,6 +1052,7 @@ impl fmt::Debug for RecurrentPpoAgent {
     }
 }
 
+#[cfg(not(target_arch = "wasm32"))]
 impl RecurrentPpoAgent {
     /// Initialize one species-specific actor and critic pair.
     ///
@@ -1010,8 +1179,102 @@ impl RecurrentPpoAgent {
             config,
             seeds,
         )?;
+        let networks = agent.load_networks(path)?;
+        agent.actor = networks.actor;
+        agent.critic = networks.critic;
+        Ok(agent)
+    }
+
+    /// Load a recurrent actor while retaining a newly initialized critic.
+    ///
+    /// This transfer mode preserves decentralized behavior across curriculum
+    /// stages and starts value learning from the destination stage's seed.
+    /// Both optimizer states also start fresh.
+    ///
+    /// # Errors
+    ///
+    /// Returns a configuration or checkpoint error.
+    pub fn load_actor_with_fresh_critic(
+        path: impl AsRef<Path>,
+        observation_dim: usize,
+        global_state_dim: usize,
+        value_count: usize,
+        action_low: &[f32],
+        action_high: &[f32],
+        config: RecurrentPpoConfig,
+        seeds: SeedConfig,
+    ) -> Result<Self, RecurrentPpoError> {
+        let path = path.as_ref().to_path_buf();
+        let mut agent = Self::new(
+            observation_dim,
+            global_state_dim,
+            value_count,
+            action_low,
+            action_high,
+            config,
+            seeds,
+        )?;
+        let networks = agent.load_networks(path)?;
+        agent.actor = networks.actor;
+        Ok(agent)
+    }
+
+    /// Load a legacy actor after inserting one zero-weight observation feature.
+    ///
+    /// Every existing input row keeps its relative order. The inserted feature
+    /// cannot affect the migrated actor until later training changes its zero
+    /// weights. The destination critic and both optimizer states start fresh.
+    ///
+    /// # Errors
+    ///
+    /// Returns a configuration or checkpoint error if the source shape, insert
+    /// position, destination shape, or saved record is invalid.
+    #[expect(
+        clippy::too_many_arguments,
+        reason = "checkpoint migration requires explicit source and destination contracts"
+    )]
+    pub fn load_actor_with_inserted_input_feature_and_fresh_critic(
+        path: impl AsRef<Path>,
+        source_observation_dim: usize,
+        inserted_feature: usize,
+        global_state_dim: usize,
+        value_count: usize,
+        action_low: &[f32],
+        action_high: &[f32],
+        config: RecurrentPpoConfig,
+        seeds: SeedConfig,
+    ) -> Result<Self, RecurrentPpoError> {
+        let observation_dim = source_observation_dim.checked_add(1).ok_or_else(|| {
+            RecurrentPpoError::invalid_config(
+                "source_observation_dim",
+                "source width must allow one inserted feature",
+            )
+        })?;
+        if inserted_feature > source_observation_dim {
+            return Err(RecurrentPpoError::invalid_config(
+                "inserted_feature",
+                "insert position must be at or before the source width",
+            ));
+        }
+
+        let path = path.as_ref().to_path_buf();
+        let mut agent = Self::new(
+            observation_dim,
+            global_state_dim,
+            value_count,
+            action_low,
+            action_high,
+            config,
+            seeds,
+        )?;
         let networks = RecurrentNetworks {
-            actor: agent.actor.clone(),
+            actor: RecurrentActor::new(
+                source_observation_dim,
+                agent.config.actor_hidden_size,
+                action_low.len(),
+                agent.config.initial_log_std,
+                &agent.device,
+            ),
             critic: agent.critic.clone(),
         }
         .load_file(path.clone(), &policy_recorder(), &agent.device)
@@ -1023,8 +1286,239 @@ impl RecurrentPpoAgent {
             ))
         })?;
         agent.actor = networks.actor;
-        agent.critic = networks.critic;
+        agent
+            .actor
+            .insert_zero_input_feature(inserted_feature, &agent.device);
         Ok(agent)
+    }
+
+    /// Copy one actor observation feature's LSTM input weights to another feature.
+    ///
+    /// This preserves learned behavior when two typed input channels represent
+    /// the same curriculum context before and after a stage transition. All
+    /// recurrent, output-head, exploration, and critic parameters remain unchanged.
+    ///
+    /// # Errors
+    ///
+    /// Returns a configuration error if either feature index is outside the
+    /// actor observation width.
+    pub fn copy_actor_input_feature(
+        &mut self,
+        source_feature: usize,
+        target_feature: usize,
+    ) -> Result<(), RecurrentPpoError> {
+        if source_feature >= self.observation_dim || target_feature >= self.observation_dim {
+            return Err(RecurrentPpoError::invalid_config(
+                "actor_input_feature",
+                "source and target must be inside the observation width",
+            ));
+        }
+
+        // Copy the input row for every LSTM gate so the target channel has the
+        // exact same recurrent effect as the learned source channel.
+        self.actor
+            .copy_input_feature(source_feature, target_feature);
+        Ok(())
+    }
+
+    /// Add a finite offset to one actor action-mean bias.
+    ///
+    /// The offset applies before `tanh` action bounding. Recurrent memory,
+    /// exploration scale, every other action dimension, and the critic remain
+    /// unchanged.
+    ///
+    /// # Errors
+    ///
+    /// Returns a configuration error for an invalid action dimension or a
+    /// non-finite offset.
+    pub fn shift_actor_mean_bias(
+        &mut self,
+        action_dimension: usize,
+        delta: f32,
+    ) -> Result<(), RecurrentPpoError> {
+        if action_dimension >= self.action_low.len() || !delta.is_finite() {
+            return Err(RecurrentPpoError::invalid_config(
+                "actor_mean_bias",
+                "action dimension must be valid and offset must be finite",
+            ));
+        }
+        self.actor.shift_mean_bias(action_dimension, delta);
+        Ok(())
+    }
+
+    /// Read one complete network record into this agent's architecture.
+    fn load_networks(
+        &self,
+        path: PathBuf,
+    ) -> Result<RecurrentNetworks<TrainingBackend>, RecurrentPpoError> {
+        RecurrentNetworks {
+            actor: self.actor.clone(),
+            critic: self.critic.clone(),
+        }
+        .load_file(path.clone(), &policy_recorder(), &self.device)
+        .map_err(|error| {
+            RecurrentPpoError::Checkpoint(CheckpointError::new(
+                CheckpointOperation::Load,
+                path,
+                error.to_string(),
+            ))
+        })
+    }
+
+    /// Fit the deterministic actor mean to one batch of expert actions.
+    ///
+    /// Each sample starts with zero recurrent memory. This makes the method fit
+    /// Markov demonstrations without exposing the training-only critic.
+    ///
+    /// # Errors
+    ///
+    /// Returns a dimension, non-finite, action-bound, or empty-batch error.
+    pub fn behavior_clone(
+        &mut self,
+        samples: &[RecurrentBehaviorSample],
+    ) -> Result<f64, RecurrentPpoError> {
+        self.validate_behavior_samples(samples)?;
+
+        let observations = samples
+            .iter()
+            .map(|sample| sample.observation.clone())
+            .collect::<Vec<_>>();
+        let target_actions = samples
+            .iter()
+            .map(|sample| normalize_action(&sample.action, &self.action_low, &self.action_high))
+            .collect::<Vec<_>>();
+        let observations =
+            encode_matrix::<TrainingBackend>(&observations, self.observation_dim, &self.device)
+                .reshape([samples.len(), 1, self.observation_dim]);
+        let targets =
+            encode_matrix::<TrainingBackend>(&target_actions, self.action_low.len(), &self.device);
+        let (mean, _, _) = self.actor.forward(
+            observations,
+            None,
+            self.action_low.len(),
+            self.config.log_std_min,
+            self.config.log_std_max,
+        );
+        let residual = mean.tanh() - targets;
+        let loss = residual.clone().mul(residual).mean();
+        let loss_value = loss.clone().into_scalar().elem::<f64>();
+        let gradients = GradientsParams::from_grads(loss.backward(), &self.actor);
+        self.actor = self.actor_optimizer.step(
+            self.config.actor_learning_rate,
+            self.actor.clone(),
+            gradients,
+        );
+        Ok(loss_value)
+    }
+
+    /// Fit bounded actor targets at explicit recurrent states.
+    ///
+    /// Each sample is one step, so callers can regularize recurrent behavior
+    /// without backpropagating through the actions that produced its memory.
+    ///
+    /// # Errors
+    ///
+    /// Returns a dimension, non-finite, action-bound, memory, or empty-batch error.
+    pub fn behavior_clone_with_memory(
+        &mut self,
+        samples: &[RecurrentBehaviorMemorySample],
+    ) -> Result<f64, RecurrentPpoError> {
+        self.validate_memory_behavior_samples(samples)?;
+
+        let observations = samples
+            .iter()
+            .map(|sample| sample.observation.clone())
+            .collect::<Vec<_>>();
+        let target_actions = samples
+            .iter()
+            .map(|sample| normalize_action(&sample.action, &self.action_low, &self.action_high))
+            .collect::<Vec<_>>();
+        let observations =
+            encode_matrix::<TrainingBackend>(&observations, self.observation_dim, &self.device)
+                .reshape([samples.len(), 1, self.observation_dim]);
+        let memories = samples
+            .iter()
+            .map(|sample| sample.initial_memory.clone())
+            .collect::<Vec<_>>();
+        let state = memories_to_state::<TrainingBackend>(
+            &memories,
+            &self.device,
+            self.config.actor_hidden_size,
+        );
+        let targets =
+            encode_matrix::<TrainingBackend>(&target_actions, self.action_low.len(), &self.device);
+        let (mean, _, _) = self.actor.forward(
+            observations,
+            Some(state),
+            self.action_low.len(),
+            self.config.log_std_min,
+            self.config.log_std_max,
+        );
+        let residual = mean.tanh() - targets;
+        let loss = residual.clone().mul(residual).mean();
+        let loss_value = loss.clone().into_scalar().elem::<f64>();
+        let gradients = GradientsParams::from_grads(loss.backward(), &self.actor);
+        self.actor = self.actor_optimizer.step(
+            self.config.actor_learning_rate,
+            self.actor.clone(),
+            gradients,
+        );
+        Ok(loss_value)
+    }
+
+    /// Validate one Markov behavior-cloning batch at the public boundary.
+    fn validate_behavior_samples(
+        &self,
+        samples: &[RecurrentBehaviorSample],
+    ) -> Result<(), RecurrentPpoError> {
+        if samples.is_empty() {
+            return Err(RecurrentPpoError::invalid_sequence(
+                "at least one behavior sample is required",
+            ));
+        }
+        for sample in samples {
+            validate_vector(&sample.observation, self.observation_dim, "observation")?;
+            validate_vector(&sample.action, self.action_low.len(), "action")?;
+            if sample
+                .action
+                .iter()
+                .zip(self.action_low.iter().zip(&self.action_high))
+                .any(|(action, (low, high))| action < low || action > high)
+            {
+                return Err(RecurrentPpoError::invalid_sequence(
+                    "behavior actions must remain inside the configured bounds",
+                ));
+            }
+        }
+        Ok(())
+    }
+
+    /// Validate one explicit-memory behavior-cloning batch.
+    fn validate_memory_behavior_samples(
+        &self,
+        samples: &[RecurrentBehaviorMemorySample],
+    ) -> Result<(), RecurrentPpoError> {
+        if samples.is_empty() {
+            return Err(RecurrentPpoError::invalid_sequence(
+                "at least one explicit-memory behavior sample is required",
+            ));
+        }
+        for sample in samples {
+            validate_vector(&sample.observation, self.observation_dim, "observation")?;
+            validate_vector(&sample.action, self.action_low.len(), "action")?;
+            validate_memory(&sample.initial_memory, self.config.actor_hidden_size)?;
+            if sample
+                .action
+                .iter()
+                .zip(self.action_low.iter().zip(&self.action_high))
+                .any(|(action, (low, high))| action < low || action > high)
+            {
+                return Err(RecurrentPpoError::invalid_sequence(
+                    "explicit-memory behavior actions must remain inside the configured bounds",
+                ));
+            }
+        }
+        Ok(())
     }
 
     /// Apply clipped PPO actor updates and centralized critic regression.
@@ -1147,6 +1641,90 @@ impl RecurrentPpoAgent {
         })
     }
 
+    /// Regress the centralized critic while leaving the actor unchanged.
+    ///
+    /// This supports bounded value warmup after actor-only curriculum transfer.
+    /// Every sequence must remain contiguous and inside one episode.
+    ///
+    /// # Errors
+    ///
+    /// Returns a sequence validation or tensor conversion error.
+    pub fn update_critic(
+        &mut self,
+        sequences: &[RecurrentPpoSequence],
+    ) -> Result<RecurrentPpoUpdate, RecurrentPpoError> {
+        if sequences.is_empty() {
+            return Err(RecurrentPpoError::invalid_sequence(
+                "at least one sequence is required",
+            ));
+        }
+        for sequence in sequences {
+            sequence.validate(
+                self.observation_dim,
+                self.global_state_dim,
+                self.action_low.len(),
+                self.config.actor_hidden_size,
+                self.value_count,
+            )?;
+        }
+
+        let valid_samples = sequences.iter().fold(0_u64, |total, sequence| {
+            total.saturating_add(sequence.observations.len() as u64)
+        });
+        let mut critic_loss_total = 0.0;
+        let mut valid_timestep_total = 0_u64;
+        let mut optimizer_updates = 0_u64;
+        let mut minibatch_order = sequences.iter().collect::<Vec<_>>();
+        for _ in 0..self.config.epochs {
+            self.minibatch_rng.shuffle(&mut minibatch_order);
+            for minibatch in minibatch_order.chunks(self.config.minibatch_sequences) {
+                let mut critic_loss = None;
+                let mut minibatch_valid_timesteps = 0_usize;
+                for sequence in minibatch {
+                    let (sequence_loss, sequence_loss_value) = self.critic_loss(sequence);
+                    let valid_timesteps = sequence.observations.len();
+                    let tensor_weight = valid_timesteps as f32;
+                    let metric_weight = valid_timesteps as f64;
+                    critic_loss = Some(match critic_loss {
+                        Some(total) => total + sequence_loss * tensor_weight,
+                        None => sequence_loss * tensor_weight,
+                    });
+                    critic_loss_total =
+                        sequence_loss_value.mul_add(metric_weight, critic_loss_total);
+                    valid_timestep_total =
+                        valid_timestep_total.saturating_add(valid_timesteps as u64);
+                    minibatch_valid_timesteps =
+                        minibatch_valid_timesteps.saturating_add(valid_timesteps);
+                }
+                let Some(critic_loss) = critic_loss else {
+                    return Err(RecurrentPpoError::invalid_sequence(
+                        "optimizer minibatches must be nonempty",
+                    ));
+                };
+                let critic_loss = critic_loss / minibatch_valid_timesteps as f32;
+                let gradients = GradientsParams::from_grads(critic_loss.backward(), &self.critic);
+                self.critic = self.critic_optimizer.step(
+                    self.config.critic_learning_rate,
+                    self.critic.clone(),
+                    gradients,
+                );
+                optimizer_updates = optimizer_updates.saturating_add(1);
+            }
+        }
+        let divisor = valid_timestep_total as f64;
+        Ok(RecurrentPpoUpdate {
+            optimizer_steps: self.optimizer_steps,
+            optimizer_updates,
+            valid_samples,
+            actor_loss: 0.0,
+            critic_loss: critic_loss_total / divisor,
+            entropy: 0.0,
+            approximate_kl: 0.0,
+            actor_learning_rate: self.config.actor_learning_rate,
+            critic_learning_rate: self.config.critic_learning_rate,
+        })
+    }
+
     /// Build one intact sequence's differentiable actor objective.
     fn actor_loss(
         &self,
@@ -1246,6 +1824,7 @@ impl RecurrentPpoAgent {
 
 /// Accumulated update diagnostics before averaging.
 #[derive(Debug, Default, Clone, Copy, PartialEq)]
+#[cfg(not(target_arch = "wasm32"))]
 struct UpdateTotals {
     /// Actor loss sum weighted by valid recurrent timesteps.
     actor_loss: f64,
@@ -1265,6 +1844,7 @@ struct UpdateTotals {
 
 /// Diagnostics returned by one actor sequence update.
 #[derive(Debug, Clone, Copy, PartialEq)]
+#[cfg(not(target_arch = "wasm32"))]
 struct ActorMetrics {
     /// Combined actor loss.
     loss: f64,
@@ -1335,6 +1915,7 @@ impl RecurrentPpoError {
     }
 
     /// Construct a static sequence error.
+    #[cfg(not(target_arch = "wasm32"))]
     const fn invalid_sequence(reason: &'static str) -> Self {
         Self::InvalidSequence(reason)
     }
@@ -1402,6 +1983,27 @@ fn memory_to_state<B: Backend>(
     LstmState::new(cell, hidden)
 }
 
+/// Convert host recurrent states into one batched backend state.
+#[cfg(not(target_arch = "wasm32"))]
+fn memories_to_state<B: Backend>(
+    memories: &[RecurrentMemory],
+    device: &B::Device,
+    hidden_size: usize,
+) -> LstmState<B, 2> {
+    let cells = memories
+        .iter()
+        .map(|memory| memory.cell.clone())
+        .collect::<Vec<_>>();
+    let hidden = memories
+        .iter()
+        .map(|memory| memory.hidden.clone())
+        .collect::<Vec<_>>();
+    LstmState::new(
+        encode_matrix::<B>(&cells, hidden_size, device),
+        encode_matrix::<B>(&hidden, hidden_size, device),
+    )
+}
+
 /// Convert a one-lane backend state into detached host memory.
 fn state_to_memory<B: Backend>(
     state: LstmState<B, 2>,
@@ -1423,12 +2025,14 @@ fn tensor_vec<B: Backend, const D: usize>(
 }
 
 /// Flatten a validated row-major matrix into a backend tensor.
+#[cfg(not(target_arch = "wasm32"))]
 fn encode_matrix<B: Backend>(rows: &[Vec<f32>], width: usize, device: &B::Device) -> Tensor<B, 2> {
     let values: Vec<_> = rows.iter().flatten().copied().collect();
     Tensor::<B, 1>::from_floats(values.as_slice(), device).reshape([rows.len(), width])
 }
 
 /// Evaluate corrected tanh-and-affine diagonal Gaussian log probabilities.
+#[cfg(not(target_arch = "wasm32"))]
 fn tensor_log_probabilities<B: Backend>(
     mean: Tensor<B, 2>,
     log_std: Tensor<B, 2>,
@@ -1470,6 +2074,16 @@ fn scale_action(samples: &[f32], action_low: &[f32], action_high: &[f32]) -> Vec
         .collect()
 }
 
+/// Normalize bounded environment actions into the actor's `[-1, 1]` range.
+#[cfg(not(target_arch = "wasm32"))]
+fn normalize_action(actions: &[f32], action_low: &[f32], action_high: &[f32]) -> Vec<f32> {
+    actions
+        .iter()
+        .zip(action_low.iter().zip(action_high))
+        .map(|(action, (low, high))| 2.0 * (action - low) / (high - low) - 1.0)
+        .collect()
+}
+
 /// Host equivalent of [`tensor_log_probabilities`] for behavior collection.
 fn host_log_probability(
     mean: &[f32],
@@ -1497,6 +2111,7 @@ fn host_log_probability(
 }
 
 /// Compute shared advantage normalization statistics.
+#[cfg(not(target_arch = "wasm32"))]
 fn advantage_normalization(sequences: &[RecurrentPpoSequence], epsilon: f32) -> (f32, f32) {
     let count: usize = sequences
         .iter()
@@ -1524,6 +2139,7 @@ fn validate_memory(memory: &RecurrentMemory, hidden_size: usize) -> Result<(), R
 }
 
 /// Validate every row of one matrix.
+#[cfg(not(target_arch = "wasm32"))]
 fn validate_matrix(
     rows: &[Vec<f32>],
     width: usize,
@@ -1719,6 +2335,149 @@ mod tests {
         assert!(update.approximate_kl.is_finite());
     }
 
+    /// Critic warmup must leave recurrent actor behavior unchanged.
+    #[test]
+    fn critic_only_update_preserves_actor_and_changes_value() {
+        let config = RecurrentPpoConfig {
+            actor_hidden_size: 8,
+            critic_hidden_sizes: vec![8],
+            epochs: 2,
+            ..RecurrentPpoConfig::default()
+        };
+        let mut agent =
+            RecurrentPpoAgent::new(2, 3, 1, &[-1.0], &[1.0], config, SeedConfig::from_root(80))
+                .expect("agent initializes");
+        let observation = [0.1, 0.2];
+        let global_state = [0.0, 0.1, 0.2];
+        let policy = agent.policy();
+        let memory = policy.initial_memory();
+        let before_action = policy
+            .mean_action(&observation, &memory)
+            .expect("actor evaluates before warmup");
+        let before_value = policy
+            .value(&global_state, 0)
+            .expect("critic evaluates before warmup");
+        let sequence = RecurrentPpoSequence {
+            observations: vec![observation.to_vec(); 4],
+            global_states: vec![global_state.to_vec(); 4],
+            pre_tanh_actions: vec![before_action.pre_tanh_action.clone(); 4],
+            old_log_probabilities: vec![before_action.log_probability; 4],
+            advantages: vec![1.0; 4],
+            returns: vec![2.0; 4],
+            value_index: 0,
+            initial_memory: memory,
+        };
+
+        let update = agent
+            .update_critic(std::slice::from_ref(&sequence))
+            .expect("critic warmup succeeds");
+        let warmed = agent.policy();
+
+        assert_eq!(
+            before_action,
+            warmed
+                .mean_action(&observation, &warmed.initial_memory())
+                .expect("actor evaluates after warmup")
+        );
+        assert_ne!(
+            before_value.to_bits(),
+            warmed
+                .value(&global_state, 0)
+                .expect("critic evaluates after warmup")
+                .to_bits()
+        );
+        assert!(update.actor_loss.abs() < f64::EPSILON);
+        assert!(update.critic_loss.is_finite());
+        assert_eq!(update.optimizer_updates, 2);
+    }
+
+    /// Demonstrations must directly move the deterministic actor toward expert actions.
+    #[test]
+    fn behavior_cloning_reduces_mean_action_error() {
+        let config = RecurrentPpoConfig {
+            actor_hidden_size: 8,
+            critic_hidden_sizes: vec![8],
+            actor_learning_rate: 0.01,
+            ..RecurrentPpoConfig::default()
+        };
+        let mut agent =
+            RecurrentPpoAgent::new(2, 2, 1, &[-1.0], &[1.0], config, SeedConfig::from_root(80))
+                .expect("agent initializes");
+        let demonstrations = [
+            RecurrentBehaviorSample {
+                observation: vec![1.0, 0.0],
+                action: vec![0.8],
+            },
+            RecurrentBehaviorSample {
+                observation: vec![-1.0, 0.0],
+                action: vec![-0.8],
+            },
+        ];
+        let mean_error = |agent: &RecurrentPpoAgent| {
+            let policy = agent.policy();
+            demonstrations
+                .iter()
+                .map(|sample| {
+                    let predicted = policy
+                        .mean_action(&sample.observation, &policy.initial_memory())
+                        .expect("mean action succeeds")
+                        .action[0];
+                    (predicted - sample.action[0]).powi(2)
+                })
+                .sum::<f32>()
+                / demonstrations.len() as f32
+        };
+        let initial_error = mean_error(&agent);
+        for _ in 0..200 {
+            agent
+                .behavior_clone(&demonstrations)
+                .expect("behavior update succeeds");
+        }
+
+        assert!(mean_error(&agent) < initial_error * 0.1);
+    }
+
+    /// Explicit-memory behavior cloning must fit targets at nonzero LSTM states.
+    #[test]
+    fn explicit_memory_behavior_cloning_reduces_mean_action_error() {
+        let config = RecurrentPpoConfig {
+            actor_hidden_size: 8,
+            critic_hidden_sizes: vec![8],
+            actor_learning_rate: 0.01,
+            ..RecurrentPpoConfig::default()
+        };
+        let mut agent =
+            RecurrentPpoAgent::new(2, 2, 1, &[-1.0], &[1.0], config, SeedConfig::from_root(81))
+                .expect("agent initializes");
+        let policy = agent.policy();
+        let memory = policy
+            .mean_action(&[1.0, 0.0], &policy.initial_memory())
+            .expect("warmup succeeds")
+            .next_memory;
+        let demonstrations = [RecurrentBehaviorMemorySample {
+            observation: vec![0.0, 1.0],
+            initial_memory: memory,
+            action: vec![0.8],
+        }];
+        let mean_error = |agent: &RecurrentPpoAgent| {
+            let policy = agent.policy();
+            let sample = &demonstrations[0];
+            let predicted = policy
+                .mean_action(&sample.observation, &sample.initial_memory)
+                .expect("explicit-memory mean action succeeds")
+                .action[0];
+            (predicted - sample.action[0]).powi(2)
+        };
+        let initial_error = mean_error(&agent);
+        for _ in 0..200 {
+            agent
+                .behavior_clone_with_memory(&demonstrations)
+                .expect("explicit-memory behavior update succeeds");
+        }
+
+        assert!(mean_error(&agent) < initial_error * 0.1);
+    }
+
     /// Mixed recurrent chunks must contribute in proportion to valid timesteps.
     #[test]
     fn mixed_length_sequences_weight_update_metrics_by_valid_timesteps() {
@@ -1881,6 +2640,10 @@ mod tests {
         policy.save(&path).expect("policy checkpoint saves");
         let loaded = RecurrentPpoPolicy::load(&path, 2, 3, 2, &[-1.0], &[1.0], &config)
             .expect("policy checkpoint loads");
+        let checkpoint_bytes = std::fs::read(&path).expect("checkpoint bytes read");
+        let loaded_from_bytes =
+            RecurrentPpoPolicy::load_bytes(checkpoint_bytes, 2, 3, 2, &[-1.0], &[1.0], &config)
+                .expect("policy checkpoint bytes load");
 
         assert_eq!(
             expected_action,
@@ -1895,6 +2658,233 @@ mod tests {
                 .expect("loaded critic inference succeeds")
                 .to_bits()
         );
+        assert_eq!(
+            expected_action,
+            loaded_from_bytes
+                .mean_action(&observation, &loaded_from_bytes.initial_memory())
+                .expect("bytes-loaded actor inference succeeds")
+        );
+        assert_eq!(
+            expected_value.to_bits(),
+            loaded_from_bytes
+                .value(&global_state, 1)
+                .expect("bytes-loaded critic inference succeeds")
+                .to_bits()
+        );
         drop(std::fs::remove_dir_all(root));
+    }
+
+    /// Stage transfer must preserve the actor while reinitializing the critic.
+    #[test]
+    #[expect(
+        clippy::allow_attributes,
+        reason = "the repository disallows synchronous filesystem helpers by default"
+    )]
+    #[allow(
+        clippy::disallowed_methods,
+        reason = "bounded synchronous filesystem setup keeps the transfer test dependency-free"
+    )]
+    fn actor_only_checkpoint_load_keeps_a_fresh_critic() {
+        let config = RecurrentPpoConfig {
+            actor_hidden_size: 8,
+            critic_hidden_sizes: vec![8],
+            ..RecurrentPpoConfig::default()
+        };
+        let source = RecurrentPpoAgent::new(
+            2,
+            3,
+            2,
+            &[-1.0],
+            &[1.0],
+            config.clone(),
+            SeedConfig::from_root(101),
+        )
+        .expect("source agent initializes");
+        let root = std::env::temp_dir().join(format!(
+            "bevy-gym-recurrent-ppo-actor-transfer-{}",
+            std::process::id()
+        ));
+        drop(std::fs::remove_dir_all(&root));
+        std::fs::create_dir_all(&root).expect("temporary checkpoint directory creates");
+        let path = root.join("policy.mpk");
+        source.policy().save(&path).expect("source policy saves");
+        let transfer_seeds = SeedConfig::from_root(103);
+        let fresh =
+            RecurrentPpoAgent::new(2, 3, 2, &[-1.0], &[1.0], config.clone(), transfer_seeds)
+                .expect("fresh reference agent initializes");
+
+        let transferred = RecurrentPpoAgent::load_actor_with_fresh_critic(
+            &path,
+            2,
+            3,
+            2,
+            &[-1.0],
+            &[1.0],
+            config,
+            transfer_seeds,
+        )
+        .expect("actor-only transfer loads");
+        let observation = [0.25, -0.5];
+        let global_state = [0.1, 0.2, 0.3];
+        let source_policy = source.policy();
+        let fresh_policy = fresh.policy();
+        let transferred_policy = transferred.policy();
+
+        assert_eq!(
+            source_policy
+                .mean_action(&observation, &source_policy.initial_memory())
+                .expect("source actor evaluates"),
+            transferred_policy
+                .mean_action(&observation, &transferred_policy.initial_memory())
+                .expect("transferred actor evaluates")
+        );
+        assert_eq!(
+            fresh_policy
+                .value(&global_state, 1)
+                .expect("fresh critic evaluates")
+                .to_bits(),
+            transferred_policy
+                .value(&global_state, 1)
+                .expect("transferred critic evaluates")
+                .to_bits()
+        );
+        assert_ne!(
+            source_policy
+                .value(&global_state, 1)
+                .expect("source critic evaluates")
+                .to_bits(),
+            transferred_policy
+                .value(&global_state, 1)
+                .expect("transferred critic evaluates")
+                .to_bits()
+        );
+        drop(std::fs::remove_dir_all(root));
+    }
+
+    /// Input-feature transfer must preserve the source actor response exactly.
+    #[test]
+    fn actor_input_feature_copy_preserves_behavior_and_validates_indices() {
+        let mut agent = RecurrentPpoAgent::new(
+            2,
+            3,
+            2,
+            &[-1.0],
+            &[1.0],
+            RecurrentPpoConfig::default(),
+            SeedConfig::from_root(107),
+        )
+        .expect("agent initializes");
+        let source_policy = agent.policy();
+        let expected = source_policy
+            .mean_action(&[1.0, 0.0], &source_policy.initial_memory())
+            .expect("source feature evaluates");
+
+        agent
+            .copy_actor_input_feature(0, 1)
+            .expect("bounded feature copy succeeds");
+        let transferred_policy = agent.policy();
+
+        assert_eq!(
+            expected,
+            transferred_policy
+                .mean_action(&[0.0, 1.0], &transferred_policy.initial_memory())
+                .expect("target feature evaluates")
+        );
+        assert!(agent.copy_actor_input_feature(2, 0).is_err());
+        assert!(agent.copy_actor_input_feature(0, 2).is_err());
+    }
+
+    /// Adding one zero-weight observation feature must preserve legacy actor behavior exactly.
+    #[test]
+    #[expect(
+        clippy::disallowed_methods,
+        reason = "bounded synchronous filesystem setup keeps the migration test dependency-free"
+    )]
+    fn actor_input_insertion_migrates_a_legacy_checkpoint() {
+        let directory = std::env::temp_dir().join(format!(
+            "bevy-gym-recurrent-ppo-input-migration-{}",
+            std::process::id()
+        ));
+        if directory.exists() {
+            std::fs::remove_dir_all(&directory).expect("stale test directory is removable");
+        }
+        std::fs::create_dir_all(&directory).expect("test directory is creatable");
+        let checkpoint = directory.join("legacy.mpk");
+        let config = RecurrentPpoConfig {
+            actor_hidden_size: 8,
+            critic_hidden_sizes: vec![8],
+            ..RecurrentPpoConfig::default()
+        };
+        let source = RecurrentPpoAgent::new(
+            2,
+            3,
+            2,
+            &[-1.0],
+            &[1.0],
+            config.clone(),
+            SeedConfig::from_root(127),
+        )
+        .expect("source learner initializes");
+        source
+            .policy()
+            .save(&checkpoint)
+            .expect("legacy checkpoint saves");
+        let source_policy = source.policy();
+        let migrated = RecurrentPpoAgent::load_actor_with_inserted_input_feature_and_fresh_critic(
+            &checkpoint,
+            2,
+            1,
+            3,
+            2,
+            &[-1.0],
+            &[1.0],
+            config,
+            SeedConfig::from_root(131),
+        )
+        .expect("legacy actor migrates");
+        let migrated_policy = migrated.policy();
+        let source_action = source_policy
+            .mean_action(&[0.25, -0.5], &source_policy.initial_memory())
+            .expect("source actor evaluates");
+        let migrated_action = migrated_policy
+            .mean_action(&[0.25, 1.0, -0.5], &migrated_policy.initial_memory())
+            .expect("migrated actor evaluates");
+
+        assert_eq!(source_action, migrated_action);
+        std::fs::remove_dir_all(directory).expect("test directory is removable");
+    }
+
+    /// Mean-bias calibration must change one action without changing memory.
+    #[test]
+    fn actor_mean_bias_shift_is_scoped_and_validated() {
+        let mut agent = RecurrentPpoAgent::new(
+            2,
+            3,
+            2,
+            &[-1.0, -1.0],
+            &[1.0, 1.0],
+            RecurrentPpoConfig::default(),
+            SeedConfig::from_root(109),
+        )
+        .expect("agent initializes");
+        let observation = [0.25, -0.5];
+        let before_policy = agent.policy();
+        let before = before_policy
+            .mean_action(&observation, &before_policy.initial_memory())
+            .expect("actor evaluates before calibration");
+
+        agent
+            .shift_actor_mean_bias(0, 0.10)
+            .expect("bounded bias shift succeeds");
+        let after_policy = agent.policy();
+        let after = after_policy
+            .mean_action(&observation, &after_policy.initial_memory())
+            .expect("actor evaluates after calibration");
+
+        assert!(after.action[0] > before.action[0]);
+        assert_eq!(after.action[1].to_bits(), before.action[1].to_bits());
+        assert_eq!(after.next_memory, before.next_memory);
+        assert!(agent.shift_actor_mean_bias(2, 0.10).is_err());
+        assert!(agent.shift_actor_mean_bias(0, f32::NAN).is_err());
     }
 }

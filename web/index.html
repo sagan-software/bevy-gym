@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Run trained bevy-gym ecosystem policies in the browser."
+    />
+    <title>bevy-gym · ecosystem inference</title>
+    <link data-trunk rel="rust" data-bin="bevy-gym-web" />
+    <link data-trunk rel="css" href="styles.css" />
+    <link data-trunk rel="copy-dir" href="checkpoints" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <a class="wordmark" href="#/ecosystem/forage" aria-label="bevy-gym ecosystem demo home">
+          <span class="wordmark-mark" aria-hidden="true">BG</span>
+          <span>ecosystem inference</span>
+        </a>
+        <div class="runtime-state" aria-live="polite">
+          <span class="status-light" aria-hidden="true"></span>
+          <span id="runtime-status">Loading WASM runtime</span>
+        </div>
+      </header>
+
+      <nav class="stage-nav" aria-label="Ecosystem environments">
+        <p class="eyebrow">Curriculum</p>
+        <a href="#/ecosystem/forage" data-stage="forage"><span>01</span> Forage</a>
+        <a href="#/ecosystem/survival" data-stage="survival"><span>02</span> Survival</a>
+        <a href="#/ecosystem/shelter" data-stage="shelter"><span>03</span> Shelter</a>
+        <a href="#/ecosystem/competition" data-stage="competition"><span>04</span> Competition</a>
+        <a href="#/ecosystem/predator-prey" data-stage="predator-prey"><span>05</span> Predator-prey</a>
+        <a href="#/ecosystem/obstacles" data-stage="obstacles"><span>06</span> Obstacles</a>
+      </nav>
+
+      <section class="viewport" aria-labelledby="environment-title">
+        <div class="viewport-heading">
+          <div>
+            <p class="eyebrow" id="environment-index">Environment 01 / 06</p>
+            <h1 id="environment-title">Forage</h1>
+          </div>
+          <dl class="metrics" aria-label="Live inference metrics">
+            <div><dt>Step</dt><dd id="metric-step">0</dd></div>
+            <div><dt>Living</dt><dd id="metric-living">—</dd></div>
+            <div><dt>Episode</dt><dd id="metric-episode">0</dd></div>
+            <div><dt>Policy</dt><dd id="metric-policy">loading</dd></div>
+          </dl>
+        </div>
+        <div class="canvas-frame">
+          <canvas id="ecosystem-canvas" aria-label="Live ecosystem simulation"></canvas>
+          <div class="canvas-message" id="canvas-message" role="status">
+            Fetching the curated checkpoint…
+          </div>
+        </div>
+      </section>
+
+      <aside class="inspector" aria-labelledby="checkpoint-heading">
+        <div>
+          <p class="eyebrow">Inference source</p>
+          <h2 id="checkpoint-heading">Checkpoint</h2>
+        </div>
+        <dl class="checkpoint-meta">
+          <div><dt>Status</dt><dd id="checkpoint-status">Loading</dd></div>
+          <div><dt>Qualification</dt><dd id="checkpoint-qualification">—</dd></div>
+          <div><dt>Record</dt><dd id="checkpoint-record">—</dd></div>
+          <div><dt>Source</dt><dd id="checkpoint-source">Curated default</dd></div>
+        </dl>
+
+        <div class="upload-group">
+          <label for="bunny-checkpoint">Bunny policy</label>
+          <input id="bunny-checkpoint" type="file" accept=".mpk,application/octet-stream" />
+          <label class="sidecar-label" for="bunny-checkpoint-config">Optional bunny sidecar</label>
+          <input id="bunny-checkpoint-config" type="file" accept=".config.json,application/json" />
+          <p id="bunny-upload-state">Uses the curated default.</p>
+        </div>
+
+        <div class="upload-group" id="fox-upload-group" hidden>
+          <label for="fox-checkpoint">Fox policy</label>
+          <input id="fox-checkpoint" type="file" accept=".mpk,application/octet-stream" />
+          <label class="sidecar-label" for="fox-checkpoint-config">Optional fox sidecar</label>
+          <input id="fox-checkpoint-config" type="file" accept=".config.json,application/json" />
+          <p id="fox-upload-state">Uses the curated default.</p>
+        </div>
+
+        <p id="upload-error" class="upload-error" role="alert" hidden></p>
+
+        <div class="playback-controls" aria-label="Playback controls">
+          <button id="pause-playback" type="button">Pause</button>
+          <button id="restart-environment" type="button">Restart episode</button>
+          <label for="playback-speed">Speed</label>
+          <select id="playback-speed">
+            <option value="0.25">0.25×</option>
+            <option value="0.5">0.5×</option>
+            <option value="1" selected>1×</option>
+            <option value="2">2×</option>
+            <option value="4">4×</option>
+          </select>
+        </div>
+
+        <button id="reset-checkpoints" type="button">Reset curated checkpoint</button>
+        <p class="upload-note">
+          Local files remain in this browser tab. Uploaded weights remain unverified unless a
+          matching configuration sidecar identifies their training environment.
+        </p>
+      </aside>
+    </main>
+  </body>
+</html>

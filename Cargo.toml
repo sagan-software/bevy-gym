@@ -4,20 +4,28 @@ version = "0.3.3"
 edition = "2021"
 description = "Bevy ECS plugin for parallelised RL environment simulation"
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/vidarrio/bevy-gym"
+repository = "https://github.com/sagan-software/bevy-gym"
 keywords = ["bevy", "gym", "ecs", "simulation", "rl"]
 categories = ["game-engines", "science"]
+
+[workspace]
+members = ["web"]
+default-members = ["."]
+resolver = "2"
 
 [lints]
 workspace = true
 
 [features]
 default = ["render"]
+# Portable ecosystem simulation and read-only visual projection used by WASM inference.
+ecosystem-inference = ["dep:avian2d"]
 # Local iteration only. Bevy dynamic linking is the largest rebuild-time win,
 # but should not be enabled for published or shipping builds.
 fast-compile = ["bevy/dynamic_linking"]
 render = [
     "bevy/2d_bevy_render",
+    "bevy/3d_bevy_render",
     "bevy/default_app",
     "bevy/default_font",
     "bevy/bevy_remote",
@@ -30,30 +38,56 @@ render = [
     "bevy/wayland",
     "bevy/x11",
     "dep:bevy-inspector-egui",
-    "dep:serde",
-    "dep:tokio",
 ]
 bevy-mcp = ["render", "dep:bevy_brp_extras"]
 # Name expected by Bevy BRP MCP launch tooling.
 bevy_remote = ["bevy-mcp"]
+# MuJoCo 3.9-backed environments remain optional because they require the
+# native MuJoCo runtime. `nix develop` supplies the exact runtime automatically.
+mujoco = ["dep:mujoco-rs"]
 
 # Minimal Bevy — only what's needed for ECS + scheduling.
 [dependencies.bevy]
 default-features = false
-features = ["bevy_log", "multi_threaded"]
+features = ["bevy_log"]
 version = "0.18"
 
 [dependencies.burn]
 default-features = false
-features = ["std", "autodiff", "flex"]
+features = ["std", "flex"]
 version = "0.21"
 
-# Avian 0.6 is the Bevy 0.18-compatible line. Its rendering features remain
-# off because the ecosystem examples own their visual presentation.
-[dev-dependencies.avian2d]
+[dependencies.avian2d]
 default-features = false
-features = ["2d", "f32", "parry-f32", "parallel"]
+features = ["2d", "f32", "parry-f32"]
+optional = true
 version = "0.6.1"
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies.bevy]
+default-features = false
+features = ["multi_threaded"]
+version = "0.18"
+
+# Keep ecosystem parallel physics native-only and opt-in.
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies.avian2d]
+default-features = false
+features = ["parallel"]
+optional = true
+version = "0.6.1"
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies.burn]
+default-features = false
+features = ["autodiff"]
+version = "0.21"
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies.clap]
+features = ["derive"]
+version = "4.5.54"
+
+[dependencies.mujoco-rs]
+default-features = false
+optional = true
+version = "=5.0.0"
 
 [dependencies.bevy_brp_extras]
 default-features = true
@@ -68,15 +102,16 @@ version = "0.36"
 
 [dependencies.serde]
 features = ["derive"]
-optional = true
 version = "1"
 
 [dependencies.serde_json]
 version = "1"
 
-[dependencies.tokio]
+[dependencies.shakmaty]
+version = "0.30.1"
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies.tokio]
 features = ["fs", "io-util", "process", "rt"]
-optional = true
 version = "1"
 
 [[example]]
@@ -84,20 +119,188 @@ name = "cartpole"
 path = "examples/classic-control/cart_pole.rs"
 
 [[example]]
+name = "mountain-car"
+path = "examples/classic-control/mountain_car.rs"
+
+[[example]]
+name = "pendulum"
+path = "examples/classic-control/pendulum.rs"
+
+[[example]]
+name = "mountain-car-continuous"
+path = "examples/classic-control/mountain_car_continuous.rs"
+
+[[example]]
+name = "acrobot"
+path = "examples/classic-control/acrobot.rs"
+
+[[example]]
+name = "frozen-lake"
+path = "examples/toy-text/frozen_lake.rs"
+
+[[example]]
+name = "cliff-walking"
+path = "examples/toy-text/cliff_walking.rs"
+
+[[example]]
+name = "blackjack"
+path = "examples/toy-text/blackjack.rs"
+
+[[example]]
+name = "taxi"
+path = "examples/toy-text/taxi.rs"
+
+[[example]]
+name = "lunar-lander"
+path = "examples/box2d-approximation/lunar_lander.rs"
+
+[[example]]
+name = "bipedal-walker"
+path = "examples/box2d-approximation/bipedal_walker.rs"
+
+[[example]]
+name = "car-racing"
+path = "examples/box2d-approximation/car_racing.rs"
+
+[[example]]
+name = "inverted-pendulum"
+path = "examples/mujoco-approximation/inverted_pendulum.rs"
+
+[[example]]
+name = "inverted-double-pendulum"
+path = "examples/mujoco-approximation/inverted_double_pendulum.rs"
+
+[[example]]
+name = "reacher"
+path = "examples/mujoco-approximation/reacher.rs"
+
+[[example]]
+name = "pusher"
+path = "examples/mujoco-approximation/pusher.rs"
+
+[[example]]
+name = "swimmer"
+path = "examples/mujoco-approximation/swimmer.rs"
+
+[[example]]
+name = "hopper"
+path = "examples/mujoco-approximation/hopper.rs"
+
+[[example]]
+name = "half-cheetah"
+path = "examples/mujoco-approximation/half_cheetah.rs"
+
+[[example]]
+name = "walker2d"
+path = "examples/mujoco-approximation/walker_2d.rs"
+
+[[example]]
+name = "ant"
+path = "examples/mujoco-approximation/ant.rs"
+
+[[example]]
+name = "humanoid-standup"
+path = "examples/mujoco-approximation/humanoid_standup.rs"
+
+[[example]]
+name = "humanoid"
+path = "examples/mujoco-approximation/humanoid.rs"
+
+[[example]]
+name = "mujoco-inverted-pendulum"
+path = "examples/mujoco/inverted_pendulum.rs"
+required-features = ["mujoco"]
+
+[[example]]
+name = "mujoco-inverted-double-pendulum"
+path = "examples/mujoco/inverted_double_pendulum.rs"
+required-features = ["mujoco"]
+
+[[example]]
+name = "mujoco-reacher"
+path = "examples/mujoco/reacher.rs"
+required-features = ["mujoco"]
+
+[[example]]
+name = "ecosystem-forage"
+path = "examples/ecosystem/forage.rs"
+required-features = ["ecosystem-inference"]
+
+[[example]]
+name = "ecosystem-sprint"
+path = "examples/ecosystem/sprint.rs"
+required-features = ["ecosystem-inference"]
+
+[[example]]
+name = "ecosystem-gorge"
+path = "examples/ecosystem/gorge.rs"
+required-features = ["ecosystem-inference"]
+
+[[example]]
 name = "ecosystem-survival"
 path = "examples/ecosystem/survival.rs"
+required-features = ["ecosystem-inference"]
+
+[[example]]
+name = "ecosystem-shelter"
+path = "examples/ecosystem/shelter.rs"
+required-features = ["ecosystem-inference"]
 
 [[example]]
 name = "ecosystem-competition"
 path = "examples/ecosystem/competition.rs"
+required-features = ["ecosystem-inference"]
 
 [[example]]
 name = "ecosystem-predator-prey"
 path = "examples/ecosystem/predator_prey.rs"
+required-features = ["ecosystem-inference"]
 
 [[example]]
 name = "ecosystem-obstacles"
 path = "examples/ecosystem/obstacles.rs"
+required-features = ["ecosystem-inference"]
+
+[[example]]
+name = "ecosystem-curriculum"
+path = "examples/ecosystem/curriculum.rs"
+required-features = ["ecosystem-inference"]
+
+[[example]]
+name = "rps-v2"
+path = "examples/classic/rps_v2.rs"
+
+[[example]]
+name = "tictactoe-v3"
+path = "examples/classic/tictactoe_v3.rs"
+
+[[example]]
+name = "connect-four-v3"
+path = "examples/classic/connect_four_v3.rs"
+
+[[example]]
+name = "chess-v6"
+path = "examples/classic/chess_v6.rs"
+
+[[example]]
+name = "texas-holdem-no-limit-v6"
+path = "examples/classic/texas_holdem_no_limit_v6.rs"
+
+[[example]]
+name = "texas-holdem-v4"
+path = "examples/classic/texas_holdem_v4.rs"
+
+[[example]]
+name = "leduc-holdem-v4"
+path = "examples/classic/leduc_holdem_v4.rs"
+
+[[example]]
+name = "go-v5"
+path = "examples/classic/go_v5.rs"
+
+[[example]]
+name = "hanabi-v5"
+path = "examples/classic/hanabi_v5.rs"
 
 [profile.dev]
 # Bevy's recommended dev profile: lightly optimize local code and heavily

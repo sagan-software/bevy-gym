@@ -13,6 +13,7 @@
 //! cargo run --example cartpole --features render --release
 //! cargo run --example cartpole --features bevy_remote --release -- watch
 //! ```
+
 #![allow(
     clippy::missing_docs_in_private_items,
     clippy::too_many_lines,
@@ -22,8 +23,16 @@
     reason = "the synchronous example keeps its complete workflow readable in one target"
 )]
 
+use tokio as _;
+
 use std::env;
 use std::error::Error;
+
+#[cfg(feature = "ecosystem-inference")]
+use avian2d as _;
+use clap as _;
+#[cfg(feature = "mujoco")]
+use mujoco_rs as _;
 use std::fmt;
 use std::fs::{self, File, OpenOptions};
 use std::io::Write;
@@ -31,31 +40,12 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::time::{SystemTime, UNIX_EPOCH};
 
-use bevy::prelude::*;
+use bevy_gym::recording::{CheckpointRole, CheckpointTimeline};
 use bevy_gym::training::{
     AlgorithmKind, BevyTransitionCollector, DqnAgent, DqnConfig, DqnPolicy, MetricRecord,
     MetricValue, MetricsWriter, RunConfig, RunId, RunPaths, SeedConfig,
 };
-#[cfg(feature = "render")]
-use bevy_gym::{
-    ActionRequest, ActionResponse, BevyGymPlugin, CurrentObservation, EnvComponent, EnvStats,
-    GymSet,
-};
 use bevy_gym::{Env, EpisodeStatus, Reset, Step, TimeLimit};
-
-#[cfg(all(feature = "render", not(feature = "bevy-mcp")))]
-use bevy::remote::{http::RemoteHttpPlugin, RemotePlugin};
-#[cfg(feature = "render")]
-use bevy::render::view::screenshot::{save_to_disk, Capturing, Screenshot};
-#[cfg(feature = "render")]
-use bevy::render::{
-    settings::{Backends, RenderCreation, WgpuSettings},
-    RenderPlugin,
-};
-#[cfg(feature = "render")]
-use bevy::window::{PresentMode, WindowResolution};
-#[cfg(feature = "bevy-mcp")]
-use bevy_brp_extras::BrpExtrasPlugin;
 
 const OBS_SIZE: usize = 4;
 const NUM_ACTIONS: usize = 2;
@@ -78,8 +68,6 @@ const DEFAULT_EVAL_INTERVAL: usize = 5_000;
 const DEFAULT_NUM_ENVS: usize = 8;
 const DEFAULT_ROOT_SEED: u64 = 42;
 const SOLVED_MEAN_REWARD: f64 = 475.0;
-const DEFAULT_VIDEO_SECONDS: usize = 30;
-const DEFAULT_VIDEO_FINAL_SECONDS: usize = 10;
 const DEFAULT_VIDEO_FPS: usize = 50;
 const DEFAULT_VIDEO_WIDTH: usize = 1_280;
 const DEFAULT_VIDEO_HEIGHT: usize = 720;
@@ -374,8 +362,6 @@ struct Args {
     screenshot: Option<PathBuf>,
     screenshot_frames: u32,
     video_output: Option<PathBuf>,
-    video_seconds: usize,
-    video_final_seconds: usize,
 }
 
 impl Args {
@@ -391,8 +377,6 @@ impl Args {
         let mut screenshot = None;
         let mut screenshot_frames = 90;
         let mut video_output = None;
-        let mut video_seconds = DEFAULT_VIDEO_SECONDS;
-        let mut video_final_seconds = DEFAULT_VIDEO_FINAL_SECONDS;
 
         while let Some(arg) = raw.next() {
             match arg.as_str() {
@@ -445,10 +429,6 @@ impl Args {
                 "--output" | "--video-output" => {
                     video_output = Some(PathBuf::from(parse_next::<String>(&mut raw, "--output")?));
                 }
-                "--video-seconds" => video_seconds = parse_next(&mut raw, "--video-seconds")?,
-                "--final-seconds" => {
-                    video_final_seconds = parse_next(&mut raw, "--final-seconds")?;
-                }
                 "--smoke" => {
                     config.train_steps = 512;
                     config.eval_interval = 256;
@@ -478,8 +458,6 @@ impl Args {
             screenshot,
             screenshot_frames,
             video_output,
-            video_seconds,
-            video_final_seconds,
         })
     }
 }
@@ -542,8 +520,6 @@ fn main() -> Result<(), Box<dyn Error>> {
                 &run_dir,
                 &output,
                 VideoConfig {
-                    total_seconds: args.video_seconds,
-                    final_seconds: args.video_final_seconds,
                     fps: DEFAULT_VIDEO_FPS,
                     width: DEFAULT_VIDEO_WIDTH,
                     height: DEFAULT_VIDEO_HEIGHT,
@@ -822,19 +798,10 @@ fn step_checkpoint_path(paths: &RunPaths, global_step: usize) -> PathBuf {
 
 #[derive(Debug, Clone)]
 struct VideoConfig {
-    total_seconds: usize,
-    final_seconds: usize,
     fps: usize,
     width: usize,
     height: usize,
     seed: u64,
-}
-
-#[derive(Debug, Clone)]
-struct VideoCheckpoint {
-    global_step: usize,
-    mean_reward: f64,
-    path: PathBuf,
 }
 
 fn render_training_video(
@@ -842,35 +809,11 @@ fn render_training_video(
     output: &Path,
     config: VideoConfig,
 ) -> Result<(), Box<dyn Error>> {
-    if config.final_seconds >= config.total_seconds {
-        return Err("--final-seconds must be smaller than --video-seconds".into());
-    }
-
-    let checkpoints = video_checkpoints(run_dir)?;
-    if checkpoints.is_empty() {
-        return Err(format!(
-            "no step checkpoints found in {}; rerun `train` with the current example first",
-            run_dir.display()
-        )
-        .into());
-    }
+    let timeline = CheckpointTimeline::training_progress(run_dir)?;
 
     if let Some(parent) = output.parent() {
         fs::create_dir_all(parent)?;
     }
-
-    let best_checkpoint = run_dir.join("best.mpk");
-    if !best_checkpoint.exists() {
-        return Err(format!("missing best checkpoint: {}", best_checkpoint.display()).into());
-    }
-
-    let timelapse_frames = (config.total_seconds - config.final_seconds) * config.fps;
-    let final_frames = config.final_seconds * config.fps;
-    let selected = sampled_checkpoints(&checkpoints, timelapse_frames);
-    let final_mean = checkpoints
-        .iter()
-        .max_by(|left, right| left.mean_reward.total_cmp(&right.mean_reward))
-        .map_or(0.0, |checkpoint| checkpoint.mean_reward);
 
     let fps = config.fps.to_string();
     let mut child = Command::new("ffmpeg")
@@ -904,38 +847,27 @@ fn render_training_video(
             .take()
             .ok_or("failed to open ffmpeg stdin for frame pipe")?;
         let mut frame_index = 0usize;
-        for (segment_index, checkpoint) in selected.iter().enumerate() {
-            let segment_frames =
-                distributed_frames(timelapse_frames, selected.len(), segment_index);
-            let policy = load_policy(&checkpoint.path)?;
-            let label = format!(
-                "STEP {:>6}  MEAN {:>5.1}",
-                checkpoint.global_step, checkpoint.mean_reward
-            );
+        let timeline_frames = timeline.duration().as_secs() as usize * config.fps;
+        for segment in timeline.segments() {
+            let segment_frames = segment.duration().as_secs() as usize * config.fps;
+            let policy = load_policy(segment.checkpoint())?;
+            let label = match segment.role() {
+                CheckpointRole::Best => "BEST CHECKPOINT",
+                CheckpointRole::First => "FIRST CHECKPOINT",
+                CheckpointRole::Progress33 => "33% CHECKPOINT",
+                CheckpointRole::Progress66 => "66% CHECKPOINT",
+            };
             write_policy_video_segment(
                 &mut stdin,
                 &policy,
                 segment_frames,
                 &config,
                 config.seed,
-                &label,
+                label,
                 &mut frame_index,
-                timelapse_frames,
+                timeline_frames,
             )?;
         }
-
-        let final_policy = load_policy(&best_checkpoint)?;
-        let label = format!("FINAL BEST  MEAN {final_mean:>5.1}  REAL TIME");
-        write_policy_video_segment(
-            &mut stdin,
-            &final_policy,
-            final_frames,
-            &config,
-            config.seed,
-            &label,
-            &mut frame_index,
-            timelapse_frames,
-        )?;
     }
 
     let output_result = child.wait_with_output()?;
@@ -949,102 +881,6 @@ fn render_training_video(
 
     Ok(())
 }
-
-fn video_checkpoints(run_dir: &Path) -> Result<Vec<VideoCheckpoint>, Box<dyn Error>> {
-    let eval_records = read_eval_records(&run_dir.join("eval.jsonl"))?;
-    let checkpoints_dir = run_dir.join("checkpoints");
-    let mut checkpoints = Vec::new();
-
-    for record in eval_records {
-        let path = checkpoints_dir.join(format!("step-{:06}.mpk", record.global_step));
-        if path.exists() {
-            checkpoints.push(VideoCheckpoint {
-                global_step: record.global_step,
-                mean_reward: record.mean_reward,
-                path,
-            });
-        }
-    }
-
-    checkpoints.sort_by_key(|checkpoint| checkpoint.global_step);
-    Ok(checkpoints)
-}
-
-fn sampled_checkpoints(
-    checkpoints: &[VideoCheckpoint],
-    frame_budget: usize,
-) -> Vec<VideoCheckpoint> {
-    if frame_budget == 0 {
-        return Vec::new();
-    }
-    if frame_budget == 1 {
-        return checkpoints.first().cloned().into_iter().collect();
-    }
-    if checkpoints.len() <= frame_budget {
-        return checkpoints.to_vec();
-    }
-
-    (0..frame_budget)
-        .map(|index| {
-            let source_index = index * (checkpoints.len() - 1) / (frame_budget - 1);
-            checkpoints
-                .get(source_index)
-                .expect("sampled checkpoint index stays in bounds")
-                .clone()
-        })
-        .collect()
-}
-
-fn distributed_frames(total_frames: usize, segments: usize, index: usize) -> usize {
-    let base = total_frames / segments;
-    let extra = usize::from(index < total_frames % segments);
-    base + extra
-}
-
-#[derive(Debug, Clone, Copy)]
-struct EvalRecord {
-    global_step: usize,
-    mean_reward: f64,
-}
-
-fn read_eval_records(path: &Path) -> Result<Vec<EvalRecord>, Box<dyn Error>> {
-    let content = fs::read_to_string(path)?;
-    let mut records = Vec::new();
-
-    for line in content.lines() {
-        let Some(global_step) = json_usize_field(line, "global_step") else {
-            continue;
-        };
-        let Some(mean_reward) = json_f64_field(line, "mean_reward") else {
-            continue;
-        };
-        records.push(EvalRecord {
-            global_step,
-            mean_reward,
-        });
-    }
-
-    Ok(records)
-}
-
-fn json_usize_field(line: &str, key: &str) -> Option<usize> {
-    json_number_field(line, key)?.parse().ok()
-}
-
-fn json_f64_field(line: &str, key: &str) -> Option<f64> {
-    json_number_field(line, key)?.parse().ok()
-}
-
-fn json_number_field<'a>(line: &'a str, key: &str) -> Option<&'a str> {
-    let needle = format!("\"{key}\":");
-    let start = line.find(&needle)? + needle.len();
-    let rest = line.get(start..)?.trim_start();
-    let end = rest
-        .find(|ch: char| !(ch.is_ascii_digit() || matches!(ch, '.' | '-' | '+' | 'e' | 'E')))
-        .unwrap_or(rest.len());
-    rest.get(..end)
-}
-
 fn write_policy_video_segment(
     writer: &mut impl Write,
     policy: &DqnPolicy,
@@ -1590,222 +1426,267 @@ const fn help_text() -> &'static str {
     "Usage: cargo run --example cartpole [--features render] -- [train|eval|video|watch|train-watch]\n\
      Flags: --steps N --eval-episodes N --eval-interval N --num-envs N --run-id ID\n\
      Flags: --runs-root PATH --checkpoint PATH --seed N --screenshot PATH --screenshot-frames N\n\
-     Flags: --output PATH --video-seconds N --final-seconds N --smoke"
+     Flags: --output PATH --smoke"
 }
 
-#[cfg(feature = "render")]
-#[derive(Resource)]
-struct VisualPolicy {
-    policy: DqnPolicy,
-}
-
-#[cfg(feature = "render")]
-#[derive(Resource)]
-struct ScreenshotRequest {
-    path: PathBuf,
-    wait_frames: u32,
-    requested: bool,
-}
-
-#[cfg(feature = "render")]
-#[derive(Component)]
-struct CartBody;
-
-#[cfg(feature = "render")]
-#[derive(Component)]
-struct PoleBody;
-
-#[cfg(feature = "render")]
-#[derive(Component)]
-struct PivotBody;
-
-#[cfg(feature = "render")]
 fn run_visual(
     checkpoint: &Path,
     screenshot: Option<&Path>,
     screenshot_frames: u32,
 ) -> Result<(), Box<dyn Error>> {
-    let policy = load_policy(checkpoint)?;
-    let mut app = App::new();
-
-    app.insert_resource(VisualPolicy { policy })
-        .insert_resource(ClearColor(Color::srgb(1.0, 1.0, 1.0)))
-        .add_plugins(
-            DefaultPlugins
-                .set(WindowPlugin {
-                    primary_window: Some(Window {
-                        title: "bevy-gym CartPole DQN policy".into(),
-                        resolution: WindowResolution::new(600, 400),
-                        present_mode: PresentMode::AutoVsync,
-                        ..default()
-                    }),
-                    ..default()
-                })
-                .set(RenderPlugin {
-                    render_creation: RenderCreation::Automatic(WgpuSettings {
-                        backends: Some(Backends::PRIMARY),
-                        ..default()
-                    }),
-                    ..default()
-                }),
-        )
-        .add_plugins(BevyGymPlugin::new(|_| cartpole_v1()).with_tick_rate(50.0))
-        .add_systems(Startup, setup_visuals)
-        .add_systems(
-            FixedUpdate,
-            model_policy_system.in_set(GymSet::RequestActions),
-        )
-        .add_systems(Update, update_visuals);
-
-    #[cfg(feature = "bevy-mcp")]
-    app.add_plugins(BrpExtrasPlugin::with_port(brp_port()));
-
-    #[cfg(all(feature = "render", not(feature = "bevy-mcp")))]
-    app.add_plugins(RemotePlugin::default())
-        .add_plugins(RemoteHttpPlugin::default().with_port(brp_port()));
-
-    if let Some(path) = screenshot {
-        app.insert_resource(ScreenshotRequest {
-            path: path.to_path_buf(),
-            wait_frames: screenshot_frames,
-            requested: false,
-        })
-        .add_systems(Update, screenshot_once);
-    }
-
-    println!(
-        "watching checkpoint={} brp_port={}",
-        checkpoint.display(),
-        brp_port()
-    );
-    app.run();
-    Ok(())
+    #[cfg(not(feature = "render"))]
+    let _ = (checkpoint, screenshot, screenshot_frames);
+    #[cfg(feature = "render")]
+    return render::run_visual(checkpoint, screenshot, screenshot_frames);
+    #[cfg(not(feature = "render"))]
+    return Err("visual mode requires the `render` feature".into());
 }
 
-#[cfg(not(feature = "render"))]
-fn run_visual(
-    _checkpoint: &Path,
-    _screenshot: Option<&Path>,
-    _screenshot_frames: u32,
-) -> Result<(), Box<dyn Error>> {
-    Err("visual mode requires `--features bevy_remote` or `--features render`".into())
-}
-
+/// Render-only `CartPole` scene implementation.
 #[cfg(feature = "render")]
-fn setup_visuals(
-    mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<ColorMaterial>>,
-) {
-    commands.spawn((Camera2d, Name::new("CartPole Camera")));
-
-    commands.spawn((
-        Sprite::from_color(Color::BLACK, Vec2::new(600.0, 2.0)),
-        Transform::from_xyz(0.0, TRACK_Y, 0.0),
-        Name::new("CartPole Track"),
-    ));
-
-    commands.spawn((
-        Sprite::from_color(Color::BLACK, Vec2::new(CART_W, CART_H)),
-        Transform::from_xyz(0.0, CART_Y, 2.0),
-        CartBody,
-        Name::new("CartPole Cart"),
-    ));
-
-    commands.spawn((
-        Sprite::from_color(Color::srgb_u8(202, 152, 101), Vec2::new(POLE_W, POLE_LEN)),
-        Transform::from_xyz(0.0, CART_Y + AXLE_OFFSET + POLE_CENTER_OFFSET, 3.0),
-        PoleBody,
-        Name::new("CartPole Pole"),
-    ));
-
-    commands.spawn((
-        Mesh2d(meshes.add(Circle::new(POLE_W / 2.0))),
-        MeshMaterial2d(materials.add(Color::srgb_u8(129, 132, 203))),
-        Transform::from_xyz(0.0, CART_Y + AXLE_OFFSET, 3.2),
-        PivotBody,
-        Name::new("CartPole Hinge"),
-    ));
-}
-
-#[cfg(feature = "render")]
-fn model_policy_system(
-    policy: Res<VisualPolicy>,
-    mut requests: MessageReader<ActionRequest<CartPoleV1>>,
-    mut responses: MessageWriter<ActionResponse<CartPoleV1>>,
-) {
-    for request in requests.read() {
-        responses.write(ActionResponse {
-            entity: request.entity,
-            action: greedy_action(&policy.policy, &request.observation),
-        });
-    }
-}
-
-#[cfg(feature = "render")]
-fn update_visuals(
-    env_query: Query<(&CurrentObservation<CartPoleV1>, &EnvStats), With<EnvComponent<CartPoleV1>>>,
-    mut transforms: ParamSet<(
-        Query<&mut Transform, With<CartBody>>,
-        Query<&mut Transform, With<PivotBody>>,
-        Query<&mut Transform, With<PoleBody>>,
-    )>,
-) {
-    let Ok((observation, _stats)) = env_query.single() else {
-        return;
+mod render {
+    use super::{
+        cartpole_v1, env, greedy_action, load_policy, CartPoleScene, CartPoleV1, DqnPolicy, Error,
+        Path, PathBuf, AXLE_OFFSET, CART_H, CART_W, CART_Y, POLE_CENTER_OFFSET, POLE_LEN, POLE_W,
+        TRACK_Y,
     };
-    let scene = CartPoleScene::from_observation(&observation.observation);
+    use bevy::prelude::*;
+    #[cfg(not(feature = "bevy-mcp"))]
+    use bevy::remote::{http::RemoteHttpPlugin, RemotePlugin};
+    use bevy::render::view::screenshot::{save_to_disk, Capturing, Screenshot};
+    use bevy::render::{
+        settings::{Backends, RenderCreation, WgpuSettings},
+        RenderPlugin,
+    };
+    use bevy::window::{PresentMode, WindowResolution};
+    #[cfg(feature = "bevy-mcp")]
+    use bevy_brp_extras::BrpExtrasPlugin;
+    use bevy_gym::{
+        ActionRequest, ActionResponse, BevyGymPlugin, CurrentObservation, EnvComponent, EnvStats,
+        GymSet,
+    };
 
-    if let Ok(mut transform) = transforms.p0().single_mut() {
-        transform.translation.x = scene.cart_center[0];
-        transform.translation.y = scene.cart_center[1];
+    /// `CartPole` renderer registered by visual modes.
+    pub(super) struct ExampleRendererPlugin;
+
+    impl Plugin for ExampleRendererPlugin {
+        fn build(&self, app: &mut App) {
+            app.insert_resource(ClearColor(Color::srgb(1.0, 1.0, 1.0)));
+        }
     }
 
-    if let Ok(mut transform) = transforms.p1().single_mut() {
-        transform.translation.x = scene.pivot[0];
-        transform.translation.y = scene.pivot[1];
+    #[derive(Resource)]
+    struct VisualPolicy {
+        policy: DqnPolicy,
     }
 
-    if let Ok(mut transform) = transforms.p2().single_mut() {
-        transform.translation.x = scene.pole_center[0];
-        transform.translation.y = scene.pole_center[1];
-        transform.rotation = Quat::from_rotation_z(scene.pole_rotation);
-    }
-}
-
-#[cfg(feature = "render")]
-fn screenshot_once(
-    mut commands: Commands,
-    mut request: ResMut<ScreenshotRequest>,
-    captures: Query<Entity, With<Capturing>>,
-    mut exit: MessageWriter<AppExit>,
-) {
-    if request.wait_frames > 0 {
-        request.wait_frames -= 1;
-        return;
+    #[derive(Resource)]
+    struct ScreenshotRequest {
+        path: PathBuf,
+        wait_frames: u32,
+        requested: bool,
     }
 
-    if !request.requested {
-        commands
-            .spawn(Screenshot::primary_window())
-            .observe(save_to_disk(request.path.clone()));
-        request.requested = true;
-        request.wait_frames = 20;
-        return;
+    #[derive(Component)]
+    struct CartBody;
+
+    #[derive(Component)]
+    struct PoleBody;
+
+    #[derive(Component)]
+    struct PivotBody;
+
+    pub(super) fn run_visual(
+        checkpoint: &Path,
+        screenshot: Option<&Path>,
+        screenshot_frames: u32,
+    ) -> Result<(), Box<dyn Error>> {
+        let policy = load_policy(checkpoint)?;
+        let mut app = App::new();
+        app.add_plugins(ExampleRendererPlugin);
+
+        app.insert_resource(VisualPolicy { policy })
+            .add_plugins(
+                DefaultPlugins
+                    .set(WindowPlugin {
+                        primary_window: Some(Window {
+                            title: "bevy-gym CartPole DQN policy".into(),
+                            resolution: WindowResolution::new(600, 400),
+                            present_mode: PresentMode::AutoVsync,
+                            ..default()
+                        }),
+                        ..default()
+                    })
+                    .set(RenderPlugin {
+                        render_creation: RenderCreation::Automatic(WgpuSettings {
+                            backends: Some(Backends::PRIMARY),
+                            ..default()
+                        }),
+                        ..default()
+                    }),
+            )
+            .add_plugins(BevyGymPlugin::new(|_| cartpole_v1()).with_tick_rate(50.0))
+            .add_systems(Startup, setup_visuals)
+            .add_systems(
+                FixedUpdate,
+                model_policy_system.in_set(GymSet::RequestActions),
+            )
+            .add_systems(Update, update_visuals);
+
+        #[cfg(feature = "bevy-mcp")]
+        app.add_plugins(BrpExtrasPlugin::with_port(brp_port()));
+
+        #[cfg(all(feature = "render", not(feature = "bevy-mcp")))]
+        app.add_plugins(RemotePlugin::default())
+            .add_plugins(RemoteHttpPlugin::default().with_port(brp_port()));
+
+        if let Some(path) = screenshot {
+            app.insert_resource(ScreenshotRequest {
+                path: path.to_path_buf(),
+                wait_frames: screenshot_frames,
+                requested: false,
+            })
+            .add_systems(Update, screenshot_once);
+        }
+
+        println!(
+            "watching checkpoint={} brp_port={}",
+            checkpoint.display(),
+            brp_port()
+        );
+        app.run();
+        Ok(())
     }
 
-    if captures.is_empty() {
-        exit.write(AppExit::Success);
+    #[cfg(not(feature = "render"))]
+    fn run_visual(
+        _checkpoint: &Path,
+        _screenshot: Option<&Path>,
+        _screenshot_frames: u32,
+    ) -> Result<(), Box<dyn Error>> {
+        Err("visual mode requires `--features bevy_remote` or `--features render`".into())
     }
-}
 
-#[cfg(feature = "render")]
-fn brp_port() -> u16 {
-    env::var("BRP_EXTRAS_PORT")
-        .ok()
-        .or_else(|| env::var("BEVY_GYM_BRP_PORT").ok())
-        .and_then(|value| value.parse().ok())
-        .unwrap_or(15_702)
+    fn setup_visuals(
+        mut commands: Commands<'_, '_>,
+        mut meshes: ResMut<'_, Assets<Mesh>>,
+        mut materials: ResMut<'_, Assets<ColorMaterial>>,
+    ) {
+        commands.spawn((Camera2d, Name::new("CartPole Camera")));
+
+        commands.spawn((
+            Sprite::from_color(Color::BLACK, Vec2::new(600.0, 2.0)),
+            Transform::from_xyz(0.0, TRACK_Y, 0.0),
+            Name::new("CartPole Track"),
+        ));
+
+        commands.spawn((
+            Sprite::from_color(Color::BLACK, Vec2::new(CART_W, CART_H)),
+            Transform::from_xyz(0.0, CART_Y, 2.0),
+            CartBody,
+            Name::new("CartPole Cart"),
+        ));
+
+        commands.spawn((
+            Sprite::from_color(Color::srgb_u8(202, 152, 101), Vec2::new(POLE_W, POLE_LEN)),
+            Transform::from_xyz(0.0, CART_Y + AXLE_OFFSET + POLE_CENTER_OFFSET, 3.0),
+            PoleBody,
+            Name::new("CartPole Pole"),
+        ));
+
+        commands.spawn((
+            Mesh2d(meshes.add(Circle::new(POLE_W / 2.0))),
+            MeshMaterial2d(materials.add(Color::srgb_u8(129, 132, 203))),
+            Transform::from_xyz(0.0, CART_Y + AXLE_OFFSET, 3.2),
+            PivotBody,
+            Name::new("CartPole Hinge"),
+        ));
+    }
+
+    fn model_policy_system(
+        policy: Res<'_, VisualPolicy>,
+        mut requests: MessageReader<'_, '_, ActionRequest<CartPoleV1>>,
+        mut responses: MessageWriter<'_, ActionResponse<CartPoleV1>>,
+    ) {
+        for request in requests.read() {
+            responses.write(ActionResponse {
+                entity: request.entity,
+                action: greedy_action(&policy.policy, &request.observation),
+            });
+        }
+    }
+
+    fn update_visuals(
+        env_query: Query<
+            '_,
+            '_,
+            (&CurrentObservation<CartPoleV1>, &EnvStats),
+            With<EnvComponent<CartPoleV1>>,
+        >,
+        mut transforms: ParamSet<
+            '_,
+            '_,
+            (
+                Query<'_, '_, &mut Transform, With<CartBody>>,
+                Query<'_, '_, &mut Transform, With<PivotBody>>,
+                Query<'_, '_, &mut Transform, With<PoleBody>>,
+            ),
+        >,
+    ) {
+        let Ok((observation, _stats)) = env_query.single() else {
+            return;
+        };
+        let scene = CartPoleScene::from_observation(&observation.observation);
+
+        if let Ok(mut transform) = transforms.p0().single_mut() {
+            transform.translation.x = scene.cart_center[0];
+            transform.translation.y = scene.cart_center[1];
+        }
+
+        if let Ok(mut transform) = transforms.p1().single_mut() {
+            transform.translation.x = scene.pivot[0];
+            transform.translation.y = scene.pivot[1];
+        }
+
+        if let Ok(mut transform) = transforms.p2().single_mut() {
+            transform.translation.x = scene.pole_center[0];
+            transform.translation.y = scene.pole_center[1];
+            transform.rotation = Quat::from_rotation_z(scene.pole_rotation);
+        }
+    }
+
+    fn screenshot_once(
+        mut commands: Commands<'_, '_>,
+        mut request: ResMut<'_, ScreenshotRequest>,
+        captures: Query<'_, '_, Entity, With<Capturing>>,
+        mut exit: MessageWriter<'_, AppExit>,
+    ) {
+        if request.wait_frames > 0 {
+            request.wait_frames -= 1;
+            return;
+        }
+
+        if !request.requested {
+            commands
+                .spawn(Screenshot::primary_window())
+                .observe(save_to_disk(request.path.clone()));
+            request.requested = true;
+            request.wait_frames = 20;
+            return;
+        }
+
+        if captures.is_empty() {
+            exit.write(AppExit::Success);
+        }
+    }
+
+    fn brp_port() -> u16 {
+        env::var("BRP_EXTRAS_PORT")
+            .ok()
+            .or_else(|| env::var("BEVY_GYM_BRP_PORT").ok())
+            .and_then(|value| value.parse().ok())
+            .unwrap_or(15_702)
+    }
 }
 
 #[cfg(test)]

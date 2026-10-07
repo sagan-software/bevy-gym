@@ -1,0 +1,22 @@
+[build]
+target = "index.html"
+dist = "../dist"
+public_url = "/"
+filehash = true
+
+[watch]
+watch = [
+  "index.html",
+  "styles.css",
+  "Trunk.toml",
+  "src",
+  "checkpoints",
+  "../src",
+  "../examples/ecosystem/shared",
+]
+ignore = ["../target", "../runs"]
+
+[serve]
+addresses = ["127.0.0.1"]
+port = 8080
+open = false

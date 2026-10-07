@@ -1,4 +1,4 @@
-//! Stage 2: multi-agent competition for finite resources.
+//! Stage 6: multi-agent competition for finite resources.
 //!
 //! Several `Avian2D` bunny bodies act simultaneously in one world. They collide,
 //! block, and push one another while competing for spawned food and well water.
@@ -20,6 +20,8 @@
 //!
 //! The default render feature supplies the Inspector-egui HUD, camera controls,
 //! checkpoint playback, and checkpoint video generation.
+
+use tokio as _;
 
 #[path = "shared/mod.rs"]
 mod shared;

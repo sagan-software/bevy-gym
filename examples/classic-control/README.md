@@ -1,0 +1,91 @@
+# Classic Control examples
+
+Each example starts in visual mode by default. Use the explicit `train` command
+for headless batched training.
+
+## CartPole-v1
+
+The environment uses Gymnasium's exact four observations, two discrete forces,
+Euler transition equations, `+1` reward, 500-step limit, and cart-pole
+geometry. The selected DQN checkpoint learned from scratch without behavior
+cloning or reward shaping. Its held-out mean improved from `8.92` to the
+maximum `500`, above Gymnasium's `475` registry threshold.
+
+```sh
+cargo run --no-default-features --release --example cartpole -- train
+cargo run --release --example cartpole
+```
+
+![Trained CartPole-v1 policy](../../docs/images/cartpole.gif)
+
+[30-second checkpoint progression](../../docs/videos/cartpole.mp4)
+
+## MountainCar-v0
+
+The environment uses Gymnasium's exact state bounds, transition equations,
+`-1` environment reward, 200-step limit, 600x400 curve, car, wheels, and flag.
+The selected DQN profile uses learning rate `0.001` and altitude-potential scale
+`25`. Its best checkpoint reached `-107.83` over 100 held-out episodes with a
+100% goal rate, above Gymnasium's `-110` registry threshold.
+
+```sh
+cargo run --no-default-features --release --example mountain-car -- train
+cargo run --release --example mountain-car
+```
+
+![Trained MountainCar-v0 policy](../../docs/images/mountain-car.gif)
+
+[30-second checkpoint progression](../../docs/videos/mountain-car.mp4)
+
+## MountainCarContinuous-v0
+
+The environment uses Gymnasium's exact continuous force, transition equations,
+control cost, goal bonus, 999-step limit, 600x400 curve, car, wheels, and flag.
+The selected recurrent PPO profile uses actor rate `0.003`, critic rate `0.001`,
+and altitude-potential scale `25`. It reached held-out means of `90.50`, `97.06`,
+and `97.32` across seeds 42, 157, and 907, above Gymnasium's `90` threshold.
+
+```sh
+cargo run --no-default-features --release --example mountain-car-continuous -- train
+cargo run --release --example mountain-car-continuous
+```
+
+![Trained MountainCarContinuous-v0 policy](../../docs/images/mountain-car-continuous.gif)
+
+[30-second checkpoint progression](../../docs/videos/mountain-car-continuous.mp4)
+
+## Pendulum-v1
+
+The environment uses Gymnasium's exact torque bounds, transition equations,
+reward, 200-step limit, 500x500 rod geometry, rounded ends, axle, and torque
+arrow. Gymnasium publishes no solve threshold. The selected recurrent PPO
+profile uses actor rate `0.003`, critic rate `0.001`, and training reward scale
+`0.1`. It improved the 100-episode held-out mean from about `-1436.88` to
+`-653.65`; the best held-out episode returned `-382.996`.
+
+```sh
+cargo run --no-default-features --release --example pendulum -- train
+cargo run --release --example pendulum
+```
+
+![Trained Pendulum-v1 policy](../../docs/images/pendulum.gif)
+
+[30-second checkpoint progression](../../docs/videos/pendulum.mp4)
+
+## Acrobot-v1
+
+The environment uses Gymnasium's exact fourth-order Runge-Kutta dynamics,
+three discrete torques, sparse reward, 500-step limit, 500x500 link geometry,
+joint circles, and target line. The selected DQN profile uses learning rate
+`0.0003` and height-potential scale `10`. Its 100-episode held-out means were
+`-91.19`, `-99.39`, and `-95.79` across three training seeds. Each checkpoint
+had a 100% goal rate and exceeded Gymnasium's `-100` registry threshold.
+
+```sh
+cargo run --no-default-features --release --example acrobot -- train
+cargo run --release --example acrobot
+```
+
+![Trained Acrobot-v1 policy](../../docs/images/acrobot.gif)
+
+[30-second checkpoint progression](../../docs/videos/acrobot.mp4)

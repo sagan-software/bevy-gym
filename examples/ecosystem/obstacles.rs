@@ -1,4 +1,4 @@
-//! Stage 4: predator-prey curriculum with procedural hazards.
+//! Stage 8: predator-prey curriculum with procedural hazards.
 //!
 //! This stage transfers both stage-3 policies into procedurally generated maps.
 //! Trees and rocks are solid `Avian2D` obstacles. Thorn bushes are traversable
@@ -21,6 +21,8 @@
 //!
 //! The default render feature supplies the Inspector-egui HUD, camera controls,
 //! checkpoint playback, and checkpoint video generation.
+
+use tokio as _;
 
 #[path = "shared/mod.rs"]
 mod shared;

@@ -1,0 +1,50 @@
+name: Browser preview
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "Cargo.*"
+      - "flake.*"
+      - "src/**"
+      - "examples/ecosystem/shared/**"
+      - "web/**"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+env:
+  CARGO_BUILD_JOBS: 4
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+      - uses: cachix/install-nix-action@v31
+      - run: nix develop --command cargo test -p bevy-gym-web --locked
+      - run: nix run .#web-check
+      - run: nix develop --command trunk build --config web/Trunk.toml --release --locked --public-url /bevy-gym/
+      - run: touch dist/.nojekyll
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: dist
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/deploy-pages@v5
+        id: deployment

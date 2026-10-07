@@ -1,5 +1,7 @@
 /target/
 /runs/
+/dist/
+/test-results/
 /.direnv/
 /result
 /result-*

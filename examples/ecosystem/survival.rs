@@ -1,4 +1,4 @@
-//! Stage 1: single-agent ecosystem survival.
+//! Stage 4: single-agent ecosystem survival.
 //!
 //! One bunny receives only local ray perception, physiology, and its Burn LSTM
 //! state. It must find spawned food and a finite refillable well.
@@ -22,6 +22,9 @@
 //!
 //! See [`examples/ecosystem/README.md`](README.md) for the observation,
 //! evidence, and video contracts.
+
+use shakmaty as _;
+use tokio as _;
 
 #[path = "shared/mod.rs"]
 mod shared;

@@ -67,28 +67,36 @@
 
 #[cfg(feature = "bevy-mcp")]
 use bevy_brp_extras as _;
-// Cargo exposes dev-dependencies to the library test target. Ecosystem example
-// tests own the actual Avian use, while this keeps per-target dependency linting exact.
 #[cfg(test)]
-use avian2d as _;
+use clap as _;
 // Ecosystem examples own these serialization dependencies. Keep library builds
 // free of false unused-dependency diagnostics.
 #[cfg(feature = "render")]
 use bevy_inspector_egui as _;
-#[cfg(feature = "render")]
 use serde as _;
 use serde_json as _;
-#[cfg(feature = "render")]
-use tokio as _;
+use shakmaty as _;
+
+#[cfg(not(target_arch = "wasm32"))]
+mod runtime_io;
 
 /// ECS components used to store environment state.
 pub mod components;
 /// Core reinforcement-learning environment vocabulary.
 pub mod core;
+/// Portable ecosystem simulation and renderer-only projection.
+#[cfg(feature = "ecosystem-inference")]
+pub mod ecosystem;
 /// Messages emitted by the gym systems.
 pub mod events;
+/// Safe MuJoCo simulation boundary used by optional native environments.
+#[cfg(feature = "mujoco")]
+pub mod mujoco;
 /// Bevy plugin and startup helpers.
 pub mod plugin;
+/// Training checkpoint selection and rendered artifact recording.
+#[cfg(not(target_arch = "wasm32"))]
+pub mod recording;
 /// Fixed-update systems that step and reset environments.
 pub mod systems;
 /// Burn-backed trainer API boundary.

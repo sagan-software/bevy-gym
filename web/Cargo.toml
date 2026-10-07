@@ -1,0 +1,103 @@
+[package]
+name = "bevy-gym-web"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[features]
+default = ["render"]
+native-export = ["dep:bevy-gym", "dep:clap", "dep:tokio"]
+render = []
+
+[lints]
+workspace = true
+
+[dependencies.serde]
+features = ["derive"]
+version = "1"
+
+[dependencies.serde_json]
+version = "1"
+
+[dependencies.sha2]
+version = "0.10.9"
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies.bevy-gym]
+default-features = false
+optional = true
+path = ".."
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies.clap]
+features = ["derive"]
+optional = true
+version = "4.5.54"
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies.tokio]
+features = ["fs", "process", "rt"]
+optional = true
+version = "1.49"
+
+[target.'cfg(target_arch = "wasm32")'.dependencies.bevy]
+default-features = false
+features = [
+    "2d_bevy_render",
+    "bevy_winit",
+    "default_app",
+    "std",
+    "webgl2",
+]
+version = "0.18"
+
+[target.'cfg(target_arch = "wasm32")'.dependencies.bevy-gym]
+default-features = false
+features = ["ecosystem-inference"]
+path = ".."
+
+[target.'cfg(target_arch = "wasm32")'.dependencies.console_error_panic_hook]
+version = "0.1.7"
+
+[target.'cfg(target_arch = "wasm32")'.dependencies.getrandom]
+features = ["wasm_js"]
+version = "0.4.2"
+
+[target.'cfg(target_arch = "wasm32")'.dependencies.js-sys]
+version = "0.3"
+
+[target.'cfg(target_arch = "wasm32")'.dependencies.wasm-bindgen]
+version = "=0.2.121"
+
+[target.'cfg(target_arch = "wasm32")'.dependencies.wasm-bindgen-futures]
+version = "0.4"
+
+[target.'cfg(target_arch = "wasm32")'.dependencies.web-sys]
+features = [
+    "Blob",
+    "Document",
+    "Element",
+    "Event",
+    "EventTarget",
+    "File",
+    "FileList",
+    "FileReader",
+    "HtmlCanvasElement",
+    "HtmlButtonElement",
+    "HtmlElement",
+    "HtmlInputElement",
+    "HtmlSelectElement",
+    "Location",
+    "Performance",
+    "Request",
+    "RequestInit",
+    "Response",
+    "Window",
+]
+version = "0.3"
+
+[[bin]]
+name = "bevy-gym-web"
+path = "src/main.rs"
+
+[[bin]]
+name = "export-web-checkpoint"
+path = "src/bin/export_web_checkpoint.rs"
+required-features = ["native-export"]

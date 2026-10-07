@@ -2,7 +2,7 @@
 
 [![crates.io](https://img.shields.io/crates/v/bevy-gym.svg)](https://crates.io/crates/bevy-gym)
 [![docs.rs](https://docs.rs/bevy-gym/badge.svg)](https://docs.rs/bevy-gym)
-[![CI](https://github.com/vidarrio/bevy-gym/actions/workflows/ci.yml/badge.svg)](https://github.com/vidarrio/bevy-gym/actions/workflows/ci.yml)
+[![CI](https://github.com/sagan-software/bevy-gym/actions/workflows/ci.yml/badge.svg)](https://github.com/sagan-software/bevy-gym/actions/workflows/ci.yml)
 
 Bevy ECS plugin for parallelised reinforcement-learning environment simulation and Burn-backed
 training.
@@ -114,14 +114,67 @@ Add `ResetRequested` to any environment entity to trigger a reset on the next fi
 commands.entity(env_entity).insert(ResetRequested { seed: Some(42) });
 ```
 
+## Gymnasium browser roadmap
+
+See [the browser training and inference plan](GYMNASIUM_BROWSER_PLAN.md) for
+per-environment score gates, live learning curves, speed controls, and bundled
+qualified policies. Browser training is planned; the current site runs ecosystem
+inference only. Gymnasium builds do not enable Avian by default.
+
+## WASM ecosystem demo
+
+The static demo runs inference for all six ecosystem stages. It loads the
+curated checkpoint manifest by default and accepts local `.mpk` uploads without
+sending checkpoint data to a server.
+
+Run the live-reloading loopback server:
+
+```sh
+nix run .#web-serve
+```
+
+Run the server on this machine's Tailscale IPv4 address:
+
+```sh
+nix run .#web-serve-tailnet
+```
+
+For Tailscale HTTPS, configure the proxy once and run the loopback server with
+secure WebSocket reloads. Port 8443 avoids this host's existing Traefik listener
+on port 443:
+
+```sh
+sudo tailscale serve --bg --https=8443 8080
+nix run .#web-serve-tailscale-https
+```
+
+Build the reproducible static artifact or run the browser suite:
+
+```sh
+nix build .#web-dist
+nix run .#web-check
+```
+
+Use `export-web-checkpoint` to validate a native checkpoint, copy its
+content-addressed policy files, and update the manifest:
+
+```sh
+cargo run -p bevy-gym-web --features native-export \
+  --bin export-web-checkpoint -- \
+  --stage survival \
+  --run-dir runs/example \
+  --qualification best-compatible-available
+```
+
 ## Feature flags
 
-| Feature        | Description                                                       |
-| -------------- | ----------------------------------------------------------------- |
-| `fast-compile` | Enables Bevy dynamic linking for local iteration. Do not ship it. |
-| `render`       | Default. Enables 2D rendering and Inspector-egui example HUDs.     |
-| `bevy-mcp`     | Adds `bevy_brp_extras` for screenshots, shutdown, and MCP tooling. |
-| `bevy_remote`  | Alias expected by Bevy BRP MCP launch tooling.                    |
+| Feature                 | Description                                                       |
+| ----------------------- | ----------------------------------------------------------------- |
+| `fast-compile`          | Enables Bevy dynamic linking for local iteration. Do not ship it. |
+| `render`                | Default. Enables 2D rendering and Inspector-egui example HUDs.    |
+| `ecosystem-inference`   | Opts into Avian ecosystem examples and the portable inference facade. |
+| `bevy-mcp`              | Adds `bevy_brp_extras` for screenshots, shutdown, and MCP tooling. |
+| `bevy_remote`           | Alias expected by Bevy BRP MCP launch tooling.                    |
 
 ## Training boundary
 
@@ -132,15 +185,21 @@ roots. CartPole DQN train/eval is the first accepted behavioral path.
 
 ## Examples
 
-| Example                                 | Notes                                                    |
-| --------------------------------------- | -------------------------------------------------------- |
-| [`cartpole`](docs/examples/cartpole.md) | CartPole Burn DQN trainer, eval, BRP/MCP visualizer, and screenshots |
-| [`ecosystem`](examples/ecosystem/README.md) | Four visual-first recurrent PPO curriculum examples             |
+| Example | Notes |
+| --- | --- |
+| [`classic-control`](examples/classic-control/README.md) | Five Gymnasium-inspired control examples with recorded checkpoints |
+| [`toy-text`](examples/toy-text/README.md) | Four finite-state tabular examples |
+| [`box2d-approximation`](examples/box2d-approximation/README.md) | Three experimental approximations awaiting faithful Box2D ports |
+| [`mujoco-approximation`](examples/mujoco-approximation/README.md) | Eleven experimental approximations awaiting faithful MuJoCo ports |
+| [`mujoco`](examples/mujoco/README.md) | Three examples backed by official Gymnasium XML and MuJoCo 3.9 |
+| [`ecosystem`](examples/ecosystem/README.md) | Four visual-first recurrent PPO curriculum examples |
 
 ## Plugin docs
 
 - [BevyGymPlugin](docs/plugins/bevy_gym_plugin.md) -- core plugin, factory, runner messages, system
   ordering
+- [BevyGymRecorderPlugin](docs/plugins/bevy_gym_recorder_plugin.md) -- GIF and dynamic-checkpoint
+  MP4 recording
 
 ## Development
 

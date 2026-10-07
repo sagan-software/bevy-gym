@@ -6,7 +6,7 @@ The [ecosystem suite](ecosystem/README.md) is an incremental recurrent PPO
 curriculum using Bevy, Burn, and Avian2D. Its four stages cover solo survival,
 multi-agent competition, predator-prey learning, and obstacle avoidance.
 
-Start the survival example with `cargo run --example ecosystem-survival`. It
+Start the survival example with `cargo run --features ecosystem-inference --example ecosystem-survival`. It
 opens the visual environment, trains in the background, and displays live
 reward and learning curves in an Inspector-egui HUD.
 

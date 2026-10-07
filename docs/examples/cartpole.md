@@ -27,8 +27,9 @@ cargo run --example cartpole --release -- video \
 ```
 
 The video renderer uses Gymnasium's CartPole cadence: 50 FPS, matching the environment's 0.02 second
-state update interval. The first 20 seconds sample the run's `checkpoints/step-*.mpk` policies; the
-last 10 seconds show the final `best.mpk` policy at real-time speed.
+state update interval. It shows the best checkpoint for five seconds, then the first, 33 percent,
+and 66 percent checkpoints for five seconds each. It finishes with the best checkpoint for ten
+seconds.
 
 Run the realtime visualizer with Bevy Remote Protocol and BRP extras enabled:
 

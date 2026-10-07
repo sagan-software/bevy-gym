@@ -4,26 +4,60 @@ use std::error::Error;
 use std::fmt;
 use std::time::Duration;
 
-use bevy_gym::EpisodeStatus;
+use serde::{Deserialize, Serialize};
 
-/// Fixed binocular semantic-ray capacity emitted by every agent.
-pub(super) const RAY_COUNT: usize = 36;
+use super::EpisodeStatus;
 
-/// Semantic channels encoded after every ray distance and presence value.
-pub(super) const RAY_KIND_COUNT: usize = 7;
+/// Fixed center-origin semantic-ray capacity emitted by every agent.
+pub(super) const RAY_COUNT: usize = 24;
 
-/// Scalar features reserved for proprioception.
-pub(super) const PROPRIOCEPTION_SIZE: usize = 12;
+/// Semantic channels encoded after every ray distance value.
+pub(super) const RAY_KIND_COUNT: usize = 10;
+
+/// Distance plus the semantic one-hot channels stored for each perception ray.
+pub(super) const RAY_FEATURE_SIZE: usize = 1 + RAY_KIND_COUNT;
+
+/// First semantic one-hot channel within one perception ray.
+pub(super) const RAY_KIND_START: usize = 1;
+
+/// Scalar features before the fixed semantic-ray channels.
+pub(super) const PROPRIOCEPTION_SIZE: usize = 11;
+
+/// Signed body-forward velocity channel.
+pub(super) const LOCAL_LONGITUDINAL_VELOCITY_INDEX: usize = 4;
+
+/// Signed body-left velocity channel.
+pub(super) const LOCAL_LATERAL_VELOCITY_INDEX: usize = 5;
+
+/// Normalized conjugate gaze yaw relative to the body.
+pub(super) const LOCAL_GAZE_YAW_INDEX: usize = 7;
+
+/// Normalized protection reserve supplied by shelter use.
+pub(super) const LOCAL_EXPOSURE_INDEX: usize = 8;
+
+/// Shelter state: `-1` in active weather, `0` before weather, and `1` inside shelter.
+pub(super) const LOCAL_IN_SHELTER_INDEX: usize = 9;
+
+/// Normalized fixed-step delay before another interaction can start.
+pub(super) const LOCAL_INTERACTION_COOLDOWN_INDEX: usize = 10;
 
 /// One-hot curriculum lesson width.
-pub(super) const LESSON_COUNT: usize = 4;
+pub(super) const LESSON_COUNT: usize = 8;
 
 /// Stable local actor input width across every curriculum lesson.
-pub(super) const LOCAL_OBSERVATION_SIZE: usize =
-    PROPRIOCEPTION_SIZE + RAY_COUNT * (2 + RAY_KIND_COUNT) + LESSON_COUNT;
+pub(super) const LOCAL_OBSERVATION_SIZE: usize = PROPRIOCEPTION_SIZE + RAY_COUNT * RAY_FEATURE_SIZE;
+
+/// Stable lower bounds for forward, turn, gaze, and attack controls.
+pub(super) const ACTION_LOW: [f32; 4] = [-1.0; 4];
+
+/// Stable upper bounds for forward, turn, gaze, and attack controls.
+pub(super) const ACTION_HIGH: [f32; 4] = [1.0; 4];
 
 /// Maximum possible agents represented in centralized training state.
 pub(super) const MAX_AGENTS: usize = 12;
+
+/// Environment lanes shown and trained as the survival 3x3 batch.
+pub(super) const SURVIVAL_BATCH_ENVIRONMENTS: usize = 9;
 
 /// Maximum live food slots represented in centralized training state.
 pub(super) const MAX_FOOD: usize = 24;
@@ -43,116 +77,57 @@ pub(super) const GLOBAL_OBSTACLE_FEATURES: usize = 6;
 /// Stable critic input width across every curriculum lesson.
 pub(super) const GLOBAL_STATE_SIZE: usize = MAX_AGENTS * GLOBAL_AGENT_FEATURES
     + 4
+    + 4
     + MAX_FOOD * GLOBAL_FOOD_FEATURES
     + MAX_OBSTACLES * GLOBAL_OBSTACLE_FEATURES
     + 1
     + LESSON_COUNT;
 
-/// One side of the binocular perception system.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(super) enum EyeSide {
-    /// Eye offset to the agent's left.
-    Left,
-
-    /// Eye offset to the agent's right.
-    Right,
-}
-
-impl EyeSide {
-    /// Return the signed lateral offset from the body centerline.
-    pub(super) const fn lateral_sign(self) -> f32 {
-        match self {
-            Self::Left => 1.0,
-            Self::Right => -1.0,
-        }
-    }
-}
-
-/// Ray eye assignment ordered from frontal to peripheral importance.
-pub(super) const RAY_EYES: [EyeSide; RAY_COUNT] = [
-    EyeSide::Left,
-    EyeSide::Right,
-    EyeSide::Left,
-    EyeSide::Right,
-    EyeSide::Left,
-    EyeSide::Right,
-    EyeSide::Left,
-    EyeSide::Right,
-    EyeSide::Left,
-    EyeSide::Right,
-    EyeSide::Left,
-    EyeSide::Right,
-    EyeSide::Left,
-    EyeSide::Right,
-    EyeSide::Left,
-    EyeSide::Right,
-    EyeSide::Left,
-    EyeSide::Right,
-    EyeSide::Left,
-    EyeSide::Right,
-    EyeSide::Left,
-    EyeSide::Right,
-    EyeSide::Left,
-    EyeSide::Right,
-    EyeSide::Left,
-    EyeSide::Right,
-    EyeSide::Left,
-    EyeSide::Right,
-    EyeSide::Left,
-    EyeSide::Right,
-    EyeSide::Left,
-    EyeSide::Right,
-    EyeSide::Left,
-    EyeSide::Right,
-    EyeSide::Left,
-    EyeSide::Right,
-];
-
-/// Eye-relative ray angles, dense near gaze and sparse at the periphery.
+/// Center-origin ray angles, dense near gaze and sparse at the periphery.
 pub(super) const RAY_ANGLES: [f32; RAY_COUNT] = [
     2.0_f32.to_radians(),
-    2.0_f32.to_radians(),
-    (-2.0_f32).to_radians(),
     (-2.0_f32).to_radians(),
     5.0_f32.to_radians(),
-    5.0_f32.to_radians(),
-    (-5.0_f32).to_radians(),
     (-5.0_f32).to_radians(),
     9.0_f32.to_radians(),
-    9.0_f32.to_radians(),
-    (-9.0_f32).to_radians(),
     (-9.0_f32).to_radians(),
     14.0_f32.to_radians(),
-    14.0_f32.to_radians(),
-    (-14.0_f32).to_radians(),
     (-14.0_f32).to_radians(),
     20.0_f32.to_radians(),
-    20.0_f32.to_radians(),
-    (-20.0_f32).to_radians(),
     (-20.0_f32).to_radians(),
     28.0_f32.to_radians(),
-    28.0_f32.to_radians(),
-    (-28.0_f32).to_radians(),
     (-28.0_f32).to_radians(),
     37.0_f32.to_radians(),
-    37.0_f32.to_radians(),
-    (-37.0_f32).to_radians(),
     (-37.0_f32).to_radians(),
     47.0_f32.to_radians(),
-    47.0_f32.to_radians(),
-    (-47.0_f32).to_radians(),
     (-47.0_f32).to_radians(),
     55.0_f32.to_radians(),
-    55.0_f32.to_radians(),
     (-55.0_f32).to_radians(),
-    (-55.0_f32).to_radians(),
+    62.0_f32.to_radians(),
+    (-62.0_f32).to_radians(),
+    68.0_f32.to_radians(),
+    (-68.0_f32).to_radians(),
+    73.0_f32.to_radians(),
+    (-73.0_f32).to_radians(),
 ];
 
 /// Ordered ecosystem curriculum lessons.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub(crate) enum CurriculumStage {
+    /// One bunny learning to perceive, approach, and eat food.
+    Forage,
+
+    /// One bunny learning to reach visible food before it disappears.
+    Sprint,
+
+    /// One bunny retaining sprinting while routing across a safe bridge.
+    Gorge,
+
     /// One bunny with food and one refillable well.
     Survival,
+
+    /// One bunny retaining homeostasis while seeking weather shelter.
+    Shelter,
 
     /// Several bunnies competing for the same resources.
     Competition,
@@ -167,7 +142,11 @@ pub(crate) enum CurriculumStage {
 impl CurriculumStage {
     /// Every lesson in progression order.
     pub(crate) const ALL: [Self; LESSON_COUNT] = [
+        Self::Forage,
+        Self::Sprint,
+        Self::Gorge,
         Self::Survival,
+        Self::Shelter,
         Self::Competition,
         Self::PredatorPrey,
         Self::Obstacles,
@@ -175,8 +154,13 @@ impl CurriculumStage {
 
     /// Return the stable stage key used by commands and run directories.
     pub(crate) const fn as_key(self) -> &'static str {
+        // Keep artifact keys aligned with the executable stage names.
         match self {
+            Self::Forage => "forage",
+            Self::Sprint => "sprint",
+            Self::Gorge => "gorge",
             Self::Survival => "survival",
+            Self::Shelter => "shelter",
             Self::Competition => "competition",
             Self::PredatorPrey => "predator-prey",
             Self::Obstacles => "obstacles",
@@ -185,8 +169,13 @@ impl CurriculumStage {
 
     /// Return a human-readable stage title.
     pub(crate) const fn title(self) -> &'static str {
+        // Keep display text centralized for training, watch, and video modes.
         match self {
+            Self::Forage => "Single-agent food foraging",
+            Self::Sprint => "Ephemeral-food sprinting",
+            Self::Gorge => "Gorge bridge crossing",
             Self::Survival => "Single-agent ecosystem survival",
+            Self::Shelter => "Single-agent shelter survival",
             Self::Competition => "Multi-agent resource competition",
             Self::PredatorPrey => "Predator-prey ecosystem",
             Self::Obstacles => "Obstacle and thorn ecosystem",
@@ -195,11 +184,47 @@ impl CurriculumStage {
 
     /// Return the zero-based one-hot channel index.
     pub(super) const fn index(self) -> usize {
+        // Preserve transfer order in the centralized critic stage channels.
         match self {
-            Self::Survival => 0,
-            Self::Competition => 1,
-            Self::PredatorPrey => 2,
-            Self::Obstacles => 3,
+            Self::Forage => 0,
+            Self::Sprint => 1,
+            Self::Gorge => 2,
+            Self::Survival => 3,
+            Self::Shelter => 4,
+            Self::Competition => 5,
+            Self::PredatorPrey => 6,
+            Self::Obstacles => 7,
+        }
+    }
+
+    /// Return whether food uses the movement lesson's fixed expiry window.
+    pub(super) const fn uses_ephemeral_food(self) -> bool {
+        matches!(self, Self::Sprint | Self::Gorge)
+    }
+
+    /// Return whether this lesson requires food and water homeostasis.
+    pub(super) const fn uses_hydration(self) -> bool {
+        !matches!(self, Self::Forage | Self::Sprint | Self::Gorge)
+    }
+}
+
+/// Closed forage reset distribution used by curriculum promotion.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub(super) enum ForageDifficulty {
+    /// Short targets near the body centerline.
+    Foundation,
+    /// Held-out left, right, near, and far target distribution.
+    #[default]
+    Expanded,
+}
+
+impl ForageDifficulty {
+    /// Return the stable artifact and metric key.
+    pub(super) const fn as_key(self) -> &'static str {
+        match self {
+            Self::Foundation => "foundation",
+            Self::Expanded => "expanded",
         }
     }
 }
@@ -246,8 +271,17 @@ pub(super) enum DeathCause {
     /// Thorn damage exhausted hit points.
     Thorns,
 
+    /// A high-speed solid collision exhausted hit points.
+    Collision,
+
+    /// The agent left the bridge and fell into the gorge.
+    Gorge,
+
     /// Concurrent deprivation and thorn damage exhausted hit points.
     CombinedDamage,
+
+    /// Unprotected exposure exhausted hit points.
+    Exposure,
 
     /// Non-finite or escaped physics state invalidated the trajectory.
     InvalidPhysics,
@@ -276,6 +310,15 @@ pub(super) enum PerceptKind {
 
     /// Static map boundary.
     Boundary,
+
+    /// Passive protection zone.
+    Shelter,
+
+    /// Lethal floor below the gorge cliffs.
+    Gorge,
+
+    /// Solid bridge rail that identifies the safe crossing.
+    Bridge,
 }
 
 impl PerceptKind {
@@ -289,6 +332,9 @@ impl PerceptKind {
             Self::SolidObstacle => 4,
             Self::Thorn => 5,
             Self::Boundary => 6,
+            Self::Shelter => 7,
+            Self::Gorge => 8,
+            Self::Bridge => 9,
         }
     }
 }
@@ -304,6 +350,9 @@ pub(super) struct LocomotionAction {
 
     /// Conjugate left/right eye yaw in `[-1, 1]`.
     pub(super) gaze: f32,
+
+    /// Intent to use the overlapping mouth hitbox in `[-1, 1]`.
+    pub(super) attack: f32,
 }
 
 impl LocomotionAction {
@@ -313,14 +362,21 @@ impl LocomotionAction {
     ///
     /// Returns [`ActionError`] if any axis is non-finite or outside
     /// `[-1, 1]`.
-    pub(super) fn new(forward: f32, turn: f32, gaze: f32) -> Result<Self, ActionError> {
+    pub(super) fn new(
+        forward: f32,
+        turn: f32,
+        gaze: f32,
+        attack: f32,
+    ) -> Result<Self, ActionError> {
         validate_action_axis("forward", forward)?;
         validate_action_axis("turn", turn)?;
         validate_action_axis("gaze", gaze)?;
+        validate_action_axis("attack", attack)?;
         Ok(Self {
             forward,
             turn,
             gaze,
+            attack,
         })
     }
 }
@@ -362,12 +418,12 @@ pub(super) type LocalObservation = [f32; LOCAL_OBSERVATION_SIZE];
 /// Fixed-shape centralized training-only critic state.
 pub(super) type GlobalState = [f32; GLOBAL_STATE_SIZE];
 
-/// Valid number of binocular perception rays sampled by each agent.
+/// Valid number of center-origin perception rays sampled by each agent.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(super) struct PerceptionRayCount(u8);
 
 impl PerceptionRayCount {
-    /// Smallest profile with one ray from each eye.
+    /// Smallest symmetric profile around the gaze direction.
     pub(super) const MIN: u8 = 2;
 
     /// Fixed actor-tensor capacity reserved for perception sectors.
@@ -396,23 +452,20 @@ impl TryFrom<u8> for PerceptionRayCount {
         } else {
             Err(ConfigError::new(
                 "perception_ray_count",
-                "must be an even count in 2..=36 binocular rays",
+                "must be an even count in 2..=24 center-origin rays",
             ))
         }
     }
 }
 
-/// Runtime-adjustable perception, reward, physiology, and horizon settings.
+/// Runtime-adjustable perception, physiology, and horizon settings.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub(super) struct ExperimentTuning {
-    /// Paired binocular sectors sampled within the fixed tensor capacity.
+    /// Active forage reset distribution.
+    pub(super) forage_difficulty: ForageDifficulty,
+
+    /// Paired center-origin sectors sampled within the fixed tensor capacity.
     pub(super) perception_ray_count: PerceptionRayCount,
-
-    /// Reward earned for one compatible food or prey event.
-    pub(super) food_reward: f32,
-
-    /// Base reward earned by one completed drink event.
-    pub(super) drink_reward: f32,
 
     /// Maximum discrete HP available to an agent.
     pub(super) maximum_hit_points: u8,
@@ -459,17 +512,16 @@ impl Default for ExperimentTuning {
         // Start agents under visible resource pressure while retaining enough
         // exploration time for the demo policy to discover food and water.
         Self {
+            forage_difficulty: ForageDifficulty::Expanded,
             perception_ray_count: PerceptionRayCount::default(),
-            food_reward: 8.0,
-            drink_reward: 10.0,
             maximum_hit_points: 5,
             initial_hit_points: 5,
             maximum_satiation: 5,
-            initial_satiation: 3,
+            initial_satiation: 2,
             maximum_hydration: 5,
-            initial_hydration: 3,
-            need_loss_interval_seconds: 5,
-            starvation_damage_interval_seconds: 3,
+            initial_hydration: 2,
+            need_loss_interval_seconds: 4,
+            starvation_damage_interval_seconds: 2,
             dehydration_damage_interval_seconds: 2,
             movement_need_cost_percent: 25,
             movement_speed_multiplier: 1.0,
@@ -482,18 +534,8 @@ impl Default for ExperimentTuning {
 impl ExperimentTuning {
     /// Validate the bounded playground surface before applying it to a world.
     pub(super) fn validate(self) -> Result<(), ConfigError> {
-        // Bounds prevent an accidental slider value from creating non-finite
-        // rewards, immortal agents, or an impractically long demo episode.
-        if !self.food_reward.is_finite()
-            || !(0.0..=20.0).contains(&self.food_reward)
-            || !self.drink_reward.is_finite()
-            || !(0.0..=10.0).contains(&self.drink_reward)
-        {
-            return Err(ConfigError::new(
-                "reward_tuning",
-                "reward weights must be finite and within their demo bounds",
-            ));
-        }
+        // Bounds prevent an accidental slider value from creating immortal
+        // agents or an impractically long demo episode.
         if self.maximum_hit_points == 0
             || self.maximum_hit_points > 20
             || self.initial_hit_points == 0
@@ -537,6 +579,9 @@ pub(super) struct SimulationConfig {
     /// Curriculum lesson represented by this world.
     pub(super) stage: CurriculumStage,
 
+    /// Active forage reset distribution.
+    pub(super) forage_difficulty: ForageDifficulty,
+
     /// Number of possible bunny slots.
     pub(super) bunny_count: usize,
 
@@ -575,12 +620,6 @@ pub(super) struct SimulationConfig {
 
     /// Number of traversable thorn bushes.
     pub(super) thorn_obstacles: usize,
-
-    /// Reward earned for one compatible food or prey event.
-    pub(super) food_reward: f32,
-
-    /// Base reward earned by one completed drink event.
-    pub(super) drink_reward: f32,
 
     /// Maximum discrete HP available to an agent.
     pub(super) maximum_hit_points: u8,
@@ -640,25 +679,53 @@ impl SimulationConfig {
             solid_obstacles,
             thorn_obstacles,
         ) = match stage {
-            CurriculumStage::Survival => (1, 0, 10.0, 2, 0, 0),
-            CurriculumStage::Competition => (4, 0, 14.0, 12, 0, 0),
-            CurriculumStage::PredatorPrey => (6, 2, 20.0, 12, 0, 0),
-            CurriculumStage::Obstacles => (6, 2, 25.0, 12, 12, 8),
+            CurriculumStage::Forage | CurriculumStage::Sprint => (1, 0, 16.0, 1, 0, 0),
+            CurriculumStage::Gorge => (1, 0, 12.0, 1, 0, 0),
+            CurriculumStage::Survival => (1, 0, 10.0, 2, 5, 0),
+            CurriculumStage::Shelter => (1, 0, 12.0, 2, 0, 0),
+            CurriculumStage::Competition => (4, 0, 14.0, 2, 0, 0),
+            CurriculumStage::PredatorPrey => (6, 2, 20.0, 6, 0, 0),
+            CurriculumStage::Obstacles => (6, 2, 25.0, 6, 12, 8),
         };
         let food_spawn_interval = match stage {
-            CurriculumStage::Survival => 20,
-            CurriculumStage::Competition
+            CurriculumStage::Forage
+            | CurriculumStage::Sprint
+            | CurriculumStage::Gorge
+            | CurriculumStage::Survival => 20,
+            CurriculumStage::Shelter
+            | CurriculumStage::Competition
             | CurriculumStage::PredatorPrey
             | CurriculumStage::Obstacles => 30,
         };
         let max_food = match stage {
-            CurriculumStage::Survival => 2,
-            CurriculumStage::Competition
-            | CurriculumStage::PredatorPrey
-            | CurriculumStage::Obstacles => 20,
+            CurriculumStage::Forage | CurriculumStage::Sprint | CurriculumStage::Gorge => 1,
+            CurriculumStage::Survival => 6,
+            CurriculumStage::Shelter => 2,
+            CurriculumStage::Competition => 3,
+            CurriculumStage::PredatorPrey | CurriculumStage::Obstacles => 8,
         };
+        let (initial_satiation, initial_hydration) = if stage == CurriculumStage::Survival {
+            (3, 3)
+        } else {
+            (tuning.initial_satiation, tuning.initial_hydration)
+        };
+        let need_loss_interval_seconds = if stage == CurriculumStage::Survival {
+            60
+        } else {
+            tuning.need_loss_interval_seconds
+        };
+        let (starvation_damage_interval_seconds, dehydration_damage_interval_seconds) =
+            if stage == CurriculumStage::Survival {
+                (10, 10)
+            } else {
+                (
+                    tuning.starvation_damage_interval_seconds,
+                    tuning.dehydration_damage_interval_seconds,
+                )
+            };
         let config = Self {
             stage,
+            forage_difficulty: tuning.forage_difficulty,
             bunny_count,
             fox_count,
             map_half_extent,
@@ -668,21 +735,23 @@ impl SimulationConfig {
             max_food,
             food_spawn_interval,
             well_capacity: 8.0,
-            well_refill_rate: 0.12,
+            well_refill_rate: if stage == CurriculumStage::Survival {
+                0.24
+            } else {
+                0.12
+            },
             well_drink_rate: 0.6,
             solid_obstacles,
             thorn_obstacles,
-            food_reward: tuning.food_reward,
-            drink_reward: tuning.drink_reward,
             maximum_hit_points: tuning.maximum_hit_points,
             initial_hit_points: tuning.initial_hit_points,
             maximum_satiation: tuning.maximum_satiation,
-            initial_satiation: tuning.initial_satiation,
+            initial_satiation,
             maximum_hydration: tuning.maximum_hydration,
-            initial_hydration: tuning.initial_hydration,
-            need_loss_interval_seconds: tuning.need_loss_interval_seconds,
-            starvation_damage_interval_seconds: tuning.starvation_damage_interval_seconds,
-            dehydration_damage_interval_seconds: tuning.dehydration_damage_interval_seconds,
+            initial_hydration,
+            need_loss_interval_seconds,
+            starvation_damage_interval_seconds,
+            dehydration_damage_interval_seconds,
             movement_need_cost_percent: tuning.movement_need_cost_percent,
             movement_speed_multiplier: tuning.movement_speed_multiplier,
             gaze_yaw_limit_degrees: tuning.gaze_yaw_limit_degrees,
@@ -745,9 +814,8 @@ impl SimulationConfig {
         // Validate before mutation so a rejected profile leaves the prior
         // simulation contract intact.
         tuning.validate()?;
-        self.food_reward = tuning.food_reward;
-        self.drink_reward = tuning.drink_reward;
         self.maximum_hit_points = tuning.maximum_hit_points;
+        self.forage_difficulty = tuning.forage_difficulty;
         self.initial_hit_points = tuning.initial_hit_points;
         self.maximum_satiation = tuning.maximum_satiation;
         self.initial_satiation = tuning.initial_satiation;
@@ -769,9 +837,8 @@ impl SimulationConfig {
         // Derive this view from authoritative simulation fields so the HUD and
         // metrics cannot report a profile that the world does not use.
         ExperimentTuning {
+            forage_difficulty: self.forage_difficulty,
             perception_ray_count: self.perception_ray_count,
-            food_reward: self.food_reward,
-            drink_reward: self.drink_reward,
             maximum_hit_points: self.maximum_hit_points,
             initial_hit_points: self.initial_hit_points,
             maximum_satiation: self.maximum_satiation,
@@ -894,7 +961,7 @@ pub(super) struct EcosystemSnapshot {
 }
 
 /// Renderer-only kind for a static or consumable world object.
-#[cfg(feature = "render")]
+#[cfg(any(feature = "render", feature = "ecosystem-inference"))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(super) enum VisualObjectKind {
     /// Consumable bunny food.
@@ -911,10 +978,13 @@ pub(super) enum VisualObjectKind {
 
     /// Traversable damaging thorn bush.
     Thorn,
+
+    /// Passive protection zone.
+    Shelter,
 }
 
 /// Renderer-only state for one agent body.
-#[cfg(feature = "render")]
+#[cfg(any(feature = "render", feature = "ecosystem-inference"))]
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub(super) struct VisualAgent {
     /// Stable agent identity.
@@ -935,6 +1005,9 @@ pub(super) struct VisualAgent {
     /// Whether the agent can still act.
     pub(super) is_alive: bool,
 
+    /// Whether the forward mouth hitbox is active for this step.
+    pub(super) attack_active: bool,
+
     /// Current satiation points.
     pub(super) satiation: u8,
 
@@ -943,10 +1016,16 @@ pub(super) struct VisualAgent {
 
     /// Current hit points.
     pub(super) hit_points: u8,
+
+    /// Current environmental protection reserve.
+    pub(super) exposure: u8,
+
+    /// Whether the agent currently occupies shelter.
+    pub(super) in_shelter: bool,
 }
 
 /// One exact actor perception sector projected into world coordinates.
-#[cfg(feature = "render")]
+#[cfg(any(feature = "render", feature = "ecosystem-inference"))]
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub(super) struct VisualRay {
     /// Stable identity of the observing agent.
@@ -963,7 +1042,7 @@ pub(super) struct VisualRay {
 }
 
 /// Renderer-only state for one non-agent entity.
-#[cfg(feature = "render")]
+#[cfg(any(feature = "render", feature = "ecosystem-inference"))]
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub(super) struct VisualObject {
     /// Semantic object kind.
@@ -976,8 +1055,19 @@ pub(super) struct VisualObject {
     pub(super) radius: f32,
 }
 
+/// Renderer-only rectangular gorge and safe bridge dimensions.
+#[cfg(any(feature = "render", feature = "ecosystem-inference"))]
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub(super) struct VisualGorge {
+    /// Half-width of the gorge along the world X axis.
+    pub(super) half_width: f32,
+
+    /// Half-width of the safe bridge corridor along the world Y axis.
+    pub(super) bridge_half_width: f32,
+}
+
 /// Complete read-only scene projection for watch and video modes.
-#[cfg(feature = "render")]
+#[cfg(any(feature = "render", feature = "ecosystem-inference"))]
 #[derive(Debug, Clone, PartialEq)]
 pub(super) struct VisualWorldSnapshot {
     /// Compact counters shared with smoke output.
@@ -985,6 +1075,27 @@ pub(super) struct VisualWorldSnapshot {
 
     /// Half extent of the square playable area.
     pub(super) map_half_extent: f32,
+
+    /// Configured HP segment count.
+    pub(super) maximum_hit_points: u8,
+
+    /// Configured satiation segment count.
+    pub(super) maximum_satiation: u8,
+
+    /// Configured hydration segment count.
+    pub(super) maximum_hydration: u8,
+
+    /// Configured environmental protection segment count.
+    pub(super) maximum_exposure: u8,
+
+    /// Whether damaging weather has started in this episode.
+    pub(super) weather_active: bool,
+
+    /// Seeded simulated second at which damaging weather starts.
+    pub(super) weather_onset_seconds: f32,
+
+    /// Gorge and bridge geometry when the movement lesson enables it.
+    pub(super) gorge: Option<VisualGorge>,
 
     /// Current agent bodies in stable identity order.
     pub(super) agents: Vec<VisualAgent>,
@@ -1011,6 +1122,15 @@ pub(super) struct AgentEpisodeMetrics {
     /// Total undiscounted reward earned during the episode.
     pub(super) episode_return: f32,
 
+    /// Hit points present at death or the episode horizon.
+    pub(super) terminal_hit_points: u8,
+
+    /// Satiation points present at death or the episode horizon.
+    pub(super) terminal_satiation: u8,
+
+    /// Hydration points present at death or the episode horizon.
+    pub(super) terminal_hydration: u8,
+
     /// Compatible food or prey consumed.
     pub(super) food_eaten: u32,
 
@@ -1023,11 +1143,38 @@ pub(super) struct AgentEpisodeMetrics {
     /// Hit points lost to thorn contact.
     pub(super) thorn_damage: f32,
 
+    /// Hit points lost to high-speed solid collisions.
+    pub(super) collision_damage: f32,
+
     /// Hit points lost to excess food or water.
     pub(super) overconsumption_damage: f32,
 
     /// Agent-agent overlap contacts observed across physics steps.
     pub(super) collision_contacts: u32,
+
+    /// Agent-contact steps in which world position changed.
+    pub(super) contact_displacements: u32,
+
+    /// Solid contacts that exceeded the post-solver penetration tolerance.
+    pub(super) unresolved_solid_penetrations: u32,
+
+    /// World-space distance traveled during the episode.
+    pub(super) path_length: f32,
+
+    /// Simulated seconds spent inside shelter.
+    pub(super) shelter_seconds: f32,
+
+    /// Whether shelter was entered before exposure reached zero.
+    pub(super) sheltered_before_critical_exposure: bool,
+
+    /// Simulated time of the first food or well contact.
+    pub(super) first_resource_contact_seconds: Option<f32>,
+
+    /// Visible-resource transitions eligible for approach scoring.
+    pub(super) visible_resource_transitions: u32,
+
+    /// Eligible transitions that reduced ray-derived resource distance.
+    pub(super) resource_approach_transitions: u32,
 
     /// Natural death cause, or none at a horizon.
     pub(super) death_cause: Option<DeathCause>,
@@ -1037,34 +1184,52 @@ pub(super) struct AgentEpisodeMetrics {
 mod tests {
     use super::*;
 
+    /// The suite must expose every curriculum stage in transfer order.
+    #[test]
+    fn curriculum_places_speed_and_bridge_lessons_before_survival() {
+        // Assert the exact transfer chain consumed by curriculum orchestration.
+        let keys: Vec<_> = CurriculumStage::ALL
+            .into_iter()
+            .map(CurriculumStage::as_key)
+            .collect();
+
+        assert_eq!(
+            keys,
+            [
+                "forage",
+                "sprint",
+                "gorge",
+                "survival",
+                "shelter",
+                "competition",
+                "predator-prey",
+                "obstacles",
+            ]
+        );
+    }
+
     /// Every lesson must preserve the direct-checkpoint tensor contract.
     #[test]
     fn all_stage_defaults_fit_fixed_tensor_capacities() {
-        for stage in [
-            CurriculumStage::Survival,
-            CurriculumStage::Competition,
-            CurriculumStage::PredatorPrey,
-            CurriculumStage::Obstacles,
-        ] {
+        for stage in CurriculumStage::ALL {
             let config = SimulationConfig::for_stage(stage).expect("stage defaults are valid");
             assert!(config.agent_count() <= MAX_AGENTS);
             assert!(config.max_food <= MAX_FOOD);
             assert!(config.solid_obstacles + config.thorn_obstacles <= MAX_OBSTACLES);
         }
-        assert_eq!(LOCAL_OBSERVATION_SIZE, 340);
-        assert_eq!(GLOBAL_STATE_SIZE, 357);
+        assert_eq!(LOCAL_OBSERVATION_SIZE, 275);
+        assert_eq!(GLOBAL_STATE_SIZE, 365);
     }
 
     /// Demo tuning must update every experiment lever as one validated profile.
     #[test]
-    fn experiment_tuning_applies_reward_physiology_and_timeout() {
+    fn experiment_tuning_applies_perception_physiology_and_timeout() {
         // Change every lever together to detect an omitted assignment.
         let mut config = SimulationConfig::for_stage(CurriculumStage::Survival)
             .expect("stage defaults are valid");
         let tuning = ExperimentTuning {
+            forage_difficulty: ForageDifficulty::Foundation,
             perception_ray_count: PerceptionRayCount::try_from(8_u8).expect("eight rays fit"),
-            food_reward: 4.0,
-            drink_reward: 2.0,
             maximum_hit_points: 8,
             initial_hit_points: 4,
             maximum_satiation: 7,
@@ -1109,7 +1274,7 @@ mod tests {
         assert!(PerceptionRayCount::try_from(0_u8).is_err());
         assert!(PerceptionRayCount::try_from(1_u8).is_err());
         assert!(PerceptionRayCount::try_from(3_u8).is_err());
-        assert!(PerceptionRayCount::try_from(37_u8).is_err());
+        assert!(PerceptionRayCount::try_from(25_u8).is_err());
         assert_eq!(
             PerceptionRayCount::try_from(4_u8)
                 .expect("four rays fit the fixed capacity")
@@ -1121,15 +1286,17 @@ mod tests {
     /// Invalid action scalars must not reach physics.
     #[test]
     fn action_boundary_rejects_non_finite_and_unbounded_values() {
-        assert!(LocomotionAction::new(f32::NAN, 0.0, 0.0).is_err());
-        assert!(LocomotionAction::new(0.0, 1.01, 0.0).is_err());
-        assert!(LocomotionAction::new(0.0, 0.0, -1.01).is_err());
+        assert!(LocomotionAction::new(f32::NAN, 0.0, 0.0, 0.0).is_err());
+        assert!(LocomotionAction::new(0.0, 1.01, 0.0, 0.0).is_err());
+        assert!(LocomotionAction::new(0.0, 0.0, -1.01, 0.0).is_err());
+        assert!(LocomotionAction::new(0.0, 0.0, 0.0, 1.01).is_err());
         assert_eq!(
-            LocomotionAction::new(-1.0, 1.0, 0.5).expect("bounded gaze is valid"),
+            LocomotionAction::new(-1.0, 1.0, 0.5, 1.0).expect("bounded action is valid"),
             LocomotionAction {
                 forward: -1.0,
                 turn: 1.0,
                 gaze: 0.5,
+                attack: 1.0,
             }
         );
     }

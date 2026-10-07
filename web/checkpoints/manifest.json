@@ -1,0 +1,433 @@
+{
+  "manifest_version": 1,
+  "source_commit": "915db888df025ec76c78bb24edc0d663ea6ccc3b",
+  "burn_version": "0.21.0",
+  "stages": [
+    {
+      "stage": "forage",
+      "title": "Forage",
+      "checkpoint_profile": 17,
+      "experiment_tuning": {
+        "forage_difficulty": "expanded",
+        "perception_ray_count": 24,
+        "maximum_hit_points": 5,
+        "initial_hit_points": 5,
+        "maximum_satiation": 5,
+        "initial_satiation": 2,
+        "maximum_hydration": 5,
+        "initial_hydration": 2,
+        "need_loss_interval_seconds": 4,
+        "starvation_damage_interval_seconds": 2,
+        "dehydration_damage_interval_seconds": 2,
+        "movement_need_cost_percent": 25,
+        "movement_speed_multiplier": 1.0,
+        "gaze_yaw_limit_degrees": 30.0,
+        "episode_seconds": 20
+      },
+      "algorithm": "recurrent-ppo",
+      "architecture": {
+        "local_observation_size": 267,
+        "global_state_size": 363,
+        "max_agents": 12,
+        "action_size": 4,
+        "actor_hidden_size": 64,
+        "critic_hidden_sizes": [
+          128,
+          64
+        ]
+      },
+      "required_policy_roles": [
+        "bunny"
+      ],
+      "training_seed": 269,
+      "selection_summary": {
+        "global_steps": 25477,
+        "initial_bunny_mean_return": 0.24874845,
+        "best_bunny_mean_return": 0.26014563,
+        "initial_bunny_mean_lifetime": 19.984,
+        "best_bunny_mean_lifetime": 20.0,
+        "best_bunny_ci95_lower": 20.0,
+        "best_bunny_ci95_upper": 20.0,
+        "best_bunny_food_fraction": 1.0,
+        "best_bunny_food_and_water_fraction": 0.3,
+        "initial_fox_mean_return": 0.0,
+        "best_fox_mean_return": 0.0,
+        "initial_fox_mean_lifetime": 0.0,
+        "best_fox_mean_lifetime": 0.0,
+        "best_fox_ci95_lower": 0.0,
+        "best_fox_ci95_upper": 0.0,
+        "best_fox_prey_and_water_fraction": 0.0,
+        "qualification_evidence": "fixed validation-seed demo evidence; disjoint test-seed qualification is reported separately"
+      },
+      "qualification": "best-compatible-available",
+      "bunny": {
+        "path": "checkpoints/forage-bunny-1b1110c394f9.mpk",
+        "sha256": "1b1110c394f981396ab0dc8aa25702d89412b956d1db40ebaf9001bac6f6ab87",
+        "bytes": 566607,
+        "config_path": "checkpoints/forage-bunny-1b1110c394f9.config.json",
+        "config_sha256": "bda31e03d18257ab88bc39bde36bdc996c61b03e85f967a438ecf0bc8013eba6",
+        "config_bytes": 587,
+        "source_run": "runs/ecosystem-profile17/ecosystem-forage-ppo/profile17-forage-gated-initial-teacher-seed269"
+      },
+      "fox": null
+    },
+    {
+      "stage": "survival",
+      "title": "Survival",
+      "checkpoint_profile": 28,
+      "experiment_tuning": {
+        "forage_difficulty": "expanded",
+        "perception_ray_count": 24,
+        "maximum_hit_points": 5,
+        "initial_hit_points": 5,
+        "maximum_satiation": 5,
+        "initial_satiation": 3,
+        "maximum_hydration": 5,
+        "initial_hydration": 3,
+        "need_loss_interval_seconds": 60,
+        "starvation_damage_interval_seconds": 10,
+        "dehydration_damage_interval_seconds": 10,
+        "movement_need_cost_percent": 25,
+        "movement_speed_multiplier": 1.0,
+        "gaze_yaw_limit_degrees": 30.0,
+        "episode_seconds": 120
+      },
+      "algorithm": "recurrent-ppo",
+      "architecture": {
+        "local_observation_size": 267,
+        "global_state_size": 363,
+        "max_agents": 12,
+        "action_size": 4,
+        "actor_hidden_size": 64,
+        "critic_hidden_sizes": [
+          128,
+          64
+        ]
+      },
+      "required_policy_roles": [
+        "bunny"
+      ],
+      "training_seed": 157,
+      "selection_summary": {
+        "global_steps": 172800,
+        "initial_bunny_mean_return": 0.705895,
+        "best_bunny_mean_return": 5.976326,
+        "initial_bunny_mean_lifetime": 50.924995,
+        "best_bunny_mean_lifetime": 120.0,
+        "best_bunny_ci95_lower": 120.0,
+        "best_bunny_ci95_upper": 120.0,
+        "best_bunny_food_fraction": 1.0,
+        "best_bunny_food_and_water_fraction": 0.8125,
+        "initial_fox_mean_return": 0.0,
+        "best_fox_mean_return": 0.0,
+        "initial_fox_mean_lifetime": 0.0,
+        "best_fox_mean_lifetime": 0.0,
+        "best_fox_ci95_lower": 0.0,
+        "best_fox_ci95_upper": 0.0,
+        "best_fox_prey_and_water_fraction": 0.0,
+        "qualification_evidence": "fixed validation-seed demo evidence; disjoint test-seed qualification is reported separately"
+      },
+      "qualification": "best-compatible-available",
+      "bunny": {
+        "path": "checkpoints/survival-bunny-9bb0439ab815.mpk",
+        "sha256": "9bb0439ab815355692680e33508ca43e804bc36535e006c364e3eae8d4b62d98",
+        "bytes": 566607,
+        "config_path": "checkpoints/survival-bunny-9bb0439ab815.config.json",
+        "config_sha256": "8709bb71114bb82cc5a05377401342477abd03769b799ed63c57aa68d03b5e35",
+        "config_bytes": 593,
+        "source_run": "runs/ecosystem-survival-ppo/final-homeostasis-profile-20260801"
+      },
+      "fox": null
+    },
+    {
+      "stage": "shelter",
+      "title": "Shelter",
+      "checkpoint_profile": 18,
+      "experiment_tuning": {
+        "forage_difficulty": "expanded",
+        "perception_ray_count": 24,
+        "maximum_hit_points": 5,
+        "initial_hit_points": 5,
+        "maximum_satiation": 5,
+        "initial_satiation": 2,
+        "maximum_hydration": 5,
+        "initial_hydration": 2,
+        "need_loss_interval_seconds": 4,
+        "starvation_damage_interval_seconds": 2,
+        "dehydration_damage_interval_seconds": 2,
+        "movement_need_cost_percent": 25,
+        "movement_speed_multiplier": 1.0,
+        "gaze_yaw_limit_degrees": 30.0,
+        "episode_seconds": 20
+      },
+      "algorithm": "recurrent-ppo",
+      "architecture": {
+        "local_observation_size": 267,
+        "global_state_size": 363,
+        "max_agents": 12,
+        "action_size": 4,
+        "actor_hidden_size": 64,
+        "critic_hidden_sizes": [
+          128,
+          64
+        ]
+      },
+      "required_policy_roles": [
+        "bunny"
+      ],
+      "training_seed": 163,
+      "selection_summary": {
+        "global_steps": 110646,
+        "initial_bunny_mean_return": 0.19549215,
+        "best_bunny_mean_return": 0.19549215,
+        "initial_bunny_mean_lifetime": 16.510002,
+        "best_bunny_mean_lifetime": 16.510002,
+        "best_bunny_ci95_lower": 16.098999,
+        "best_bunny_ci95_upper": 16.900003,
+        "best_bunny_food_fraction": 0.96,
+        "best_bunny_food_and_water_fraction": 0.75,
+        "initial_fox_mean_return": 0.0,
+        "best_fox_mean_return": 0.0,
+        "initial_fox_mean_lifetime": 0.0,
+        "best_fox_mean_lifetime": 0.0,
+        "best_fox_ci95_lower": 0.0,
+        "best_fox_ci95_upper": 0.0,
+        "best_fox_prey_and_water_fraction": 0.0,
+        "qualification_evidence": "fixed validation-seed demo evidence; disjoint test-seed qualification is reported separately"
+      },
+      "qualification": "best-compatible-available",
+      "bunny": {
+        "path": "checkpoints/shelter-bunny-be31747df87a.mpk",
+        "sha256": "be31747df87a3abac2a1ab2ea93fe6678513f7ac765b4f9903a5574bcddb18ed",
+        "bytes": 566607,
+        "config_path": "checkpoints/shelter-bunny-be31747df87a.config.json",
+        "config_sha256": "d1eee82179736498408180af2da51b4c974d4276bd056a0f6cd8baa7ca3594c8",
+        "config_bytes": 588,
+        "source_run": "runs/ecosystem-profile18/ecosystem-shelter-ppo/profile18-shelter-weather-seed163"
+      },
+      "fox": null
+    },
+    {
+      "stage": "competition",
+      "title": "Competition",
+      "checkpoint_profile": 18,
+      "experiment_tuning": {
+        "forage_difficulty": "expanded",
+        "perception_ray_count": 24,
+        "maximum_hit_points": 5,
+        "initial_hit_points": 5,
+        "maximum_satiation": 5,
+        "initial_satiation": 2,
+        "maximum_hydration": 5,
+        "initial_hydration": 2,
+        "need_loss_interval_seconds": 4,
+        "starvation_damage_interval_seconds": 2,
+        "dehydration_damage_interval_seconds": 2,
+        "movement_need_cost_percent": 25,
+        "movement_speed_multiplier": 1.0,
+        "gaze_yaw_limit_degrees": 30.0,
+        "episode_seconds": 20
+      },
+      "algorithm": "recurrent-ppo",
+      "architecture": {
+        "local_observation_size": 267,
+        "global_state_size": 363,
+        "max_agents": 12,
+        "action_size": 4,
+        "actor_hidden_size": 64,
+        "critic_hidden_sizes": [
+          128,
+          64
+        ]
+      },
+      "required_policy_roles": [
+        "bunny"
+      ],
+      "training_seed": 157,
+      "selection_summary": {
+        "global_steps": 109295,
+        "initial_bunny_mean_return": 0.16984361,
+        "best_bunny_mean_return": 0.17744559,
+        "initial_bunny_mean_lifetime": 14.460227,
+        "best_bunny_mean_lifetime": 14.974231,
+        "best_bunny_ci95_lower": 14.742732,
+        "best_bunny_ci95_upper": 15.192732,
+        "best_bunny_food_fraction": 0.6375,
+        "best_bunny_food_and_water_fraction": 0.465,
+        "initial_fox_mean_return": 0.0,
+        "best_fox_mean_return": 0.0,
+        "initial_fox_mean_lifetime": 0.0,
+        "best_fox_mean_lifetime": 0.0,
+        "best_fox_ci95_lower": 0.0,
+        "best_fox_ci95_upper": 0.0,
+        "best_fox_prey_and_water_fraction": 0.0,
+        "qualification_evidence": "fixed validation-seed demo evidence; disjoint test-seed qualification is reported separately"
+      },
+      "qualification": "best-compatible-available",
+      "bunny": {
+        "path": "checkpoints/competition-bunny-f706048754ed.mpk",
+        "sha256": "f706048754edd7b3ede6fd0ba1f885c351b21af6e7d4688d54ef828850bdf666",
+        "bytes": 566607,
+        "config_path": "checkpoints/competition-bunny-f706048754ed.config.json",
+        "config_sha256": "fa8c01e5386e65b199b177c7004c166c97aedb27e6cd5510a8be201ff6520de2",
+        "config_bytes": 592,
+        "source_run": "runs/ecosystem-competition-ppo/ecosystem-competition-ppo/profile18-competition-declared-budget32-seed157"
+      },
+      "fox": null
+    },
+    {
+      "stage": "predator-prey",
+      "title": "Predator-prey",
+      "checkpoint_profile": 18,
+      "experiment_tuning": {
+        "forage_difficulty": "expanded",
+        "perception_ray_count": 24,
+        "maximum_hit_points": 5,
+        "initial_hit_points": 5,
+        "maximum_satiation": 5,
+        "initial_satiation": 2,
+        "maximum_hydration": 5,
+        "initial_hydration": 2,
+        "need_loss_interval_seconds": 4,
+        "starvation_damage_interval_seconds": 2,
+        "dehydration_damage_interval_seconds": 2,
+        "movement_need_cost_percent": 25,
+        "movement_speed_multiplier": 1.0,
+        "gaze_yaw_limit_degrees": 30.0,
+        "episode_seconds": 20
+      },
+      "algorithm": "recurrent-ppo",
+      "architecture": {
+        "local_observation_size": 267,
+        "global_state_size": 363,
+        "max_agents": 12,
+        "action_size": 4,
+        "actor_hidden_size": 64,
+        "critic_hidden_sizes": [
+          128,
+          64
+        ]
+      },
+      "required_policy_roles": [
+        "bunny",
+        "fox"
+      ],
+      "training_seed": 157,
+      "selection_summary": {
+        "global_steps": 19935,
+        "initial_bunny_mean_return": 0.13144884,
+        "best_bunny_mean_return": 0.13453832,
+        "initial_bunny_mean_lifetime": 11.162324,
+        "best_bunny_mean_lifetime": 11.415993,
+        "best_bunny_ci95_lower": 10.926334,
+        "best_bunny_ci95_upper": 11.952996,
+        "best_bunny_food_fraction": 0.66333336,
+        "best_bunny_food_and_water_fraction": 0.27,
+        "initial_fox_mean_return": 0.15878189,
+        "best_fox_mean_return": 0.1608848,
+        "initial_fox_mean_lifetime": 14.043008,
+        "best_fox_mean_lifetime": 14.1460085,
+        "best_fox_ci95_lower": 13.783009,
+        "best_fox_ci95_upper": 14.54501,
+        "best_fox_prey_and_water_fraction": 0.3,
+        "qualification_evidence": "fixed validation-seed demo evidence; disjoint test-seed qualification is reported separately"
+      },
+      "qualification": "best-compatible-available",
+      "bunny": {
+        "path": "checkpoints/predator-prey-bunny-3eea252f582f.mpk",
+        "sha256": "3eea252f582f0dd14b07684efeb4baede9b69d3fdaaf7322fe36254b6cd64280",
+        "bytes": 566607,
+        "config_path": "checkpoints/predator-prey-bunny-3eea252f582f.config.json",
+        "config_sha256": "b79a298ceefe63ecc9ba5e68adafea3be3ae7a6e25aca6e9c019bc81b78fda75",
+        "config_bytes": 594,
+        "source_run": "runs/ecosystem-predator-prey-ppo/profile18-predator-from-current-competition-seed157-budget8"
+      },
+      "fox": {
+        "path": "checkpoints/predator-prey-fox-f8c57c7b4309.mpk",
+        "sha256": "f8c57c7b43094cef0398201f233cc137a243b0a3bdcb3dd709ee0a4de7ebaf8e",
+        "bytes": 566607,
+        "config_path": "checkpoints/predator-prey-fox-f8c57c7b4309.config.json",
+        "config_sha256": "b79a298ceefe63ecc9ba5e68adafea3be3ae7a6e25aca6e9c019bc81b78fda75",
+        "config_bytes": 594,
+        "source_run": "runs/ecosystem-predator-prey-ppo/profile18-predator-from-current-competition-seed157-budget8"
+      }
+    },
+    {
+      "stage": "obstacles",
+      "title": "Obstacles",
+      "checkpoint_profile": 18,
+      "experiment_tuning": {
+        "forage_difficulty": "expanded",
+        "perception_ray_count": 24,
+        "maximum_hit_points": 5,
+        "initial_hit_points": 5,
+        "maximum_satiation": 5,
+        "initial_satiation": 2,
+        "maximum_hydration": 5,
+        "initial_hydration": 2,
+        "need_loss_interval_seconds": 4,
+        "starvation_damage_interval_seconds": 2,
+        "dehydration_damage_interval_seconds": 2,
+        "movement_need_cost_percent": 25,
+        "movement_speed_multiplier": 1.0,
+        "gaze_yaw_limit_degrees": 30.0,
+        "episode_seconds": 20
+      },
+      "algorithm": "recurrent-ppo",
+      "architecture": {
+        "local_observation_size": 267,
+        "global_state_size": 363,
+        "max_agents": 12,
+        "action_size": 4,
+        "actor_hidden_size": 64,
+        "critic_hidden_sizes": [
+          128,
+          64
+        ]
+      },
+      "required_policy_roles": [
+        "bunny",
+        "fox"
+      ],
+      "training_seed": 263,
+      "selection_summary": {
+        "global_steps": 30102,
+        "initial_bunny_mean_return": 0.12436779,
+        "best_bunny_mean_return": 0.12576939,
+        "initial_bunny_mean_lifetime": 11.364983,
+        "best_bunny_mean_lifetime": 11.519649,
+        "best_bunny_ci95_lower": 11.155983,
+        "best_bunny_ci95_upper": 11.889653,
+        "best_bunny_food_fraction": 0.5566667,
+        "best_bunny_food_and_water_fraction": 0.1,
+        "initial_fox_mean_return": 0.1293737,
+        "best_fox_mean_return": 0.12838995,
+        "initial_fox_mean_lifetime": 12.25001,
+        "best_fox_mean_lifetime": 12.236007,
+        "best_fox_ci95_lower": 11.92901,
+        "best_fox_ci95_upper": 12.58501,
+        "best_fox_prey_and_water_fraction": 0.07,
+        "qualification_evidence": "fixed validation-seed demo evidence; disjoint test-seed qualification is reported separately"
+      },
+      "qualification": "best-compatible-available",
+      "bunny": {
+        "path": "checkpoints/obstacles-bunny-174f2ae1e4eb.mpk",
+        "sha256": "174f2ae1e4eb18fd4f6f0f5554510db550484e9afea0ecf5da98dd45b7fc8078",
+        "bytes": 566607,
+        "config_path": "checkpoints/obstacles-bunny-174f2ae1e4eb.config.json",
+        "config_sha256": "64de71bbe5d47b8613f3ef5f323b86e8cc0d92c0de0ed92d0f73239b463bb886",
+        "config_bytes": 590,
+        "source_run": "runs/ecosystem-obstacles-ppo/profile18-obstacles-thorn-potential-default-exploration-seed263-budget12"
+      },
+      "fox": {
+        "path": "checkpoints/obstacles-fox-2c24ec839196.mpk",
+        "sha256": "2c24ec8391961ea32465ad8582fa534e950489196060e8910372e9369052cd0b",
+        "bytes": 566607,
+        "config_path": "checkpoints/obstacles-fox-2c24ec839196.config.json",
+        "config_sha256": "64de71bbe5d47b8613f3ef5f323b86e8cc0d92c0de0ed92d0f73239b463bb886",
+        "config_bytes": 590,
+        "source_run": "runs/ecosystem-obstacles-ppo/profile18-obstacles-thorn-potential-default-exploration-seed263-budget12"
+      }
+    }
+  ]
+}

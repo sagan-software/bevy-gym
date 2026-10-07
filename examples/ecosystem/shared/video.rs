@@ -25,8 +25,8 @@ use super::rendering::{
     draw_perception_rays, ecosystem_hud_ui, load_policy, redraw_scene, setup_viewer, WatchSession,
 };
 use super::training::{
-    checkpoint_experiment_tuning, ecosystem_algorithm, experiment_tuning_json,
-    sibling_fox_checkpoint, validate_checkpoint_stage, validate_checkpoint_tuning_match,
+    checkpoint_experiment_tuning, ecosystem_algorithm, sibling_fox_checkpoint,
+    validate_checkpoint_stage, validate_checkpoint_tuning_match, ExperimentTuningProfile,
 };
 
 /// Required output width in pixels.
@@ -35,14 +35,14 @@ const VIDEO_WIDTH: u32 = 1280;
 /// Required output height in pixels.
 const VIDEO_HEIGHT: u32 = 720;
 
-/// Exact opening duration for the validation-selected checkpoint.
-const INTRO_SECONDS: u32 = 10;
+/// Exact opening duration for the step-zero checkpoint.
+const INTRO_SECONDS: u32 = 5;
 
 /// Exact duration for each chronological training checkpoint.
 const CHECKPOINT_SECONDS: u32 = 5;
 
 /// Exact closing duration for the validation-selected checkpoint.
-const OUTRO_SECONDS: u32 = 20;
+const OUTRO_SECONDS: u32 = 15;
 
 /// Validated command-line video controls.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -76,14 +76,14 @@ struct VideoOptions {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "kebab-case")]
 enum SegmentKind {
-    /// Opening validation-selected policy.
-    BestIntro,
+    /// Opening step-zero or earliest policy.
+    Worst,
 
     /// Immutable chronological training policy.
     Checkpoint,
 
     /// Closing validation-selected policy.
-    BestOutro,
+    Best,
 }
 
 /// Paths and timing resolved before any GPU work begins.
@@ -144,7 +144,7 @@ struct SegmentManifest {
 }
 
 /// Complete machine-readable provenance for one training-progress video.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[derive(Debug, Clone, PartialEq, Serialize)]
 struct VideoManifest {
     /// Curriculum stage key.
     stage: String,
@@ -168,7 +168,7 @@ struct VideoManifest {
     pixel_format: String,
 
     /// Exact effective environment tuning, including any CLI horizon override.
-    experiment_tuning: serde_json::Value,
+    experiment_tuning: ExperimentTuningProfile,
 
     /// Ordered checkpoint provenance and frame ranges.
     segments: Vec<SegmentManifest>,
@@ -426,17 +426,29 @@ fn resolve_segments(
         return Err("video run has no chronological step-*.mpk checkpoints".into());
     }
 
-    // Use the selected best at both ends and every immutable step checkpoint
-    // exactly once in lexical order, which is numeric for zero-padded names.
-    let mut descriptors = Vec::with_capacity(chronological.len() + 2);
+    // Sample the chronological run at worst, early, and middle points before
+    // giving the validation-selected best checkpoint the final fifteen seconds.
+    let worst = chronological
+        .first()
+        .cloned()
+        .ok_or("video run has no worst checkpoint")?;
+    let early = chronological
+        .get(chronological.len() / 3)
+        .cloned()
+        .ok_or("video run has no early checkpoint")?;
+    let middle = chronological
+        .get(chronological.len() * 2 / 3)
+        .cloned()
+        .ok_or("video run has no middle checkpoint")?;
+    let mut descriptors = Vec::with_capacity(4);
     descriptors.push(segment_descriptor(
         stage,
-        SegmentKind::BestIntro,
-        best.clone(),
-        "BEST (opening)".to_owned(),
+        SegmentKind::Worst,
+        worst,
+        "WORST / STEP ZERO".to_owned(),
         options.intro_seconds * options.frames_per_second,
     )?);
-    for checkpoint in chronological {
+    for checkpoint in [early, middle] {
         let name = checkpoint
             .file_stem()
             .and_then(|value| value.to_str())
@@ -452,7 +464,7 @@ fn resolve_segments(
     }
     descriptors.push(segment_descriptor(
         stage,
-        SegmentKind::BestOutro,
+        SegmentKind::Best,
         best,
         "BEST (final)".to_owned(),
         options.outro_seconds * options.frames_per_second,
@@ -568,7 +580,7 @@ fn build_manifest(
         height: VIDEO_HEIGHT,
         frames_per_second: options.frames_per_second,
         pixel_format: "yuv420p".to_owned(),
-        experiment_tuning: experiment_tuning_json(tuning),
+        experiment_tuning: ExperimentTuningProfile::from(tuning),
         segments,
     })
 }
@@ -801,9 +813,9 @@ mod tests {
             .into_iter(),
         )
         .expect("default video arguments parse");
-        assert_eq!(options.intro_seconds, 10);
+        assert_eq!(options.intro_seconds, 5);
         assert_eq!(options.checkpoint_seconds, 5);
-        assert_eq!(options.outro_seconds, 20);
+        assert_eq!(options.outro_seconds, 15);
         assert_eq!(options.episode_seconds, None);
         for value in ["1", "301"] {
             assert!(parse_video_options(
@@ -830,6 +842,55 @@ mod tests {
             manifest_path(Path::new("media/survival.mp4")),
             PathBuf::from("media/survival-video-manifest.json"),
         );
+    }
+
+    /// Segment resolution must produce four distinct roles and exactly 900 frames.
+    #[test]
+    fn progression_segments_match_the_thirty_second_contract() {
+        let directory =
+            std::env::temp_dir().join(format!("bevy-gym-video-segments-{}", std::process::id()));
+        if directory.exists() {
+            fs::remove_dir_all(&directory).expect("stale test directory is removable");
+        }
+        fs::create_dir_all(directory.join("checkpoints"))
+            .expect("checkpoint directory is creatable");
+        fs::write(directory.join("best.mpk"), b"best").expect("best checkpoint writes");
+        for step in [0, 100, 200, 300] {
+            fs::write(
+                directory
+                    .join("checkpoints")
+                    .join(format!("step-{step:06}.mpk")),
+                step.to_string(),
+            )
+            .expect("step checkpoint writes");
+        }
+        let options = VideoOptions {
+            run_dir: directory.clone(),
+            output: directory.join("progression.mp4"),
+            seed: 907,
+            frames_per_second: 30,
+            episode_seconds: None,
+            intro_seconds: 5,
+            checkpoint_seconds: 5,
+            outro_seconds: 15,
+        };
+
+        let segments =
+            resolve_segments(CurriculumStage::Forage, &options).expect("segments resolve");
+
+        assert_eq!(segments.len(), 4);
+        assert_eq!(segments[0].kind, SegmentKind::Worst);
+        assert_eq!(segments[1].kind, SegmentKind::Checkpoint);
+        assert_eq!(segments[2].kind, SegmentKind::Checkpoint);
+        assert_eq!(segments[3].kind, SegmentKind::Best);
+        assert_eq!(
+            segments.iter().map(|segment| segment.frames).sum::<u32>(),
+            900
+        );
+        assert!(segments
+            .windows(2)
+            .all(|pair| pair[0].bunny_checkpoint != pair[1].bunny_checkpoint));
+        fs::remove_dir_all(directory).expect("test directory is removable");
     }
 
     /// Video segments must reject policy snapshots from different mechanics.
@@ -893,7 +954,7 @@ mod tests {
             outro_seconds: 20,
         };
         let descriptors = [SegmentDescriptor {
-            kind: SegmentKind::BestIntro,
+            kind: SegmentKind::Best,
             bunny_checkpoint: checkpoint,
             fox_checkpoint: None,
             label: "best".to_owned(),
@@ -905,7 +966,7 @@ mod tests {
         let manifest = build_manifest(CurriculumStage::Survival, &options, &descriptors, tuning)
             .expect("manifest builds");
 
-        assert_eq!(manifest.experiment_tuning["episode_seconds"], 33);
+        assert_eq!(manifest.experiment_tuning.episode_seconds, 33);
         fs::remove_dir_all(directory).expect("test directory is removable");
     }
 }

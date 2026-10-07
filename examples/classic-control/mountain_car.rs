@@ -81,3 +81,577 @@
 //! ## Version History
 //!
 //! * v0: Initial versions release
+
+use tokio as _;
+
+use std::error::Error;
+
+use clap as _;
+#[cfg(feature = "mujoco")]
+use mujoco_rs as _;
+use std::path::Path;
+
+use bevy_gym::training::DqnConfig;
+use bevy_gym::{Env, EpisodeStatus, Reset, Step};
+
+use bevy_gym::training::{run_discrete_workflow, DiscreteDqnExample, DqnAction};
+
+#[cfg(feature = "ecosystem-inference")]
+use avian2d as _;
+use bevy as _;
+#[cfg(feature = "bevy-mcp")]
+use bevy_brp_extras as _;
+use burn as _;
+use serde_json as _;
+
+/// `MIN_POSITION` used by this example.
+const MIN_POSITION: f32 = -1.2;
+/// `MAX_POSITION` used by this example.
+const MAX_POSITION: f32 = 0.6;
+/// `MAX_SPEED` used by this example.
+const MAX_SPEED: f32 = 0.07;
+/// `GOAL_POSITION` used by this example.
+const GOAL_POSITION: f32 = 0.5;
+/// `FORCE` used by this example.
+const FORCE: f32 = 0.001;
+/// `GRAVITY` used by this example.
+const GRAVITY: f32 = 0.0025;
+/// `MAX_EPISODE_STEPS` used by this example.
+const MAX_EPISODE_STEPS: usize = 200;
+
+/// MountainCar-v0 action in Gymnasium order.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum MountainCarAction {
+    /// Accelerate left.
+    Left,
+    /// Apply no engine force.
+    Coast,
+    /// Accelerate right.
+    Right,
+}
+
+impl DqnAction for MountainCarAction {
+    fn from_index(index: usize) -> Self {
+        match index % 3 {
+            0 => Self::Left,
+            1 => Self::Coast,
+            _ => Self::Right,
+        }
+    }
+
+    fn as_index(self) -> usize {
+        match self {
+            Self::Left => 0,
+            Self::Coast => 1,
+            Self::Right => 2,
+        }
+    }
+}
+
+/// Exact default Gymnasium MountainCar-v0 dynamics.
+#[derive(Debug, Clone)]
+struct MountainCar {
+    /// Position and velocity.
+    state: [f32; 2],
+    /// Current episode transition count.
+    elapsed_steps: usize,
+    /// Deterministic reset generator.
+    rng: SplitMix64,
+}
+
+impl Default for MountainCar {
+    fn default() -> Self {
+        Self {
+            state: [-0.5, 0.0],
+            elapsed_steps: 0,
+            rng: SplitMix64::new(0),
+        }
+    }
+}
+
+impl MountainCar {
+    /// Construct one controlled state for transition tests.
+    #[cfg(test)]
+    const fn from_state(position: f32, velocity: f32) -> Self {
+        Self {
+            state: [position, velocity],
+            elapsed_steps: 0,
+            rng: SplitMix64::new(0),
+        }
+    }
+
+    /// Return Gymnasium's sinusoidal terrain height.
+    fn height_for_training(position: f32) -> f32 {
+        (3.0 * position).sin().mul_add(0.45, 0.55)
+    }
+}
+
+impl Env for MountainCar {
+    type Action = MountainCarAction;
+    type Observation = Vec<f32>;
+    type Info = ();
+
+    fn reset(&mut self, seed: Option<u64>) -> Reset<Self::Observation, Self::Info> {
+        if let Some(seed) = seed {
+            self.rng = SplitMix64::new(seed);
+        }
+        self.state = [self.rng.f32_between(-0.6, -0.4), 0.0];
+        self.elapsed_steps = 0;
+        Reset {
+            observation: self.state.to_vec(),
+            info: (),
+        }
+    }
+
+    fn step(&mut self, action: Self::Action) -> Step<Self::Observation, Self::Info> {
+        let force_direction: f32 = match action {
+            MountainCarAction::Left => -1.0,
+            MountainCarAction::Coast => 0.0,
+            MountainCarAction::Right => 1.0,
+        };
+        let [position, velocity] = self.state;
+        let velocity = force_direction
+            .mul_add(FORCE, (3.0 * position).cos().mul_add(-GRAVITY, velocity))
+            .clamp(-MAX_SPEED, MAX_SPEED);
+        let next_position = (position + velocity).clamp(MIN_POSITION, MAX_POSITION);
+        let next_velocity = if next_position <= MIN_POSITION && velocity < 0.0 {
+            0.0
+        } else {
+            velocity
+        };
+        self.state = [next_position, next_velocity];
+        self.elapsed_steps += 1;
+        let status = if next_position >= GOAL_POSITION {
+            EpisodeStatus::Terminated
+        } else if self.elapsed_steps >= MAX_EPISODE_STEPS {
+            EpisodeStatus::Truncated
+        } else {
+            EpisodeStatus::Continuing
+        };
+        Step {
+            observation: self.state.to_vec(),
+            reward: -1.0,
+            status,
+            info: (),
+        }
+    }
+}
+
+impl DiscreteDqnExample for MountainCar {
+    const ENV_NAME: &'static str = "mountain-car";
+    const GYMNASIUM_ID: &'static str = "MountainCar-v0";
+    const OBSERVATION_DIM: usize = 2;
+    const ACTION_COUNT: usize = 3;
+    const DEFAULT_TRAIN_STEPS: usize = 300_000;
+    const DEFAULT_EVAL_INTERVAL: usize = 10_000;
+    const DEFAULT_EVAL_EPISODES: usize = 20;
+    const DEFAULT_LEARNING_RATE: f64 = 0.001;
+    const DEFAULT_REWARD_SCALE: f64 = 100.0;
+    const SOLVED_MEAN_REWARD: f64 = -110.0;
+    const GIF_PATH: &'static str = "docs/images/mountain-car.gif";
+
+    fn dqn_config(learning_rate: f64) -> DqnConfig {
+        DqnConfig {
+            hidden_sizes: vec![64, 64],
+            gamma: 0.99,
+            learning_rate,
+            replay_capacity: 100_000,
+            min_replay_size: 2_000,
+            batch_size: 64,
+            target_update_interval: 1_000,
+            epsilon_start: 1.0,
+            epsilon_end: 0.05,
+            epsilon_decay_steps: 100_000,
+            ..DqnConfig::default()
+        }
+    }
+
+    fn encode_observation(observation: &[f32]) -> Vec<f32> {
+        let position = observation.first().copied().unwrap_or(-0.5);
+        let velocity = observation.get(1).copied().unwrap_or(0.0);
+        vec![
+            2.0 * (position - MIN_POSITION) / (MAX_POSITION - MIN_POSITION) - 1.0,
+            velocity / MAX_SPEED,
+        ]
+    }
+
+    fn training_reward(
+        observation: &[f32],
+        _action: Self::Action,
+        environment_reward: f64,
+        next_observation: &[f32],
+        status: EpisodeStatus,
+        reward_scale: f64,
+    ) -> f64 {
+        let position = observation.first().copied().unwrap_or(MIN_POSITION);
+        let next_position = next_observation.first().copied().unwrap_or(MIN_POSITION);
+        let potential = f64::from(Self::height_for_training(position) - 1.0);
+        let next_potential = if status == EpisodeStatus::Terminated {
+            0.0
+        } else {
+            f64::from(Self::height_for_training(next_position) - 1.0)
+        };
+        reward_scale.mul_add(
+            0.99f64.mul_add(next_potential, -potential),
+            environment_reward,
+        )
+    }
+
+    fn is_success(final_observation: &[f32], _total_reward: f64, status: EpisodeStatus) -> bool {
+        status == EpisodeStatus::Terminated
+            && final_observation.first().copied().unwrap_or(MIN_POSITION) >= GOAL_POSITION
+    }
+
+    fn watch(checkpoint: &Path) -> Result<(), Box<dyn Error>> {
+        #[cfg(not(feature = "render"))]
+        let _ = checkpoint;
+        #[cfg(feature = "render")]
+        return render::run_visual(checkpoint, None);
+        #[cfg(not(feature = "render"))]
+        return Err("watch mode requires the render feature".into());
+    }
+
+    fn gif(checkpoint: &Path, output: &Path) -> Result<(), Box<dyn Error>> {
+        #[cfg(not(feature = "render"))]
+        let _ = (checkpoint, output);
+        #[cfg(feature = "render")]
+        return render::render_gif(checkpoint, output);
+        #[cfg(not(feature = "render"))]
+        return Err("GIF mode requires the render feature".into());
+    }
+}
+
+fn main() -> Result<(), Box<dyn Error>> {
+    run_discrete_workflow::<MountainCar>()
+}
+
+/// Small deterministic generator used for reset sampling.
+#[derive(Debug, Clone, Copy)]
+struct SplitMix64 {
+    /// Current generator state.
+    state: u64,
+}
+
+impl SplitMix64 {
+    /// Construct a stream from one root seed.
+    const fn new(seed: u64) -> Self {
+        Self { state: seed }
+    }
+
+    /// Generate a uniform scalar in `[0, 1)`.
+    fn unit_f32(&mut self) -> f32 {
+        self.state = self.state.wrapping_add(0x9e37_79b9_7f4a_7c15);
+        let mut value = self.state;
+        value = (value ^ (value >> 30)).wrapping_mul(0xbf58_476d_1ce4_e5b9);
+        value = (value ^ (value >> 27)).wrapping_mul(0x94d0_49bb_1331_11eb);
+        value ^= value >> 31;
+        (value >> 40) as f32 / (1_u32 << 24) as f32
+    }
+
+    /// Generate one scalar in `[low, high)`.
+    fn f32_between(&mut self, low: f32, high: f32) -> f32 {
+        self.unit_f32().mul_add(high - low, low)
+    }
+}
+
+/// Render-only scene implementation.
+#[cfg(feature = "render")]
+mod render {
+    use super::{
+        DiscreteDqnExample, DqnAction, Env, EpisodeStatus, Error, MountainCar, MountainCarAction,
+        Path, GOAL_POSITION, MAX_POSITION, MIN_POSITION,
+    };
+
+    use bevy::prelude::*;
+    use bevy::render::view::screenshot::{save_to_disk, Capturing, Screenshot};
+    use bevy::window::{PresentMode, WindowResolution};
+    use bevy_gym::recording::{encode_gif, GifCapture};
+    use bevy_gym::training::DqnPolicy;
+    use bevy_inspector_egui as _;
+    use serde as _;
+    use tokio as _;
+
+    /// Environment-specific renderer registered by visual modes.
+    pub(super) struct ExampleRendererPlugin;
+
+    impl Plugin for ExampleRendererPlugin {
+        fn build(&self, app: &mut App) {
+            app.insert_resource(ClearColor(Color::WHITE));
+        }
+    }
+
+    /// Policy playback state shown in the `MountainCar` scene.
+    #[derive(Resource)]
+    struct VisualMountainCar {
+        /// Greedy checkpoint policy.
+        policy: DqnPolicy,
+        /// Live exact environment.
+        env: MountainCar,
+        /// Current exact observation.
+        observation: Vec<f32>,
+    }
+
+    /// Four-Hz interactive playback clock.
+    #[derive(Resource)]
+    struct VisualClock(Timer);
+
+    /// Dynamic black car body.
+    #[derive(Component)]
+    struct CarBody;
+
+    /// Dynamic gray wheel with a signed horizontal offset.
+    #[derive(Component)]
+    struct CarWheel(f32);
+
+    /// Run the Gymnasium-matching interactive or finite-capture scene.
+    pub(super) fn run_visual(
+        checkpoint: &Path,
+        capture_dir: Option<&Path>,
+    ) -> Result<(), Box<dyn Error>> {
+        let policy = DqnPolicy::load(checkpoint, 2, 3, &[64, 64])?;
+        let mut env = MountainCar::default();
+        let observation = env.reset(Some(12_345)).observation;
+        let mut app = App::new();
+        app.add_plugins(ExampleRendererPlugin);
+        app.insert_resource(VisualMountainCar {
+            policy,
+            env,
+            observation,
+        })
+        .insert_resource(VisualClock(Timer::from_seconds(
+            1.0 / 30.0,
+            TimerMode::Repeating,
+        )))
+        .add_plugins(
+            DefaultPlugins
+                .set(ImagePlugin::default_nearest())
+                .set(WindowPlugin {
+                    primary_window: Some(Window {
+                        title: "bevy-gym MountainCar-v0".into(),
+                        resolution: WindowResolution::new(600, 400),
+                        present_mode: PresentMode::AutoVsync,
+                        resizable: false,
+                        ..default()
+                    }),
+                    ..default()
+                }),
+        )
+        .add_systems(Startup, setup_scene)
+        .add_systems(Update, draw_static_scene);
+
+        if let Some(directory) = capture_dir {
+            app.insert_resource(GifCapture::new(directory))
+                .add_systems(Update, capture_gif_frames);
+        } else {
+            app.add_systems(Update, (advance_watch, sync_car).chain());
+        }
+        println!("watching checkpoint={}", checkpoint.display());
+        app.run();
+        Ok(())
+    }
+
+    #[cfg(not(feature = "render"))]
+    /// Report the explicit render requirement in headless builds.
+    pub(super) fn run_visual(
+        _checkpoint: &Path,
+        _capture_dir: Option<&Path>,
+    ) -> Result<(), Box<dyn Error>> {
+        Err("visual mode requires the default `render` feature".into())
+    }
+
+    /// Spawn Gymnasium's black body and two gray wheels.
+    fn setup_scene(
+        mut commands: Commands<'_, '_>,
+        mut meshes: ResMut<'_, Assets<Mesh>>,
+        mut materials: ResMut<'_, Assets<ColorMaterial>>,
+    ) {
+        commands.spawn((Camera2d, Name::new("MountainCar Camera")));
+        commands.spawn((
+            Mesh2d(meshes.add(Rectangle::new(40.0, 20.0))),
+            MeshMaterial2d(materials.add(Color::BLACK)),
+            Transform::from_xyz(0.0, 0.0, 2.0),
+            CarBody,
+        ));
+        for offset in [-10.0, 10.0] {
+            commands.spawn((
+                Mesh2d(meshes.add(Circle::new(8.0))),
+                MeshMaterial2d(materials.add(Color::srgb_u8(128, 128, 128))),
+                Transform::from_xyz(0.0, 0.0, 3.0),
+                CarWheel(offset),
+            ));
+        }
+    }
+
+    /// Draw the exact sinusoid and goal flag in Gymnasium viewport coordinates.
+    fn draw_static_scene(mut gizmos: Gizmos<'_, '_>) {
+        let mut previous = terrain_position(MIN_POSITION);
+        for sample in 1..100 {
+            let fraction = sample as f32 / 99.0;
+            let position = fraction.mul_add(MAX_POSITION - MIN_POSITION, MIN_POSITION);
+            let next = terrain_position(position);
+            gizmos.line_2d(previous, next, Color::BLACK);
+            previous = next;
+        }
+        let flag_base = terrain_position(GOAL_POSITION);
+        let flag_top = flag_base + Vec2::Y * 50.0;
+        gizmos.line_2d(flag_base, flag_top, Color::BLACK);
+        gizmos.line_2d(
+            flag_top,
+            flag_top + Vec2::new(25.0, -5.0),
+            Color::srgb_u8(204, 204, 0),
+        );
+        gizmos.line_2d(
+            flag_top + Vec2::new(25.0, -5.0),
+            flag_top + Vec2::new(0.0, -10.0),
+            Color::srgb_u8(204, 204, 0),
+        );
+        gizmos.line_2d(
+            flag_top + Vec2::new(0.0, -10.0),
+            flag_top,
+            Color::srgb_u8(204, 204, 0),
+        );
+    }
+
+    /// Advance policy playback at Gymnasium's 30 frames per second.
+    fn advance_watch(
+        time: Res<'_, Time>,
+        mut clock: ResMut<'_, VisualClock>,
+        mut visual: ResMut<'_, VisualMountainCar>,
+    ) {
+        if clock.0.tick(time.delta()).just_finished() {
+            advance_visual(&mut visual, 1);
+        }
+    }
+
+    /// Advance a fixed number of greedy environment transitions.
+    fn advance_visual(visual: &mut VisualMountainCar, steps: usize) {
+        for _ in 0..steps {
+            let encoded = MountainCar::encode_observation(&visual.observation);
+            let Ok(action_index) = visual.policy.greedy_action(&encoded) else {
+                return;
+            };
+            let transition = visual.env.step(MountainCarAction::from_index(action_index));
+            visual.observation = transition.observation;
+            if transition.status != EpisodeStatus::Continuing {
+                visual.observation = visual.env.reset(None).observation;
+                break;
+            }
+        }
+    }
+
+    /// Synchronize the body and wheels with the exact renderer transform.
+    fn sync_car(
+        visual: Res<'_, VisualMountainCar>,
+        mut body: Single<'_, '_, &mut Transform, With<CarBody>>,
+        mut wheels: Query<'_, '_, (&CarWheel, &mut Transform), Without<CarBody>>,
+    ) {
+        let position = visual.observation.first().copied().unwrap_or(-0.5);
+        let rotation = (3.0 * position).cos();
+        let anchor = terrain_position(position) + Vec2::Y * 10.0;
+        let body_offset = Vec2::new(0.0, 10.0).rotate(Vec2::from_angle(rotation));
+        body.translation = (anchor + body_offset).extend(2.0);
+        body.rotation = Quat::from_rotation_z(rotation);
+        for (wheel, mut transform) in &mut wheels {
+            let offset = Vec2::new(wheel.0, 0.0).rotate(Vec2::from_angle(rotation));
+            transform.translation = (anchor + offset).extend(3.0);
+        }
+    }
+
+    /// Capture five policy transitions per GIF frame.
+    fn capture_gif_frames(
+        mut commands: Commands<'_, '_>,
+        mut capture: ResMut<'_, GifCapture>,
+        mut visual: ResMut<'_, VisualMountainCar>,
+        mut body: Single<'_, '_, &mut Transform, With<CarBody>>,
+        mut wheels: Query<'_, '_, (&CarWheel, &mut Transform), Without<CarBody>>,
+        captures: Query<'_, '_, Entity, With<Capturing>>,
+        mut exit: MessageWriter<'_, AppExit>,
+    ) {
+        if !captures.is_empty() {
+            return;
+        }
+        if capture.is_warming_up() {
+            return;
+        }
+        if capture.is_complete() {
+            exit.write(AppExit::Success);
+            return;
+        }
+        if capture.has_started() {
+            advance_visual(&mut visual, 5);
+        }
+        let position = visual.observation.first().copied().unwrap_or(-0.5);
+        let rotation = (3.0 * position).cos();
+        let anchor = terrain_position(position) + Vec2::Y * 10.0;
+        let body_offset = Vec2::new(0.0, 10.0).rotate(Vec2::from_angle(rotation));
+        body.translation = (anchor + body_offset).extend(2.0);
+        body.rotation = Quat::from_rotation_z(rotation);
+        for (wheel, mut transform) in &mut wheels {
+            let offset = Vec2::new(wheel.0, 0.0).rotate(Vec2::from_angle(rotation));
+            transform.translation = (anchor + offset).extend(3.0);
+        }
+        let path = capture.next_path();
+        commands
+            .spawn(Screenshot::primary_window())
+            .observe(save_to_disk(path));
+    }
+
+    /// Convert one world position to Gymnasium's 600-by-400 viewport.
+    fn terrain_position(position: f32) -> Vec2 {
+        const SCALE: f32 = 600.0 / (MAX_POSITION - MIN_POSITION);
+        Vec2::new(
+            (position - MIN_POSITION).mul_add(SCALE, -300.0),
+            MountainCar::height_for_training(position).mul_add(SCALE, -200.0),
+        )
+    }
+
+    /// Render 100 frames and encode five seconds at 20 FPS.
+    pub(super) fn render_gif(checkpoint: &Path, output: &Path) -> Result<(), Box<dyn Error>> {
+        encode_gif(output, "mountain-car", 600, 400, |frames| {
+            run_visual(checkpoint, Some(frames))
+        })
+    }
+
+    #[cfg(not(feature = "render"))]
+    /// Report the explicit render requirement in headless builds.
+    pub(super) fn render_gif(_checkpoint: &Path, output: &Path) -> Result<(), Box<dyn Error>> {
+        Err("GIF mode requires the default `render` feature".into())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn right_acceleration_matches_the_gymnasium_equation() {
+        let mut car = MountainCar::from_state(-0.5, 0.0);
+
+        let step = car.step(MountainCarAction::Right);
+
+        let expected_velocity = 0.001 - (3.0_f32 * -0.5).cos() * 0.0025;
+        assert!((step.observation[1] - expected_velocity).abs() < 1e-7);
+        assert!((step.observation[0] - (-0.5 + expected_velocity)).abs() < 1e-7);
+        assert_eq!(step.reward, -1.0);
+        assert_eq!(step.status, EpisodeStatus::Continuing);
+    }
+
+    #[test]
+    fn crossing_the_goal_terminates_the_episode() {
+        let mut car = MountainCar::from_state(0.499, 0.01);
+
+        let step = car.step(MountainCarAction::Coast);
+
+        assert!(step.observation[0] >= 0.5);
+        assert_eq!(step.status, EpisodeStatus::Terminated);
+    }
+
+    #[test]
+    fn the_left_boundary_removes_negative_velocity() {
+        let mut car = MountainCar::from_state(-1.2, -0.05);
+
+        let step = car.step(MountainCarAction::Left);
+
+        assert_eq!(step.observation, vec![-1.2, 0.0]);
+    }
+}

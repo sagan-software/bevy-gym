@@ -10,6 +10,8 @@ use std::fs::{self, OpenOptions};
 use std::io::{self, Write};
 use std::path::{Path, PathBuf};
 
+use super::config::RunPaths;
+
 /// On-disk format version written by [`TabularQTrainer::save`].
 pub const TABULAR_Q_CHECKPOINT_VERSION: u32 = 1;
 
@@ -23,7 +25,7 @@ const FNV_OFFSET_BASIS: u64 = 0xcbf2_9ce4_8422_2325;
 const FNV_PRIME: u64 = 0x0000_0100_0000_01b3;
 
 /// Hyperparameters for finite-state tabular Q-learning.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct TabularQConfig {
     /// Q-value interpolation factor in `(0, 1]`.
     pub learning_rate: f64,
@@ -548,8 +550,12 @@ impl TabularQTrainer {
     /// Returns a checkpoint I/O error, a finite-value error, or a dimension
     /// conversion error. A failed write removes the newly created partial file.
     #[expect(
+        clippy::allow_attributes,
+        reason = "the next synchronous-checkpoint allowance is intentional"
+    )]
+    #[allow(
         clippy::disallowed_methods,
-        reason = "the requested std-only checkpoint core is synchronous and performs bounded file I/O"
+        reason = "the requested std-only checkpoint core performs bounded synchronous file I/O"
     )]
     pub fn save(&self, path: impl AsRef<Path>) -> Result<PathBuf, TabularQError> {
         let path = path.as_ref().to_path_buf();
@@ -583,6 +589,37 @@ impl TabularQTrainer {
         Ok(path)
     }
 
+    /// Atomically publish this trainer as the run's validation-selected checkpoint.
+    ///
+    /// # Errors
+    ///
+    /// Returns a checkpoint I/O, finite-value, or dimension conversion error.
+    pub fn save_best(&self, paths: &RunPaths) -> Result<PathBuf, TabularQError> {
+        self.save_replacing(&paths.best_checkpoint)
+    }
+
+    /// Atomically publish this trainer as the run's most recent checkpoint.
+    ///
+    /// # Errors
+    ///
+    /// Returns a checkpoint I/O, finite-value, or dimension conversion error.
+    pub fn save_latest(&self, paths: &RunPaths) -> Result<PathBuf, TabularQError> {
+        self.save_replacing(&paths.latest_checkpoint)
+    }
+
+    /// Save one immutable chronological checkpoint under the run's checkpoint directory.
+    ///
+    /// # Errors
+    ///
+    /// Returns a checkpoint I/O, finite-value, or dimension conversion error.
+    pub fn save_step(&self, paths: &RunPaths, global_step: u64) -> Result<PathBuf, TabularQError> {
+        self.save(
+            paths
+                .checkpoints_dir
+                .join(format!("step-{global_step:06}.mpk")),
+        )
+    }
+
     /// Load a trainer, including masks, counters, and exploration RNG state.
     ///
     /// # Errors
@@ -591,8 +628,12 @@ impl TabularQTrainer {
     /// mismatches, malformed dimensions, invalid masks, non-finite values, or
     /// trailing bytes.
     #[expect(
+        clippy::allow_attributes,
+        reason = "the next synchronous-checkpoint allowance is intentional"
+    )]
+    #[allow(
         clippy::disallowed_methods,
-        reason = "the requested std-only checkpoint core is synchronous and performs bounded file I/O"
+        reason = "the requested std-only checkpoint core performs bounded synchronous file I/O"
     )]
     pub fn load(path: impl AsRef<Path>) -> Result<Self, TabularQError> {
         let path = path.as_ref().to_path_buf();
@@ -600,6 +641,61 @@ impl TabularQTrainer {
             TabularQError::checkpoint_io(TabularCheckpointOperation::Load, &path, &error)
         })?;
         Self::decode_checkpoint(&path, &bytes)
+    }
+
+    /// Write a complete temporary checkpoint, then replace the published path.
+    #[expect(
+        clippy::allow_attributes,
+        reason = "the next synchronous-checkpoint allowance is intentional"
+    )]
+    #[allow(
+        clippy::disallowed_methods,
+        reason = "checkpoint publication performs bounded synchronous file I/O"
+    )]
+    fn save_replacing(&self, path: &Path) -> Result<PathBuf, TabularQError> {
+        let bytes = self.encode_checkpoint()?;
+        if let Some(parent) = path
+            .parent()
+            .filter(|parent| !parent.as_os_str().is_empty())
+        {
+            fs::create_dir_all(parent).map_err(|error| {
+                TabularQError::checkpoint_io(TabularCheckpointOperation::Save, path, &error)
+            })?;
+        }
+
+        let extension = path
+            .extension()
+            .and_then(|value| value.to_str())
+            .unwrap_or("checkpoint");
+        let temporary = path.with_extension(format!(
+            "{extension}.tmp-{}-{}",
+            std::process::id(),
+            self.update_count
+        ));
+        let mut file = OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(&temporary)
+            .map_err(|error| {
+                TabularQError::checkpoint_io(TabularCheckpointOperation::Save, &temporary, &error)
+            })?;
+
+        // Only a fully written and synced file can replace the published checkpoint.
+        if let Err(error) = file.write_all(&bytes).and_then(|()| file.sync_all()) {
+            drop(file);
+            drop(fs::remove_file(&temporary));
+            return Err(TabularQError::checkpoint_io(
+                TabularCheckpointOperation::Save,
+                &temporary,
+                &error,
+            ));
+        }
+        drop(file);
+        fs::rename(&temporary, path).map_err(|error| {
+            drop(fs::remove_file(&temporary));
+            TabularQError::checkpoint_io(TabularCheckpointOperation::Save, path, &error)
+        })?;
+        Ok(path.to_path_buf())
     }
 
     /// Sample uniformly from the actions allowed in one state.
@@ -641,14 +737,15 @@ impl TabularQTrainer {
         if self.q_values.iter().any(|value| !value.is_finite()) {
             return Err(TabularQError::NonFiniteValue { field: "q_values" });
         }
-        let state_count = u64::try_from(self.state_count).map_err(|_| {
+        let state_count = u64::try_from(self.state_count).map_err(|_conversion_error| {
             TabularQError::invalid_config("state_count", "must fit u64 for checkpointing")
         })?;
-        let action_count = u64::try_from(self.action_count).map_err(|_| {
+        let action_count = u64::try_from(self.action_count).map_err(|_conversion_error| {
             TabularQError::invalid_config("action_count", "must fit u64 for checkpointing")
         })?;
-        let q_count = u64::try_from(self.q_values.len())
-            .map_err(|_| TabularQError::invalid_config("q_values", "table length must fit u64"))?;
+        let q_count = u64::try_from(self.q_values.len()).map_err(|_conversion_error| {
+            TabularQError::invalid_config("q_values", "table length must fit u64")
+        })?;
 
         let mut bytes = Vec::new();
         bytes.extend_from_slice(CHECKPOINT_MAGIC);
@@ -683,14 +780,23 @@ impl TabularQTrainer {
     }
 
     /// Decode and validate a complete checkpoint.
+    #[expect(
+        clippy::allow_attributes,
+        reason = "the next linear-decoder allowance is intentional"
+    )]
+    #[allow(
+        clippy::too_many_lines,
+        reason = "the linear decoder validates every checkpoint field in serialized order"
+    )]
     fn decode_checkpoint(path: &Path, bytes: &[u8]) -> Result<Self, TabularQError> {
         let checksum_start = bytes.len().checked_sub(8).ok_or_else(|| {
             TabularQError::invalid_checkpoint(path, "checkpoint is shorter than its checksum")
         })?;
         let (payload, checksum_bytes) = bytes.split_at(checksum_start);
-        let expected_checksum = u64::from_le_bytes(checksum_bytes.try_into().map_err(|_| {
-            TabularQError::invalid_checkpoint(path, "checkpoint checksum has invalid width")
-        })?);
+        let expected_checksum =
+            u64::from_le_bytes(checksum_bytes.try_into().map_err(|_conversion_error| {
+                TabularQError::invalid_checkpoint(path, "checkpoint checksum has invalid width")
+            })?);
         let actual_checksum = fnv1a64(payload);
         if actual_checksum != expected_checksum {
             return Err(TabularQError::invalid_checkpoint(
@@ -715,10 +821,10 @@ impl TabularQTrainer {
                 ),
             ));
         }
-        let state_count = usize::try_from(decoder.read_u64()?).map_err(|_| {
+        let state_count = usize::try_from(decoder.read_u64()?).map_err(|_conversion_error| {
             TabularQError::invalid_checkpoint(path, "state_count does not fit usize")
         })?;
-        let action_count = usize::try_from(decoder.read_u64()?).map_err(|_| {
+        let action_count = usize::try_from(decoder.read_u64()?).map_err(|_conversion_error| {
             TabularQError::invalid_checkpoint(path, "action_count does not fit usize")
         })?;
         let config = TabularQConfig {
@@ -765,7 +871,7 @@ impl TabularQTrainer {
             }
         };
 
-        let saved_q_count = usize::try_from(decoder.read_u64()?).map_err(|_| {
+        let saved_q_count = usize::try_from(decoder.read_u64()?).map_err(|_conversion_error| {
             TabularQError::invalid_checkpoint(path, "saved Q-value count does not fit usize")
         })?;
         if saved_q_count != table_len {
@@ -1046,7 +1152,7 @@ impl SplitMix64 {
 
     /// Sample an unbiased index in `0..upper` with rejection sampling.
     fn index(&mut self, upper: usize) -> Result<usize, TabularQError> {
-        let upper = u64::try_from(upper).map_err(|_| {
+        let upper = u64::try_from(upper).map_err(|_conversion_error| {
             TabularQError::invalid_config("action_count", "must fit u64 for sampling")
         })?;
         if upper == 0 {
@@ -1059,7 +1165,7 @@ impl SplitMix64 {
         loop {
             let value = self.next_u64();
             if value >= rejection_floor {
-                return usize::try_from(value % upper).map_err(|_| {
+                return usize::try_from(value % upper).map_err(|_conversion_error| {
                     TabularQError::invalid_config(
                         "action_count",
                         "sampled action does not fit usize",
@@ -1262,7 +1368,9 @@ impl<'a> CheckpointDecoder<'a> {
         let bytes: [u8; 4] = self
             .read_exact(4)?
             .try_into()
-            .map_err(|_| TabularQError::invalid_checkpoint(&self.path, "invalid u32 width"))?;
+            .map_err(|_conversion_error| {
+                TabularQError::invalid_checkpoint(&self.path, "invalid u32 width")
+            })?;
         Ok(u32::from_le_bytes(bytes))
     }
 
@@ -1271,7 +1379,9 @@ impl<'a> CheckpointDecoder<'a> {
         let bytes: [u8; 8] = self
             .read_exact(8)?
             .try_into()
-            .map_err(|_| TabularQError::invalid_checkpoint(&self.path, "invalid u64 width"))?;
+            .map_err(|_conversion_error| {
+                TabularQError::invalid_checkpoint(&self.path, "invalid u64 width")
+            })?;
         Ok(u64::from_le_bytes(bytes))
     }
 
@@ -1304,6 +1414,7 @@ impl<'a> CheckpointDecoder<'a> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::training::{AlgorithmKind, RunId};
     use std::sync::atomic::{AtomicU64, Ordering};
 
     /// Unique suffix for parallel checkpoint tests in one process.
@@ -1505,8 +1616,7 @@ mod tests {
             epsilon_decay_steps: 200,
             seed: 4_242,
         };
-        let mut first =
-            TabularQTrainer::new(3, 3, config.clone(), None).expect("valid first trainer");
+        let mut first = TabularQTrainer::new(3, 3, config, None).expect("valid first trainer");
         let mut second = TabularQTrainer::new(3, 3, config, None).expect("valid second trainer");
 
         for step in 0..256 {
@@ -1543,14 +1653,10 @@ mod tests {
     }
 
     #[test]
-    #[expect(
-        clippy::disallowed_methods,
-        reason = "bounded synchronous filesystem setup keeps the std-only checkpoint round-trip test dependency-free"
-    )]
     fn versioned_checkpoint_round_trip_is_resumable_and_collision_safe() {
         let path = temp_checkpoint_path();
         if let Some(root) = path.parent() {
-            drop(fs::remove_dir_all(root));
+            drop(crate::runtime_io::remove_directory_all(root));
         }
         let config = TabularQConfig {
             learning_rate: 0.5,
@@ -1568,7 +1674,7 @@ mod tests {
             .expect("checkpointed update");
 
         assert_eq!(trainer.save(&path).expect("new checkpoint"), path);
-        let bytes = fs::read(&path).expect("read checkpoint header");
+        let bytes = crate::runtime_io::read(&path).expect("read checkpoint header");
         let version_bytes: [u8; 4] = bytes
             .get(CHECKPOINT_MAGIC.len()..CHECKPOINT_MAGIC.len() + 4)
             .expect("version bytes")
@@ -1600,7 +1706,43 @@ mod tests {
         );
 
         if let Some(root) = path.parent() {
-            drop(fs::remove_dir_all(root));
+            drop(crate::runtime_io::remove_directory_all(root));
         }
+    }
+
+    #[test]
+    fn run_checkpoint_helpers_replace_best_and_latest_tables() {
+        let path = temp_checkpoint_path();
+        let root = path.parent().expect("temporary run root");
+        drop(crate::runtime_io::remove_directory_all(root));
+        let run_id = RunId::new("replace-test").expect("valid run id");
+        let paths = RunPaths::new(
+            root,
+            "frozen-lake",
+            &AlgorithmKind::Custom("tabular-q".into()),
+            &run_id,
+        )
+        .expect("valid run paths");
+        paths.create_new().expect("new run");
+        let mut trainer = TabularQTrainer::new(2, 2, exact_config(), None).expect("valid trainer");
+
+        trainer.save_best(&paths).expect("initial best");
+        trainer.save_latest(&paths).expect("initial latest");
+        trainer
+            .update(transition(0, 1, 1.0, 1, true, false))
+            .expect("changed table");
+        trainer.save_best(&paths).expect("replacement best");
+        trainer.save_latest(&paths).expect("replacement latest");
+        trainer
+            .save_step(&paths, 7)
+            .expect("immutable step checkpoint");
+
+        let best = TabularQTrainer::load(&paths.best_checkpoint).expect("load best");
+        let latest = TabularQTrainer::load(&paths.latest_checkpoint).expect("load latest");
+        assert_eq!(best.q_values(), trainer.q_values());
+        assert_eq!(latest.q_values(), trainer.q_values());
+        assert!(paths.checkpoints_dir.join("step-000007.mpk").exists());
+
+        drop(crate::runtime_io::remove_directory_all(root));
     }
 }

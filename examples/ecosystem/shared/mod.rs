@@ -5,14 +5,22 @@ mod demo;
 mod domain;
 #[cfg(feature = "render")]
 mod rendering;
+mod reward;
 mod rng;
 mod simulation;
+#[cfg(feature = "render")]
+mod survival_batch;
 mod training;
 #[cfg(feature = "render")]
 mod video;
 
 use std::error::Error;
 use std::io::{self, Write as _};
+
+use bevy_gym::EpisodeStatus;
+use clap as _;
+#[cfg(feature = "mujoco")]
+use mujoco_rs as _;
 
 // The recurrent trainer slice will use Burn directly. Retain the example-level
 // dependency signal while the deterministic environment slice lands first.
@@ -103,6 +111,7 @@ fn run_smoke(stage: CurriculumStage) -> Result<(), Box<dyn Error>> {
             .into_iter()
             .map(|agent| {
                 let action = LocomotionAction::new(
+                    action_rng.f32_between(-1.0, 1.0),
                     action_rng.f32_between(-1.0, 1.0),
                     action_rng.f32_between(-1.0, 1.0),
                     action_rng.f32_between(-1.0, 1.0),

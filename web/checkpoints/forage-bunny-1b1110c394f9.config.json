@@ -1,0 +1,21 @@
+{
+  "checkpoint_profile": 17,
+  "stage": "forage",
+  "experiment_tuning": {
+    "forage_difficulty": "expanded",
+    "perception_ray_count": 24,
+    "maximum_hit_points": 5,
+    "initial_hit_points": 5,
+    "maximum_satiation": 5,
+    "initial_satiation": 2,
+    "maximum_hydration": 5,
+    "initial_hydration": 2,
+    "need_loss_interval_seconds": 4,
+    "starvation_damage_interval_seconds": 2,
+    "dehydration_damage_interval_seconds": 2,
+    "movement_need_cost_percent": 25,
+    "movement_speed_multiplier": 1.0,
+    "gaze_yaw_limit_degrees": 30.0,
+    "episode_seconds": 20
+  }
+}

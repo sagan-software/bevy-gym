@@ -1,10 +1,10 @@
 # Ecosystem curriculum handoff
 
-Date: 2026-07-29
+Date: 2026-08-02
 Repository: `/home/sagan/Sync/playground/bevy-gym`
 Branch: `master`
 Baseline commit: `e71f01c Add reusable training core and artifact contracts`
-Persistent goal: `019f9f8f-6b82-7a22-a137-e0edfe02414d`
+Persistent goal: `019fc083-1907-7b71-8b78-6c3e91c22c79`
 
 ## Read first
 
@@ -22,16 +22,96 @@ Do not discard or reset any existing change.
 `runs/`, `target/`, temporary frames, screenshots, and raw diagnostic videos
 are run or build artifacts. Do not commit them.
 
+## WASM demo status
+
+The static ecosystem inference demo is implemented under `web/`. It exposes
+fragment routes for forage, survival, shelter, competition, predator-prey, and
+obstacles. Each route loads the curated manifest default, runs deterministic
+Burn Flex inference, and renders the library-owned Avian ecosystem runtime
+through Bevy WebGL2. The manifest includes a typed profile, architecture,
+training seed, source run, source commit, Burn version, selection evidence,
+qualification, content hash, byte length, and configuration sidecar for every
+policy. All current defaults are honestly labelled
+`best-compatible-available`.
+
+The interface supports pause, restart, 0.25x through 4x playback, bunny policy
+uploads, paired bunny and fox uploads on predator routes, and reset to curated
+defaults. Uploaded `.mpk` and optional sidecar files remain browser-local. The
+browser rejects files over 8 MiB, validates supplied sidecars against the
+selected stage, and decodes a complete replacement before activation. A bad
+upload keeps the last working policy active.
+
+The verified live-reloading HTTPS server is:
+
+```text
+https://nixos.tail87afcc.ts.net:8443/#/ecosystem/survival
+```
+
+It runs the loopback Trunk server through
+`nix run .#web-serve-tailscale-https`, then uses Tailscale Serve on port 8443.
+Trunk rebuilds changed files without a server restart and uses secure WebSocket
+reloads through the HTTPS proxy. A tailnet browser verified all six routes,
+advancing inference metrics, curated defaults, and canvases on 2026-08-02.
+
+Port 443 remains diverted to the existing Traefik listener. Tailscale Serve is
+configured on port 8443 with:
+
+```sh
+sudo tailscale serve --bg --https=8443 8080
+```
+
+The Tailscale configuration persists independently of the Trunk process. Restart
+the live-reloading backend with `nix run .#web-serve-tailscale-https` if needed.
+
+The pure release contains a 32,880,630-byte WASM file. Its gzip size is
+8,472,059 bytes. The eight checkpoint records total 4,532,856 bytes. A
+single-policy route transfers 566,607 checkpoint bytes. A paired route
+transfers 1,133,214 checkpoint bytes. One Chromium survival run measured 56.5
+ms checkpoint decode, 742.9 ms to the first active rendered frame, and 19.305
+ms mean active frame time. These measurements describe this machine and are
+not performance guarantees.
+
+The following focused demo gates pass against the current files:
+
+```text
+cargo test -p bevy-gym-web
+cargo clippy -p bevy-gym-web --all-targets --all-features -- -D warnings
+nix develop -c cargo check --manifest-path web/Cargo.toml --target wasm32-unknown-unknown --bin bevy-gym-web
+nix run .#web-check
+```
+
+The browser suite covers all six routes for at least five seconds, visible
+canvas changes, performance attributes, raw upload and reset, paired upload
+with matching sidecars, malformed-upload recovery, pause, restart, speed, and
+browser errors. It writes inspected survival and predator-prey screenshots to
+`test-results/wasm-demo-survival.png` and
+`test-results/wasm-demo-predator-prey.png`.
+
+The repository-wide strict Clippy gate still fails on unrelated dirty-worktree
+code. Its remaining failures are the global unused `shakmaty` dependency in
+more than twenty example and test crates, plus the ecosystem qualification
+function's `similar_names` and `too_many_lines` diagnostics. The personal lint
+gate also remains red because both phases cannot find `wayland-client` through
+their isolated pkg-config paths. Its current log is
+`~/.cache/rust-personal-lints/logs/run-2760077-1785686423040`. `nix flake
+check` reaches a treefmt failure caused by 51 existing formatting differences
+across the dirty worktree. Do not rewrite those unrelated files without
+approval.
+
 ## Objective
 
-Finish and prove the four-stage ecosystem curriculum:
+Finish and prove the eight-stage ecosystem curriculum:
 
-1. Single-agent hunger, thirst, food, finite well-water, health, hit points,
+1. Single-agent food perception and approach.
+2. Ephemeral-food sprinting with a speed-sensitive reward.
+3. Alternating-bank food reached through a lethal-gorge bridge.
+4. Single-agent hunger, thirst, food, finite well-water, health, hit points,
    and survival.
-2. Shared-policy multi-agent resource competition with physical
+5. Single-agent weather exposure and shelter use.
+6. Shared-policy multi-agent resource competition with physical
    blocking and pushing.
-3. Separately learned bunny and fox policies in a predator-prey environment.
-4. Transferred predator-prey policies with trees, rocks, and damaging thorns.
+7. Separately learned bunny and fox policies in a predator-prey environment.
+8. Transferred predator-prey policies with trees, rocks, and damaging thorns.
 
 Every stage also needs recurrent visual memory, fixed held-out learning
 evidence, a useful HUD, checkpoint videos, and durable documentation.
@@ -40,6 +120,27 @@ evidence, a useful HUD, checkpoint videos, and durable documentation.
 
 The implementation is substantial but incomplete.
 
+- Sprint food expires after five simulated seconds and gives a larger reward
+  for earlier contact. Gorge food retains that deadline and alternates banks.
+  The gorge kills agents outside the visible rail-guided bridge corridor.
+- Survival playback now defaults to 1x and interpolates between fixed physics
+  states. The visible world pauses for one wall-clock second after each episode.
+- Survival collects nine independent environments in parallel for each PPO
+  update. Every environment supplies recurrent sequences and returns to that
+  update. The visual demo replays the same nine trajectories in a labelled 3x3
+  grid with pan and zoom. All nine lanes use survival maps and mechanics.
+  Startup shows a labelled looping nine-environment preview while offline
+  survival initialization runs, then replaces it with contributing batches.
+  Completed traces keep looping while the worker collects, evaluates, or runs
+  PPO, so optimizer work does not freeze the renderer.
+- The training graph retains every episode return. Fixed-seed evaluation means
+  remain a separate series.
+- Survival episodes regenerate five solid obstacles. Agents cross the shallow
+  well at half speed.
+- Food, water, and prey interactions require an active forward mouth hitbox.
+  Solid impacts apply speed-scaled damage from Avian contact data.
+- Agents turn at up to 8 radians per second. Ground traction removes lateral
+  sliding. Each agent HUD shows episode return and fading signed reward deltas.
 - Every ecosystem example now starts visual training when run without
   arguments. Burn trains on a worker thread while Bevy renders the current
   policy.
@@ -68,15 +169,46 @@ The implementation is substantial but incomplete.
 - Obstacles have mechanics tests but no learning qualification.
 - No curated videos or poster frames are ready to commit.
 
+A five-second nine-environment collection test took 0.36 seconds with parallel
+collection and 1.03 seconds with a temporary sequential strategy on this
+machine. The final code uses parallel collection. A one-update visual smoke run
+recorded 450 joint steps and nine optimizer updates. It showed all nine
+environments in a uniform 3x3 grid, and manual pan and zoom worked.
+
+The no-argument survival command now uses 16 PPO updates, nine 120-second
+episodes per update, 16 validation episodes every fourth update and after the
+final update, and 1x playback. The accepted run completed 172,800 training steps
+in 16 minutes 57 seconds:
+
+```text
+runs/ecosystem-survival-ppo/final-homeostasis-profile-20260801/best.mpk
+```
+
+All 16 selected validation episodes survived 120 seconds. Their mean terminal
+health and satiation were 100%, mean hydration was 72.5%, and 43.75% ended with
+all three stats at maximum. A disjoint 100-episode 120-second evaluation had
+100% survival, 100% mean terminal health, 95.6% satiation, 72.8% hydration, and
+31% exact maximum terminal stats.
+
+A disjoint 100-episode 300-second stress test had 85% survival. It recorded 15
+dehydration deaths. The 300-second continuation in
+`runs/ecosystem-survival-ppo/final-long-horizon-20260801` reached 100% on its 16
+selection episodes but only 80% on 100 disjoint episodes, so it is rejected.
+Current evidence does not prove indefinite survival.
+
 The recurrent PPO timestep-weighting defect and environment-side stable-ID
 resource bias are both fixed and tested. Every multi-agent stage must still be
 retrained under the corrected mechanics.
 
 ## Implemented code
 
-Four Cargo examples exist:
+Eight stage Cargo examples exist:
 
+- `ecosystem-forage`
+- `ecosystem-sprint`
+- `ecosystem-gorge`
 - `ecosystem-survival`
+- `ecosystem-shelter`
 - `ecosystem-competition`
 - `ecosystem-predator-prey`
 - `ecosystem-obstacles`
