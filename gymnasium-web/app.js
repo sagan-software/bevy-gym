@@ -1,4 +1,13 @@
 const $ = (id) => document.getElementById(id);
+const taskName = new URL(location.href).searchParams.get("env") === "mountain-car" ? "mountain-car" : "cartpole";
+const task = taskName === "mountain-car"
+  ? { title: "MountainCar-v0", hz: 30, minimum: -200, maximum: 0, target: -110, rateMaximum: .0014, replay: 2000 }
+  : { title: "CartPole-v1", hz: 50, minimum: 0, maximum: 500, target: 475, rateMaximum: .0004, replay: 1000 };
+$("environment").value = taskName;
+$("environment").onchange = () => { location.search = new URLSearchParams({ env: $("environment").value }).toString(); };
+document.querySelector("h1").textContent = task.title;
+$("score-target").textContent = `Target mean ≥${task.target}`;
+$("scene").setAttribute("aria-label", taskName === "mountain-car" ? "MountainCar simulation: a car climbs the right hill" : "CartPole simulation: a cart balances an upright pole");
 let worker, generation = 0;
 /** @type {"loading" | "running" | "advancing" | "pausing" | "paused" | "failed"} */
 let phase = "loading";
@@ -44,7 +53,7 @@ function start(mode, bytes, source = "Bundled model") {
   $("return-summary").textContent = "No completed episodes";
   $("rate-summary").textContent = mode === "training" ? "Waiting for the first optimizer update." : "Inference performs no optimizer updates.";
   drawScene([0, 0, 0, 0]); drawCharts();
-  worker = new Worker(new URL("gymnasium-worker_loader.js", document.baseURI), { type: "module" });
+  worker = new Worker(new URL("gymnasium-worker_loader.js", document.baseURI), { type: "module", name: taskName });
   worker.onerror = (event) => { if (run === generation) fail(event.message || "The Rust worker failed."); };
   worker.onmessage = ({ data }) => {
     if (run !== generation) return;
@@ -64,7 +73,7 @@ function start(mode, bytes, source = "Bundled model") {
       case "snapshot": setPhase(phase === "pausing" ? "paused" : "running"); update(message.snapshot); break;
       case "policy": {
         const url = URL.createObjectURL(new Blob([new Uint8Array(message.bytes)], { type: "application/octet-stream" }));
-        const link = document.createElement("a"); link.href = url; link.download = `cartpole-${currentMode}-${latest?.transitions ?? 0}.mpk`; link.click();
+        const link = document.createElement("a"); link.href = url; link.download = `${taskName}-${currentMode}-${latest?.transitions ?? 0}.mpk`; link.click();
         setTimeout(() => URL.revokeObjectURL(url), 1000); break;
       }
       case "error": fail(message.message); break;
@@ -94,10 +103,10 @@ function update(snapshot) {
     $("return-summary").textContent = `Mean of last ${recent.length} episodes: ${mean.toFixed(1)} · raw returns and rolling mean`;
   }
   $("status").textContent = phase === "paused" ? "Paused" : currentMode === "inference" ? "Running frozen policy"
-    : snapshot.optimizer_steps ? "Training in this browser" : `Collecting replay transitions · ${snapshot.transitions}/1,000`;
+    : snapshot.optimizer_steps ? "Training in this browser" : `Collecting replay transitions · ${snapshot.transitions}/${task.replay.toLocaleString()}`;
   const now = performance.now();
   if (phase === "running" && now - speedWindow.time >= 1000) {
-    const achieved = (snapshot.transitions - speedWindow.transitions) * 20 / (now - speedWindow.time);
+    const achieved = (snapshot.transitions - speedWindow.transitions) * (1000 / task.hz) / (now - speedWindow.time);
     $("achieved").textContent = `${achieved.toFixed(1)}× actual`;
     speedWindow = { time: now, transitions: snapshot.transitions };
   }
@@ -107,7 +116,7 @@ function frame(now) {
   const elapsed = Math.min((now - lastTime) / 1000, .1); lastTime = now;
   if (phase === "running" || phase === "advancing") {
     // One in-flight batch bounds control latency. Speed never changes physics or updates per transition.
-    debt = Math.min(debt + elapsed * 50 * Number($("speed").value), 64);
+    debt = Math.min(debt + elapsed * task.hz * Number($("speed").value), 64);
     if (phase === "running" && debt >= 1) { const steps = Math.floor(debt); debt -= steps; advance(steps); }
   } else { debt = 0; }
   requestAnimationFrame(frame);
@@ -142,6 +151,7 @@ function context(id) {
   const ctx = canvas.getContext("2d"); ctx.scale(dpr, dpr); return [ctx, bounds.width, bounds.height];
 }
 function drawScene(state) {
+  if (taskName === "mountain-car") { drawMountainCar(state); return; }
   const [ctx, width, height] = context("scene"), scale = width / 6, floor = height * .74;
   const cart = width / 2 + state[0] * scale, poleLength = Math.min(scale, height * .5);
   ctx.strokeStyle = "#34453a"; ctx.lineWidth = 1;
@@ -154,14 +164,29 @@ function drawScene(state) {
   ctx.beginPath(); ctx.moveTo(cart, floor - 6); ctx.lineTo(cart + Math.sin(state[2]) * poleLength, floor - 6 - Math.cos(state[2]) * poleLength); ctx.stroke();
   ctx.fillStyle = "#ecf1e8"; ctx.beginPath(); ctx.arc(cart, floor - 6, 5, 0, Math.PI * 2); ctx.fill();
 }
-function chart(id, points, maximum, target, moving) {
+function drawMountainCar(state) {
+  const [ctx, width, height] = context("scene");
+  const x = position => 24 + (position + 1.2) / 1.8 * (width - 48);
+  const y = position => height - 24 - (Math.sin(3 * position) * .45 + .55) * (height - 60);
+  ctx.strokeStyle = "#76937d"; ctx.lineWidth = 2; ctx.beginPath();
+  for (let i = 0; i <= 120; i++) { const position = -1.2 + 1.8 * i / 120; if (i) ctx.lineTo(x(position), y(position)); else ctx.moveTo(x(position), y(position)); }
+  ctx.stroke();
+  ctx.strokeStyle = "#b6ee63"; ctx.beginPath(); ctx.moveTo(x(.5), y(.5)); ctx.lineTo(x(.5), y(.5)-30); ctx.stroke();
+  ctx.fillStyle = "#b6ee63"; ctx.beginPath(); ctx.moveTo(x(.5), y(.5)-30); ctx.lineTo(x(.5)+18,y(.5)-23); ctx.lineTo(x(.5),y(.5)-16); ctx.fill();
+  ctx.save(); ctx.translate(x(state[0]), y(state[0])-9);
+  ctx.rotate(Math.atan2(-1.35 * Math.cos(3 * state[0]) * (height-60), (width-48)/1.8));
+  ctx.fillStyle = "#b6ee63"; ctx.fillRect(-15,-10,30,14); ctx.fillStyle = "#a5b2a8";
+  for (const offset of [-10,10]) { ctx.beginPath(); ctx.arc(offset,5,5,0,Math.PI*2); ctx.fill(); }
+  ctx.restore();
+}
+function chart(id, points, maximum, target, moving, minimum = 0) {
   const [ctx, width, height] = context(id), left = 48, right = width - 12, top = 22, bottom = height - 34;
   const first = points[0]?.[0] ?? 0, last = Math.max(first + 1, points.at(-1)?.[0] ?? 1);
   const x = (value) => left + (value - first) / (last - first) * (right - left);
-  const y = (value) => bottom - value / maximum * (bottom - top);
+  const y = (value) => bottom - (value - minimum) / (maximum - minimum) * (bottom - top);
   ctx.font = "11px system-ui"; ctx.fillStyle = "#a5b2a8"; ctx.textAlign = "right";
   for (let i = 0; i <= 2; i++) {
-    const value = maximum * i / 2; ctx.fillText(maximum < 1 ? value.toExponential(1) : value.toFixed(0), left - 8, y(value) + 4);
+    const value = minimum + (maximum - minimum) * i / 2; ctx.fillText(maximum > 0 && maximum < 1 ? value.toExponential(1) : value.toFixed(0), left - 8, y(value) + 4);
     ctx.strokeStyle = "#34453a"; ctx.beginPath(); ctx.moveTo(left, y(value)); ctx.lineTo(right, y(value)); ctx.stroke();
   }
   if (target != null) { ctx.strokeStyle = "#a5b2a8"; ctx.setLineDash([4,4]); ctx.beginPath(); ctx.moveTo(left,y(target));ctx.lineTo(right,y(target));ctx.stroke();ctx.setLineDash([]); }
@@ -170,15 +195,15 @@ function chart(id, points, maximum, target, moving) {
   if (moving) line(points.map((point,index)=>{const batch=points.slice(Math.max(0,index-19),index+1);return [point[0],batch.reduce((sum,p)=>sum+p[1],0)/batch.length];}),"#b6ee63");
   ctx.fillStyle="#a5b2a8";ctx.textAlign="left";ctx.fillText(first.toLocaleString(),left,bottom+18);ctx.textAlign="right";ctx.fillText(last.toLocaleString(),right,bottom+18);ctx.textAlign="center";ctx.fillText("Transitions",(left+right)/2,height-3);
 }
-function drawCharts() { chart("returns-chart", returns, 500, 475, true); chart("rate-chart", rates, .0004, null, false); }
+function drawCharts() { chart("returns-chart", returns, task.maximum, task.target, true, task.minimum); chart("rate-chart", rates, task.rateMaximum, null, false); }
 window.addEventListener("resize",()=>{drawScene(latest?.state ?? [0,0,0,0]);drawCharts();});
 drawScene([0,0,0,0]);drawCharts();requestAnimationFrame(frame);
 const initialGeneration = generation;
 $("bundled").disabled = true;
 try {
   const [response, metadataResponse] = await Promise.all([
-    fetch(new URL("models/cartpole.mpk", document.baseURI)),
-    fetch(new URL("models/cartpole.json", document.baseURI)),
+    fetch(new URL(`models/${taskName}.mpk`, document.baseURI)),
+    fetch(new URL(`models/${taskName}.json`, document.baseURI)),
   ]);
   if (!response.ok || !metadataResponse.ok) throw new Error("Bundled policy or qualification report failed to load.");
   const metadata = await metadataResponse.json();

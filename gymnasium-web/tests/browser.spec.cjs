@@ -54,6 +54,22 @@ test("training, frozen inference, pause, step, speed, and policy round trip", as
   expect(failures).toEqual([]);
 });
 
+test("MountainCar selection trains and loads its qualified policy", async ({ page }) => {
+  await page.goto("./?env=mountain-car");
+  await expect(page.locator("h1")).toHaveText("MountainCar-v0");
+  await expect(page.locator("#status")).toHaveText("Running frozen policy");
+  await page.locator("#speed").selectOption("16");
+  await expect.poll(async () => Number((await page.locator("#episodes").innerText()).replaceAll(",", ""))).toBeGreaterThan(0);
+  await expect(page.locator("#return-summary")).toContainText("Mean of last");
+  await page.getByRole("button", { name: "Train from scratch", exact: true }).click();
+  await expect.poll(async () => Number((await page.locator("#updates").innerText()).replaceAll(",", ""))).toBeGreaterThan(0);
+  await expect(page.locator("#rate")).toHaveText("1.0e-3");
+  await paused(page);
+  await page.locator("#environment").selectOption("cartpole");
+  await expect(page.locator("h1")).toHaveText("CartPole-v1");
+  await expect(page.locator("#status")).toHaveText("Running frozen policy");
+});
+
 test("late bundled-model loading cannot replace a newer training session", async ({ page }) => {
   let pending;
   await page.route("**/models/cartpole.mpk", route => { pending = route; });
@@ -68,15 +84,18 @@ test("late bundled-model loading cannot replace a newer training session", async
 });
 
 // A separate worker can consume the full transition budget without display throttling.
-test("browser DQN learns and passes held-out scores", async ({ page }, testInfo) => {
+for (const qualification of [
+  { task: "cartpole", target: 475, selection: 475, validationCount: 20, minimumSuccesses: 180, checkpoints: 20, improvement: 400, testStart: 100000 },
+  { task: "mountain-car", target: -110, selection: -105, validationCount: 100, minimumSuccesses: 190, checkpoints: 100, improvement: 80, testStart: 300000 },
+]) test(`${qualification.task} browser DQN learns and passes held-out scores`, async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "chromium", "Full score qualification runs in Chromium; all engines run optimizer and inference checks.");
   test.setTimeout(1_200_000);
-  await page.goto("./");
+  await page.goto(`./?env=${qualification.task}`);
   await expect(page.locator("#status")).toHaveText("Running frozen policy");
   await paused(page);
-  const evaluation = page.evaluate(async () => {
+  const evaluation = page.evaluate(async qualification => {
     async function client() {
-      const worker = new Worker(new URL("gymnasium-worker_loader.js", document.baseURI), { type: "module" });
+      const worker = new Worker(new URL("gymnasium-worker_loader.js", document.baseURI), { type: "module", name: qualification.task });
       await new Promise((resolve, reject) => {
         worker.onerror = event => reject(new Error(event.message));
         worker.onmessage = event => { const message = JSON.parse(event.data); if (message.event === "ready" && message.protocol === 1) resolve(); else reject(new Error("worker protocol mismatch")); };
@@ -100,7 +119,7 @@ test("browser DQN learns and passes held-out scores", async ({ page }, testInfo)
         await evaluator.send({ command: "start_inference", seed, bytes });
         for (;;) {
           const { snapshot } = await evaluator.send({ command: "advance", steps: 256 });
-          if (snapshot.completed.length) { const score = snapshot.completed[0].reward; sum += score; if (score === 500) full++; break; }
+          if (snapshot.completed.length) { const score = snapshot.completed[0].reward; sum += score; if (qualification.task === "cartpole" ? score === 500 : score > -200) full++; break; }
         }
       }
       return { mean: sum / count, full, count };
@@ -108,19 +127,19 @@ test("browser DQN learns and passes held-out scores", async ({ page }, testInfo)
     try {
       await trainer.send({ command: "start_training", seed: 42 });
       const initial = await trainer.send({ command: "export" });
-      const baseline = await evaluate(initial.bytes, 10000, 20);
+      const baseline = await evaluate(initial.bytes, 10000, qualification.validationCount);
       const history = [];
       let selected;
-      for (let checkpoint = 1; checkpoint <= 20; checkpoint++) {
+      for (let checkpoint = 1; checkpoint <= qualification.checkpoints; checkpoint++) {
         for (let batch = 0; batch < 40; batch++) await trainer.send({ command: "advance", steps: 250 });
         const candidate = await trainer.send({ command: "export" });
-        const validation = await evaluate(candidate.bytes, 10000, 20);
+        const validation = await evaluate(candidate.bytes, 10000, qualification.validationCount);
         history.push({ transitions: checkpoint * 10000, ...validation });
-        if (validation.mean >= 475 && validation.full >= 18) { selected = candidate.bytes; break; }
+        if (validation.mean >= qualification.selection && validation.full / validation.count >= qualification.minimumSuccesses / 200) { selected = candidate.bytes; break; }
       }
-      return { baseline, history, test: selected ? await evaluate(selected, 100000, 200) : null };
+      return { baseline, history, test: selected ? await evaluate(selected, qualification.testStart, 200) : null };
     } finally { trainer.worker.terminate(); evaluator.worker.terminate(); }
-  });
+  }, qualification);
   await expect.poll(() => page.evaluate(() => Boolean(window.offlineQualificationReady))).toBe(true);
   await page.context().setOffline(true);
   await page.evaluate(() => window.startOfflineQualification());
@@ -128,7 +147,7 @@ test("browser DQN learns and passes held-out scores", async ({ page }, testInfo)
   await testInfo.attach("browser-learning.json", { body: JSON.stringify(result, null, 2), contentType: "application/json" });
   console.log(JSON.stringify(result));
   expect(result.test).not.toBeNull();
-  expect(result.test.mean).toBeGreaterThanOrEqual(475);
-  expect(result.test.full).toBeGreaterThanOrEqual(180);
-  expect(result.test.mean - result.baseline.mean).toBeGreaterThanOrEqual(400);
+  expect(result.test.mean).toBeGreaterThanOrEqual(qualification.target);
+  expect(result.test.full).toBeGreaterThanOrEqual(qualification.minimumSuccesses);
+  expect(result.test.mean - result.baseline.mean).toBeGreaterThanOrEqual(qualification.improvement);
 });

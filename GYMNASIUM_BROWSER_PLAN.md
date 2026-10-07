@@ -343,8 +343,17 @@ and access policy before deployment. Training and inference remain client-side.
 
 ## Current verification boundary
 
-The dependency cleanup is implemented. The browser training, new controls,
-qualification jobs, faithful physics replacements, and new bundled models above
-are planned work. Existing learning claims have not been requalified.
-No frontend implementation changed in this task, so visual acceptance remains
-an implementation gate rather than a claimed result.
+CartPole is deployed with browser training, inference, controls, curves, and a
+qualified bundle. Three native training seeds passed. Chromium trained offline
+and scored 500 across 200 held-out episodes. Chromium, Firefox, and WebKit
+passed the functional browser checks. Desktop and mobile views were inspected.
+
+MountainCar has shared float64 dynamics, boundary tests, browser task selection,
+and a bundled qualified model. Native training seeds 42, 43, and 44 all passed
+within 310,000 transitions. Its expanded offline browser qualification and
+final deployed visual review remain pending. Other environments are not yet
+browser-qualified, and the Box2D/MuJoCo engine replacements remain planned.
+
+The broader controls and performance checks above remain acceptance work,
+including hidden-tab behavior, explicit worker crashes, every speed setting,
+200% zoom, latency budgets, and 30-minute resource stability.

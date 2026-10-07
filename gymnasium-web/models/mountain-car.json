@@ -1,0 +1,485 @@
+{
+  "environment": "MountainCar-v0",
+  "algorithm": "DQN",
+  "architecture": {
+    "observations": 2,
+    "actions": 3,
+    "hidden": [
+      64,
+      64
+    ]
+  },
+  "selected_training_seed": 43,
+  "sha256": "64374e77338a4237b5545051660832cb416a2e09fbdc6aa4b412a8c739458bea",
+  "learning_rate": 0.001,
+  "reward_potential_scale": 25,
+  "normalization": "position mapped from [-1.2, 0.6] to [-1, 1]; velocity divided by 0.07",
+  "validation_seeds": [
+    10000,
+    10100
+  ],
+  "test_seeds": [
+    200000,
+    200200
+  ],
+  "gates": {
+    "test_mean_minimum": -110,
+    "test_successes_minimum": 190,
+    "test_episodes": 200
+  },
+  "qualification": [
+    {
+      "best_validation_mean": -101.59,
+      "history": [
+        {
+          "mean": -194.8,
+          "successes": 32,
+          "transitions": 10000
+        },
+        {
+          "mean": -127.02,
+          "successes": 100,
+          "transitions": 20000
+        },
+        {
+          "mean": -115.98,
+          "successes": 100,
+          "transitions": 30000
+        },
+        {
+          "mean": -187.52,
+          "successes": 36,
+          "transitions": 40000
+        },
+        {
+          "mean": -200.0,
+          "successes": 0,
+          "transitions": 50000
+        },
+        {
+          "mean": -200.0,
+          "successes": 0,
+          "transitions": 60000
+        },
+        {
+          "mean": -200.0,
+          "successes": 0,
+          "transitions": 70000
+        },
+        {
+          "mean": -126.59,
+          "successes": 96,
+          "transitions": 80000
+        },
+        {
+          "mean": -147.68,
+          "successes": 100,
+          "transitions": 90000
+        },
+        {
+          "mean": -186.42,
+          "successes": 44,
+          "transitions": 100000
+        },
+        {
+          "mean": -199.81,
+          "successes": 27,
+          "transitions": 110000
+        },
+        {
+          "mean": -194.14,
+          "successes": 17,
+          "transitions": 120000
+        },
+        {
+          "mean": -168.06,
+          "successes": 86,
+          "transitions": 130000
+        },
+        {
+          "mean": -184.34,
+          "successes": 24,
+          "transitions": 140000
+        },
+        {
+          "mean": -170.06,
+          "successes": 51,
+          "transitions": 150000
+        },
+        {
+          "mean": -159.46,
+          "successes": 100,
+          "transitions": 160000
+        },
+        {
+          "mean": -177.27,
+          "successes": 68,
+          "transitions": 170000
+        },
+        {
+          "mean": -166.27,
+          "successes": 100,
+          "transitions": 180000
+        },
+        {
+          "mean": -175.6,
+          "successes": 63,
+          "transitions": 190000
+        },
+        {
+          "mean": -200.0,
+          "successes": 0,
+          "transitions": 200000
+        },
+        {
+          "mean": -172.63,
+          "successes": 54,
+          "transitions": 210000
+        },
+        {
+          "mean": -131.31,
+          "successes": 100,
+          "transitions": 220000
+        },
+        {
+          "mean": -125.69,
+          "successes": 100,
+          "transitions": 230000
+        },
+        {
+          "mean": -175.87,
+          "successes": 64,
+          "transitions": 240000
+        },
+        {
+          "mean": -167.44,
+          "successes": 42,
+          "transitions": 250000
+        },
+        {
+          "mean": -110.74,
+          "successes": 100,
+          "transitions": 260000
+        },
+        {
+          "mean": -158.28,
+          "successes": 47,
+          "transitions": 270000
+        },
+        {
+          "mean": -118.32,
+          "successes": 98,
+          "transitions": 280000
+        },
+        {
+          "mean": -121.32,
+          "successes": 100,
+          "transitions": 290000
+        },
+        {
+          "mean": -117.37,
+          "successes": 100,
+          "transitions": 300000
+        },
+        {
+          "mean": -101.59,
+          "successes": 100,
+          "transitions": 310000
+        }
+      ],
+      "initial_validation_mean": -200.0,
+      "learning_rate": 0.001,
+      "reward_potential_scale": 25,
+      "seed": 42,
+      "test_episodes": 200,
+      "test_mean": -104.015,
+      "test_seeds": [
+        200000,
+        200200
+      ],
+      "test_successes": 200,
+      "transitions": 310000,
+      "validation_seeds": [
+        10000,
+        10100
+      ]
+    },
+    {
+      "best_validation_mean": -101.25,
+      "history": [
+        {
+          "mean": -187.58,
+          "successes": 32,
+          "transitions": 10000
+        },
+        {
+          "mean": -151.03,
+          "successes": 95,
+          "transitions": 20000
+        },
+        {
+          "mean": -156.06,
+          "successes": 88,
+          "transitions": 30000
+        },
+        {
+          "mean": -172.96,
+          "successes": 45,
+          "transitions": 40000
+        },
+        {
+          "mean": -200.0,
+          "successes": 0,
+          "transitions": 50000
+        },
+        {
+          "mean": -186.66,
+          "successes": 67,
+          "transitions": 60000
+        },
+        {
+          "mean": -133.05,
+          "successes": 100,
+          "transitions": 70000
+        },
+        {
+          "mean": -133.87,
+          "successes": 100,
+          "transitions": 80000
+        },
+        {
+          "mean": -179.04,
+          "successes": 43,
+          "transitions": 90000
+        },
+        {
+          "mean": -200.0,
+          "successes": 0,
+          "transitions": 100000
+        },
+        {
+          "mean": -148.91,
+          "successes": 70,
+          "transitions": 110000
+        },
+        {
+          "mean": -115.59,
+          "successes": 100,
+          "transitions": 120000
+        },
+        {
+          "mean": -164.15,
+          "successes": 39,
+          "transitions": 130000
+        },
+        {
+          "mean": -150.63,
+          "successes": 88,
+          "transitions": 140000
+        },
+        {
+          "mean": -114.12,
+          "successes": 100,
+          "transitions": 150000
+        },
+        {
+          "mean": -130.54,
+          "successes": 100,
+          "transitions": 160000
+        },
+        {
+          "mean": -150.18,
+          "successes": 83,
+          "transitions": 170000
+        },
+        {
+          "mean": -112.06,
+          "successes": 100,
+          "transitions": 180000
+        },
+        {
+          "mean": -115.35,
+          "successes": 100,
+          "transitions": 190000
+        },
+        {
+          "mean": -112.16,
+          "successes": 100,
+          "transitions": 200000
+        },
+        {
+          "mean": -176.69,
+          "successes": 31,
+          "transitions": 210000
+        },
+        {
+          "mean": -175.27,
+          "successes": 42,
+          "transitions": 220000
+        },
+        {
+          "mean": -141.45,
+          "successes": 93,
+          "transitions": 230000
+        },
+        {
+          "mean": -131.0,
+          "successes": 100,
+          "transitions": 240000
+        },
+        {
+          "mean": -130.68,
+          "successes": 100,
+          "transitions": 250000
+        },
+        {
+          "mean": -126.36,
+          "successes": 100,
+          "transitions": 260000
+        },
+        {
+          "mean": -120.78,
+          "successes": 100,
+          "transitions": 270000
+        },
+        {
+          "mean": -118.39,
+          "successes": 100,
+          "transitions": 280000
+        },
+        {
+          "mean": -101.25,
+          "successes": 100,
+          "transitions": 290000
+        }
+      ],
+      "initial_validation_mean": -200.0,
+      "learning_rate": 0.001,
+      "reward_potential_scale": 25,
+      "seed": 43,
+      "test_episodes": 200,
+      "test_mean": -104.08,
+      "test_seeds": [
+        200000,
+        200200
+      ],
+      "test_successes": 200,
+      "transitions": 290000,
+      "validation_seeds": [
+        10000,
+        10100
+      ]
+    },
+    {
+      "best_validation_mean": -103.08,
+      "history": [
+        {
+          "mean": -200.0,
+          "successes": 0,
+          "transitions": 10000
+        },
+        {
+          "mean": -136.87,
+          "successes": 100,
+          "transitions": 20000
+        },
+        {
+          "mean": -127.72,
+          "successes": 100,
+          "transitions": 30000
+        },
+        {
+          "mean": -162.25,
+          "successes": 100,
+          "transitions": 40000
+        },
+        {
+          "mean": -181.84,
+          "successes": 82,
+          "transitions": 50000
+        },
+        {
+          "mean": -200.0,
+          "successes": 0,
+          "transitions": 60000
+        },
+        {
+          "mean": -200.0,
+          "successes": 0,
+          "transitions": 70000
+        },
+        {
+          "mean": -119.97,
+          "successes": 100,
+          "transitions": 80000
+        },
+        {
+          "mean": -142.06,
+          "successes": 100,
+          "transitions": 90000
+        },
+        {
+          "mean": -192.6,
+          "successes": 17,
+          "transitions": 100000
+        },
+        {
+          "mean": -200.0,
+          "successes": 0,
+          "transitions": 110000
+        },
+        {
+          "mean": -122.05,
+          "successes": 100,
+          "transitions": 120000
+        },
+        {
+          "mean": -168.08,
+          "successes": 41,
+          "transitions": 130000
+        },
+        {
+          "mean": -154.92,
+          "successes": 88,
+          "transitions": 140000
+        },
+        {
+          "mean": -200.0,
+          "successes": 0,
+          "transitions": 150000
+        },
+        {
+          "mean": -119.57,
+          "successes": 100,
+          "transitions": 160000
+        },
+        {
+          "mean": -126.51,
+          "successes": 100,
+          "transitions": 170000
+        },
+        {
+          "mean": -103.08,
+          "successes": 100,
+          "transitions": 180000
+        }
+      ],
+      "initial_validation_mean": -200.0,
+      "learning_rate": 0.001,
+      "reward_potential_scale": 25,
+      "seed": 44,
+      "test_episodes": 200,
+      "test_mean": -104.005,
+      "test_seeds": [
+        200000,
+        200200
+      ],
+      "test_successes": 200,
+      "transitions": 180000,
+      "validation_seeds": [
+        10000,
+        10100
+      ]
+    }
+  ]
+}

@@ -1,19 +1,19 @@
 //! Training and inference session lifecycle.
-use crate::{AdvanceSteps, Episode, SessionError, Snapshot};
-use bevy_gym::environments::{CartPole, CartPoleAction};
-use bevy_gym::training::{DqnAgent, DqnConfig, DqnError, DqnPolicy, SeedConfig};
-use bevy_gym::wrappers::time_limit::TimeLimit;
-use bevy_gym::Env;
+use crate::{
+    environment::Environment, observation::Observation, AdvanceSteps, Episode, SessionError,
+    Snapshot, Task,
+};
+use bevy_gym::training::{DqnAgent, DqnPolicy, SeedConfig};
 
 /// An isolated simulation with either a learner or a frozen policy.
 #[derive(Debug)]
 pub struct Session {
     /// Mutually exclusive optimizer and inference state.
     mode: Mode,
-    /// Shared Gymnasium dynamics with the `CartPole`-v1 500-step cap.
-    environment: TimeLimit<CartPole>,
+    /// Shared Gymnasium dynamics with the selected task's episode cap.
+    environment: Environment,
     /// Last observation, before the next selected action.
-    observation: [f32; 4],
+    observation: Observation,
     /// Count of consumed environment transitions.
     transitions: u64,
     /// Count of completed episodes.
@@ -39,8 +39,7 @@ impl Session {
     /// # Errors
     /// Returns the shared learner's configuration or tensor error.
     pub fn train(seed: u64) -> Result<Self, SessionError> {
-        let agent = DqnAgent::new(4, 2, DqnConfig::default(), SeedConfig::from_root(seed))?;
-        Ok(Self::new(Mode::Training(Box::new(agent)), seed))
+        Self::train_task(Task::CartPole, seed)
     }
 
     /// Start `CartPole` inference using a frozen, validated DQN record.
@@ -48,15 +47,38 @@ impl Session {
     /// # Errors
     /// Rejects corrupt records and records with a different architecture.
     pub fn inference(bytes: Vec<u8>, seed: u64) -> Result<Self, SessionError> {
-        let policy = DqnPolicy::load_bytes(bytes, 4, 2, &[64, 64])?;
-        Ok(Self::new(Mode::Inference(policy), seed))
+        Self::inference_task(Task::CartPole, bytes, seed)
+    }
+
+    /// Start the selected environment with its documented learner settings.
+    ///
+    /// # Errors
+    /// Returns the shared learner's configuration or tensor error.
+    pub fn train_task(task: Task, seed: u64) -> Result<Self, SessionError> {
+        let (observations, actions) = task.dimensions();
+        let agent = DqnAgent::new(
+            observations,
+            actions,
+            task.config(),
+            SeedConfig::from_root(seed),
+        )?;
+        Ok(Self::new(Mode::Training(Box::new(agent)), task, seed))
+    }
+
+    /// Load an inference record for the selected task's architecture.
+    ///
+    /// # Errors
+    /// Rejects corrupt records and incompatible network dimensions.
+    pub fn inference_task(task: Task, bytes: Vec<u8>, seed: u64) -> Result<Self, SessionError> {
+        let (observations, actions) = task.dimensions();
+        let policy = DqnPolicy::load_bytes(bytes, observations, actions, &[64, 64])?;
+        Ok(Self::new(Mode::Inference(policy), task, seed))
     }
 
     /// Initialize shared episode state after the mode has been validated.
-    fn new(mode: Mode, seed: u64) -> Self {
-        let mut environment =
-            TimeLimit::new(CartPole::default(), 500).expect("positive constant limit");
-        let observation = environment.reset(Some(seed)).observation;
+    fn new(mode: Mode, task: Task, seed: u64) -> Self {
+        let mut environment = Environment::new(task);
+        let observation = environment.reset(Some(seed));
         Self {
             mode,
             environment,
@@ -68,7 +90,7 @@ impl Session {
         }
     }
 
-    /// Advance fixed 20 ms transitions with at most 256 optimizer calls per batch.
+    /// Advance fixed environment transitions with at most 256 optimizer calls per batch.
     ///
     /// Work is linear in the bounded step count; retained replay has the learner's
     /// fixed capacity. Episode evidence is bounded by this batch, not run duration.
@@ -78,23 +100,22 @@ impl Session {
     pub fn advance(&mut self, steps: AdvanceSteps) -> Result<Snapshot, SessionError> {
         let mut completed = Vec::new();
         for _ in 0..steps.get() {
+            let encoded = self.observation.encoded();
             let action_index = match &mut self.mode {
-                Mode::Training(agent) => agent.select_action(&self.observation)?.action_index,
-                Mode::Inference(policy) => policy.greedy_action(&self.observation)?,
+                Mode::Training(agent) => agent.select_action(encoded.as_ref())?.action_index,
+                Mode::Inference(policy) => policy.greedy_action(encoded.as_ref())?,
             };
-            let action = CartPoleAction::try_from(action_index).map_err(|_invalid_action| {
-                DqnError::ActionOutOfBounds {
-                    action_index,
-                    action_dim: 2,
-                }
-            })?;
-            let result = self.environment.step(action);
+            let result = self.environment.step(action_index)?;
             if let Mode::Training(agent) = &mut self.mode {
                 if let Some(update) = agent.observe(
-                    &self.observation,
+                    encoded.as_ref(),
                     action_index,
-                    result.reward,
-                    &result.observation,
+                    self.observation.training_reward(
+                        result.observation,
+                        result.reward,
+                        result.status,
+                    ),
+                    result.observation.encoded().as_ref(),
                     result.status,
                 )? {
                     self.loss = Some(update.loss);
@@ -110,7 +131,7 @@ impl Session {
                 });
                 self.episodes += 1;
                 self.episode_return = 0.0;
-                self.observation = self.environment.reset(None).observation;
+                self.observation = self.environment.reset(None);
             } else {
                 self.observation = result.observation;
             }
@@ -134,7 +155,7 @@ impl Session {
             learning_rate,
             epsilon,
             loss: self.loss,
-            state: *self.environment.inner().state(),
+            state: self.environment.state(),
             episode_return: self.episode_return,
             episode_count: self.episodes,
             completed,

@@ -20,7 +20,8 @@ pub struct Snapshot {
     pub epsilon: Option<f64>,
     /// Most recent TD loss; absent before the first update and during inference.
     pub loss: Option<f64>,
-    /// Physical state for rendering, in metres and radians.
+    /// `CartPole` physical state in metres and radians, or `MountainCar` position
+    /// and per-step velocity followed by two zeros.
     pub state: [f64; 4],
     /// Unmodified reward sum in the current episode.
     pub episode_return: f64,

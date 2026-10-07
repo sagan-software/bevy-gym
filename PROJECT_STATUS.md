@@ -4,7 +4,7 @@ Assessment date: 2026-10-07.
 
 Finish one Gymnasium environment at a time, including browser playback and
 browser training and measured policy quality, before expanding the catalog.
-CartPole is deployed; MountainCar is next.
+CartPole is deployed; MountainCar is undergoing final browser qualification.
 Keep ecosystem and PettingZoo expansion behind the Gymnasium milestones.
 
 ## Gymnasium port policy
@@ -186,7 +186,11 @@ See [the browser package](gymnasium-web/README.md) for commands and coverage gap
 
 ## Remaining verification and environments
 
-MountainCar-v0 is next, followed by the delivery order above. Other Gymnasium
+MountainCar-v0 now has shared Rust dynamics, browser training and inference,
+and a bundled policy selected by validation score. All three native training
+seeds passed the -110/95% gate. Browser functional checks passed in Chromium;
+its full offline learning gate and deployment verification remain pending.
+MountainCarContinuous-v0 follows after that slice passes. Other Gymnasium
 environments have not passed browser acceptance. Box2D and MuJoCo browser
 engine compatibility still needs proof before their faithful ports proceed.
 

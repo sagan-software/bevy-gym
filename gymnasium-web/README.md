@@ -1,17 +1,19 @@
 # Browser Gymnasium
 
-Run CartPole training and inference at <https://sagan-software.github.io/bevy-gym/>.
+Run CartPole and MountainCar training and inference at <https://sagan-software.github.io/bevy-gym/>.
 The browser worker runs Bevy Gym's Rust environment and Burn DQN learner locally.
 Training starts from a fresh model. Inference loads a frozen policy.
 
 ```sh
-nix develop --command trunk serve --config gymnasium-web/Trunk.toml
+NO_COLOR=true nix develop --command trunk serve --config gymnasium-web/Trunk.toml
 ```
 
 Open <http://127.0.0.1:8081>. The page shows episode returns, their rolling mean,
 optimizer learning rate, TD loss, and the actual achieved simulation speed.
-The 1× through 16× controls keep the original 20 ms physical timestep and one
-optimizer opportunity per transition. Hardware limits can reduce achieved speed.
+At 1×, CartPole advances 50 transitions per second with its original 20 ms
+physical timestep. MountainCar advances 30 transitions per second, matching
+Gymnasium playback. Speed changes pacing, with one optimizer opportunity per
+transition. Hardware limits can reduce achieved speed.
 Pause takes effect after the current worker batch, at most 64 transitions.
 Downloaded policies contain inference parameters, not resumable training state.
 
@@ -28,22 +30,45 @@ architecture, model hash, validation seeds, held-out seeds, and each run's curve
 The model uses the default `DqnConfig`, including Adam learning rate 0.0003.
 Learning rate and episode return are separate charts.
 
+## Verified MountainCar model
+
+The default MountainCar-v0 port uses float64 internal state, the original
+clipping rules and reward, and an external 200-transition cap. It requires
+both position at least 0.5 and velocity at least zero to terminate.
+Custom reset bounds and nonzero goal-velocity options are not exposed yet.
+Diagnostic state injection rejects nonfinite coordinates and positions whose
+terrain angle `3 * position` would overflow.
+
+Training uses DQN with learning rate 0.001, normalized observations, and terrain
+potential scale 25. Potential shaping changes only the optimizer reward;
+charts and score gates use the original environment reward. The default native
+example uses the same scale. The three qualification runs reached their selected
+checkpoints after 310,000, 290,000, and 180,000 transitions for seeds 42, 43, and 44.
+
+Their held-out means were -104.015, -104.08, and -104.005, with 200/200 goals each.
+The bundled seed-43 model had the best validation mean, -101.25.
+[Model provenance](models/mountain-car.json) records all three runs and the hash.
+The gate requires mean at least -110, at least 190/200 goals, and improvement
+of at least 80 from initialization, within one million transitions per seed.
+Validation uses 100 seeds; the 200 held-out seeds are disjoint.
+
 ## Checks
 
 ```sh
 nix develop --command cargo test -p bevy-gym-browser
 nix develop --command cargo test -p bevy-gym-browser --test learning -- --ignored --nocapture
+nix develop --command cargo test -p bevy-gym-browser --test mountain_car_learning -- --ignored --nocapture
 nix develop --command cargo clippy -p bevy-gym-browser --all-targets -- -D warnings
 nix develop --command cargo clippy -p bevy-gym-browser --target wasm32-unknown-unknown -- -D warnings
 ```
 
-The learning gate starts three independent models, selects each checkpoint on
+The CartPole learning gate starts three independent models, selects each checkpoint on
 20 validation seeds, and evaluates it on 200 different seeds. Each seed must
 reach mean return 475, at least 90% full-length episodes, and improvement of at
 least 400 over its initial validation mean within 200,000 transitions.
 The command saves reports and policies under `runs/browser-cartpole/`.
 
-The shared dynamics use Gymnasium's default Euler equations and float64 state.
+CartPole uses Gymnasium's default Euler equations and float64 state.
 Reset values have Gymnasium's uniform distribution, but use SplitMix64 rather
 than NumPy PCG64. Equal numeric seeds do not produce the same Python sequence.
 The explicit state-injection tests compare against the pinned Python oracle.
@@ -56,18 +81,24 @@ site under `/bevy-gym/`, exercises its controls and policy round trip, and train
 a fresh model in a real browser worker before checking held-out scores.
 Chromium performs full qualification with the network disconnected after worker
 initialization. Firefox and WebKit check training updates, inference, controls,
-and rejection of stale loading results. All seven checks passed on this host;
-the two full qualification cases for Firefox and WebKit are explicitly skipped.
+and rejection of stale loading results. Full qualification cases for Firefox
+and WebKit are explicitly skipped. CartPole passed all seven original browser
+checks; the expanded MountainCar matrix must pass before Pages deployment.
 
-Native coverage records 100% of the CartPole dynamics, action validation, state
-validation, batch-budget, and error-display lines. Session coverage is 81 of 88
-lines. Its unhit paths propagate configuration, observation, optimizer, and
-out-of-range action errors that the fixed valid session configuration does not
-produce. Native worker command handling covers 76 of 80 lines; the no-op native entry
-point and defensive error propagation remain unhit. WebAssembly worker
-behavior is checked by browser tests rather than native LLVM instrumentation.
+Native coverage records all dynamics, action-validation, and state-validation
+lines for both environments. Session coverage is 95 of 96 lines. Unhit session
+paths propagate configuration, observation, action, and optimizer errors that
+the fixed valid configuration does not produce. Native worker coverage is
+91 of 95 lines; its no-op entry point and defensive errors remain unhit.
+WebAssembly worker behavior is checked by browser tests rather than native LLVM.
 
 ## Worker contract
+
+The worker name selects `cartpole` or `mountain-car` for its lifetime.
+An empty name retains the original CartPole default; other names fail before
+initialization. The existing command shapes remain unchanged.
+MountainCar snapshots place position and per-step velocity in the first two
+state coordinates and zero the remaining two.
 
 The worker announces protocol `1` before accepting commands. The page checks
 that version before sending work. A worker instance identifies its run;

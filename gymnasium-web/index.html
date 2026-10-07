@@ -14,7 +14,7 @@
 <body>
   <header><a class="brand" href="./">Bevy Gym</a><span>Gymnasium</span><a href="ecosystem/">Ecosystem demos</a><a href="https://github.com/sagan-software/bevy-gym">Source</a></header>
   <main>
-    <div class="heading"><h1>CartPole-v1</h1><span id="mode">Inference</span><span id="policy-source">Bundled model</span></div>
+    <div class="heading"><label class="environment-choice">Environment <select id="environment"><option value="cartpole">CartPole-v1</option><option value="mountain-car">MountainCar-v0</option></select></label><h1>CartPole-v1</h1><span id="mode">Inference</span><span id="policy-source">Bundled model</span></div>
     <div class="workspace">
       <section class="simulation" aria-label="Simulation">
         <canvas id="scene" width="900" height="480" aria-label="CartPole simulation: a cart balances an upright pole"></canvas>
@@ -45,7 +45,7 @@
         <p class="note">Policy files run inference. They do not resume optimizer or replay state.</p>
       </aside>
     <section class="charts" aria-label="Learning curves">
-      <figure><figcaption>Episode return <span>Target mean ≥475</span></figcaption><canvas id="returns-chart" width="700" height="220" aria-label="Episode return by environment transition"></canvas><p id="return-summary">No completed episodes</p></figure>
+      <figure><figcaption>Episode return <span id="score-target">Target mean ≥475</span></figcaption><canvas id="returns-chart" width="700" height="220" aria-label="Episode return by environment transition"></canvas><p id="return-summary">No completed episodes</p></figure>
       <figure><figcaption>Optimizer learning rate</figcaption><canvas id="rate-chart" width="700" height="220" aria-label="Learning rate by environment transition"></canvas><p id="rate-summary">Inference performs no optimizer updates.</p></figure>
     </section>
     </div>

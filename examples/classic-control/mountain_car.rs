@@ -113,10 +113,6 @@ const MAX_POSITION: f32 = 0.6;
 const MAX_SPEED: f32 = 0.07;
 /// `GOAL_POSITION` used by this example.
 const GOAL_POSITION: f32 = 0.5;
-/// `FORCE` used by this example.
-const FORCE: f32 = 0.001;
-/// `GRAVITY` used by this example.
-const GRAVITY: f32 = 0.0025;
 /// `MAX_EPISODE_STEPS` used by this example.
 const MAX_EPISODE_STEPS: usize = 200;
 
@@ -149,23 +145,21 @@ impl DqnAction for MountainCarAction {
     }
 }
 
-/// Exact default Gymnasium MountainCar-v0 dynamics.
+/// Native workflow adapter around the shared double-precision environment.
 #[derive(Debug, Clone)]
 struct MountainCar {
-    /// Position and velocity.
-    state: [f32; 2],
-    /// Current episode transition count.
-    elapsed_steps: usize,
-    /// Deterministic reset generator.
-    rng: SplitMix64,
+    /// External episode cap, shared with browser execution.
+    inner: bevy_gym::wrappers::time_limit::TimeLimit<bevy_gym::environments::MountainCar>,
 }
 
 impl Default for MountainCar {
     fn default() -> Self {
         Self {
-            state: [-0.5, 0.0],
-            elapsed_steps: 0,
-            rng: SplitMix64::new(0),
+            inner: bevy_gym::wrappers::time_limit::TimeLimit::new(
+                bevy_gym::environments::MountainCar::default(),
+                MAX_EPISODE_STEPS,
+            )
+            .expect("positive episode cap"),
         }
     }
 }
@@ -173,15 +167,22 @@ impl Default for MountainCar {
 impl MountainCar {
     /// Construct one controlled state for transition tests.
     #[cfg(test)]
-    const fn from_state(position: f32, velocity: f32) -> Self {
+    fn from_state(position: f32, velocity: f32) -> Self {
+        let state = bevy_gym::environments::MountainCarState::try_from([
+            f64::from(position),
+            f64::from(velocity),
+        ])
+        .expect("finite test state");
         Self {
-            state: [position, velocity],
-            elapsed_steps: 0,
-            rng: SplitMix64::new(0),
+            inner: bevy_gym::wrappers::time_limit::TimeLimit::new(
+                bevy_gym::environments::MountainCar::from_state(state),
+                MAX_EPISODE_STEPS,
+            )
+            .expect("positive episode cap"),
         }
     }
 
-    /// Return Gymnasium's sinusoidal terrain height.
+    /// Return Gymnasium's sinusoidal terrain height for reward shaping.
     fn height_for_training(position: f32) -> f32 {
         (3.0 * position).sin().mul_add(0.45, 0.55)
     }
@@ -193,47 +194,25 @@ impl Env for MountainCar {
     type Info = ();
 
     fn reset(&mut self, seed: Option<u64>) -> Reset<Self::Observation, Self::Info> {
-        if let Some(seed) = seed {
-            self.rng = SplitMix64::new(seed);
-        }
-        self.state = [self.rng.f32_between(-0.6, -0.4), 0.0];
-        self.elapsed_steps = 0;
+        let result = self.inner.reset(seed);
         Reset {
-            observation: self.state.to_vec(),
-            info: (),
+            observation: result.observation.to_vec(),
+            info: result.info,
         }
     }
 
     fn step(&mut self, action: Self::Action) -> Step<Self::Observation, Self::Info> {
-        let force_direction: f32 = match action {
-            MountainCarAction::Left => -1.0,
-            MountainCarAction::Coast => 0.0,
-            MountainCarAction::Right => 1.0,
+        let action = match action {
+            MountainCarAction::Left => bevy_gym::environments::MountainCarAction::Left,
+            MountainCarAction::Coast => bevy_gym::environments::MountainCarAction::Coast,
+            MountainCarAction::Right => bevy_gym::environments::MountainCarAction::Right,
         };
-        let [position, velocity] = self.state;
-        let velocity = force_direction
-            .mul_add(FORCE, (3.0 * position).cos().mul_add(-GRAVITY, velocity))
-            .clamp(-MAX_SPEED, MAX_SPEED);
-        let next_position = (position + velocity).clamp(MIN_POSITION, MAX_POSITION);
-        let next_velocity = if next_position <= MIN_POSITION && velocity < 0.0 {
-            0.0
-        } else {
-            velocity
-        };
-        self.state = [next_position, next_velocity];
-        self.elapsed_steps += 1;
-        let status = if next_position >= GOAL_POSITION {
-            EpisodeStatus::Terminated
-        } else if self.elapsed_steps >= MAX_EPISODE_STEPS {
-            EpisodeStatus::Truncated
-        } else {
-            EpisodeStatus::Continuing
-        };
+        let result = self.inner.step(action);
         Step {
-            observation: self.state.to_vec(),
-            reward: -1.0,
-            status,
-            info: (),
+            observation: result.observation.to_vec(),
+            reward: result.reward,
+            status: result.status,
+            info: result.info,
         }
     }
 }
@@ -247,7 +226,7 @@ impl DiscreteDqnExample for MountainCar {
     const DEFAULT_EVAL_INTERVAL: usize = 10_000;
     const DEFAULT_EVAL_EPISODES: usize = 20;
     const DEFAULT_LEARNING_RATE: f64 = 0.001;
-    const DEFAULT_REWARD_SCALE: f64 = 100.0;
+    const DEFAULT_REWARD_SCALE: f64 = 25.0;
     const SOLVED_MEAN_REWARD: f64 = -110.0;
     const GIF_PATH: &'static str = "docs/images/mountain-car.gif";
 
@@ -324,35 +303,6 @@ impl DiscreteDqnExample for MountainCar {
 
 fn main() -> Result<(), Box<dyn Error>> {
     run_discrete_workflow::<MountainCar>()
-}
-
-/// Small deterministic generator used for reset sampling.
-#[derive(Debug, Clone, Copy)]
-struct SplitMix64 {
-    /// Current generator state.
-    state: u64,
-}
-
-impl SplitMix64 {
-    /// Construct a stream from one root seed.
-    const fn new(seed: u64) -> Self {
-        Self { state: seed }
-    }
-
-    /// Generate a uniform scalar in `[0, 1)`.
-    fn unit_f32(&mut self) -> f32 {
-        self.state = self.state.wrapping_add(0x9e37_79b9_7f4a_7c15);
-        let mut value = self.state;
-        value = (value ^ (value >> 30)).wrapping_mul(0xbf58_476d_1ce4_e5b9);
-        value = (value ^ (value >> 27)).wrapping_mul(0x94d0_49bb_1331_11eb);
-        value ^= value >> 31;
-        (value >> 40) as f32 / (1_u32 << 24) as f32
-    }
-
-    /// Generate one scalar in `[low, high)`.
-    fn f32_between(&mut self, low: f32, high: f32) -> f32 {
-        self.unit_f32().mul_add(high - low, low)
-    }
 }
 
 /// Render-only scene implementation.
@@ -446,7 +396,8 @@ mod render {
         } else {
             app.add_systems(Update, (advance_watch, sync_car).chain());
         }
-        println!("watching checkpoint={}", checkpoint.display());
+        let checkpoint_display = checkpoint.display();
+        println!("watching checkpoint={checkpoint_display}");
         app.run();
         Ok(())
     }

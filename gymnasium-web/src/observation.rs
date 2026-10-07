@@ -1,0 +1,101 @@
+//! Fixed-size observations avoid allocating a vector on every transition.
+use bevy_gym::EpisodeStatus;
+
+/// Original environment observations, before learner-specific normalization.
+#[derive(Debug, Clone, Copy)]
+pub(crate) enum Observation {
+    /// Cart position, velocity, pole angle, and angular velocity.
+    CartPole([f32; 4]),
+    /// Car position and displacement per step.
+    MountainCar([f32; 2]),
+}
+impl AsRef<[f32]> for Observation {
+    fn as_ref(&self) -> &[f32] {
+        match self {
+            Self::CartPole(values) => values,
+            Self::MountainCar(values) => values,
+        }
+    }
+}
+impl Observation {
+    /// Normalize `MountainCar`'s position and velocity using the native example profile.
+    pub(crate) fn encoded(self) -> Self {
+        match self {
+            Self::CartPole(_) => self,
+            Self::MountainCar([position, velocity]) => Self::MountainCar([
+                2.0 * (position - (-1.2_f32)) / (0.6_f32 - (-1.2_f32)) - 1.0,
+                velocity / 0.07,
+            ]),
+        }
+    }
+
+    /// Add discounted terrain potential only to the optimizer reward.
+    ///
+    /// Potential is dimensionless terrain height minus one; scale 25 converts
+    /// its change to reward units. Gamma 0.99 matches the `MountainCar` learner.
+    pub(crate) fn training_reward(self, next: Self, reward: f64, status: EpisodeStatus) -> f64 {
+        match (self, next) {
+            (Self::MountainCar([position, _]), Self::MountainCar([next_position, _])) => {
+                let potential = f64::from((3.0 * position).sin().mul_add(0.45, 0.55) - 1.0);
+                let next_potential = if status == EpisodeStatus::Terminated {
+                    0.0
+                } else {
+                    f64::from((3.0 * next_position).sin().mul_add(0.45, 0.55) - 1.0)
+                };
+                25.0_f64.mul_add(0.99_f64.mul_add(next_potential, -potential), reward)
+            }
+            _ => reward,
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{EpisodeStatus, Observation};
+
+    #[test]
+    fn shaping_zeros_terminal_potential_but_keeps_truncated_bootstrap() {
+        let current = Observation::MountainCar([-0.5, 0.0]);
+        let next = Observation::MountainCar([0.5, 0.01]);
+        let potential = f64::from((-1.5_f32).sin().mul_add(0.45, 0.55) - 1.0);
+        let next_potential = f64::from(1.5_f32.sin().mul_add(0.45, 0.55) - 1.0);
+        let terminal = current.training_reward(next, -1.0, EpisodeStatus::Terminated);
+        let expected = 25.0_f64.mul_add(-potential, -1.0);
+        assert!((terminal - expected).abs() < 1e-10);
+        for status in [EpisodeStatus::Continuing, EpisodeStatus::Truncated] {
+            let expected = 25.0_f64.mul_add(0.99_f64.mul_add(next_potential, -potential), -1.0);
+            assert!((current.training_reward(next, -1.0, status) - expected).abs() < 1e-10);
+        }
+        let cart = Observation::CartPole([0.0; 4]);
+        assert_eq!(
+            cart.training_reward(cart, 1.0, EpisodeStatus::Terminated)
+                .to_bits(),
+            1.0_f64.to_bits()
+        );
+    }
+
+    #[test]
+    fn normalization_maps_declared_bounds_and_preserves_cartpole() {
+        for (raw, expected) in [([-1.2, -0.07], [-1.0_f32, -1.0]), ([0.6, 0.07], [1.0, 1.0])] {
+            let encoded = Observation::MountainCar(raw).encoded();
+            assert_eq!(
+                encoded
+                    .as_ref()
+                    .iter()
+                    .map(|v| v.to_bits())
+                    .collect::<Vec<_>>(),
+                expected.map(f32::to_bits)
+            );
+        }
+        let raw = [0.1_f32, -0.2, 0.3, -0.4];
+        assert_eq!(
+            Observation::CartPole(raw)
+                .encoded()
+                .as_ref()
+                .iter()
+                .map(|value| value.to_bits())
+                .collect::<Vec<_>>(),
+            raw.map(f32::to_bits)
+        );
+    }
+}
