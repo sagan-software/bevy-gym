@@ -14,7 +14,7 @@ pub mod config;
 pub mod continuous_workflow;
 #[cfg(not(target_arch = "wasm32"))]
 pub mod discrete_workflow;
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(any(not(target_arch = "wasm32"), feature = "browser-training"))]
 pub mod dqn;
 #[cfg(not(target_arch = "wasm32"))]
 pub mod evaluation;
@@ -25,9 +25,7 @@ pub mod metrics;
 #[cfg(not(target_arch = "wasm32"))]
 pub mod ppo;
 pub mod recurrent_ppo;
-#[cfg(not(target_arch = "wasm32"))]
 pub mod rng;
-#[cfg(not(target_arch = "wasm32"))]
 pub mod split_mix64;
 #[cfg(not(target_arch = "wasm32"))]
 pub mod tabular_q;
@@ -37,7 +35,7 @@ pub mod tabular_workflow;
 pub mod tensor;
 
 pub use backend::{inference_device, InferenceBackend};
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(any(not(target_arch = "wasm32"), feature = "browser-training"))]
 pub use backend::{training_device, TrainingBackend};
 pub use checkpoint::{
     policy_recorder, CheckpointError, CheckpointOperation, CheckpointPaths, PolicyRecorder,
@@ -54,10 +52,10 @@ pub use continuous_workflow::{
 pub use discrete_workflow::{
     run_discrete_workflow, DiscreteDqnExample, DiscreteEvaluation, DqnAction,
 };
+#[cfg(any(not(target_arch = "wasm32"), feature = "browser-training"))]
+pub use dqn::{DqnActionSelection, DqnAgent, DqnConfig, DqnError, DqnPolicy, DqnUpdate};
 #[cfg(not(target_arch = "wasm32"))]
-pub use dqn::{
-    DqnActionSelection, DqnAgent, DqnConfig, DqnError, DqnPolicy, DqnReport, DqnTrainer, DqnUpdate,
-};
+pub use dqn::{DqnReport, DqnTrainer};
 #[cfg(not(target_arch = "wasm32"))]
 pub use evaluation::{
     ConfidenceInterval, EpisodeOutcome, EvaluationError, EvaluationGate, EvaluationSuite,
@@ -78,9 +76,7 @@ pub use recurrent_ppo::{
     RecurrentPpoConfig, RecurrentPpoError, RecurrentPpoPolicy, RecurrentPpoSequence,
     RecurrentPpoUpdate, RecurrentSampler,
 };
-#[cfg(not(target_arch = "wasm32"))]
 pub use rng::SeedConfig;
-#[cfg(not(target_arch = "wasm32"))]
 pub use split_mix64::SplitMix64;
 #[cfg(not(target_arch = "wasm32"))]
 pub use tabular_q::{

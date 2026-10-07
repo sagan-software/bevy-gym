@@ -10,9 +10,9 @@ use bevy_gym as _;
 use bevy_inspector_egui as _;
 use burn as _;
 use clap as _;
-#[cfg(feature = "render")]
 use serde as _;
 use serde_json as _;
+use shakmaty as _;
 use tokio as _;
 
 #[cfg(feature = "mujoco")]

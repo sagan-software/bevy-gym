@@ -31,9 +31,12 @@ jobs:
       - run: nix develop --command cargo fmt --all -- --check
       - run: nix develop --command cargo test
       - run: nix develop --command cargo test -p bevy-gym-web --locked
+      - run: nix develop --command cargo test -p bevy-gym-browser --locked
   strict:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
       - uses: cachix/install-nix-action@v31
       - run: nix develop --command cargo clippy --all-targets --all-features -- -D warnings
+      - run: nix develop --command cargo clippy -p bevy-gym-browser --all-targets -- -D warnings
+      - run: nix develop --command cargo clippy -p bevy-gym-browser --target wasm32-unknown-unknown -- -D warnings

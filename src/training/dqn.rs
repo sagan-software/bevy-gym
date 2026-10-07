@@ -2,6 +2,7 @@
 
 use std::error::Error;
 use std::fmt;
+#[cfg(not(target_arch = "wasm32"))]
 use std::marker::PhantomData;
 use std::path::{Path, PathBuf};
 
@@ -11,14 +12,18 @@ use burn::nn::{Linear, LinearConfig, Relu};
 use burn::optim::adaptor::OptimizerAdaptor;
 use burn::optim::{Adam, AdamConfig, GradientsParams, Optimizer};
 use burn::prelude::{Backend, ElementConversion};
+use burn::record::{FullPrecisionSettings, NamedMpkBytesRecorder, Recorder};
 use burn::tensor::{Int, Tensor};
 
-use crate::{Env, EpisodeStatus};
+#[cfg(not(target_arch = "wasm32"))]
+use crate::Env;
+use crate::EpisodeStatus;
 
 use super::backend::{
     inference_device, training_device, InferenceBackend, TrainingBackend, MODEL_INITIALIZATION_LOCK,
 };
 use super::checkpoint::{policy_recorder, CheckpointError, CheckpointOperation};
+#[cfg(not(target_arch = "wasm32"))]
 use super::config::{RunConfig, RunPaths};
 use super::rng::SeedConfig;
 
@@ -230,6 +235,97 @@ pub struct DqnPolicy {
 }
 
 impl DqnPolicy {
+    /// Serialize a policy record without accessing the filesystem.
+    ///
+    /// # Errors
+    /// Returns a checkpoint error if the record cannot be encoded.
+    pub fn to_bytes(&self) -> Result<Vec<u8>, DqnError> {
+        NamedMpkBytesRecorder::<FullPrecisionSettings>::default()
+            .record(self.network.clone().into_record(), ())
+            .map_err(|error| {
+                DqnError::Checkpoint(CheckpointError::new(
+                    CheckpointOperation::Save,
+                    "<memory>",
+                    error.to_string(),
+                ))
+            })
+    }
+
+    /// Load a policy from bytes with its declared architecture.
+    ///
+    /// # Errors
+    /// Returns a configuration or checkpoint error for invalid input.
+    pub fn load_bytes(
+        bytes: Vec<u8>,
+        observation_dim: usize,
+        action_dim: usize,
+        hidden_sizes: &[usize],
+    ) -> Result<Self, DqnError> {
+        validate_architecture(observation_dim, action_dim, hidden_sizes)?;
+        let device = inference_device();
+        let record: QNetworkRecord<InferenceBackend> =
+            NamedMpkBytesRecorder::<FullPrecisionSettings>::default()
+                .load(bytes, &device)
+                .map_err(|error| {
+                    DqnError::Checkpoint(CheckpointError::new(
+                        CheckpointOperation::Load,
+                        "<memory>",
+                        error.to_string(),
+                    ))
+                })?;
+        // Reject incompatible shapes before Burn can execute a mismatched matrix product.
+        if record.layers.len() != hidden_sizes.len() + 1 {
+            return Err(DqnError::invalid_config(
+                "checkpoint",
+                "layer count differs from the declared architecture",
+            ));
+        }
+        let inputs = std::iter::once(observation_dim).chain(hidden_sizes.iter().copied());
+        let outputs = hidden_sizes
+            .iter()
+            .copied()
+            .chain(std::iter::once(action_dim));
+        for (layer, (input, output)) in record.layers.iter().zip(inputs.zip(outputs)) {
+            let bias = layer.bias.as_ref().ok_or_else(|| {
+                DqnError::invalid_config("checkpoint", "every layer must contain a bias")
+            })?;
+            if layer.weight.val().dims() != [input, output] || bias.val().dims() != [output] {
+                return Err(DqnError::invalid_config(
+                    "checkpoint",
+                    "layer shape differs from the declared architecture",
+                ));
+            }
+            let weights = layer
+                .weight
+                .val()
+                .into_data()
+                .to_vec::<f32>()
+                .map_err(|error| DqnError::TensorConversion(error.to_string()))?;
+            let bias = bias
+                .val()
+                .into_data()
+                .to_vec::<f32>()
+                .map_err(|error| DqnError::TensorConversion(error.to_string()))?;
+            if !weights.iter().chain(&bias).all(|value| value.is_finite()) {
+                return Err(DqnError::invalid_config(
+                    "checkpoint",
+                    "parameters must be finite",
+                ));
+            }
+        }
+        let _guard = MODEL_INITIALIZATION_LOCK
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
+        let network =
+            QNetwork::new(observation_dim, action_dim, hidden_sizes, &device).load_record(record);
+        Ok(Self {
+            network,
+            observation_dim,
+            action_dim,
+            hidden_sizes: hidden_sizes.to_vec(),
+        })
+    }
+
     /// Return Q-values for one encoded observation.
     ///
     /// # Errors
@@ -323,6 +419,7 @@ impl DqnPolicy {
     /// # Errors
     ///
     /// Returns the same checkpoint error as [`Self::save`].
+    #[cfg(not(target_arch = "wasm32"))]
     pub fn save_best(&self, paths: &RunPaths) -> Result<PathBuf, DqnError> {
         self.save(&paths.best_checkpoint)
     }
@@ -332,6 +429,7 @@ impl DqnPolicy {
     /// # Errors
     ///
     /// Returns the same checkpoint error as [`Self::save`].
+    #[cfg(not(target_arch = "wasm32"))]
     pub fn save_latest(&self, paths: &RunPaths) -> Result<PathBuf, DqnError> {
         self.save(&paths.latest_checkpoint)
     }
@@ -382,6 +480,7 @@ impl DqnPolicy {
     /// # Errors
     ///
     /// Returns the same validation or checkpoint error as [`Self::load`].
+    #[cfg(not(target_arch = "wasm32"))]
     pub fn load_best(
         paths: &RunPaths,
         observation_dim: usize,
@@ -708,6 +807,7 @@ impl DqnAgent {
     /// # Errors
     ///
     /// Returns the same checkpoint error as [`DqnPolicy::save_best`].
+    #[cfg(not(target_arch = "wasm32"))]
     pub fn save_best(&self, paths: &RunPaths) -> Result<PathBuf, DqnError> {
         self.policy().save_best(paths)
     }
@@ -717,6 +817,7 @@ impl DqnAgent {
     /// # Errors
     ///
     /// Returns the same checkpoint error as [`DqnPolicy::save_latest`].
+    #[cfg(not(target_arch = "wasm32"))]
     pub fn save_latest(&self, paths: &RunPaths) -> Result<PathBuf, DqnError> {
         self.policy().save_latest(paths)
     }
@@ -1270,6 +1371,7 @@ fn encode_batch_training(
 }
 
 /// Run-oriented DQN trainer boundary type.
+#[cfg(not(target_arch = "wasm32"))]
 #[derive(Debug, Clone)]
 pub struct DqnTrainer<E: Env> {
     /// Shared run configuration.
@@ -1282,6 +1384,7 @@ pub struct DqnTrainer<E: Env> {
     _env: PhantomData<E>,
 }
 
+#[cfg(not(target_arch = "wasm32"))]
 impl<E: Env> DqnTrainer<E> {
     /// Create a DQN trainer boundary.
     #[must_use]
@@ -1319,6 +1422,7 @@ impl<E: Env> DqnTrainer<E> {
 }
 
 /// Summary returned by DQN training/evaluation orchestration.
+#[cfg(not(target_arch = "wasm32"))]
 #[derive(Debug, Clone, PartialEq)]
 pub struct DqnReport {
     /// Run paths used for artifacts.
@@ -1335,6 +1439,46 @@ pub struct DqnReport {
 mod tests {
     use super::*;
     use crate::training::config::{AlgorithmKind, RunId};
+
+    #[test]
+    fn byte_loader_rejects_missing_bias_wrong_bias_shape_and_nonfinite_parameters() {
+        let device = inference_device();
+        for variant in 0..3 {
+            let policy = DqnAgent::new(
+                4,
+                2,
+                DqnConfig {
+                    hidden_sizes: vec![8],
+                    ..DqnConfig::default()
+                },
+                SeedConfig::from_root(42),
+            )
+            .expect("valid learner")
+            .policy();
+            let mut record = policy.network.into_record();
+            let layer = record.layers.first_mut().expect("first layer");
+            match variant {
+                0 => layer.bias = None,
+                1 => {
+                    layer.bias = Some(burn::module::Param::from_tensor(Tensor::zeros(
+                        [9],
+                        &device,
+                    )))
+                }
+                _ => {
+                    layer.weight =
+                        burn::module::Param::from_tensor(Tensor::full([4, 8], f32::NAN, &device))
+                }
+            }
+            let bytes = NamedMpkBytesRecorder::<FullPrecisionSettings>::default()
+                .record(record, ())
+                .expect("encode invalid architecture");
+            assert!(matches!(
+                DqnPolicy::load_bytes(bytes, 4, 2, &[8]),
+                Err(DqnError::InvalidConfig { .. })
+            ));
+        }
+    }
 
     #[test]
     fn same_model_seed_initializes_the_same_policy() {

@@ -8,6 +8,7 @@
 //! cargo run --no-default-features --release --example ecosystem-forage -- train
 //! ```
 
+use shakmaty as _;
 use tokio as _;
 
 #[path = "shared/mod.rs"]

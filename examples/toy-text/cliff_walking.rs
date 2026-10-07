@@ -71,6 +71,7 @@
 //! - v1: Add slippery version of cliffwalking
 //! - v0: Initial version release
 
+use shakmaty as _;
 use tokio as _;
 
 use bevy_gym::{Env, EpisodeStatus, Reset, Step};

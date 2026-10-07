@@ -263,6 +263,29 @@
           '';
         };
 
+        gymnasiumCheck = pkgs.writeShellApplication {
+          name = "bevy-gym-browser-check";
+          runtimeInputs = [
+            rustToolchain
+            pkgs.binaryen
+            pkgs.playwright-test
+            pkgs.python3
+            pkgs.trunk
+            pkgs.wasm-bindgen-cli
+          ];
+          text = ''
+            export NO_COLOR=true
+            export PLAYWRIGHT_BROWSERS_PATH="${pkgs.playwright-driver.browsers}"
+            trunk build --config gymnasium-web/Trunk.toml --release --locked --public-url /bevy-gym/
+            serve_root=$(mktemp -d)
+            ln -s "$PWD/site" "$serve_root/bevy-gym"
+            python -m http.server 4174 --bind 127.0.0.1 --directory "$serve_root" >/dev/null 2>&1 &
+            server_pid=$!
+            trap 'kill "$server_pid"; rm -r "$serve_root"' EXIT
+            playwright test --config gymnasium-web/playwright.config.cjs
+          '';
+        };
+
         wasmCheck = pkgs.stdenvNoCC.mkDerivation {
           name = "wasm-check";
           src = self;
@@ -305,6 +328,10 @@
           web-serve-tailscale-https = {
             type = "app";
             program = lib.getExe webServeTailscaleHttps;
+          };
+          gymnasium-check = {
+            type = "app";
+            program = lib.getExe gymnasiumCheck;
           };
           web-check = {
             type = "app";

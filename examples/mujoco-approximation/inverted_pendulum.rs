@@ -91,6 +91,7 @@
 //! * v1: `max_time_steps` raised to 1000 for robot based tasks (including inverted pendulum).
 //! * v0: Initial versions release.
 
+use shakmaty as _;
 use tokio as _;
 
 use std::error::Error;

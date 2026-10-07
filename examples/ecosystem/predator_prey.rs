@@ -22,6 +22,7 @@
 //! The default render feature supplies the Inspector-egui HUD, camera controls,
 //! checkpoint playback, and checkpoint video generation.
 
+use shakmaty as _;
 use tokio as _;
 
 #[path = "shared/mod.rs"]

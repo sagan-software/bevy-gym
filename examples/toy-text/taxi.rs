@@ -140,6 +140,7 @@
 //! * v1: Remove (3,2) from locs, add passidx<4 check
 //! * v0: Initial version release
 
+use shakmaty as _;
 use tokio as _;
 
 use std::error::Error;

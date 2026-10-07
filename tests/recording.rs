@@ -11,9 +11,9 @@ use burn as _;
 use clap as _;
 #[cfg(feature = "mujoco")]
 use mujoco_rs as _;
-#[cfg(feature = "render")]
 use serde as _;
 use serde_json as _;
+use shakmaty as _;
 
 use std::error::Error;
 use std::io;

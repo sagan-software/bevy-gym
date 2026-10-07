@@ -138,6 +138,7 @@
 //!  * v1: Bug fixes to rewards (v1.3, added reward customization)
 //!  * v0: Initial version release
 
+use shakmaty as _;
 use tokio as _;
 
 use bevy_gym::{Env, EpisodeStatus, Reset, Step};

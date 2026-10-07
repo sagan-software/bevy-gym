@@ -14,6 +14,7 @@
     reason = "fixed Gymnasium vectors and rendering equations stay legible in this standalone example"
 )]
 
+use shakmaty as _;
 use tokio as _;
 
 use std::error::Error;

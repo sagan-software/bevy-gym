@@ -82,6 +82,7 @@
 //!
 //! * v0: Initial versions release
 
+use shakmaty as _;
 use tokio as _;
 
 use std::error::Error;

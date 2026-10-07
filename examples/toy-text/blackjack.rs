@@ -93,6 +93,7 @@
 //! * v1: Fix the natural handling in Blackjack
 //! * v0: Initial version release
 
+use shakmaty as _;
 use tokio as _;
 
 use std::error::Error;

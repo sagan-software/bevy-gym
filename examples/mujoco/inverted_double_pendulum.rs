@@ -21,6 +21,7 @@ use burn as _;
 use clap as _;
 use mujoco_rs as _;
 use serde_json as _;
+use shakmaty as _;
 use tokio as _;
 
 /// `MODEL_XML` used by this example.

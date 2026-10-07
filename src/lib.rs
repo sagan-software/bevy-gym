@@ -87,6 +87,8 @@ pub mod core;
 /// Portable ecosystem simulation and renderer-only projection.
 #[cfg(feature = "ecosystem-inference")]
 pub mod ecosystem;
+/// Portable Gymnasium environment implementations.
+pub mod environments;
 /// Messages emitted by the gym systems.
 pub mod events;
 /// Safe MuJoCo simulation boundary used by optional native environments.

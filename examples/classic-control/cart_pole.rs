@@ -40,27 +40,19 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::time::{SystemTime, UNIX_EPOCH};
 
+#[cfg(test)]
+use bevy_gym::environments::CartPoleState;
+use bevy_gym::environments::{CartPole, CartPoleAction as CartAction};
 use bevy_gym::recording::{CheckpointRole, CheckpointTimeline};
 use bevy_gym::training::{
     AlgorithmKind, BevyTransitionCollector, DqnAgent, DqnConfig, DqnPolicy, MetricRecord,
     MetricValue, MetricsWriter, RunConfig, RunId, RunPaths, SeedConfig,
 };
-use bevy_gym::{Env, EpisodeStatus, Reset, Step, TimeLimit};
+use bevy_gym::{Env, EpisodeStatus, TimeLimit};
 
 const OBS_SIZE: usize = 4;
 const NUM_ACTIONS: usize = 2;
 const MAX_STEPS_PER_EPISODE: usize = 500;
-
-const GRAVITY: f32 = 9.8;
-const MASS_CART: f32 = 1.0;
-const MASS_POLE: f32 = 0.1;
-const TOTAL_MASS: f32 = MASS_CART + MASS_POLE;
-const LENGTH: f32 = 0.5;
-const POLE_MASS_LENGTH: f32 = MASS_POLE * LENGTH;
-const FORCE_MAG: f32 = 10.0;
-const TAU: f32 = 0.02;
-const X_THRESHOLD: f32 = 2.4;
-const THETA_THRESHOLD_RADIANS: f32 = 12.0 * std::f32::consts::PI / 180.0;
 
 const DEFAULT_TRAIN_STEPS: usize = 100_000;
 const DEFAULT_EVAL_EPISODES: usize = 12;
@@ -110,110 +102,11 @@ impl CartPoleScene {
     }
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-enum CartAction {
-    Left,
-    Right,
-}
-
-impl CartAction {
-    const fn as_index(self) -> usize {
-        match self {
-            Self::Left => 0,
-            Self::Right => 1,
-        }
-    }
-
-    const fn from_index(index: usize) -> Self {
-        if index == 0 {
-            Self::Left
-        } else {
-            Self::Right
-        }
-    }
-}
-
-#[derive(Debug, Clone)]
-struct CartPole {
-    state: [f32; OBS_SIZE],
-    rng: SplitMix64,
-}
-
-impl Default for CartPole {
-    fn default() -> Self {
-        Self {
-            state: [0.0; OBS_SIZE],
-            rng: SplitMix64::new(0),
-        }
-    }
-}
-
 type CartPoleV1 = TimeLimit<CartPole>;
 
 fn cartpole_v1() -> CartPoleV1 {
     TimeLimit::new(CartPole::default(), MAX_STEPS_PER_EPISODE)
         .expect("CartPole-v1 has a positive time limit")
-}
-
-impl Env for CartPole {
-    type Observation = [f32; OBS_SIZE];
-    type Action = CartAction;
-    type Info = ();
-
-    fn reset(&mut self, seed: Option<u64>) -> Reset<Self::Observation> {
-        if let Some(seed) = seed {
-            self.rng = SplitMix64::new(seed);
-        }
-        self.state = [
-            self.rng.f32_between(-0.05, 0.05),
-            self.rng.f32_between(-0.05, 0.05),
-            self.rng.f32_between(-0.05, 0.05),
-            self.rng.f32_between(-0.05, 0.05),
-        ];
-
-        Reset {
-            observation: self.state,
-            info: (),
-        }
-    }
-
-    fn step(&mut self, action: Self::Action) -> Step<Self::Observation> {
-        let [x, x_dot, theta, theta_dot] = self.state;
-        let force = match action {
-            CartAction::Left => -FORCE_MAG,
-            CartAction::Right => FORCE_MAG,
-        };
-
-        let cos_theta = theta.cos();
-        let sin_theta = theta.sin();
-        let temp = (POLE_MASS_LENGTH * theta_dot.powi(2)).mul_add(sin_theta, force) / TOTAL_MASS;
-        let theta_acc = cos_theta.mul_add(-temp, GRAVITY * sin_theta)
-            / (LENGTH * (4.0 / 3.0 - MASS_POLE * cos_theta.powi(2) / TOTAL_MASS));
-        let x_acc = temp - POLE_MASS_LENGTH * theta_acc * cos_theta / TOTAL_MASS;
-
-        self.state = [
-            TAU.mul_add(x_dot, x),
-            TAU.mul_add(x_acc, x_dot),
-            TAU.mul_add(theta_dot, theta),
-            TAU.mul_add(theta_acc, theta_dot),
-        ];
-
-        let [x, _, theta, _] = self.state;
-        let status = if !(-X_THRESHOLD..=X_THRESHOLD).contains(&x)
-            || !(-THETA_THRESHOLD_RADIANS..=THETA_THRESHOLD_RADIANS).contains(&theta)
-        {
-            EpisodeStatus::Terminated
-        } else {
-            EpisodeStatus::Continuing
-        };
-
-        Step {
-            observation: self.state,
-            reward: 1.0,
-            status,
-            info: (),
-        }
-    }
 }
 
 #[derive(Debug, Clone)]
@@ -268,34 +161,6 @@ impl CartPoleDqnConfig {
             epsilon_decay_steps: self.epsilon_decay_steps as u64,
             ..DqnConfig::default()
         }
-    }
-}
-
-#[derive(Debug, Clone)]
-struct SplitMix64 {
-    state: u64,
-}
-
-impl SplitMix64 {
-    const fn new(seed: u64) -> Self {
-        Self { state: seed }
-    }
-
-    const fn next_u64(&mut self) -> u64 {
-        self.state = self.state.wrapping_add(0x9e37_79b9_7f4a_7c15);
-        let mut value = self.state;
-        value = (value ^ (value >> 30)).wrapping_mul(0xbf58_476d_1ce4_e5b9);
-        value = (value ^ (value >> 27)).wrapping_mul(0x94d0_49bb_1331_11eb);
-        value ^ (value >> 31)
-    }
-
-    fn f64(&mut self) -> f64 {
-        self.next_u64() as f64 / u64::MAX as f64
-    }
-
-    fn f32_between(&mut self, low: f32, high: f32) -> f32 {
-        let unit = self.f64() as f32;
-        unit.mul_add(high - low, low)
     }
 }
 
@@ -609,9 +474,9 @@ fn train(args: Args) -> Result<TrainReport, Box<dyn Error>> {
         let actions = requested_observations
             .iter()
             .map(|observation| {
-                agent
-                    .select_action(observation)
-                    .map(|selection| CartAction::from_index(selection.action_index))
+                agent.select_action(observation).map(|selection| {
+                    CartAction::try_from(selection.action_index).expect("two-output policy")
+                })
             })
             .collect::<Result<Vec<_>, _>>()?;
         let batch = collector.step(actions)?;
@@ -620,7 +485,7 @@ fn train(args: Args) -> Result<TrainReport, Box<dyn Error>> {
             let transition = &event.transition;
             if let Some(update) = agent.observe(
                 &transition.observation,
-                transition.action.as_index(),
+                usize::from(transition.action),
                 transition.reward,
                 &transition.next_observation,
                 transition.status,
@@ -1276,7 +1141,7 @@ fn greedy_action(policy: &DqnPolicy, observation: &[f32; OBS_SIZE]) -> CartActio
     let index = policy
         .greedy_action(observation)
         .expect("CartPole observation width matches the saved DQN policy");
-    CartAction::from_index(index)
+    CartAction::try_from(index).expect("two-output policy")
 }
 
 #[cfg(test)]
@@ -1749,7 +1614,9 @@ mod tests {
         }
 
         let mut failed = cartpole_v1();
-        failed.inner_mut().state = [X_THRESHOLD, 5.0, 0.0, 0.0];
+        *failed.inner_mut() = CartPole::from_state(
+            CartPoleState::try_from([2.4, 5.0, 0.0, 0.0]).expect("finite state"),
+        );
         assert_eq!(
             failed.step(CartAction::Right).status,
             EpisodeStatus::Terminated
@@ -1821,10 +1688,8 @@ mod tests {
         ];
 
         for (state, action, expected) in cases {
-            let mut env = CartPole {
-                state,
-                rng: SplitMix64::new(0),
-            };
+            let mut env =
+                CartPole::from_state(CartPoleState::try_from(state).expect("finite state"));
             let result = env.step(action);
             for (actual, expected) in result.observation.into_iter().zip(expected) {
                 assert!((actual - expected).abs() <= 1e-6);

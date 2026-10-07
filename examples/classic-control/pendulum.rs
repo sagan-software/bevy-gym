@@ -76,6 +76,7 @@
 //! * v1: Simplify the math equations, no difference in behavior.
 //! * v0: Initial versions release
 
+use shakmaty as _;
 use tokio as _;
 
 use std::error::Error;

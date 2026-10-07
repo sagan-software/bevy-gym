@@ -63,6 +63,7 @@
 //! Created by Oleg Klimov
 //!
 
+use shakmaty as _;
 use tokio as _;
 
 use std::error::Error;

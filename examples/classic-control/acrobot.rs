@@ -111,6 +111,7 @@
 //!   MIT Press. <https://proceedings.neurips.cc/paper/1995/file/8f1d43620bc6bb580df6e80b0dc05c48-Paper.pdf>
 //! - Sutton, R. S., Barto, A. G. (2018 ). Reinforcement Learning: An Introduction. The MIT Press.
 
+use shakmaty as _;
 use tokio as _;
 
 use std::error::Error;

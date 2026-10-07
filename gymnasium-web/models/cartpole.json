@@ -1,0 +1,168 @@
+{
+  "environment": "CartPole-v1",
+  "algorithm": "DQN",
+  "record": "cartpole.mpk",
+  "sha256": "7db86d435546a745c631884f8693c5e12bcaf95f78e07dc3ccdc8ad72d6be4e5",
+  "observation_dim": 4,
+  "action_dim": 2,
+  "hidden_sizes": [
+    64,
+    64
+  ],
+  "selected_training_seed": 42,
+  "selected_transitions": 60000,
+  "validation_seeds": {
+    "start": 10000,
+    "end_exclusive": 10020
+  },
+  "test_seeds": {
+    "start": 100000,
+    "end_exclusive": 100200
+  },
+  "gates": {
+    "mean_return": 475,
+    "full_length_fraction": 0.9,
+    "learning_improvement": 400,
+    "transition_budget_per_seed": 200000
+  },
+  "qualification": [
+    {
+      "best_validation_mean": 500.0,
+      "history": [
+        {
+          "full_length": 0,
+          "transitions": 10000,
+          "validation_mean": 140.2
+        },
+        {
+          "full_length": 0,
+          "transitions": 20000,
+          "validation_mean": 156.2
+        },
+        {
+          "full_length": 0,
+          "transitions": 30000,
+          "validation_mean": 100.15
+        },
+        {
+          "full_length": 0,
+          "transitions": 40000,
+          "validation_mean": 105.5
+        },
+        {
+          "full_length": 2,
+          "transitions": 50000,
+          "validation_mean": 299.0
+        },
+        {
+          "full_length": 20,
+          "transitions": 60000,
+          "validation_mean": 500.0
+        }
+      ],
+      "initial_validation_mean": 9.45,
+      "seed": 42,
+      "test_episodes": 200,
+      "test_full_length": 200,
+      "test_mean": 500.0,
+      "transitions": 60000
+    },
+    {
+      "best_validation_mean": 500.0,
+      "history": [
+        {
+          "full_length": 0,
+          "transitions": 10000,
+          "validation_mean": 191.6
+        },
+        {
+          "full_length": 0,
+          "transitions": 20000,
+          "validation_mean": 154.2
+        },
+        {
+          "full_length": 0,
+          "transitions": 30000,
+          "validation_mean": 148.4
+        },
+        {
+          "full_length": 0,
+          "transitions": 40000,
+          "validation_mean": 213.6
+        },
+        {
+          "full_length": 0,
+          "transitions": 50000,
+          "validation_mean": 160.85
+        },
+        {
+          "full_length": 0,
+          "transitions": 60000,
+          "validation_mean": 81.0
+        },
+        {
+          "full_length": 0,
+          "transitions": 70000,
+          "validation_mean": 103.55
+        },
+        {
+          "full_length": 0,
+          "transitions": 80000,
+          "validation_mean": 177.65
+        },
+        {
+          "full_length": 20,
+          "transitions": 90000,
+          "validation_mean": 500.0
+        }
+      ],
+      "initial_validation_mean": 9.45,
+      "seed": 43,
+      "test_episodes": 200,
+      "test_full_length": 199,
+      "test_mean": 497.59,
+      "transitions": 90000
+    },
+    {
+      "best_validation_mean": 500.0,
+      "history": [
+        {
+          "full_length": 0,
+          "transitions": 10000,
+          "validation_mean": 181.6
+        },
+        {
+          "full_length": 0,
+          "transitions": 20000,
+          "validation_mean": 198.95
+        },
+        {
+          "full_length": 0,
+          "transitions": 30000,
+          "validation_mean": 142.45
+        },
+        {
+          "full_length": 0,
+          "transitions": 40000,
+          "validation_mean": 150.6
+        },
+        {
+          "full_length": 8,
+          "transitions": 50000,
+          "validation_mean": 291.4
+        },
+        {
+          "full_length": 20,
+          "transitions": 60000,
+          "validation_mean": 500.0
+        }
+      ],
+      "initial_validation_mean": 9.35,
+      "seed": 44,
+      "test_episodes": 200,
+      "test_full_length": 200,
+      "test_mean": 500.0,
+      "transitions": 60000
+    }
+  ]
+}

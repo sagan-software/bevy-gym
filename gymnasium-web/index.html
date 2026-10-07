@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Train and run Gymnasium agents in your browser with Bevy Gym.">
+  <title>Bevy Gym · Gymnasium</title>
+  <base data-trunk-public-url>
+  <link data-trunk rel="rust" href="Cargo.toml" data-bin="gymnasium-worker" data-type="worker" data-loader-shim data-bindgen-target="web">
+  <link data-trunk rel="css" href="styles.css">
+  <link data-trunk rel="copy-file" href="app.js">
+  <link data-trunk rel="copy-dir" href="models">
+</head>
+<body>
+  <header><a class="brand" href="./">Bevy Gym</a><span>Gymnasium</span><a href="ecosystem/">Ecosystem demos</a><a href="https://github.com/sagan-software/bevy-gym">Source</a></header>
+  <main>
+    <div class="heading"><h1>CartPole-v1</h1><span id="mode">Inference</span></div>
+    <div class="workspace">
+      <section class="simulation" aria-label="Simulation">
+        <canvas id="scene" width="900" height="480" aria-label="CartPole simulation: a cart balances an upright pole"></canvas>
+        <div class="transport">
+          <button id="pause" disabled>Pause</button><button id="step" disabled>Step</button><button id="restart" disabled>Restart</button>
+          <label>Speed <select id="speed"><option value="1">1×</option><option value="2">2×</option><option value="4">4×</option><option value="8">8×</option><option value="16">16×</option></select></label>
+          <span id="achieved">0.0× actual</span>
+        </div>
+        <p id="status" role="status">Loading bundled model</p>
+        <p id="error" role="alert" hidden></p>
+      </section>
+      <aside aria-label="Session controls">
+        <h2>Session</h2>
+        <label class="seed">Seed <input id="seed" type="number" min="0" max="4294967295" step="1" value="42" required></label>
+        <button id="train" class="primary">Train from scratch</button>
+        <button id="bundled">Run bundled model</button>
+        <p id="model-evidence">Loading model qualification report</p>
+        <dl>
+          <div><dt>Transitions</dt><dd id="transitions">0</dd></div>
+          <div><dt>Episodes</dt><dd id="episodes">0</dd></div>
+          <div><dt>Current return</dt><dd id="return">0</dd></div>
+          <div><dt>Optimizer updates</dt><dd id="updates">0</dd></div>
+          <div><dt>Learning rate</dt><dd id="rate">None</dd></div>
+          <div><dt>Exploration ε</dt><dd id="epsilon">None</dd></div>
+          <div><dt>TD loss</dt><dd id="loss">None</dd></div>
+        </dl>
+        <div class="model-actions"><button id="export" disabled>Download policy</button><label class="upload">Load policy<input id="import" type="file" accept=".mpk"></label></div>
+        <p class="note">Policy files run inference. They do not resume optimizer or replay state.</p>
+      </aside>
+    </div>
+    <section class="charts" aria-label="Learning curves">
+      <figure><figcaption>Episode return <span>Target mean ≥475</span></figcaption><canvas id="returns-chart" width="700" height="220" aria-label="Episode return by environment transition"></canvas><p id="return-summary">No completed episodes</p></figure>
+      <figure><figcaption>Optimizer learning rate</figcaption><canvas id="rate-chart" width="700" height="220" aria-label="Learning rate by environment transition"></canvas><p id="rate-summary">Inference performs no optimizer updates.</p></figure>
+    </section>
+  </main>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

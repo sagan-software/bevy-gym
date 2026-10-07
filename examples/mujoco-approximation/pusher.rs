@@ -139,6 +139,7 @@
 //! * v1: `max_time_steps` raised to 1000 for robot based tasks (not including pusher, which has a `max_time_steps` of 100). Added `reward_threshold` to environments.
 //! * v0: Initial versions release.
 
+use shakmaty as _;
 use tokio as _;
 
 use std::error::Error;

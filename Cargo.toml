@@ -9,7 +9,7 @@ keywords = ["bevy", "gym", "ecs", "simulation", "rl"]
 categories = ["game-engines", "science"]
 
 [workspace]
-members = ["web"]
+members = ["web", "gymnasium-web"]
 default-members = ["."]
 resolver = "2"
 
@@ -18,6 +18,8 @@ workspace = true
 
 [features]
 default = ["render"]
+# Enables CPU autodiff in browser workers without native run-file orchestration.
+browser-training = ["burn/autodiff"]
 # Portable ecosystem simulation and read-only visual projection used by WASM inference.
 ecosystem-inference = ["dep:avian2d"]
 # Local iteration only. Bevy dynamic linking is the largest rebuild-time win,
