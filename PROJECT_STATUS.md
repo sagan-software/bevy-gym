@@ -191,6 +191,7 @@ environments have not passed browser acceptance. Box2D and MuJoCo browser
 engine compatibility still needs proof before their faithful ports proceed.
 
 Sustained resource use and the provisional latency budgets remain unmeasured.
-The expanded three-engine browser suite and offline qualification are pending
-verification. Fixture integrity alone does not prove environment conformance;
+Chromium, Firefox, and WebKit passed the browser controls and real optimizer
+checks. Chromium also passed full offline learning qualification.
+Fixture integrity alone does not prove environment conformance;
 Blackjack hidden-hand and Taxi fickle-state enumeration remain unfinished.

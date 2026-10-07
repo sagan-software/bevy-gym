@@ -54,6 +54,10 @@ Other Gymnasium environments remain in the
 The deployment also runs `nix run .#gymnasium-check`. This launches the built
 site under `/bevy-gym/`, exercises its controls and policy round trip, and trains
 a fresh model in a real browser worker before checking held-out scores.
+Chromium performs full qualification with the network disconnected after worker
+initialization. Firefox and WebKit check training updates, inference, controls,
+and rejection of stale loading results. All seven checks passed on this host;
+the two full qualification cases for Firefox and WebKit are explicitly skipped.
 
 Native coverage records 100% of the CartPole dynamics, action validation, state
 validation, batch-budget, and error-display lines. Session coverage is 81 of 88

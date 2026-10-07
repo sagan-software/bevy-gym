@@ -14,7 +14,7 @@ use std::time::Duration;
 ///
 /// Call `reset` after termination. Diagnostic state injection accepts finite
 /// coordinates; extreme injected velocities can overflow as in the Python model.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct CartPole {
     /// Position in metres, velocity in m/s, angle in radians, angular speed in rad/s.
     state: [f64; 4],
