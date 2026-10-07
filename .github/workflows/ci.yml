@@ -26,6 +26,12 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: cachix/install-nix-action@v31
+      - uses: Swatinem/rust-cache@v2.9.2
+        with:
+          cmd-format: "nix develop --command {0}"
+          key: ${{ hashFiles('flake.lock') }}
+          cache-bin: false
+          cache-on-failure: true
       - run: python3 tests/fixtures/gymnasium/test_contracts.py
       - run: nix develop --command python3 tests/test_gymnasium_dependencies.py
       - run: nix develop --command cargo fmt --all -- --check
@@ -37,6 +43,12 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: cachix/install-nix-action@v31
+      - uses: Swatinem/rust-cache@v2.9.2
+        with:
+          cmd-format: "nix develop --command {0}"
+          key: ${{ hashFiles('flake.lock') }}
+          cache-bin: false
+          cache-on-failure: true
       - run: nix develop --command cargo clippy --all-targets --all-features -- -D warnings
       - run: nix develop --command cargo clippy -p bevy-gym-browser --all-targets -- -D warnings
       - run: nix develop --command cargo clippy -p bevy-gym-browser --target wasm32-unknown-unknown -- -D warnings

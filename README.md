@@ -126,7 +126,7 @@ The bundled CartPole policy scored 500 across 200 held-out episodes. A separate
 browser training run reached the same score after 70,000 transitions.
 See [setup and qualification evidence](gymnasium-web/README.md) and
 [the remaining environment plan](GYMNASIUM_BROWSER_PLAN.md).
-MountainCar's bundled policy scored −104.08 with 200/200 goals.
+MountainCar's bundled browser-trained policy scored −102.41 with 200/200 goals.
 Other Gymnasium environments are not yet implemented in the browser.
 Gymnasium builds do not enable Avian by default.
 

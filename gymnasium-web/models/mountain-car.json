@@ -9,8 +9,8 @@
       64
     ]
   },
-  "selected_training_seed": 43,
-  "sha256": "64374e77338a4237b5545051660832cb416a2e09fbdc6aa4b412a8c739458bea",
+  "selected_training_seed": 42,
+  "sha256": "4d138e93b5e6bbfa02ce945d135962ee229b76e9d50d37af8f87f39826d8ce38",
   "learning_rate": 0.001,
   "reward_potential_scale": 25,
   "normalization": "position mapped from [-1.2, 0.6] to [-1, 1]; velocity divided by 0.07",
@@ -19,8 +19,8 @@
     10100
   ],
   "test_seeds": [
-    200000,
-    200200
+    300000,
+    300200
   ],
   "gates": {
     "test_mean_minimum": -110,
@@ -202,7 +202,8 @@
       "validation_seeds": [
         10000,
         10100
-      ]
+      ],
+      "run_id": "native-seed-42"
     },
     {
       "best_validation_mean": -101.25,
@@ -368,7 +369,8 @@
       "validation_seeds": [
         10000,
         10100
-      ]
+      ],
+      "run_id": "native-seed-43"
     },
     {
       "best_validation_mean": -103.08,
@@ -479,7 +481,227 @@
       "validation_seeds": [
         10000,
         10100
+      ],
+      "run_id": "native-seed-44"
+    },
+    {
+      "run_id": "browser-seed-42",
+      "runtime": "Chromium WebAssembly, offline",
+      "seed": 42,
+      "transitions": 390000,
+      "initial_validation_mean": -200,
+      "best_validation_mean": -100.83,
+      "validation_seeds": [
+        10000,
+        10100
+      ],
+      "test_seeds": [
+        300000,
+        300200
+      ],
+      "test_mean": -102.41,
+      "test_successes": 200,
+      "test_episodes": 200,
+      "learning_rate": 0.001,
+      "reward_potential_scale": 25,
+      "history": [
+        {
+          "transitions": 10000,
+          "mean": -200,
+          "successes": 0
+        },
+        {
+          "transitions": 20000,
+          "mean": -145.59,
+          "successes": 98
+        },
+        {
+          "transitions": 30000,
+          "mean": -143.89,
+          "successes": 100
+        },
+        {
+          "transitions": 40000,
+          "mean": -191.22,
+          "successes": 29
+        },
+        {
+          "transitions": 50000,
+          "mean": -177.33,
+          "successes": 41
+        },
+        {
+          "transitions": 60000,
+          "mean": -176.46,
+          "successes": 87
+        },
+        {
+          "transitions": 70000,
+          "mean": -119.36,
+          "successes": 97
+        },
+        {
+          "transitions": 80000,
+          "mean": -166.95,
+          "successes": 75
+        },
+        {
+          "transitions": 90000,
+          "mean": -158.41,
+          "successes": 78
+        },
+        {
+          "transitions": 100000,
+          "mean": -200,
+          "successes": 0
+        },
+        {
+          "transitions": 110000,
+          "mean": -200,
+          "successes": 0
+        },
+        {
+          "transitions": 120000,
+          "mean": -193.15,
+          "successes": 13
+        },
+        {
+          "transitions": 130000,
+          "mean": -200,
+          "successes": 0
+        },
+        {
+          "transitions": 140000,
+          "mean": -200,
+          "successes": 0
+        },
+        {
+          "transitions": 150000,
+          "mean": -200,
+          "successes": 0
+        },
+        {
+          "transitions": 160000,
+          "mean": -191.51,
+          "successes": 12
+        },
+        {
+          "transitions": 170000,
+          "mean": -131.17,
+          "successes": 86
+        },
+        {
+          "transitions": 180000,
+          "mean": -200,
+          "successes": 0
+        },
+        {
+          "transitions": 190000,
+          "mean": -200,
+          "successes": 0
+        },
+        {
+          "transitions": 200000,
+          "mean": -164.95,
+          "successes": 34
+        },
+        {
+          "transitions": 210000,
+          "mean": -200,
+          "successes": 0
+        },
+        {
+          "transitions": 220000,
+          "mean": -200,
+          "successes": 0
+        },
+        {
+          "transitions": 230000,
+          "mean": -198.96,
+          "successes": 4
+        },
+        {
+          "transitions": 240000,
+          "mean": -200,
+          "successes": 0
+        },
+        {
+          "transitions": 250000,
+          "mean": -144.13,
+          "successes": 55
+        },
+        {
+          "transitions": 260000,
+          "mean": -105.35,
+          "successes": 100
+        },
+        {
+          "transitions": 270000,
+          "mean": -126.96,
+          "successes": 88
+        },
+        {
+          "transitions": 280000,
+          "mean": -187.53,
+          "successes": 14
+        },
+        {
+          "transitions": 290000,
+          "mean": -107.72,
+          "successes": 100
+        },
+        {
+          "transitions": 300000,
+          "mean": -134.25,
+          "successes": 72
+        },
+        {
+          "transitions": 310000,
+          "mean": -152.24,
+          "successes": 64
+        },
+        {
+          "transitions": 320000,
+          "mean": -172.57,
+          "successes": 24
+        },
+        {
+          "transitions": 330000,
+          "mean": -199.08,
+          "successes": 1
+        },
+        {
+          "transitions": 340000,
+          "mean": -134.76,
+          "successes": 100
+        },
+        {
+          "transitions": 350000,
+          "mean": -137.53,
+          "successes": 98
+        },
+        {
+          "transitions": 360000,
+          "mean": -113.23,
+          "successes": 94
+        },
+        {
+          "transitions": 370000,
+          "mean": -113.54,
+          "successes": 100
+        },
+        {
+          "transitions": 380000,
+          "mean": -112.33,
+          "successes": 96
+        },
+        {
+          "transitions": 390000,
+          "mean": -100.83,
+          "successes": 100
+        }
       ]
     }
-  ]
+  ],
+  "selected_run": "browser-seed-42"
 }

@@ -1,9 +1,41 @@
 const { expect, test } = require("@playwright/test");
+const { mkdir, writeFile } = require("node:fs/promises");
 
 async function paused(page) {
   await page.getByRole("button", { name: "Pause", exact: true }).click();
   await expect(page.locator("#status")).toHaveText("Paused");
 }
+
+test("pause survives snapshots between pointer down and up", async ({ page }) => {
+  await page.goto("./");
+  await expect(page.locator("#status")).toHaveText("Running frozen policy");
+  await page.locator("#speed").selectOption("16");
+  const button = page.getByRole("button", { name: "Pause", exact: true });
+  await button.hover();
+  await page.mouse.down();
+  const before = await page.locator("#transitions").innerText();
+  await expect(page.locator("#transitions")).not.toHaveText(before);
+  await page.mouse.up();
+  await expect(page.locator("#status")).toHaveText("Paused");
+});
+
+test("every speed advances inference without optimizer updates", async ({ page }) => {
+  await page.goto("./");
+  await expect(page.locator("#status")).toHaveText("Running frozen policy");
+  for (const speed of ["1", "2", "4", "8", "16"]) {
+    await page.locator("#speed").selectOption(speed);
+    const before = await page.locator("#transitions").innerText();
+    await expect(page.locator("#transitions")).not.toHaveText(before);
+    await expect(page.locator("#updates")).toHaveText("0");
+  }
+  await paused(page);
+  const before = await page.locator("#transitions").innerText();
+  for (const speed of ["1", "2", "4", "8", "16"]) {
+    await page.locator("#speed").selectOption(speed);
+    await expect(page.locator("#status")).toHaveText("Paused");
+    await expect(page.locator("#transitions")).toHaveText(before);
+  }
+});
 
 // Exercise the shipped UI and actual Rust worker, including the repository URL prefix.
 test("training, frozen inference, pause, step, speed, and policy round trip", async ({ page }) => {
@@ -137,15 +169,24 @@ for (const qualification of [
         history.push({ transitions: checkpoint * 10000, ...validation });
         if (validation.mean >= qualification.selection && validation.full / validation.count >= qualification.minimumSuccesses / 200) { selected = candidate.bytes; break; }
       }
-      return { baseline, history, test: selected ? await evaluate(selected, qualification.testStart, 200) : null };
+      return { baseline, history, test: selected ? await evaluate(selected, qualification.testStart, 200) : null, policy: selected };
     } finally { trainer.worker.terminate(); evaluator.worker.terminate(); }
   }, qualification);
   await expect.poll(() => page.evaluate(() => Boolean(window.offlineQualificationReady))).toBe(true);
   await page.context().setOffline(true);
   await page.evaluate(() => window.startOfflineQualification());
   const result = await evaluation.finally(() => page.context().setOffline(false));
-  await testInfo.attach("browser-learning.json", { body: JSON.stringify(result, null, 2), contentType: "application/json" });
-  console.log(JSON.stringify(result));
+  const { policy, ...metrics } = result;
+  await mkdir(testInfo.outputPath(), { recursive: true });
+  const reportPath = testInfo.outputPath(`${qualification.task}-learning.json`);
+  await writeFile(reportPath, JSON.stringify(metrics, null, 2));
+  await testInfo.attach(`${qualification.task}-learning.json`, { path: reportPath, contentType: "application/json" });
+  if (policy) {
+    const policyPath = testInfo.outputPath(`${qualification.task}-policy.mpk`);
+    await writeFile(policyPath, Buffer.from(policy));
+    await testInfo.attach(`${qualification.task}-policy.mpk`, { path: policyPath, contentType: "application/octet-stream" });
+  }
+  console.log(JSON.stringify(metrics));
   expect(result.test).not.toBeNull();
   expect(result.test.mean).toBeGreaterThanOrEqual(qualification.target);
   expect(result.test.full).toBeGreaterThanOrEqual(qualification.minimumSuccesses);

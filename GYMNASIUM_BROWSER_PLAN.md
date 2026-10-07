@@ -350,10 +350,11 @@ passed the functional browser checks. Desktop and mobile views were inspected.
 
 MountainCar has shared float64 dynamics, boundary tests, browser task selection,
 and a bundled qualified model. Native training seeds 42, 43, and 44 all passed
-within 310,000 transitions. Its expanded offline browser qualification and
-final deployed visual review remain pending. Other environments are not yet
-browser-qualified, and the Box2D/MuJoCo engine replacements remain planned.
+within 310,000 transitions. Chromium trained offline for 390,000 transitions
+and scored -102.41 with 200/200 goals. The deployed visual review remains
+pending. Other environments are not yet browser-qualified.
+The Box2D/MuJoCo engine replacements remain planned.
 
 The broader controls and performance checks above remain acceptance work,
-including hidden-tab behavior, explicit worker crashes, every speed setting,
+including hidden-tab behavior, explicit worker crashes, speed-independent replay,
 200% zoom, latency budgets, and 30-minute resource stability.

@@ -4,7 +4,8 @@ Assessment date: 2026-10-07.
 
 Finish one Gymnasium environment at a time, including browser playback and
 browser training and measured policy quality, before expanding the catalog.
-CartPole is deployed; MountainCar is undergoing final browser qualification.
+CartPole is deployed. MountainCar passed offline browser qualification; its
+deployment and visual review remain pending.
 Keep ecosystem and PettingZoo expansion behind the Gymnasium milestones.
 
 ## Gymnasium port policy

@@ -21,7 +21,9 @@ function setPhase(next) {
   $("step").disabled = unavailable || phase === "advancing" || phase === "pausing";
   $("export").disabled = unavailable;
   $("restart").disabled = phase === "loading";
-  $("pause").textContent = phase === "paused" || phase === "pausing" ? "Resume" : "Pause";
+  const label = phase === "paused" || phase === "pausing" ? "Resume" : "Pause";
+  // WebKit can cancel a held click when its text node is replaced by a snapshot.
+  if ($("pause").textContent !== label) $("pause").textContent = label;
 }
 function fail(message) {
   if (worker) worker.onmessage = null;
@@ -211,7 +213,8 @@ try {
   const digest = new Uint8Array(await crypto.subtle.digest("SHA-256", bytes));
   const hash = Array.from(digest, value => value.toString(16).padStart(2, "0")).join("");
   if (hash !== metadata.sha256) throw new Error("Bundled policy does not match its qualification report.");
-  const report = metadata.qualification.find(run => run.seed === metadata.selected_training_seed);
+  const report = metadata.qualification.find(run => metadata.selected_run
+    ? run.run_id === metadata.selected_run : run.seed === metadata.selected_training_seed);
   if (!Number.isFinite(report?.test_mean)) throw new Error("Bundled policy has no qualification score.");
   bundledBytes = bytes;
   $("model-evidence").textContent = `Bundled model · mean ${report.test_mean} over ${report.test_episodes} held-out episodes.`;

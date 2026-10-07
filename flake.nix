@@ -282,7 +282,7 @@
             python -m http.server 4174 --bind 127.0.0.1 --directory "$serve_root" >/dev/null 2>&1 &
             server_pid=$!
             trap 'kill "$server_pid"; rm -r "$serve_root"' EXIT
-            playwright test --config gymnasium-web/playwright.config.cjs
+            playwright test --config gymnasium-web/playwright.config.cjs "$@"
           '';
         };
 

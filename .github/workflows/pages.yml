@@ -33,11 +33,19 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: cachix/install-nix-action@v31
+      - uses: Swatinem/rust-cache@v2.9.2
+        with:
+          cmd-format: "nix develop --command {0}"
+          key: ${{ hashFiles('flake.lock') }}
+          cache-bin: false
+          cache-on-failure: true
       - run: nix develop --command cargo test -p bevy-gym-web --locked
       - run: nix develop --command cargo test -p bevy-gym-browser --locked
       - run: nix run .#web-check
       - run: nix develop --command trunk build --config web/Trunk.toml --release --locked --public-url /bevy-gym/ecosystem/
       - run: nix run .#gymnasium-check
+        env:
+          DEBUG: pw:browser
       - uses: actions/upload-artifact@v7
         if: always()
         with:

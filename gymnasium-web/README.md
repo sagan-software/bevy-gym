@@ -14,6 +14,7 @@ At 1×, CartPole advances 50 transitions per second with its original 20 ms
 physical timestep. MountainCar advances 30 transitions per second, matching
 Gymnasium playback. Speed changes pacing, with one optimizer opportunity per
 transition. Hardware limits can reduce achieved speed.
+
 Pause takes effect after the current worker batch, at most 64 transitions.
 Downloaded policies contain inference parameters, not resumable training state.
 
@@ -46,8 +47,11 @@ example uses the same scale. The three qualification runs reached their selected
 checkpoints after 310,000, 290,000, and 180,000 transitions for seeds 42, 43, and 44.
 
 Their held-out means were -104.015, -104.08, and -104.005, with 200/200 goals each.
-The bundled seed-43 model had the best validation mean, -101.25.
-[Model provenance](models/mountain-car.json) records all three runs and the hash.
+The bundled model comes from offline Chromium training with seed 42. Its
+validation mean was -100.83 after 390,000 transitions, exceeding the native
+models. It scored -102.41 with 200/200 goals on separate held-out seeds.
+[Model provenance](models/mountain-car.json) records all four runs and the hash.
+
 The gate requires mean at least -110, at least 190/200 goals, and improvement
 of at least 80 from initialization, within one million transitions per seed.
 Validation uses 100 seeds; the 200 held-out seeds are disjoint.
@@ -82,8 +86,12 @@ a fresh model in a real browser worker before checking held-out scores.
 Chromium performs full qualification with the network disconnected after worker
 initialization. Firefox and WebKit check training updates, inference, controls,
 and rejection of stale loading results. Full qualification cases for Firefox
-and WebKit are explicitly skipped. CartPole passed all seven original browser
-checks; the expanded MountainCar matrix must pass before Pages deployment.
+and WebKit are explicitly skipped.
+
+Both environments passed the 17 browser checks, including all speed settings
+and the WebKit pause regression. MountainCar passed offline training, scoring -102.41 across
+200 held-out episodes after 390,000 transitions. Qualification jobs retain
+both metric reports and the selected policy record as downloadable artifacts.
 
 Native coverage records all dynamics, action-validation, and state-validation
 lines for both environments. Session coverage is 95 of 96 lines. Unhit session
