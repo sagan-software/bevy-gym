@@ -1,5 +1,13 @@
 //! Portable ports of the pinned Gymnasium environment contracts.
 
+mod acrobot;
+mod acrobot_action;
+mod acrobot_state;
+
+pub use acrobot::Acrobot;
+pub use acrobot_action::{AcrobotAction, InvalidAcrobotAction};
+pub use acrobot_state::{AcrobotState, InvalidAcrobotState};
+
 mod cart_pole;
 mod cart_pole_action;
 mod cart_pole_state;
