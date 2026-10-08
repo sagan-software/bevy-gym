@@ -1,0 +1,261 @@
+{
+  "retrieved": "2026-10-08",
+  "unity_revision": "7a03145ae48ad354821bd89e0243d99332149ace",
+  "godot_revision": "d65963648439167f4902043376321c15d3df0e3a",
+  "media": [
+    {
+      "family": "unity",
+      "name": "Basic",
+      "url": "https://raw.githubusercontent.com/Unity-Technologies/ml-agents/7a03145ae48ad354821bd89e0243d99332149ace/docs/images/basic.png",
+      "bytes": 103930,
+      "sha256": "19c1e2f4cc2fb0d68fa82847a342b7e925276ead20945a994630b5ab566b7e92"
+    },
+    {
+      "family": "unity",
+      "name": "3D Balance Ball",
+      "url": "https://raw.githubusercontent.com/Unity-Technologies/ml-agents/7a03145ae48ad354821bd89e0243d99332149ace/docs/images/balance.png",
+      "bytes": 320771,
+      "sha256": "ea06e60d2b40f8daacd777d8042ceecab9bc0c84ea316368cd94ec8b882044d6"
+    },
+    {
+      "family": "unity",
+      "name": "GridWorld",
+      "url": "https://raw.githubusercontent.com/Unity-Technologies/ml-agents/7a03145ae48ad354821bd89e0243d99332149ace/docs/images/gridworld.png",
+      "bytes": 72689,
+      "sha256": "2ad812a632eb70f05a3118cabf626bbfbf4192e3814030a81bdf04462d21fa7d"
+    },
+    {
+      "family": "unity",
+      "name": "Push",
+      "url": "https://raw.githubusercontent.com/Unity-Technologies/ml-agents/7a03145ae48ad354821bd89e0243d99332149ace/docs/images/push.png",
+      "bytes": 193539,
+      "sha256": "27978f0b1b01a5e5f3f423bddcee0137a4517a93279faf96db4ebe5cca9279c2"
+    },
+    {
+      "family": "unity",
+      "name": "Wall",
+      "url": "https://raw.githubusercontent.com/Unity-Technologies/ml-agents/7a03145ae48ad354821bd89e0243d99332149ace/docs/images/wall.png",
+      "bytes": 141905,
+      "sha256": "477260d48eb58bcbc40fc42c44b9e548ee1614f6f15b222591a10640526782c3"
+    },
+    {
+      "family": "unity",
+      "name": "Crawler",
+      "url": "https://raw.githubusercontent.com/Unity-Technologies/ml-agents/7a03145ae48ad354821bd89e0243d99332149ace/docs/images/crawler.png",
+      "bytes": 302116,
+      "sha256": "9d51a72d88c28fd443edc5cb55683eb190a8e77e6c2a26914f2cbd3707d16f42"
+    },
+    {
+      "family": "unity",
+      "name": "Worm",
+      "url": "https://raw.githubusercontent.com/Unity-Technologies/ml-agents/7a03145ae48ad354821bd89e0243d99332149ace/docs/images/worm.png",
+      "bytes": 166392,
+      "sha256": "376c13e26c33c6f18712330cad14f0a09d1dfd287f5d173f876e6182769ea158"
+    },
+    {
+      "family": "unity",
+      "name": "Collector",
+      "url": "https://raw.githubusercontent.com/Unity-Technologies/ml-agents/7a03145ae48ad354821bd89e0243d99332149ace/docs/images/foodCollector.png",
+      "bytes": 289128,
+      "sha256": "bcb78adc8b6be603fef120b4799dc0006ee4b2aa69b47380d9ba094d89dc3dc2"
+    },
+    {
+      "family": "unity",
+      "name": "Hallway",
+      "url": "https://raw.githubusercontent.com/Unity-Technologies/ml-agents/7a03145ae48ad354821bd89e0243d99332149ace/docs/images/hallway.png",
+      "bytes": 273156,
+      "sha256": "307eab7757d841e9342d517f8713de4e3372cac0255a610134d9a4735b470708"
+    },
+    {
+      "family": "unity",
+      "name": "SoccerTwos",
+      "url": "https://raw.githubusercontent.com/Unity-Technologies/ml-agents/7a03145ae48ad354821bd89e0243d99332149ace/docs/images/soccer.png",
+      "bytes": 411494,
+      "sha256": "53112484cf80d1f63c1dcc515b32044d5e64f113e65717de591cb69840f5dd5b"
+    },
+    {
+      "family": "unity",
+      "name": "StrikersVsGoalie",
+      "url": "https://raw.githubusercontent.com/Unity-Technologies/ml-agents/7a03145ae48ad354821bd89e0243d99332149ace/docs/images/strikersvsgoalie.png",
+      "bytes": 348058,
+      "sha256": "b92005f065467972de20b848982e60a11aec4a708f5d14cbbab8120a5e85519a"
+    },
+    {
+      "family": "unity",
+      "name": "Walker",
+      "url": "https://raw.githubusercontent.com/Unity-Technologies/ml-agents/7a03145ae48ad354821bd89e0243d99332149ace/docs/images/walker.png",
+      "bytes": 243385,
+      "sha256": "a61e4c4bb27708dae3d70084bcf689f63f54f1dc387db135e09599fc58d4d6bd"
+    },
+    {
+      "family": "unity",
+      "name": "Pyramids",
+      "url": "https://raw.githubusercontent.com/Unity-Technologies/ml-agents/7a03145ae48ad354821bd89e0243d99332149ace/docs/images/pyramids.png",
+      "bytes": 655801,
+      "sha256": "8ac6f97efc98ceb1faddc34ab9ba24a17d18de017134ca08e64645bf0a74755c"
+    },
+    {
+      "family": "unity",
+      "name": "Match 3",
+      "url": "https://raw.githubusercontent.com/Unity-Technologies/ml-agents/7a03145ae48ad354821bd89e0243d99332149ace/docs/images/match3.png",
+      "bytes": 476180,
+      "sha256": "3b35bef3b1dc0eb58e7bd3c5294d1e4d058684bec4f66f2559939f7779a0b9fb"
+    },
+    {
+      "family": "unity",
+      "name": "Sorter",
+      "url": "https://raw.githubusercontent.com/Unity-Technologies/ml-agents/7a03145ae48ad354821bd89e0243d99332149ace/docs/images/sorter.png",
+      "bytes": 914032,
+      "sha256": "a729695e73d5d7c205052bd1ae117b82001c0bd7a0b389bb506c0856e2d2d68c"
+    },
+    {
+      "family": "unity",
+      "name": "CoopPushBlock",
+      "url": "https://raw.githubusercontent.com/Unity-Technologies/ml-agents/7a03145ae48ad354821bd89e0243d99332149ace/docs/images/cooperative_pushblock.png",
+      "bytes": 138698,
+      "sha256": "55d19f45cf7e523db0b1cb08010c74ac907830e6e23bb0afefb4ed74acb243d0"
+    },
+    {
+      "family": "unity",
+      "name": "DungeonEscape",
+      "url": "https://raw.githubusercontent.com/Unity-Technologies/ml-agents/7a03145ae48ad354821bd89e0243d99332149ace/docs/images/dungeon_escape.png",
+      "bytes": 880833,
+      "sha256": "d405d21b23d09ff620512b619eee3f9b306298608f2216cc3d2f8e68cc6e600f"
+    },
+    {
+      "family": "godot",
+      "name": "3D Car Parking",
+      "url": "https://github.com/edbeeching/godot_rl_agents_examples/assets/61947090/3a71a48b-47df-4036-9c61-26b0ec0aeb3c",
+      "bytes": 9598121,
+      "sha256": "d8a3612d906678c4800e06adef28174701a740aa08b880f1e7b6a7245d253512",
+      "duration_seconds": 96.833333
+    },
+    {
+      "family": "godot",
+      "name": "Item Sorting Cart",
+      "url": "https://github.com/user-attachments/assets/57fbdbe3-906b-4064-b54b-45bf2a142f6c",
+      "bytes": 5708073,
+      "sha256": "bcb8576427c4dfa4ecc961b4aeea549496880d3d9e1342da3e61f4874b23d99d",
+      "duration_seconds": 23.372013
+    },
+    {
+      "family": "godot",
+      "name": "Hovercraft racing",
+      "url": "https://github.com/edbeeching/godot_rl_agents_examples/assets/61947090/09cfa8ef-4d1a-46d3-a38a-0b7cdf1e1000",
+      "bytes": 9472223,
+      "sha256": "38b1b2ab255a57ef44aec7a51bd5e9924679da6b16531f8205be791b80da5edc",
+      "duration_seconds": 103.9
+    },
+    {
+      "family": "godot",
+      "name": "3D Lander",
+      "url": "https://github.com/edbeeching/godot_rl_agents_examples/assets/61947090/67e44394-0e9f-4a6f-90f3-5109de49eab1",
+      "bytes": 9614110,
+      "sha256": "d224d868fd9cab15d10b3dbdb4f602f54abaa4e51daebc15a15c339f4862630d",
+      "duration_seconds": 89.433333
+    },
+    {
+      "family": "godot",
+      "name": "MultiLevel Robot",
+      "url": "https://github.com/edbeeching/godot_rl_agents_examples/assets/61947090/d734fbc8-6d09-4763-92fe-caf1565c8f01",
+      "bytes": 8533555,
+      "sha256": "0cedd3d99e58a8c629835799676d1e499af53172764ba5073e76041465c31d3c",
+      "duration_seconds": 26.602667
+    },
+    {
+      "family": "godot",
+      "name": "Robot Volleyball",
+      "url": "https://github.com/edbeeching/godot_rl_agents_examples/assets/61947090/fbbba179-d7fb-441d-a98f-f129b15b8f8c",
+      "bytes": 9566809,
+      "sha256": "abf3edeec4c5c846779c80a22221a84f922ef2a5d4127d0c20eabea90177d508",
+      "duration_seconds": 37.616667
+    },
+    {
+      "family": "godot",
+      "name": "DownFall",
+      "url": "https://github.com/edbeeching/godot_rl_agents_examples/assets/7275864/a4e4f51f-6fca-465d-8359-f7bf18d2f1c7",
+      "bytes": 5733202,
+      "sha256": "5176cae3878c67cde274b39c5811f900bd2c4cb6dce29b26d870b74b65b0d52f",
+      "duration_seconds": 33.176471
+    },
+    {
+      "family": "godot",
+      "name": "MultiAgent Simple",
+      "url": "https://github.com/edbeeching/godot_rl_agents_examples/assets/61947090/9b0632e5-1970-483b-98ae-e6e6432b759b",
+      "bytes": 5852619,
+      "sha256": "533271a4b2765f181a74741ef25219320f4ceae04279fc239f9387d86082ac2d",
+      "duration_seconds": 18.069333
+    },
+    {
+      "family": "godot",
+      "name": "Cross The Road",
+      "url": "https://github.com/user-attachments/assets/287f066c-261f-4f5f-9420-5922ee12a23d",
+      "bytes": 1490320,
+      "sha256": "9698ea70ed20ece29c6cce66c0e4cbbe9fb896d444451261ec9d50bb3c9d0ad1",
+      "duration_seconds": 20.32
+    },
+    {
+      "family": "godot",
+      "name": "Score The Goal",
+      "url": "https://github.com/user-attachments/assets/80c8b16b-df09-4607-bcc6-2b0e760f03c5",
+      "bytes": 10037611,
+      "sha256": "0ead04fa68de90189bf7d90c15d903829e3dcc417373e4c812a554eba2951ac5",
+      "duration_seconds": 46.84
+    },
+    {
+      "family": "godot",
+      "name": "Robot FPS",
+      "url": "https://github.com/user-attachments/assets/d44efbd1-59c2-4828-ae88-d8b374fb27e2",
+      "bytes": 7874225,
+      "sha256": "6966f4768023a270955eedac2dc515951d67df15900740458ed0b41ac04525df",
+      "duration_seconds": 46.4
+    }
+  ],
+  "arc_documentary": {
+    "url": "https://www.youtube.com/watch?v=DRlhpzc7ImA",
+    "sha256": "2c9f1f7abc50aabf5cef8eb90f3dd5944aa93be5a1f7942f9886652317f7bcbf",
+    "clips": [
+      {
+        "name": "aerial",
+        "start_seconds": 140,
+        "duration_seconds": 60,
+        "frames": 20
+      },
+      {
+        "name": "damage",
+        "start_seconds": 348,
+        "duration_seconds": 40,
+        "frames": 20
+      },
+      {
+        "name": "locomotion",
+        "start_seconds": 743,
+        "duration_seconds": 100,
+        "frames": 20
+      },
+      {
+        "name": "training",
+        "start_seconds": 956,
+        "duration_seconds": 140,
+        "frames": 20
+      }
+    ]
+  },
+  "leaper_gameplay": {
+    "url": "https://www.youtube.com/watch?v=wrBP07lVO5c",
+    "channel": "ARC Raiders",
+    "duration_seconds": 187,
+    "sha256": "f258162629083fe8b881176f1437567b39e751f8c5353f60cb0d14787fb486f4",
+    "dense_intervals_seconds": [
+      [
+        50,
+        65
+      ],
+      [
+        80,
+        95
+      ]
+    ],
+    "frames_per_interval": 24
+  }
+}

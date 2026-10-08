@@ -38,13 +38,12 @@ Inspected 20-frame documentary sheets for these intervals:
   The frames support physical reactions but do not prove the control algorithm.
 - 12:23–14:03: editor footage shows articulated multi-legged prototypes and
   multiple robots in a training scene. Leg poses change with body position.
-- 15:56–18:16: training discussion and examples; contact sheet generated, detailed
-  behavioral notes pending.
+- 15:56–18:16: mixed interviews, gameplay, and an editor terrain view. These
+  frames do not expose a reproducible training configuration or measured results.
 
 Local files are `runs/quality-research/arc-documentary.mp4`,
 `arc-documentary.en.vtt`, and `arc-media-manifest.json`. The manifest records the
-video hash and intervals. Dense jump and damaged-flight sequences remain required;
-these overview sheets alone do not establish their timing.
+video hash and intervals. These overview sheets alone do not establish movement timing.
 
 ## Drone and locomotion methods
 
@@ -112,6 +111,42 @@ The root `LICENSE.md` is Apache-2.0. Check asset-specific notices during import.
 The documentation still lists Strikers versus Goalie; the current example tree
 has no directory with that name. Resolve it through history before implementing.
 
+Inspected all 17 official images. They share a blue-gray background, dark tiled
+floors, soft shadows, and bright agent colors. Preserve each scene's source camera
+and scale rather than applying one generic scene layout.
+
+- Basic: a long platform, a blue cube agent with a yellow headband, and two green
+  spheres of different sizes.
+- 3D Balance Ball: repeated blue headband cubes, tilted top surfaces, and small
+  white-gray balls.
+- GridWorld: a square walled arena, hollow blue agent, red and green markers, and
+  a separate top-down agent-view inset.
+- Push Block: a walled rectangle, one white block, and a green goal strip.
+- Wall Jump: a translucent blue wall, a white block, an airborne cube agent,
+  and a green goal patch beyond the wall.
+- Crawler: a blue cylindrical body, four jointed blue-white legs, a blue ground
+  ring, a green direction arrow, and a green target cube.
+- Worm: a segmented blue body with white joints, a headband, eyes, and a green
+  target cube.
+- Food Collector: multiple small agents, scattered red and green spheres, a
+  purple beam, and repeated bounded arenas.
+- Hallway: a long walled corridor, an early symbol panel, and two marked goal pads.
+- Soccer Twos: two blue and two purple cube agents, a soccer ball, white pitch
+  lines, nets, colored goal areas, and rounded end walls.
+- Strikers versus Goalie: the same pitch style with two blue attackers and one
+  purple defender. This distinct team arrangement needs its own behavior source.
+- Walker: a jointed humanoid with white upper body, blue hips and thighs, a
+  headband, a blue ground ring, and a green direction arrow and target.
+- Pyramids: separated cross-shaped walls, stacks of cubes, a green button,
+  and a highlighted stack supporting a green cube.
+- Match 3: a yellow board with a dark frame and colored face tiles, stars,
+  and triangles.
+- Sorter: a circular arena with numbered white and green blocks along its edge.
+- Cooperative Push Block: three colored agents, differently sized numbered
+  blocks, and a green goal strip.
+- Dungeon Escape: blue sword-carrying agents, a green key-carrying enemy,
+  columns, a rear door, and a purple portal.
+
 ## Godot RL Agents
 
 Source revision: `d65963648439167f4902043376321c15d3df0e3a`.
@@ -127,7 +162,31 @@ Paths under `examples/`: `3DCarParking`, `ItemSortingCart`, `HovercraftRacing`,
 Completed versions; use Completed as the behavior reference.
 
 `runs/quality-research/media-manifest.json` records URLs, hashes, byte sizes,
-durations, and sheet paths. Visual inspection and scene-level contracts are pending.
+durations, and sheet paths. All eleven sheets are inspected; scene-level contracts
+remain pending. Visible reference details are:
+
+- 3D Car Parking: white bay markings, parked colored cars, orange perimeter posts,
+  a green goal arrow, and a central grass island with trees.
+- Item Sorting Cart: a yellow cart on a horizontal strip, cyan and orange end
+  containers, grass, trees, and repeated arenas behind the active cart.
+- Hovercraft Racing: a blue-purple craft with side fan pods, dashed white road
+  stripes, black-yellow barriers, yellow gates, and a chase camera.
+- 3D Lander: gray rocky terrain, a small upright craft, a translucent green region,
+  and a black sky.
+- MultiLevel Robot: separated gray tiled platforms, an orange robot, green goal
+  volumes, yellow objects, and later red agents.
+- Robot Volleyball: two orange wheel robots, a yellow ball, a yellow court with a
+  center net, grass, trees, and scores in the top corners.
+- DownFall: colored rounded humanoids, platforms with gaps, spiked rollers,
+  striped obstacles, and yellow goal arches.
+- MultiAgent Simple: an orange robot, green pads, a yellow slatted plank over a
+  brown void, and repeated arenas. Read the scene before inferring cooperation.
+- Cross The Road: orange tiles, a gray traffic lane with white cars, green trees,
+  a small green robot, and an elevated camera.
+- Score The Goal: a gray fenced arena, three colored goals and matching balls,
+  a green robot with a white selection ring, and surrounding grass and trees.
+- Robot FPS: first-person and overhead views, colored wall blocks, wooden crates,
+  a central hut with a pink roof, colored robots, and purple projectiles.
 
 ## AI Warehouse
 
@@ -144,3 +203,27 @@ training/inference and necessary controls on the example page. Reuse existing
 browser worker functionality. Preserve exact task names and qualification status.
 Inspect desktop and mobile rendering before publishing. The T3 preview host was
 unavailable during this initial research pass, so no live gallery review is claimed.
+
+## Additional inspected gameplay
+
+Downloaded [I am Leaper](https://www.youtube.com/watch?v=wrBP07lVO5c) and inspected
+a five-second overview plus 24-frame sheets for 00:50–01:05 and 01:20–01:35. The
+robot spreads its long articulated legs during airborne approaches, closes distance
+across height changes, and lands near players and cover. Shots cut between scenes,
+so these sheets cannot establish a single continuous jump trajectory. A continuous
+clip is required before measuring launch speed, recovery time, or contact order.
+
+A 24-frame documentary sheet for 02:30–02:45 shows a four-lobed aerial silhouette,
+bright thruster or attack effects, downward pursuit near a wall, impact, and debris.
+Use those visible events to define comparison shots. Do not infer hearing, online
+learning, or a particular controller from them.
+
+[The committed media inventory](reference-inventory.json) retains source URLs,
+content hashes, durations, and source revisions independently of local downloads.
+Raw gameplay videos remain local reference material.
+
+Two more Creative Commons candidates are
+[NateGazzard's four-rotor drone](https://poly.pizza/m/DNbUoMtG3H) and
+[Silly Fear's drone](https://poly.pizza/m/3Ae_y67lzvd). Their source pages list
+Attribution licenses, but direct downloads and geometry inspection are unresolved.
+The first model's source description explicitly identifies four rotors.

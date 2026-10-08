@@ -1,5 +1,9 @@
 # Ecosystem curriculum handoff
 
+Current work, 2026-10-08: follow the [quality and examples status](docs/EXAMPLE_STATUS.md)
+and [delivery roadmap](docs/EXAMPLE_ROADMAP.md). They supersede the priorities below;
+older implementation and validation records remain historical evidence.
+
 Date: 2026-08-02
 Repository: `/home/sagan/Sync/playground/bevy-gym`
 Branch: `master`

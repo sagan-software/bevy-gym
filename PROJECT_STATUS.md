@@ -1,5 +1,9 @@
 # Project status and next steps
 
+Current work, 2026-10-08: follow the [quality and examples status](docs/EXAMPLE_STATUS.md)
+and [delivery roadmap](docs/EXAMPLE_ROADMAP.md). They supersede the priorities below;
+older implementation and validation records remain historical evidence.
+
 Assessment date: 2026-10-07.
 
 Finish one Gymnasium environment at a time, including browser playback and
