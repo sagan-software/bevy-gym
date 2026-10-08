@@ -15,6 +15,10 @@ for (const [name, renderer, state, goal] of [
   ["pendulum-down", "drawPendulum", [Math.PI, 0, 0, 0]],
   ["pendulum-positive-torque", "drawPendulum", [-0.8, 2, 2, 0]],
   ["pendulum-negative-torque", "drawPendulum", [1.4, -3, -1, 0]],
+  ["acrobot-down", "drawAcrobot", [0, 0, 0, 0]],
+  ["acrobot-upright", "drawAcrobot", [Math.PI, 0, 0, 0]],
+  ["acrobot-bent", "drawAcrobot", [0.8, -1.4, 2, -3]],
+  ["acrobot-goal", "drawAcrobot", [-2.6, 0.6, -1, 4]],
 ]) {
   test(`Gymnasium rendering matches ${name}`, async ({ page }, testInfo) => {
     await page.goto("./");
@@ -26,7 +30,8 @@ for (const [name, renderer, state, goal] of [
       const actual = document.createElement("canvas");
       renderers[renderer](actual, state, goal);
       const expected = document.createElement("canvas");
-      const width = renderer === "drawPendulum" ? 500 : 600, height = renderer === "drawPendulum" ? 500 : 400;
+      const square = ["drawPendulum", "drawAcrobot"].includes(renderer);
+      const width = square ? 500 : 600, height = square ? 500 : 400;
       expected.width = width; expected.height = height;
       const img = new Image(); img.src = reference; await img.decode();
       expected.getContext("2d").drawImage(img, 0, 0);
@@ -34,9 +39,13 @@ for (const [name, renderer, state, goal] of [
       const b = expected.getContext("2d").getImageData(0, 0, width, height).data;
       function mismatch(source, target) {
         let foreground = 0, missed = 0;
+        // Acrobot's black/cyan/yellow palette has a zero channel. Test pixels with
+        // at least 69% ink coverage; weaker Canvas edge blends have no Pygame counterpart.
+        // Opaque geometry and colors still use the same two-pixel/80-channel bounds.
+        const foregroundLimit = renderer === "drawAcrobot" ? 80 : 220;
         for (let y = 0; y < height; y++) for (let x = 0; x < width; x++) {
           const i = (y * width + x) * 4;
-          if (Math.min(source[i], source[i + 1], source[i + 2]) > 220) continue;
+          if (Math.min(source[i], source[i + 1], source[i + 2]) > foregroundLimit) continue;
           foreground++;
           let found = false;
           for (let dy = -2; dy <= 2 && !found; dy++) for (let dx = -2; dx <= 2; dx++) {
@@ -55,7 +64,7 @@ for (const [name, renderer, state, goal] of [
     await writeFile(artifact, Buffer.from(result.png.split(",")[1], "base64"));
     await testInfo.attach(`${name}-actual`, { path: artifact, contentType: "image/png" });
     console.log(name, JSON.stringify({ actual: result.actual, reference: result.reference }));
-    expect([result.width, result.height]).toEqual(renderer === "drawPendulum" ? [500, 500] : [600, 400]);
+    expect([result.width, result.height]).toEqual(["drawPendulum", "drawAcrobot"].includes(renderer) ? [500, 500] : [600, 400]);
     expect(result.actual.foreground).toBeGreaterThan(1000);
     expect(result.reference.fraction).toBeLessThan(0.005);
     expect(result.actual.fraction).toBeLessThan(0.005);

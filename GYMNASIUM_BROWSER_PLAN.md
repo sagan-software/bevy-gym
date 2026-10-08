@@ -366,20 +366,36 @@ The full local suite passed 81 cases, with six non-Chromium learning cases skipp
 GitHub CI and Pages deployment passed for commit `976cd46`.
 Deployed inference, pause, single-step, and fresh training were recorded after
 refreshing stale cached worker assets. A build-directory versioning fix passes
-its regression in all three engines; publication of that fix remains pending.
+its regression in all three engines. That fix is deployed; an ordinary navigation
+loaded the versioned worker and updated both PPO optimizers.
 
 Pendulum's shared environment and native adapter now preserve double-precision
 state and match 420 pinned Python transitions. The three shared modules have
 100% measured line and region coverage. Its browser session now trains both
 networks and replays frozen policies with native transition agreement.
-All twelve fixed-state renderer comparisons pass. The
-[Pendulum port contract](gymnasium-web/PENDULUM.md) records the remaining
-qualification and page-integration work. Durable local training is running.
+All twelve fixed-state renderer comparisons and fifteen control/evaluation
+checks pass. The page integration is tested locally but awaits a qualified
+bundle before deployment.
 
-Pendulum is followed by Acrobot and Toy Text. MuJoCo follows
+The
+[Pendulum port contract](gymnasium-web/PENDULUM.md) records the remaining
+qualification work. Native training and offline browser training are running.
+
+Acrobot now has a shared core, native adapter, browser session, renderer, and
+qualified bundle. Its oracle covers 2,133 transitions and 33 reset seeds; all
+three new core modules have 100% measured line and region coverage. Three fresh
+native seeds passed, and offline Chromium training scored -86.585 with 200/200
+goals. The selected native bundle scores -82.555 with 200/200 goals in all three
+browser engines. [The Acrobot contract](gymnasium-web/ACROBOT.md) records its
+two browser-to-native episode differences and separate transition tolerances.
+Deployment and motion review remain pending.
+
+Pendulum qualification continues while Toy Text implementation proceeds. MuJoCo follows
 Toy Text, as requested on 2026-10-07; Box2D follows MuJoCo. Both engine
 integrations still require their browser feasibility gates.
 
 The broader controls and performance checks above remain acceptance work,
-including physical tab-switch verification, explicit worker crashes, speed-independent replay,
-200% zoom, latency budgets, and 30-minute resource stability.
+including physical tab-switch verification, 200% zoom, latency budgets, and
+30-minute resource stability. Worker crash recovery and fixed-budget equivalence
+at all five speeds passed for the five implemented tasks. Acrobot's corrected
+physical playback rate has a separate clock regression and repeat checks.

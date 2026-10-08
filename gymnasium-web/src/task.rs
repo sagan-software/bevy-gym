@@ -12,6 +12,8 @@ pub enum Task {
     MountainCarContinuous,
     /// Bounded Pendulum torque with the 200-step limit.
     Pendulum,
+    /// Three elbow torques with the 500-step limit.
+    Acrobot,
 }
 
 /// A browser task name outside the supported catalog.
@@ -26,14 +28,16 @@ impl std::str::FromStr for Task {
             "mountain-car" => Ok(Self::MountainCar),
             "mountain-car-continuous" => Ok(Self::MountainCarContinuous),
             "pendulum" => Ok(Self::Pendulum),
+            "acrobot" => Ok(Self::Acrobot),
             _ => Err(InvalidTask),
         }
     }
 }
 impl std::fmt::Display for InvalidTask {
     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        formatter
-            .write_str("task must be cartpole, mountain-car, mountain-car-continuous, or pendulum")
+        formatter.write_str(
+            "task must be cartpole, mountain-car, mountain-car-continuous, pendulum, or acrobot",
+        )
     }
 }
 impl std::error::Error for InvalidTask {}
@@ -47,16 +51,24 @@ mod tests {
             assert_eq!(name.parse::<Task>(), Ok(Task::CartPole));
         }
         assert_eq!("mountain-car".parse::<Task>(), Ok(Task::MountainCar));
+        assert_eq!("acrobot".parse::<Task>(), Ok(Task::Acrobot));
+        assert_eq!("pendulum".parse::<Task>(), Ok(Task::Pendulum));
         assert_eq!(
             "mountain-car-continuous".parse::<Task>(),
             Ok(Task::MountainCarContinuous)
         );
-        for name in ["MountainCar", "mountain-car ", "unknown"] {
+        for name in [
+            "MountainCar",
+            "mountain-car ",
+            "unknown",
+            "Acrobot",
+            "acrobot ",
+        ] {
             assert_eq!(name.parse::<Task>(), Err(InvalidTask));
         }
         assert_eq!(
             InvalidTask.to_string(),
-            "task must be cartpole, mountain-car, mountain-car-continuous, or pendulum"
+            "task must be cartpole, mountain-car, mountain-car-continuous, pendulum, or acrobot"
         );
     }
 }

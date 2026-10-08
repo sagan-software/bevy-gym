@@ -1,10 +1,12 @@
-import { drawCartPole, drawMountainCar } from "./renderers.js";
+import { drawCartPole, drawMountainCar, drawPendulum, drawAcrobot, loadPendulumAsset } from "./renderers.js";
 const assetBase = new URL(".", import.meta.url);
 const $ = (id) => document.getElementById(id);
 const tasks = {
   "cartpole": { title: "CartPole-v1", algorithm: "DQN", hz: 50, minimum: 0, maximum: 500, target: 475, rateMaximum: .0004, replay: 1000, lanes: 1 },
   "mountain-car": { title: "MountainCar-v0", algorithm: "DQN", hz: 30, minimum: -200, maximum: 0, target: -110, rateMaximum: .0014, replay: 2000, lanes: 1, goal: .5 },
   "mountain-car-continuous": { title: "MountainCarContinuous-v0", algorithm: "PPO", hz: 30, minimum: -100, maximum: 100, target: 90, rateMaximum: .0035, replay: 512, lanes: 8, goal: .45 },
+  "pendulum": { title: "Pendulum-v1", algorithm: "PPO", hz: 20, minimum: -1700, maximum: 0, target: -200, rateMaximum: .0035, replay: 512, lanes: 8 },
+  "acrobot": { title: "Acrobot-v1", algorithm: "DQN", hz: 5, minimum: -500, maximum: 0, target: -100, rateMaximum: .0004, replay: 5000, lanes: 1 },
 };
 const requestedTask = new URL(location.href).searchParams.get("env");
 const taskName = Object.hasOwn(tasks, requestedTask) ? requestedTask : "cartpole";
@@ -19,7 +21,8 @@ $("environment").value = taskName;
 $("environment").onchange = () => { location.search = new URLSearchParams({ env: $("environment").value }).toString(); };
 document.querySelector("h1").textContent = task.title;
 $("score-target").textContent = `Target mean ≥${task.target}`;
-$("scene").setAttribute("aria-label", task.goal ? "MountainCar simulation: a car climbs the right hill" : "CartPole simulation: a cart balances an upright pole");
+$("scene").classList.toggle("square", ["pendulum", "acrobot"].includes(taskName));
+$("scene").setAttribute("aria-label", taskName === "acrobot" ? "Acrobot simulation: two links swing above the target line" : taskName === "pendulum" ? "Pendulum simulation: a rod swings upright under torque" : task.goal ? "MountainCar simulation: a car climbs the right hill" : "CartPole simulation: a cart balances an upright pole");
 let worker, generation = 0, uploadGeneration = 0, cancelPolicyValidation;
 /** @type {"loading" | "running" | "advancing" | "pausing" | "paused" | "failed"} */
 let phase = "loading";
@@ -60,7 +63,7 @@ function seed() {
   return Number($("seed").value);
 }
 function post(command) { worker.postMessage(JSON.stringify(command)); }
-function start(mode, bytes, source = "Bundled model") {
+async function start(mode, bytes, source = "Bundled model") {
   let runSeed;
   try { runSeed = seed(); } catch (error) { $("error").textContent = error.message; $("error").hidden = false; return; }
   const run = ++generation;
@@ -78,6 +81,11 @@ function start(mode, bytes, source = "Bundled model") {
   $("return-summary").textContent = "No completed episodes";
   $("rate-summary").textContent = mode === "training" ? "Waiting for the first optimizer update." : "Inference performs no optimizer updates.";
   drawScene([0, 0, 0, 0]); drawCharts();
+  if (taskName === "pendulum") {
+    try { await loadPendulumAsset(); }
+    catch { if (run === generation) fail("Pendulum rendering asset failed to load."); return; }
+    if (run !== generation) return;
+  }
   worker = new Worker(new URL("gymnasium-worker_loader.js", assetBase), { type: "module", name: taskName });
   worker.onerror = (event) => { if (run === generation) fail(event.message || "The Rust worker failed."); };
   worker.onmessage = ({ data }) => {
@@ -214,7 +222,9 @@ function context(id) {
 }
 function drawScene(state) {
   const canvas = $("scene");
-  if (task.goal) drawMountainCar(canvas, state, task.goal);
+  if (taskName === "pendulum") drawPendulum(canvas, state);
+  else if (taskName === "acrobot") drawAcrobot(canvas, state);
+  else if (task.goal) drawMountainCar(canvas, state, task.goal);
   else drawCartPole(canvas, state);
 }
 function chart(id, points, maximum, target, moving, minimum = 0, horizontalLabel = "Transitions", secondary = []) {

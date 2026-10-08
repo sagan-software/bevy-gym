@@ -1,6 +1,7 @@
 // Geometry and colors ported from Farama Gymnasium (MIT), revision
 // 7a1191388aa4aa973d3a5e4b039899cd99cc991f, classic_control/{cartpole,mountain_car,continuous_mountain_car,pendulum}.py.
 // Pendulum also uses the original assets/clockwise.png sprite.
+// Acrobot's source includes RLPy BSD-3-Clause terms, retained in ACROBOT-BSD-3-Clause.txt.
 function surface(canvas, width = 600, height = 400) {
   canvas.width = width; canvas.height = height;
   const ctx = canvas.getContext("2d");
@@ -79,4 +80,18 @@ export function drawPendulum(canvas, [angle, velocity, torque]) {
     ctx.restore();
   }
   circle(ctx, offset, offset, Math.trunc(.05 * scale), "#000000");
+}
+
+export function drawAcrobot(canvas, [first, second]) {
+  const ctx = surface(canvas, 500, 500), scale = 500 / 4.4, offset = 250;
+  ctx.strokeStyle = "#000000"; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(0, Math.trunc(scale + offset)); ctx.lineTo(500, Math.trunc(scale + offset)); ctx.stroke();
+  const anchors = [[0, 0], [Math.sin(first) * scale, -Math.cos(first) * scale]];
+  const rotations = [first - Math.PI / 2, first + second - Math.PI / 2];
+  for (let index = 0; index < 2; index++) {
+    const [x, y] = anchors[index], cosine = Math.cos(rotations[index]), sine = Math.sin(rotations[index]);
+    const rotate = ([a, b]) => [a * cosine - b * sine + x + offset, a * sine + b * cosine + y + offset];
+    polygon(ctx, [[0, -.1 * scale], [0, .1 * scale], [scale, .1 * scale], [scale, -.1 * scale]].map(rotate), "#00cccc");
+    circle(ctx, Math.trunc(x + offset), Math.trunc(y + offset), Math.trunc(.1 * scale), "#cccc00");
+  }
 }

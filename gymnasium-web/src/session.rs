@@ -44,6 +44,9 @@ impl Session {
     /// Returns the shared learner's configuration or tensor error.
     pub fn train_task(task: Task, seed: u64) -> Result<Self, SessionError> {
         let inner = match task {
+            Task::Acrobot => {
+                SessionKind::Discrete(DiscreteSession::train(DiscreteTask::Acrobot, seed)?)
+            }
             Task::CartPole => {
                 SessionKind::Discrete(DiscreteSession::train(DiscreteTask::CartPole, seed)?)
             }
@@ -67,6 +70,11 @@ impl Session {
     /// Rejects corrupt records and incompatible network dimensions.
     pub fn inference_task(task: Task, bytes: Vec<u8>, seed: u64) -> Result<Self, SessionError> {
         let inner = match task {
+            Task::Acrobot => SessionKind::Discrete(DiscreteSession::inference(
+                DiscreteTask::Acrobot,
+                bytes,
+                seed,
+            )?),
             Task::CartPole => SessionKind::Discrete(DiscreteSession::inference(
                 DiscreteTask::CartPole,
                 bytes,

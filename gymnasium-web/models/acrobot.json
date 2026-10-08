@@ -1,0 +1,7703 @@
+{
+  "environment": "Acrobot-v1",
+  "algorithm": "DQN",
+  "architecture": {
+    "observations": 6,
+    "actions": 3,
+    "hidden": [
+      128,
+      128
+    ]
+  },
+  "selected_training_seed": 43,
+  "selection": "Highest native validation mean within budget; earliest checkpoint breaks ties. Every seed must pass common validation seeds 10000..10100 before held-out evaluation. Highest common-validation mean selects bundle; lowest training seed breaks ties.",
+  "sha256": "e3e9868e57146b8b010da5fa4f3f21c8eb749a1742605f738ec0ff7a6a015030",
+  "qualification_profile": "acrobot-native-dqn-v2",
+  "recipe": {
+    "profile": "acrobot-native-dqn-v2",
+    "training_seeds": [
+      42,
+      43,
+      44
+    ],
+    "max_transitions": 1000000,
+    "num_envs": 16,
+    "hidden_sizes": [
+      128,
+      128
+    ],
+    "learning_rate": 0.0003,
+    "gamma": 0.99,
+    "optimizer": "Adam",
+    "optimizer_epsilon": 1e-08,
+    "huber_delta": 1,
+    "replay_capacity": 200000,
+    "min_replay_size": 5000,
+    "batch_size": 128,
+    "target_update_interval_optimizer_steps": 1000,
+    "epsilon_start": 1,
+    "epsilon_end": 0.05,
+    "epsilon_decay_transitions": 200000,
+    "reward_potential_scale": 10,
+    "eval_interval": 10000,
+    "eval_episodes": 100,
+    "selection": "Highest native validation mean within budget; earliest checkpoint breaks ties. Every seed must pass common validation seeds 10000..10100 before held-out evaluation. Highest common-validation mean selects bundle; lowest training seed breaks ties.",
+    "native_test_seeds": [
+      700000,
+      700200
+    ],
+    "browser_test_seeds": [
+      800000,
+      800200
+    ],
+    "mean_gate": -100,
+    "goal_rate_gate": 0.95,
+    "initialization_improvement_deadline_transitions": 250000,
+    "hardware": "T490 Intel Core i7-8565U, 4 cores / 8 threads; concurrent training jobs",
+    "binary_sha256": "1381ebfb06415eed90b5885134e791ee4e6e787467d3b87fec6a457aa5dfbd5a",
+    "source_base": "a0c139065d043ec60210e9037232d00730a38da9",
+    "validation_stop_mean": -90,
+    "changes_from_v1": "Evaluate100 episodes; stop training at validation mean-90. Network, optimizer, observations, dynamics, rewards, seeds, and 1M budget are unchanged."
+  },
+  "normalization": "Angular velocities divided by float32(4*pi) and float32(9*pi); trigonometric observations unchanged.",
+  "reward": "Original environment return for charts and qualification; gamma*next_height_potential - current_height_potential added only to training reward, scale 10, terminal potential zero.",
+  "qualification": [
+    {
+      "profile": "acrobot-native-dqn-v2",
+      "seed": 42,
+      "selected_training_seed": 43,
+      "test": {
+        "episodes": [
+          {
+            "reached": true,
+            "reward": -72.0
+          },
+          {
+            "reached": true,
+            "reward": -103.0
+          },
+          {
+            "reached": true,
+            "reward": -73.0
+          },
+          {
+            "reached": true,
+            "reward": -109.0
+          },
+          {
+            "reached": true,
+            "reward": -83.0
+          },
+          {
+            "reached": true,
+            "reward": -88.0
+          },
+          {
+            "reached": true,
+            "reward": -77.0
+          },
+          {
+            "reached": true,
+            "reward": -77.0
+          },
+          {
+            "reached": true,
+            "reward": -84.0
+          },
+          {
+            "reached": true,
+            "reward": -256.0
+          },
+          {
+            "reached": true,
+            "reward": -88.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -93.0
+          },
+          {
+            "reached": true,
+            "reward": -72.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -73.0
+          },
+          {
+            "reached": true,
+            "reward": -69.0
+          },
+          {
+            "reached": true,
+            "reward": -82.0
+          },
+          {
+            "reached": true,
+            "reward": -99.0
+          },
+          {
+            "reached": true,
+            "reward": -112.0
+          },
+          {
+            "reached": true,
+            "reward": -62.0
+          },
+          {
+            "reached": true,
+            "reward": -84.0
+          },
+          {
+            "reached": true,
+            "reward": -88.0
+          },
+          {
+            "reached": true,
+            "reward": -72.0
+          },
+          {
+            "reached": true,
+            "reward": -83.0
+          },
+          {
+            "reached": true,
+            "reward": -63.0
+          },
+          {
+            "reached": true,
+            "reward": -95.0
+          },
+          {
+            "reached": true,
+            "reward": -77.0
+          },
+          {
+            "reached": true,
+            "reward": -77.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -63.0
+          },
+          {
+            "reached": true,
+            "reward": -78.0
+          },
+          {
+            "reached": true,
+            "reward": -81.0
+          },
+          {
+            "reached": true,
+            "reward": -63.0
+          },
+          {
+            "reached": true,
+            "reward": -73.0
+          },
+          {
+            "reached": true,
+            "reward": -64.0
+          },
+          {
+            "reached": true,
+            "reward": -80.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -85.0
+          },
+          {
+            "reached": true,
+            "reward": -82.0
+          },
+          {
+            "reached": true,
+            "reward": -316.0
+          },
+          {
+            "reached": true,
+            "reward": -83.0
+          },
+          {
+            "reached": true,
+            "reward": -107.0
+          },
+          {
+            "reached": true,
+            "reward": -97.0
+          },
+          {
+            "reached": true,
+            "reward": -63.0
+          },
+          {
+            "reached": true,
+            "reward": -95.0
+          },
+          {
+            "reached": true,
+            "reward": -87.0
+          },
+          {
+            "reached": true,
+            "reward": -62.0
+          },
+          {
+            "reached": true,
+            "reward": -69.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -64.0
+          },
+          {
+            "reached": true,
+            "reward": -79.0
+          },
+          {
+            "reached": true,
+            "reward": -69.0
+          },
+          {
+            "reached": true,
+            "reward": -72.0
+          },
+          {
+            "reached": true,
+            "reward": -77.0
+          },
+          {
+            "reached": true,
+            "reward": -69.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -84.0
+          },
+          {
+            "reached": true,
+            "reward": -95.0
+          },
+          {
+            "reached": true,
+            "reward": -185.0
+          },
+          {
+            "reached": true,
+            "reward": -77.0
+          },
+          {
+            "reached": true,
+            "reward": -77.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -63.0
+          },
+          {
+            "reached": true,
+            "reward": -63.0
+          },
+          {
+            "reached": true,
+            "reward": -91.0
+          },
+          {
+            "reached": true,
+            "reward": -73.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -63.0
+          },
+          {
+            "reached": true,
+            "reward": -72.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -69.0
+          },
+          {
+            "reached": true,
+            "reward": -83.0
+          },
+          {
+            "reached": true,
+            "reward": -103.0
+          },
+          {
+            "reached": true,
+            "reward": -84.0
+          },
+          {
+            "reached": true,
+            "reward": -96.0
+          },
+          {
+            "reached": true,
+            "reward": -84.0
+          },
+          {
+            "reached": true,
+            "reward": -102.0
+          },
+          {
+            "reached": true,
+            "reward": -84.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -89.0
+          },
+          {
+            "reached": true,
+            "reward": -75.0
+          },
+          {
+            "reached": true,
+            "reward": -83.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -69.0
+          },
+          {
+            "reached": true,
+            "reward": -91.0
+          },
+          {
+            "reached": true,
+            "reward": -76.0
+          },
+          {
+            "reached": true,
+            "reward": -78.0
+          },
+          {
+            "reached": true,
+            "reward": -68.0
+          },
+          {
+            "reached": true,
+            "reward": -141.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -68.0
+          },
+          {
+            "reached": true,
+            "reward": -76.0
+          },
+          {
+            "reached": true,
+            "reward": -77.0
+          },
+          {
+            "reached": true,
+            "reward": -69.0
+          },
+          {
+            "reached": true,
+            "reward": -75.0
+          },
+          {
+            "reached": true,
+            "reward": -87.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -88.0
+          },
+          {
+            "reached": true,
+            "reward": -84.0
+          },
+          {
+            "reached": true,
+            "reward": -69.0
+          },
+          {
+            "reached": true,
+            "reward": -76.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -95.0
+          },
+          {
+            "reached": true,
+            "reward": -68.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -79.0
+          },
+          {
+            "reached": true,
+            "reward": -81.0
+          },
+          {
+            "reached": true,
+            "reward": -72.0
+          },
+          {
+            "reached": true,
+            "reward": -76.0
+          },
+          {
+            "reached": true,
+            "reward": -82.0
+          },
+          {
+            "reached": true,
+            "reward": -90.0
+          },
+          {
+            "reached": true,
+            "reward": -90.0
+          },
+          {
+            "reached": true,
+            "reward": -80.0
+          },
+          {
+            "reached": true,
+            "reward": -96.0
+          },
+          {
+            "reached": true,
+            "reward": -69.0
+          },
+          {
+            "reached": true,
+            "reward": -62.0
+          },
+          {
+            "reached": true,
+            "reward": -130.0
+          },
+          {
+            "reached": true,
+            "reward": -89.0
+          },
+          {
+            "reached": true,
+            "reward": -78.0
+          },
+          {
+            "reached": true,
+            "reward": -88.0
+          },
+          {
+            "reached": true,
+            "reward": -84.0
+          },
+          {
+            "reached": true,
+            "reward": -64.0
+          },
+          {
+            "reached": true,
+            "reward": -62.0
+          },
+          {
+            "reached": true,
+            "reward": -78.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -87.0
+          },
+          {
+            "reached": true,
+            "reward": -63.0
+          },
+          {
+            "reached": true,
+            "reward": -77.0
+          },
+          {
+            "reached": true,
+            "reward": -91.0
+          },
+          {
+            "reached": true,
+            "reward": -72.0
+          },
+          {
+            "reached": true,
+            "reward": -72.0
+          },
+          {
+            "reached": true,
+            "reward": -78.0
+          },
+          {
+            "reached": true,
+            "reward": -68.0
+          },
+          {
+            "reached": true,
+            "reward": -75.0
+          },
+          {
+            "reached": true,
+            "reward": -80.0
+          },
+          {
+            "reached": true,
+            "reward": -82.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -75.0
+          },
+          {
+            "reached": true,
+            "reward": -113.0
+          },
+          {
+            "reached": true,
+            "reward": -63.0
+          },
+          {
+            "reached": true,
+            "reward": -76.0
+          },
+          {
+            "reached": true,
+            "reward": -256.0
+          },
+          {
+            "reached": true,
+            "reward": -69.0
+          },
+          {
+            "reached": true,
+            "reward": -72.0
+          },
+          {
+            "reached": true,
+            "reward": -75.0
+          },
+          {
+            "reached": true,
+            "reward": -63.0
+          },
+          {
+            "reached": true,
+            "reward": -69.0
+          },
+          {
+            "reached": true,
+            "reward": -63.0
+          },
+          {
+            "reached": true,
+            "reward": -80.0
+          },
+          {
+            "reached": true,
+            "reward": -88.0
+          },
+          {
+            "reached": true,
+            "reward": -94.0
+          },
+          {
+            "reached": true,
+            "reward": -88.0
+          },
+          {
+            "reached": true,
+            "reward": -97.0
+          },
+          {
+            "reached": true,
+            "reward": -75.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -105.0
+          },
+          {
+            "reached": true,
+            "reward": -73.0
+          },
+          {
+            "reached": true,
+            "reward": -78.0
+          },
+          {
+            "reached": true,
+            "reward": -81.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -76.0
+          },
+          {
+            "reached": true,
+            "reward": -94.0
+          },
+          {
+            "reached": true,
+            "reward": -142.0
+          },
+          {
+            "reached": true,
+            "reward": -82.0
+          },
+          {
+            "reached": true,
+            "reward": -89.0
+          },
+          {
+            "reached": true,
+            "reward": -77.0
+          },
+          {
+            "reached": true,
+            "reward": -76.0
+          },
+          {
+            "reached": true,
+            "reward": -77.0
+          },
+          {
+            "reached": true,
+            "reward": -83.0
+          },
+          {
+            "reached": true,
+            "reward": -69.0
+          },
+          {
+            "reached": true,
+            "reward": -87.0
+          },
+          {
+            "reached": true,
+            "reward": -62.0
+          },
+          {
+            "reached": true,
+            "reward": -82.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -141.0
+          },
+          {
+            "reached": true,
+            "reward": -72.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -80.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -86.0
+          },
+          {
+            "reached": true,
+            "reward": -80.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -103.0
+          },
+          {
+            "reached": true,
+            "reward": -89.0
+          },
+          {
+            "reached": true,
+            "reward": -114.0
+          },
+          {
+            "reached": true,
+            "reward": -85.0
+          },
+          {
+            "reached": true,
+            "reward": -209.0
+          },
+          {
+            "reached": true,
+            "reward": -84.0
+          },
+          {
+            "reached": true,
+            "reward": -84.0
+          },
+          {
+            "reached": true,
+            "reward": -157.0
+          },
+          {
+            "reached": true,
+            "reward": -93.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -94.0
+          },
+          {
+            "reached": true,
+            "reward": -113.0
+          },
+          {
+            "reached": true,
+            "reward": -62.0
+          },
+          {
+            "reached": true,
+            "reward": -74.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          }
+        ],
+        "goal_rate": 1.0,
+        "mean": -84.535,
+        "mean_95_percent_normal_interval": [
+          -88.77586701116863,
+          -80.29413298883136
+        ]
+      },
+      "test_seeds": [
+        700000,
+        700200
+      ],
+      "transitions": 110000,
+      "validation": {
+        "episodes": [
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -101.0
+          },
+          {
+            "reached": true,
+            "reward": -81.0
+          },
+          {
+            "reached": true,
+            "reward": -75.0
+          },
+          {
+            "reached": true,
+            "reward": -69.0
+          },
+          {
+            "reached": true,
+            "reward": -104.0
+          },
+          {
+            "reached": true,
+            "reward": -80.0
+          },
+          {
+            "reached": true,
+            "reward": -95.0
+          },
+          {
+            "reached": true,
+            "reward": -69.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -69.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -224.0
+          },
+          {
+            "reached": true,
+            "reward": -66.0
+          },
+          {
+            "reached": true,
+            "reward": -90.0
+          },
+          {
+            "reached": true,
+            "reward": -62.0
+          },
+          {
+            "reached": true,
+            "reward": -81.0
+          },
+          {
+            "reached": true,
+            "reward": -78.0
+          },
+          {
+            "reached": true,
+            "reward": -91.0
+          },
+          {
+            "reached": true,
+            "reward": -89.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -83.0
+          },
+          {
+            "reached": true,
+            "reward": -69.0
+          },
+          {
+            "reached": true,
+            "reward": -147.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -82.0
+          },
+          {
+            "reached": true,
+            "reward": -132.0
+          },
+          {
+            "reached": true,
+            "reward": -63.0
+          },
+          {
+            "reached": true,
+            "reward": -83.0
+          },
+          {
+            "reached": true,
+            "reward": -72.0
+          },
+          {
+            "reached": true,
+            "reward": -82.0
+          },
+          {
+            "reached": true,
+            "reward": -80.0
+          },
+          {
+            "reached": true,
+            "reward": -82.0
+          },
+          {
+            "reached": true,
+            "reward": -81.0
+          },
+          {
+            "reached": true,
+            "reward": -75.0
+          },
+          {
+            "reached": true,
+            "reward": -72.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -75.0
+          },
+          {
+            "reached": true,
+            "reward": -75.0
+          },
+          {
+            "reached": true,
+            "reward": -75.0
+          },
+          {
+            "reached": true,
+            "reward": -69.0
+          },
+          {
+            "reached": true,
+            "reward": -99.0
+          },
+          {
+            "reached": true,
+            "reward": -76.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -90.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -90.0
+          },
+          {
+            "reached": true,
+            "reward": -81.0
+          },
+          {
+            "reached": true,
+            "reward": -99.0
+          },
+          {
+            "reached": true,
+            "reward": -76.0
+          },
+          {
+            "reached": true,
+            "reward": -85.0
+          },
+          {
+            "reached": true,
+            "reward": -147.0
+          },
+          {
+            "reached": true,
+            "reward": -62.0
+          },
+          {
+            "reached": true,
+            "reward": -63.0
+          },
+          {
+            "reached": true,
+            "reward": -93.0
+          },
+          {
+            "reached": true,
+            "reward": -86.0
+          },
+          {
+            "reached": true,
+            "reward": -88.0
+          },
+          {
+            "reached": true,
+            "reward": -72.0
+          },
+          {
+            "reached": true,
+            "reward": -101.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -73.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -79.0
+          },
+          {
+            "reached": true,
+            "reward": -63.0
+          },
+          {
+            "reached": true,
+            "reward": -79.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -69.0
+          },
+          {
+            "reached": false,
+            "reward": -500.0
+          },
+          {
+            "reached": true,
+            "reward": -92.0
+          },
+          {
+            "reached": true,
+            "reward": -89.0
+          },
+          {
+            "reached": true,
+            "reward": -105.0
+          },
+          {
+            "reached": true,
+            "reward": -81.0
+          },
+          {
+            "reached": true,
+            "reward": -77.0
+          },
+          {
+            "reached": true,
+            "reward": -69.0
+          },
+          {
+            "reached": true,
+            "reward": -80.0
+          },
+          {
+            "reached": true,
+            "reward": -62.0
+          },
+          {
+            "reached": true,
+            "reward": -75.0
+          },
+          {
+            "reached": true,
+            "reward": -95.0
+          },
+          {
+            "reached": true,
+            "reward": -83.0
+          },
+          {
+            "reached": true,
+            "reward": -63.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -64.0
+          },
+          {
+            "reached": true,
+            "reward": -76.0
+          },
+          {
+            "reached": true,
+            "reward": -94.0
+          },
+          {
+            "reached": true,
+            "reward": -82.0
+          },
+          {
+            "reached": true,
+            "reward": -63.0
+          },
+          {
+            "reached": true,
+            "reward": -77.0
+          },
+          {
+            "reached": true,
+            "reward": -84.0
+          },
+          {
+            "reached": true,
+            "reward": -63.0
+          },
+          {
+            "reached": true,
+            "reward": -69.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -77.0
+          },
+          {
+            "reached": true,
+            "reward": -88.0
+          },
+          {
+            "reached": true,
+            "reward": -83.0
+          },
+          {
+            "reached": true,
+            "reward": -69.0
+          },
+          {
+            "reached": true,
+            "reward": -82.0
+          },
+          {
+            "reached": true,
+            "reward": -69.0
+          },
+          {
+            "reached": true,
+            "reward": -93.0
+          },
+          {
+            "reached": true,
+            "reward": -73.0
+          },
+          {
+            "reached": true,
+            "reward": -82.0
+          }
+        ],
+        "goal_rate": 0.99,
+        "mean": -85.71,
+        "mean_95_percent_normal_interval": [
+          -94.87223667416782,
+          -76.54776332583216
+        ]
+      },
+      "validation_seeds": [
+        10000,
+        10100
+      ],
+      "test_mean": -84.535,
+      "test_episodes": 200,
+      "test_successes": 200,
+      "history": [
+        {
+          "transitions": 0,
+          "mean": -253.43
+        },
+        {
+          "transitions": 10000,
+          "mean": -102.16
+        },
+        {
+          "transitions": 20000,
+          "mean": -204.73
+        },
+        {
+          "transitions": 30000,
+          "mean": -196.93
+        },
+        {
+          "transitions": 40000,
+          "mean": -101.83
+        },
+        {
+          "transitions": 50000,
+          "mean": -105.66
+        },
+        {
+          "transitions": 60000,
+          "mean": -112.3
+        },
+        {
+          "transitions": 70000,
+          "mean": -91.41
+        },
+        {
+          "transitions": 80000,
+          "mean": -90.12
+        },
+        {
+          "transitions": 90000,
+          "mean": -91.48
+        },
+        {
+          "transitions": 100000,
+          "mean": -95.72
+        },
+        {
+          "transitions": 110000,
+          "mean": -82.13
+        }
+      ]
+    },
+    {
+      "profile": "acrobot-native-dqn-v2",
+      "seed": 43,
+      "selected_training_seed": 43,
+      "test": {
+        "episodes": [
+          {
+            "reached": true,
+            "reward": -74.0
+          },
+          {
+            "reached": true,
+            "reward": -96.0
+          },
+          {
+            "reached": true,
+            "reward": -95.0
+          },
+          {
+            "reached": true,
+            "reward": -76.0
+          },
+          {
+            "reached": true,
+            "reward": -95.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -69.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -86.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -82.0
+          },
+          {
+            "reached": true,
+            "reward": -85.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -114.0
+          },
+          {
+            "reached": true,
+            "reward": -62.0
+          },
+          {
+            "reached": true,
+            "reward": -101.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -95.0
+          },
+          {
+            "reached": true,
+            "reward": -79.0
+          },
+          {
+            "reached": true,
+            "reward": -69.0
+          },
+          {
+            "reached": true,
+            "reward": -84.0
+          },
+          {
+            "reached": true,
+            "reward": -69.0
+          },
+          {
+            "reached": true,
+            "reward": -109.0
+          },
+          {
+            "reached": true,
+            "reward": -79.0
+          },
+          {
+            "reached": true,
+            "reward": -67.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -113.0
+          },
+          {
+            "reached": true,
+            "reward": -85.0
+          },
+          {
+            "reached": true,
+            "reward": -84.0
+          },
+          {
+            "reached": true,
+            "reward": -92.0
+          },
+          {
+            "reached": true,
+            "reward": -108.0
+          },
+          {
+            "reached": true,
+            "reward": -97.0
+          },
+          {
+            "reached": true,
+            "reward": -78.0
+          },
+          {
+            "reached": true,
+            "reward": -96.0
+          },
+          {
+            "reached": true,
+            "reward": -62.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -69.0
+          },
+          {
+            "reached": true,
+            "reward": -75.0
+          },
+          {
+            "reached": true,
+            "reward": -63.0
+          },
+          {
+            "reached": true,
+            "reward": -83.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -99.0
+          },
+          {
+            "reached": true,
+            "reward": -78.0
+          },
+          {
+            "reached": true,
+            "reward": -101.0
+          },
+          {
+            "reached": true,
+            "reward": -136.0
+          },
+          {
+            "reached": true,
+            "reward": -106.0
+          },
+          {
+            "reached": true,
+            "reward": -86.0
+          },
+          {
+            "reached": true,
+            "reward": -95.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -85.0
+          },
+          {
+            "reached": true,
+            "reward": -87.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -76.0
+          },
+          {
+            "reached": true,
+            "reward": -96.0
+          },
+          {
+            "reached": true,
+            "reward": -85.0
+          },
+          {
+            "reached": true,
+            "reward": -80.0
+          },
+          {
+            "reached": true,
+            "reward": -85.0
+          },
+          {
+            "reached": true,
+            "reward": -69.0
+          },
+          {
+            "reached": true,
+            "reward": -101.0
+          },
+          {
+            "reached": true,
+            "reward": -76.0
+          },
+          {
+            "reached": true,
+            "reward": -97.0
+          },
+          {
+            "reached": true,
+            "reward": -86.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -85.0
+          },
+          {
+            "reached": true,
+            "reward": -74.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -82.0
+          },
+          {
+            "reached": true,
+            "reward": -84.0
+          },
+          {
+            "reached": true,
+            "reward": -82.0
+          },
+          {
+            "reached": true,
+            "reward": -85.0
+          },
+          {
+            "reached": true,
+            "reward": -96.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -62.0
+          },
+          {
+            "reached": true,
+            "reward": -82.0
+          },
+          {
+            "reached": true,
+            "reward": -146.0
+          },
+          {
+            "reached": true,
+            "reward": -76.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -75.0
+          },
+          {
+            "reached": true,
+            "reward": -84.0
+          },
+          {
+            "reached": true,
+            "reward": -62.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -85.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -98.0
+          },
+          {
+            "reached": true,
+            "reward": -85.0
+          },
+          {
+            "reached": true,
+            "reward": -75.0
+          },
+          {
+            "reached": true,
+            "reward": -80.0
+          },
+          {
+            "reached": true,
+            "reward": -84.0
+          },
+          {
+            "reached": true,
+            "reward": -63.0
+          },
+          {
+            "reached": true,
+            "reward": -84.0
+          },
+          {
+            "reached": true,
+            "reward": -76.0
+          },
+          {
+            "reached": true,
+            "reward": -92.0
+          },
+          {
+            "reached": true,
+            "reward": -82.0
+          },
+          {
+            "reached": true,
+            "reward": -82.0
+          },
+          {
+            "reached": true,
+            "reward": -75.0
+          },
+          {
+            "reached": true,
+            "reward": -80.0
+          },
+          {
+            "reached": true,
+            "reward": -87.0
+          },
+          {
+            "reached": true,
+            "reward": -92.0
+          },
+          {
+            "reached": true,
+            "reward": -80.0
+          },
+          {
+            "reached": true,
+            "reward": -75.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -63.0
+          },
+          {
+            "reached": true,
+            "reward": -76.0
+          },
+          {
+            "reached": true,
+            "reward": -98.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -101.0
+          },
+          {
+            "reached": true,
+            "reward": -62.0
+          },
+          {
+            "reached": true,
+            "reward": -87.0
+          },
+          {
+            "reached": true,
+            "reward": -90.0
+          },
+          {
+            "reached": true,
+            "reward": -105.0
+          },
+          {
+            "reached": true,
+            "reward": -98.0
+          },
+          {
+            "reached": true,
+            "reward": -81.0
+          },
+          {
+            "reached": true,
+            "reward": -75.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -76.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -89.0
+          },
+          {
+            "reached": true,
+            "reward": -88.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -79.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -86.0
+          },
+          {
+            "reached": true,
+            "reward": -139.0
+          },
+          {
+            "reached": true,
+            "reward": -88.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -98.0
+          },
+          {
+            "reached": true,
+            "reward": -76.0
+          },
+          {
+            "reached": true,
+            "reward": -72.0
+          },
+          {
+            "reached": true,
+            "reward": -82.0
+          },
+          {
+            "reached": true,
+            "reward": -74.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -81.0
+          },
+          {
+            "reached": true,
+            "reward": -81.0
+          },
+          {
+            "reached": true,
+            "reward": -63.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -85.0
+          },
+          {
+            "reached": true,
+            "reward": -107.0
+          },
+          {
+            "reached": true,
+            "reward": -84.0
+          },
+          {
+            "reached": true,
+            "reward": -83.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -103.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -82.0
+          },
+          {
+            "reached": true,
+            "reward": -78.0
+          },
+          {
+            "reached": true,
+            "reward": -74.0
+          },
+          {
+            "reached": true,
+            "reward": -105.0
+          },
+          {
+            "reached": true,
+            "reward": -69.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -63.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -103.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -95.0
+          },
+          {
+            "reached": true,
+            "reward": -92.0
+          },
+          {
+            "reached": true,
+            "reward": -100.0
+          },
+          {
+            "reached": true,
+            "reward": -110.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -82.0
+          },
+          {
+            "reached": true,
+            "reward": -62.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -97.0
+          },
+          {
+            "reached": true,
+            "reward": -135.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -89.0
+          },
+          {
+            "reached": true,
+            "reward": -63.0
+          },
+          {
+            "reached": true,
+            "reward": -86.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -85.0
+          },
+          {
+            "reached": true,
+            "reward": -77.0
+          },
+          {
+            "reached": true,
+            "reward": -126.0
+          },
+          {
+            "reached": true,
+            "reward": -85.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -89.0
+          },
+          {
+            "reached": true,
+            "reward": -165.0
+          },
+          {
+            "reached": true,
+            "reward": -69.0
+          },
+          {
+            "reached": true,
+            "reward": -90.0
+          },
+          {
+            "reached": true,
+            "reward": -91.0
+          },
+          {
+            "reached": true,
+            "reward": -75.0
+          },
+          {
+            "reached": true,
+            "reward": -105.0
+          },
+          {
+            "reached": true,
+            "reward": -83.0
+          },
+          {
+            "reached": true,
+            "reward": -76.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -86.0
+          },
+          {
+            "reached": true,
+            "reward": -102.0
+          },
+          {
+            "reached": true,
+            "reward": -88.0
+          },
+          {
+            "reached": true,
+            "reward": -79.0
+          }
+        ],
+        "goal_rate": 1.0,
+        "mean": -82.555,
+        "mean_95_percent_normal_interval": [
+          -84.76279244254289,
+          -80.34720755745712
+        ]
+      },
+      "test_seeds": [
+        700000,
+        700200
+      ],
+      "transitions": 130000,
+      "validation": {
+        "episodes": [
+          {
+            "reached": true,
+            "reward": -76.0
+          },
+          {
+            "reached": true,
+            "reward": -80.0
+          },
+          {
+            "reached": true,
+            "reward": -92.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -83.0
+          },
+          {
+            "reached": true,
+            "reward": -86.0
+          },
+          {
+            "reached": true,
+            "reward": -62.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -77.0
+          },
+          {
+            "reached": true,
+            "reward": -92.0
+          },
+          {
+            "reached": true,
+            "reward": -87.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -100.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -76.0
+          },
+          {
+            "reached": true,
+            "reward": -87.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -87.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -92.0
+          },
+          {
+            "reached": true,
+            "reward": -81.0
+          },
+          {
+            "reached": false,
+            "reward": -500.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -83.0
+          },
+          {
+            "reached": true,
+            "reward": -74.0
+          },
+          {
+            "reached": true,
+            "reward": -75.0
+          },
+          {
+            "reached": true,
+            "reward": -100.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -82.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -62.0
+          },
+          {
+            "reached": true,
+            "reward": -76.0
+          },
+          {
+            "reached": true,
+            "reward": -82.0
+          },
+          {
+            "reached": true,
+            "reward": -99.0
+          },
+          {
+            "reached": true,
+            "reward": -78.0
+          },
+          {
+            "reached": true,
+            "reward": -86.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -75.0
+          },
+          {
+            "reached": true,
+            "reward": -111.0
+          },
+          {
+            "reached": true,
+            "reward": -74.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -62.0
+          },
+          {
+            "reached": true,
+            "reward": -97.0
+          },
+          {
+            "reached": true,
+            "reward": -97.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -76.0
+          },
+          {
+            "reached": true,
+            "reward": -88.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -227.0
+          },
+          {
+            "reached": true,
+            "reward": -75.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -93.0
+          },
+          {
+            "reached": true,
+            "reward": -72.0
+          },
+          {
+            "reached": true,
+            "reward": -86.0
+          },
+          {
+            "reached": true,
+            "reward": -87.0
+          },
+          {
+            "reached": true,
+            "reward": -76.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -76.0
+          },
+          {
+            "reached": true,
+            "reward": -85.0
+          },
+          {
+            "reached": true,
+            "reward": -111.0
+          },
+          {
+            "reached": true,
+            "reward": -69.0
+          },
+          {
+            "reached": true,
+            "reward": -83.0
+          },
+          {
+            "reached": true,
+            "reward": -63.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -76.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -76.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -78.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -75.0
+          },
+          {
+            "reached": true,
+            "reward": -75.0
+          },
+          {
+            "reached": true,
+            "reward": -63.0
+          },
+          {
+            "reached": true,
+            "reward": -114.0
+          },
+          {
+            "reached": true,
+            "reward": -90.0
+          },
+          {
+            "reached": true,
+            "reward": -75.0
+          },
+          {
+            "reached": true,
+            "reward": -100.0
+          },
+          {
+            "reached": true,
+            "reward": -85.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -74.0
+          },
+          {
+            "reached": true,
+            "reward": -141.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -76.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -138.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -109.0
+          },
+          {
+            "reached": true,
+            "reward": -64.0
+          },
+          {
+            "reached": true,
+            "reward": -62.0
+          },
+          {
+            "reached": true,
+            "reward": -85.0
+          },
+          {
+            "reached": true,
+            "reward": -63.0
+          },
+          {
+            "reached": true,
+            "reward": -84.0
+          }
+        ],
+        "goal_rate": 0.99,
+        "mean": -85.19,
+        "mean_95_percent_normal_interval": [
+          -94.33703714452633,
+          -76.04296285547366
+        ]
+      },
+      "validation_seeds": [
+        10000,
+        10100
+      ],
+      "test_mean": -82.555,
+      "test_episodes": 200,
+      "test_successes": 200,
+      "history": [
+        {
+          "transitions": 0,
+          "mean": -500
+        },
+        {
+          "transitions": 10000,
+          "mean": -101.1
+        },
+        {
+          "transitions": 20000,
+          "mean": -461.35
+        },
+        {
+          "transitions": 30000,
+          "mean": -147.35
+        },
+        {
+          "transitions": 40000,
+          "mean": -105.29
+        },
+        {
+          "transitions": 50000,
+          "mean": -114.19
+        },
+        {
+          "transitions": 60000,
+          "mean": -127.41
+        },
+        {
+          "transitions": 70000,
+          "mean": -140.49
+        },
+        {
+          "transitions": 80000,
+          "mean": -101.18
+        },
+        {
+          "transitions": 90000,
+          "mean": -122.04
+        },
+        {
+          "transitions": 100000,
+          "mean": -91.37
+        },
+        {
+          "transitions": 110000,
+          "mean": -106.56
+        },
+        {
+          "transitions": 120000,
+          "mean": -91.26
+        },
+        {
+          "transitions": 130000,
+          "mean": -84.76
+        }
+      ]
+    },
+    {
+      "profile": "acrobot-native-dqn-v2",
+      "seed": 44,
+      "selected_training_seed": 43,
+      "test": {
+        "episodes": [
+          {
+            "reached": true,
+            "reward": -74.0
+          },
+          {
+            "reached": true,
+            "reward": -84.0
+          },
+          {
+            "reached": true,
+            "reward": -84.0
+          },
+          {
+            "reached": true,
+            "reward": -107.0
+          },
+          {
+            "reached": true,
+            "reward": -121.0
+          },
+          {
+            "reached": true,
+            "reward": -85.0
+          },
+          {
+            "reached": true,
+            "reward": -84.0
+          },
+          {
+            "reached": true,
+            "reward": -69.0
+          },
+          {
+            "reached": true,
+            "reward": -101.0
+          },
+          {
+            "reached": true,
+            "reward": -90.0
+          },
+          {
+            "reached": true,
+            "reward": -68.0
+          },
+          {
+            "reached": true,
+            "reward": -81.0
+          },
+          {
+            "reached": true,
+            "reward": -173.0
+          },
+          {
+            "reached": true,
+            "reward": -68.0
+          },
+          {
+            "reached": true,
+            "reward": -69.0
+          },
+          {
+            "reached": true,
+            "reward": -84.0
+          },
+          {
+            "reached": true,
+            "reward": -86.0
+          },
+          {
+            "reached": true,
+            "reward": -62.0
+          },
+          {
+            "reached": true,
+            "reward": -103.0
+          },
+          {
+            "reached": true,
+            "reward": -77.0
+          },
+          {
+            "reached": true,
+            "reward": -73.0
+          },
+          {
+            "reached": true,
+            "reward": -78.0
+          },
+          {
+            "reached": true,
+            "reward": -99.0
+          },
+          {
+            "reached": true,
+            "reward": -84.0
+          },
+          {
+            "reached": true,
+            "reward": -83.0
+          },
+          {
+            "reached": true,
+            "reward": -77.0
+          },
+          {
+            "reached": true,
+            "reward": -112.0
+          },
+          {
+            "reached": true,
+            "reward": -76.0
+          },
+          {
+            "reached": true,
+            "reward": -79.0
+          },
+          {
+            "reached": true,
+            "reward": -86.0
+          },
+          {
+            "reached": true,
+            "reward": -69.0
+          },
+          {
+            "reached": true,
+            "reward": -91.0
+          },
+          {
+            "reached": true,
+            "reward": -83.0
+          },
+          {
+            "reached": true,
+            "reward": -86.0
+          },
+          {
+            "reached": true,
+            "reward": -101.0
+          },
+          {
+            "reached": true,
+            "reward": -90.0
+          },
+          {
+            "reached": true,
+            "reward": -86.0
+          },
+          {
+            "reached": true,
+            "reward": -92.0
+          },
+          {
+            "reached": true,
+            "reward": -90.0
+          },
+          {
+            "reached": true,
+            "reward": -97.0
+          },
+          {
+            "reached": true,
+            "reward": -68.0
+          },
+          {
+            "reached": true,
+            "reward": -72.0
+          },
+          {
+            "reached": true,
+            "reward": -85.0
+          },
+          {
+            "reached": true,
+            "reward": -66.0
+          },
+          {
+            "reached": true,
+            "reward": -286.0
+          },
+          {
+            "reached": true,
+            "reward": -63.0
+          },
+          {
+            "reached": true,
+            "reward": -67.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -76.0
+          },
+          {
+            "reached": true,
+            "reward": -84.0
+          },
+          {
+            "reached": true,
+            "reward": -89.0
+          },
+          {
+            "reached": true,
+            "reward": -94.0
+          },
+          {
+            "reached": true,
+            "reward": -88.0
+          },
+          {
+            "reached": true,
+            "reward": -102.0
+          },
+          {
+            "reached": true,
+            "reward": -69.0
+          },
+          {
+            "reached": true,
+            "reward": -90.0
+          },
+          {
+            "reached": true,
+            "reward": -77.0
+          },
+          {
+            "reached": true,
+            "reward": -100.0
+          },
+          {
+            "reached": true,
+            "reward": -236.0
+          },
+          {
+            "reached": true,
+            "reward": -68.0
+          },
+          {
+            "reached": true,
+            "reward": -111.0
+          },
+          {
+            "reached": true,
+            "reward": -82.0
+          },
+          {
+            "reached": true,
+            "reward": -86.0
+          },
+          {
+            "reached": true,
+            "reward": -68.0
+          },
+          {
+            "reached": true,
+            "reward": -64.0
+          },
+          {
+            "reached": true,
+            "reward": -68.0
+          },
+          {
+            "reached": true,
+            "reward": -68.0
+          },
+          {
+            "reached": true,
+            "reward": -80.0
+          },
+          {
+            "reached": true,
+            "reward": -101.0
+          },
+          {
+            "reached": true,
+            "reward": -68.0
+          },
+          {
+            "reached": true,
+            "reward": -68.0
+          },
+          {
+            "reached": true,
+            "reward": -89.0
+          },
+          {
+            "reached": true,
+            "reward": -108.0
+          },
+          {
+            "reached": true,
+            "reward": -97.0
+          },
+          {
+            "reached": true,
+            "reward": -78.0
+          },
+          {
+            "reached": true,
+            "reward": -78.0
+          },
+          {
+            "reached": true,
+            "reward": -68.0
+          },
+          {
+            "reached": true,
+            "reward": -74.0
+          },
+          {
+            "reached": true,
+            "reward": -68.0
+          },
+          {
+            "reached": true,
+            "reward": -92.0
+          },
+          {
+            "reached": true,
+            "reward": -74.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -91.0
+          },
+          {
+            "reached": true,
+            "reward": -97.0
+          },
+          {
+            "reached": true,
+            "reward": -69.0
+          },
+          {
+            "reached": true,
+            "reward": -77.0
+          },
+          {
+            "reached": true,
+            "reward": -77.0
+          },
+          {
+            "reached": true,
+            "reward": -76.0
+          },
+          {
+            "reached": true,
+            "reward": -88.0
+          },
+          {
+            "reached": true,
+            "reward": -80.0
+          },
+          {
+            "reached": true,
+            "reward": -76.0
+          },
+          {
+            "reached": true,
+            "reward": -91.0
+          },
+          {
+            "reached": true,
+            "reward": -77.0
+          },
+          {
+            "reached": true,
+            "reward": -79.0
+          },
+          {
+            "reached": true,
+            "reward": -72.0
+          },
+          {
+            "reached": true,
+            "reward": -69.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -62.0
+          },
+          {
+            "reached": true,
+            "reward": -174.0
+          },
+          {
+            "reached": true,
+            "reward": -90.0
+          },
+          {
+            "reached": true,
+            "reward": -101.0
+          },
+          {
+            "reached": true,
+            "reward": -68.0
+          },
+          {
+            "reached": true,
+            "reward": -85.0
+          },
+          {
+            "reached": true,
+            "reward": -61.0
+          },
+          {
+            "reached": true,
+            "reward": -77.0
+          },
+          {
+            "reached": true,
+            "reward": -69.0
+          },
+          {
+            "reached": true,
+            "reward": -76.0
+          },
+          {
+            "reached": true,
+            "reward": -69.0
+          },
+          {
+            "reached": true,
+            "reward": -72.0
+          },
+          {
+            "reached": true,
+            "reward": -69.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -69.0
+          },
+          {
+            "reached": true,
+            "reward": -69.0
+          },
+          {
+            "reached": true,
+            "reward": -90.0
+          },
+          {
+            "reached": true,
+            "reward": -92.0
+          },
+          {
+            "reached": true,
+            "reward": -89.0
+          },
+          {
+            "reached": true,
+            "reward": -110.0
+          },
+          {
+            "reached": true,
+            "reward": -69.0
+          },
+          {
+            "reached": true,
+            "reward": -102.0
+          },
+          {
+            "reached": true,
+            "reward": -77.0
+          },
+          {
+            "reached": true,
+            "reward": -90.0
+          },
+          {
+            "reached": true,
+            "reward": -99.0
+          },
+          {
+            "reached": true,
+            "reward": -79.0
+          },
+          {
+            "reached": true,
+            "reward": -105.0
+          },
+          {
+            "reached": true,
+            "reward": -89.0
+          },
+          {
+            "reached": true,
+            "reward": -60.0
+          },
+          {
+            "reached": true,
+            "reward": -76.0
+          },
+          {
+            "reached": true,
+            "reward": -329.0
+          },
+          {
+            "reached": true,
+            "reward": -84.0
+          },
+          {
+            "reached": true,
+            "reward": -92.0
+          },
+          {
+            "reached": true,
+            "reward": -78.0
+          },
+          {
+            "reached": true,
+            "reward": -90.0
+          },
+          {
+            "reached": true,
+            "reward": -88.0
+          },
+          {
+            "reached": true,
+            "reward": -68.0
+          },
+          {
+            "reached": true,
+            "reward": -97.0
+          },
+          {
+            "reached": true,
+            "reward": -103.0
+          },
+          {
+            "reached": true,
+            "reward": -103.0
+          },
+          {
+            "reached": true,
+            "reward": -90.0
+          },
+          {
+            "reached": true,
+            "reward": -85.0
+          },
+          {
+            "reached": true,
+            "reward": -88.0
+          },
+          {
+            "reached": true,
+            "reward": -79.0
+          },
+          {
+            "reached": true,
+            "reward": -69.0
+          },
+          {
+            "reached": true,
+            "reward": -73.0
+          },
+          {
+            "reached": true,
+            "reward": -83.0
+          },
+          {
+            "reached": true,
+            "reward": -76.0
+          },
+          {
+            "reached": true,
+            "reward": -86.0
+          },
+          {
+            "reached": true,
+            "reward": -61.0
+          },
+          {
+            "reached": true,
+            "reward": -61.0
+          },
+          {
+            "reached": true,
+            "reward": -89.0
+          },
+          {
+            "reached": true,
+            "reward": -106.0
+          },
+          {
+            "reached": true,
+            "reward": -65.0
+          },
+          {
+            "reached": true,
+            "reward": -75.0
+          },
+          {
+            "reached": true,
+            "reward": -69.0
+          },
+          {
+            "reached": true,
+            "reward": -88.0
+          },
+          {
+            "reached": true,
+            "reward": -68.0
+          },
+          {
+            "reached": true,
+            "reward": -77.0
+          },
+          {
+            "reached": true,
+            "reward": -84.0
+          },
+          {
+            "reached": true,
+            "reward": -75.0
+          },
+          {
+            "reached": true,
+            "reward": -85.0
+          },
+          {
+            "reached": true,
+            "reward": -84.0
+          },
+          {
+            "reached": true,
+            "reward": -84.0
+          },
+          {
+            "reached": true,
+            "reward": -85.0
+          },
+          {
+            "reached": true,
+            "reward": -86.0
+          },
+          {
+            "reached": true,
+            "reward": -88.0
+          },
+          {
+            "reached": true,
+            "reward": -117.0
+          },
+          {
+            "reached": true,
+            "reward": -69.0
+          },
+          {
+            "reached": true,
+            "reward": -62.0
+          },
+          {
+            "reached": true,
+            "reward": -112.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -82.0
+          },
+          {
+            "reached": true,
+            "reward": -69.0
+          },
+          {
+            "reached": true,
+            "reward": -94.0
+          },
+          {
+            "reached": true,
+            "reward": -86.0
+          },
+          {
+            "reached": true,
+            "reward": -76.0
+          },
+          {
+            "reached": true,
+            "reward": -91.0
+          },
+          {
+            "reached": true,
+            "reward": -72.0
+          },
+          {
+            "reached": true,
+            "reward": -66.0
+          },
+          {
+            "reached": true,
+            "reward": -96.0
+          },
+          {
+            "reached": true,
+            "reward": -61.0
+          },
+          {
+            "reached": true,
+            "reward": -102.0
+          },
+          {
+            "reached": true,
+            "reward": -67.0
+          },
+          {
+            "reached": true,
+            "reward": -110.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -76.0
+          },
+          {
+            "reached": true,
+            "reward": -77.0
+          },
+          {
+            "reached": true,
+            "reward": -265.0
+          },
+          {
+            "reached": true,
+            "reward": -115.0
+          },
+          {
+            "reached": true,
+            "reward": -61.0
+          },
+          {
+            "reached": true,
+            "reward": -90.0
+          },
+          {
+            "reached": true,
+            "reward": -97.0
+          },
+          {
+            "reached": true,
+            "reward": -68.0
+          },
+          {
+            "reached": true,
+            "reward": -79.0
+          },
+          {
+            "reached": true,
+            "reward": -62.0
+          },
+          {
+            "reached": true,
+            "reward": -69.0
+          },
+          {
+            "reached": true,
+            "reward": -92.0
+          },
+          {
+            "reached": true,
+            "reward": -89.0
+          },
+          {
+            "reached": true,
+            "reward": -68.0
+          },
+          {
+            "reached": true,
+            "reward": -73.0
+          },
+          {
+            "reached": true,
+            "reward": -86.0
+          },
+          {
+            "reached": true,
+            "reward": -76.0
+          }
+        ],
+        "goal_rate": 1.0,
+        "mean": -86.58,
+        "mean_95_percent_normal_interval": [
+          -91.04182686543444,
+          -82.11817313456555
+        ]
+      },
+      "test_seeds": [
+        700000,
+        700200
+      ],
+      "transitions": 130000,
+      "validation": {
+        "episodes": [
+          {
+            "reached": true,
+            "reward": -91.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -84.0
+          },
+          {
+            "reached": true,
+            "reward": -88.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -127.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -104.0
+          },
+          {
+            "reached": true,
+            "reward": -100.0
+          },
+          {
+            "reached": true,
+            "reward": -69.0
+          },
+          {
+            "reached": true,
+            "reward": -320.0
+          },
+          {
+            "reached": true,
+            "reward": -76.0
+          },
+          {
+            "reached": true,
+            "reward": -64.0
+          },
+          {
+            "reached": true,
+            "reward": -78.0
+          },
+          {
+            "reached": true,
+            "reward": -73.0
+          },
+          {
+            "reached": true,
+            "reward": -94.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -88.0
+          },
+          {
+            "reached": true,
+            "reward": -68.0
+          },
+          {
+            "reached": true,
+            "reward": -101.0
+          },
+          {
+            "reached": true,
+            "reward": -94.0
+          },
+          {
+            "reached": true,
+            "reward": -103.0
+          },
+          {
+            "reached": true,
+            "reward": -84.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -60.0
+          },
+          {
+            "reached": true,
+            "reward": -62.0
+          },
+          {
+            "reached": true,
+            "reward": -77.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -69.0
+          },
+          {
+            "reached": true,
+            "reward": -93.0
+          },
+          {
+            "reached": true,
+            "reward": -86.0
+          },
+          {
+            "reached": true,
+            "reward": -77.0
+          },
+          {
+            "reached": true,
+            "reward": -87.0
+          },
+          {
+            "reached": true,
+            "reward": -105.0
+          },
+          {
+            "reached": true,
+            "reward": -81.0
+          },
+          {
+            "reached": true,
+            "reward": -80.0
+          },
+          {
+            "reached": true,
+            "reward": -94.0
+          },
+          {
+            "reached": true,
+            "reward": -104.0
+          },
+          {
+            "reached": true,
+            "reward": -69.0
+          },
+          {
+            "reached": true,
+            "reward": -87.0
+          },
+          {
+            "reached": true,
+            "reward": -75.0
+          },
+          {
+            "reached": true,
+            "reward": -84.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -72.0
+          },
+          {
+            "reached": true,
+            "reward": -64.0
+          },
+          {
+            "reached": true,
+            "reward": -86.0
+          },
+          {
+            "reached": true,
+            "reward": -95.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -66.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -86.0
+          },
+          {
+            "reached": true,
+            "reward": -81.0
+          },
+          {
+            "reached": true,
+            "reward": -68.0
+          },
+          {
+            "reached": true,
+            "reward": -68.0
+          },
+          {
+            "reached": true,
+            "reward": -85.0
+          },
+          {
+            "reached": true,
+            "reward": -67.0
+          },
+          {
+            "reached": true,
+            "reward": -89.0
+          },
+          {
+            "reached": true,
+            "reward": -83.0
+          },
+          {
+            "reached": true,
+            "reward": -68.0
+          },
+          {
+            "reached": true,
+            "reward": -89.0
+          },
+          {
+            "reached": true,
+            "reward": -180.0
+          },
+          {
+            "reached": true,
+            "reward": -89.0
+          },
+          {
+            "reached": true,
+            "reward": -66.0
+          },
+          {
+            "reached": true,
+            "reward": -86.0
+          },
+          {
+            "reached": true,
+            "reward": -61.0
+          },
+          {
+            "reached": true,
+            "reward": -79.0
+          },
+          {
+            "reached": true,
+            "reward": -86.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -78.0
+          },
+          {
+            "reached": true,
+            "reward": -84.0
+          },
+          {
+            "reached": true,
+            "reward": -90.0
+          },
+          {
+            "reached": true,
+            "reward": -68.0
+          },
+          {
+            "reached": true,
+            "reward": -70.0
+          },
+          {
+            "reached": true,
+            "reward": -87.0
+          },
+          {
+            "reached": true,
+            "reward": -124.0
+          },
+          {
+            "reached": true,
+            "reward": -103.0
+          },
+          {
+            "reached": true,
+            "reward": -88.0
+          },
+          {
+            "reached": true,
+            "reward": -72.0
+          },
+          {
+            "reached": true,
+            "reward": -62.0
+          },
+          {
+            "reached": true,
+            "reward": -68.0
+          },
+          {
+            "reached": true,
+            "reward": -105.0
+          },
+          {
+            "reached": true,
+            "reward": -112.0
+          },
+          {
+            "reached": true,
+            "reward": -76.0
+          },
+          {
+            "reached": true,
+            "reward": -148.0
+          },
+          {
+            "reached": true,
+            "reward": -71.0
+          },
+          {
+            "reached": true,
+            "reward": -88.0
+          },
+          {
+            "reached": true,
+            "reward": -90.0
+          },
+          {
+            "reached": true,
+            "reward": -92.0
+          },
+          {
+            "reached": true,
+            "reward": -76.0
+          },
+          {
+            "reached": true,
+            "reward": -92.0
+          },
+          {
+            "reached": true,
+            "reward": -91.0
+          },
+          {
+            "reached": true,
+            "reward": -76.0
+          },
+          {
+            "reached": true,
+            "reward": -105.0
+          },
+          {
+            "reached": true,
+            "reward": -102.0
+          },
+          {
+            "reached": true,
+            "reward": -85.0
+          },
+          {
+            "reached": true,
+            "reward": -92.0
+          },
+          {
+            "reached": true,
+            "reward": -77.0
+          },
+          {
+            "reached": true,
+            "reward": -88.0
+          },
+          {
+            "reached": true,
+            "reward": -88.0
+          }
+        ],
+        "goal_rate": 1.0,
+        "mean": -86.31,
+        "mean_95_percent_normal_interval": [
+          -92.1198996187363,
+          -80.5001003812637
+        ]
+      },
+      "validation_seeds": [
+        10000,
+        10100
+      ],
+      "test_mean": -86.58,
+      "test_episodes": 200,
+      "test_successes": 200,
+      "history": [
+        {
+          "transitions": 0,
+          "mean": -500
+        },
+        {
+          "transitions": 10000,
+          "mean": -91.61
+        },
+        {
+          "transitions": 20000,
+          "mean": -131.46
+        },
+        {
+          "transitions": 30000,
+          "mean": -123.57
+        },
+        {
+          "transitions": 40000,
+          "mean": -95.84
+        },
+        {
+          "transitions": 50000,
+          "mean": -98.74
+        },
+        {
+          "transitions": 60000,
+          "mean": -97.68
+        },
+        {
+          "transitions": 70000,
+          "mean": -108.76
+        },
+        {
+          "transitions": 80000,
+          "mean": -94.53
+        },
+        {
+          "transitions": 90000,
+          "mean": -99.17
+        },
+        {
+          "transitions": 100000,
+          "mean": -123
+        },
+        {
+          "transitions": 110000,
+          "mean": -94.72
+        },
+        {
+          "transitions": 120000,
+          "mean": -90.26
+        },
+        {
+          "transitions": 130000,
+          "mean": -88.51
+        }
+      ]
+    }
+  ],
+  "browser_training": {
+    "profile": "acrobot-browser-dqn-v1",
+    "seed": 42,
+    "transitions": 50000,
+    "baseline": {
+      "mean": -259.07,
+      "goal_rate": 1,
+      "episodes": [
+        {
+          "reward": -318,
+          "reached": true
+        },
+        {
+          "reward": -249,
+          "reached": true
+        },
+        {
+          "reward": -234,
+          "reached": true
+        },
+        {
+          "reward": -323,
+          "reached": true
+        },
+        {
+          "reward": -328,
+          "reached": true
+        },
+        {
+          "reward": -262,
+          "reached": true
+        },
+        {
+          "reward": -248,
+          "reached": true
+        },
+        {
+          "reward": -340,
+          "reached": true
+        },
+        {
+          "reward": -375,
+          "reached": true
+        },
+        {
+          "reward": -250,
+          "reached": true
+        },
+        {
+          "reward": -269,
+          "reached": true
+        },
+        {
+          "reward": -242,
+          "reached": true
+        },
+        {
+          "reward": -294,
+          "reached": true
+        },
+        {
+          "reward": -215,
+          "reached": true
+        },
+        {
+          "reward": -204,
+          "reached": true
+        },
+        {
+          "reward": -226,
+          "reached": true
+        },
+        {
+          "reward": -235,
+          "reached": true
+        },
+        {
+          "reward": -221,
+          "reached": true
+        },
+        {
+          "reward": -226,
+          "reached": true
+        },
+        {
+          "reward": -260,
+          "reached": true
+        },
+        {
+          "reward": -255,
+          "reached": true
+        },
+        {
+          "reward": -285,
+          "reached": true
+        },
+        {
+          "reward": -216,
+          "reached": true
+        },
+        {
+          "reward": -261,
+          "reached": true
+        },
+        {
+          "reward": -273,
+          "reached": true
+        },
+        {
+          "reward": -207,
+          "reached": true
+        },
+        {
+          "reward": -250,
+          "reached": true
+        },
+        {
+          "reward": -265,
+          "reached": true
+        },
+        {
+          "reward": -238,
+          "reached": true
+        },
+        {
+          "reward": -244,
+          "reached": true
+        },
+        {
+          "reward": -247,
+          "reached": true
+        },
+        {
+          "reward": -262,
+          "reached": true
+        },
+        {
+          "reward": -275,
+          "reached": true
+        },
+        {
+          "reward": -278,
+          "reached": true
+        },
+        {
+          "reward": -234,
+          "reached": true
+        },
+        {
+          "reward": -380,
+          "reached": true
+        },
+        {
+          "reward": -181,
+          "reached": true
+        },
+        {
+          "reward": -298,
+          "reached": true
+        },
+        {
+          "reward": -240,
+          "reached": true
+        },
+        {
+          "reward": -210,
+          "reached": true
+        },
+        {
+          "reward": -252,
+          "reached": true
+        },
+        {
+          "reward": -252,
+          "reached": true
+        },
+        {
+          "reward": -235,
+          "reached": true
+        },
+        {
+          "reward": -231,
+          "reached": true
+        },
+        {
+          "reward": -237,
+          "reached": true
+        },
+        {
+          "reward": -238,
+          "reached": true
+        },
+        {
+          "reward": -296,
+          "reached": true
+        },
+        {
+          "reward": -304,
+          "reached": true
+        },
+        {
+          "reward": -305,
+          "reached": true
+        },
+        {
+          "reward": -312,
+          "reached": true
+        },
+        {
+          "reward": -230,
+          "reached": true
+        },
+        {
+          "reward": -241,
+          "reached": true
+        },
+        {
+          "reward": -226,
+          "reached": true
+        },
+        {
+          "reward": -197,
+          "reached": true
+        },
+        {
+          "reward": -233,
+          "reached": true
+        },
+        {
+          "reward": -236,
+          "reached": true
+        },
+        {
+          "reward": -323,
+          "reached": true
+        },
+        {
+          "reward": -244,
+          "reached": true
+        },
+        {
+          "reward": -197,
+          "reached": true
+        },
+        {
+          "reward": -263,
+          "reached": true
+        },
+        {
+          "reward": -255,
+          "reached": true
+        },
+        {
+          "reward": -256,
+          "reached": true
+        },
+        {
+          "reward": -241,
+          "reached": true
+        },
+        {
+          "reward": -243,
+          "reached": true
+        },
+        {
+          "reward": -203,
+          "reached": true
+        },
+        {
+          "reward": -232,
+          "reached": true
+        },
+        {
+          "reward": -362,
+          "reached": true
+        },
+        {
+          "reward": -241,
+          "reached": true
+        },
+        {
+          "reward": -247,
+          "reached": true
+        },
+        {
+          "reward": -235,
+          "reached": true
+        },
+        {
+          "reward": -253,
+          "reached": true
+        },
+        {
+          "reward": -221,
+          "reached": true
+        },
+        {
+          "reward": -215,
+          "reached": true
+        },
+        {
+          "reward": -314,
+          "reached": true
+        },
+        {
+          "reward": -279,
+          "reached": true
+        },
+        {
+          "reward": -242,
+          "reached": true
+        },
+        {
+          "reward": -234,
+          "reached": true
+        },
+        {
+          "reward": -298,
+          "reached": true
+        },
+        {
+          "reward": -226,
+          "reached": true
+        },
+        {
+          "reward": -258,
+          "reached": true
+        },
+        {
+          "reward": -294,
+          "reached": true
+        },
+        {
+          "reward": -236,
+          "reached": true
+        },
+        {
+          "reward": -260,
+          "reached": true
+        },
+        {
+          "reward": -194,
+          "reached": true
+        },
+        {
+          "reward": -233,
+          "reached": true
+        },
+        {
+          "reward": -252,
+          "reached": true
+        },
+        {
+          "reward": -288,
+          "reached": true
+        },
+        {
+          "reward": -227,
+          "reached": true
+        },
+        {
+          "reward": -240,
+          "reached": true
+        },
+        {
+          "reward": -242,
+          "reached": true
+        },
+        {
+          "reward": -271,
+          "reached": true
+        },
+        {
+          "reward": -423,
+          "reached": true
+        },
+        {
+          "reward": -221,
+          "reached": true
+        },
+        {
+          "reward": -445,
+          "reached": true
+        },
+        {
+          "reward": -312,
+          "reached": true
+        },
+        {
+          "reward": -172,
+          "reached": true
+        },
+        {
+          "reward": -353,
+          "reached": true
+        },
+        {
+          "reward": -255,
+          "reached": true
+        },
+        {
+          "reward": -229,
+          "reached": true
+        },
+        {
+          "reward": -235,
+          "reached": true
+        }
+      ]
+    },
+    "history": [
+      {
+        "transitions": 10000,
+        "mean": -108.07,
+        "goal_rate": 1
+      },
+      {
+        "transitions": 20000,
+        "mean": -182.09,
+        "goal_rate": 0.9
+      },
+      {
+        "transitions": 30000,
+        "mean": -143.21,
+        "goal_rate": 0.98
+      },
+      {
+        "transitions": 40000,
+        "mean": -112.58,
+        "goal_rate": 0.99
+      },
+      {
+        "transitions": 50000,
+        "mean": -81.38,
+        "goal_rate": 1
+      }
+    ],
+    "validationSeeds": [
+      10000,
+      10100
+    ],
+    "testSeeds": [
+      800000,
+      800200
+    ],
+    "validationStopMean": -90,
+    "validation": {
+      "mean": -81.38,
+      "goal_rate": 1,
+      "episodes": [
+        {
+          "reward": -87,
+          "reached": true
+        },
+        {
+          "reward": -62,
+          "reached": true
+        },
+        {
+          "reward": -92,
+          "reached": true
+        },
+        {
+          "reward": -78,
+          "reached": true
+        },
+        {
+          "reward": -72,
+          "reached": true
+        },
+        {
+          "reward": -83,
+          "reached": true
+        },
+        {
+          "reward": -69,
+          "reached": true
+        },
+        {
+          "reward": -76,
+          "reached": true
+        },
+        {
+          "reward": -88,
+          "reached": true
+        },
+        {
+          "reward": -83,
+          "reached": true
+        },
+        {
+          "reward": -71,
+          "reached": true
+        },
+        {
+          "reward": -70,
+          "reached": true
+        },
+        {
+          "reward": -87,
+          "reached": true
+        },
+        {
+          "reward": -70,
+          "reached": true
+        },
+        {
+          "reward": -81,
+          "reached": true
+        },
+        {
+          "reward": -87,
+          "reached": true
+        },
+        {
+          "reward": -69,
+          "reached": true
+        },
+        {
+          "reward": -91,
+          "reached": true
+        },
+        {
+          "reward": -60,
+          "reached": true
+        },
+        {
+          "reward": -82,
+          "reached": true
+        },
+        {
+          "reward": -78,
+          "reached": true
+        },
+        {
+          "reward": -114,
+          "reached": true
+        },
+        {
+          "reward": -77,
+          "reached": true
+        },
+        {
+          "reward": -76,
+          "reached": true
+        },
+        {
+          "reward": -69,
+          "reached": true
+        },
+        {
+          "reward": -123,
+          "reached": true
+        },
+        {
+          "reward": -61,
+          "reached": true
+        },
+        {
+          "reward": -83,
+          "reached": true
+        },
+        {
+          "reward": -73,
+          "reached": true
+        },
+        {
+          "reward": -230,
+          "reached": true
+        },
+        {
+          "reward": -79,
+          "reached": true
+        },
+        {
+          "reward": -77,
+          "reached": true
+        },
+        {
+          "reward": -81,
+          "reached": true
+        },
+        {
+          "reward": -70,
+          "reached": true
+        },
+        {
+          "reward": -60,
+          "reached": true
+        },
+        {
+          "reward": -73,
+          "reached": true
+        },
+        {
+          "reward": -90,
+          "reached": true
+        },
+        {
+          "reward": -68,
+          "reached": true
+        },
+        {
+          "reward": -78,
+          "reached": true
+        },
+        {
+          "reward": -87,
+          "reached": true
+        },
+        {
+          "reward": -78,
+          "reached": true
+        },
+        {
+          "reward": -91,
+          "reached": true
+        },
+        {
+          "reward": -60,
+          "reached": true
+        },
+        {
+          "reward": -61,
+          "reached": true
+        },
+        {
+          "reward": -74,
+          "reached": true
+        },
+        {
+          "reward": -77,
+          "reached": true
+        },
+        {
+          "reward": -73,
+          "reached": true
+        },
+        {
+          "reward": -77,
+          "reached": true
+        },
+        {
+          "reward": -97,
+          "reached": true
+        },
+        {
+          "reward": -61,
+          "reached": true
+        },
+        {
+          "reward": -89,
+          "reached": true
+        },
+        {
+          "reward": -69,
+          "reached": true
+        },
+        {
+          "reward": -83,
+          "reached": true
+        },
+        {
+          "reward": -101,
+          "reached": true
+        },
+        {
+          "reward": -82,
+          "reached": true
+        },
+        {
+          "reward": -94,
+          "reached": true
+        },
+        {
+          "reward": -60,
+          "reached": true
+        },
+        {
+          "reward": -80,
+          "reached": true
+        },
+        {
+          "reward": -86,
+          "reached": true
+        },
+        {
+          "reward": -74,
+          "reached": true
+        },
+        {
+          "reward": -69,
+          "reached": true
+        },
+        {
+          "reward": -89,
+          "reached": true
+        },
+        {
+          "reward": -85,
+          "reached": true
+        },
+        {
+          "reward": -62,
+          "reached": true
+        },
+        {
+          "reward": -69,
+          "reached": true
+        },
+        {
+          "reward": -72,
+          "reached": true
+        },
+        {
+          "reward": -69,
+          "reached": true
+        },
+        {
+          "reward": -69,
+          "reached": true
+        },
+        {
+          "reward": -139,
+          "reached": true
+        },
+        {
+          "reward": -95,
+          "reached": true
+        },
+        {
+          "reward": -86,
+          "reached": true
+        },
+        {
+          "reward": -61,
+          "reached": true
+        },
+        {
+          "reward": -82,
+          "reached": true
+        },
+        {
+          "reward": -71,
+          "reached": true
+        },
+        {
+          "reward": -205,
+          "reached": true
+        },
+        {
+          "reward": -90,
+          "reached": true
+        },
+        {
+          "reward": -61,
+          "reached": true
+        },
+        {
+          "reward": -68,
+          "reached": true
+        },
+        {
+          "reward": -61,
+          "reached": true
+        },
+        {
+          "reward": -73,
+          "reached": true
+        },
+        {
+          "reward": -74,
+          "reached": true
+        },
+        {
+          "reward": -89,
+          "reached": true
+        },
+        {
+          "reward": -60,
+          "reached": true
+        },
+        {
+          "reward": -84,
+          "reached": true
+        },
+        {
+          "reward": -67,
+          "reached": true
+        },
+        {
+          "reward": -62,
+          "reached": true
+        },
+        {
+          "reward": -93,
+          "reached": true
+        },
+        {
+          "reward": -69,
+          "reached": true
+        },
+        {
+          "reward": -94,
+          "reached": true
+        },
+        {
+          "reward": -69,
+          "reached": true
+        },
+        {
+          "reward": -88,
+          "reached": true
+        },
+        {
+          "reward": -70,
+          "reached": true
+        },
+        {
+          "reward": -89,
+          "reached": true
+        },
+        {
+          "reward": -84,
+          "reached": true
+        },
+        {
+          "reward": -76,
+          "reached": true
+        },
+        {
+          "reward": -78,
+          "reached": true
+        },
+        {
+          "reward": -79,
+          "reached": true
+        },
+        {
+          "reward": -99,
+          "reached": true
+        },
+        {
+          "reward": -98,
+          "reached": true
+        },
+        {
+          "reward": -68,
+          "reached": true
+        }
+      ]
+    },
+    "test": {
+      "mean": -86.585,
+      "goal_rate": 1,
+      "episodes": [
+        {
+          "reward": -84,
+          "reached": true
+        },
+        {
+          "reward": -88,
+          "reached": true
+        },
+        {
+          "reward": -92,
+          "reached": true
+        },
+        {
+          "reward": -85,
+          "reached": true
+        },
+        {
+          "reward": -61,
+          "reached": true
+        },
+        {
+          "reward": -83,
+          "reached": true
+        },
+        {
+          "reward": -107,
+          "reached": true
+        },
+        {
+          "reward": -89,
+          "reached": true
+        },
+        {
+          "reward": -92,
+          "reached": true
+        },
+        {
+          "reward": -60,
+          "reached": true
+        },
+        {
+          "reward": -92,
+          "reached": true
+        },
+        {
+          "reward": -69,
+          "reached": true
+        },
+        {
+          "reward": -90,
+          "reached": true
+        },
+        {
+          "reward": -77,
+          "reached": true
+        },
+        {
+          "reward": -71,
+          "reached": true
+        },
+        {
+          "reward": -69,
+          "reached": true
+        },
+        {
+          "reward": -99,
+          "reached": true
+        },
+        {
+          "reward": -70,
+          "reached": true
+        },
+        {
+          "reward": -70,
+          "reached": true
+        },
+        {
+          "reward": -89,
+          "reached": true
+        },
+        {
+          "reward": -88,
+          "reached": true
+        },
+        {
+          "reward": -214,
+          "reached": true
+        },
+        {
+          "reward": -92,
+          "reached": true
+        },
+        {
+          "reward": -86,
+          "reached": true
+        },
+        {
+          "reward": -111,
+          "reached": true
+        },
+        {
+          "reward": -87,
+          "reached": true
+        },
+        {
+          "reward": -70,
+          "reached": true
+        },
+        {
+          "reward": -146,
+          "reached": true
+        },
+        {
+          "reward": -74,
+          "reached": true
+        },
+        {
+          "reward": -72,
+          "reached": true
+        },
+        {
+          "reward": -75,
+          "reached": true
+        },
+        {
+          "reward": -82,
+          "reached": true
+        },
+        {
+          "reward": -151,
+          "reached": true
+        },
+        {
+          "reward": -85,
+          "reached": true
+        },
+        {
+          "reward": -70,
+          "reached": true
+        },
+        {
+          "reward": -78,
+          "reached": true
+        },
+        {
+          "reward": -72,
+          "reached": true
+        },
+        {
+          "reward": -89,
+          "reached": true
+        },
+        {
+          "reward": -69,
+          "reached": true
+        },
+        {
+          "reward": -151,
+          "reached": true
+        },
+        {
+          "reward": -181,
+          "reached": true
+        },
+        {
+          "reward": -69,
+          "reached": true
+        },
+        {
+          "reward": -93,
+          "reached": true
+        },
+        {
+          "reward": -80,
+          "reached": true
+        },
+        {
+          "reward": -86,
+          "reached": true
+        },
+        {
+          "reward": -72,
+          "reached": true
+        },
+        {
+          "reward": -108,
+          "reached": true
+        },
+        {
+          "reward": -61,
+          "reached": true
+        },
+        {
+          "reward": -89,
+          "reached": true
+        },
+        {
+          "reward": -96,
+          "reached": true
+        },
+        {
+          "reward": -82,
+          "reached": true
+        },
+        {
+          "reward": -78,
+          "reached": true
+        },
+        {
+          "reward": -78,
+          "reached": true
+        },
+        {
+          "reward": -61,
+          "reached": true
+        },
+        {
+          "reward": -77,
+          "reached": true
+        },
+        {
+          "reward": -61,
+          "reached": true
+        },
+        {
+          "reward": -175,
+          "reached": true
+        },
+        {
+          "reward": -70,
+          "reached": true
+        },
+        {
+          "reward": -85,
+          "reached": true
+        },
+        {
+          "reward": -61,
+          "reached": true
+        },
+        {
+          "reward": -81,
+          "reached": true
+        },
+        {
+          "reward": -69,
+          "reached": true
+        },
+        {
+          "reward": -72,
+          "reached": true
+        },
+        {
+          "reward": -85,
+          "reached": true
+        },
+        {
+          "reward": -103,
+          "reached": true
+        },
+        {
+          "reward": -61,
+          "reached": true
+        },
+        {
+          "reward": -73,
+          "reached": true
+        },
+        {
+          "reward": -90,
+          "reached": true
+        },
+        {
+          "reward": -228,
+          "reached": true
+        },
+        {
+          "reward": -73,
+          "reached": true
+        },
+        {
+          "reward": -95,
+          "reached": true
+        },
+        {
+          "reward": -86,
+          "reached": true
+        },
+        {
+          "reward": -69,
+          "reached": true
+        },
+        {
+          "reward": -192,
+          "reached": true
+        },
+        {
+          "reward": -71,
+          "reached": true
+        },
+        {
+          "reward": -96,
+          "reached": true
+        },
+        {
+          "reward": -77,
+          "reached": true
+        },
+        {
+          "reward": -84,
+          "reached": true
+        },
+        {
+          "reward": -95,
+          "reached": true
+        },
+        {
+          "reward": -70,
+          "reached": true
+        },
+        {
+          "reward": -81,
+          "reached": true
+        },
+        {
+          "reward": -98,
+          "reached": true
+        },
+        {
+          "reward": -69,
+          "reached": true
+        },
+        {
+          "reward": -95,
+          "reached": true
+        },
+        {
+          "reward": -73,
+          "reached": true
+        },
+        {
+          "reward": -81,
+          "reached": true
+        },
+        {
+          "reward": -69,
+          "reached": true
+        },
+        {
+          "reward": -71,
+          "reached": true
+        },
+        {
+          "reward": -77,
+          "reached": true
+        },
+        {
+          "reward": -97,
+          "reached": true
+        },
+        {
+          "reward": -89,
+          "reached": true
+        },
+        {
+          "reward": -67,
+          "reached": true
+        },
+        {
+          "reward": -67,
+          "reached": true
+        },
+        {
+          "reward": -92,
+          "reached": true
+        },
+        {
+          "reward": -80,
+          "reached": true
+        },
+        {
+          "reward": -83,
+          "reached": true
+        },
+        {
+          "reward": -91,
+          "reached": true
+        },
+        {
+          "reward": -68,
+          "reached": true
+        },
+        {
+          "reward": -148,
+          "reached": true
+        },
+        {
+          "reward": -67,
+          "reached": true
+        },
+        {
+          "reward": -81,
+          "reached": true
+        },
+        {
+          "reward": -92,
+          "reached": true
+        },
+        {
+          "reward": -85,
+          "reached": true
+        },
+        {
+          "reward": -61,
+          "reached": true
+        },
+        {
+          "reward": -91,
+          "reached": true
+        },
+        {
+          "reward": -70,
+          "reached": true
+        },
+        {
+          "reward": -70,
+          "reached": true
+        },
+        {
+          "reward": -69,
+          "reached": true
+        },
+        {
+          "reward": -91,
+          "reached": true
+        },
+        {
+          "reward": -87,
+          "reached": true
+        },
+        {
+          "reward": -81,
+          "reached": true
+        },
+        {
+          "reward": -69,
+          "reached": true
+        },
+        {
+          "reward": -109,
+          "reached": true
+        },
+        {
+          "reward": -67,
+          "reached": true
+        },
+        {
+          "reward": -86,
+          "reached": true
+        },
+        {
+          "reward": -82,
+          "reached": true
+        },
+        {
+          "reward": -164,
+          "reached": true
+        },
+        {
+          "reward": -87,
+          "reached": true
+        },
+        {
+          "reward": -60,
+          "reached": true
+        },
+        {
+          "reward": -78,
+          "reached": true
+        },
+        {
+          "reward": -67,
+          "reached": true
+        },
+        {
+          "reward": -73,
+          "reached": true
+        },
+        {
+          "reward": -61,
+          "reached": true
+        },
+        {
+          "reward": -61,
+          "reached": true
+        },
+        {
+          "reward": -61,
+          "reached": true
+        },
+        {
+          "reward": -88,
+          "reached": true
+        },
+        {
+          "reward": -112,
+          "reached": true
+        },
+        {
+          "reward": -93,
+          "reached": true
+        },
+        {
+          "reward": -81,
+          "reached": true
+        },
+        {
+          "reward": -99,
+          "reached": true
+        },
+        {
+          "reward": -70,
+          "reached": true
+        },
+        {
+          "reward": -84,
+          "reached": true
+        },
+        {
+          "reward": -92,
+          "reached": true
+        },
+        {
+          "reward": -84,
+          "reached": true
+        },
+        {
+          "reward": -73,
+          "reached": true
+        },
+        {
+          "reward": -70,
+          "reached": true
+        },
+        {
+          "reward": -92,
+          "reached": true
+        },
+        {
+          "reward": -76,
+          "reached": true
+        },
+        {
+          "reward": -86,
+          "reached": true
+        },
+        {
+          "reward": -69,
+          "reached": true
+        },
+        {
+          "reward": -89,
+          "reached": true
+        },
+        {
+          "reward": -82,
+          "reached": true
+        },
+        {
+          "reward": -95,
+          "reached": true
+        },
+        {
+          "reward": -88,
+          "reached": true
+        },
+        {
+          "reward": -84,
+          "reached": true
+        },
+        {
+          "reward": -74,
+          "reached": true
+        },
+        {
+          "reward": -88,
+          "reached": true
+        },
+        {
+          "reward": -83,
+          "reached": true
+        },
+        {
+          "reward": -69,
+          "reached": true
+        },
+        {
+          "reward": -88,
+          "reached": true
+        },
+        {
+          "reward": -94,
+          "reached": true
+        },
+        {
+          "reward": -70,
+          "reached": true
+        },
+        {
+          "reward": -70,
+          "reached": true
+        },
+        {
+          "reward": -69,
+          "reached": true
+        },
+        {
+          "reward": -91,
+          "reached": true
+        },
+        {
+          "reward": -69,
+          "reached": true
+        },
+        {
+          "reward": -89,
+          "reached": true
+        },
+        {
+          "reward": -77,
+          "reached": true
+        },
+        {
+          "reward": -77,
+          "reached": true
+        },
+        {
+          "reward": -94,
+          "reached": true
+        },
+        {
+          "reward": -78,
+          "reached": true
+        },
+        {
+          "reward": -87,
+          "reached": true
+        },
+        {
+          "reward": -102,
+          "reached": true
+        },
+        {
+          "reward": -84,
+          "reached": true
+        },
+        {
+          "reward": -74,
+          "reached": true
+        },
+        {
+          "reward": -85,
+          "reached": true
+        },
+        {
+          "reward": -69,
+          "reached": true
+        },
+        {
+          "reward": -83,
+          "reached": true
+        },
+        {
+          "reward": -85,
+          "reached": true
+        },
+        {
+          "reward": -77,
+          "reached": true
+        },
+        {
+          "reward": -68,
+          "reached": true
+        },
+        {
+          "reward": -69,
+          "reached": true
+        },
+        {
+          "reward": -60,
+          "reached": true
+        },
+        {
+          "reward": -227,
+          "reached": true
+        },
+        {
+          "reward": -136,
+          "reached": true
+        },
+        {
+          "reward": -72,
+          "reached": true
+        },
+        {
+          "reward": -89,
+          "reached": true
+        },
+        {
+          "reward": -83,
+          "reached": true
+        },
+        {
+          "reward": -107,
+          "reached": true
+        },
+        {
+          "reward": -75,
+          "reached": true
+        },
+        {
+          "reward": -85,
+          "reached": true
+        },
+        {
+          "reward": -69,
+          "reached": true
+        },
+        {
+          "reward": -70,
+          "reached": true
+        },
+        {
+          "reward": -86,
+          "reached": true
+        },
+        {
+          "reward": -84,
+          "reached": true
+        },
+        {
+          "reward": -72,
+          "reached": true
+        },
+        {
+          "reward": -62,
+          "reached": true
+        },
+        {
+          "reward": -91,
+          "reached": true
+        },
+        {
+          "reward": -138,
+          "reached": true
+        },
+        {
+          "reward": -84,
+          "reached": true
+        },
+        {
+          "reward": -109,
+          "reached": true
+        },
+        {
+          "reward": -175,
+          "reached": true
+        },
+        {
+          "reward": -69,
+          "reached": true
+        },
+        {
+          "reward": -70,
+          "reached": true
+        },
+        {
+          "reward": -78,
+          "reached": true
+        },
+        {
+          "reward": -72,
+          "reached": true
+        },
+        {
+          "reward": -61,
+          "reached": true
+        },
+        {
+          "reward": -60,
+          "reached": true
+        },
+        {
+          "reward": -76,
+          "reached": true
+        },
+        {
+          "reward": -89,
+          "reached": true
+        }
+      ]
+    },
+    "elapsedSeconds": 603.679391153,
+    "hardware": {
+      "cpu": "Intel(R) Core(TM) i7-8565U CPU @ 1.80GHz",
+      "logicalCpus": 8,
+      "platform": "linux",
+      "architecture": "x64",
+      "browser": "147.0.7727.15"
+    },
+    "sha256": "59ff92c0dd92c098425e0892e6bd18a4937e34f966ebdf278b2600b3bea1092f"
+  },
+  "browser_policy_native_replay": {
+    "episode_differences": [
+      {
+        "browser_reward": -214.0,
+        "native_reward": -218.0,
+        "seed": 800021
+      },
+      {
+        "browser_reward": -227.0,
+        "native_reward": -236.0,
+        "seed": 800173
+      }
+    ],
+    "scores": {
+      "episodes": [
+        {
+          "reached": true,
+          "reward": -84.0
+        },
+        {
+          "reached": true,
+          "reward": -88.0
+        },
+        {
+          "reached": true,
+          "reward": -92.0
+        },
+        {
+          "reached": true,
+          "reward": -85.0
+        },
+        {
+          "reached": true,
+          "reward": -61.0
+        },
+        {
+          "reached": true,
+          "reward": -83.0
+        },
+        {
+          "reached": true,
+          "reward": -107.0
+        },
+        {
+          "reached": true,
+          "reward": -89.0
+        },
+        {
+          "reached": true,
+          "reward": -92.0
+        },
+        {
+          "reached": true,
+          "reward": -60.0
+        },
+        {
+          "reached": true,
+          "reward": -92.0
+        },
+        {
+          "reached": true,
+          "reward": -69.0
+        },
+        {
+          "reached": true,
+          "reward": -90.0
+        },
+        {
+          "reached": true,
+          "reward": -77.0
+        },
+        {
+          "reached": true,
+          "reward": -71.0
+        },
+        {
+          "reached": true,
+          "reward": -69.0
+        },
+        {
+          "reached": true,
+          "reward": -99.0
+        },
+        {
+          "reached": true,
+          "reward": -70.0
+        },
+        {
+          "reached": true,
+          "reward": -70.0
+        },
+        {
+          "reached": true,
+          "reward": -89.0
+        },
+        {
+          "reached": true,
+          "reward": -88.0
+        },
+        {
+          "reached": true,
+          "reward": -218.0
+        },
+        {
+          "reached": true,
+          "reward": -92.0
+        },
+        {
+          "reached": true,
+          "reward": -86.0
+        },
+        {
+          "reached": true,
+          "reward": -111.0
+        },
+        {
+          "reached": true,
+          "reward": -87.0
+        },
+        {
+          "reached": true,
+          "reward": -70.0
+        },
+        {
+          "reached": true,
+          "reward": -146.0
+        },
+        {
+          "reached": true,
+          "reward": -74.0
+        },
+        {
+          "reached": true,
+          "reward": -72.0
+        },
+        {
+          "reached": true,
+          "reward": -75.0
+        },
+        {
+          "reached": true,
+          "reward": -82.0
+        },
+        {
+          "reached": true,
+          "reward": -151.0
+        },
+        {
+          "reached": true,
+          "reward": -85.0
+        },
+        {
+          "reached": true,
+          "reward": -70.0
+        },
+        {
+          "reached": true,
+          "reward": -78.0
+        },
+        {
+          "reached": true,
+          "reward": -72.0
+        },
+        {
+          "reached": true,
+          "reward": -89.0
+        },
+        {
+          "reached": true,
+          "reward": -69.0
+        },
+        {
+          "reached": true,
+          "reward": -151.0
+        },
+        {
+          "reached": true,
+          "reward": -181.0
+        },
+        {
+          "reached": true,
+          "reward": -69.0
+        },
+        {
+          "reached": true,
+          "reward": -93.0
+        },
+        {
+          "reached": true,
+          "reward": -80.0
+        },
+        {
+          "reached": true,
+          "reward": -86.0
+        },
+        {
+          "reached": true,
+          "reward": -72.0
+        },
+        {
+          "reached": true,
+          "reward": -108.0
+        },
+        {
+          "reached": true,
+          "reward": -61.0
+        },
+        {
+          "reached": true,
+          "reward": -89.0
+        },
+        {
+          "reached": true,
+          "reward": -96.0
+        },
+        {
+          "reached": true,
+          "reward": -82.0
+        },
+        {
+          "reached": true,
+          "reward": -78.0
+        },
+        {
+          "reached": true,
+          "reward": -78.0
+        },
+        {
+          "reached": true,
+          "reward": -61.0
+        },
+        {
+          "reached": true,
+          "reward": -77.0
+        },
+        {
+          "reached": true,
+          "reward": -61.0
+        },
+        {
+          "reached": true,
+          "reward": -175.0
+        },
+        {
+          "reached": true,
+          "reward": -70.0
+        },
+        {
+          "reached": true,
+          "reward": -85.0
+        },
+        {
+          "reached": true,
+          "reward": -61.0
+        },
+        {
+          "reached": true,
+          "reward": -81.0
+        },
+        {
+          "reached": true,
+          "reward": -69.0
+        },
+        {
+          "reached": true,
+          "reward": -72.0
+        },
+        {
+          "reached": true,
+          "reward": -85.0
+        },
+        {
+          "reached": true,
+          "reward": -103.0
+        },
+        {
+          "reached": true,
+          "reward": -61.0
+        },
+        {
+          "reached": true,
+          "reward": -73.0
+        },
+        {
+          "reached": true,
+          "reward": -90.0
+        },
+        {
+          "reached": true,
+          "reward": -228.0
+        },
+        {
+          "reached": true,
+          "reward": -73.0
+        },
+        {
+          "reached": true,
+          "reward": -95.0
+        },
+        {
+          "reached": true,
+          "reward": -86.0
+        },
+        {
+          "reached": true,
+          "reward": -69.0
+        },
+        {
+          "reached": true,
+          "reward": -192.0
+        },
+        {
+          "reached": true,
+          "reward": -71.0
+        },
+        {
+          "reached": true,
+          "reward": -96.0
+        },
+        {
+          "reached": true,
+          "reward": -77.0
+        },
+        {
+          "reached": true,
+          "reward": -84.0
+        },
+        {
+          "reached": true,
+          "reward": -95.0
+        },
+        {
+          "reached": true,
+          "reward": -70.0
+        },
+        {
+          "reached": true,
+          "reward": -81.0
+        },
+        {
+          "reached": true,
+          "reward": -98.0
+        },
+        {
+          "reached": true,
+          "reward": -69.0
+        },
+        {
+          "reached": true,
+          "reward": -95.0
+        },
+        {
+          "reached": true,
+          "reward": -73.0
+        },
+        {
+          "reached": true,
+          "reward": -81.0
+        },
+        {
+          "reached": true,
+          "reward": -69.0
+        },
+        {
+          "reached": true,
+          "reward": -71.0
+        },
+        {
+          "reached": true,
+          "reward": -77.0
+        },
+        {
+          "reached": true,
+          "reward": -97.0
+        },
+        {
+          "reached": true,
+          "reward": -89.0
+        },
+        {
+          "reached": true,
+          "reward": -67.0
+        },
+        {
+          "reached": true,
+          "reward": -67.0
+        },
+        {
+          "reached": true,
+          "reward": -92.0
+        },
+        {
+          "reached": true,
+          "reward": -80.0
+        },
+        {
+          "reached": true,
+          "reward": -83.0
+        },
+        {
+          "reached": true,
+          "reward": -91.0
+        },
+        {
+          "reached": true,
+          "reward": -68.0
+        },
+        {
+          "reached": true,
+          "reward": -148.0
+        },
+        {
+          "reached": true,
+          "reward": -67.0
+        },
+        {
+          "reached": true,
+          "reward": -81.0
+        },
+        {
+          "reached": true,
+          "reward": -92.0
+        },
+        {
+          "reached": true,
+          "reward": -85.0
+        },
+        {
+          "reached": true,
+          "reward": -61.0
+        },
+        {
+          "reached": true,
+          "reward": -91.0
+        },
+        {
+          "reached": true,
+          "reward": -70.0
+        },
+        {
+          "reached": true,
+          "reward": -70.0
+        },
+        {
+          "reached": true,
+          "reward": -69.0
+        },
+        {
+          "reached": true,
+          "reward": -91.0
+        },
+        {
+          "reached": true,
+          "reward": -87.0
+        },
+        {
+          "reached": true,
+          "reward": -81.0
+        },
+        {
+          "reached": true,
+          "reward": -69.0
+        },
+        {
+          "reached": true,
+          "reward": -109.0
+        },
+        {
+          "reached": true,
+          "reward": -67.0
+        },
+        {
+          "reached": true,
+          "reward": -86.0
+        },
+        {
+          "reached": true,
+          "reward": -82.0
+        },
+        {
+          "reached": true,
+          "reward": -164.0
+        },
+        {
+          "reached": true,
+          "reward": -87.0
+        },
+        {
+          "reached": true,
+          "reward": -60.0
+        },
+        {
+          "reached": true,
+          "reward": -78.0
+        },
+        {
+          "reached": true,
+          "reward": -67.0
+        },
+        {
+          "reached": true,
+          "reward": -73.0
+        },
+        {
+          "reached": true,
+          "reward": -61.0
+        },
+        {
+          "reached": true,
+          "reward": -61.0
+        },
+        {
+          "reached": true,
+          "reward": -61.0
+        },
+        {
+          "reached": true,
+          "reward": -88.0
+        },
+        {
+          "reached": true,
+          "reward": -112.0
+        },
+        {
+          "reached": true,
+          "reward": -93.0
+        },
+        {
+          "reached": true,
+          "reward": -81.0
+        },
+        {
+          "reached": true,
+          "reward": -99.0
+        },
+        {
+          "reached": true,
+          "reward": -70.0
+        },
+        {
+          "reached": true,
+          "reward": -84.0
+        },
+        {
+          "reached": true,
+          "reward": -92.0
+        },
+        {
+          "reached": true,
+          "reward": -84.0
+        },
+        {
+          "reached": true,
+          "reward": -73.0
+        },
+        {
+          "reached": true,
+          "reward": -70.0
+        },
+        {
+          "reached": true,
+          "reward": -92.0
+        },
+        {
+          "reached": true,
+          "reward": -76.0
+        },
+        {
+          "reached": true,
+          "reward": -86.0
+        },
+        {
+          "reached": true,
+          "reward": -69.0
+        },
+        {
+          "reached": true,
+          "reward": -89.0
+        },
+        {
+          "reached": true,
+          "reward": -82.0
+        },
+        {
+          "reached": true,
+          "reward": -95.0
+        },
+        {
+          "reached": true,
+          "reward": -88.0
+        },
+        {
+          "reached": true,
+          "reward": -84.0
+        },
+        {
+          "reached": true,
+          "reward": -74.0
+        },
+        {
+          "reached": true,
+          "reward": -88.0
+        },
+        {
+          "reached": true,
+          "reward": -83.0
+        },
+        {
+          "reached": true,
+          "reward": -69.0
+        },
+        {
+          "reached": true,
+          "reward": -88.0
+        },
+        {
+          "reached": true,
+          "reward": -94.0
+        },
+        {
+          "reached": true,
+          "reward": -70.0
+        },
+        {
+          "reached": true,
+          "reward": -70.0
+        },
+        {
+          "reached": true,
+          "reward": -69.0
+        },
+        {
+          "reached": true,
+          "reward": -91.0
+        },
+        {
+          "reached": true,
+          "reward": -69.0
+        },
+        {
+          "reached": true,
+          "reward": -89.0
+        },
+        {
+          "reached": true,
+          "reward": -77.0
+        },
+        {
+          "reached": true,
+          "reward": -77.0
+        },
+        {
+          "reached": true,
+          "reward": -94.0
+        },
+        {
+          "reached": true,
+          "reward": -78.0
+        },
+        {
+          "reached": true,
+          "reward": -87.0
+        },
+        {
+          "reached": true,
+          "reward": -102.0
+        },
+        {
+          "reached": true,
+          "reward": -84.0
+        },
+        {
+          "reached": true,
+          "reward": -74.0
+        },
+        {
+          "reached": true,
+          "reward": -85.0
+        },
+        {
+          "reached": true,
+          "reward": -69.0
+        },
+        {
+          "reached": true,
+          "reward": -83.0
+        },
+        {
+          "reached": true,
+          "reward": -85.0
+        },
+        {
+          "reached": true,
+          "reward": -77.0
+        },
+        {
+          "reached": true,
+          "reward": -68.0
+        },
+        {
+          "reached": true,
+          "reward": -69.0
+        },
+        {
+          "reached": true,
+          "reward": -60.0
+        },
+        {
+          "reached": true,
+          "reward": -236.0
+        },
+        {
+          "reached": true,
+          "reward": -136.0
+        },
+        {
+          "reached": true,
+          "reward": -72.0
+        },
+        {
+          "reached": true,
+          "reward": -89.0
+        },
+        {
+          "reached": true,
+          "reward": -83.0
+        },
+        {
+          "reached": true,
+          "reward": -107.0
+        },
+        {
+          "reached": true,
+          "reward": -75.0
+        },
+        {
+          "reached": true,
+          "reward": -85.0
+        },
+        {
+          "reached": true,
+          "reward": -69.0
+        },
+        {
+          "reached": true,
+          "reward": -70.0
+        },
+        {
+          "reached": true,
+          "reward": -86.0
+        },
+        {
+          "reached": true,
+          "reward": -84.0
+        },
+        {
+          "reached": true,
+          "reward": -72.0
+        },
+        {
+          "reached": true,
+          "reward": -62.0
+        },
+        {
+          "reached": true,
+          "reward": -91.0
+        },
+        {
+          "reached": true,
+          "reward": -138.0
+        },
+        {
+          "reached": true,
+          "reward": -84.0
+        },
+        {
+          "reached": true,
+          "reward": -109.0
+        },
+        {
+          "reached": true,
+          "reward": -175.0
+        },
+        {
+          "reached": true,
+          "reward": -69.0
+        },
+        {
+          "reached": true,
+          "reward": -70.0
+        },
+        {
+          "reached": true,
+          "reward": -78.0
+        },
+        {
+          "reached": true,
+          "reward": -72.0
+        },
+        {
+          "reached": true,
+          "reward": -61.0
+        },
+        {
+          "reached": true,
+          "reward": -60.0
+        },
+        {
+          "reached": true,
+          "reward": -76.0
+        },
+        {
+          "reached": true,
+          "reward": -89.0
+        }
+      ],
+      "goal_rate": 1.0,
+      "mean": -86.65,
+      "mean_95_percent_normal_interval": [
+        -90.52967872653272,
+        -82.77032127346729
+      ]
+    }
+  },
+  "failed_profile": {
+    "name": "acrobot-native-dqn-v1",
+    "validation_only": [
+      {
+        "scores": {
+          "episodes": [
+            {
+              "reached": true,
+              "reward": -100.0
+            },
+            {
+              "reached": true,
+              "reward": -123.0
+            },
+            {
+              "reached": true,
+              "reward": -139.0
+            },
+            {
+              "reached": true,
+              "reward": -117.0
+            },
+            {
+              "reached": true,
+              "reward": -115.0
+            },
+            {
+              "reached": true,
+              "reward": -89.0
+            },
+            {
+              "reached": true,
+              "reward": -155.0
+            },
+            {
+              "reached": true,
+              "reward": -75.0
+            },
+            {
+              "reached": true,
+              "reward": -87.0
+            },
+            {
+              "reached": true,
+              "reward": -100.0
+            },
+            {
+              "reached": true,
+              "reward": -110.0
+            },
+            {
+              "reached": true,
+              "reward": -100.0
+            },
+            {
+              "reached": true,
+              "reward": -95.0
+            },
+            {
+              "reached": true,
+              "reward": -182.0
+            },
+            {
+              "reached": true,
+              "reward": -95.0
+            },
+            {
+              "reached": true,
+              "reward": -116.0
+            },
+            {
+              "reached": true,
+              "reward": -126.0
+            },
+            {
+              "reached": true,
+              "reward": -114.0
+            },
+            {
+              "reached": true,
+              "reward": -82.0
+            },
+            {
+              "reached": true,
+              "reward": -105.0
+            },
+            {
+              "reached": true,
+              "reward": -90.0
+            },
+            {
+              "reached": true,
+              "reward": -121.0
+            },
+            {
+              "reached": true,
+              "reward": -191.0
+            },
+            {
+              "reached": true,
+              "reward": -95.0
+            },
+            {
+              "reached": true,
+              "reward": -99.0
+            },
+            {
+              "reached": true,
+              "reward": -111.0
+            },
+            {
+              "reached": true,
+              "reward": -134.0
+            },
+            {
+              "reached": true,
+              "reward": -103.0
+            },
+            {
+              "reached": true,
+              "reward": -101.0
+            },
+            {
+              "reached": true,
+              "reward": -79.0
+            },
+            {
+              "reached": true,
+              "reward": -102.0
+            },
+            {
+              "reached": true,
+              "reward": -171.0
+            },
+            {
+              "reached": true,
+              "reward": -84.0
+            },
+            {
+              "reached": true,
+              "reward": -95.0
+            },
+            {
+              "reached": true,
+              "reward": -99.0
+            },
+            {
+              "reached": true,
+              "reward": -129.0
+            },
+            {
+              "reached": true,
+              "reward": -100.0
+            },
+            {
+              "reached": true,
+              "reward": -108.0
+            },
+            {
+              "reached": true,
+              "reward": -86.0
+            },
+            {
+              "reached": true,
+              "reward": -101.0
+            },
+            {
+              "reached": true,
+              "reward": -92.0
+            },
+            {
+              "reached": true,
+              "reward": -104.0
+            },
+            {
+              "reached": true,
+              "reward": -99.0
+            },
+            {
+              "reached": true,
+              "reward": -82.0
+            },
+            {
+              "reached": true,
+              "reward": -99.0
+            },
+            {
+              "reached": true,
+              "reward": -102.0
+            },
+            {
+              "reached": true,
+              "reward": -103.0
+            },
+            {
+              "reached": true,
+              "reward": -96.0
+            },
+            {
+              "reached": true,
+              "reward": -98.0
+            },
+            {
+              "reached": true,
+              "reward": -82.0
+            },
+            {
+              "reached": true,
+              "reward": -104.0
+            },
+            {
+              "reached": true,
+              "reward": -96.0
+            },
+            {
+              "reached": true,
+              "reward": -89.0
+            },
+            {
+              "reached": true,
+              "reward": -82.0
+            },
+            {
+              "reached": true,
+              "reward": -86.0
+            },
+            {
+              "reached": true,
+              "reward": -88.0
+            },
+            {
+              "reached": true,
+              "reward": -112.0
+            },
+            {
+              "reached": true,
+              "reward": -81.0
+            },
+            {
+              "reached": true,
+              "reward": -129.0
+            },
+            {
+              "reached": true,
+              "reward": -106.0
+            },
+            {
+              "reached": true,
+              "reward": -100.0
+            },
+            {
+              "reached": true,
+              "reward": -116.0
+            },
+            {
+              "reached": true,
+              "reward": -84.0
+            },
+            {
+              "reached": true,
+              "reward": -89.0
+            },
+            {
+              "reached": true,
+              "reward": -90.0
+            },
+            {
+              "reached": true,
+              "reward": -145.0
+            },
+            {
+              "reached": true,
+              "reward": -110.0
+            },
+            {
+              "reached": true,
+              "reward": -101.0
+            },
+            {
+              "reached": true,
+              "reward": -96.0
+            },
+            {
+              "reached": true,
+              "reward": -103.0
+            },
+            {
+              "reached": true,
+              "reward": -148.0
+            },
+            {
+              "reached": true,
+              "reward": -98.0
+            },
+            {
+              "reached": true,
+              "reward": -115.0
+            },
+            {
+              "reached": true,
+              "reward": -102.0
+            },
+            {
+              "reached": true,
+              "reward": -82.0
+            },
+            {
+              "reached": true,
+              "reward": -116.0
+            },
+            {
+              "reached": true,
+              "reward": -82.0
+            },
+            {
+              "reached": true,
+              "reward": -134.0
+            },
+            {
+              "reached": true,
+              "reward": -100.0
+            },
+            {
+              "reached": true,
+              "reward": -84.0
+            },
+            {
+              "reached": true,
+              "reward": -99.0
+            },
+            {
+              "reached": true,
+              "reward": -96.0
+            },
+            {
+              "reached": true,
+              "reward": -150.0
+            },
+            {
+              "reached": true,
+              "reward": -134.0
+            },
+            {
+              "reached": true,
+              "reward": -82.0
+            },
+            {
+              "reached": true,
+              "reward": -110.0
+            },
+            {
+              "reached": true,
+              "reward": -107.0
+            },
+            {
+              "reached": true,
+              "reward": -148.0
+            },
+            {
+              "reached": true,
+              "reward": -110.0
+            },
+            {
+              "reached": true,
+              "reward": -100.0
+            },
+            {
+              "reached": true,
+              "reward": -89.0
+            },
+            {
+              "reached": true,
+              "reward": -82.0
+            },
+            {
+              "reached": true,
+              "reward": -98.0
+            },
+            {
+              "reached": true,
+              "reward": -100.0
+            },
+            {
+              "reached": true,
+              "reward": -106.0
+            },
+            {
+              "reached": true,
+              "reward": -101.0
+            },
+            {
+              "reached": true,
+              "reward": -102.0
+            },
+            {
+              "reached": true,
+              "reward": -83.0
+            },
+            {
+              "reached": true,
+              "reward": -107.0
+            },
+            {
+              "reached": true,
+              "reward": -77.0
+            }
+          ],
+          "goal_rate": 1.0,
+          "mean": -105.3,
+          "mean_95_percent_normal_interval": [
+            -109.60025137881402,
+            -100.99974862118597
+          ]
+        },
+        "seed": 42,
+        "transitions": 50000
+      },
+      {
+        "scores": {
+          "episodes": [
+            {
+              "reached": true,
+              "reward": -104.0
+            },
+            {
+              "reached": true,
+              "reward": -139.0
+            },
+            {
+              "reached": true,
+              "reward": -146.0
+            },
+            {
+              "reached": true,
+              "reward": -94.0
+            },
+            {
+              "reached": true,
+              "reward": -90.0
+            },
+            {
+              "reached": true,
+              "reward": -134.0
+            },
+            {
+              "reached": true,
+              "reward": -68.0
+            },
+            {
+              "reached": true,
+              "reward": -118.0
+            },
+            {
+              "reached": true,
+              "reward": -103.0
+            },
+            {
+              "reached": true,
+              "reward": -89.0
+            },
+            {
+              "reached": true,
+              "reward": -81.0
+            },
+            {
+              "reached": true,
+              "reward": -110.0
+            },
+            {
+              "reached": true,
+              "reward": -83.0
+            },
+            {
+              "reached": true,
+              "reward": -91.0
+            },
+            {
+              "reached": true,
+              "reward": -82.0
+            },
+            {
+              "reached": true,
+              "reward": -102.0
+            },
+            {
+              "reached": true,
+              "reward": -107.0
+            },
+            {
+              "reached": true,
+              "reward": -82.0
+            },
+            {
+              "reached": true,
+              "reward": -68.0
+            },
+            {
+              "reached": false,
+              "reward": -500.0
+            },
+            {
+              "reached": true,
+              "reward": -83.0
+            },
+            {
+              "reached": true,
+              "reward": -167.0
+            },
+            {
+              "reached": true,
+              "reward": -102.0
+            },
+            {
+              "reached": true,
+              "reward": -82.0
+            },
+            {
+              "reached": true,
+              "reward": -97.0
+            },
+            {
+              "reached": true,
+              "reward": -83.0
+            },
+            {
+              "reached": true,
+              "reward": -198.0
+            },
+            {
+              "reached": true,
+              "reward": -94.0
+            },
+            {
+              "reached": true,
+              "reward": -83.0
+            },
+            {
+              "reached": true,
+              "reward": -87.0
+            },
+            {
+              "reached": true,
+              "reward": -80.0
+            },
+            {
+              "reached": true,
+              "reward": -101.0
+            },
+            {
+              "reached": true,
+              "reward": -99.0
+            },
+            {
+              "reached": true,
+              "reward": -90.0
+            },
+            {
+              "reached": true,
+              "reward": -76.0
+            },
+            {
+              "reached": true,
+              "reward": -140.0
+            },
+            {
+              "reached": true,
+              "reward": -84.0
+            },
+            {
+              "reached": true,
+              "reward": -85.0
+            },
+            {
+              "reached": true,
+              "reward": -68.0
+            },
+            {
+              "reached": true,
+              "reward": -89.0
+            },
+            {
+              "reached": true,
+              "reward": -92.0
+            },
+            {
+              "reached": true,
+              "reward": -131.0
+            },
+            {
+              "reached": true,
+              "reward": -103.0
+            },
+            {
+              "reached": true,
+              "reward": -94.0
+            },
+            {
+              "reached": true,
+              "reward": -93.0
+            },
+            {
+              "reached": true,
+              "reward": -94.0
+            },
+            {
+              "reached": true,
+              "reward": -82.0
+            },
+            {
+              "reached": true,
+              "reward": -77.0
+            },
+            {
+              "reached": true,
+              "reward": -83.0
+            },
+            {
+              "reached": true,
+              "reward": -78.0
+            },
+            {
+              "reached": true,
+              "reward": -89.0
+            },
+            {
+              "reached": true,
+              "reward": -175.0
+            },
+            {
+              "reached": true,
+              "reward": -252.0
+            },
+            {
+              "reached": true,
+              "reward": -100.0
+            },
+            {
+              "reached": true,
+              "reward": -93.0
+            },
+            {
+              "reached": true,
+              "reward": -82.0
+            },
+            {
+              "reached": true,
+              "reward": -76.0
+            },
+            {
+              "reached": true,
+              "reward": -77.0
+            },
+            {
+              "reached": true,
+              "reward": -101.0
+            },
+            {
+              "reached": true,
+              "reward": -80.0
+            },
+            {
+              "reached": true,
+              "reward": -82.0
+            },
+            {
+              "reached": true,
+              "reward": -152.0
+            },
+            {
+              "reached": true,
+              "reward": -77.0
+            },
+            {
+              "reached": true,
+              "reward": -82.0
+            },
+            {
+              "reached": true,
+              "reward": -95.0
+            },
+            {
+              "reached": true,
+              "reward": -95.0
+            },
+            {
+              "reached": true,
+              "reward": -91.0
+            },
+            {
+              "reached": true,
+              "reward": -92.0
+            },
+            {
+              "reached": true,
+              "reward": -107.0
+            },
+            {
+              "reached": true,
+              "reward": -92.0
+            },
+            {
+              "reached": true,
+              "reward": -100.0
+            },
+            {
+              "reached": true,
+              "reward": -108.0
+            },
+            {
+              "reached": true,
+              "reward": -81.0
+            },
+            {
+              "reached": true,
+              "reward": -81.0
+            },
+            {
+              "reached": true,
+              "reward": -68.0
+            },
+            {
+              "reached": true,
+              "reward": -93.0
+            },
+            {
+              "reached": true,
+              "reward": -68.0
+            },
+            {
+              "reached": true,
+              "reward": -82.0
+            },
+            {
+              "reached": true,
+              "reward": -166.0
+            },
+            {
+              "reached": true,
+              "reward": -89.0
+            },
+            {
+              "reached": true,
+              "reward": -109.0
+            },
+            {
+              "reached": true,
+              "reward": -132.0
+            },
+            {
+              "reached": true,
+              "reward": -92.0
+            },
+            {
+              "reached": true,
+              "reward": -162.0
+            },
+            {
+              "reached": true,
+              "reward": -95.0
+            },
+            {
+              "reached": true,
+              "reward": -265.0
+            },
+            {
+              "reached": true,
+              "reward": -110.0
+            },
+            {
+              "reached": true,
+              "reward": -181.0
+            },
+            {
+              "reached": true,
+              "reward": -88.0
+            },
+            {
+              "reached": true,
+              "reward": -114.0
+            },
+            {
+              "reached": true,
+              "reward": -88.0
+            },
+            {
+              "reached": true,
+              "reward": -139.0
+            },
+            {
+              "reached": true,
+              "reward": -69.0
+            },
+            {
+              "reached": true,
+              "reward": -88.0
+            },
+            {
+              "reached": true,
+              "reward": -83.0
+            },
+            {
+              "reached": true,
+              "reward": -115.0
+            },
+            {
+              "reached": true,
+              "reward": -95.0
+            },
+            {
+              "reached": true,
+              "reward": -106.0
+            },
+            {
+              "reached": true,
+              "reward": -81.0
+            },
+            {
+              "reached": true,
+              "reward": -83.0
+            }
+          ],
+          "goal_rate": 0.99,
+          "mean": -106.27,
+          "mean_95_percent_normal_interval": [
+            -116.57162538710826,
+            -95.96837461289174
+          ]
+        },
+        "seed": 43,
+        "transitions": 10000
+      },
+      {
+        "scores": {
+          "episodes": [
+            {
+              "reached": true,
+              "reward": -93.0
+            },
+            {
+              "reached": true,
+              "reward": -133.0
+            },
+            {
+              "reached": true,
+              "reward": -94.0
+            },
+            {
+              "reached": true,
+              "reward": -96.0
+            },
+            {
+              "reached": true,
+              "reward": -120.0
+            },
+            {
+              "reached": true,
+              "reward": -75.0
+            },
+            {
+              "reached": true,
+              "reward": -69.0
+            },
+            {
+              "reached": true,
+              "reward": -93.0
+            },
+            {
+              "reached": true,
+              "reward": -161.0
+            },
+            {
+              "reached": true,
+              "reward": -85.0
+            },
+            {
+              "reached": true,
+              "reward": -75.0
+            },
+            {
+              "reached": true,
+              "reward": -69.0
+            },
+            {
+              "reached": true,
+              "reward": -76.0
+            },
+            {
+              "reached": true,
+              "reward": -76.0
+            },
+            {
+              "reached": true,
+              "reward": -96.0
+            },
+            {
+              "reached": true,
+              "reward": -149.0
+            },
+            {
+              "reached": true,
+              "reward": -121.0
+            },
+            {
+              "reached": true,
+              "reward": -77.0
+            },
+            {
+              "reached": true,
+              "reward": -88.0
+            },
+            {
+              "reached": true,
+              "reward": -83.0
+            },
+            {
+              "reached": true,
+              "reward": -70.0
+            },
+            {
+              "reached": true,
+              "reward": -106.0
+            },
+            {
+              "reached": true,
+              "reward": -74.0
+            },
+            {
+              "reached": true,
+              "reward": -99.0
+            },
+            {
+              "reached": true,
+              "reward": -95.0
+            },
+            {
+              "reached": true,
+              "reward": -92.0
+            },
+            {
+              "reached": true,
+              "reward": -94.0
+            },
+            {
+              "reached": true,
+              "reward": -82.0
+            },
+            {
+              "reached": true,
+              "reward": -84.0
+            },
+            {
+              "reached": true,
+              "reward": -106.0
+            },
+            {
+              "reached": true,
+              "reward": -102.0
+            },
+            {
+              "reached": true,
+              "reward": -92.0
+            },
+            {
+              "reached": true,
+              "reward": -91.0
+            },
+            {
+              "reached": true,
+              "reward": -70.0
+            },
+            {
+              "reached": true,
+              "reward": -94.0
+            },
+            {
+              "reached": true,
+              "reward": -78.0
+            },
+            {
+              "reached": true,
+              "reward": -80.0
+            },
+            {
+              "reached": false,
+              "reward": -500.0
+            },
+            {
+              "reached": true,
+              "reward": -98.0
+            },
+            {
+              "reached": true,
+              "reward": -75.0
+            },
+            {
+              "reached": true,
+              "reward": -83.0
+            },
+            {
+              "reached": true,
+              "reward": -83.0
+            },
+            {
+              "reached": true,
+              "reward": -62.0
+            },
+            {
+              "reached": true,
+              "reward": -71.0
+            },
+            {
+              "reached": true,
+              "reward": -74.0
+            },
+            {
+              "reached": true,
+              "reward": -81.0
+            },
+            {
+              "reached": true,
+              "reward": -76.0
+            },
+            {
+              "reached": true,
+              "reward": -71.0
+            },
+            {
+              "reached": true,
+              "reward": -75.0
+            },
+            {
+              "reached": true,
+              "reward": -72.0
+            },
+            {
+              "reached": true,
+              "reward": -70.0
+            },
+            {
+              "reached": true,
+              "reward": -83.0
+            },
+            {
+              "reached": true,
+              "reward": -98.0
+            },
+            {
+              "reached": true,
+              "reward": -80.0
+            },
+            {
+              "reached": true,
+              "reward": -95.0
+            },
+            {
+              "reached": true,
+              "reward": -101.0
+            },
+            {
+              "reached": true,
+              "reward": -84.0
+            },
+            {
+              "reached": true,
+              "reward": -95.0
+            },
+            {
+              "reached": true,
+              "reward": -149.0
+            },
+            {
+              "reached": true,
+              "reward": -91.0
+            },
+            {
+              "reached": true,
+              "reward": -75.0
+            },
+            {
+              "reached": true,
+              "reward": -106.0
+            },
+            {
+              "reached": true,
+              "reward": -75.0
+            },
+            {
+              "reached": true,
+              "reward": -63.0
+            },
+            {
+              "reached": true,
+              "reward": -84.0
+            },
+            {
+              "reached": true,
+              "reward": -93.0
+            },
+            {
+              "reached": true,
+              "reward": -90.0
+            },
+            {
+              "reached": true,
+              "reward": -69.0
+            },
+            {
+              "reached": true,
+              "reward": -90.0
+            },
+            {
+              "reached": true,
+              "reward": -86.0
+            },
+            {
+              "reached": true,
+              "reward": -77.0
+            },
+            {
+              "reached": true,
+              "reward": -83.0
+            },
+            {
+              "reached": true,
+              "reward": -133.0
+            },
+            {
+              "reached": true,
+              "reward": -144.0
+            },
+            {
+              "reached": true,
+              "reward": -84.0
+            },
+            {
+              "reached": true,
+              "reward": -118.0
+            },
+            {
+              "reached": true,
+              "reward": -69.0
+            },
+            {
+              "reached": true,
+              "reward": -88.0
+            },
+            {
+              "reached": true,
+              "reward": -69.0
+            },
+            {
+              "reached": true,
+              "reward": -63.0
+            },
+            {
+              "reached": true,
+              "reward": -68.0
+            },
+            {
+              "reached": true,
+              "reward": -84.0
+            },
+            {
+              "reached": true,
+              "reward": -69.0
+            },
+            {
+              "reached": true,
+              "reward": -74.0
+            },
+            {
+              "reached": true,
+              "reward": -84.0
+            },
+            {
+              "reached": true,
+              "reward": -84.0
+            },
+            {
+              "reached": true,
+              "reward": -88.0
+            },
+            {
+              "reached": true,
+              "reward": -101.0
+            },
+            {
+              "reached": true,
+              "reward": -89.0
+            },
+            {
+              "reached": true,
+              "reward": -77.0
+            },
+            {
+              "reached": true,
+              "reward": -155.0
+            },
+            {
+              "reached": true,
+              "reward": -70.0
+            },
+            {
+              "reached": true,
+              "reward": -70.0
+            },
+            {
+              "reached": true,
+              "reward": -90.0
+            },
+            {
+              "reached": true,
+              "reward": -75.0
+            },
+            {
+              "reached": true,
+              "reward": -75.0
+            },
+            {
+              "reached": true,
+              "reward": -216.0
+            },
+            {
+              "reached": true,
+              "reward": -91.0
+            },
+            {
+              "reached": true,
+              "reward": -180.0
+            },
+            {
+              "reached": true,
+              "reward": -84.0
+            }
+          ],
+          "goal_rate": 0.99,
+          "mean": -94.88,
+          "mean_95_percent_normal_interval": [
+            -104.32566676181169,
+            -85.4343332381883
+          ]
+        },
+        "seed": 44,
+        "transitions": 10000
+      }
+    ],
+    "test_seeds_opened": false
+  },
+  "source_base_commit": "a0c139065d043ec60210e9037232d00730a38da9",
+  "source_sha256": {
+    "src/environments/acrobot.rs": "71ebd25b6d2ec2813bd34cb3bd058e5122b96988072557d5575ebdc2a3b2051c",
+    "src/environments/acrobot_action.rs": "8e22f59f2b4eedcc9dd641a62d974359173e02c9f7cc36271ad56b85050b45db",
+    "src/environments/acrobot_state.rs": "4bf5bccaba3a6131798227c2f4c1a2a93a148642702885594d75ee8746b733a5",
+    "examples/classic-control/acrobot.rs": "8ee5c83e9ca42a53b99e311ec165b9283593e83969ece15746710ab5a65abcd0",
+    "gymnasium-web/src/discrete_task.rs": "f5797518064335401f9efc985c31e4ac72c37a77eba00c1a5966ee39a8b69b48",
+    "gymnasium-web/src/observation.rs": "27bc8b91a58ae928ab02d263973e1080f09bc855f105380512cb7e8de5725c39",
+    "gymnasium-web/src/environment.rs": "788c270aa8b14bac70191e95a338775f348dc3e755f4cf37d4ecf7a0f27a365f",
+    "gymnasium-web/src/discrete_session.rs": "33350df32268c17d5f4a0b98041d5ebd273410b28ac80f4eddb90dd7e3ec276c"
+  },
+  "gymnasium_revision": "7a1191388aa4aa973d3a5e4b039899cd99cc991f",
+  "numpy_version": "2.4.4",
+  "compatibility": {
+    "absolute_state_error_limit": 1e-09,
+    "native_maximum_observed_error": 8.881784197001252e-16,
+    "browser_maximum_observed_error": 1.7763568394002505e-15,
+    "probes": "Seeds 20000..20003, first 32 transitions, native and browser-trained policies, Chromium/Firefox/WebKit.",
+    "record_note": "The native file recorder and in-memory recorder have different metadata; canonical export preserves parameters and is identical across targets."
+  }
+}

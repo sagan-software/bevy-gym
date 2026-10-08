@@ -8,6 +8,8 @@ pub(crate) enum DiscreteTask {
     CartPole,
     /// Left, neutral, and right engine forces.
     MountainCar,
+    /// Negative, zero, and positive elbow torques.
+    Acrobot,
 }
 
 impl DiscreteTask {
@@ -16,6 +18,7 @@ impl DiscreteTask {
         match self {
             Self::CartPole => (4, 2),
             Self::MountainCar => (2, 3),
+            Self::Acrobot => (6, 3),
         }
     }
 
@@ -34,6 +37,19 @@ impl DiscreteTask {
                 epsilon_start: 1.0,
                 epsilon_end: 0.05,
                 epsilon_decay_steps: 100_000,
+                ..DqnConfig::default()
+            },
+            Self::Acrobot => DqnConfig {
+                hidden_sizes: vec![128, 128],
+                gamma: 0.99,
+                learning_rate: 0.0003,
+                replay_capacity: 200_000,
+                min_replay_size: 5_000,
+                batch_size: 128,
+                target_update_interval: 1_000,
+                epsilon_start: 1.0,
+                epsilon_end: 0.05,
+                epsilon_decay_steps: 200_000,
                 ..DqnConfig::default()
             },
         }

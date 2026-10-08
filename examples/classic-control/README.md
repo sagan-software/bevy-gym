@@ -90,18 +90,24 @@ Its held-out mean improved from about `-1436.88` to `-653.65`, with best episode
 
 ## Acrobot-v1
 
-The environment uses Gymnasium's exact fourth-order Runge-Kutta dynamics,
-three discrete torques, sparse reward, 500-step limit, 500x500 link geometry,
-joint circles, and target line. The selected DQN profile uses learning rate
-`0.0003` and height-potential scale `10`. Its 100-episode held-out means were
-`-91.19`, `-99.39`, and `-95.79` across three training seeds. Each checkpoint
-had a 100% goal rate and exceeded Gymnasium's `-100` registry threshold.
+The native adapter uses the shared `bevy_gym::environments::Acrobot` port,
+verified against 2,133 Python transitions and 33 reset seeds. It preserves
+float64 Runge–Kutta dynamics, float32 reset/observation precision, inclusive
+angle-wrap endpoints, and an external 500-transition limit.
+
+Fresh DQN seeds 42, 43, and 44 scored `-84.535`, `-82.555`, and `-86.58`
+over 200 held-out episodes each, with 100% goal completion. Learning rate is
+`0.0003` and height-potential scale is `10`; qualification uses unshaped returns.
+The [Acrobot contract](../../gymnasium-web/ACROBOT.md) records the exact recipe,
+failed first profile, browser training, and cross-target verification limits.
 
 ```sh
 cargo run --no-default-features --release --example acrobot -- train
 cargo run --release --example acrobot
 ```
 
-![Trained Acrobot-v1 policy](../../docs/images/acrobot.gif)
+The older capture below predates the shared-core qualification.
+
+![Historical Acrobot-v1 policy](../../docs/images/acrobot.gif)
 
 [30-second checkpoint progression](../../docs/videos/acrobot.mp4)

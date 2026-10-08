@@ -59,7 +59,8 @@ impl DiscreteSession {
         seed: u64,
     ) -> Result<Self, SessionError> {
         let (observations, actions) = task.dimensions();
-        let policy = DqnPolicy::load_bytes(bytes, observations, actions, &[64, 64])?;
+        let policy =
+            DqnPolicy::load_bytes(bytes, observations, actions, &task.config().hidden_sizes)?;
         Ok(Self::new(Mode::Inference(policy), task, seed))
     }
 

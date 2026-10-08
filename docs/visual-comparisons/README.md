@@ -85,6 +85,29 @@ and negative-torque rendering. All three browser engines pass the comparison.
 The [port contract](../../gymnasium-web/PENDULUM.md) records pending training
 qualification, page controls, and motion review.
 
+## Acrobot
+
+Gymnasium documentation:
+
+![Gymnasium Acrobot](references/acrobot.png)
+
+The browser preserves the 500×500 scene, cyan links, yellow joints, and target
+line. Four fixed-state comparisons pass in Chromium, Firefox, and WebKit.
+
+Bevy Gym browser inference:
+
+![Bevy Gym Acrobot](classic-control/acrobot-preview.png)
+
+The [browser recording](classic-control/acrobot.webm) starts with 20 seconds of
+bundled inference, then trains a new policy and loads its exported weights.
+The contact sheet samples six inference frames from seconds 1–19. Reviewed
+[desktop training](classic-control/acrobot-training.png) and
+[mobile inference](classic-control/acrobot-mobile.png) captures retain the
+controls and curves. The links swing through the target line with the original
+geometry and colors; browser 1× uses the 0.2-second physical timestep.
+The [Acrobot contract](../../gymnasium-web/ACROBOT.md) records the rendering
+tolerance and playback time basis. Deployed motion review is still pending.
+
 ## Automated comparison
 
 CartPole and MountainCar draw procedural shapes; their upstream renderers use
@@ -92,9 +115,10 @@ no sprite assets. The browser ports those drawing operations from Gymnasium
 revision `7a1191388aa4aa973d3a5e4b039899cd99cc991f`. Other environments must reuse
 upstream image or model assets where their renderers use them.
 
-Ten fixed-state PNGs come directly from the pinned Pygame renderer:
+Fourteen fixed-state PNGs come directly from the pinned Pygame renderer:
 CartPole upright and tilted; both MountainCar tasks in the valley and on the slope;
-and Pendulum upright, downward, with positive torque, and with negative torque.
+Pendulum upright, downward, with positive torque, and with negative torque;
+and Acrobot downward, upright, bent, and above the goal.
 `tests/fixtures/gymnasium/generate_rendering.py` regenerates them with NumPy,
 Pygame, and Pillow. Set `PYTHONPATH=ref/gymnasium` and
 `SDL_VIDEODRIVER=dummy` before running the generator.
@@ -104,6 +128,8 @@ background area cannot conceal a missing object. Less than 0.5% of foreground
 pixels may lack a match within two pixels and 80 units per RGB channel.
 This tolerance permits Pygame and Canvas edge rasterization differences;
 it does not establish byte-identical images. Tests retain each actual PNG.
+Acrobot selects foreground using a channel threshold of 80 to omit faint
+antialiasing pixels; the other environments retain their threshold of 220.
 
 ```sh
 nix run .#gymnasium-check -- --grep 'Gymnasium rendering|visual review'

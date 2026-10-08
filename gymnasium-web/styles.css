@@ -4,3 +4,5 @@ header{display:flex;align-items:center;gap:24px;padding:18px 32px;border-bottom:
 @media(max-width:800px){header{padding:14px 18px;gap:16px;flex-wrap:wrap}header span{display:none}header a{font-size:13px}main{padding:20px 18px}.workspace{grid-template-columns:1fr;grid-template-rows:none;gap:24px}aside{grid-column:auto;grid-row:auto;border-left:0;border-top:1px solid var(--line);padding:20px 0 0;display:grid;grid-template-columns:1fr 1fr;gap:10px 16px}aside h2,.seed,#model-evidence,aside dl,.note{grid-column:1/-1}.seed{max-width:330px}aside dl{margin:4px 0;display:grid;grid-template-columns:1fr 1fr;gap:0 20px}aside .model-actions{grid-column:1/-1;flex-direction:row}aside .model-actions>*{flex:1}.charts{grid-template-columns:1fr}.transport label{margin-left:0}.transport button{padding:8px 10px}.heading{margin-bottom:16px}h1{font-size:24px}}
 
 .environment-choice{font-size:13px;color:var(--muted)}.environment-choice select{margin-left:8px}.heading{gap:12px 20px}
+#scene.square{width:min(100%,280px);aspect-ratio:1}
+@media(max-width:800px){#scene.square{width:min(100%,350px)}}

@@ -10,6 +10,8 @@ pub(crate) enum Observation {
     MountainCar([f32; 2]),
     /// Angle cosine, angle sine, and angular velocity in radians per second.
     Pendulum([f32; 3]),
+    /// Both angle cosine/sine pairs, then angular velocities in radians per second.
+    Acrobot([f32; 6]),
 }
 impl AsRef<[f32]> for Observation {
     fn as_ref(&self) -> &[f32] {
@@ -17,6 +19,7 @@ impl AsRef<[f32]> for Observation {
             Self::CartPole(values) => values,
             Self::MountainCar(values) => values,
             Self::Pendulum(values) => values,
+            Self::Acrobot(values) => values,
         }
     }
 }
@@ -29,6 +32,14 @@ impl Observation {
             Self::Pendulum([cosine, sine, velocity]) => {
                 Self::Pendulum([cosine, sine, velocity / 8.0])
             }
+            Self::Acrobot([cos_1, sin_1, cos_2, sin_2, velocity_1, velocity_2]) => Self::Acrobot([
+                cos_1,
+                sin_1,
+                cos_2,
+                sin_2,
+                velocity_1 / (4.0 * std::f64::consts::PI) as f32,
+                velocity_2 / (9.0 * std::f64::consts::PI) as f32,
+            ]),
         }
     }
 
@@ -37,6 +48,8 @@ impl Observation {
     /// Potential is dimensionless terrain height minus one; scale 25 converts
     /// its change to reward units. Gamma 0.99 matches the `MountainCar` learner.
     /// Pendulum scales its reward by the dimensionless factor 0.1.
+    /// Acrobot divides height minus 2 metres by 1 metre for its dimensionless
+    /// potential; scale 10 converts its discounted change to reward units.
     pub(crate) fn training_reward(self, next: Self, reward: f64, status: EpisodeStatus) -> f64 {
         match (self, next) {
             (Self::MountainCar([position, _]), Self::MountainCar([next_position, _])) => {
@@ -49,9 +62,28 @@ impl Observation {
                 25.0_f64.mul_add(0.99_f64.mul_add(next_potential, -potential), reward)
             }
             (Self::Pendulum(_), Self::Pendulum(_)) => reward * 0.1,
+            (Self::Acrobot(current), Self::Acrobot(next)) => {
+                let potential = acrobot_height(current) - 2.0;
+                let next_potential = if status == EpisodeStatus::Terminated {
+                    0.0
+                } else {
+                    acrobot_height(next) - 2.0
+                };
+                10.0_f64.mul_add(0.99_f64.mul_add(next_potential, -potential), reward)
+            }
             _ => reward,
         }
     }
+}
+
+/// Recover the two unit-length links' endpoint height in metres, as in the native example.
+#[expect(
+    clippy::suboptimal_flops,
+    reason = "preserve the native training profile's arithmetic"
+)]
+fn acrobot_height([cos_1, sin_1, cos_2, sin_2, _, _]: [f32; 6]) -> f64 {
+    let [cos_1, sin_1, cos_2, sin_2] = [cos_1, sin_1, cos_2, sin_2].map(f64::from);
+    -cos_1 - (cos_1 * cos_2 - sin_1 * sin_2)
 }
 
 /// Map source position bounds [-1.2, 0.6] and per-step speed bounds [-0.07, 0.07] to [-1, 1].
@@ -65,6 +97,55 @@ pub(crate) fn encode_mountain_car([position, velocity]: [f32; 2]) -> [f32; 2] {
 #[cfg(test)]
 mod tests {
     use super::{EpisodeStatus, Observation};
+
+    #[test]
+    fn acrobot_normalizes_both_speed_bounds_without_changing_angle_coordinates() {
+        for sign in [-1.0_f32, 0.0, 1.0] {
+            let raw = [
+                0.6,
+                -0.8,
+                -0.8,
+                0.6,
+                sign * (4.0 * std::f64::consts::PI) as f32,
+                sign * (9.0 * std::f64::consts::PI) as f32,
+            ];
+            let observation = Observation::Acrobot(raw);
+            assert_eq!(observation.as_ref(), &raw);
+            assert_eq!(
+                observation.encoded().as_ref(),
+                &[0.6, -0.8, -0.8, 0.6, sign, sign]
+            );
+        }
+    }
+
+    #[test]
+    fn acrobot_shaping_keeps_truncation_bootstrap_and_clears_terminal_potential() {
+        let downward = Observation::Acrobot([1.0, 0.0, 1.0, 0.0, 0.0, 0.0]);
+        let horizontal = Observation::Acrobot([0.0, 1.0, 1.0, 0.0, 0.0, 0.0]);
+        // Source height -2m and next height 0m give potentials -4 and -2.
+        let expected = 10.0_f64.mul_add(0.99_f64.mul_add(-2.0, 4.0), -1.0);
+        for status in [EpisodeStatus::Continuing, EpisodeStatus::Truncated] {
+            assert_eq!(
+                downward.training_reward(horizontal, -1.0, status).to_bits(),
+                expected.to_bits()
+            );
+        }
+        assert_eq!(
+            downward
+                .training_reward(horizontal, 0.0, EpisodeStatus::Terminated)
+                .to_bits(),
+            40.0_f64.to_bits(),
+        );
+        // A nonzero second sine exercises the subtraction inside cos(theta1+theta2).
+        let folded = Observation::Acrobot([0.0, 1.0, 0.0, 1.0, 0.0, 0.0]);
+        let expected = 10.0_f64.mul_add(0.99_f64.mul_add(-1.0, 4.0), -1.0);
+        assert_eq!(
+            downward
+                .training_reward(folded, -1.0, EpisodeStatus::Continuing)
+                .to_bits(),
+            expected.to_bits()
+        );
+    }
 
     #[test]
     fn shaping_zeros_terminal_potential_but_keeps_truncated_bootstrap() {

@@ -1,6 +1,6 @@
 # Browser Gymnasium
 
-Run CartPole, MountainCar, and continuous MountainCar at <https://sagan-software.github.io/bevy-gym/>.
+Run the qualified Gymnasium examples at <https://sagan-software.github.io/bevy-gym/>.
 The browser worker runs Bevy Gym's Rust environments and Burn learners locally.
 Training starts from a fresh model. Inference loads a frozen policy.
 
@@ -90,6 +90,18 @@ initialization. It scored 95.43 with 200/200 goals. Loading that browser-trained
 policy natively reproduces its mean within 0.00001 on the same held-out seeds.
 The bundled native-trained policy is evaluated in all three browser engines.
 Desktop checks also require the return chart to fit a 1280×800 viewport.
+
+## Verified Acrobot model
+
+Acrobot now shares its native and browser dynamics. Three fresh native DQN
+seeds passed with 200/200 goals each. The validation-selected bundle scored
+-82.555 in native inference and all three browser engines. Offline Chromium
+training produced a separate model with mean -86.585 and 200/200 goals.
+
+Browser 1× uses the 0.2-second physical timestep: five transitions per second.
+Its 500×500 renderer preserves the original links, joints, and target line.
+The [Acrobot contract](ACROBOT.md) records the recipe, oracle checks, model
+selection, rendering tolerance, and two differing browser/native episode returns.
 
 ## Continuous-action model records
 
@@ -197,8 +209,8 @@ these measurements do not establish complete branch coverage.
 
 ## Worker contract
 
-The worker name selects `cartpole`, `mountain-car`, or `mountain-car-continuous`
-for its lifetime.
+The worker name selects `cartpole`, `mountain-car`, `mountain-car-continuous`,
+or `pendulum` for its lifetime.
 An empty name retains the original CartPole default; other names fail before
 initialization. The existing command shapes remain unchanged.
 MountainCar snapshots place position and per-step velocity in the first two
@@ -221,7 +233,12 @@ to loading. Invalid seed input leaves the previous session intact.
 Commands are JSON objects tagged by `command`: `start_training` takes a `u32`
 seed, `start_inference` takes a seed and policy byte array, `advance` takes an
 integer step count from 1 through 256, and `export` takes no extra fields.
+`evaluate_pendulum` takes a seed and policy byte array, then scores an independent
+200-transition episode without changing the active session. Its `evaluation`
+response and qualification rules are defined in [PENDULUM.md](PENDULUM.md).
+
 Unknown fields and commands are rejected. The worker limits JSON messages to
 1 MiB; the page limits policy uploads to 128 KiB. Responses are tagged by
-`event`: `ready`, `started`, `snapshot`, `policy`, or `error`. An error includes
-a diagnostic message. A new worker is required after a page-handled error.
+`event`: `ready`, `started`, `snapshot`, `policy`, `evaluation`, or `error`.
+An error includes a diagnostic message. A new worker is required after a
+page-handled error.

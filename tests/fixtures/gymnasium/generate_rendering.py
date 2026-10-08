@@ -4,6 +4,7 @@ import subprocess
 from pathlib import Path
 
 import numpy as np
+from gymnasium.envs.classic_control.acrobot import AcrobotEnv
 from gymnasium.envs.classic_control.cartpole import CartPoleEnv
 from gymnasium.envs.classic_control.mountain_car import MountainCarEnv
 from gymnasium.envs.classic_control.pendulum import PendulumEnv
@@ -33,6 +34,10 @@ for name, environment, state in [
     ("mountain-car-slope", MountainCarEnv, [0.45, 0.03]),
     ("mountain-car-continuous-valley", Continuous_MountainCarEnv, [-0.5, 0]),
     ("mountain-car-continuous-slope", Continuous_MountainCarEnv, [0.45, 0.03]),
+    ("acrobot-down", AcrobotEnv, [0, 0, 0, 0]),
+    ("acrobot-upright", AcrobotEnv, [np.pi, 0, 0, 0]),
+    ("acrobot-bent", AcrobotEnv, [0.8, -1.4, 2, -3]),
+    ("acrobot-goal", AcrobotEnv, [-2.6, 0.6, -1, 4]),
 ]:
     env = environment(render_mode="rgb_array")
     env.state = np.array(state, dtype=np.float64)
