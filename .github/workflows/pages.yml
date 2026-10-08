@@ -54,9 +54,46 @@ jobs:
       - run: nix develop --command cargo test -p bevy-gym-browser --locked
       - run: nix run .#web-check
       - run: nix develop --command trunk build --config web/Trunk.toml --release --locked --public-url /bevy-gym/ecosystem/
+      - name: Identify Gymnasium qualification inputs
+        id: gymnasium-key
+        env:
+          GYMNASIUM_INPUTS: >-
+            ${{ hashFiles('Cargo.toml', 'Cargo.lock', 'web/Cargo.toml', 'rust-toolchain.toml', '.cargo/**', 'flake.nix', 'flake.lock', 'src/**', 'examples/ecosystem/shared/**', 'gymnasium-web/**', 'tests/test_browser_assets.py', 'LICENSES/ACROBOT-BSD-3-Clause.txt', '.github/workflows/pages.yml') }}
+        run: |
+          printf 'key=gymnasium-qualified-v1-%s-%s-%s-%s-%s\n' \
+            "$RUNNER_OS" "$RUNNER_ARCH" "${ImageOS:?}" "${ImageVersion:?}" \
+            "${GYMNASIUM_INPUTS:?}" >> "$GITHUB_OUTPUT"
+      - name: Restore verified Gymnasium output
+        id: gymnasium-cache
+        if: github.event_name != 'workflow_dispatch'
+        uses: actions/cache/restore@v5
+        with:
+          key: ${{ steps.gymnasium-key.outputs.key }}
+          path: |
+            site
+            test-results/gymnasium
       - run: nix run .#gymnasium-check
+        if: steps.gymnasium-cache.outputs.cache-hit != 'true'
         env:
           DEBUG: pw:browser
+      - name: Record Gymnasium qualification source
+        if: steps.gymnasium-cache.outputs.cache-hit != 'true'
+        env:
+          QUALIFICATION_KEY: ${{ steps.gymnasium-key.outputs.key }}
+        run: |
+          printf 'Commit: %s\nRun: %s/%s/actions/runs/%s\nKey: %s\n' \
+            "$GITHUB_SHA" "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" \
+            "$GITHUB_RUN_ID" "$QUALIFICATION_KEY" \
+            > test-results/gymnasium/qualification-source.txt
+      # When qualification succeeds, save before other examples enter site/.
+      - name: Save verified Gymnasium output
+        if: github.event_name != 'workflow_dispatch' && steps.gymnasium-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v5
+        with:
+          key: ${{ steps.gymnasium-cache.outputs.cache-primary-key }}
+          path: |
+            site
+            test-results/gymnasium
       - run: nix develop --command scripts/build_drone_viewer.sh --release
       - uses: actions/upload-artifact@v7
         if: always()

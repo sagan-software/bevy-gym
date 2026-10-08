@@ -8,8 +8,8 @@ Read [the roadmap](EXAMPLE_ROADMAP.md), [quality audit](QUALITY_AUDIT.md),
 [reference research](EXAMPLE_RESEARCH.md), and [drone contract](ROBOT_ENVIRONMENT.md).
 Continue P1 with separate browser training controls and a curriculum. The qualified
 recovery policy is now selectable in the viewer and has browser video evidence.
-Confirm this inference checkpoint's GitHub CI and Pages status before reporting
-it as deployed. Its local checks pass; publication is recorded by Git history.
+The inference checkpoint is pushed and passes CI. Its Pages deployment is pending.
+Confirm Pages status before reporting it as deployed.
 The disturbed-start task and native/browser comparison are pushed and pass CI.
 The public examples page and manual viewer are deployed and visually verified.
 The disturbed-start deployment passed. The training checkpoint's deployment is
@@ -277,6 +277,16 @@ The hover, recovery, and one-update training guides pass after the final prose
 edit. Four documentation tests pass; one existing plugin example remains ignored.
 Changed Markdown passes its configured check.
 
+## Deployment qualification cache
+
+The [cache contract](BROWSER_QUALIFICATION_CACHE.md) allows Pages to reuse an
+identical, previously verified Gymnasium build. The workflow includes source and
+runner image identity, excludes prefix fallbacks, saves only after success, and
+retains the qualifying commit/run/key. Drone output is always rebuilt separately.
+Manual dispatch always reruns qualification. Actionlint and the current input-path
+audit pass. Cache miss/save, exact-hit reuse, and manual-dispatch execution still
+need CI evidence. No speed improvement has been measured yet.
+
 ## Published checkpoints
 
 - `2843952`: roadmap and initial audit. GitHub
@@ -317,6 +327,11 @@ Changed Markdown passes its configured check.
   including the new headless browser learning suite.
   [Browser deployment](https://github.com/sagan-software/bevy-gym/actions/runs/37853641770)
   is running.
+- `12ff6a4`: learned-policy viewer, reset/failure guards, 25 viewer tests, and
+  browser recording. Pushed to GitHub `main`; remote revision verified.
+  [CI](https://github.com/sagan-software/bevy-gym/actions/runs/37857449446) passed.
+  [Browser deployment](https://github.com/sagan-software/bevy-gym/actions/runs/37857449451)
+  is pending behind the active build.
 
 ## Local evidence and active validation
 
