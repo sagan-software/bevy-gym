@@ -25,6 +25,13 @@ pub enum Command {
     },
     /// Export inference parameters; this is not a resumable training checkpoint.
     Export,
+    /// Evaluate one complete Pendulum episode without modifying the active session.
+    EvaluatePendulum {
+        /// Reproducible reset seed.
+        seed: u32,
+        /// Frozen recurrent PPO parameters with the Pendulum architecture.
+        bytes: Vec<u8>,
+    },
 }
 
 #[cfg(test)]
@@ -40,6 +47,11 @@ mod tests {
             r#"{"command":"start_training","seed":-1}"#,
             r#"{"command":"delete"}"#,
             r#"{"command":"advance"}"#,
+            r#"{"command":"evaluate_pendulum","seed":0}"#,
+            r#"{"command":"evaluate_pendulum","seed":4294967296,"bytes":[]}"#,
+            r#"{"command":"evaluate_pendulum","seed":1.5,"bytes":[]}"#,
+            r#"{"command":"evaluate_pendulum","seed":-1,"bytes":[]}"#,
+            r#"{"command":"evaluate_pendulum","seed":0,"bytes":[],"steps":200}"#,
         ] {
             serde_json::from_str::<Command>(text).expect_err(text);
         }
@@ -50,6 +62,12 @@ mod tests {
         assert!(matches!(
             serde_json::from_str::<Command>(r#"{"command":"export"}"#),
             Ok(Command::Export)
+        ));
+        assert!(matches!(
+            serde_json::from_str::<Command>(
+                r#"{"command":"evaluate_pendulum","seed":4294967295,"bytes":[]}"#
+            ),
+            Ok(Command::EvaluatePendulum { seed: u32::MAX, .. })
         ));
         assert!(matches!(
             serde_json::from_str::<Command>(

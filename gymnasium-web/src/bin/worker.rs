@@ -8,6 +8,10 @@ use tokio as _;
 #[cfg(not(target_arch = "wasm32"))]
 use {bevy_gym_browser as _, serde_json as _};
 
+#[cfg(any(target_arch = "wasm32", test))]
+#[path = "worker/pendulum_score.rs"]
+mod pendulum_score;
+
 #[cfg(not(target_arch = "wasm32"))]
 const fn main() {}
 
@@ -47,7 +51,7 @@ fn main() {
 /// Parse a bounded request and encode either its successful response or diagnostic.
 #[cfg(any(target_arch = "wasm32", test))]
 fn respond(session: &mut Option<Session>, task: Task, text: &str) -> serde_json::Value {
-    // A full DQN policy is below 32 KiB; reject oversized uploads before decoding.
+    // Bound policy uploads before decoding; the Acrobot network is larger than CartPole's.
     if text.len() > 1_048_576 {
         return serde_json::json!({"event":"error", "message":"worker message exceeds 1 MiB"});
     }
@@ -95,12 +99,92 @@ fn handle_command(
                 .map_err(|error| error.to_string())?;
             Ok(serde_json::json!({"event":"policy", "bytes":bytes}))
         }
+        Command::EvaluatePendulum { bytes, seed } => {
+            if task != Task::Pendulum {
+                return Err("Pendulum evaluation requires the pendulum worker".to_owned());
+            }
+            let score = pendulum_score::evaluate(bytes, u64::from(seed))?;
+            Ok(serde_json::json!({"event":"evaluation", "score":score}))
+        }
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::{respond, Task};
+    use super::{respond, AdvanceSteps, Session, Task};
+
+    #[test]
+    fn pendulum_evaluation_is_stateless_and_checks_the_task_before_the_record() {
+        let mut session = None;
+        let bytes = Session::train_task(Task::Pendulum, 42)
+            .expect("fresh policy")
+            .export_policy()
+            .expect("record");
+        let request = serde_json::json!({"command":"evaluate_pendulum","seed":17,"bytes":bytes});
+        let result = respond(&mut session, Task::Pendulum, &request.to_string());
+        assert!(session.is_none());
+        assert_eq!(result["event"], "evaluation");
+        let mut inference =
+            Session::inference_task(Task::Pendulum, bytes, 17).expect("frozen policy");
+        let snapshot = inference
+            .advance(AdvanceSteps::try_from(200).expect("one episode"))
+            .expect("inference");
+        assert_eq!(
+            result["score"]["reward"]
+                .as_f64()
+                .expect("raw return")
+                .to_bits(),
+            snapshot.completed[0].reward.to_bits()
+        );
+        assert!(
+            result["score"]["upright_steps"]
+                .as_u64()
+                .expect("integer count")
+                <= 150
+        );
+        session = Some(inference);
+        // A scoring failure must not reset or advance the caller's current session.
+        let bad_record = r#"{"command":"evaluate_pendulum","seed":17,"bytes":[0]}"#;
+        assert_eq!(
+            respond(&mut session, Task::Pendulum, bad_record)["event"],
+            "error"
+        );
+        for task in [
+            Task::CartPole,
+            Task::MountainCar,
+            Task::MountainCarContinuous,
+        ] {
+            assert_eq!(
+                respond(&mut session, task, bad_record)["message"],
+                "Pendulum evaluation requires the pendulum worker"
+            );
+        }
+        let after = session
+            .expect("preserved inference")
+            .advance(AdvanceSteps::try_from(1).expect("one step"))
+            .expect("inference");
+        assert_eq!(after.transitions, 201);
+        assert_eq!(after.episode_count, 1);
+    }
+
+    #[test]
+    fn finite_policy_parameters_that_overflow_cannot_corrupt_the_active_session() {
+        let bytes = include_bytes!("../../tests/fixtures/pendulum-overflow.mpk").to_vec();
+        // Import succeeds because every stored parameter is finite and has the correct shape.
+        let mut session =
+            Some(Session::inference_task(Task::Pendulum, bytes.clone(), 17).expect("valid record"));
+        let request = serde_json::json!({"command":"evaluate_pendulum","seed":17,"bytes":bytes});
+        let response = respond(&mut session, Task::Pendulum, &request.to_string());
+        assert_eq!(response["event"], "error");
+        assert_eq!(response["message"], "Pendulum torque must be finite");
+        let first = session
+            .as_mut()
+            .expect("preserved session")
+            .advance(AdvanceSteps::try_from(1).expect("one step"))
+            .expect("first action is finite");
+        assert_eq!(first.transitions, 1);
+        assert_eq!(first.episode_count, 0);
+    }
 
     #[test]
     fn invalid_messages_and_unstarted_commands_return_errors_without_state() {
