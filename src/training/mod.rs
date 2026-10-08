@@ -69,7 +69,7 @@ pub use humanoid_model::{
 pub use metrics::{MetricRecord, MetricValue, MetricsError, MetricsWriter};
 #[cfg(not(target_arch = "wasm32"))]
 pub use ppo::{PpoConfig, PpoReport, PpoTrainer};
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(any(not(target_arch = "wasm32"), feature = "browser-training"))]
 pub use recurrent_ppo::RecurrentPpoAgent;
 pub use recurrent_ppo::{
     RecurrentAction, RecurrentBehaviorMemorySample, RecurrentBehaviorSample, RecurrentMemory,

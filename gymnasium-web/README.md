@@ -65,6 +65,21 @@ The gate requires mean at least -110, at least 190/200 goals, and improvement
 of at least 80 from initialization, within one million transitions per seed.
 Validation uses 100 seeds; the 200 held-out seeds are disjoint.
 
+## Continuous-action learner support
+
+The shared recurrent PPO learner compiles with `browser-training` on WebAssembly.
+`RecurrentPpoPolicy::to_bytes` and `load_bytes` use the locked Burn 0.21
+named MessagePack record. They preserve actor, critic, and recurrent inference
+parameters; optimizer and rollout state are excluded.
+
+Byte loading rejects missing biases, incompatible actor and critic dimensions,
+and nonfinite parameters before activating the model. The focused native test
+proves that both actor and critic change after an update and survive a byte
+round trip. The checkpoint validator has 100% line coverage. Its tensor-to-float
+conversion error cannot be constructed with the fixed float32 backend and is
+not exercised. Continuous MountainCar's browser session and qualification remain
+in progress.
+
 ## Visual fidelity
 
 CartPole and MountainCar preserve Gymnasium's 600 by 400 scene proportions,

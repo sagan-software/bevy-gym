@@ -4,27 +4,29 @@
 //! Global state is accepted by a separate training-only critic API, which keeps
 //! centralized training data unreachable from decentralized execution.
 
+mod checkpoint;
+
 use std::error::Error;
 use std::fmt;
 use std::path::{Path, PathBuf};
 
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(any(not(target_arch = "wasm32"), feature = "browser-training"))]
 use burn::module::AutodiffModule;
 use burn::module::{Initializer, Module, Param};
 use burn::nn::{Linear, LinearConfig, Lstm, LstmConfig, LstmState, Relu};
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(any(not(target_arch = "wasm32"), feature = "browser-training"))]
 use burn::optim::adaptor::OptimizerAdaptor;
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(any(not(target_arch = "wasm32"), feature = "browser-training"))]
 use burn::optim::{Adam, AdamConfig, GradientsParams, Optimizer};
 use burn::prelude::{Backend, ElementConversion};
 use burn::record::{FullPrecisionSettings, NamedMpkBytesRecorder, Recorder};
 use burn::tensor::Tensor;
 
 use super::backend::{inference_device, InferenceBackend, MODEL_INITIALIZATION_LOCK};
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(any(not(target_arch = "wasm32"), feature = "browser-training"))]
 use super::backend::{training_device, TrainingBackend, TrainingDevice};
 use super::checkpoint::{policy_recorder, CheckpointError, CheckpointOperation};
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(any(not(target_arch = "wasm32"), feature = "browser-training"))]
 use super::rng::SeedConfig;
 
 /// Constant in the diagonal Gaussian log-density formula.
@@ -290,7 +292,7 @@ impl<B: Backend> RecurrentActor<B> {
     }
 
     /// Copy one observation feature across every recurrent input gate.
-    #[cfg(not(target_arch = "wasm32"))]
+    #[cfg(any(not(target_arch = "wasm32"), feature = "browser-training"))]
     fn copy_input_feature(&mut self, source_feature: usize, target_feature: usize) {
         let copy_weight = |weight: Param<Tensor<B, 2>>| {
             weight.map(|tensor| {
@@ -313,7 +315,7 @@ impl<B: Backend> RecurrentActor<B> {
     }
 
     /// Insert one zero-weight observation row into every recurrent input gate.
-    #[cfg(not(target_arch = "wasm32"))]
+    #[cfg(any(not(target_arch = "wasm32"), feature = "browser-training"))]
     fn insert_zero_input_feature(&mut self, feature: usize, device: &B::Device) {
         let insert_weight = |weight: Param<Tensor<B, 2>>| {
             weight.map(|tensor| {
@@ -343,7 +345,7 @@ impl<B: Backend> RecurrentActor<B> {
     }
 
     /// Add one finite offset to one pre-tanh action-mean bias.
-    #[cfg(not(target_arch = "wasm32"))]
+    #[cfg(any(not(target_arch = "wasm32"), feature = "browser-training"))]
     fn shift_mean_bias(&mut self, action_dimension: usize, delta: f32) {
         if let Some(bias) = self.mean_head.bias.take() {
             self.mean_head.bias = Some(bias.map(|tensor| {
@@ -578,7 +580,7 @@ pub struct RecurrentBehaviorMemorySample {
 
 impl RecurrentPpoSequence {
     /// Validate dimensions without permitting episode-boundary padding.
-    #[cfg(not(target_arch = "wasm32"))]
+    #[cfg(any(not(target_arch = "wasm32"), feature = "browser-training"))]
     fn validate(
         &self,
         observation_dim: usize,
@@ -684,6 +686,26 @@ pub struct RecurrentPpoPolicy {
 }
 
 impl RecurrentPpoPolicy {
+    /// Encode actor and critic parameters without filesystem access.
+    ///
+    /// # Errors
+    /// Returns a checkpoint error when encoding fails.
+    pub fn to_bytes(&self) -> Result<Vec<u8>, RecurrentPpoError> {
+        let networks = RecurrentNetworks {
+            actor: self.actor.clone(),
+            critic: self.critic.clone(),
+        };
+        NamedMpkBytesRecorder::<FullPrecisionSettings>::default()
+            .record(networks.into_record(), ())
+            .map_err(|error| {
+                RecurrentPpoError::Checkpoint(CheckpointError::new(
+                    CheckpointOperation::Save,
+                    "<memory>",
+                    error.to_string(),
+                ))
+            })
+    }
+
     /// Return a clean episode-boundary memory state.
     #[must_use]
     pub fn initial_memory(&self) -> RecurrentMemory {
@@ -917,6 +939,14 @@ impl RecurrentPpoPolicy {
                 error.to_string(),
             ))
         })?;
+        checkpoint::validate(
+            &record,
+            observation_dim,
+            global_state_dim,
+            value_count,
+            action_low.len(),
+            config,
+        )?;
         let networks = networks.load_record(record);
         Ok(Self {
             actor: networks.actor,
@@ -961,7 +991,7 @@ impl RecurrentPpoPolicy {
 }
 
 /// Stateful recurrent PPO learner for one parameter-sharing group.
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(any(not(target_arch = "wasm32"), feature = "browser-training"))]
 pub struct RecurrentPpoAgent {
     /// Autodiff local actor.
     actor: RecurrentActor<TrainingBackend>,
@@ -1005,13 +1035,13 @@ pub struct RecurrentPpoAgent {
 
 /// Small independent stream used only to shuffle intact recurrent chunks.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(any(not(target_arch = "wasm32"), feature = "browser-training"))]
 struct MinibatchRng {
     /// Current `SplitMix64` state.
     state: u64,
 }
 
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(any(not(target_arch = "wasm32"), feature = "browser-training"))]
 impl MinibatchRng {
     /// Construct the stream from the caller's dedicated rollout seed.
     const fn new(seed: u64) -> Self {
@@ -1036,7 +1066,7 @@ impl MinibatchRng {
     }
 }
 
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(any(not(target_arch = "wasm32"), feature = "browser-training"))]
 impl fmt::Debug for RecurrentPpoAgent {
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
         formatter
@@ -1052,7 +1082,7 @@ impl fmt::Debug for RecurrentPpoAgent {
     }
 }
 
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(any(not(target_arch = "wasm32"), feature = "browser-training"))]
 impl RecurrentPpoAgent {
     /// Initialize one species-specific actor and critic pair.
     ///
@@ -1829,7 +1859,7 @@ impl RecurrentPpoAgent {
 
 /// Accumulated update diagnostics before averaging.
 #[derive(Debug, Default, Clone, Copy, PartialEq)]
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(any(not(target_arch = "wasm32"), feature = "browser-training"))]
 struct UpdateTotals {
     /// Actor loss sum weighted by valid recurrent timesteps.
     actor_loss: f64,
@@ -1849,7 +1879,7 @@ struct UpdateTotals {
 
 /// Diagnostics returned by one actor sequence update.
 #[derive(Debug, Clone, Copy, PartialEq)]
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(any(not(target_arch = "wasm32"), feature = "browser-training"))]
 struct ActorMetrics {
     /// Combined actor loss.
     loss: f64,
@@ -1920,7 +1950,7 @@ impl RecurrentPpoError {
     }
 
     /// Construct a static sequence error.
-    #[cfg(not(target_arch = "wasm32"))]
+    #[cfg(any(not(target_arch = "wasm32"), feature = "browser-training"))]
     const fn invalid_sequence(reason: &'static str) -> Self {
         Self::InvalidSequence(reason)
     }
@@ -1989,7 +2019,7 @@ fn memory_to_state<B: Backend>(
 }
 
 /// Convert host recurrent states into one batched backend state.
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(any(not(target_arch = "wasm32"), feature = "browser-training"))]
 fn memories_to_state<B: Backend>(
     memories: &[RecurrentMemory],
     device: &B::Device,
@@ -2030,14 +2060,14 @@ fn tensor_vec<B: Backend, const D: usize>(
 }
 
 /// Flatten a validated row-major matrix into a backend tensor.
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(any(not(target_arch = "wasm32"), feature = "browser-training"))]
 fn encode_matrix<B: Backend>(rows: &[Vec<f32>], width: usize, device: &B::Device) -> Tensor<B, 2> {
     let values: Vec<_> = rows.iter().flatten().copied().collect();
     Tensor::<B, 1>::from_floats(values.as_slice(), device).reshape([rows.len(), width])
 }
 
 /// Evaluate corrected tanh-and-affine diagonal Gaussian log probabilities.
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(any(not(target_arch = "wasm32"), feature = "browser-training"))]
 fn tensor_log_probabilities<B: Backend>(
     mean: Tensor<B, 2>,
     log_std: Tensor<B, 2>,
@@ -2080,7 +2110,7 @@ fn scale_action(samples: &[f32], action_low: &[f32], action_high: &[f32]) -> Vec
 }
 
 /// Normalize bounded environment actions into the actor's `[-1, 1]` range.
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(any(not(target_arch = "wasm32"), feature = "browser-training"))]
 fn normalize_action(actions: &[f32], action_low: &[f32], action_high: &[f32]) -> Vec<f32> {
     actions
         .iter()
@@ -2116,7 +2146,7 @@ fn host_log_probability(
 }
 
 /// Compute shared advantage normalization statistics.
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(any(not(target_arch = "wasm32"), feature = "browser-training"))]
 fn advantage_normalization(sequences: &[RecurrentPpoSequence], epsilon: f32) -> (f32, f32) {
     let count: usize = sequences
         .iter()
@@ -2144,7 +2174,7 @@ fn validate_memory(memory: &RecurrentMemory, hidden_size: usize) -> Result<(), R
 }
 
 /// Validate every row of one matrix.
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(any(not(target_arch = "wasm32"), feature = "browser-training"))]
 fn validate_matrix(
     rows: &[Vec<f32>],
     width: usize,
