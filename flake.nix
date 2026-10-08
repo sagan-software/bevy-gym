@@ -317,6 +317,28 @@
           '';
         };
 
+        droneBrowserCheck = pkgs.writeShellApplication {
+          name = "bevy-gym-drone-browser-check";
+          runtimeInputs = [
+            rustToolchain
+            pkgs.wasm-bindgen-cli
+            pkgs.chromedriver
+          ];
+          text = ''
+            export CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_RUNNER=wasm-bindgen-test-runner
+            export CHROMEDRIVER="${lib.getExe pkgs.chromedriver}"
+            export WASM_BINDGEN_TEST_WEBDRIVER_JSON="${
+              pkgs.writeText "drone-webdriver.json" (
+                builtins.toJSON {
+                  "goog:chromeOptions".binary = lib.getExe pkgs.chromium;
+                }
+              )
+            }"
+            cargo test --locked --no-default-features --features robots,browser \
+              --target wasm32-unknown-unknown --test drone_hover --test drone_parity "$@"
+          '';
+        };
+
         gymnasiumCheck = pkgs.writeShellApplication {
           name = "bevy-gym-browser-check";
           runtimeInputs = [
@@ -391,6 +413,10 @@
           browser-runtime-check = {
             type = "app";
             program = lib.getExe browserRuntimeCheck;
+          };
+          drone-browser-check = {
+            type = "app";
+            program = lib.getExe droneBrowserCheck;
           };
           gymnasium-check = {
             type = "app";

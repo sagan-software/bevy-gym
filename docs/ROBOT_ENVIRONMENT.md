@@ -1,7 +1,7 @@
 # First drone environment contract
 
 Status: headless physics, typed Bevy integration, and manual browser flight implemented.
-Updated 2026-10-08. Native/browser rollout comparison and learning remain pending.
+Updated 2026-10-08. Native/browser rollout comparison passed; learning remains pending.
 This defines the first P1 checkpoint in [the roadmap](EXAMPLE_ROADMAP.md).
 It is an original game simulation informed by the references, not an ARC Raiders
 source port or a claim about Embark's unpublished controller.
@@ -14,7 +14,8 @@ requires Rust 1.86. Its `PhysicsWorld`, rigid-body force, and contact-query sour
 were inspected. The [Rapier guide](https://rapier.rs/docs/user_guides/rust/getting_started/)
 documents WASM support and the determinism feature. Bevy 0.18 renders an observation;
 the environment owns a private Rapier world, so it needs no Bevy physics-plugin
-version coupling. Native/WASM comparison remains an implementation gate.
+version coupling. [Native/WASM comparison](DRONE_PARITY.md) passed for seven
+recorded motor sequences using test-profile builds.
 
 [Flightmare's pinned dynamics](https://github.com/uzh-rpg/flightmare/blob/d4218aedac18cbe9364a0a0df10ab992c4b65e4f/flightlib/src/dynamics/quadrotor_dynamics.cpp)
 uses body-frame motor positions, inertia, thrust mapping, and alternating reaction
@@ -95,7 +96,7 @@ qualified for this task yet.
 - [x] A private invariant has an internal test after external tests pass.
 - [x] Native and WASM builds use the same environment implementation.
 - [x] Two Bevy environments run through typed action and transition messages.
-- [ ] Native/WASM rollout comparison passes in an actual browser.
+- [x] Native/WASM rollout comparison passes in an actual browser.
 - [x] The model has provenance, a retained license, and a documented actuator map.
 - [x] Bevy browser rendering reads the real state; visual checks cover motion
       and repeated resets. The viewer labels its manual controls.

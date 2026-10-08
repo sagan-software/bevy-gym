@@ -1,0 +1,207 @@
+{
+  "date": "2026-10-08",
+  "production_source_baseline": "bfe088d996d968bcdc960adfe77b182fc31e2eac",
+  "production_rust_changes": false,
+  "toolchain": {
+    "rustc": "1.97.1 (8bab26f4f 2026-07-14)",
+    "llvm": "22.1.6",
+    "native_target": "x86_64-unknown-linux-gnu",
+    "wasm_target": "wasm32-unknown-unknown",
+    "profile": "test",
+    "wasm_bindgen": "0.2.121",
+    "wasm_bindgen_test": "0.3.71"
+  },
+  "browser": {
+    "runtime": "T3Code(Alpha)/0.0.45 Chrome/152.0.7977.78 Electron/44.3.0 on Linux x86_64",
+    "public_contract_tests_passed": 8,
+    "parity_test_passed": true,
+    "screenshots": [
+      "drone-contracts-browser.png",
+      "drone-parity-browser.png"
+    ]
+  },
+  "fixture": {
+    "path": "tests/fixtures/robots/drone-native.jsonl",
+    "sha256": "a8191afded83edb830c5abce139bf6654e93b6dd1f41e2b85c7728191dac5c74",
+    "bytes": 341223,
+    "records": 1420,
+    "observation_float_bits_compared": 18460,
+    "reward_float_bits_compared": 1399,
+    "cases": {
+      "Hover": {
+        "records": 505,
+        "outcomes": {
+          "Reset": 3,
+          "Continuing": 501,
+          "Truncated": 1
+        }
+      },
+      "Fall": {
+        "records": 39,
+        "outcomes": {
+          "Reset": 3,
+          "Continuing": 32,
+          "Terminated": 4
+        }
+      },
+      "Climb": {
+        "records": 72,
+        "outcomes": {
+          "Reset": 3,
+          "Continuing": 65,
+          "Terminated": 4
+        }
+      },
+      "Roll": {
+        "records": 59,
+        "outcomes": {
+          "Reset": 3,
+          "Continuing": 52,
+          "Terminated": 4
+        }
+      },
+      "Pitch": {
+        "records": 60,
+        "outcomes": {
+          "Reset": 3,
+          "Continuing": 53,
+          "Terminated": 4
+        }
+      },
+      "Yaw": {
+        "records": 505,
+        "outcomes": {
+          "Reset": 3,
+          "Continuing": 501,
+          "Truncated": 1
+        }
+      },
+      "Alternating": {
+        "records": 180,
+        "outcomes": {
+          "Reset": 3,
+          "Continuing": 173,
+          "Terminated": 4
+        }
+      }
+    }
+  },
+  "coverage": {
+    "command": "cargo llvm-cov --branch --no-default-features --features robots --test drone_hover --test drone_parity --json",
+    "export": "LLVM export of both instrumented integration binaries; Cargo separates build and target directories.",
+    "files": [
+      {
+        "path": "tests/drone_hover.rs",
+        "sha256": "807d4ecf3a81cc83e9c201a749190ddb21b3fab01dba48e5e99d19766ef151a2",
+        "summary": {
+          "branches": {
+            "count": 0,
+            "covered": 0,
+            "notcovered": 0,
+            "percent": 0
+          },
+          "functions": {
+            "count": 11,
+            "covered": 11,
+            "percent": 100
+          },
+          "instantiations": {
+            "count": 11,
+            "covered": 11,
+            "percent": 100
+          },
+          "lines": {
+            "count": 154,
+            "covered": 154,
+            "percent": 100
+          },
+          "mcdc": {
+            "count": 0,
+            "covered": 0,
+            "notcovered": 0,
+            "percent": 0
+          },
+          "regions": {
+            "count": 333,
+            "covered": 333,
+            "notcovered": 0,
+            "percent": 100
+          }
+        },
+        "unhit_region_start_lines": []
+      },
+      {
+        "path": "tests/drone_parity.rs",
+        "sha256": "a26890687f57567589169253af88678210e14684fc1823faddbe1be5a1dc2112",
+        "summary": {
+          "branches": {
+            "count": 4,
+            "covered": 4,
+            "notcovered": 0,
+            "percent": 100
+          },
+          "functions": {
+            "count": 7,
+            "covered": 6,
+            "percent": 85.71428571428571
+          },
+          "instantiations": {
+            "count": 7,
+            "covered": 6,
+            "percent": 85.71428571428571
+          },
+          "lines": {
+            "count": 87,
+            "covered": 77,
+            "percent": 88.50574712643679
+          },
+          "mcdc": {
+            "count": 0,
+            "covered": 0,
+            "notcovered": 0,
+            "percent": 0
+          },
+          "regions": {
+            "count": 184,
+            "covered": 158,
+            "notcovered": 26,
+            "percent": 85.86956521739131
+          }
+        },
+        "unhit_region_start_lines": [
+          189,
+          192,
+          196,
+          197,
+          198,
+          199,
+          200,
+          202,
+          203
+        ]
+      }
+    ],
+    "gap": "The explicit, ignored fixture generator was executed before the instrumented run. Its ten lines have no coverage hits in this run. Browser-only attributes and logging have browser execution evidence, not native LLVM hits."
+  },
+  "gates": {
+    "native_contracts": "passed",
+    "root_fmt": "passed",
+    "root_cargo_test": "passed",
+    "root_all_targets_all_features_clippy": "passed",
+    "wasm_tests_clippy": "passed",
+    "wasm_tests_compile": "passed",
+    "interactive_browser_execution": "passed",
+    "nix_personal_lint": "passed",
+    "actionlint": "passed",
+    "nix_ci_wrapper_build_and_help": "passed",
+    "ci_headless_browser_execution": "pending first CI run",
+    "personal_rust_changed_ranges": "no changed-line diagnostics",
+    "personal_rust_full_package": "unresolved: 51 distinct Clippy errors and 2 Dylint warnings in unchanged files"
+  },
+  "limits": [
+    "This fixture compares selected sequences, not all actions or platforms.",
+    "The fixture is generated by native DroneHover, not by an independent simulator.",
+    "This comparison uses test-profile builds; it does not establish bit equality for every release configuration.",
+    "Native GUI and mobile touch input remain unverified."
+  ]
+}

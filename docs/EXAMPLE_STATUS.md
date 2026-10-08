@@ -6,9 +6,9 @@ Updated: 2026-10-08. Goal status: active.
 
 Read [the roadmap](EXAMPLE_ROADMAP.md), [quality audit](QUALITY_AUDIT.md),
 [reference research](EXAMPLE_RESEARCH.md), and [drone contract](ROBOT_ENVIRONMENT.md).
-Continue P1 with native/browser rollout comparison, then a disturbed hover task
-and learned control. Publish the tested manual viewer checkpoint and monitor its
-deployment. Manual Bevy flight runs in WASM.
+Continue P1 with a disturbed hover task and learned control. Native/browser
+comparison passed locally. The manual viewer is pushed; monitor CI and deployment.
+Manual Bevy flight runs in WASM.
 Perception, damage adaptation, pursuit, and the jumping quadruped remain pending.
 Do not start later port families before the custom robot milestones.
 
@@ -87,8 +87,8 @@ and Cargo TOML checks pass. The remaining CI commands also passed: both Python
 contract/dependency checks, robot tests without default features, both browser
 package test suites, and browser-package Clippy for native and WASM targets.
 Opt-in long training qualification tests remain ignored by their existing configuration.
-The new viewer has run in the T3 browser with manual controls. A trained drone policy,
-native/browser rollout comparison, and new deployment remain unqualified.
+The new viewer has run in the T3 browser with manual controls. A trained drone policy
+and new deployment remain unqualified. Native/browser comparison now passes below.
 
 Earlier missing-API tests failed with `E0432` before production code existed.
 The initial reset regressions also failed before their fixes. These logs are retained
@@ -146,7 +146,28 @@ initialization, loading/failure text, and color projection retain instrumented g
 The CPU tests do not start a native window. Asset-loader failure fixtures remain
 pending; the successful browser load does not cover those failure branches.
 Browser video covers visible behavior; it does not supply native coverage hits.
-The native window, touch input, and native/browser numerical parity remain unverified.
+The native window and touch input remain unverified.
+
+## Native/browser physics comparison
+
+The [comparison guide](DRONE_PARITY.md) and [evidence record](progress/drone-parity.json)
+record 1,420 complete native/browser results with identical float bits and statuses.
+The seven cases cover hover, falling, climbing, roll, pitch, yaw, changing motors,
+absorbing termination, seeded reset, and continuing reset. All eight public drone
+contract tests also pass in the T3 browser. Screenshots were shown to the user.
+
+The fixture contains 18,460 observation floats and 1,399 rewards. It is generated
+from native physics, so independent gravity and torque checks remain necessary.
+Both compared targets used test-profile builds. Other configurations are unqualified.
+Root Rust gates, WASM Clippy, Nix lint, and actionlint passed. Personal lints found
+no changed-line diagnostics; the current full scan retains 51 distinct errors and
+two warnings in unchanged files. The ignored fixture generator's ten lines remain
+unhit in the coverage run; the comparison itself has full measured branch coverage.
+
+`nix run .#drone-browser-check` is wired into CI. Its wrapper built and printed help
+locally; the first headless CI execution is pending. Interactive local suites ran on
+ports 8769 and 8770. Their `wasm-bindgen-test-runner` servers remain in user units.
+The comparison checkpoint is validated locally and awaits commit and publication.
 
 The next learning lesson must include tilt or velocity disturbances. Constant half
 thrust already solves the calm diagnostic baseline. Require held-out improvement
@@ -165,7 +186,12 @@ against that baseline before describing a policy as learned hover control.
   [CI](https://github.com/sagan-software/bevy-gym/actions/runs/37830890969) passed.
   [Browser deployment](https://github.com/sagan-software/bevy-gym/actions/runs/37830890801)
   reached its 45-minute job limit during Gymnasium qualification. Deployment was skipped.
-  The pending viewer checkpoint raises the job limit to 90 minutes without removing tests.
+  The viewer checkpoint raises the job limit to 90 minutes without removing tests.
+- `bfe088d`: manual drone viewer, licensed font, examples index, recordings, and
+  coverage gaps. Pushed to GitHub `main`; remote revision verified.
+  [CI](https://github.com/sagan-software/bevy-gym/actions/runs/37841619148) passed.
+  [Browser deployment](https://github.com/sagan-software/bevy-gym/actions/runs/37841619198)
+  is running. The new public routes are not yet verified.
 
 ## Local evidence and active validation
 

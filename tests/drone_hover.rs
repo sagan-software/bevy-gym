@@ -7,6 +7,12 @@ use bevy::prelude::{App, FixedUpdate, Messages, MinimalPlugins};
 use bevy_gym::robots::{DroneAction, DroneHover, InvalidDroneAction};
 use bevy_gym::{ActionRequest, ActionResponse, BevyGymPlugin, Env, EpisodeStatus, TransitionEvent};
 
+#[cfg(target_arch = "wasm32")]
+use wasm_bindgen_test::{wasm_bindgen_test, wasm_bindgen_test_configure};
+
+#[cfg(target_arch = "wasm32")]
+wasm_bindgen_test_configure!(run_in_browser);
+
 /// Compare scalar physics values with an explicit absolute tolerance.
 fn close(actual: f32, expected: f32, tolerance: f32) {
     assert!(
@@ -15,7 +21,8 @@ fn close(actual: f32, expected: f32, tolerance: f32) {
     );
 }
 
-#[test]
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
 fn motor_commands_validate_each_boundary_before_simulation() {
     for value in [0.0, -0.0, 0.5, 1.0] {
         let action = DroneAction::try_from([value; 4]).expect("valid motor fraction");
@@ -44,7 +51,8 @@ fn motor_commands_validate_each_boundary_before_simulation() {
     assert!(std::error::Error::source(&InvalidDroneAction).is_none());
 }
 
-#[test]
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
 fn equal_seeds_reproduce_resets_and_rollouts() {
     let mut left = DroneHover::default();
     let mut right = DroneHover::default();
@@ -64,7 +72,8 @@ fn equal_seeds_reproduce_resets_and_rollouts() {
     assert_eq!(next, right.reset(None));
 }
 
-#[test]
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
 fn power_off_accelerates_downward_at_gravity() {
     let mut drone = DroneHover::default();
     let initial = drone.reset(Some(42)).observation;
@@ -78,7 +87,8 @@ fn power_off_accelerates_downward_at_gravity() {
     assert_eq!(step.status, EpisodeStatus::Continuing);
 }
 
-#[test]
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
 fn symmetric_hover_balances_gravity_and_all_moments() {
     let mut drone = DroneHover::default();
     let initial = drone.reset(Some(42)).observation;
@@ -98,7 +108,8 @@ fn symmetric_hover_balances_gravity_and_all_moments() {
     }
 }
 
-#[test]
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
 fn each_motor_produces_the_expected_roll_pitch_and_yaw_direction() {
     // A body's moment is offset cross force, plus alternating rotor reaction.
     for (fractions, direction) in [
@@ -117,7 +128,8 @@ fn each_motor_produces_the_expected_roll_pitch_and_yaw_direction() {
     }
 }
 
-#[test]
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
 fn tilted_thrust_changes_horizontal_velocity() {
     let mut drone = DroneHover::default();
     drone.reset(Some(42));
@@ -133,7 +145,8 @@ fn tilted_thrust_changes_horizontal_velocity() {
     assert!(after.linear_velocity().x > before.linear_velocity().x);
 }
 
-#[test]
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
 fn ground_contact_and_region_exit_end_until_reset() {
     for (fractions, terminal_height) in [([0.0; 4], 0.0..=0.2), ([1.0; 4], 10.0..=10.2)] {
         let mut drone = DroneHover::default();
@@ -159,7 +172,8 @@ fn ground_contact_and_region_exit_end_until_reset() {
     }
 }
 
-#[test]
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
 fn bevy_runs_two_drone_environments_through_typed_messages() {
     let mut app = App::new();
     app.add_plugins(MinimalPlugins)
