@@ -27,7 +27,8 @@ pub struct Snapshot {
     /// Most recent DQN TD loss or PPO actor loss; absent before the first update and during inference.
     pub loss: Option<f64>,
     /// `CartPole` physical state in metres and radians, or `MountainCar` position
-    /// and per-step velocity followed by two zeros.
+    /// and per-step velocity followed by two zeros. Pendulum uses angle in radians,
+    /// angular velocity in radians per second, last torque in newton metres, and zero.
     pub state: [f64; 4],
     /// Unmodified reward sum in the current episode.
     pub episode_return: f64,

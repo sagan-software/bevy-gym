@@ -1,7 +1,8 @@
 //! Browser session dispatch keeps each action space with its learner.
 use crate::{
-    continuous_session::ContinuousSession, discrete_session::DiscreteSession,
-    discrete_task::DiscreteTask, AdvanceSteps, SessionError, Snapshot, Task,
+    continuous_session::ContinuousSession, continuous_task::ContinuousTask,
+    discrete_session::DiscreteSession, discrete_task::DiscreteTask, AdvanceSteps, SessionError,
+    Snapshot, Task,
 };
 
 /// An isolated simulation with either a learner or a frozen policy.
@@ -49,9 +50,13 @@ impl Session {
             Task::MountainCar => {
                 SessionKind::Discrete(DiscreteSession::train(DiscreteTask::MountainCar, seed)?)
             }
-            Task::MountainCarContinuous => {
-                SessionKind::Continuous(Box::new(ContinuousSession::train(seed)?))
-            }
+            Task::MountainCarContinuous => SessionKind::Continuous(Box::new(
+                ContinuousSession::train(ContinuousTask::MountainCar, seed)?,
+            )),
+            Task::Pendulum => SessionKind::Continuous(Box::new(ContinuousSession::train(
+                ContinuousTask::Pendulum,
+                seed,
+            )?)),
         };
         Ok(Self { inner })
     }
@@ -72,9 +77,14 @@ impl Session {
                 bytes,
                 seed,
             )?),
-            Task::MountainCarContinuous => {
-                SessionKind::Continuous(Box::new(ContinuousSession::inference(bytes, seed)?))
-            }
+            Task::MountainCarContinuous => SessionKind::Continuous(Box::new(
+                ContinuousSession::inference(ContinuousTask::MountainCar, bytes, seed)?,
+            )),
+            Task::Pendulum => SessionKind::Continuous(Box::new(ContinuousSession::inference(
+                ContinuousTask::Pendulum,
+                bytes,
+                seed,
+            )?)),
         };
         Ok(Self { inner })
     }

@@ -6,6 +6,7 @@ from pathlib import Path
 import numpy as np
 from gymnasium.envs.classic_control.cartpole import CartPoleEnv
 from gymnasium.envs.classic_control.mountain_car import MountainCarEnv
+from gymnasium.envs.classic_control.pendulum import PendulumEnv
 from gymnasium.envs.classic_control.continuous_mountain_car import (
     Continuous_MountainCarEnv,
 )
@@ -35,5 +36,17 @@ for name, environment, state in [
 ]:
     env = environment(render_mode="rgb_array")
     env.state = np.array(state, dtype=np.float64)
+    Image.fromarray(env.render()).save(output / f"{name}.png")
+    env.close()
+
+for name, state, torque in [
+    ("pendulum-upright", [0, 0], None),
+    ("pendulum-down", [np.pi, 0], 0.0),
+    ("pendulum-positive-torque", [-0.8, 2.0], 2.0),
+    ("pendulum-negative-torque", [1.4, -3.0], -1.0),
+]:
+    env = PendulumEnv(render_mode="rgb_array")
+    env.state = np.array(state, dtype=np.float64)
+    env.last_u = torque
     Image.fromarray(env.render()).save(output / f"{name}.png")
     env.close()

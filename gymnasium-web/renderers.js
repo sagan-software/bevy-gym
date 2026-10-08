@@ -1,8 +1,7 @@
 // Geometry and colors ported from Farama Gymnasium (MIT), revision
-// 7a1191388aa4aa973d3a5e4b039899cd99cc991f, classic_control/{cartpole,mountain_car,continuous_mountain_car}.py.
-// These environments draw polygons and circles; upstream uses no sprite assets.
-function surface(canvas) {
-  const width = 600, height = 400;
+// 7a1191388aa4aa973d3a5e4b039899cd99cc991f, classic_control/{cartpole,mountain_car,continuous_mountain_car,pendulum}.py.
+// Pendulum also uses the original assets/clockwise.png sprite.
+function surface(canvas, width = 600, height = 400) {
   canvas.width = width; canvas.height = height;
   const ctx = canvas.getContext("2d");
   ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, width, height);
@@ -48,4 +47,36 @@ export function drawMountainCar(canvas, state, goal = 0.5) {
   const flagx=Math.trunc(x(goal)), flagy=Math.trunc(height(goal)*scale);
   ctx.beginPath();ctx.moveTo(flagx,flagy);ctx.lineTo(flagx,flagy+50);ctx.stroke();
   polygon(ctx,[[flagx,flagy+50],[flagx,flagy+40],[flagx+25,flagy+45]],"#cccc00");
+}
+
+let torqueArrow;
+export async function loadPendulumAsset() {
+  if (!torqueArrow) {
+    const image = new Image();
+    image.src = new URL("assets/clockwise.png", import.meta.url).href;
+    await image.decode();
+    torqueArrow = image;
+  }
+}
+export function drawPendulum(canvas, [angle, velocity, torque]) {
+  const ctx = surface(canvas, 500, 500), scale = 500 / 4.4, offset = 250;
+  const width = .2 * scale, rotation = angle + Math.PI / 2;
+  const cosine = Math.cos(rotation), sine = Math.sin(rotation);
+  const rotate = ([x, y]) => [x * cosine - y * sine + offset, x * sine + y * cosine + offset];
+  polygon(ctx, [[0, -width / 2], [0, width / 2], [scale, width / 2], [scale, -width / 2]].map(rotate), "#cc4d4d");
+  const [x, y] = rotate([scale, 0]);
+  circle(ctx, offset, offset, Math.trunc(width / 2), "#cc4d4d");
+  circle(ctx, Math.trunc(x), Math.trunc(y), Math.trunc(width / 2), "#cc4d4d");
+  const size = Math.trunc(scale * Math.abs(torque) / 2);
+  if (size > 0) {
+    if (!torqueArrow) throw new Error("Pendulum torque asset has not loaded.");
+    // The two vertical flips cancel; retain Pygame's integer blit coordinates.
+    const left = offset - Math.trunc(size / 2), top = 500 - (offset - Math.trunc(size / 2)) - size;
+    ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.translate(torque > 0 ? left + size : left, top); ctx.scale(torque > 0 ? -1 : 1, 1);
+    ctx.imageSmoothingQuality = "high";
+    ctx.drawImage(torqueArrow, 0, 0, size, size);
+    ctx.restore();
+  }
+  circle(ctx, offset, offset, Math.trunc(.05 * scale), "#000000");
 }

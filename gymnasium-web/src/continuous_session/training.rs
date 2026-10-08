@@ -1,10 +1,10 @@
 //! Eight independent lanes contribute one fixed 512-transition PPO rollout.
 use super::{
     config,
-    episode::{encode, EpisodeState},
+    episode::EpisodeState,
     rollout::{self, RolloutStep},
 };
-use crate::{observation::Observation, Episode};
+use crate::{continuous_task::ContinuousTask, Episode};
 use bevy_gym::training::{
     RecurrentMemory, RecurrentPpoAgent, RecurrentPpoConfig, RecurrentPpoError, RecurrentPpoPolicy,
     RecurrentPpoSequence, RecurrentPpoUpdate, RecurrentSampler, SeedConfig,
@@ -49,13 +49,16 @@ struct Lane {
 
 impl Training {
     /// Initialize one model and eight deterministic environment streams.
-    pub(super) fn new(seed: u64) -> Result<Self, RecurrentPpoError> {
+    pub(super) fn new(task: ContinuousTask, seed: u64) -> Result<Self, RecurrentPpoError> {
         let seeds = SeedConfig::from_root(seed);
         let config = config();
-        let agent = RecurrentPpoAgent::new(2, 2, 1, &[-1.0], &[1.0], config.clone(), seeds)?;
+        let dimension = task.observation_dim();
+        let (low, high) = task.action_bounds();
+        let agent =
+            RecurrentPpoAgent::new(dimension, dimension, 1, low, high, config.clone(), seeds)?;
         let policy = agent.policy();
         let lanes = std::array::from_fn(|index| Lane {
-            episode: EpisodeState::new(seeds.environment_episode(index, 0)),
+            episode: EpisodeState::new(task, seeds.environment_episode(index, 0)),
             memory: policy.initial_memory(),
             sampler: RecurrentSampler::new(seeds.action ^ (index as u64).wrapping_mul(0x9e37_79b9)),
             steps: Vec::with_capacity(ROLLOUT_LENGTH),
@@ -78,24 +81,22 @@ impl Training {
             .lanes
             .get_mut(index)
             .expect("modulo lane count bounds the index");
-        let observation = lane.episode.encoded();
-        let raw = lane.episode.observation;
-        let sampled = self
-            .policy
-            .sample_action(&observation, &lane.memory, &mut lane.sampler)?;
-        let value = self.policy.value(&observation, 0)?;
+        let raw = lane.episode.observation();
+        let observation = raw.encoded();
+        let sampled =
+            self.policy
+                .sample_action(observation.as_ref(), &lane.memory, &mut lane.sampler)?;
+        let value = self.policy.value(observation.as_ref(), 0)?;
         let result = lane.episode.step(&sampled.action)?;
         // Bootstrap from the actual next observation, including time-limit boundaries.
-        let next_value = self.policy.value(&encode(result.observation), 0)?;
+        let next_value = self
+            .policy
+            .value(result.observation.encoded().as_ref(), 0)?;
         lane.steps.push(RolloutStep {
             observation,
             pre_tanh_action: sampled.pre_tanh_action,
             log_probability: sampled.log_probability,
-            reward: Observation::MountainCar(raw).training_reward(
-                Observation::MountainCar(result.observation),
-                result.reward,
-                result.status,
-            ) as f32,
+            reward: raw.training_reward(result.observation, result.reward, result.status) as f32,
             value,
             next_value,
             status: result.status,
@@ -165,7 +166,7 @@ mod tests {
 
     #[test]
     fn closing_an_empty_segment_does_not_create_a_ppo_sequence() {
-        let mut training = Training::new(42).expect("fixed profile");
+        let mut training = Training::new(ContinuousTask::MountainCar, 42).expect("fixed profile");
         let lane = training.lanes.first_mut().expect("eight lanes");
         lane.finish(&training.config);
         assert!(lane.finished.is_empty());

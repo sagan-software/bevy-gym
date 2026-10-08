@@ -1,17 +1,18 @@
 //! Bounded contiguous trajectories and time-limit-aware advantage estimates.
+use crate::observation::Observation;
 use bevy_gym::training::{RecurrentMemory, RecurrentPpoConfig, RecurrentPpoSequence};
 use bevy_gym::EpisodeStatus;
 
 /// Fields of one sampled transition stay together until PPO sequence construction.
 #[derive(Debug)]
 pub(super) struct RolloutStep {
-    /// Normalized position and velocity before the action.
-    pub observation: [f32; 2],
-    /// Gaussian force sample before tanh squashing.
+    /// Task-specific normalized observation before the action.
+    pub observation: Observation,
+    /// Gaussian action sample before tanh squashing and physical scaling.
     pub pre_tanh_action: Vec<f32>,
     /// Behavior-policy density including the tanh correction.
     pub log_probability: f32,
-    /// Potential-shaped reward, used only for optimization.
+    /// Shaped or scaled reward, used only for optimization.
     pub reward: f32,
     /// Critic estimate before the action.
     pub value: f32,
@@ -46,10 +47,14 @@ pub(super) fn finish(steps: Vec<RolloutStep>, config: &RecurrentPpoConfig) -> Re
         value_index: 0,
         initial_memory: RecurrentMemory::zeros(config.actor_hidden_size),
     };
-    // The shared API owns actor and critic inputs separately; this copies two floats per step.
+    // The shared API owns actor and critic inputs separately; copy only the task's coordinates.
     for (step, advantage) in steps.into_iter().zip(&sequence.advantages) {
-        sequence.observations.push(step.observation.to_vec());
-        sequence.global_states.push(step.observation.to_vec());
+        sequence
+            .observations
+            .push(step.observation.as_ref().to_vec());
+        sequence
+            .global_states
+            .push(step.observation.as_ref().to_vec());
         sequence.pre_tanh_actions.push(step.pre_tanh_action);
         sequence.old_log_probabilities.push(step.log_probability);
         sequence.returns.push(step.value + advantage);
@@ -64,7 +69,7 @@ mod tests {
     /// A literal two-state value example distinguishes termination from a time limit.
     fn transition(status: EpisodeStatus) -> RolloutStep {
         RolloutStep {
-            observation: [0.0, 0.0],
+            observation: Observation::MountainCar([0.0, 0.0]),
             pre_tanh_action: vec![0.0],
             log_probability: 0.0,
             reward: 2.0,

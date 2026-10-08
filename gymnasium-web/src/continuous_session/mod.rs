@@ -1,9 +1,9 @@
-//! Continuous `MountainCar` training and frozen inference in a bounded worker session.
+//! Continuous-action PPO training and frozen inference in a bounded worker session.
 mod episode;
 mod rollout;
 mod training;
 
-use crate::{AdvanceSteps, Episode, SessionError, Snapshot};
+use crate::{continuous_task::ContinuousTask, AdvanceSteps, Episode, SessionError, Snapshot};
 use bevy_gym::training::{RecurrentMemory, RecurrentPpoConfig, RecurrentPpoPolicy};
 use episode::EpisodeState;
 use training::Training;
@@ -39,21 +39,28 @@ struct Inference {
 
 impl ContinuousSession {
     /// Start fresh PPO training with the native example's declared recipe.
-    pub(crate) fn train(seed: u64) -> Result<Self, SessionError> {
+    pub(crate) fn train(task: ContinuousTask, seed: u64) -> Result<Self, SessionError> {
         Ok(Self {
-            mode: Mode::Training(Box::new(Training::new(seed)?)),
+            mode: Mode::Training(Box::new(Training::new(task, seed)?)),
             transitions: 0,
         })
     }
 
     /// Validate the record before starting a frozen deterministic episode.
-    pub(crate) fn inference(bytes: Vec<u8>, seed: u64) -> Result<Self, SessionError> {
-        let policy = RecurrentPpoPolicy::load_bytes(bytes, 2, 2, 1, &[-1.0], &[1.0], &config())?;
+    pub(crate) fn inference(
+        task: ContinuousTask,
+        bytes: Vec<u8>,
+        seed: u64,
+    ) -> Result<Self, SessionError> {
+        let dimension = task.observation_dim();
+        let (low, high) = task.action_bounds();
+        let policy =
+            RecurrentPpoPolicy::load_bytes(bytes, dimension, dimension, 1, low, high, &config())?;
         let memory = policy.initial_memory();
         Ok(Self {
             mode: Mode::Inference(Box::new(Inference {
                 policy,
-                episode: EpisodeState::new(seed),
+                episode: EpisodeState::new(task, seed),
                 memory,
             })),
             transitions: 0,
@@ -73,7 +80,7 @@ impl ContinuousSession {
                         episode,
                         memory,
                     } = inference.as_mut();
-                    let action = policy.mean_action(&episode.encoded(), memory)?;
+                    let action = policy.mean_action(episode.encoded().as_ref(), memory)?;
                     let result = episode.step(&action.action)?;
                     *memory = action.next_memory;
                     if result.is_done() {
@@ -141,7 +148,7 @@ impl ContinuousSession {
     }
 }
 
-/// Native `MountainCarContinuous` recipe; reward shaping uses the same gamma 0.99.
+/// Shared native PPO architecture and rates; task reward transforms retain gamma 0.99.
 fn config() -> RecurrentPpoConfig {
     RecurrentPpoConfig {
         actor_hidden_size: 32,

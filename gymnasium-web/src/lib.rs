@@ -7,6 +7,7 @@ use {console_error_panic_hook as _, getrandom as _, js_sys as _, wasm_bindgen as
 mod advance_steps;
 mod command;
 mod continuous_session;
+mod continuous_task;
 mod discrete_session;
 mod discrete_task;
 mod environment;

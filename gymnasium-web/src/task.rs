@@ -10,6 +10,8 @@ pub enum Task {
     MountainCar,
     /// Continuous engine force with the 999-step limit.
     MountainCarContinuous,
+    /// Bounded Pendulum torque with the 200-step limit.
+    Pendulum,
 }
 
 /// A browser task name outside the supported catalog.
@@ -23,13 +25,15 @@ impl std::str::FromStr for Task {
             "" | "cartpole" => Ok(Self::CartPole),
             "mountain-car" => Ok(Self::MountainCar),
             "mountain-car-continuous" => Ok(Self::MountainCarContinuous),
+            "pendulum" => Ok(Self::Pendulum),
             _ => Err(InvalidTask),
         }
     }
 }
 impl std::fmt::Display for InvalidTask {
     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        formatter.write_str("task must be cartpole, mountain-car, or mountain-car-continuous")
+        formatter
+            .write_str("task must be cartpole, mountain-car, mountain-car-continuous, or pendulum")
     }
 }
 impl std::error::Error for InvalidTask {}
@@ -52,7 +56,7 @@ mod tests {
         }
         assert_eq!(
             InvalidTask.to_string(),
-            "task must be cartpole, mountain-car, or mountain-car-continuous"
+            "task must be cartpole, mountain-car, mountain-car-continuous, or pendulum"
         );
     }
 }

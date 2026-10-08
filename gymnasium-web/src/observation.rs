@@ -8,28 +8,35 @@ pub(crate) enum Observation {
     CartPole([f32; 4]),
     /// Car position and displacement per step.
     MountainCar([f32; 2]),
+    /// Angle cosine, angle sine, and angular velocity in radians per second.
+    Pendulum([f32; 3]),
 }
 impl AsRef<[f32]> for Observation {
     fn as_ref(&self) -> &[f32] {
         match self {
             Self::CartPole(values) => values,
             Self::MountainCar(values) => values,
+            Self::Pendulum(values) => values,
         }
     }
 }
 impl Observation {
-    /// Normalize `MountainCar`'s position and velocity using the native example profile.
+    /// Normalize position and speed using each native example's profile.
     pub(crate) fn encoded(self) -> Self {
         match self {
             Self::CartPole(_) => self,
             Self::MountainCar(values) => Self::MountainCar(encode_mountain_car(values)),
+            Self::Pendulum([cosine, sine, velocity]) => {
+                Self::Pendulum([cosine, sine, velocity / 8.0])
+            }
         }
     }
 
-    /// Add discounted terrain potential only to the optimizer reward.
+    /// Transform only the optimizer reward; episode accounting retains the raw reward.
     ///
     /// Potential is dimensionless terrain height minus one; scale 25 converts
     /// its change to reward units. Gamma 0.99 matches the `MountainCar` learner.
+    /// Pendulum scales its reward by the dimensionless factor 0.1.
     pub(crate) fn training_reward(self, next: Self, reward: f64, status: EpisodeStatus) -> f64 {
         match (self, next) {
             (Self::MountainCar([position, _]), Self::MountainCar([next_position, _])) => {
@@ -41,6 +48,7 @@ impl Observation {
                 };
                 25.0_f64.mul_add(0.99_f64.mul_add(next_potential, -potential), reward)
             }
+            (Self::Pendulum(_), Self::Pendulum(_)) => reward * 0.1,
             _ => reward,
         }
     }
@@ -102,5 +110,24 @@ mod tests {
                 .collect::<Vec<_>>(),
             raw.map(f32::to_bits)
         );
+    }
+
+    #[test]
+    fn pendulum_normalizes_speed_and_scales_only_the_optimizer_reward() {
+        for (velocity, expected) in [(-8.0, -1.0_f32), (0.0, 0.0), (8.0, 1.0)] {
+            let raw = Observation::Pendulum([0.6, -0.8, velocity]);
+            assert_eq!(raw.encoded().as_ref(), &[0.6, -0.8, expected]);
+            assert_eq!(raw.as_ref(), &[0.6, -0.8, velocity]);
+            for status in [
+                EpisodeStatus::Continuing,
+                EpisodeStatus::Truncated,
+                EpisodeStatus::Terminated,
+            ] {
+                assert_eq!(
+                    raw.training_reward(raw, -20.0, status).to_bits(),
+                    (-2.0_f64).to_bits()
+                );
+            }
+        }
     }
 }
