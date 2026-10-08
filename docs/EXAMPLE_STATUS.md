@@ -6,10 +6,11 @@ Updated: 2026-10-08. Goal status: active.
 
 Read [the roadmap](EXAMPLE_ROADMAP.md), [quality audit](QUALITY_AUDIT.md),
 [reference research](EXAMPLE_RESEARCH.md), and [drone contract](ROBOT_ENVIRONMENT.md).
-Continue P1 with learned recovery control, batched training, and a curriculum.
-The disturbed-start task and native/browser comparison pass locally. The manual
-viewer and first comparison checkpoint are pushed; monitor CI and deployment.
-Manual Bevy flight runs in WASM.
+Continue P1 by adding the qualified recovery policy to the viewer, then separate
+browser training controls and a curriculum.
+The disturbed-start task and native/browser comparison are pushed and pass CI.
+The public examples page and manual viewer are deployed and visually verified.
+The disturbed-start deployment is still running. Manual Bevy flight runs in WASM.
 Perception, damage adaptation, pursuit, and the jumping quadruped remain pending.
 Do not start later port families before the custom robot milestones.
 
@@ -88,8 +89,8 @@ and Cargo TOML checks pass. The remaining CI commands also passed: both Python
 contract/dependency checks, robot tests without default features, both browser
 package test suites, and browser-package Clippy for native and WASM targets.
 Opt-in long training qualification tests remain ignored by their existing configuration.
-The new viewer has run in the T3 browser with manual controls. A trained drone policy
-and new deployment remain unqualified. Native/browser comparison now passes below.
+The manual viewer is deployed and verified. The recovery policy now passes native
+and browser qualification below; it is not yet selectable in the viewer.
 
 Earlier missing-API tests failed with `E0432` before production code existed.
 The initial reset regressions also failed before their fixes. These logs are retained
@@ -166,8 +167,8 @@ no changed-line diagnostics; the current full scan retains 51 distinct errors an
 two warnings in unchanged files. The ignored fixture generator's ten lines remain
 unhit in the coverage run; the comparison itself has full measured branch coverage.
 
-`nix run .#drone-browser-check` is wired into CI. Its wrapper built and printed help
-locally; the first headless CI execution is pending. Interactive local suites ran on
+`nix run .#drone-browser-check` passes in CI. Its wrapper built and printed help
+locally. Interactive local suites ran on
 ports 8769, 8770, and 8771. Their `wasm-bindgen-test-runner` servers remain in user units.
 The first comparison checkpoint is pushed as `9f98657`.
 
@@ -186,11 +187,49 @@ All 16 viewer tests pass. Physics and session code have full measured native lin
 and branch coverage; [the record](progress/drone-recovery-coverage.json) retains
 UI construction and asset-state coverage gaps. Root tests, strict Clippy, WASM Clippy,
 Nix lint, and actionlint pass. Both guides and documentation tests pass after the
-final prose edit. This checkpoint awaits commit and publication.
+final prose edit. Checkpoint `88f2c5f` is pushed and passes CI.
 
-There is no learned drone controller yet. Constant half-thrust solves calm hover
-but fails the five recovery seeds. Require held-out improvement before describing
-a policy as learned recovery control. Training seeds must exclude evaluation seeds.
+Constant half-thrust solves calm hover but fails the five recovery seeds.
+The following training checkpoint supplies a learned controller with separate
+qualification seeds. Training seeds exclude both evaluation partitions.
+
+## Qualified recovery policy
+
+The native training guide and shared lesson implementation are under
+`examples/robots/train.rs` and `examples/robots/learning/`. The lesson uses the
+existing recurrent PPO optimizer and keeps the library API unchanged.
+[The contract](DRONE_LEARNING.md) records seed partitions, observation units,
+rollout boundaries, and acceptance checks. Ten native tests and ten browser tests
+pass, including a real optimizer update and the bundled-policy qualification.
+
+`bevy-gym-drone-learning-run-20261008.service` ran the first seed-7 experiment.
+It wrote checkpoint and evaluation pairs beneath `runs/drone-recovery/seed7-v1/`.
+That ignored directory also retains the exact source snapshot used for the run.
+The run allowed 2,000 updates of 512 transitions each. Its log is
+`/home/sagan/.cache/bevy-gym-quality-validation/logs/drone-learning-run.log`.
+The run was stopped after the selected 133,120-transition checkpoint passed
+qualification. Do not overwrite or delete this run. Only that selected checkpoint
+is qualified. The guide now defaults to the selected 260-update budget.
+
+The selected checkpoint survived all five selection episodes, with mean return
+468.670. On 32 distinct final seeds, all episodes survived ten seconds, mean return
+was 443.324, and mean final distance was 0.341 m. Constant half-thrust survived none
+and scored 47.621. The same frozen qualification gates pass in the browser.
+The policy is bundled at `assets/robots/recovery.mpk`; its SHA-256 starts `bb0bef6e`.
+[The learning guide](DRONE_LEARNING.md) links the curve, raw results, and full hash.
+
+The final root test, strict Clippy, WASM Clippy, Nix lint, and workflow checks pass.
+Personal lints report no changed-line diagnostics and retain the full-package
+backlog of 51 errors and two warnings. [Coverage](progress/drone-learning-coverage.json)
+records 350/350 lines and 14/14 branches across the guide and helper files, including
+internal test code. Both JSON and model write failures were exercised.
+The file-based ignored qualification helper ran separately without coverage;
+the bundled qualification ran under coverage. Native window and touch checks remain
+unavailable. Learned inference and browser training controls remain unfinished.
+
+The updated `drone-browser-check` wrapper builds and prints help; its new learning
+suite awaits CI. Interactive browser execution is verified at port 8772 through
+`bevy-gym-drone-learning-browser-20261008.service`.
 
 ## Published checkpoints
 
@@ -210,13 +249,22 @@ a policy as learned recovery control. Training seeds must exclude evaluation see
   coverage gaps. Pushed to GitHub `main`; remote revision verified.
   [CI](https://github.com/sagan-software/bevy-gym/actions/runs/37841619148) passed.
   [Browser deployment](https://github.com/sagan-software/bevy-gym/actions/runs/37841619198)
-  is running. The new public routes are not yet verified.
+  passed. Opened the public gallery and drone route in T3, then verified keyboard
+  playback, climb, tilt, pause, and reset. The [live gallery screenshot](progress/examples-live.png),
+  [viewer screenshot](progress/drone-live.png), and [recording](progress/drone-live.mp4)
+  show the deployed build. This deployment predates the disturbed-start controls.
 - `9f98657`: native/browser bit comparison and browser contract-test harness.
   Pushed to GitHub `main`; remote revision verified.
-  [CI](https://github.com/sagan-software/bevy-gym/actions/runs/37847009522) is running.
+  [CI](https://github.com/sagan-software/bevy-gym/actions/runs/37847009522) passed,
+  including the first headless browser contract and parity runs.
   [Browser deployment](https://github.com/sagan-software/bevy-gym/actions/runs/37847009460)
-  is pending behind the viewer build. Pages already uses `cancel-in-progress: false`;
+  was replaced while pending by the next checkpoint. Pages uses `cancel-in-progress: false`;
   new checkpoints do not cancel the active build.
+- `88f2c5f`: disturbed starts, manual comparison controls, guide, and browser tests.
+  Pushed to GitHub `main`; remote revision verified.
+  [CI](https://github.com/sagan-software/bevy-gym/actions/runs/37848277209) passed.
+  [Browser deployment](https://github.com/sagan-software/bevy-gym/actions/runs/37848277060)
+  is running.
 
 ## Local evidence and active validation
 

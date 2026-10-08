@@ -1,0 +1,304 @@
+{
+  "date": "2026-10-08",
+  "scope": "Native training guide, private lesson helpers, and browser qualification",
+  "baseline_commit": "88f2c5f39dcf89438c03d62673791201971aff11",
+  "rust": "1.97.1",
+  "versions": {
+    "bevy": "0.18.1",
+    "burn": "0.21.0",
+    "rapier3d": "0.36.0",
+    "wasm-bindgen": "0.2.121",
+    "wasm-bindgen-test": "0.3.71"
+  },
+  "training": {
+    "root_seed": 7,
+    "selected_update": 260,
+    "transitions": 133120,
+    "lanes": 8,
+    "actions_per_lane": 64,
+    "expert_demonstrations": false,
+    "checkpoint": "assets/robots/recovery.mpk",
+    "original_run": "runs/drone-recovery/seed7-v1",
+    "original_source_snapshot": "runs/drone-recovery/seed7-v1/source",
+    "original_source_sha256": "1eabb04b0a4e36469c0b7bc5c1a6928a89bd1c8abe17bc2eb3cc91008e146a08  examples/robots/learning/encoding.rs\n97f7c0afd00299837be3440d6c0a5bc5027665036f6932602171c621b2f58f87  examples/robots/learning/evaluation.rs\nb6a402800776859430d61f99203b20cd1fabb08984b7a0f9054a8682e2528e5e  examples/robots/learning/mod.rs\nab1c2d14b85b2656ffa3f779dddd1ffc78c15867d393ab28611d5b905becd76f  examples/robots/learning/rollout.rs\n15c6eebe658815e90eef1bcd909f9addce0dbb6663120754e7c82d7dac54f7c3  examples/robots/train.rs\n",
+    "final_collector_first_update_matches_original": true
+  },
+  "files": [
+    {
+      "path": "examples/robots/train.rs",
+      "sha256": "1005dd6323d054fc74e54d4da653761fe3ef761031d37951f8211708b2936839",
+      "summary": {
+        "branches": {
+          "count": 6,
+          "covered": 6,
+          "notcovered": 0,
+          "percent": 100
+        },
+        "functions": {
+          "count": 1,
+          "covered": 1,
+          "percent": 100
+        },
+        "instantiations": {
+          "count": 1,
+          "covered": 1,
+          "percent": 100
+        },
+        "lines": {
+          "count": 38,
+          "covered": 38,
+          "percent": 100
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 105,
+          "covered": 92,
+          "notcovered": 13,
+          "percent": 87.61904761904762
+        }
+      }
+    },
+    {
+      "path": "examples/robots/learning/encoding.rs",
+      "sha256": "8dcc6b34457006fa2b1fa2ae09ac0a8503b86abf4918b10013e33619382c1de0",
+      "summary": {
+        "branches": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "functions": {
+          "count": 6,
+          "covered": 6,
+          "percent": 100
+        },
+        "instantiations": {
+          "count": 6,
+          "covered": 6,
+          "percent": 100
+        },
+        "lines": {
+          "count": 46,
+          "covered": 46,
+          "percent": 100
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 83,
+          "covered": 83,
+          "notcovered": 0,
+          "percent": 100
+        }
+      }
+    },
+    {
+      "path": "examples/robots/learning/evaluation.rs",
+      "sha256": "97f7c0afd00299837be3440d6c0a5bc5027665036f6932602171c621b2f58f87",
+      "summary": {
+        "branches": {
+          "count": 2,
+          "covered": 2,
+          "notcovered": 0,
+          "percent": 100
+        },
+        "functions": {
+          "count": 5,
+          "covered": 5,
+          "percent": 100
+        },
+        "instantiations": {
+          "count": 6,
+          "covered": 6,
+          "percent": 100
+        },
+        "lines": {
+          "count": 46,
+          "covered": 46,
+          "percent": 100
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 81,
+          "covered": 78,
+          "notcovered": 3,
+          "percent": 96.29629629629629
+        }
+      }
+    },
+    {
+      "path": "examples/robots/learning/mod.rs",
+      "sha256": "b6a402800776859430d61f99203b20cd1fabb08984b7a0f9054a8682e2528e5e",
+      "summary": {
+        "branches": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "functions": {
+          "count": 3,
+          "covered": 3,
+          "percent": 100
+        },
+        "instantiations": {
+          "count": 3,
+          "covered": 3,
+          "percent": 100
+        },
+        "lines": {
+          "count": 22,
+          "covered": 22,
+          "percent": 100
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 18,
+          "covered": 18,
+          "notcovered": 0,
+          "percent": 100
+        }
+      }
+    },
+    {
+      "path": "examples/robots/learning/rollout.rs",
+      "sha256": "9603c856acca32f40fc11a9430ceaac568a339c0b834977b9aac4acb8d1a45ce",
+      "summary": {
+        "branches": {
+          "count": 6,
+          "covered": 6,
+          "notcovered": 0,
+          "percent": 100
+        },
+        "functions": {
+          "count": 12,
+          "covered": 12,
+          "percent": 100
+        },
+        "instantiations": {
+          "count": 12,
+          "covered": 12,
+          "percent": 100
+        },
+        "lines": {
+          "count": 198,
+          "covered": 198,
+          "percent": 100
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 371,
+          "covered": 369,
+          "notcovered": 2,
+          "percent": 99.46091644204851
+        }
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "assets/robots/recovery.mpk",
+      "bytes": 46343,
+      "sha256": "bb0bef6e7412fd79ea097fa95036d428d22962af3b259c52c82b38c894df9b76"
+    },
+    {
+      "path": "docs/progress/drone-learning-curve.png",
+      "bytes": 82220,
+      "sha256": "b5e0bc46fd07c6e699600f43d495ac8462c748713d1a2cc616ecdf8792ef26bd"
+    },
+    {
+      "path": "docs/progress/drone-learning-curve.json",
+      "bytes": 17107,
+      "sha256": "5bbf3b44ef9c9985e686b8050c6ab29038e4ac9f5f019ad360cfffb964a8ae8c"
+    },
+    {
+      "path": "docs/progress/drone-learning-final.json",
+      "bytes": 11118,
+      "sha256": "0c0d8f775cfd10a95e0309a4cbb98fa2ec64c0f1bc33fabbd276290ca7fbf3e4"
+    },
+    {
+      "path": "docs/progress/drone-learning-selection.json",
+      "bytes": 722,
+      "sha256": "56a6a12b4467005be2b4368d3df675b1045aa79e3900d0e88037c8a30301b0da"
+    }
+  ],
+  "native": {
+    "focused_tests_passed": 10,
+    "file_based_qualification_passed": 1,
+    "ignored_in_regular_suite": 1,
+    "held_out_episodes": 32,
+    "survived": 32,
+    "mean_return": 443.32428377494216,
+    "mean_final_distance_metres": 0.3411145661957562,
+    "constant_thrust_mean_return": 47.62117954718997,
+    "constant_thrust_survived": 0
+  },
+  "browser": {
+    "method": "T3 preview with wasm-bindgen-test-runner interactive server",
+    "tests_passed": 10,
+    "qualification_gate_passed": true,
+    "screenshot": "docs/progress/drone-learning-browser.png",
+    "new_headless_ci_suite": "pending publication"
+  },
+  "coverage": {
+    "line_hits": 350,
+    "lines": 350,
+    "branch_hits": 14,
+    "branches": 14,
+    "includes_internal_tests": true,
+    "entrypoint_cases": [
+      "21 updates exercise first, periodic, final, and skipped records",
+      "JSON write failure at a pre-existing directory named 512.json",
+      "model write failure at a pre-existing directory named 512.mpk"
+    ],
+    "uncovered": "The ignored external-file qualification wrapper ran without instrumentation. The bundled qualification and shared assertions ran under instrumentation. No reachable production line or measured branch in the listed files remains unhit."
+  },
+  "validation": {
+    "root_tests": "passed",
+    "strict_clippy_all_targets_all_features": "passed",
+    "wasm_clippy": "passed",
+    "nix_lint": "passed",
+    "actionlint": "passed",
+    "changed_line_personal_diagnostics": 0,
+    "full_personal_clippy_errors": 51,
+    "full_personal_dylint_warnings": 2,
+    "rejected_cli_update_counts": [
+      0,
+      4294967296
+    ]
+  },
+  "remaining": [
+    "Learned-policy viewer mode",
+    "Browser training controls",
+    "Curriculum",
+    "Perception",
+    "Damage adaptation",
+    "Pursuit",
+    "Jumping quadruped"
+  ]
+}

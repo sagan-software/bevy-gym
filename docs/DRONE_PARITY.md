@@ -64,8 +64,8 @@ CI uses the pinned Nix Chromium and driver:
 nix run .#drone-browser-check
 ```
 
-That wrapper built locally and its command help passed. Its first CI browser run
-remains pending. Local browser evidence comes from the interactive runner:
+That wrapper passed in [CI](https://github.com/sagan-software/bevy-gym/actions/runs/37848277209).
+Local browser evidence comes from the interactive runner:
 
 ```sh
 NO_HEADLESS=1 WASM_BINDGEN_TEST_ADDRESS=0.0.0.0:8770 \

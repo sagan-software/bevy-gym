@@ -336,6 +336,8 @@
             }"
             cargo test --locked --no-default-features --features robots,browser \
               --target wasm32-unknown-unknown --test drone_hover --test drone_recovery --test drone_parity "$@"
+            cargo test --locked --no-default-features --features robots,browser,browser-training \
+              --target wasm32-unknown-unknown --test drone_learning "$@"
           '';
         };
 

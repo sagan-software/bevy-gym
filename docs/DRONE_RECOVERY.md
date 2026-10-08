@@ -49,9 +49,9 @@ actions and observations. Later curriculum stages need their own reviewed contra
 - [x] Run required Rust gates and changed-line personal lints.
 - [x] Finish with prose-only documentation, the guide, and documentation tests.
 
-This checkpoint has no learned controller. The following checkpoint must train a
-policy, evaluate held-out seeds against constant half-thrust, retain the checkpoint
-and learning curve, and show inference and training as distinct browser modes.
+The [learning lesson](DRONE_LEARNING.md) now supplies a qualified checkpoint and
+held-out comparisons against constant half-thrust. Learned inference and training
+controls in the viewer remain pending.
 
 ## Run and inspect
 

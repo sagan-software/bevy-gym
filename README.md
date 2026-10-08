@@ -134,7 +134,9 @@ Its manual controls compare calm and disturbed starts with hover, climb, power-o
 and tilt. The [recovery guide](examples/robots/recovery.rs) adds initial tilt and
 velocity through `DroneHover::disturbed()`. The
 [browser build guide](robot-web/README.md) uses the same Bevy example in WebAssembly.
-No trained drone policy is qualified yet. See the
+The [learning guide](docs/DRONE_LEARNING.md) trains a recovery policy and records
+its native and browser qualification. The bundled policy survived all 32 native
+held-out episodes. The viewer still uses manual controls. See the
 [physics contract](docs/ROBOT_ENVIRONMENT.md) and [execution status](docs/EXAMPLE_STATUS.md).
 
 ## Train in your browser

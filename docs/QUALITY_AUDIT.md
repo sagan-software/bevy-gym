@@ -25,6 +25,21 @@ versioned contract and explain only the actions and observations used by the les
 
 ## Confirmed delivery gaps
 
+The public `PpoTrainer` currently stores configuration without a training method.
+`PpoAgent` constructs an actor and critic and exposes inference, but has no optimizer
+update. These types document a trainer boundary; they do not provide a usable
+training entry point. The recovery lesson uses the working `RecurrentPpoAgent`.
+Review these overlapping names before designing a smaller public training API.
+
+`ContinuousPpoExample` requires `Vec<f32>` actions and observations, which forces
+typed environments through adapters. The recovery collector keeps `DroneAction`
+and `DroneObservation` through simulation and converts them only at the network
+boundary. Its private lesson code can inform a later compatible public API.
+
+The synchronous training guide also exposed a lint that bans `std::fs` writes.
+A function-local exception keeps checkpoint output synchronous. The guide uses
+no asynchronous runtime solely to satisfy that lint.
+
 The new thumbnail index links to the manual drone viewer and five Classic Control
 tasks. Pendulum now appears in the existing environment selector. The public
 deployment remains gated by the browser workflow; the previous run timed out.

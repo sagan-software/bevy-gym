@@ -1,0 +1,711 @@
+[
+  {
+    "baseline": [
+      {
+        "final_distance": 6.703430652618408,
+        "reward": 39.76732603833079,
+        "seed": 0,
+        "steps": 85,
+        "survived": false
+      },
+      {
+        "final_distance": 8.140289306640625,
+        "reward": 67.04166154097766,
+        "seed": 1,
+        "steps": 130,
+        "survived": false
+      },
+      {
+        "final_distance": 11.053842544555664,
+        "reward": 85.61805526912212,
+        "seed": 2,
+        "steps": 176,
+        "survived": false
+      },
+      {
+        "final_distance": 9.496874809265137,
+        "reward": 44.842814203351736,
+        "seed": 42,
+        "steps": 274,
+        "survived": false
+      },
+      {
+        "final_distance": 4.324670314788818,
+        "reward": 46.12651114910841,
+        "seed": 18446744073709551615,
+        "steps": 79,
+        "survived": false
+      }
+    ],
+    "episodes": [
+      {
+        "final_distance": 2.829472780227661,
+        "reward": 23.666414989624172,
+        "seed": 0,
+        "steps": 47,
+        "survived": false
+      },
+      {
+        "final_distance": 2.981015205383301,
+        "reward": 28.1437371148495,
+        "seed": 1,
+        "steps": 52,
+        "survived": false
+      },
+      {
+        "final_distance": 2.9183788299560547,
+        "reward": 27.55642982770223,
+        "seed": 2,
+        "steps": 52,
+        "survived": false
+      },
+      {
+        "final_distance": 2.6238741874694824,
+        "reward": 24.215806286782026,
+        "seed": 42,
+        "steps": 49,
+        "survived": false
+      },
+      {
+        "final_distance": 2.6322848796844482,
+        "reward": 26.69310807576403,
+        "seed": 18446744073709551615,
+        "steps": 49,
+        "survived": false
+      }
+    ],
+    "seed": 7,
+    "steps": 0,
+    "updates": 2000
+  },
+  {
+    "actor_loss": -0.008285919882837334,
+    "approximate_kl": 0.01265396056430743,
+    "critic_loss": 23.31049025990069,
+    "entropy": -2.3226098951417953,
+    "episodes": [
+      {
+        "final_distance": 2.7713847160339355,
+        "reward": 23.134357857168652,
+        "seed": 0,
+        "steps": 47,
+        "survived": false
+      },
+      {
+        "final_distance": 2.9012913703918457,
+        "reward": 27.519052896357607,
+        "seed": 1,
+        "steps": 51,
+        "survived": false
+      },
+      {
+        "final_distance": 2.8598034381866455,
+        "reward": 26.94465326354839,
+        "seed": 2,
+        "steps": 51,
+        "survived": false
+      },
+      {
+        "final_distance": 2.587653160095215,
+        "reward": 23.811776034533978,
+        "seed": 42,
+        "steps": 48,
+        "survived": false
+      },
+      {
+        "final_distance": 2.590453863143921,
+        "reward": 26.168421435169876,
+        "seed": 18446744073709551615,
+        "steps": 49,
+        "survived": false
+      }
+    ],
+    "optimizer_steps": 8,
+    "steps": 512
+  },
+  {
+    "actor_loss": -0.004484526474698214,
+    "approximate_kl": 0.005022269824216636,
+    "critic_loss": 0.9487407653186892,
+    "entropy": -2.3181320377625525,
+    "episodes": [
+      {
+        "final_distance": 2.857513427734375,
+        "reward": 25.462319455575198,
+        "seed": 0,
+        "steps": 49,
+        "survived": false
+      },
+      {
+        "final_distance": 3.167257070541382,
+        "reward": 31.010711173410527,
+        "seed": 1,
+        "steps": 55,
+        "survived": false
+      },
+      {
+        "final_distance": 2.9202628135681152,
+        "reward": 29.73670263402164,
+        "seed": 2,
+        "steps": 54,
+        "survived": false
+      },
+      {
+        "final_distance": 2.8483970165252686,
+        "reward": 26.362733395770192,
+        "seed": 42,
+        "steps": 52,
+        "survived": false
+      },
+      {
+        "final_distance": 2.7001354694366455,
+        "reward": 28.43493269616738,
+        "seed": 18446744073709551615,
+        "steps": 51,
+        "survived": false
+      }
+    ],
+    "optimizer_steps": 228,
+    "steps": 10240
+  },
+  {
+    "actor_loss": -0.002668924958925345,
+    "approximate_kl": -0.00010884680011127076,
+    "critic_loss": 13.323167165377527,
+    "entropy": -2.306038078968413,
+    "episodes": [
+      {
+        "final_distance": 4.607985019683838,
+        "reward": 43.32083986699581,
+        "seed": 0,
+        "steps": 79,
+        "survived": false
+      },
+      {
+        "final_distance": 5.080641746520996,
+        "reward": 79.08020395040512,
+        "seed": 1,
+        "steps": 117,
+        "survived": false
+      },
+      {
+        "final_distance": 3.3825085163116455,
+        "reward": 57.13667440589052,
+        "seed": 2,
+        "steps": 99,
+        "survived": false
+      },
+      {
+        "final_distance": 2.103989601135254,
+        "reward": 44.37880302220583,
+        "seed": 42,
+        "steps": 80,
+        "survived": false
+      },
+      {
+        "final_distance": 1.9721254110336304,
+        "reward": 50.90605405345559,
+        "seed": 18446744073709551615,
+        "steps": 84,
+        "survived": false
+      }
+    ],
+    "optimizer_steps": 408,
+    "steps": 20480
+  },
+  {
+    "actor_loss": 0.0009203443696605973,
+    "approximate_kl": 0.0010983734950754977,
+    "critic_loss": 9.15878687845543,
+    "entropy": -2.3075404700357467,
+    "episodes": [
+      {
+        "final_distance": 3.4481494426727295,
+        "reward": 53.82156121311709,
+        "seed": 0,
+        "steps": 94,
+        "survived": false
+      },
+      {
+        "final_distance": 4.281307220458984,
+        "reward": 47.93035191204399,
+        "seed": 1,
+        "steps": 78,
+        "survived": false
+      },
+      {
+        "final_distance": 5.408671855926514,
+        "reward": 50.51073697395623,
+        "seed": 2,
+        "steps": 87,
+        "survived": false
+      },
+      {
+        "final_distance": 3.989351749420166,
+        "reward": 35.397123634349555,
+        "seed": 42,
+        "steps": 74,
+        "survived": false
+      },
+      {
+        "final_distance": 4.3119611740112305,
+        "reward": 43.44170326925814,
+        "seed": 18446744073709551615,
+        "steps": 74,
+        "survived": false
+      }
+    ],
+    "optimizer_steps": 568,
+    "steps": 30720
+  },
+  {
+    "actor_loss": -0.0032702353491913527,
+    "approximate_kl": -0.0027491142624285186,
+    "critic_loss": 2.4227236373117194,
+    "entropy": -2.310788923292421,
+    "episodes": [
+      {
+        "final_distance": 3.197251081466675,
+        "reward": 54.413939975202084,
+        "seed": 0,
+        "steps": 110,
+        "survived": false
+      },
+      {
+        "final_distance": 7.125332832336426,
+        "reward": 72.80043321568519,
+        "seed": 1,
+        "steps": 125,
+        "survived": false
+      },
+      {
+        "final_distance": 4.064195156097412,
+        "reward": 74.02477163821459,
+        "seed": 2,
+        "steps": 128,
+        "survived": false
+      },
+      {
+        "final_distance": 4.566366195678711,
+        "reward": 45.04199435189366,
+        "seed": 42,
+        "steps": 102,
+        "survived": false
+      },
+      {
+        "final_distance": 6.112267971038818,
+        "reward": 62.17283994704485,
+        "seed": 18446744073709551615,
+        "steps": 117,
+        "survived": false
+      }
+    ],
+    "optimizer_steps": 728,
+    "steps": 40960
+  },
+  {
+    "actor_loss": -0.0036855917551292805,
+    "approximate_kl": -0.003709414905188145,
+    "critic_loss": 4.860858387470529,
+    "entropy": -2.297072342829779,
+    "episodes": [
+      {
+        "final_distance": 6.653318405151367,
+        "reward": 55.843073735013604,
+        "seed": 0,
+        "steps": 141,
+        "survived": false
+      },
+      {
+        "final_distance": 6.512824058532715,
+        "reward": 91.75160285457969,
+        "seed": 1,
+        "steps": 170,
+        "survived": false
+      },
+      {
+        "final_distance": 7.869823932647705,
+        "reward": 83.27800306212157,
+        "seed": 2,
+        "steps": 204,
+        "survived": false
+      },
+      {
+        "final_distance": 6.7904229164123535,
+        "reward": 72.08646458946168,
+        "seed": 42,
+        "steps": 167,
+        "survived": false
+      },
+      {
+        "final_distance": 4.689905166625977,
+        "reward": 86.71861043572426,
+        "seed": 18446744073709551615,
+        "steps": 138,
+        "survived": false
+      }
+    ],
+    "optimizer_steps": 888,
+    "steps": 51200
+  },
+  {
+    "actor_loss": -0.0009463659116590861,
+    "approximate_kl": 0.0006253548413610701,
+    "critic_loss": 2.959183475562895,
+    "entropy": -2.2917166601400822,
+    "episodes": [
+      {
+        "final_distance": 8.914898872375488,
+        "reward": 74.94873130973428,
+        "seed": 0,
+        "steps": 187,
+        "survived": false
+      },
+      {
+        "final_distance": 7.967658519744873,
+        "reward": 95.64526271354407,
+        "seed": 1,
+        "steps": 216,
+        "survived": false
+      },
+      {
+        "final_distance": 8.170550346374512,
+        "reward": 75.74789284262806,
+        "seed": 2,
+        "steps": 194,
+        "survived": false
+      },
+      {
+        "final_distance": 9.906475067138672,
+        "reward": 67.76527791447006,
+        "seed": 42,
+        "steps": 213,
+        "survived": false
+      },
+      {
+        "final_distance": 10.26661205291748,
+        "reward": 87.41058364789933,
+        "seed": 18446744073709551615,
+        "steps": 202,
+        "survived": false
+      }
+    ],
+    "optimizer_steps": 1048,
+    "steps": 61440
+  },
+  {
+    "actor_loss": -0.0031906710864859633,
+    "approximate_kl": 0.008175920472581328,
+    "critic_loss": 8.080776900998899,
+    "entropy": -2.2798988338327035,
+    "episodes": [
+      {
+        "final_distance": 5.183258533477783,
+        "reward": 91.62500219419599,
+        "seed": 0,
+        "steps": 175,
+        "survived": false
+      },
+      {
+        "final_distance": 4.870711326599121,
+        "reward": 103.59575682505965,
+        "seed": 1,
+        "steps": 183,
+        "survived": false
+      },
+      {
+        "final_distance": 6.643953323364258,
+        "reward": 104.39968414790928,
+        "seed": 2,
+        "steps": 232,
+        "survived": false
+      },
+      {
+        "final_distance": 1.9546173810958862,
+        "reward": 90.37002372741699,
+        "seed": 42,
+        "steps": 170,
+        "survived": false
+      },
+      {
+        "final_distance": 3.396393299102783,
+        "reward": 88.37472209334373,
+        "seed": 18446744073709551615,
+        "steps": 148,
+        "survived": false
+      }
+    ],
+    "optimizer_steps": 1208,
+    "steps": 71680
+  },
+  {
+    "actor_loss": -0.0046121970226522535,
+    "approximate_kl": 0.007489801261783713,
+    "critic_loss": 2.7540574295271654,
+    "entropy": -2.277766952989623,
+    "episodes": [
+      {
+        "final_distance": 4.4298906326293945,
+        "reward": 110.92305606976151,
+        "seed": 0,
+        "steps": 262,
+        "survived": false
+      },
+      {
+        "final_distance": 5.0125017166137695,
+        "reward": 113.86023935303092,
+        "seed": 1,
+        "steps": 243,
+        "survived": false
+      },
+      {
+        "final_distance": 3.913052797317505,
+        "reward": 121.49288386106491,
+        "seed": 2,
+        "steps": 270,
+        "survived": false
+      },
+      {
+        "final_distance": 7.249430179595947,
+        "reward": 57.94080322328955,
+        "seed": 42,
+        "steps": 209,
+        "survived": false
+      },
+      {
+        "final_distance": 3.0587449073791504,
+        "reward": 104.25182832032442,
+        "seed": 18446744073709551615,
+        "steps": 189,
+        "survived": false
+      }
+    ],
+    "optimizer_steps": 1364,
+    "steps": 81920
+  },
+  {
+    "actor_loss": -0.0021015123129473068,
+    "approximate_kl": 0.002602824263590281,
+    "critic_loss": 5.146573758363957,
+    "entropy": -2.286039116792381,
+    "episodes": [
+      {
+        "final_distance": 1.9777977466583252,
+        "reward": 205.15191148221493,
+        "seed": 0,
+        "steps": 354,
+        "survived": false
+      },
+      {
+        "final_distance": 2.0603103637695312,
+        "reward": 150.2834969907999,
+        "seed": 1,
+        "steps": 250,
+        "survived": false
+      },
+      {
+        "final_distance": 3.345879316329956,
+        "reward": 208.2536539658904,
+        "seed": 2,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 3.067521333694458,
+        "reward": 87.99350754916668,
+        "seed": 42,
+        "steps": 278,
+        "survived": false
+      },
+      {
+        "final_distance": 2.1324779987335205,
+        "reward": 116.49612402915955,
+        "seed": 18446744073709551615,
+        "steps": 187,
+        "survived": false
+      }
+    ],
+    "optimizer_steps": 1512,
+    "steps": 92160
+  },
+  {
+    "actor_loss": 6.284081609919667e-05,
+    "approximate_kl": 0.0007686155130386639,
+    "critic_loss": 6.674916322241188,
+    "entropy": -2.292090114671737,
+    "episodes": [
+      {
+        "final_distance": 7.058353900909424,
+        "reward": 132.75747282989323,
+        "seed": 0,
+        "steps": 373,
+        "survived": false
+      },
+      {
+        "final_distance": 6.990352153778076,
+        "reward": 153.66884391894564,
+        "seed": 1,
+        "steps": 460,
+        "survived": false
+      },
+      {
+        "final_distance": 7.872941970825195,
+        "reward": 113.70460205152631,
+        "seed": 2,
+        "steps": 366,
+        "survived": false
+      },
+      {
+        "final_distance": 8.343771934509277,
+        "reward": 122.2854840811342,
+        "seed": 42,
+        "steps": 426,
+        "survived": false
+      },
+      {
+        "final_distance": 7.690060138702393,
+        "reward": 182.65196299692616,
+        "seed": 18446744073709551615,
+        "steps": 479,
+        "survived": false
+      }
+    ],
+    "optimizer_steps": 1664,
+    "steps": 102400
+  },
+  {
+    "actor_loss": -0.004242716036969796,
+    "approximate_kl": 0.0005502111179112451,
+    "critic_loss": 3.6536257957923226,
+    "entropy": -2.2948754862882197,
+    "episodes": [
+      {
+        "final_distance": 0.47906944155693054,
+        "reward": 420.8108150959015,
+        "seed": 0,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.44854283332824707,
+        "reward": 422.4243515133858,
+        "seed": 1,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.5064748525619507,
+        "reward": 433.63723397254944,
+        "seed": 2,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 1.0015441179275513,
+        "reward": 318.88487046957016,
+        "seed": 42,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.4040879011154175,
+        "reward": 394.5580699443817,
+        "seed": 18446744073709551615,
+        "steps": 500,
+        "survived": true
+      }
+    ],
+    "optimizer_steps": 1800,
+    "steps": 112640
+  },
+  {
+    "actor_loss": -0.007867877444368787,
+    "approximate_kl": 0.007784335404267043,
+    "critic_loss": 6.9121715280925855,
+    "entropy": -2.3157698404975235,
+    "episodes": [
+      {
+        "final_distance": 0.561637818813324,
+        "reward": 417.0246099829674,
+        "seed": 0,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.5492398738861084,
+        "reward": 429.0629048347473,
+        "seed": 1,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.6015434265136719,
+        "reward": 414.7505994439125,
+        "seed": 2,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.6005285382270813,
+        "reward": 423.50269812345505,
+        "seed": 42,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.689765989780426,
+        "reward": 423.60932743549347,
+        "seed": 18446744073709551615,
+        "steps": 500,
+        "survived": true
+      }
+    ],
+    "optimizer_steps": 1948,
+    "steps": 122880
+  },
+  {
+    "actor_loss": -0.0034707587910816073,
+    "approximate_kl": 0.0041007906861523155,
+    "critic_loss": 1.7454812517389655,
+    "entropy": -2.3347119372338057,
+    "episodes": [
+      {
+        "final_distance": 0.2761036455631256,
+        "reward": 466.7585833668709,
+        "seed": 0,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.28503841161727905,
+        "reward": 468.5618842244148,
+        "seed": 1,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.2546214163303375,
+        "reward": 471.4901004433632,
+        "seed": 2,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.252908855676651,
+        "reward": 466.7303889989853,
+        "seed": 42,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.20851938426494598,
+        "reward": 469.80673545598984,
+        "seed": 18446744073709551615,
+        "steps": 500,
+        "survived": true
+      }
+    ],
+    "optimizer_steps": 2076,
+    "steps": 133120
+  }
+]

@@ -36,7 +36,7 @@ jobs:
       - run: nix develop --command python3 tests/test_gymnasium_dependencies.py
       - run: nix develop --command cargo fmt --all -- --check
       - run: nix develop --command cargo test
-      - run: nix develop --command cargo test --no-default-features --features robots --lib --test drone_hover --test drone_recovery --test drone_parity
+      - run: nix develop --command cargo test --no-default-features --features robots --lib --test drone_hover --test drone_recovery --test drone_parity --test drone_learning
       - run: nix develop --command cargo test --features robots --example drone-flight
       - run: nix develop --command cargo check --no-default-features --features robots,browser --target wasm32-unknown-unknown
       - run: nix run .#drone-browser-check

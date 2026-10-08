@@ -33,3 +33,13 @@ Rotor vertices already include their offsets from the source origin.
 Before animating a rotor, create a pivot at that rotor's centre and preserve its
 initial world position. Rotating the mesh around the source origin would move
 the whole rotor around the drone.
+
+## Recovery policy
+
+`recovery.mpk` contains actor and critic weights trained in this repository.
+It uses the repository's MIT OR Apache-2.0 license. The
+[learning guide](../../docs/DRONE_LEARNING.md) records its recipe and qualification.
+It controls the ten-second disturbed hover task; it has no damage or perception inputs.
+
+SHA-256: `bb0bef6e7412fd79ea097fa95036d428d22962af3b259c52c82b38c894df9b76`.
+Load it with the exact architecture in `examples/robots/learning/mod.rs` and Burn 0.21.
