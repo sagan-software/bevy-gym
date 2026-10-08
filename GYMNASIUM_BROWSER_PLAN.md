@@ -273,11 +273,11 @@ must remain useful without the user's browser storage or a private run directory
    the selected model, and verify the deployed page. Do not proceed on inference alone.
 3. Repeat all gates for MountainCar, continuous MountainCar, Pendulum, and Acrobot.
 4. Repeat for CliffWalking, FrozenLake, Taxi, and Blackjack, including their variants.
-5. Pass the Box2D browser feasibility gate. Replace and qualify LunarLander,
-   BipedalWalker, and CarRacing individually, including registered variants.
-6. Pass the MuJoCo browser feasibility gate. Qualify InvertedPendulum,
+5. Pass the MuJoCo browser feasibility gate. Qualify InvertedPendulum,
    InvertedDoublePendulum, Reacher, Pusher, Swimmer, Hopper, HalfCheetah, Walker2d,
    Ant, HumanoidStandup, and Humanoid individually.
+6. Pass the Box2D browser feasibility gate. Replace and qualify LunarLander,
+   BipedalWalker, and CarRacing individually, including registered variants.
 7. Publish the complete tested catalog and its machine-readable qualification
    reports. Resume custom Avian or more complex examples afterward.
 
@@ -351,15 +351,22 @@ passed the functional browser checks. Desktop and mobile views were inspected.
 MountainCar has shared float64 dynamics, boundary tests, browser task selection,
 and a bundled qualified model. Native training seeds 42, 43, and 44 all passed
 within 310,000 transitions. Chromium trained offline for 390,000 transitions
-and scored -102.41 with 200/200 goals. The deployed visual review remains
-pending. Other environments are not yet browser-qualified.
+and scored -102.41 with 200/200 goals. Deployed inference and fresh training
+were inspected; the retained recording is linked from the visual comparisons.
 
 Continuous MountainCar now has a shared core and native adapter. A pinned NumPy
 2.4.4 oracle checks 201 transitions bit for bit, including clipped force,
 raw-action penalties, reverse motion at the goal, and both precision states.
-Its new production files have 100% line coverage. Browser training, model
-qualification, and deployment for this task remain unfinished.
-The Box2D/MuJoCo engine replacements remain planned.
+Its environment and continuous-session files have 100% line coverage. Three
+fresh PPO seeds passed qualification, and offline Chromium training scored
+95.43 with 200/200 goals. The selected bundle scored 98.44 with 200/200 goals.
+
+Browser-to-native policy loading preserves the browser score within 0.00001.
+Publication and final deployed verification remain pending.
+
+The next task is Pendulum, followed by Acrobot and Toy Text. MuJoCo follows
+Toy Text, as requested on 2026-10-07; Box2D follows MuJoCo. Both engine
+integrations still require their browser feasibility gates.
 
 The broader controls and performance checks above remain acceptance work,
 including physical tab-switch verification, explicit worker crashes, speed-independent replay,

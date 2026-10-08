@@ -1,19 +1,29 @@
 import { drawCartPole, drawMountainCar } from "./renderers.js";
 const $ = (id) => document.getElementById(id);
-const taskName = new URL(location.href).searchParams.get("env") === "mountain-car" ? "mountain-car" : "cartpole";
-const task = taskName === "mountain-car"
-  ? { title: "MountainCar-v0", hz: 30, minimum: -200, maximum: 0, target: -110, rateMaximum: .0014, replay: 2000 }
-  : { title: "CartPole-v1", hz: 50, minimum: 0, maximum: 500, target: 475, rateMaximum: .0004, replay: 1000 };
+const tasks = {
+  "cartpole": { title: "CartPole-v1", algorithm: "DQN", hz: 50, minimum: 0, maximum: 500, target: 475, rateMaximum: .0004, replay: 1000, lanes: 1 },
+  "mountain-car": { title: "MountainCar-v0", algorithm: "DQN", hz: 30, minimum: -200, maximum: 0, target: -110, rateMaximum: .0014, replay: 2000, lanes: 1, goal: .5 },
+  "mountain-car-continuous": { title: "MountainCarContinuous-v0", algorithm: "PPO", hz: 30, minimum: -100, maximum: 100, target: 90, rateMaximum: .0035, replay: 512, lanes: 8, goal: .45 },
+};
+const requestedTask = new URL(location.href).searchParams.get("env");
+const taskName = Object.hasOwn(tasks, requestedTask) ? requestedTask : "cartpole";
+const task = tasks[taskName], continuous = task.algorithm === "PPO";
+$("updates-label").textContent = continuous ? "Updates per optimizer" : "Optimizer updates";
+$("rate-label").textContent = continuous ? "Actor rate" : "Learning rate";
+$("loss-label").textContent = continuous ? "Actor loss" : "TD loss";
+$("epsilon-row").hidden = continuous;
+$("critic-rate-row").hidden = !continuous;
+$("critic-loss-row").hidden = !continuous;
 $("environment").value = taskName;
 $("environment").onchange = () => { location.search = new URLSearchParams({ env: $("environment").value }).toString(); };
 document.querySelector("h1").textContent = task.title;
 $("score-target").textContent = `Target mean ≥${task.target}`;
-$("scene").setAttribute("aria-label", taskName === "mountain-car" ? "MountainCar simulation: a car climbs the right hill" : "CartPole simulation: a cart balances an upright pole");
+$("scene").setAttribute("aria-label", task.goal ? "MountainCar simulation: a car climbs the right hill" : "CartPole simulation: a cart balances an upright pole");
 let worker, generation = 0, uploadGeneration = 0, cancelPolicyValidation;
 /** @type {"loading" | "running" | "advancing" | "pausing" | "paused" | "failed"} */
 let phase = "loading";
 let currentMode = "inference", initialBytes, initialSource, bundledBytes, latest, lastTime = 0, debt = 0;
-let returns = [], rates = [], speedWindow = { time: performance.now(), transitions: 0 };
+let returns = [], rates = [], criticRates = [], speedWindow = { time: performance.now(), transitions: 0 };
 
 function setPhase(next) {
   phase = next;
@@ -56,14 +66,14 @@ function start(mode, bytes, source = "Bundled model") {
   ++uploadGeneration; cancelPolicyValidation?.();
   worker?.terminate();
   currentMode = mode; initialBytes = bytes; initialSource = source; latest = undefined;
-  setPhase("loading"); debt = 0; returns = []; rates = [];
+  setPhase("loading"); debt = 0; returns = []; rates = []; criticRates = [];
   $("error").hidden = true;
-  $("mode").textContent = mode === "training" ? "Training · DQN" : "Inference";
+  $("mode").textContent = mode === "training" ? `Training · ${task.algorithm}` : "Inference";
   $("policy-source").textContent = mode === "training" ? `Fresh model · seed ${runSeed}` : source;
   $("status").textContent = "Starting Rust worker";
   $("pause").textContent = "Pause";
   ["transitions", "episodes", "return", "updates"].forEach((id) => $(id).textContent = "0");
-  ["rate", "epsilon", "loss"].forEach((id) => $(id).textContent = "None");
+  ["rate", "epsilon", "loss", "critic-rate", "critic-loss"].forEach((id) => $(id).textContent = "None");
   $("return-summary").textContent = "No completed episodes";
   $("rate-summary").textContent = mode === "training" ? "Waiting for the first optimizer update." : "Inference performs no optimizer updates.";
   drawScene([0, 0, 0, 0]); drawCharts();
@@ -82,7 +92,7 @@ function start(mode, bytes, source = "Bundled model") {
       case "started":
         setPhase("running"); lastTime = performance.now();
         speedWindow = { time: lastTime, transitions: 0 };
-        $("status").textContent = mode === "training" ? "Collecting replay transitions" : "Running frozen policy";
+        $("status").textContent = mode === "training" ? (continuous ? "Collecting PPO rollout" : "Collecting replay transitions") : "Running frozen policy";
         syncVisibility();
         break;
       case "snapshot": setPhase(phase === "pausing" ? "paused" : "running"); update(message.snapshot); break;
@@ -104,13 +114,18 @@ function update(snapshot) {
   $("return").textContent = snapshot.episode_return.toFixed(0);
   $("updates").textContent = snapshot.optimizer_steps.toLocaleString();
   $("rate").textContent = snapshot.learning_rate?.toExponential(1) ?? "None";
+  $("critic-rate").textContent = snapshot.critic_learning_rate?.toExponential(1) ?? "None";
+  $("critic-loss").textContent = snapshot.critic_loss?.toFixed(4) ?? "None";
   $("epsilon").textContent = snapshot.epsilon?.toFixed(3) ?? "None";
   $("loss").textContent = snapshot.loss?.toFixed(4) ?? "None";
   returns.push(...snapshot.completed.map((episode) => [episode.transition, episode.reward]));
   if (returns.length > 2000) returns.splice(0, returns.length - 2000);
   if (snapshot.optimizer_steps > 0) {
     rates = [[0, snapshot.learning_rate], [snapshot.optimizer_steps, snapshot.learning_rate]];
-    $("rate-summary").textContent = `Adam · constant ${snapshot.learning_rate} · ${snapshot.optimizer_steps.toLocaleString()} updates`;
+    criticRates = continuous ? [[0, snapshot.critic_learning_rate], [snapshot.optimizer_steps, snapshot.critic_learning_rate]] : [];
+    $("rate-summary").textContent = continuous
+      ? `Actor ${snapshot.learning_rate} · critic ${snapshot.critic_learning_rate} · ${snapshot.optimizer_steps.toLocaleString()} updates`
+      : `Adam · constant ${snapshot.learning_rate} · ${snapshot.optimizer_steps.toLocaleString()} updates`;
   }
   if (returns.length) {
     const recent = returns.slice(-20);
@@ -118,10 +133,11 @@ function update(snapshot) {
     $("return-summary").textContent = `Mean of last ${recent.length} episodes: ${mean.toFixed(1)} · raw returns and rolling mean`;
   }
   $("status").textContent = phase === "paused" ? pausedStatus() : currentMode === "inference" ? "Running frozen policy"
-    : snapshot.optimizer_steps ? "Training in this browser" : `Collecting replay transitions · ${snapshot.transitions}/${task.replay.toLocaleString()}`;
+    : snapshot.optimizer_steps ? (continuous ? "Training 8 environments · showing environment 1" : "Training in this browser")
+      : `Collecting ${continuous ? "PPO rollout" : "replay transitions"} · ${snapshot.transitions}/${task.replay.toLocaleString()}`;
   const now = performance.now();
   if (phase === "running" && now - speedWindow.time >= 1000) {
-    const achieved = (snapshot.transitions - speedWindow.transitions) * (1000 / task.hz) / (now - speedWindow.time);
+    const achieved = (snapshot.transitions - speedWindow.transitions) * (1000 / (task.hz * (currentMode === "training" ? task.lanes : 1))) / (now - speedWindow.time);
     $("achieved").textContent = `${achieved.toFixed(1)}× actual`;
     speedWindow = { time: now, transitions: snapshot.transitions };
   }
@@ -131,7 +147,7 @@ function frame(now) {
   const elapsed = Math.min((now - lastTime) / 1000, .1); lastTime = now;
   if (phase === "running" || phase === "advancing") {
     // One in-flight batch bounds control latency. Speed never changes physics or updates per transition.
-    debt = Math.min(debt + elapsed * task.hz * Number($("speed").value), 64);
+    debt = Math.min(debt + elapsed * task.hz * (currentMode === "training" ? task.lanes : 1) * Number($("speed").value), 64);
     if (phase === "running" && debt >= 1) { const steps = Math.floor(debt); debt -= steps; advance(steps); }
   } else { debt = 0; }
   requestAnimationFrame(frame);
@@ -197,10 +213,10 @@ function context(id) {
 }
 function drawScene(state) {
   const canvas = $("scene");
-  if (taskName === "mountain-car") drawMountainCar(canvas, state);
+  if (task.goal) drawMountainCar(canvas, state, task.goal);
   else drawCartPole(canvas, state);
 }
-function chart(id, points, maximum, target, moving, minimum = 0, horizontalLabel = "Transitions") {
+function chart(id, points, maximum, target, moving, minimum = 0, horizontalLabel = "Transitions", secondary = []) {
   const [ctx, width, height] = context(id), left = 48, right = width - 12, top = 22, bottom = height - 34;
   const first = points[0]?.[0] ?? 0, last = Math.max(first + 1, points.at(-1)?.[0] ?? 1);
   const x = (value) => left + (value - first) / (last - first) * (right - left);
@@ -213,10 +229,15 @@ function chart(id, points, maximum, target, moving, minimum = 0, horizontalLabel
   if (target != null) { ctx.strokeStyle = "#a5b2a8"; ctx.setLineDash([4,4]); ctx.beginPath(); ctx.moveTo(left,y(target));ctx.lineTo(right,y(target));ctx.stroke();ctx.setLineDash([]); }
   const line = (series, color) => { ctx.strokeStyle = color;ctx.lineWidth = 1.5;ctx.beginPath();series.forEach((point,index)=>{if(index)ctx.lineTo(x(point[0]),y(point[1]));else ctx.moveTo(x(point[0]),y(point[1]));});ctx.stroke(); };
   line(points, moving ? "#76937d" : "#b6ee63");
+  if (secondary.length) {
+    line(secondary, "#7bc9f0");
+    ctx.textAlign = "left"; ctx.fillStyle = "#b6ee63"; ctx.fillText("Actor", left, 12);
+    ctx.fillStyle = "#7bc9f0"; ctx.fillText("Critic", left + 52, 12);
+  }
   if (moving) line(points.map((point,index)=>{const batch=points.slice(Math.max(0,index-19),index+1);return [point[0],batch.reduce((sum,p)=>sum+p[1],0)/batch.length];}),"#b6ee63");
   ctx.fillStyle="#a5b2a8";ctx.textAlign="left";ctx.fillText(first.toLocaleString(),left,bottom+18);ctx.textAlign="right";ctx.fillText(last.toLocaleString(),right,bottom+18);ctx.textAlign="center";ctx.fillText(horizontalLabel,(left+right)/2,height-3);
 }
-function drawCharts() { chart("returns-chart", returns, task.maximum, task.target, true, task.minimum); chart("rate-chart", rates, task.rateMaximum, null, false, 0, "Optimizer updates"); }
+function drawCharts() { chart("returns-chart", returns, task.maximum, task.target, true, task.minimum); chart("rate-chart", rates, task.rateMaximum, null, false, 0, continuous ? "Updates per optimizer" : "Optimizer updates", criticRates); }
 window.addEventListener("resize",()=>{drawScene(latest?.state ?? [0,0,0,0]);drawCharts();});
 drawScene([0,0,0,0]);drawCharts();requestAnimationFrame(frame);
 const initialGeneration = generation;
@@ -236,7 +257,7 @@ try {
     ? run.run_id === metadata.selected_run : run.seed === metadata.selected_training_seed);
   if (!Number.isFinite(report?.test_mean)) throw new Error("Bundled policy has no qualification score.");
   bundledBytes = bytes;
-  $("model-evidence").textContent = `Bundled model · mean ${report.test_mean} over ${report.test_episodes} held-out episodes.`;
+  $("model-evidence").textContent = `Bundled model · mean ${report.test_mean.toFixed(2)} over ${report.test_episodes} held-out episodes.`;
   $("bundled").disabled = false;
   if (generation === initialGeneration) start("inference", bundledBytes);
 } catch (error) {

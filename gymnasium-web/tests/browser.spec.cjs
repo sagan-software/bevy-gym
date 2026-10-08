@@ -19,8 +19,8 @@ test("pause survives snapshots between pointer down and up", async ({ page }) =>
   await expect(page.locator("#status")).toHaveText("Paused");
 });
 
-test("every speed advances inference without optimizer updates", async ({ page }) => {
-  await page.goto("./");
+for (const task of ["cartpole", "mountain-car", "mountain-car-continuous"]) test(`${task}: every speed advances inference without optimizer updates`, async ({ page }) => {
+  await page.goto(`./?env=${task}`);
   await expect(page.locator("#status")).toHaveText("Running frozen policy");
   for (const speed of ["1", "2", "4", "8", "16"]) {
     await page.locator("#speed").selectOption(speed);
@@ -35,6 +35,10 @@ test("every speed advances inference without optimizer updates", async ({ page }
     await expect(page.locator("#status")).toHaveText("Paused");
     await expect(page.locator("#transitions")).toHaveText(before);
   }
+  await page.getByRole("button", { name: "Step", exact: true }).click();
+  await expect(page.locator("#transitions")).toHaveText((Number(before.replaceAll(",", "")) + 1).toLocaleString("en-US"));
+  await expect(page.locator("#updates")).toHaveText("0");
+  await expect(page.locator("#status")).toHaveText("Paused");
 });
 
 test("invalid uploads preserve the paused inference session", async ({ page }) => {
@@ -243,11 +247,15 @@ test("late bundled-model loading cannot replace a newer training session", async
 for (const qualification of [
   { task: "cartpole", target: 475, selection: 475, validationCount: 20, minimumSuccesses: 180, checkpoints: 20, improvement: 400, testStart: 100000 },
   { task: "mountain-car", target: -110, selection: -105, validationCount: 100, minimumSuccesses: 190, checkpoints: 100, improvement: 80, testStart: 300000 },
-]) test(`${qualification.task} browser DQN learns and passes held-out scores`, async ({ page }, testInfo) => {
+  { task: "mountain-car-continuous", algorithm: "PPO", target: 90, selection: 90, validationCount: 20, minimumSuccesses: 190, checkpoints: 195, batchSteps: 256, improvement: 0, testStart: 500000 },
+]) test(`${qualification.task} browser ${qualification.algorithm ?? "DQN"} learns and passes held-out scores`, async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "chromium", "Full score qualification runs in Chromium; all engines run optimizer and inference checks.");
   test.setTimeout(1_200_000);
   await page.goto(`./?env=${qualification.task}`);
-  await expect(page.locator("#status")).toHaveText("Running frozen policy");
+  if (qualification.algorithm === "PPO") {
+    await page.getByRole("button", { name: "Train from scratch", exact: true }).click();
+    await expect(page.locator("#pause")).toBeEnabled();
+  } else await expect(page.locator("#status")).toHaveText("Running frozen policy");
   await paused(page);
   const evaluation = page.evaluate(async qualification => {
     async function client() {
@@ -275,7 +283,7 @@ for (const qualification of [
         await evaluator.send({ command: "start_inference", seed, bytes });
         for (;;) {
           const { snapshot } = await evaluator.send({ command: "advance", steps: 256 });
-          if (snapshot.completed.length) { const score = snapshot.completed[0].reward; sum += score; if (qualification.task === "cartpole" ? score === 500 : score > -200) full++; break; }
+          if (snapshot.completed.length) { const score = snapshot.completed[0].reward; sum += score; if (qualification.task === "cartpole" ? score === 500 : score > (qualification.algorithm === "PPO" ? 0 : -200)) full++; break; }
         }
       }
       return { mean: sum / count, full, count };
@@ -287,10 +295,10 @@ for (const qualification of [
       const history = [];
       let selected;
       for (let checkpoint = 1; checkpoint <= qualification.checkpoints; checkpoint++) {
-        for (let batch = 0; batch < 40; batch++) await trainer.send({ command: "advance", steps: 250 });
+        for (let batch = 0; batch < 40; batch++) await trainer.send({ command: "advance", steps: qualification.batchSteps ?? 250 });
         const candidate = await trainer.send({ command: "export" });
         const validation = await evaluate(candidate.bytes, 10000, qualification.validationCount);
-        history.push({ transitions: checkpoint * 10000, ...validation });
+        history.push({ transitions: checkpoint * 40 * (qualification.batchSteps ?? 250), ...validation });
         if (validation.mean >= qualification.selection && validation.full / validation.count >= qualification.minimumSuccesses / 200) { selected = candidate.bytes; break; }
       }
       return { baseline, history, test: selected ? await evaluate(selected, qualification.testStart, 200) : null, policy: selected };
@@ -314,7 +322,8 @@ for (const qualification of [
   expect(result.test).not.toBeNull();
   expect(result.test.mean).toBeGreaterThanOrEqual(qualification.target);
   expect(result.test.full).toBeGreaterThanOrEqual(qualification.minimumSuccesses);
-  expect(result.test.mean - result.baseline.mean).toBeGreaterThanOrEqual(qualification.improvement);
+  if (qualification.algorithm === "PPO") expect(result.test.mean - result.baseline.mean).toBeGreaterThan(0);
+  else expect(result.test.mean - result.baseline.mean).toBeGreaterThanOrEqual(qualification.improvement);
 });
 
 test("learning rate uses optimizer updates on its horizontal axis", async ({ page }) => {

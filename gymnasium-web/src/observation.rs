@@ -22,10 +22,7 @@ impl Observation {
     pub(crate) fn encoded(self) -> Self {
         match self {
             Self::CartPole(_) => self,
-            Self::MountainCar([position, velocity]) => Self::MountainCar([
-                2.0 * (position - (-1.2_f32)) / (0.6_f32 - (-1.2_f32)) - 1.0,
-                velocity / 0.07,
-            ]),
+            Self::MountainCar(values) => Self::MountainCar(encode_mountain_car(values)),
         }
     }
 
@@ -47,6 +44,14 @@ impl Observation {
             _ => reward,
         }
     }
+}
+
+/// Map source position bounds [-1.2, 0.6] and per-step speed bounds [-0.07, 0.07] to [-1, 1].
+pub(crate) fn encode_mountain_car([position, velocity]: [f32; 2]) -> [f32; 2] {
+    [
+        2.0 * (position - (-1.2_f32)) / (0.6_f32 - (-1.2_f32)) - 1.0,
+        velocity / 0.07,
+    ]
 }
 
 #[cfg(test)]

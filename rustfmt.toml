@@ -5,4 +5,4 @@
 # https://github.com/rust-lang/rustfmt/issues/5083). We use stable defaults
 # to avoid requiring nightly toolchain.
 
-edition = "2024"
+edition = "2021"

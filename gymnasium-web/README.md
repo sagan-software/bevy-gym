@@ -1,7 +1,7 @@
 # Browser Gymnasium
 
-Run CartPole and MountainCar training and inference at <https://sagan-software.github.io/bevy-gym/>.
-The browser worker runs Bevy Gym's Rust environment and Burn DQN learner locally.
+Run CartPole, MountainCar, and continuous MountainCar at <https://sagan-software.github.io/bevy-gym/>.
+The browser worker runs Bevy Gym's Rust environments and Burn learners locally.
 Training starts from a fresh model. Inference loads a frozen policy.
 
 ```sh
@@ -65,7 +65,33 @@ The gate requires mean at least -110, at least 190/200 goals, and improvement
 of at least 80 from initialization, within one million transitions per seed.
 Validation uses 100 seeds; the 200 held-out seeds are disjoint.
 
-## Continuous-action learner support
+## Verified continuous MountainCar model
+
+MountainCarContinuous-v0 uses the original force clipping, raw-action reward
+penalty, goal at position 0.45, and external 999-transition limit. PPO collects
+64 transitions from each of eight environments before updating its actor and
+critic. The view shows the first contributing environment.
+
+Actor and critic learning rates are 0.003 and 0.001. Both appear on the
+learning-rate chart. Training uses terrain potential scale 25; episode returns
+and qualification scores retain the original reward. At 1×, each environment
+advances 30 transitions per second. Total transitions include all eight lanes;
+the displayed actual speed accounts for that lane count.
+
+Fresh training seeds 42, 43, and 44 passed after 10,240 transitions each.
+Their 200-episode held-out means were 90.82, 96.06, and 98.44, with 200 goals
+each. The bundle uses seed 44, selected by validation mean before test scoring.
+The gate requires mean at least 90 and at least 190 goals in 200 episodes.
+[Model provenance](models/mountain-car-continuous.json) retains the recipe,
+selection evidence, source hashes, model hash, and disjoint seed ranges.
+
+Chromium also trained a fresh policy with network access disabled after worker
+initialization. It scored 95.43 with 200/200 goals. Loading that browser-trained
+policy natively reproduces its mean within 0.00001 on the same held-out seeds.
+The bundled native-trained policy is evaluated in all three browser engines.
+Desktop checks also require the return chart to fit a 1280×800 viewport.
+
+## Continuous-action model records
 
 The shared recurrent PPO learner compiles with `browser-training` on WebAssembly.
 `RecurrentPpoPolicy::to_bytes` and `load_bytes` use the locked Burn 0.21
@@ -77,12 +103,11 @@ and nonfinite parameters before activating the model. The focused native test
 proves that both actor and critic change after an update and survive a byte
 round trip. The checkpoint validator has 100% line coverage. Its tensor-to-float
 conversion error cannot be constructed with the fixed float32 backend and is
-not exercised. Continuous MountainCar's browser session and qualification remain
-in progress.
+not exercised.
 
 ## Visual fidelity
 
-CartPole and MountainCar preserve Gymnasium's 600 by 400 scene proportions,
+CartPole and both MountainCar tasks preserve Gymnasium's 600 by 400 scene proportions,
 procedural shapes, and colors. The dashboard scales each scene without stretching.
 [Visual comparisons](../docs/visual-comparisons/README.md) include official GIF
 contact sheets, browser recordings, fixed-state fixtures, and comparison gates.
@@ -97,6 +122,7 @@ sets a 20-second test timeout per engine.
 nix develop --command cargo test -p bevy-gym-browser
 nix develop --command cargo test -p bevy-gym-browser --test learning -- --ignored --nocapture
 nix develop --command cargo test -p bevy-gym-browser --test mountain_car_learning -- --ignored --nocapture
+nix develop --command cargo test -p bevy-gym-browser --test continuous_learning continuous_seed_ -- --ignored --nocapture
 nix develop --command cargo clippy -p bevy-gym-browser --all-targets -- -D warnings
 nix develop --command cargo clippy -p bevy-gym-browser --target wasm32-unknown-unknown -- -D warnings
 ```
@@ -106,6 +132,15 @@ The CartPole learning gate starts three independent models, selects each checkpo
 reach mean return 475, at least 90% full-length episodes, and improvement of at
 least 400 over its initial validation mean within 200,000 transitions.
 The command saves reports and policies under `runs/browser-cartpole/`.
+
+Continuous MountainCar qualification saves reports and selected policies under
+`runs/browser-mountain-car-continuous/`. Retain Chromium's qualification JSON and
+MPK under its `browser-seed-42/` subdirectory before checking browser-to-native
+compatibility:
+
+```sh
+nix develop --command cargo test -p bevy-gym-browser --test continuous_learning browser_trained_continuous_policy_loads_natively -- --ignored --nocapture
+```
 
 CartPole uses Gymnasium's default Euler equations and float64 state.
 Reset values have Gymnasium's uniform distribution, but use SplitMix64 rather
@@ -123,26 +158,34 @@ initialization. Firefox and WebKit check training updates, inference, controls,
 and rejection of stale loading results. Full qualification cases for Firefox
 and WebKit are explicitly skipped.
 
-The UI suite passed 33 checks across all three engines, including all speed
-settings, the WebKit pause regression, and upload validation failures.
+The UI suite checks all three engines, including all speed settings for each
+environment, single-step inference, the WebKit pause regression, and upload failures.
 MountainCar passed offline training, scoring -102.41 across
 200 held-out episodes after 390,000 transitions. Qualification jobs retain
 both metric reports and the selected policy record as downloadable artifacts.
 
-Native coverage records all dynamics, action-validation, and state-validation
-lines for both environments. Session coverage is 95 of 96 lines. Unhit session
-paths propagate configuration, observation, action, and optimizer errors that
-the fixed valid configuration does not produce. Native worker coverage is
-91 of 95 lines; its no-op entry point and defensive errors remain unhit.
-WebAssembly worker behavior is checked by browser tests rather than native LLVM.
+Native session coverage records 38 of 38 facade lines and 96 of 97 discrete-session
+lines. Unhit regions propagate errors from configuration creation, policy calls,
+environment stepping, and optimizer updates. Tests do not inject failures into
+an active optimizer. WebAssembly worker behavior is checked
+by browser tests; native LLVM cannot execute its browser entry point.
+
+The continuous-session modules have 100% line coverage. Unhit regions propagate
+configuration, inference, and optimizer errors that the fixed valid recipe and
+validated model cannot directly produce. Episode validation and rollout advantage
+calculation have 100% region coverage. Line coverage alone does not establish
+complete branch coverage.
 
 ## Worker contract
 
-The worker name selects `cartpole` or `mountain-car` for its lifetime.
+The worker name selects `cartpole`, `mountain-car`, or `mountain-car-continuous`
+for its lifetime.
 An empty name retains the original CartPole default; other names fail before
 initialization. The existing command shapes remain unchanged.
 MountainCar snapshots place position and per-step velocity in the first two
 state coordinates and zero the remaining two.
+Continuous snapshots also report the critic rate and loss, plus the number of
+contributing environments. Inference has one environment and no optimizer state.
 
 The worker announces protocol `1` before accepting commands. The page checks
 that version before sending work. A worker instance identifies its run;

@@ -52,6 +52,24 @@ then fresh training and the mobile layout. The policy reaches the goal sooner
 than the documentation's policy. Terrain, car rotation, wheel placement,
 flag, colors, and scene proportions match the source renderer.
 
+[Deployed recording](classic-control/mountain-car-deployed.mp4) and its
+[contact sheet](classic-control/mountain-car-deployed-preview.png) retain the
+GitHub Pages verification.
+
+## Continuous MountainCar
+
+Gymnasium documentation:
+
+![Gymnasium continuous MountainCar](references/mountain_car_continuous.png)
+
+Bevy Gym browser inference:
+
+![Bevy Gym continuous MountainCar](classic-control/mountain-car-continuous-preview.png)
+
+The [browser recording](classic-control/mountain-car-continuous.webm) shows
+bundled inference, fresh PPO training, and the mobile layout. This task reuses
+the upstream MountainCar geometry with its goal flag at position 0.45.
+
 ## Automated comparison
 
 CartPole and MountainCar draw procedural shapes; their upstream renderers use
@@ -59,8 +77,8 @@ no sprite assets. The browser ports those drawing operations from Gymnasium
 revision `7a1191388aa4aa973d3a5e4b039899cd99cc991f`. Other environments must reuse
 upstream image or model assets where their renderers use them.
 
-Four fixed-state PNGs come directly from the pinned Pygame renderer:
-CartPole upright and tilted; MountainCar in the valley and on the slope.
+Six fixed-state PNGs come directly from the pinned Pygame renderer:
+CartPole upright and tilted; both MountainCar tasks in the valley and on the slope.
 `tests/fixtures/gymnasium/generate_rendering.py` regenerates them with NumPy,
 Pygame, and Pillow. Set `PYTHONPATH=ref/gymnasium` and
 `SDL_VIDEODRIVER=dummy` before running the generator.

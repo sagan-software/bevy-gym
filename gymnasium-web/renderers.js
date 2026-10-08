@@ -1,5 +1,5 @@
 // Geometry and colors ported from Farama Gymnasium (MIT), revision
-// 7a1191388aa4aa973d3a5e4b039899cd99cc991f, classic_control/{cartpole,mountain_car}.py.
+// 7a1191388aa4aa973d3a5e4b039899cd99cc991f, classic_control/{cartpole,mountain_car,continuous_mountain_car}.py.
 // These environments draw polygons and circles; upstream uses no sprite assets.
 function surface(canvas) {
   const width = 600, height = 400;

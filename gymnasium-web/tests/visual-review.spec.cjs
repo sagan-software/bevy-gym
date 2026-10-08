@@ -2,7 +2,7 @@ const { test, expect } = require("@playwright/test");
 
 test.use({ video: { mode: "on", size: { width: 1280, height: 800 } }, viewport: { width: 1280, height: 800 } });
 
-for (const environment of ["cartpole", "mountain-car"]) {
+for (const environment of ["cartpole", "mountain-car", "mountain-car-continuous"]) {
   test(`visual review ${environment}`, async ({ page }, testInfo) => {
     await page.goto(`./?env=${environment}`);
     await expect(page.locator("#status")).toHaveText("Running frozen policy");
@@ -14,7 +14,7 @@ for (const environment of ["cartpole", "mountain-car"]) {
     expect(scene.width / scene.height).toBeCloseTo(1.5, 4);
     await page.locator("#speed").selectOption("16");
     await page.getByRole("button", { name: "Train from scratch", exact: true }).click();
-    await expect(page.locator("#status")).toHaveText("Training in this browser");
+    await expect(page.locator("#status")).toHaveText(environment === "mountain-car-continuous" ? "Training 8 environments · showing environment 1" : "Training in this browser");
     await expect.poll(async () => Number((await page.locator("#updates").innerText()).replaceAll(",", ""))).toBeGreaterThan(0);
     await page.waitForTimeout(3000);
     await page.setViewportSize({ width: 390, height: 844 });

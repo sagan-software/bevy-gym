@@ -6,6 +6,9 @@ from pathlib import Path
 import numpy as np
 from gymnasium.envs.classic_control.cartpole import CartPoleEnv
 from gymnasium.envs.classic_control.mountain_car import MountainCarEnv
+from gymnasium.envs.classic_control.continuous_mountain_car import (
+    Continuous_MountainCarEnv,
+)
 from PIL import Image
 
 REVISION = "7a1191388aa4aa973d3a5e4b039899cd99cc991f"
@@ -27,6 +30,8 @@ for name, environment, state in [
     ("cartpole-tilted", CartPoleEnv, [-1.25, 0, 0.2, 0]),
     ("mountain-car-valley", MountainCarEnv, [-0.5, 0]),
     ("mountain-car-slope", MountainCarEnv, [0.45, 0.03]),
+    ("mountain-car-continuous-valley", Continuous_MountainCarEnv, [-0.5, 0]),
+    ("mountain-car-continuous-slope", Continuous_MountainCarEnv, [0.45, 0.03]),
 ]:
     env = environment(render_mode="rgb_array")
     env.state = np.array(state, dtype=np.float64)

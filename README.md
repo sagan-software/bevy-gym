@@ -119,6 +119,7 @@ commands.entity(env_entity).insert(ResetRequested { seed: Some(42) });
 [Open the Gymnasium demo](https://sagan-software.github.io/bevy-gym/).
 CartPole-v1 and MountainCar-v0 support fresh DQN training, frozen-policy inference, episode-return
 and learning-rate charts, pause, single-step, and 1× through 16× speed controls.
+MountainCarContinuous-v0 uses PPO with separate actor and critic learning-rate plots.
 Download a trained policy and load it for inference. Training runs in a Rust
 WebAssembly worker on your device.
 
@@ -126,7 +127,9 @@ The bundled CartPole policy scored 500 across 200 held-out episodes. A separate
 browser training run reached the same score after 70,000 transitions.
 See [setup and qualification evidence](gymnasium-web/README.md) and
 [the remaining environment plan](GYMNASIUM_BROWSER_PLAN.md).
+
 MountainCar's bundled browser-trained policy scored −102.41 with 200/200 goals.
+Continuous MountainCar's selected policy scored 98.44 with 200/200 goals.
 Other Gymnasium environments are not yet implemented in the browser.
 Gymnasium builds do not enable Avian by default.
 
@@ -180,7 +183,7 @@ cargo run -p bevy-gym-web --features native-export \
 | Feature                 | Description                                                       |
 | ----------------------- | ----------------------------------------------------------------- |
 | `fast-compile`          | Enables Bevy dynamic linking for local iteration. Do not ship it. |
-| `render`                | Default. Enables 2D rendering and Inspector-egui example HUDs.    |
+| `render`                | Enables 2D rendering and Inspector-egui example HUDs by default. |
 | `ecosystem-inference`   | Opts into Avian ecosystem examples and the portable inference facade. |
 | `bevy-mcp`              | Adds `bevy_brp_extras` for screenshots, shutdown, and MCP tooling. |
 | `bevy_remote`           | Alias expected by Bevy BRP MCP launch tooling.                    |

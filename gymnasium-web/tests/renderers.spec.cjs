@@ -4,19 +4,21 @@ const path = require("node:path");
 
 // Compare foreground pixels against the actual pinned Gymnasium renderer.
 // A two-pixel neighborhood permits Pygame/Canvas rasterization differences.
-for (const [name, renderer, state] of [
+for (const [name, renderer, state, goal] of [
   ["cartpole-upright", "drawCartPole", [0, 0, 0, 0]],
   ["cartpole-tilted", "drawCartPole", [-1.25, 0, 0.2, 0]],
   ["mountain-car-valley", "drawMountainCar", [-0.5, 0]],
   ["mountain-car-slope", "drawMountainCar", [0.45, 0.03]],
+  ["mountain-car-continuous-valley", "drawMountainCar", [-0.5, 0], 0.45],
+  ["mountain-car-continuous-slope", "drawMountainCar", [0.45, 0.03], 0.45],
 ]) {
   test(`Gymnasium rendering matches ${name}`, async ({ page }, testInfo) => {
     await page.goto("./");
     const reference = await readFile(path.join(__dirname, "fixtures", `${name}.png`));
-    const result = await page.evaluate(async ({ renderer, state, reference }) => {
+    const result = await page.evaluate(async ({ renderer, state, goal, reference }) => {
       const renderers = await import("./renderers.js");
       const actual = document.createElement("canvas");
-      renderers[renderer](actual, state);
+      renderers[renderer](actual, state, goal);
       const expected = document.createElement("canvas");
       expected.width = 600; expected.height = 400;
       const img = new Image(); img.src = reference; await img.decode();
@@ -40,7 +42,7 @@ for (const [name, renderer, state] of [
         return { foreground, missed, fraction: missed / foreground };
       }
       return { width: actual.width, height: actual.height, actual: mismatch(a, b), reference: mismatch(b, a), png: actual.toDataURL() };
-    }, { renderer, state, reference: `data:image/png;base64,${reference.toString("base64")}` });
+    }, { renderer, state, goal, reference: `data:image/png;base64,${reference.toString("base64")}` });
     const artifact = testInfo.outputPath(`${name}-actual.png`);
     await mkdir(path.dirname(artifact), { recursive: true });
     await writeFile(artifact, Buffer.from(result.png.split(",")[1], "base64"));

@@ -1,6 +1,6 @@
 # PettingZoo Classic examples
 
-This folder ports the [PettingZoo Classic environments](../../ref/pettingzoo/pettingzoo/classic) from the pinned PettingZoo submodule to Bevy Gym. PettingZoo uses the [Apache License 2.0](../../ref/pettingzoo/LICENSE).
+This folder ports the [PettingZoo Classic environments](https://github.com/Farama-Foundation/PettingZoo/tree/38e73889c04cedf7b92eb65d74bb6484f69c8c33/pettingzoo/classic) from the pinned PettingZoo submodule to Bevy Gym. PettingZoo uses the [Apache License 2.0](https://github.com/Farama-Foundation/PettingZoo/blob/38e73889c04cedf7b92eb65d74bb6484f69c8c33/LICENSE).
 
 Each Rust file starts with the complete upstream Python module docstring. The examples include source-compatible rules, observations, action masks, rewards, seeded resets, focused tests, checkpoint workflows, and Bevy renderers.
 

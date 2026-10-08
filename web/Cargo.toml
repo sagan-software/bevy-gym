@@ -39,13 +39,7 @@ version = "1.49"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies.bevy]
 default-features = false
-features = [
-    "2d_bevy_render",
-    "bevy_winit",
-    "default_app",
-    "std",
-    "webgl2",
-]
+features = ["2d_bevy_render", "bevy_winit", "default_app", "std", "webgl2"]
 version = "0.18"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies.bevy-gym]
@@ -71,25 +65,25 @@ version = "0.4"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies.web-sys]
 features = [
-    "Blob",
-    "Document",
-    "Element",
-    "Event",
-    "EventTarget",
-    "File",
-    "FileList",
-    "FileReader",
-    "HtmlCanvasElement",
-    "HtmlButtonElement",
-    "HtmlElement",
-    "HtmlInputElement",
-    "HtmlSelectElement",
-    "Location",
-    "Performance",
-    "Request",
-    "RequestInit",
-    "Response",
-    "Window",
+  "Blob",
+  "Document",
+  "Element",
+  "Event",
+  "EventTarget",
+  "File",
+  "FileList",
+  "FileReader",
+  "HtmlCanvasElement",
+  "HtmlButtonElement",
+  "HtmlElement",
+  "HtmlInputElement",
+  "HtmlSelectElement",
+  "Location",
+  "Performance",
+  "Request",
+  "RequestInit",
+  "Response",
+  "Window",
 ]
 version = "0.3"
 

@@ -6,15 +6,14 @@ use std::fmt;
 
 use bevy_gym::ecosystem::{
     EcosystemAction, EcosystemAgentId, EcosystemRuntime, EcosystemRuntimeError, EcosystemSpecies,
-    EcosystemStage, EcosystemVisualSnapshot, ACTION_HIGH, ACTION_LOW, GLOBAL_STATE_SIZE,
-    MAX_AGENTS,
+    EcosystemStage, EcosystemVisualSnapshot, ACTION_HIGH, ACTION_LOW, MAX_AGENTS,
 };
 use bevy_gym::training::{
     RecurrentMemory, RecurrentPpoConfig, RecurrentPpoError, RecurrentPpoPolicy,
 };
 
 use crate::checkpoint_observation::{project, CHECKPOINT_OBSERVATION_SIZE};
-use crate::manifest::Stage;
+use crate::manifest::{Architecture, Stage};
 
 /// Deterministic seed used when a route first opens.
 const INITIAL_ENVIRONMENT_SEED: u64 = 907;
@@ -207,7 +206,9 @@ fn load_policy(
     RecurrentPpoPolicy::load_bytes(
         bytes,
         CHECKPOINT_OBSERVATION_SIZE,
-        GLOBAL_STATE_SIZE,
+        // Playback uses only the actor. Validate the stored critic against its
+        // checkpoint schema, which predates the runtime's added global features.
+        usize::from(Architecture::CURRENT.global_state_size),
         MAX_AGENTS,
         &ACTION_LOW,
         &ACTION_HIGH,

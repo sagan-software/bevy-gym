@@ -1,5 +1,5 @@
 //! Typed environment dispatch keeps task, action vocabulary, and state together.
-use crate::{observation::Observation, Task};
+use crate::{discrete_task::DiscreteTask, observation::Observation};
 use bevy_gym::environments::{CartPole, CartPoleAction, MountainCar, MountainCarAction};
 use bevy_gym::training::DqnError;
 use bevy_gym::wrappers::time_limit::TimeLimit;
@@ -15,12 +15,12 @@ pub(crate) enum Environment {
 }
 impl Environment {
     /// Construct only the requested simulation.
-    pub(crate) fn new(task: Task) -> Self {
+    pub(crate) fn new(task: DiscreteTask) -> Self {
         match task {
-            Task::CartPole => {
+            DiscreteTask::CartPole => {
                 Self::CartPole(TimeLimit::new(CartPole::default(), 500).expect("positive limit"))
             }
-            Task::MountainCar => Self::MountainCar(
+            DiscreteTask::MountainCar => Self::MountainCar(
                 TimeLimit::new(MountainCar::default(), 200).expect("positive limit"),
             ),
         }
@@ -82,12 +82,12 @@ impl Environment {
 
 #[cfg(test)]
 mod tests {
-    use super::{Environment, Task};
+    use super::{DiscreteTask, Environment};
     use bevy_gym::training::DqnError;
 
     #[test]
     fn invalid_actions_cannot_advance_either_task() {
-        for (task, invalid) in [(Task::CartPole, 2), (Task::MountainCar, 3)] {
+        for (task, invalid) in [(DiscreteTask::CartPole, 2), (DiscreteTask::MountainCar, 3)] {
             let mut env = Environment::new(task);
             env.reset(Some(42));
             let before = env.state().map(f64::to_bits);

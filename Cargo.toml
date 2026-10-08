@@ -26,20 +26,20 @@ ecosystem-inference = ["dep:avian2d"]
 # but should not be enabled for published or shipping builds.
 fast-compile = ["bevy/dynamic_linking"]
 render = [
-    "bevy/2d_bevy_render",
-    "bevy/3d_bevy_render",
-    "bevy/default_app",
-    "bevy/default_font",
-    "bevy/bevy_remote",
-    "bevy/bevy_gizmos",
-    "bevy/bevy_mikktspace",
-    "bevy/bevy_text",
-    "bevy/bevy_ui",
-    "bevy/bevy_ui_render",
-    "bevy/bevy_winit",
-    "bevy/wayland",
-    "bevy/x11",
-    "dep:bevy-inspector-egui",
+  "bevy/2d_bevy_render",
+  "bevy/3d_bevy_render",
+  "bevy/default_app",
+  "bevy/default_font",
+  "bevy/bevy_remote",
+  "bevy/bevy_gizmos",
+  "bevy/bevy_mikktspace",
+  "bevy/bevy_text",
+  "bevy/bevy_ui",
+  "bevy/bevy_ui_render",
+  "bevy/bevy_winit",
+  "bevy/wayland",
+  "bevy/x11",
+  "dep:bevy-inspector-egui",
 ]
 bevy-mcp = ["render", "dep:bevy_brp_extras"]
 # Name expected by Bevy BRP MCP launch tooling.

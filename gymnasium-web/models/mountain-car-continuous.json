@@ -1,0 +1,203 @@
+{
+  "environment": "MountainCarContinuous-v0",
+  "algorithm": "recurrent PPO",
+  "architecture": {
+    "observations": 2,
+    "global_states": 2,
+    "values": 1,
+    "actions": 1,
+    "actor_hidden": 32,
+    "critic_hidden": [
+      64,
+      32
+    ]
+  },
+  "selected_training_seed": 44,
+  "selection": "Highest validation mean across the three fresh seeds and the requalified historical best; test scores do not select the model.",
+  "sha256": "66f10fd74a1e23180ddb86f96d040da5c21cbf0f0b3fa5af0df09de191d1f072",
+  "actor_learning_rate": 0.003,
+  "critic_learning_rate": 0.001,
+  "gamma": 0.99,
+  "gae_lambda": 0.95,
+  "epochs": 4,
+  "minibatch_sequences": 4,
+  "initial_log_std": -0.5,
+  "entropy_coefficient": 0,
+  "parallel_environments": 8,
+  "rollout_steps_per_environment": 64,
+  "reward_potential_scale": 25,
+  "normalization": "position mapped from [-1.2, 0.6] to [-1, 1]; velocity divided by 0.07",
+  "validation_seeds": [
+    10000,
+    10020
+  ],
+  "test_seeds": [
+    400000,
+    400200
+  ],
+  "gates": {
+    "test_mean_minimum": 90,
+    "test_successes_minimum": 190,
+    "test_episodes": 200,
+    "training_budget_transitions": 1996800,
+    "validation_improves_by_budget_fraction": 0.25
+  },
+  "qualification_profile": "mcc-ppo-selection-v2",
+  "qualification": [
+    {
+      "actor_learning_rate": 0.003,
+      "best_validation_mean": 90.59724178314057,
+      "budget_transitions": 1996800,
+      "critic_learning_rate": 0.001,
+      "history": [
+        {
+          "mean": 90.59724178314057,
+          "seconds": 52.006199761,
+          "successes": 20,
+          "transitions": 10240
+        }
+      ],
+      "initial_validation_mean": -0.03640773525441362,
+      "parallel_environments": 8,
+      "qualification_profile": "mcc-ppo-selection-v2",
+      "reward_potential_scale": 25,
+      "rollout_steps_per_environment": 64,
+      "seconds": 54.139463114,
+      "seed": 42,
+      "test_episodes": 200,
+      "test_mean": 90.8230987491795,
+      "test_seeds": [
+        400000,
+        400200
+      ],
+      "test_successes": 200,
+      "transitions": 10240,
+      "validation_seeds": [
+        10000,
+        10020
+      ]
+    },
+    {
+      "actor_learning_rate": 0.003,
+      "best_validation_mean": 96.19393104532963,
+      "budget_transitions": 1996800,
+      "critic_learning_rate": 0.001,
+      "history": [
+        {
+          "mean": 96.19393104532963,
+          "seconds": 58.73574898,
+          "successes": 20,
+          "transitions": 10240
+        }
+      ],
+      "initial_validation_mean": -0.6080977049850868,
+      "parallel_environments": 8,
+      "qualification_profile": "mcc-ppo-selection-v2",
+      "reward_potential_scale": 25,
+      "rollout_steps_per_environment": 64,
+      "seconds": 61.092966361,
+      "seed": 43,
+      "test_episodes": 200,
+      "test_mean": 96.06324553468838,
+      "test_seeds": [
+        400000,
+        400200
+      ],
+      "test_successes": 200,
+      "transitions": 10240,
+      "validation_seeds": [
+        10000,
+        10020
+      ]
+    },
+    {
+      "actor_learning_rate": 0.003,
+      "best_validation_mean": 98.49985292468864,
+      "budget_transitions": 1996800,
+      "critic_learning_rate": 0.001,
+      "history": [
+        {
+          "mean": 98.49985292468864,
+          "seconds": 120.84267337,
+          "successes": 20,
+          "transitions": 10240
+        }
+      ],
+      "initial_validation_mean": -0.599369781129585,
+      "parallel_environments": 8,
+      "qualification_profile": "mcc-ppo-selection-v2",
+      "reward_potential_scale": 25,
+      "rollout_steps_per_environment": 64,
+      "seconds": 124.144620546,
+      "seed": 44,
+      "test_episodes": 200,
+      "test_mean": 98.44326774041241,
+      "test_seeds": [
+        400000,
+        400200
+      ],
+      "test_successes": 200,
+      "transitions": 10240,
+      "validation_seeds": [
+        10000,
+        10020
+      ]
+    },
+    {
+      "best_validation_mean": 97.37755598266489,
+      "run_id": "tuned-potential25-actor3e3-critic1e3-seed907-20260730",
+      "seed": 907,
+      "source": "preserved native PPO training run; requalified on the current browser session",
+      "test_episodes": 200,
+      "test_mean": 97.29556604433061,
+      "test_seeds": [
+        400000,
+        400200
+      ],
+      "test_successes": 200,
+      "validation_seeds": [
+        10000,
+        10020
+      ]
+    }
+  ],
+  "browser_training": {
+    "engine": "Chromium",
+    "backend": "CPU WebAssembly",
+    "network": "offline after worker initialization",
+    "seed": 42,
+    "test_seeds": [
+      500000,
+      500200
+    ],
+    "baseline": {
+      "mean": -0.03640773235382331,
+      "full": 0,
+      "count": 20
+    },
+    "history": [
+      {
+        "transitions": 10240,
+        "mean": 95.5653153123399,
+        "full": 20,
+        "count": 20
+      }
+    ],
+    "test": {
+      "mean": 95.42936818446341,
+      "full": 200,
+      "count": 200
+    }
+  },
+  "native_host": {
+    "system": "Linux-6.18.49-x86_64-with-glibc2.44",
+    "cpu": "Intel(R) Core(TM) i7-8565U CPU @ 1.80GHz"
+  },
+  "source_base_commit": "31ea0547da73f3b73be3a86fcb636ce8ed7c76b8",
+  "session_source_sha256": {
+    "gymnasium-web/src/continuous_session/episode.rs": "7d9be4b57aa5a81643217df1f35e681d98542d7f0d113817d7118ccbb251b3c3",
+    "gymnasium-web/src/continuous_session/mod.rs": "413e5c3120f999911e7a24c5ca323a2b5090a036c69b2125003a5bcd5150ba8d",
+    "gymnasium-web/src/continuous_session/rollout.rs": "5588caf6e657023676f7e3e8a2053dd91f2294390dad04f0f120eaf4016bd117",
+    "gymnasium-web/src/continuous_session/training.rs": "5c5a6630ddcce797c7a88b1cdc47fa626b22546a7e2b358510d502b5ee522418"
+  }
+}
