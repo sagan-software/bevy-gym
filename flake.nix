@@ -102,11 +102,34 @@
           };
         };
 
+        # Keep prose and browser-test edits from rebuilding every Rust dependency.
+        # Repository lint checks below still inspect the complete source tree.
+        rustFiles = lib.fileset.fileFilter (
+          file:
+          lib.any file.hasExt [
+            "rs"
+            "toml"
+            "lock"
+            "json"
+            "mpk"
+            "xml"
+          ]
+        ) ./.;
+        rustSource = lib.fileset.toSource {
+          root = ./.;
+          fileset = lib.fileset.unions [
+            rustFiles
+            ./LICENSE-MIT
+            ./LICENSE-APACHE
+            ./LICENSES
+          ];
+        };
+
         mkCargoCheck =
           name: command: extraNativeBuildInputs:
           pkgs.stdenvNoCC.mkDerivation {
             inherit name;
-            src = self;
+            src = rustSource;
 
             cargoDeps = pkgs.rustPlatform.importCargoLock {
               lockFile = ./Cargo.lock;
@@ -125,6 +148,9 @@
 
               export HOME="$TMPDIR"
               export CARGO_TARGET_DIR="$TMPDIR/target"
+              # Match CI without retaining debug symbols in discarded check builds.
+              export CARGO_PROFILE_DEV_DEBUG=0
+              export CARGO_PROFILE_TEST_DEBUG=0
               ${command}
 
               runHook postBuild
@@ -169,7 +195,14 @@
         webDist = pkgs.stdenvNoCC.mkDerivation {
           pname = "bevy-gym-web";
           version = "0.1.0";
-          src = self;
+          src = lib.fileset.toSource {
+            root = ./.;
+            fileset = lib.fileset.unions [
+              rustFiles
+              ./web/index.html
+              ./web/styles.css
+            ];
+          };
 
           cargoDeps = wasmRustPlatform.importCargoLock {
             lockFile = ./Cargo.lock;
@@ -314,7 +347,7 @@
 
         wasmCheck = pkgs.stdenvNoCC.mkDerivation {
           name = "wasm-check";
-          src = self;
+          src = rustSource;
 
           cargoDeps = wasmRustPlatform.importCargoLock {
             lockFile = ./Cargo.lock;
@@ -372,11 +405,13 @@
         formatter = treefmtEval.config.build.wrapper;
 
         checks = {
-          cargo-check = mkCargoCheck "cargo-check" "cargo check --locked" [ ];
+          cargo-check = mkCargoCheck "cargo-check" "cargo check --locked" renderNativeBuildInputs;
           cargo-check-render =
             mkCargoCheck "cargo-check-render" "cargo check --example cartpole --features render"
               renderNativeBuildInputs;
-          cargo-clippy = mkCargoCheck "cargo-clippy" "cargo clippy --locked" [ pkgs.clippy ];
+          cargo-clippy = mkCargoCheck "cargo-clippy" "cargo clippy --locked" (
+            [ pkgs.clippy ] ++ renderNativeBuildInputs
+          );
           wasm = wasmCheck;
           web-checkpoint-parity =
             mkCargoCheck "web-checkpoint-parity"
