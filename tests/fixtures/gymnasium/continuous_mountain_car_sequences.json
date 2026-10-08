@@ -1,0 +1,2109 @@
+{
+  "gymnasium_commit": "7a1191388aa4aa973d3a5e4b039899cd99cc991f",
+  "numpy_version": "2.4.4",
+  "action_dtype": "float32",
+  "initial_state_dtype": "float64",
+  "subsequent_state_dtype": "float32",
+  "cases": [
+    {
+      "name": "valley",
+      "initial_state": [
+        -0.5,
+        0.0
+      ],
+      "steps": [
+        {
+          "action": 1.0,
+          "observation_bits": [
+            3204403858,
+            984444360
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.0,
+          "observation_bits": [
+            3204315395,
+            992790460
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.0,
+          "observation_bits": [
+            3204183527,
+            998295279
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.0,
+          "observation_bits": [
+            3204009240,
+            1001010104
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.0,
+          "observation_bits": [
+            3203793834,
+            1003641709
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.0,
+          "observation_bits": [
+            3203538913,
+            1006170660
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.0,
+          "observation_bits": [
+            3203246371,
+            1007605710
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.0,
+          "observation_bits": [
+            3202918371,
+            1008740358
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.0,
+          "observation_bits": [
+            3202557327,
+            1009797749
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.0,
+          "observation_bits": [
+            3202165880,
+            1010770652
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.0,
+          "observation_bits": [
+            3201746869,
+            1011652707
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.0,
+          "observation_bits": [
+            3201303302,
+            1012438508
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.0,
+          "observation_bits": [
+            3200838323,
+            1013123678
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.0,
+          "observation_bits": [
+            3200355180,
+            1013704924
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.0,
+          "observation_bits": [
+            3199857189,
+            1014180074
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.0,
+          "observation_bits": [
+            3199347697,
+            1014548086
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.0,
+          "observation_bits": [
+            3198830051,
+            1014809036
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.0,
+          "observation_bits": [
+            3198307560,
+            1014964079
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.0,
+          "observation_bits": [
+            3197783465,
+            1015015386
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.0,
+          "observation_bits": [
+            3197260912,
+            1014966057
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.0,
+          "observation_bits": [
+            3196742922,
+            1014820016
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.0,
+          "observation_bits": [
+            3196232374,
+            1014581890
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.0,
+          "observation_bits": [
+            3195404317,
+            1014256880
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.0,
+          "observation_bits": [
+            3194428925,
+            1013850627
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.0,
+          "observation_bits": [
+            3193483630,
+            1013369074
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.0,
+          "observation_bits": [
+            3192774082,
+            1009597114
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.0,
+          "observation_bits": [
+            3192303369,
+            1004918546
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.0,
+          "observation_bits": [
+            3192073463,
+            996181106
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.0,
+          "observation_bits": [
+            3192085305,
+            3107522096
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.0,
+          "observation_bits": [
+            3192338846,
+            3145177394
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.0,
+          "observation_bits": [
+            3192833047,
+            3153153828
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.0,
+          "observation_bits": [
+            3193565832,
+            3157452558
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.0,
+          "observation_bits": [
+            3194533998,
+            3161218654
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.0,
+          "observation_bits": [
+            3195733092,
+            3163709363
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.0,
+          "observation_bits": [
+            3196608456,
+            3165509976
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.0,
+          "observation_bits": [
+            3197429373,
+            3167251284
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.0,
+          "observation_bits": [
+            3198354556,
+            3168919533
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.0,
+          "observation_bits": [
+            3199378511,
+            3170499895
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.0,
+          "observation_bits": [
+            3200494775,
+            3171435329
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.0,
+          "observation_bits": [
+            3201695903,
+            3172114237
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.0,
+          "observation_bits": [
+            3202973501,
+            3172726001
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.0,
+          "observation_bits": [
+            3204318314,
+            3173263721
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.0,
+          "observation_bits": [
+            3205084310,
+            3173721619
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.0,
+          "observation_bits": [
+            3205808701,
+            3174095465
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.0,
+          "observation_bits": [
+            3206551059,
+            3174382948
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.0,
+          "observation_bits": [
+            3207305979,
+            3174583941
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.0,
+          "observation_bits": [
+            3208068192,
+            3174700627
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.0,
+          "observation_bits": [
+            3208832708,
+            3174737475
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.0,
+          "observation_bits": [
+            3209594948,
+            3174701061
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.0,
+          "observation_bits": [
+            3210350857,
+            3174599758
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.0,
+          "observation_bits": [
+            3211071824,
+            3174040681
+          ],
+          "reward": 0.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.5,
+          "observation_bits": [
+            3211742573,
+            3173237194
+          ],
+          "reward": -0.025,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.75,
+          "observation_bits": [
+            3212392616,
+            3172905903
+          ],
+          "reward": -0.05625,
+          "terminated": false,
+          "truncated": false
+        }
+      ]
+    },
+    {
+      "name": "clipped_force",
+      "initial_state": [
+        -0.5,
+        0.0
+      ],
+      "steps": [
+        {
+          "action": 2.0,
+          "observation_bits": [
+            3204403858,
+            984444360
+          ],
+          "reward": -0.4,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -2.0,
+          "observation_bits": [
+            3204416058,
+            3116277588
+          ],
+          "reward": -0.4,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.0000001192092896,
+          "observation_bits": [
+            3204384101,
+            981051954
+          ],
+          "reward": -0.10000002384185934,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.0000001192092896,
+          "observation_bits": [
+            3204408889,
+            3124865162
+          ],
+          "reward": -0.10000002384185934,
+          "terminated": false,
+          "truncated": false
+        }
+      ]
+    },
+    {
+      "name": "left_wall",
+      "initial_state": [
+        -1.199,
+        -0.07
+      ],
+      "steps": [
+        {
+          "action": -1.0,
+          "observation_bits": [
+            3214514586,
+            0
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.0,
+          "observation_bits": [
+            3214508363,
+            977435592
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.0,
+          "observation_bits": [
+            3214483313,
+            994292975
+          ],
+          "reward": 0.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.0,
+          "observation_bits": [
+            3214426771,
+            1004330592
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        }
+      ]
+    },
+    {
+      "name": "stepped_left_wall",
+      "initial_state": [
+        -1.1,
+        -0.06
+      ],
+      "steps": [
+        {
+          "action": -1.0,
+          "observation_bits": [
+            3214170915,
+            3178351310
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.0,
+          "observation_bits": [
+            3214514586,
+            0
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.0,
+          "observation_bits": [
+            3214508363,
+            977435592
+          ],
+          "reward": -0.1,
+          "terminated": false,
+          "truncated": false
+        }
+      ]
+    },
+    {
+      "name": "upper_caps",
+      "initial_state": [
+        0.59,
+        0.5
+      ],
+      "steps": [
+        {
+          "action": 2.0,
+          "observation_bits": [
+            1058642330,
+            1032805417
+          ],
+          "reward": 99.6,
+          "terminated": true,
+          "truncated": false
+        },
+        {
+          "action": 0.0,
+          "observation_bits": [
+            1058642330,
+            1032805417
+          ],
+          "reward": 100.0,
+          "terminated": true,
+          "truncated": false
+        }
+      ]
+    },
+    {
+      "name": "lower_speed",
+      "initial_state": [
+        -0.5,
+        -0.5
+      ],
+      "steps": [
+        {
+          "action": -2.0,
+          "observation_bits": [
+            3205622661,
+            3180289065
+          ],
+          "reward": -0.4,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.0,
+          "observation_bits": [
+            3206791246,
+            3180242507
+          ],
+          "reward": 0.0,
+          "terminated": false,
+          "truncated": false
+        }
+      ]
+    },
+    {
+      "name": "goal_forward",
+      "initial_state": [
+        0.45,
+        0.001
+      ],
+      "steps": [
+        {
+          "action": 0.0,
+          "observation_bits": [
+            1055302069,
+            971848518
+          ],
+          "reward": 100.0,
+          "terminated": true,
+          "truncated": false
+        },
+        {
+          "action": 0.0,
+          "observation_bits": [
+            1055298991,
+            3099613880
+          ],
+          "reward": 0.0,
+          "terminated": false,
+          "truncated": false
+        }
+      ]
+    },
+    {
+      "name": "goal_backward",
+      "initial_state": [
+        0.5,
+        -0.03
+      ],
+      "steps": [
+        {
+          "action": 0.0,
+          "observation_bits": [
+            1055952041,
+            3170317677
+          ],
+          "reward": 0.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.0,
+          "observation_bits": [
+            1054926000,
+            3170533268
+          ],
+          "reward": 0.0,
+          "terminated": false,
+          "truncated": false
+        }
+      ]
+    },
+    {
+      "name": "large_finite_state",
+      "initial_state": [
+        1e+200,
+        1e+200
+      ],
+      "steps": [
+        {
+          "action": 2.0,
+          "observation_bits": [
+            1058642330,
+            1032805417
+          ],
+          "reward": 99.6,
+          "terminated": true,
+          "truncated": false
+        }
+      ]
+    },
+    {
+      "name": "mixed",
+      "initial_state": [
+        -0.55,
+        0.0
+      ],
+      "steps": [
+        {
+          "action": 1.3802992105484009,
+          "observation_bits": [
+            3205258632,
+            987662538
+          ],
+          "reward": -0.1905225910640539,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.3561075925827026,
+          "observation_bits": [
+            3205252208,
+            969457936
+          ],
+          "reward": -0.18390278026604534,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.23097819089889526,
+          "observation_bits": [
+            3205236914,
+            980351387
+          ],
+          "reward": -0.005335092467092651,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.5276802182197571,
+          "observation_bits": [
+            3205231956,
+            966455286
+          ],
+          "reward": -0.027844641270045045,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.1402320861816406,
+          "observation_bits": [
+            3205249258,
+            3129420708
+          ],
+          "reward": -0.13001292103581363,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.4567038416862488,
+          "observation_bits": [
+            3205275018,
+            3133751144
+          ],
+          "reward": -0.02085783990109782,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.28734201192855835,
+          "observation_bits": [
+            3205304781,
+            3135800727
+          ],
+          "reward": -0.008256543181915177,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.44537243247032166,
+          "observation_bits": [
+            3205319885,
+            3127640072
+          ],
+          "reward": -0.019835660360453124,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.9455434679985046,
+          "observation_bits": [
+            3205307630,
+            977238916
+          ],
+          "reward": -0.08940524498746392,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.9388413429260254,
+          "observation_bits": [
+            3205317069,
+            3121839136
+          ],
+          "reward": -0.37591057530391936,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.9838363528251648,
+          "observation_bits": [
+            3205347725,
+            3136257855
+          ],
+          "reward": -0.09679339691403221,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.41658341884613037,
+          "observation_bits": [
+            3205364125,
+            3128959208
+          ],
+          "reward": -0.01735417448575305,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.6650532484054565,
+          "observation_bits": [
+            3205401797,
+            3138594889
+          ],
+          "reward": -0.2772402320025563,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.9910547733306885,
+          "observation_bits": [
+            3205410128,
+            3120704758
+          ],
+          "reward": -0.39642991104029196,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.329384446144104,
+          "observation_bits": [
+            3205389056,
+            983867376
+          ],
+          "reward": -0.17672630056498662,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.8528906106948853,
+          "observation_bits": [
+            3205389070,
+            3042684928
+          ],
+          "reward": -0.3433203615201265,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.2701592445373535,
+          "observation_bits": [
+            3205378205,
+            975815965
+          ],
+          "reward": -0.0072986017408993575,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.437360554933548,
+          "observation_bits": [
+            3205352334,
+            986324450
+          ],
+          "reward": -0.019128425501178103,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.972293734550476,
+          "observation_bits": [
+            3205347823,
+            965539936
+          ],
+          "reward": -0.3889942575347064,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.2836644649505615,
+          "observation_bits": [
+            3205364706,
+            3129206039
+          ],
+          "reward": -0.16477944585768114,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.3403111696243286,
+          "observation_bits": [
+            3205402856,
+            3138717194
+          ],
+          "reward": -0.17964340314197358,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.1521683633327484,
+          "observation_bits": [
+            3205440652,
+            3138626652
+          ],
+          "reward": -0.002315521079936733,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.26801446080207825,
+          "observation_bits": [
+            3205467238,
+            3134174451
+          ],
+          "reward": -0.007183175119902874,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.19236309826374054,
+          "observation_bits": [
+            3205494002,
+            3134265426
+          ],
+          "reward": -0.00370035615736255,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.6791027784347534,
+          "observation_bits": [
+            3205490738,
+            961283632
+          ],
+          "reward": -0.28193861405473086,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.2596968412399292,
+          "observation_bits": [
+            3205457469,
+            989983902
+          ],
+          "reward": -0.15868361318298554,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.3953357934951782,
+          "observation_bits": [
+            3205429559,
+            987368519
+          ],
+          "reward": -0.015629038961846222,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.1873537302017212,
+          "observation_bits": [
+            3205422432,
+            970896708
+          ],
+          "reward": -0.14098088806239417,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.5666978359222412,
+          "observation_bits": [
+            3205425238,
+            3106887992
+          ],
+          "reward": -0.032114643723895143,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.4481401443481445,
+          "observation_bits": [
+            3205398528,
+            986754234
+          ],
+          "reward": -0.2097109877672665,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.6047377586364746,
+          "observation_bits": [
+            3205382886,
+            980707799
+          ],
+          "reward": -0.0365707756720667,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.9642624855041504,
+          "observation_bits": [
+            3205338044,
+            992946778
+          ],
+          "reward": -0.3858327111958943,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.2630753517150879,
+          "observation_bits": [
+            3205282882,
+            995588619
+          ],
+          "reward": -0.00692086406800172,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.0526165962219238,
+          "observation_bits": [
+            3205249599,
+            989987616
+          ],
+          "reward": -0.11080016986418287,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.634789228439331,
+          "observation_bits": [
+            3205197303,
+            994854941
+          ],
+          "reward": -0.04029573645426013,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.640906035900116,
+          "observation_bits": [
+            3205126231,
+            998952924
+          ],
+          "reward": -0.04107605468532008,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.05843029171228409,
+          "observation_bits": [
+            3205051574,
+            999411797
+          ],
+          "reward": -0.0003414098989582615,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.8836281299591064,
+          "observation_bits": [
+            3204997599,
+            995284620
+          ],
+          "reward": -0.07807986720550275,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.5196728110313416,
+          "observation_bits": [
+            3204929396,
+            998585735
+          ],
+          "reward": -0.027005983052521644,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.0832367017865181,
+          "observation_bits": [
+            3204862649,
+            998399417
+          ],
+          "reward": -0.0006928348524297746,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.6131552457809448,
+          "observation_bits": [
+            3204780332,
+            1000392261
+          ],
+          "reward": -0.03759593554286909,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.16896110773086548,
+          "observation_bits": [
+            3204694242,
+            1000875232
+          ],
+          "reward": -0.002854785592564113,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.5151554346084595,
+          "observation_bits": [
+            3204634442,
+            996775819
+          ],
+          "reward": -0.22956959910235497,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.6349520683288574,
+          "observation_bits": [
+            3204551049,
+            1000530012
+          ],
+          "reward": -0.2673068265732809,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.9311469793319702,
+          "observation_bits": [
+            3204495020,
+            995810672
+          ],
+          "reward": -0.3729328655782993,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.756957471370697,
+          "observation_bits": [
+            3204460657,
+            990264063
+          ],
+          "reward": -0.057298461346391966,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.314545750617981,
+          "observation_bits": [
+            3204454334,
+            969250864
+          ],
+          "reward": -0.17280305304677912,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.6278001070022583,
+          "observation_bits": [
+            3204466732,
+            3124868654
+          ],
+          "reward": -0.0394132974352047,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.47005894780158997,
+          "observation_bits": [
+            3204470129,
+            3109309720
+          ],
+          "reward": -0.02209554144083379,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.203349307179451,
+          "observation_bits": [
+            3204471212,
+            3095876708
+          ],
+          "reward": -0.004135094073036272,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.8643811345100403,
+          "observation_bits": [
+            3204453337,
+            982230557
+          ],
+          "reward": -0.07471547456968644,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.042185064405202866,
+          "observation_bits": [
+            3204430649,
+            978907666
+          ],
+          "reward": -0.00017795796588711139,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.3659919500350952,
+          "observation_bits": [
+            3204358614,
+            990687630
+          ],
+          "reward": -0.18659340075606823,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.6081971526145935,
+          "observation_bits": [
+            3204323795,
+            981992254
+          ],
+          "reward": -0.036990377644849914,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.1921800971031189,
+          "observation_bits": [
+            3204286168,
+            982711138
+          ],
+          "reward": -0.003693318972256421,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.01775716245174408,
+          "observation_bits": [
+            3204254793,
+            980754081
+          ],
+          "reward": -3.153168183376298e-05,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.9117772579193115,
+          "observation_bits": [
+            3204281130,
+            3125657895
+          ],
+          "reward": -0.3654892283897482,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.0880842208862305,
+          "observation_bits": [
+            3204364982,
+            3139683799
+          ],
+          "reward": -0.11839272717415952,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.665371060371399,
+          "observation_bits": [
+            3204476989,
+            3146346753
+          ],
+          "reward": -0.27734607687225576,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.0047208070755005,
+          "observation_bits": [
+            3204575277,
+            3149920226
+          ],
+          "reward": -0.10094639001704452,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.9736487865447998,
+          "observation_bits": [
+            3204700747,
+            3153399496
+          ],
+          "reward": -0.3895289532629761,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.8271668553352356,
+          "observation_bits": [
+            3204848109,
+            3155159137
+          ],
+          "reward": -0.06842050065651827,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.5044509768486023,
+          "observation_bits": [
+            3205008136,
+            3155969725
+          ],
+          "reward": -0.02544707880435091,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.5872942805290222,
+          "observation_bits": [
+            3205152154,
+            3154945133
+          ],
+          "reward": -0.034491457194210186,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.3748823404312134,
+          "observation_bits": [
+            3205268697,
+            3152256925
+          ],
+          "reward": -0.18903014500296111,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.3380396068096161,
+          "observation_bits": [
+            3205390566,
+            3152938679
+          ],
+          "reward": -0.011427077577199985,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.5266739130020142,
+          "observation_bits": [
+            3205495090,
+            3150718445
+          ],
+          "reward": -0.02773854106368532,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.07906138896942139,
+          "observation_bits": [
+            3205592753,
+            3149840305
+          ],
+          "reward": -0.0006250703225774146,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.0770915746688843,
+          "observation_bits": [
+            3205709985,
+            3152345042
+          ],
+          "reward": -0.11601262602226968,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.204299807548523,
+          "observation_bits": [
+            3205845915,
+            3154427508
+          ],
+          "reward": -0.14503380264614094,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.19085103273391724,
+          "observation_bits": [
+            3205979175,
+            3154256629
+          ],
+          "reward": -0.003642411669560275,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.1774537563323975,
+          "observation_bits": [
+            3206078815,
+            3150093292
+          ],
+          "reward": -0.1386397348301273,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.37310951948165894,
+          "observation_bits": [
+            3206159880,
+            3147715776
+          ],
+          "reward": -0.013921071352783443,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.7972882390022278,
+          "observation_bits": [
+            3206211104,
+            3142064152
+          ],
+          "reward": -0.06356685360512736,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.9208970069885254,
+          "observation_bits": [
+            3206229003,
+            3129726356
+          ],
+          "reward": -0.08480512974804243,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.4850611686706543,
+          "observation_bits": [
+            3206224414,
+            965698648
+          ],
+          "reward": -0.023528433735214096,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.0228443145751953,
+          "observation_bits": [
+            3206234744,
+            3122751777
+          ],
+          "reward": -0.10462104918588011,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.23318587243556976,
+          "observation_bits": [
+            3206240620,
+            3115820008
+          ],
+          "reward": -0.005437565110353782,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.05462338775396347,
+          "observation_bits": [
+            3206234757,
+            968308678
+          ],
+          "reward": -0.00029837144897198466,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.9555507898330688,
+          "observation_bits": [
+            3206243738,
+            3121369750
+          ],
+          "reward": -0.38241788916167396,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.8179817795753479,
+          "observation_bits": [
+            3206262916,
+            3130381494
+          ],
+          "reward": -0.06690941917172531,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.5629268288612366,
+          "observation_bits": [
+            3206285734,
+            3132245046
+          ],
+          "reward": -0.03168866146517679,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.9586385488510132,
+          "observation_bits": [
+            3206323026,
+            3138497432
+          ],
+          "reward": -0.3836264965045203,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.2486696094274521,
+          "observation_bits": [
+            3206343097,
+            3130838564
+          ],
+          "reward": -0.006183657465280157,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.19561034440994263,
+          "observation_bits": [
+            3206347138,
+            3111946636
+          ],
+          "reward": -0.0038263406840176374,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.6420656442642212,
+          "observation_bits": [
+            3206365207,
+            3129813720
+          ],
+          "reward": -0.2696379580072872,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.003074049949646,
+          "observation_bits": [
+            3206397175,
+            3136929616
+          ],
+          "reward": -0.10061575496823849,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.6171432733535767,
+          "observation_bits": [
+            3206392478,
+            965919784
+          ],
+          "reward": -0.2615152366552721,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.24694566428661346,
+          "observation_bits": [
+            3206382532,
+            974875034
+          ],
+          "reward": -0.006098216110995681,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.9581838846206665,
+          "observation_bits": [
+            3206385306,
+            3106760236
+          ],
+          "reward": -0.09181163567467508,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.450739860534668,
+          "observation_bits": [
+            3206351502,
+            990121001
+          ],
+          "reward": -0.2104646142944148,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.17731374502182007,
+          "observation_bits": [
+            3206310992,
+            991837815
+          ],
+          "reward": -0.0031440164173663025,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.5013941526412964,
+          "observation_bits": [
+            3206246988,
+            997852126
+          ],
+          "reward": -0.025139609630288363,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.6154037714004517,
+          "observation_bits": [
+            3206147407,
+            1002602084
+          ],
+          "reward": -0.2609529344654803,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.17991019785404205,
+          "observation_bits": [
+            3206033613,
+            1004421422
+          ],
+          "reward": -0.003236767929188056,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.3699519634246826,
+          "observation_bits": [
+            3205936131,
+            1002333465
+          ],
+          "reward": -0.1876768382091143,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.8557112216949463,
+          "observation_bits": [
+            3205808976,
+            1006131530
+          ],
+          "reward": -0.07322416949346576,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.7420306205749512,
+          "observation_bits": [
+            3205649455,
+            1008453667
+          ],
+          "reward": -0.303467068302075,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.3266964852809906,
+          "observation_bits": [
+            3205492137,
+            1008312684
+          ],
+          "reward": -0.01067305934949525,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.6469714641571045,
+          "observation_bits": [
+            3205313689,
+            1009665030
+          ],
+          "reward": -0.041857207543358754,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.497077226638794,
+          "observation_bits": [
+            3205106558,
+            1011500744
+          ],
+          "reward": -0.2241240222520503,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.3754866123199463,
+          "observation_bits": [
+            3204922626,
+            1010016028
+          ],
+          "reward": -0.18919634206714023,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.1298415660858154,
+          "observation_bits": [
+            3204712939,
+            1011664295
+          ],
+          "reward": -0.1276541964455248,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.10462657362222672,
+          "observation_bits": [
+            3204506870,
+            1011432793
+          ],
+          "reward": -0.0010946719907927228,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.21035386621952057,
+          "observation_bits": [
+            3204147814,
+            1011609782
+          ],
+          "reward": -0.004424874903349996,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.697005271911621,
+          "observation_bits": [
+            3203687992,
+            1012958662
+          ],
+          "reward": -0.28798268928958354,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.2526159286499023,
+          "observation_bits": [
+            3203189442,
+            1014197963
+          ],
+          "reward": -0.15690466647074575,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.4642674922943115,
+          "observation_bits": [
+            3202756517,
+            1012097945
+          ],
+          "reward": -0.2144079288989872,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.3409365117549896,
+          "observation_bits": [
+            3202359226,
+            1010957655
+          ],
+          "reward": -0.01162377050476602,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.7031159996986389,
+          "observation_bits": [
+            3201947915,
+            1011406313
+          ],
+          "reward": -0.049437210903221646,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.2468841075897217,
+          "observation_bits": [
+            3201510608,
+            1012238161
+          ],
+          "reward": -0.15547199777598167,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.3571171760559082,
+          "observation_bits": [
+            3201151089,
+            1009748965
+          ],
+          "reward": -0.18417670295459632,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.8050210475921631,
+          "observation_bits": [
+            3200781041,
+            1010085894
+          ],
+          "reward": -0.06480588870663838,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.07567685097455978,
+          "observation_bits": [
+            3200439748,
+            1009165730
+          ],
+          "reward": -0.000572698577342573,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.6889678239822388,
+          "observation_bits": [
+            3200183694,
+            1006243195
+          ],
+          "reward": -0.2852612310447299,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.07782845944166183,
+          "observation_bits": [
+            3199960367,
+            1004148654
+          ],
+          "reward": -0.0006057269099062402,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.2047916054725647,
+          "observation_bits": [
+            3199785492,
+            1001047776
+          ],
+          "reward": -0.00419396016720306,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.22458778321743011,
+          "observation_bits": [
+            3199661228,
+            997372991
+          ],
+          "reward": -0.005043967237051939,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.9298039674758911,
+          "observation_bits": [
+            3199623890,
+            982637030
+          ],
+          "reward": -0.0864535417933908,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.5391552448272705,
+          "observation_bits": [
+            3199654062,
+            3127621828
+          ],
+          "reward": -0.029068837802475402,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.0475051403045654,
+          "observation_bits": [
+            3199674078,
+            3122421734
+          ],
+          "reward": -0.10972670189644873,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.6308592557907104,
+          "observation_bits": [
+            3199765890,
+            3140702656
+          ],
+          "reward": -0.039798340061680905,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.4353612661361694,
+          "observation_bits": [
+            3199846807,
+            3139308134
+          ],
+          "reward": -0.20602619643240275,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.8082508444786072,
+          "observation_bits": [
+            3199925943,
+            3139080255
+          ],
+          "reward": -0.06532694276003817,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.0095279216766357,
+          "observation_bits": [
+            3199993121,
+            3137549609
+          ],
+          "reward": -0.10191466246447477,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.38939303159713745,
+          "observation_bits": [
+            3200117823,
+            3144912624
+          ],
+          "reward": -0.015162693305640929,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.3091038465499878,
+          "observation_bits": [
+            3200329945,
+            3150915182
+          ],
+          "reward": -0.17137528810519742,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.9613118171691895,
+          "observation_bits": [
+            3200628053,
+            3155267456
+          ],
+          "reward": -0.3846744044167508,
+          "terminated": false,
+          "truncated": false
+        }
+      ]
+    }
+  ]
+}

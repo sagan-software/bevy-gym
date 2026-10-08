@@ -111,30 +111,24 @@ const MAX_POSITION: f32 = 0.6;
 const MAX_SPEED: f32 = 0.07;
 /// `GOAL_POSITION` used by this example.
 const GOAL_POSITION: f32 = 0.45;
-/// `POWER` used by this example.
-const POWER: f32 = 0.0015;
-/// `GRAVITY` used by this example.
-const GRAVITY: f32 = 0.0025;
 /// `MAX_EPISODE_STEPS` used by this example.
 const MAX_EPISODE_STEPS: usize = 999;
 
-/// Exact default Gymnasium MountainCarContinuous-v0 dynamics.
+/// Native workflow adapter around the shared Gymnasium dynamics.
 #[derive(Debug, Clone)]
 struct ContinuousMountainCar {
-    /// Position and velocity.
-    state: [f32; 2],
-    /// Current episode transition count.
-    elapsed_steps: usize,
-    /// Deterministic reset generator.
-    rng: SplitMix64,
+    /// Original 999-transition cap applied outside the environment.
+    inner: bevy_gym::TimeLimit<bevy_gym::environments::ContinuousMountainCar>,
 }
 
 impl Default for ContinuousMountainCar {
     fn default() -> Self {
         Self {
-            state: [-0.5, 0.0],
-            elapsed_steps: 0,
-            rng: SplitMix64::new(0),
+            inner: bevy_gym::TimeLimit::new(
+                bevy_gym::environments::ContinuousMountainCar::default(),
+                MAX_EPISODE_STEPS,
+            )
+            .expect("positive episode cap"),
         }
     }
 }
@@ -142,15 +136,22 @@ impl Default for ContinuousMountainCar {
 impl ContinuousMountainCar {
     /// Construct one controlled state for transition tests.
     #[cfg(test)]
-    const fn from_state(position: f32, velocity: f32) -> Self {
+    fn from_state(position: f32, velocity: f32) -> Self {
+        let state = bevy_gym::environments::MountainCarState::try_from([
+            f64::from(position),
+            f64::from(velocity),
+        ])
+        .expect("finite test state");
         Self {
-            state: [position, velocity],
-            elapsed_steps: 0,
-            rng: SplitMix64::new(0),
+            inner: bevy_gym::TimeLimit::new(
+                bevy_gym::environments::ContinuousMountainCar::from_state(state),
+                MAX_EPISODE_STEPS,
+            )
+            .expect("positive episode cap"),
         }
     }
 
-    /// Return Gymnasium's sinusoidal terrain height.
+    /// Return Gymnasium's sinusoidal terrain height for reward shaping.
     fn height(position: f32) -> f32 {
         (3.0 * position).sin().mul_add(0.45, 0.55)
     }
@@ -162,49 +163,23 @@ impl Env for ContinuousMountainCar {
     type Info = ();
 
     fn reset(&mut self, seed: Option<u64>) -> Reset<Self::Observation, Self::Info> {
-        if let Some(seed) = seed {
-            self.rng = SplitMix64::new(seed);
-        }
-        self.state = [self.rng.f32_between(-0.6, -0.4), 0.0];
-        self.elapsed_steps = 0;
+        let result = self.inner.reset(seed);
         Reset {
-            observation: self.state.to_vec(),
-            info: (),
+            observation: result.observation.to_vec(),
+            info: result.info,
         }
     }
 
     fn step(&mut self, action: Self::Action) -> Step<Self::Observation, Self::Info> {
-        let raw_force = action.first().copied().unwrap_or(0.0);
-        let force = raw_force.clamp(-1.0, 1.0);
-        let [position, velocity] = self.state;
-        let velocity = force
-            .mul_add(POWER, (3.0 * position).cos().mul_add(-GRAVITY, velocity))
-            .clamp(-MAX_SPEED, MAX_SPEED);
-        let next_position = (position + velocity).clamp(MIN_POSITION, MAX_POSITION);
-        let next_velocity = if next_position <= MIN_POSITION && velocity < 0.0 {
-            0.0
-        } else {
-            velocity
-        };
-        self.state = [next_position, next_velocity];
-        self.elapsed_steps += 1;
-        let terminated = next_position >= GOAL_POSITION;
-        let reward = 0.1f64.mul_add(
-            -f64::from(raw_force).powi(2),
-            if terminated { 100.0 } else { 0.0 },
-        );
-        let status = if terminated {
-            EpisodeStatus::Terminated
-        } else if self.elapsed_steps >= MAX_EPISODE_STEPS {
-            EpisodeStatus::Truncated
-        } else {
-            EpisodeStatus::Continuing
-        };
+        let raw = action.first().copied().unwrap_or(0.0);
+        let action = bevy_gym::environments::ContinuousMountainCarAction::try_from(raw)
+            .expect("policy action must be finite");
+        let result = self.inner.step(action);
         Step {
-            observation: self.state.to_vec(),
-            reward,
-            status,
-            info: (),
+            observation: result.observation.to_vec(),
+            reward: result.reward,
+            status: result.status,
+            info: result.info,
         }
     }
 }
@@ -301,35 +276,6 @@ fn main() -> Result<(), Box<dyn Error>> {
     run_continuous_workflow::<ContinuousMountainCar>()
 }
 
-/// Small deterministic generator used for reset sampling.
-#[derive(Debug, Clone, Copy)]
-struct SplitMix64 {
-    /// Current generator state.
-    state: u64,
-}
-
-impl SplitMix64 {
-    /// Construct a stream from one root seed.
-    const fn new(seed: u64) -> Self {
-        Self { state: seed }
-    }
-
-    /// Generate a uniform scalar in `[0, 1)`.
-    fn unit_f32(&mut self) -> f32 {
-        self.state = self.state.wrapping_add(0x9e37_79b9_7f4a_7c15);
-        let mut value = self.state;
-        value = (value ^ (value >> 30)).wrapping_mul(0xbf58_476d_1ce4_e5b9);
-        value = (value ^ (value >> 27)).wrapping_mul(0x94d0_49bb_1331_11eb);
-        value ^= value >> 31;
-        (value >> 40) as f32 / (1_u32 << 24) as f32
-    }
-
-    /// Generate one scalar in `[low, high)`.
-    fn f32_between(&mut self, low: f32, high: f32) -> f32 {
-        self.unit_f32().mul_add(high - low, low)
-    }
-}
-
 /// Render-only scene implementation.
 #[cfg(feature = "render")]
 mod render {
@@ -421,7 +367,8 @@ mod render {
         } else {
             app.add_systems(Update, (advance_watch, sync_car).chain());
         }
-        println!("watching checkpoint={}", checkpoint.display());
+        let checkpoint_display = checkpoint.display();
+        println!("watching checkpoint={checkpoint_display}");
         app.run();
         Ok(())
     }
@@ -607,6 +554,12 @@ mod render {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn passing_the_goal_while_moving_left_does_not_terminate() {
+        let mut car = ContinuousMountainCar::from_state(0.5, -0.03);
+        assert_eq!(car.step(vec![0.0]).status, EpisodeStatus::Continuing);
+    }
 
     #[test]
     fn continuous_force_matches_gymnasium_equation() {

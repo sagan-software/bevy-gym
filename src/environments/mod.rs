@@ -15,3 +15,11 @@ mod mountain_car_state;
 pub use mountain_car::MountainCar;
 pub use mountain_car_action::{InvalidMountainCarAction, MountainCarAction};
 pub use mountain_car_state::{InvalidMountainCarState, MountainCarState};
+
+mod continuous_mountain_car;
+mod continuous_mountain_car_action;
+
+pub use continuous_mountain_car::ContinuousMountainCar;
+pub use continuous_mountain_car_action::{
+    ContinuousMountainCarAction, InvalidContinuousMountainCarAction,
+};

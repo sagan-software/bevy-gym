@@ -353,6 +353,11 @@ and a bundled qualified model. Native training seeds 42, 43, and 44 all passed
 within 310,000 transitions. Chromium trained offline for 390,000 transitions
 and scored -102.41 with 200/200 goals. The deployed visual review remains
 pending. Other environments are not yet browser-qualified.
+Continuous MountainCar now has a shared core and native adapter. A pinned NumPy
+2.4.4 oracle checks 201 transitions bit for bit, including clipped force,
+raw-action penalties, reverse motion at the goal, and both precision states.
+Its new production files have 100% line coverage. Browser training, model
+qualification, and deployment for this task remain unfinished.
 The Box2D/MuJoCo engine replacements remain planned.
 
 The broader controls and performance checks above remain acceptance work,
