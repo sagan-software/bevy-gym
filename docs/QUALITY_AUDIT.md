@@ -6,13 +6,12 @@ completed review of every production branch. Remaining areas are listed in
 
 ## Confirmed example problems
 
-`unused-crate-dependencies = "warn"` in `Cargo.toml` applies to individual example
-targets. The examples contain 432 `use crate_name as _;` lines. CartPole already
-allows `unused_crate_dependencies` but still imports `tokio`, `clap`, optional
-`avian2d`, and optional `mujoco_rs` only as `_`. These imports explain no CartPole
-concept and do not make the tutorial easier to use. Audit side-effect registration
-before removing any import. Allow the dependency lint explicitly for examples
-instead of manufacturing dependency use.
+The dependency-only import problem is fixed. `unused-crate-dependencies` now uses
+`allow` because all examples share package dependencies while each teaches a
+subset. Removed bare dependency imports from all 45 existing example source files
+that contained them, preserving named extension-trait imports. The direct search,
+root tests, and all-target/all-feature strict Clippy pass. This cleanup does not
+qualify the examples' dynamics, rendering, or learned policies.
 
 Classic Control and Toy Text examples total 7,236 lines. CartPole alone has 1,719.
 Their training, filesystem, process, video, and visualization workflows obscure
@@ -38,6 +37,29 @@ MuJoCo runtime. These facts do not establish faithful browser MuJoCo support.
 Existing six-frame reference sheets cover all 23 Gymnasium tasks. They establish
 reference availability, not visual equivalence or trained-policy performance.
 
+## Reset defects fixed
+
+Automatic reset previously matched the public `EpisodeEndEvent` by pool-local
+`EnvId`. Two distinct environment types could both have ID zero, so ending the
+first also reset the second. `tests/reset_isolation.rs` reproduced this by expecting
+zero completed episodes in the continuing environment and observing one.
+
+Reset seed schedules were also a single resource. Registering a second plugin
+replaced the first plugin's schedule. A regression expected seed 101 after the
+first plugin's terminal step and observed 201.
+
+Completion now travels through a private message parameterized by environment
+type and addressed to the exact entity. Each spawned entity retains its own seed
+schedule. Public message types and signatures are unchanged. Five regression
+tests cover both defects, a despawn before automatic reset, a continuing step,
+and a consumer clearing public transition reports before reset. Clearing those
+reports cannot prevent the private lifecycle transition.
+
+The stepper now separates parallel environment steps from serial message emission.
+It derives the follow-up from the transition and preserves public message order.
+No performance improvement is claimed. The reset and step source files have full
+measured line and branch coverage in the focused suite.
+
 ## Public API risks requiring discriminating tests
 
 These are review targets, not proven defects without their stated counterexamples.
@@ -45,9 +67,9 @@ These are review targets, not proven defects without their stated counterexample
 - `BevyGymPlugin::with_tick_rate` accepts an arbitrary `f64`, then passes it to
   `Time::<Fixed>::from_hz`. Test zero, negative, NaN, infinity, and valid endpoints.
   Prefer an additive validated rate API while preserving the existing signature.
-- Plugin configuration and reset schedules are global resources. Test two distinct
-  environment plugins with different seed schedules and reset settings before
-  claiming isolation. Their message types are generic; their configuration is not.
+- Reset schedule isolation is fixed. `GymConfig` and `Time<Fixed>` remain global.
+  Define the intended behavior when plugins request different tick rates before
+  choosing a compatible configuration API.
 - `ActionResponse` correlates by entity, without an observation/episode token.
   Stall response A, reset the environment, issue B, resolve B, then resolve A.
   Determine whether stale actions can step a new episode before proposing a fix.
@@ -58,8 +80,32 @@ These are review targets, not proven defects without their stated counterexample
   each tick. Measure realistic observation sizes and active environment counts
   before optimization. Do not infer a bottleneck solely from the implementation.
 
+## Personal-lint backlog
+
+Repository strict Clippy passes. The stricter personal suite still reports 50
+errors and two warnings in unchanged code. The
+[diagnostic inventory](progress/personal-lint-backlog.json) records each location.
+Most findings concern function length; others concern complexity, wildcard enum
+matches, midpoint expressions, and a stale lint expectation. Fix these in scoped
+follow-up changes with behavioral tests. Do not hide them with broader allowances.
+The user-requested unused-dependency allowance is the only lint-policy exception.
+
+The same personal rules report no diagnostics on this checkpoint's changed lines.
+This scoped pass does not make the full-package gate green.
+
 ## Validation boundary
 
-Baseline formatting passed. Full behavioral, compiler, lint, coverage, browser,
-and deployment validation remains pending. No runtime bug is claimed solely from
-API appearance, line count, or a historical handoff document.
+The exact root `cargo test`, formatting, all-target/all-feature strict Clippy, and
+robot WASM compile checks pass. The drone suite covers eight external contracts
+and five internal invariants. No trained controller or browser flight is qualified.
+[Coverage evidence](progress/drone-foundation-coverage.json) records source hashes,
+command scope, full-file coverage, and uncovered changed lines. All 339 instrumented
+added source lines were hit, including internal test code. No added instrumented
+line is uncovered. The full `plugin.rs` line rate is 75.54%; its uncovered paths
+are outside the changed lines. Module declarations and comments are not executable
+coverage targets. Two compile-fail documentation tests separately protect unchecked
+action construction and raw-world access.
+
+The current deployment still offers three Classic Control tasks. Existing source
+work for additional tasks does not establish deployed qualification. Every remaining
+area in the status document still requires its own behavioral and visual evidence.

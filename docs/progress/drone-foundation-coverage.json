@@ -1,0 +1,180 @@
+{
+  "date": "2026-10-08",
+  "baseline": "9cc567223de1528f6920e3c3dd28ceb6637d3aef",
+  "command": "cargo llvm-cov --branch --no-default-features --features robots --lib --test drone_hover --test reset_isolation --json",
+  "environment": {
+    "RUSTC_BOOTSTRAP": "1",
+    "note": "Enables nightly-only branch instrumentation on the repository toolchain."
+  },
+  "scope": "Source coverage includes internal tests. Changed lines intersect the LCOV DA records with added lines from git diff --unified=0 9cc5672 -- src. Compile-fail documentation tests run separately.",
+  "files": [
+    {
+      "path": "src/events.rs",
+      "sha256": "de153b26deb710e733c0d477c70b7e1a1ed60de0eb114a81929e1a91ca1095b5",
+      "source_coverage": {
+        "lines": {
+          "count": 6,
+          "covered": 6,
+          "percent": 100.0
+        },
+        "branches": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0.0
+        },
+        "functions": {
+          "count": 1,
+          "covered": 1,
+          "percent": 100.0
+        }
+      },
+      "changed_instrumented_lines": 6,
+      "uncovered_changed_lines": []
+    },
+    {
+      "path": "src/plugin.rs",
+      "sha256": "35397d547f0c0e062dacdff2951433946fd185eac97fad4398f9deaab2b0bd88",
+      "source_coverage": {
+        "lines": {
+          "count": 139,
+          "covered": 105,
+          "percent": 75.53956834532374
+        },
+        "branches": {
+          "count": 4,
+          "covered": 3,
+          "notcovered": 1,
+          "percent": 75.0
+        },
+        "functions": {
+          "count": 17,
+          "covered": 11,
+          "percent": 64.70588235294117
+        }
+      },
+      "changed_instrumented_lines": 2,
+      "uncovered_changed_lines": []
+    },
+    {
+      "path": "src/robots/action.rs",
+      "sha256": "1b6f198d12ec7aabbf555955390ede662a6d11263b067d6755d0231402f655b0",
+      "source_coverage": {
+        "lines": {
+          "count": 14,
+          "covered": 14,
+          "percent": 100.0
+        },
+        "branches": {
+          "count": 4,
+          "covered": 4,
+          "notcovered": 0,
+          "percent": 100.0
+        },
+        "functions": {
+          "count": 4,
+          "covered": 4,
+          "percent": 100.0
+        }
+      },
+      "changed_instrumented_lines": 13,
+      "uncovered_changed_lines": []
+    },
+    {
+      "path": "src/robots/hover.rs",
+      "sha256": "c547d8588a1347d0bcdb320c7eba95b61e820c8341a473a3a5dbdb2276e89aed",
+      "source_coverage": {
+        "lines": {
+          "count": 201,
+          "covered": 201,
+          "percent": 100.0
+        },
+        "branches": {
+          "count": 12,
+          "covered": 12,
+          "notcovered": 0,
+          "percent": 100.0
+        },
+        "functions": {
+          "count": 14,
+          "covered": 14,
+          "percent": 100.0
+        }
+      },
+      "changed_instrumented_lines": 200,
+      "uncovered_changed_lines": []
+    },
+    {
+      "path": "src/robots/observation.rs",
+      "sha256": "39d7b1d00ef934da0dce75143264250360a068e5069a954fc0985fd2da160c64",
+      "source_coverage": {
+        "lines": {
+          "count": 12,
+          "covered": 12,
+          "percent": 100.0
+        },
+        "branches": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0.0
+        },
+        "functions": {
+          "count": 4,
+          "covered": 4,
+          "percent": 100.0
+        }
+      },
+      "changed_instrumented_lines": 12,
+      "uncovered_changed_lines": []
+    },
+    {
+      "path": "src/systems/reset.rs",
+      "sha256": "52b2efaea1e46f334e20c9c0343ee629cd172295e90a2247787a4a012f81a1ee",
+      "source_coverage": {
+        "lines": {
+          "count": 44,
+          "covered": 44,
+          "percent": 100.0
+        },
+        "branches": {
+          "count": 2,
+          "covered": 2,
+          "notcovered": 0,
+          "percent": 100.0
+        },
+        "functions": {
+          "count": 2,
+          "covered": 2,
+          "percent": 100.0
+        }
+      },
+      "changed_instrumented_lines": 17,
+      "uncovered_changed_lines": []
+    },
+    {
+      "path": "src/systems/step.rs",
+      "sha256": "ffb8395adc1b81dbdd33c492c59511ea2b5497987496ee2c0a55751bbd8ccbd8",
+      "source_coverage": {
+        "lines": {
+          "count": 115,
+          "covered": 115,
+          "percent": 100.0
+        },
+        "branches": {
+          "count": 10,
+          "covered": 10,
+          "notcovered": 0,
+          "percent": 100.0
+        },
+        "functions": {
+          "count": 6,
+          "covered": 6,
+          "percent": 100.0
+        }
+      },
+      "changed_instrumented_lines": 89,
+      "uncovered_changed_lines": []
+    }
+  ]
+}

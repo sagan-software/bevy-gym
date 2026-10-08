@@ -1,0 +1,370 @@
+{
+  "date": "2026-10-08",
+  "scope": "Full-package diagnostics underlying the successful changed-line personal lint gate. Line numbers refer to this checkpoint. All are outside changed lines.",
+  "diagnostics": [
+    {
+      "path": "src/ecosystem/../../examples/ecosystem/shared/domain.rs",
+      "line": 671,
+      "level": "error",
+      "lint": "clippy::too_many_lines",
+      "message": "this function has too many lines (89/50)"
+    },
+    {
+      "path": "src/ecosystem/../../examples/ecosystem/shared/simulation.rs",
+      "line": 695,
+      "level": "error",
+      "lint": "clippy::too_many_lines",
+      "message": "this function has too many lines (83/50)"
+    },
+    {
+      "path": "src/ecosystem/../../examples/ecosystem/shared/simulation.rs",
+      "line": 820,
+      "level": "error",
+      "lint": "clippy::too_many_lines",
+      "message": "this function has too many lines (103/50)"
+    },
+    {
+      "path": "src/ecosystem/../../examples/ecosystem/shared/simulation.rs",
+      "line": 975,
+      "level": "error",
+      "lint": "clippy::too_many_lines",
+      "message": "this function has too many lines (64/50)"
+    },
+    {
+      "path": "src/ecosystem/../../examples/ecosystem/shared/simulation.rs",
+      "line": 1647,
+      "level": "error",
+      "lint": "clippy::too_many_lines",
+      "message": "this function has too many lines (111/50)"
+    },
+    {
+      "path": "src/ecosystem/../../examples/ecosystem/shared/simulation.rs",
+      "line": 1963,
+      "level": "error",
+      "lint": "clippy::too_many_lines",
+      "message": "this function has too many lines (121/50)"
+    },
+    {
+      "path": "src/ecosystem/../../examples/ecosystem/shared/simulation.rs",
+      "line": 2353,
+      "level": "error",
+      "lint": "clippy::too_many_lines",
+      "message": "this function has too many lines (99/50)"
+    },
+    {
+      "path": "src/ecosystem/../../examples/ecosystem/shared/simulation.rs",
+      "line": 2606,
+      "level": "error",
+      "lint": "clippy::too_many_lines",
+      "message": "this function has too many lines (79/50)"
+    },
+    {
+      "path": "src/ecosystem/../../examples/ecosystem/shared/simulation.rs",
+      "line": 3017,
+      "level": "error",
+      "lint": "clippy::too_many_lines",
+      "message": "this function has too many lines (65/50)"
+    },
+    {
+      "path": "src/ecosystem/../../examples/ecosystem/shared/simulation.rs",
+      "line": 3139,
+      "level": "error",
+      "lint": "clippy::too_many_lines",
+      "message": "this function has too many lines (84/50)"
+    },
+    {
+      "path": "src/recording/bevy_gym_recorder_plugin.rs",
+      "line": 150,
+      "level": "error",
+      "lint": "clippy::too_many_lines",
+      "message": "this function has too many lines (75/50)"
+    },
+    {
+      "path": "src/recording/checkpoint_video.rs",
+      "line": 43,
+      "level": "error",
+      "lint": "clippy::too_many_lines",
+      "message": "this function has too many lines (78/50)"
+    },
+    {
+      "path": "src/recording/encoder.rs",
+      "line": 11,
+      "level": "error",
+      "lint": "clippy::too_many_lines",
+      "message": "this function has too many lines (57/50)"
+    },
+    {
+      "path": "src/training/collector.rs",
+      "line": 126,
+      "level": "error",
+      "lint": "clippy::too_many_lines",
+      "message": "this function has too many lines (62/50)"
+    },
+    {
+      "path": "src/training/continuous_workflow.rs",
+      "line": 371,
+      "level": "error",
+      "lint": "clippy::too_many_lines",
+      "message": "this function has too many lines (91/50)"
+    },
+    {
+      "path": "src/training/continuous_workflow.rs",
+      "line": 494,
+      "level": "error",
+      "lint": "clippy::too_many_lines",
+      "message": "this function has too many lines (92/50)"
+    },
+    {
+      "path": "src/training/continuous_workflow.rs",
+      "line": 615,
+      "level": "error",
+      "lint": "clippy::too_many_lines",
+      "message": "this function has too many lines (62/50)"
+    },
+    {
+      "path": "src/training/continuous_workflow.rs",
+      "line": 774,
+      "level": "error",
+      "lint": "clippy::too_many_lines",
+      "message": "this function has too many lines (51/50)"
+    },
+    {
+      "path": "src/training/discrete_workflow.rs",
+      "line": 339,
+      "level": "error",
+      "lint": "clippy::too_many_lines",
+      "message": "this function has too many lines (89/50)"
+    },
+    {
+      "path": "src/training/discrete_workflow.rs",
+      "line": 463,
+      "level": "error",
+      "lint": "clippy::too_many_lines",
+      "message": "this function has too many lines (94/50)"
+    },
+    {
+      "path": "src/training/dqn.rs",
+      "line": 96,
+      "level": "error",
+      "lint": "clippy::too_many_lines",
+      "message": "this function has too many lines (67/50)"
+    },
+    {
+      "path": "src/training/dqn.rs",
+      "line": 1037,
+      "level": "error",
+      "lint": "clippy::too_many_lines",
+      "message": "this function has too many lines (91/50)"
+    },
+    {
+      "path": "src/training/dqn.rs",
+      "line": 1268,
+      "level": "error",
+      "lint": "clippy::wildcard_enum_match_arm",
+      "message": "wildcard match will also match any future added variants"
+    },
+    {
+      "path": "src/training/ppo.rs",
+      "line": 100,
+      "level": "error",
+      "lint": "clippy::too_many_lines",
+      "message": "this function has too many lines (83/50)"
+    },
+    {
+      "path": "src/training/ppo.rs",
+      "line": 712,
+      "level": "error",
+      "lint": "clippy::wildcard_enum_match_arm",
+      "message": "wildcard match will also match any future added variants"
+    },
+    {
+      "path": "src/training/recurrent_ppo/mod.rs",
+      "line": 175,
+      "level": "error",
+      "lint": "clippy::too_many_lines",
+      "message": "this function has too many lines (82/50)"
+    },
+    {
+      "path": "src/training/recurrent_ppo/mod.rs",
+      "line": 899,
+      "level": "error",
+      "lint": "clippy::too_many_lines",
+      "message": "this function has too many lines (56/50)"
+    },
+    {
+      "path": "src/training/recurrent_ppo/mod.rs",
+      "line": 1093,
+      "level": "error",
+      "lint": "clippy::too_many_lines",
+      "message": "this function has too many lines (58/50)"
+    },
+    {
+      "path": "src/training/recurrent_ppo/mod.rs",
+      "line": 1568,
+      "level": "error",
+      "lint": "clippy::too_many_lines",
+      "message": "this function has too many lines (100/50)"
+    },
+    {
+      "path": "src/training/recurrent_ppo/mod.rs",
+      "line": 1687,
+      "level": "error",
+      "lint": "clippy::too_many_lines",
+      "message": "this function has too many lines (69/50)"
+    },
+    {
+      "path": "src/training/recurrent_ppo/mod.rs",
+      "line": 1764,
+      "level": "error",
+      "lint": "clippy::too_many_lines",
+      "message": "this function has too many lines (67/50)"
+    },
+    {
+      "path": "src/training/recurrent_ppo/mod.rs",
+      "line": 1821,
+      "level": "warning",
+      "lint": "clippy::manual_midpoint",
+      "message": "manual implementation of `midpoint` which can overflow"
+    },
+    {
+      "path": "src/training/recurrent_ppo/mod.rs",
+      "line": 2003,
+      "level": "error",
+      "lint": "clippy::wildcard_enum_match_arm",
+      "message": "wildcard match will also match any future added variants"
+    },
+    {
+      "path": "src/training/tabular_q.rs",
+      "line": 70,
+      "level": "error",
+      "lint": "clippy::too_many_lines",
+      "message": "this function has too many lines (60/50)"
+    },
+    {
+      "path": "src/training/tabular_q.rs",
+      "line": 392,
+      "level": "error",
+      "lint": "clippy::too_many_lines",
+      "message": "this function has too many lines (59/50)"
+    },
+    {
+      "path": "src/training/tabular_workflow.rs",
+      "line": 224,
+      "level": "error",
+      "lint": "clippy::too_many_lines",
+      "message": "this function has too many lines (89/50)"
+    },
+    {
+      "path": "src/training/tabular_workflow.rs",
+      "line": 368,
+      "level": "error",
+      "lint": "clippy::too_many_lines",
+      "message": "this function has too many lines (83/50)"
+    },
+    {
+      "path": "src/ecosystem/../../examples/ecosystem/shared/simulation.rs",
+      "line": 3478,
+      "level": "error",
+      "lint": "clippy::too_many_lines",
+      "message": "this function has too many lines (54/50)"
+    },
+    {
+      "path": "src/ecosystem/../../examples/ecosystem/shared/simulation.rs",
+      "line": 3735,
+      "level": "error",
+      "lint": "clippy::too_many_lines",
+      "message": "this function has too many lines (57/50)"
+    },
+    {
+      "path": "src/ecosystem/../../examples/ecosystem/shared/simulation.rs",
+      "line": 4099,
+      "level": "error",
+      "lint": "clippy::cognitive_complexity",
+      "message": "the function has a cognitive complexity of (19/15)"
+    },
+    {
+      "path": "src/ecosystem/../../examples/ecosystem/shared/simulation.rs",
+      "line": 4099,
+      "level": "error",
+      "lint": "clippy::too_many_lines",
+      "message": "this function has too many lines (75/50)"
+    },
+    {
+      "path": "src/ecosystem/../../examples/ecosystem/shared/simulation.rs",
+      "line": 4322,
+      "level": "error",
+      "lint": "clippy::too_many_lines",
+      "message": "this function has too many lines (62/50)"
+    },
+    {
+      "path": "src/ecosystem/../../examples/ecosystem/shared/simulation.rs",
+      "line": 4456,
+      "level": "error",
+      "lint": "clippy::too_many_lines",
+      "message": "this function has too many lines (84/50)"
+    },
+    {
+      "path": "src/ecosystem/../../examples/ecosystem/shared/simulation.rs",
+      "line": 4550,
+      "level": "error",
+      "lint": "clippy::too_many_lines",
+      "message": "this function has too many lines (53/50)"
+    },
+    {
+      "path": "src/ecosystem/../../examples/ecosystem/shared/simulation.rs",
+      "line": 5131,
+      "level": "error",
+      "lint": "clippy::too_many_lines",
+      "message": "this function has too many lines (74/50)"
+    },
+    {
+      "path": "src/ecosystem/../../examples/ecosystem/shared/simulation.rs",
+      "line": 5401,
+      "level": "error",
+      "lint": "clippy::too_many_lines",
+      "message": "this function has too many lines (52/50)"
+    },
+    {
+      "path": "src/training/config.rs",
+      "line": 400,
+      "level": "error",
+      "lint": "clippy::cognitive_complexity",
+      "message": "the function has a cognitive complexity of (16/15)"
+    },
+    {
+      "path": "src/training/recurrent_ppo/mod.rs",
+      "line": 2518,
+      "level": "error",
+      "lint": "clippy::too_many_lines",
+      "message": "this function has too many lines (62/50)"
+    },
+    {
+      "path": "src/training/recurrent_ppo/mod.rs",
+      "line": 2643,
+      "level": "error",
+      "lint": "clippy::too_many_lines",
+      "message": "this function has too many lines (65/50)"
+    },
+    {
+      "path": "src/training/recurrent_ppo/mod.rs",
+      "line": 2722,
+      "level": "error",
+      "lint": "clippy::too_many_lines",
+      "message": "this function has too many lines (72/50)"
+    },
+    {
+      "path": "src/training/recurrent_ppo/mod.rs",
+      "line": 2835,
+      "level": "error",
+      "lint": "unfulfilled_lint_expectations",
+      "message": "this lint expectation is unfulfilled"
+    },
+    {
+      "path": "examples/ecosystem/shared/training.rs",
+      "line": 3863,
+      "level": "warning",
+      "lint": "clippy::manual_midpoint",
+      "message": "manual implementation of `midpoint` which can overflow"
+    }
+  ]
+}

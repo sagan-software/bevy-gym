@@ -114,6 +114,20 @@ Add `ResetRequested` to any environment entity to trigger a reset on the next fi
 commands.entity(env_entity).insert(ResetRequested { seed: Some(42) });
 ```
 
+## Drone hover
+
+Run the first robot lesson from this checkout:
+
+```sh
+nix develop --command cargo run --no-default-features --features robots --example drone-hover
+```
+
+The [hover guide](examples/robots/hover.rs) applies four validated motor commands
+in a private Rapier world and prints the resulting position. It runs without a
+window. The constant hover command is a diagnostic baseline; rendered flight and
+learned control are the next checkpoints. See the
+[physics contract](docs/ROBOT_ENVIRONMENT.md) and [execution status](docs/EXAMPLE_STATUS.md).
+
 ## Train in your browser
 
 [Open the Gymnasium demo](https://sagan-software.github.io/bevy-gym/).
@@ -180,13 +194,13 @@ cargo run -p bevy-gym-web --features native-export \
 
 ## Feature flags
 
-| Feature                 | Description                                                       |
-| ----------------------- | ----------------------------------------------------------------- |
-| `fast-compile`          | Enables Bevy dynamic linking for local iteration. Do not ship it. |
-| `render`                | Enables 2D rendering and Inspector-egui example HUDs by default. |
-| `ecosystem-inference`   | Opts into Avian ecosystem examples and the portable inference facade. |
-| `bevy-mcp`              | Adds `bevy_brp_extras` for screenshots, shutdown, and MCP tooling. |
-| `bevy_remote`           | Alias expected by Bevy BRP MCP launch tooling.                    |
+| Feature               | Description                                                           |
+| --------------------- | --------------------------------------------------------------------- |
+| `fast-compile`        | Enables Bevy dynamic linking for local iteration. Do not ship it.     |
+| `render`              | Enables 2D rendering and Inspector-egui example HUDs by default.      |
+| `ecosystem-inference` | Opts into Avian ecosystem examples and the portable inference facade. |
+| `bevy-mcp`            | Adds `bevy_brp_extras` for screenshots, shutdown, and MCP tooling.    |
+| `bevy_remote`         | Alias expected by Bevy BRP MCP launch tooling.                        |
 
 ## Training boundary
 
@@ -197,14 +211,14 @@ roots. CartPole DQN train/eval is the first accepted behavioral path.
 
 ## Examples
 
-| Example | Notes |
-| --- | --- |
-| [`classic-control`](examples/classic-control/README.md) | Five Gymnasium-inspired control examples with recorded checkpoints |
-| [`toy-text`](examples/toy-text/README.md) | Four finite-state tabular examples |
-| [`box2d-approximation`](examples/box2d-approximation/README.md) | Three experimental approximations awaiting faithful Box2D ports |
-| [`mujoco-approximation`](examples/mujoco-approximation/README.md) | Eleven experimental approximations awaiting faithful MuJoCo ports |
-| [`mujoco`](examples/mujoco/README.md) | Three examples backed by official Gymnasium XML and MuJoCo 3.9 |
-| [`ecosystem`](examples/ecosystem/README.md) | Four visual-first recurrent PPO curriculum examples |
+| Example                                                           | Notes                                                              |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------ |
+| [`classic-control`](examples/classic-control/README.md)           | Five Gymnasium-inspired control examples with recorded checkpoints |
+| [`toy-text`](examples/toy-text/README.md)                         | Four finite-state tabular examples                                 |
+| [`box2d-approximation`](examples/box2d-approximation/README.md)   | Three experimental approximations awaiting faithful Box2D ports    |
+| [`mujoco-approximation`](examples/mujoco-approximation/README.md) | Eleven experimental approximations awaiting faithful MuJoCo ports  |
+| [`mujoco`](examples/mujoco/README.md)                             | Three examples backed by official Gymnasium XML and MuJoCo 3.9     |
+| [`ecosystem`](examples/ecosystem/README.md)                       | Four visual-first recurrent PPO curriculum examples                |
 
 ## Plugin docs
 

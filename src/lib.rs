@@ -99,6 +99,9 @@ pub mod plugin;
 /// Training checkpoint selection and rendered artifact recording.
 #[cfg(not(target_arch = "wasm32"))]
 pub mod recording;
+/// Rigid-body robot environments with validated actions.
+#[cfg(feature = "robots")]
+pub mod robots;
 /// Fixed-update systems that step and reset environments.
 pub mod systems;
 /// Burn-backed trainer API boundary.
