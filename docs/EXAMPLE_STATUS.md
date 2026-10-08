@@ -6,8 +6,9 @@ Updated: 2026-10-08. Goal status: active.
 
 Read [the roadmap](EXAMPLE_ROADMAP.md), [quality audit](QUALITY_AUDIT.md),
 [reference research](EXAMPLE_RESEARCH.md), and [drone contract](ROBOT_ENVIRONMENT.md).
-Continue P1 with a disturbed hover task and learned control. Native/browser
-comparison passed locally. The manual viewer is pushed; monitor CI and deployment.
+Continue P1 with learned recovery control, batched training, and a curriculum.
+The disturbed-start task and native/browser comparison pass locally. The manual
+viewer and first comparison checkpoint are pushed; monitor CI and deployment.
 Manual Bevy flight runs in WASM.
 Perception, damage adaptation, pursuit, and the jumping quadruped remain pending.
 Do not start later port families before the custom robot milestones.
@@ -151,12 +152,13 @@ The native window and touch input remain unverified.
 ## Native/browser physics comparison
 
 The [comparison guide](DRONE_PARITY.md) and [evidence record](progress/drone-parity.json)
-record 1,420 complete native/browser results with identical float bits and statuses.
-The seven cases cover hover, falling, climbing, roll, pitch, yaw, changing motors,
+record 1,871 complete native/browser results with identical float bits and statuses.
+The ten cases cover hover, falling, climbing, roll, pitch, yaw, changing motors,
 absorbing termination, seeded reset, and continuing reset. All eight public drone
-contract tests also pass in the T3 browser. Screenshots were shown to the user.
+contract tests and four recovery tests also pass in the T3 browser. Screenshots
+were shown to the user.
 
-The fixture contains 18,460 observation floats and 1,399 rewards. It is generated
+The fixture contains 24,323 observation floats and 1,841 rewards. It is generated
 from native physics, so independent gravity and torque checks remain necessary.
 Both compared targets used test-profile builds. Other configurations are unqualified.
 Root Rust gates, WASM Clippy, Nix lint, and actionlint passed. Personal lints found
@@ -166,12 +168,29 @@ unhit in the coverage run; the comparison itself has full measured branch covera
 
 `nix run .#drone-browser-check` is wired into CI. Its wrapper built and printed help
 locally; the first headless CI execution is pending. Interactive local suites ran on
-ports 8769 and 8770. Their `wasm-bindgen-test-runner` servers remain in user units.
-The comparison checkpoint is validated locally and awaits commit and publication.
+ports 8769, 8770, and 8771. Their `wasm-bindgen-test-runner` servers remain in user units.
+The first comparison checkpoint is pushed as `9f98657`.
 
-The next learning lesson must include tilt or velocity disturbances. Constant half
-thrust already solves the calm diagnostic baseline. Require held-out improvement
-against that baseline before describing a policy as learned hover control.
+## Disturbed starts
+
+`DroneHover::disturbed()` adds finite initial tilt and velocity while preserving
+the calm constructor and all 1,420 prior trace results. The [recovery contract](DRONE_RECOVERY.md)
+defines the bounds, rotation order, reset behavior, and acceptance checks.
+The 25-line recovery guide demonstrates the constant-thrust failure case.
+Seed 42 terminates during action 274, after at most 5.48 simulated seconds.
+
+The viewer offers Calm start and Disturbed start; reset preserves the choice.
+The optimized [recording](progress/drone-recovery.mp4) shows both profiles, drift,
+termination, reset, and a single step. The desktop and 390-pixel frame were inspected.
+All 16 viewer tests pass. Physics and session code have full measured native line
+and branch coverage; [the record](progress/drone-recovery-coverage.json) retains
+UI construction and asset-state coverage gaps. Root tests, strict Clippy, WASM Clippy,
+Nix lint, and actionlint pass. Both guides and documentation tests pass after the
+final prose edit. This checkpoint awaits commit and publication.
+
+There is no learned drone controller yet. Constant half-thrust solves calm hover
+but fails the five recovery seeds. Require held-out improvement before describing
+a policy as learned recovery control. Training seeds must exclude evaluation seeds.
 
 ## Published checkpoints
 
@@ -192,6 +211,12 @@ against that baseline before describing a policy as learned hover control.
   [CI](https://github.com/sagan-software/bevy-gym/actions/runs/37841619148) passed.
   [Browser deployment](https://github.com/sagan-software/bevy-gym/actions/runs/37841619198)
   is running. The new public routes are not yet verified.
+- `9f98657`: native/browser bit comparison and browser contract-test harness.
+  Pushed to GitHub `main`; remote revision verified.
+  [CI](https://github.com/sagan-software/bevy-gym/actions/runs/37847009522) is running.
+  [Browser deployment](https://github.com/sagan-software/bevy-gym/actions/runs/37847009460)
+  is pending behind the viewer build. Pages already uses `cancel-in-progress: false`;
+  new checkpoints do not cancel the active build.
 
 ## Local evidence and active validation
 

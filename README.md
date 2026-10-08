@@ -130,7 +130,9 @@ window. Open the visual lesson with:
 nix develop --command cargo run --features robots --example drone-flight
 ```
 
-Its manual controls show hover, climb, power-off, and tilt. The
+Its manual controls compare calm and disturbed starts with hover, climb, power-off,
+and tilt. The [recovery guide](examples/robots/recovery.rs) adds initial tilt and
+velocity through `DroneHover::disturbed()`. The
 [browser build guide](robot-web/README.md) uses the same Bevy example in WebAssembly.
 No trained drone policy is qualified yet. See the
 [physics contract](docs/ROBOT_ENVIRONMENT.md) and [execution status](docs/EXAMPLE_STATUS.md).

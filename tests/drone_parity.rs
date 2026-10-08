@@ -29,11 +29,17 @@ enum FlightCase {
     Yaw,
     /// Each action changes the motor receiving extra thrust.
     Alternating,
+    /// Fixed hover thrust after a disturbed reset.
+    DisturbedHover,
+    /// Full thrust after a disturbed reset with seed zero.
+    DisturbedClimb,
+    /// Changing motor commands after a disturbed reset with the largest seed.
+    DisturbedAlternating,
 }
 
 impl FlightCase {
     /// Cases appear in this stable order in the fixture.
-    const ALL: [Self; 7] = [
+    const ALL: [Self; 10] = [
         Self::Hover,
         Self::Fall,
         Self::Climb,
@@ -41,27 +47,46 @@ impl FlightCase {
         Self::Pitch,
         Self::Yaw,
         Self::Alternating,
+        Self::DisturbedHover,
+        Self::DisturbedClimb,
+        Self::DisturbedAlternating,
     ];
 
     /// Cover zero, an ordinary seed, and the largest accepted seed.
     const fn seed(self) -> u64 {
         match self {
-            Self::Hover | Self::Fall => 42,
-            Self::Climb | Self::Roll => 0,
-            Self::Pitch | Self::Yaw | Self::Alternating => u64::MAX,
+            Self::Hover | Self::Fall | Self::DisturbedHover => 42,
+            Self::Climb | Self::Roll | Self::DisturbedClimb => 0,
+            Self::Pitch | Self::Yaw | Self::Alternating | Self::DisturbedAlternating => u64::MAX,
+        }
+    }
+
+    /// Keep the original calm traces while adding the disturbed reset profile.
+    fn environment(self) -> DroneHover {
+        match self {
+            Self::DisturbedHover | Self::DisturbedClimb | Self::DisturbedAlternating => {
+                DroneHover::disturbed()
+            }
+            Self::Hover
+            | Self::Fall
+            | Self::Climb
+            | Self::Roll
+            | Self::Pitch
+            | Self::Yaw
+            | Self::Alternating => DroneHover::default(),
         }
     }
 
     /// Construct each command through the public validation boundary.
     fn action(self, tick: usize) -> DroneAction {
         let fractions = match self {
-            Self::Hover => [0.5; 4],
+            Self::Hover | Self::DisturbedHover => [0.5; 4],
             Self::Fall => [0.0; 4],
-            Self::Climb => [1.0; 4],
+            Self::Climb | Self::DisturbedClimb => [1.0; 4],
             Self::Roll => [0.55, 0.45, 0.45, 0.55],
             Self::Pitch => [0.55, 0.55, 0.45, 0.45],
             Self::Yaw => [0.55, 0.45, 0.55, 0.45],
-            Self::Alternating => {
+            Self::Alternating | Self::DisturbedAlternating => {
                 let mut motors = [0.45; 4];
                 *motors.get_mut(tick % 4).expect("one of four motors") = 0.65;
                 motors
@@ -130,7 +155,7 @@ impl Record {
 fn recordings() -> Vec<Record> {
     let mut records = Vec::new();
     for case in FlightCase::ALL {
-        let mut drone = TimeLimit::new(DroneHover::default(), 500).expect("positive limit");
+        let mut drone = TimeLimit::new(case.environment(), 500).expect("positive limit");
         let initial = drone.reset(Some(case.seed())).observation;
         records.push(Record::observation(case, initial, Outcome::Reset));
         for tick in 0..500 {

@@ -1,0 +1,301 @@
+{
+  "date": "2026-10-08",
+  "public_api": "DroneHover::disturbed()",
+  "source_baseline": "9f986579d60ac995370f76a073f699a38b76ab17",
+  "coverage_command": "cargo llvm-cov --branch --features robots --lib --test drone_hover --test drone_recovery --test drone_parity --example drone-flight --json",
+  "files": [
+    {
+      "path": "src/robots/hover.rs",
+      "sha256": "9cd5eddc2dd69a9297f1711d9dfbbca18785d6f8fbc9345348275fb3d909cad5",
+      "summary": {
+        "branches": {
+          "count": 14,
+          "covered": 14,
+          "notcovered": 0,
+          "percent": 100.0
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0.0
+        },
+        "functions": {
+          "count": 18,
+          "covered": 18,
+          "percent": 100.0
+        },
+        "instantiations": {
+          "count": 29,
+          "covered": 28,
+          "percent": 96.55172413793105
+        },
+        "lines": {
+          "count": 255,
+          "covered": 255,
+          "percent": 100.0
+        },
+        "regions": {
+          "count": 424,
+          "covered": 424,
+          "notcovered": 0,
+          "percent": 100.0
+        }
+      },
+      "unhit_region_start_lines": []
+    },
+    {
+      "path": "examples/robots/flight/controls.rs",
+      "sha256": "d583afed4944e7081fd7523350cf67eafe537604c66901d2fa0ac40b62944066",
+      "summary": {
+        "branches": {
+          "count": 14,
+          "covered": 12,
+          "notcovered": 2,
+          "percent": 85.71428571428571
+        },
+        "functions": {
+          "count": 31,
+          "covered": 17,
+          "percent": 54.83870967741935
+        },
+        "instantiations": {
+          "count": 31,
+          "covered": 17,
+          "percent": 54.83870967741935
+        },
+        "lines": {
+          "count": 426,
+          "covered": 283,
+          "percent": 66.43192488262912
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 646,
+          "covered": 473,
+          "notcovered": 173,
+          "percent": 73.21981424148606
+        }
+      },
+      "unhit_region_start_lines": [
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        44,
+        45,
+        46,
+        47,
+        48,
+        51,
+        52,
+        53,
+        54,
+        55,
+        57,
+        62,
+        63,
+        65,
+        70,
+        71,
+        72,
+        74,
+        79,
+        80,
+        83,
+        84,
+        85,
+        86,
+        87,
+        88,
+        89,
+        90,
+        91,
+        93,
+        94,
+        95,
+        96,
+        97,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        111,
+        112,
+        114,
+        116,
+        117,
+        119,
+        124,
+        125,
+        128,
+        129,
+        130,
+        131,
+        132,
+        133,
+        137,
+        140,
+        141,
+        142,
+        143,
+        147,
+        188,
+        189,
+        246,
+        254,
+        255,
+        256,
+        257,
+        258,
+        259,
+        260,
+        261,
+        262,
+        263,
+        265,
+        267,
+        268,
+        270,
+        272,
+        273,
+        274,
+        275,
+        276,
+        277,
+        279,
+        282,
+        423
+      ]
+    },
+    {
+      "path": "examples/robots/flight/session.rs",
+      "sha256": "5703486155b59e2a635bed8126d6af4dfa10a0420f4f48f2c33a3bbeab7e342c",
+      "summary": {
+        "branches": {
+          "count": 10,
+          "covered": 10,
+          "notcovered": 0,
+          "percent": 100
+        },
+        "functions": {
+          "count": 22,
+          "covered": 22,
+          "percent": 100
+        },
+        "instantiations": {
+          "count": 22,
+          "covered": 22,
+          "percent": 100
+        },
+        "lines": {
+          "count": 169,
+          "covered": 169,
+          "percent": 100
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 303,
+          "covered": 303,
+          "notcovered": 0,
+          "percent": 100
+        }
+      },
+      "unhit_region_start_lines": []
+    }
+  ],
+  "browser": {
+    "profile": "optimized release",
+    "desktop_css_pixels": [
+      1280,
+      800
+    ],
+    "narrow_frame_css_pixels": [
+      390,
+      780
+    ],
+    "narrow_document_width": 390,
+    "narrow_scroll_width": 390,
+    "touch_device_verified": false,
+    "manual_controls_verified": [
+      "Calm start",
+      "Disturbed start",
+      "Run",
+      "Reset preserves start profile",
+      "single-step keyboard shortcut",
+      "disturbed-start keyboard shortcut"
+    ],
+    "seed_42_constant_thrust_terminal_action": 274,
+    "seed_42_constant_thrust_terminal_simulated_seconds_upper_bound": 5.48,
+    "terminal_action_stops_at_first_contact_or_exit_substep": true
+  },
+  "artifacts": [
+    {
+      "path": "docs/progress/drone-recovery.mp4",
+      "sha256": "ce7cce5f22e0196ef8c4c872dfd61b56aca3b60311c5924da869150a7b8518f7",
+      "bytes": 1181497
+    },
+    {
+      "path": "docs/progress/drone-recovery.png",
+      "sha256": "9798916641f5e931a3b2f4861392d5f04475cb8c969b2c76aca3a836724ffab7",
+      "bytes": 662038
+    },
+    {
+      "path": "docs/progress/drone-recovery-narrow.png",
+      "sha256": "50c522890d183bc4c225332eb6e7b59c2559ffbe3c2225548dcc8285eb39727d",
+      "bytes": 235925
+    },
+    {
+      "path": "docs/progress/drone-recovery-contact-sheet.png",
+      "sha256": "81784a5739a7ac0dcd66a06ec4ab14f667d7a43a661943f7e1ce77f2ecd99031",
+      "bytes": 335803
+    },
+    {
+      "path": "robot-web/dist-release/drone-flight_bg.wasm",
+      "sha256": "34c560bdfd36ddf22c807b4a82599a4e40b99e6ed4379ec7876c2ee904cd5e2b",
+      "bytes": 34804852
+    }
+  ],
+  "verification": {
+    "root_tests": "passed",
+    "native_drone_contracts": "13 passed",
+    "viewer_tests": "16 passed",
+    "wasm_parity": "1871 results matched bit for bit",
+    "wasm_recovery_contracts": "4 passed",
+    "strict_clippy": "passed",
+    "wasm_tests_clippy": "passed",
+    "changed_line_personal_lints": "no diagnostics",
+    "full_package_personal_lints": "51 distinct errors and 2 warnings in unchanged files",
+    "nix_lint": "passed",
+    "actionlint": "passed"
+  },
+  "gaps": [
+    "CPU coverage includes test code.",
+    "New UI construction lines and renderer refresh paths have no native coverage hits; the actual browser recording shows successful rendering and start selection.",
+    "Asset load failure fixtures and native window execution remain unverified.",
+    "Fixture generation ran separately; its ten lines have no hits in this coverage run.",
+    "Browser-only test annotations and logging were executed in Chromium, not measured by native LLVM coverage.",
+    "No learned controller is implemented in this checkpoint."
+  ]
+}

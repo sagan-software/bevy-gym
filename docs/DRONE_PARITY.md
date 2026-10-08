@@ -21,6 +21,7 @@ accepts `WASM_BINDGEN_TEST_ADDRESS` for the local test server.
 - Record each reward as its `f64` bit pattern and each status as a closed variant.
 - Compare every reset and action result, including terminal repetition and reset.
 - Exercise hover, power-off, climb, roll, pitch, yaw, and changing motor commands.
+- Include disturbed hover, disturbed climb, and disturbed changing commands.
 - Include seeds zero, 42, and `u64::MAX`; include seeded and continuing resets.
 - Apply a 500-action `TimeLimit` and distinguish termination from truncation.
 - Keep the fixture generator native-only and ignored during ordinary tests.
@@ -43,17 +44,18 @@ format or prove equivalence for all possible actions and platforms.
 
 ## Results and reproduction
 
-The [fixture](../tests/fixtures/robots/drone-native.jsonl) contains 1,420 results:
-18,460 observation floats, 1,399 rewards, and 21 resets. Every float bit and outcome
+The [fixture](../tests/fixtures/robots/drone-native.jsonl) contains 1,871 results:
+24,323 observation floats, 1,841 rewards, and 30 resets. Every float bit and outcome
 matched in native x86-64 Linux and the T3 Chromium browser. Both used Rust 1.97.1
-test-profile builds. All eight public contract tests also passed in both targets.
+test-profile builds. All eight hover and four recovery contract tests also passed
+in both targets. The original 1,420 calm results remain byte-for-byte unchanged.
 The [evidence record](progress/drone-parity.json) retains the fixture hash, per-case
 counts, source hashes, tool versions, and coverage gaps.
 
 Run the native tests:
 
 ```sh
-nix develop --command cargo test --locked --no-default-features --features robots --lib --test drone_hover --test drone_parity
+nix develop --command cargo test --locked --no-default-features --features robots --lib --test drone_hover --test drone_recovery --test drone_parity
 ```
 
 CI uses the pinned Nix Chromium and driver:
@@ -73,7 +75,7 @@ NO_HEADLESS=1 WASM_BINDGEN_TEST_ADDRESS=0.0.0.0:8770 \
 ```
 
 Open the printed port on the development host. Replace `drone_parity` with
-`drone_hover` to run the eight contract tests. The interactive runner stays open
+`drone_hover` or `drone_recovery` to run their contract tests. The interactive runner stays open
 after the page reports its result. Stop the runner after inspection.
 
 When an intentional physics change requires a new reference, regenerate it explicitly:

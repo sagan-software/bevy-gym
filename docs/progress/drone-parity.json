@@ -1,7 +1,7 @@
 {
   "date": "2026-10-08",
-  "production_source_baseline": "bfe088d996d968bcdc960adfe77b182fc31e2eac",
-  "production_rust_changes": false,
+  "production_source_baseline": "9f986579d60ac995370f76a073f699a38b76ab17",
+  "production_rust_changes": true,
   "toolchain": {
     "rustc": "1.97.1 (8bab26f4f 2026-07-14)",
     "llvm": "22.1.6",
@@ -17,16 +17,20 @@
     "parity_test_passed": true,
     "screenshots": [
       "drone-contracts-browser.png",
-      "drone-parity-browser.png"
-    ]
+      "drone-parity-browser.png",
+      "drone-recovery-tests.png"
+    ],
+    "recovery_contract_tests_passed": 4
   },
   "fixture": {
     "path": "tests/fixtures/robots/drone-native.jsonl",
-    "sha256": "a8191afded83edb830c5abce139bf6654e93b6dd1f41e2b85c7728191dac5c74",
-    "bytes": 341223,
-    "records": 1420,
-    "observation_float_bits_compared": 18460,
-    "reward_float_bits_compared": 1399,
+    "sha256": "1aa12776db8f7a30491b2a5bfb3be003dde5c0621cce806b03ccbcec189c04ec",
+    "bytes": 469361,
+    "records": 1871,
+    "observation_float_bits_compared": 24323,
+    "reward_float_bits_compared": 1841,
+    "calm_prefix_records": 1420,
+    "calm_prefix_unchanged": true,
     "cases": {
       "Hover": {
         "records": 505,
@@ -83,56 +87,40 @@
           "Continuing": 173,
           "Terminated": 4
         }
+      },
+      "DisturbedHover": {
+        "records": 282,
+        "outcomes": {
+          "Reset": 3,
+          "Continuing": 275,
+          "Terminated": 4
+        }
+      },
+      "DisturbedClimb": {
+        "records": 80,
+        "outcomes": {
+          "Reset": 3,
+          "Continuing": 73,
+          "Terminated": 4
+        }
+      },
+      "DisturbedAlternating": {
+        "records": 89,
+        "outcomes": {
+          "Reset": 3,
+          "Continuing": 82,
+          "Terminated": 4
+        }
       }
     }
   },
   "coverage": {
-    "command": "cargo llvm-cov --branch --no-default-features --features robots --test drone_hover --test drone_parity --json",
+    "command": "cargo llvm-cov --branch --features robots --lib --test drone_hover --test drone_recovery --test drone_parity --example drone-flight --json",
     "export": "LLVM export of both instrumented integration binaries; Cargo separates build and target directories.",
     "files": [
       {
-        "path": "tests/drone_hover.rs",
-        "sha256": "807d4ecf3a81cc83e9c201a749190ddb21b3fab01dba48e5e99d19766ef151a2",
-        "summary": {
-          "branches": {
-            "count": 0,
-            "covered": 0,
-            "notcovered": 0,
-            "percent": 0
-          },
-          "functions": {
-            "count": 11,
-            "covered": 11,
-            "percent": 100
-          },
-          "instantiations": {
-            "count": 11,
-            "covered": 11,
-            "percent": 100
-          },
-          "lines": {
-            "count": 154,
-            "covered": 154,
-            "percent": 100
-          },
-          "mcdc": {
-            "count": 0,
-            "covered": 0,
-            "notcovered": 0,
-            "percent": 0
-          },
-          "regions": {
-            "count": 333,
-            "covered": 333,
-            "notcovered": 0,
-            "percent": 100
-          }
-        },
-        "unhit_region_start_lines": []
-      },
-      {
         "path": "tests/drone_parity.rs",
-        "sha256": "a26890687f57567589169253af88678210e14684fc1823faddbe1be5a1dc2112",
+        "sha256": "382e319bbbfb47c3e45c49e15f9b826c430c4d07bbbb10f0f9b4e98859195bee",
         "summary": {
           "branches": {
             "count": 4,
@@ -141,19 +129,19 @@
             "percent": 100
           },
           "functions": {
-            "count": 7,
-            "covered": 6,
-            "percent": 85.71428571428571
+            "count": 8,
+            "covered": 7,
+            "percent": 87.5
           },
           "instantiations": {
-            "count": 7,
-            "covered": 6,
-            "percent": 85.71428571428571
+            "count": 8,
+            "covered": 7,
+            "percent": 87.5
           },
           "lines": {
-            "count": 87,
-            "covered": 77,
-            "percent": 88.50574712643679
+            "count": 92,
+            "covered": 82,
+            "percent": 89.13043478260869
           },
           "mcdc": {
             "count": 0,
@@ -162,23 +150,63 @@
             "percent": 0
           },
           "regions": {
-            "count": 184,
-            "covered": 158,
+            "count": 190,
+            "covered": 164,
             "notcovered": 26,
-            "percent": 85.86956521739131
+            "percent": 86.31578947368422
           }
         },
         "unhit_region_start_lines": [
-          189,
-          192,
-          196,
-          197,
-          198,
-          199,
-          200,
-          202,
-          203
+          214,
+          217,
+          221,
+          222,
+          223,
+          224,
+          225,
+          227,
+          228
         ]
+      },
+      {
+        "path": "tests/drone_recovery.rs",
+        "sha256": "9d257be7bf7f983108ddeb280d0b683f00fff73934a69d9126c8bdcb7181bb04",
+        "summary": {
+          "branches": {
+            "count": 12,
+            "covered": 6,
+            "notcovered": 6,
+            "percent": 50
+          },
+          "functions": {
+            "count": 6,
+            "covered": 6,
+            "percent": 100
+          },
+          "instantiations": {
+            "count": 6,
+            "covered": 6,
+            "percent": 100
+          },
+          "lines": {
+            "count": 61,
+            "covered": 61,
+            "percent": 100
+          },
+          "mcdc": {
+            "count": 0,
+            "covered": 0,
+            "notcovered": 0,
+            "percent": 0
+          },
+          "regions": {
+            "count": 176,
+            "covered": 176,
+            "notcovered": 0,
+            "percent": 100
+          }
+        },
+        "unhit_region_start_lines": []
       }
     ],
     "gap": "The explicit, ignored fixture generator was executed before the instrumented run. Its ten lines have no coverage hits in this run. Browser-only attributes and logging have browser execution evidence, not native LLVM hits."

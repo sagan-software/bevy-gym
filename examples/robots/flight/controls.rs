@@ -4,7 +4,7 @@ use bevy::prelude::*;
 use bevy_gym::EpisodeStatus;
 
 use super::scene::DroneModel;
-use super::session::{MotorPreset, Playback, Session};
+use super::session::{MotorPreset, Playback, Session, StartProfile};
 
 /// An available user action, shared by buttons and keyboard shortcuts.
 #[derive(Component, Clone, Copy)]
@@ -17,6 +17,8 @@ pub(super) enum Control {
     Reset,
     /// Select one of the four bounded motor commands.
     Preset(MotorPreset),
+    /// Replace the episode with the selected initial conditions.
+    Start(StartProfile),
 }
 
 /// Text that reports state and measured motion.
@@ -81,6 +83,20 @@ fn header(root: &mut ChildSpawnerCommands<'_>, font: &Handle<Font>) {
 fn footer(root: &mut ChildSpawnerCommands<'_>, font: &Handle<Font>) {
     root.spawn((panel(), BackgroundColor(Color::srgb(0.09, 0.10, 0.11))))
         .with_children(|footer| {
+            footer.spawn(row()).with_children(|row| {
+                button(
+                    row,
+                    "Calm start [C]",
+                    Control::Start(StartProfile::Calm),
+                    font,
+                );
+                button(
+                    row,
+                    "Disturbed start [D]",
+                    Control::Start(StartProfile::Disturbed),
+                    font,
+                );
+            });
             footer.spawn(row()).with_children(|row| {
                 button(row, "Run [Space]", Control::Playback, font);
                 button(row, "Step [N]", Control::Step, font);
@@ -181,6 +197,8 @@ pub(super) fn interact(keys: Res<'_, ButtonInput<KeyCode>>, mut session: ResMut<
         (KeyCode::Space, Control::Playback),
         (KeyCode::KeyN, Control::Step),
         (KeyCode::KeyR, Control::Reset),
+        (KeyCode::KeyC, Control::Start(StartProfile::Calm)),
+        (KeyCode::KeyD, Control::Start(StartProfile::Disturbed)),
         (KeyCode::Digit1, Control::Preset(MotorPreset::PowerOff)),
         (KeyCode::Digit2, Control::Preset(MotorPreset::Hover)),
         (KeyCode::Digit3, Control::Preset(MotorPreset::Climb)),
@@ -202,6 +220,7 @@ fn apply(control: Control, session: &mut Session) {
         Control::Step => session.single_step(),
         Control::Reset => session.reset(),
         Control::Preset(preset) => session.select(preset),
+        Control::Start(profile) => session.select_start(profile),
     }
 }
 
@@ -210,7 +229,16 @@ fn enabled(control: Control, session: &Session) -> bool {
     match control {
         Control::Playback => !session.status().is_done(),
         Control::Step => !session.status().is_done() && session.playback() == Playback::Paused,
-        Control::Reset | Control::Preset(_) => true,
+        Control::Reset | Control::Preset(_) | Control::Start(_) => true,
+    }
+}
+
+/// Highlight the current motor command and initial-condition choice.
+fn selected(control: Control, session: &Session) -> bool {
+    match control {
+        Control::Preset(preset) => preset == session.preset(),
+        Control::Start(profile) => profile == session.start_profile(),
+        Control::Playback | Control::Step | Control::Reset => false,
     }
 }
 
@@ -243,10 +271,9 @@ pub(super) fn refresh(
     };
     playback_label.clone_into(&mut playback.0);
     for (control, interaction, mut background) in &mut buttons {
-        let selected = matches!(control, Control::Preset(preset) if *preset == session.preset());
         background.0 = if !enabled(*control, &session) {
             Color::srgb(0.13, 0.14, 0.15)
-        } else if selected || *interaction == Interaction::Hovered {
+        } else if selected(*control, &session) || *interaction == Interaction::Hovered {
             Color::srgb(0.25, 0.40, 0.42)
         } else {
             Color::srgb(0.22, 0.24, 0.25)
@@ -273,7 +300,11 @@ fn status_label(session: &Session) -> String {
     let steps = session.steps();
     let height = session.observation().position().y;
     let velocity = session.observation().linear_velocity().y;
-    format!("{state} | {command} | Step {steps}/500\nHeight {height:.2} m | Vertical speed {velocity:.2} m/s")
+    let start = match session.start_profile() {
+        StartProfile::Calm => "Calm start",
+        StartProfile::Disturbed => "Disturbed start",
+    };
+    format!("{state} | {command} | Step {steps}/500\n{start} | Height {height:.2} m | Vertical speed {velocity:.2} m/s")
 }
 
 #[cfg(test)]
@@ -286,6 +317,63 @@ mod tests {
             pointer::{Location, PointerId},
         },
     };
+
+    #[test]
+    fn selecting_a_start_updates_the_label_and_restarts_after_completion() {
+        let mut session = Session::default();
+        assert!(status_label(&session).contains("Calm start"));
+        apply(Control::Start(StartProfile::Disturbed), &mut session);
+        assert!(status_label(&session).contains("Disturbed start"));
+        apply(Control::Playback, &mut session);
+        for _ in 0..500 {
+            session.advance();
+        }
+        assert!(session.status().is_done());
+        for profile in [StartProfile::Disturbed, StartProfile::Calm] {
+            assert!(enabled(Control::Start(profile), &session));
+            apply(Control::Start(profile), &mut session);
+            assert_eq!(session.start_profile(), profile);
+            assert_eq!(session.steps(), 0);
+            assert_eq!(session.status(), EpisodeStatus::Continuing);
+        }
+    }
+
+    #[test]
+    fn selection_tracks_the_start_and_motor_command_only() {
+        let mut session = Session::default();
+        for control in [Control::Playback, Control::Step, Control::Reset] {
+            assert!(!selected(control, &session));
+        }
+        assert!(selected(Control::Preset(MotorPreset::Hover), &session));
+        assert!(!selected(Control::Preset(MotorPreset::Climb), &session));
+        assert!(selected(Control::Start(StartProfile::Calm), &session));
+        assert!(!selected(Control::Start(StartProfile::Disturbed), &session));
+        apply(Control::Start(StartProfile::Disturbed), &mut session);
+        assert!(selected(Control::Start(StartProfile::Disturbed), &session));
+        assert!(!selected(Control::Start(StartProfile::Calm), &session));
+    }
+
+    #[test]
+    fn keyboard_start_choices_reset_the_session() {
+        let mut app = App::new();
+        app.init_resource::<Session>()
+            .init_resource::<ButtonInput<KeyCode>>()
+            .add_systems(Update, interact);
+        for (key, profile) in [
+            (KeyCode::KeyD, StartProfile::Disturbed),
+            (KeyCode::KeyC, StartProfile::Calm),
+        ] {
+            app.world_mut().resource_mut::<Session>().single_step();
+            let mut keys = app.world_mut().resource_mut::<ButtonInput<KeyCode>>();
+            keys.clear();
+            keys.press(key);
+            app.update();
+            let session = app.world().resource::<Session>();
+            assert_eq!(session.start_profile(), profile);
+            assert_eq!(session.steps(), 0);
+            assert_eq!(session.playback(), Playback::Paused);
+        }
+    }
 
     #[test]
     fn consecutive_clicks_on_button_labels_are_applied_before_the_next_frame() {

@@ -13,6 +13,15 @@ pub(super) enum Playback {
     Running,
 }
 
+/// Initial conditions selected by the viewer, independent of motor commands.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(super) enum StartProfile {
+    /// Upright and stationary near the target.
+    Calm,
+    /// Random tilt, heading, and velocity near the target.
+    Disturbed,
+}
+
 /// Four diagnostic commands; none is a learned controller.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(super) enum MotorPreset {
@@ -52,12 +61,24 @@ pub(super) struct Session {
     preset: MotorPreset,
     /// Policy actions applied since reset, bounded by the 500-step time limit.
     steps: usize,
+    /// Initial conditions retained when the user resets the episode.
+    start_profile: StartProfile,
 }
 
 impl Default for Session {
     fn default() -> Self {
-        let mut environment =
-            TimeLimit::new(DroneHover::default(), 500).expect("time limit is positive");
+        Self::starting(StartProfile::Calm)
+    }
+}
+
+impl Session {
+    /// Build a paused, seeded episode for either documented start distribution.
+    fn starting(start_profile: StartProfile) -> Self {
+        let drone = match start_profile {
+            StartProfile::Calm => DroneHover::default(),
+            StartProfile::Disturbed => DroneHover::disturbed(),
+        };
+        let mut environment = TimeLimit::new(drone, 500).expect("time limit is positive");
         let initial = environment.reset(Some(42));
         Self {
             environment,
@@ -70,11 +91,10 @@ impl Default for Session {
             playback: Playback::Paused,
             preset: MotorPreset::Hover,
             steps: 0,
+            start_profile,
         }
     }
-}
 
-impl Session {
     /// Read the physics pose without allowing a renderer to alter it.
     pub(super) const fn observation(&self) -> DroneObservation {
         self.last.observation
@@ -98,6 +118,16 @@ impl Session {
     /// Read the number of applied policy actions.
     pub(super) const fn steps(&self) -> usize {
         self.steps
+    }
+
+    /// Read the initial-condition choice without exposing mutable physics state.
+    pub(super) const fn start_profile(&self) -> StartProfile {
+        self.start_profile
+    }
+
+    /// Select initial conditions and replace the episode with its paused seed-42 start.
+    pub(super) fn select_start(&mut self, profile: StartProfile) {
+        *self = Self::starting(profile);
     }
 
     /// Select an action without advancing or resetting the environment.
@@ -129,9 +159,9 @@ impl Session {
         }
     }
 
-    /// Restore the original seed, hover command, and paused playback.
+    /// Restore the selected start, original seed, hover command, and paused playback.
     pub(super) fn reset(&mut self) {
-        *self = Self::default();
+        *self = Self::starting(self.start_profile);
     }
 
     /// Apply one validated action and retain its atomic result for rendering.
@@ -145,7 +175,30 @@ impl Session {
 mod tests {
     use bevy_gym::EpisodeStatus;
 
-    use super::{MotorPreset, Playback, Session};
+    use super::{MotorPreset, Playback, Session, StartProfile};
+
+    #[test]
+    fn selecting_a_start_replaces_the_episode_and_reset_keeps_the_choice() {
+        let mut session = Session::default();
+        let calm = session.observation();
+        session.select(MotorPreset::Climb);
+        session.toggle_playback();
+        session.advance();
+        session.select_start(StartProfile::Disturbed);
+        let disturbed = session.observation();
+        assert_ne!(calm, disturbed);
+        assert_eq!(session.start_profile(), StartProfile::Disturbed);
+        assert_eq!(session.steps(), 0);
+        assert_eq!(session.playback(), Playback::Paused);
+        assert_eq!(session.preset(), MotorPreset::Hover);
+        session.single_step();
+        session.reset();
+        assert_eq!(session.observation(), disturbed);
+        assert_eq!(session.start_profile(), StartProfile::Disturbed);
+        session.select_start(StartProfile::Calm);
+        assert_eq!(session.observation(), calm);
+        assert_eq!(session.start_profile(), StartProfile::Calm);
+    }
 
     #[test]
     fn paused_frames_do_not_advance_and_single_step_advances_once() {

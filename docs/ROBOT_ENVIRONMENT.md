@@ -14,7 +14,7 @@ requires Rust 1.86. Its `PhysicsWorld`, rigid-body force, and contact-query sour
 were inspected. The [Rapier guide](https://rapier.rs/docs/user_guides/rust/getting_started/)
 documents WASM support and the determinism feature. Bevy 0.18 renders an observation;
 the environment owns a private Rapier world, so it needs no Bevy physics-plugin
-version coupling. [Native/WASM comparison](DRONE_PARITY.md) passed for seven
+version coupling. [Native/WASM comparison](DRONE_PARITY.md) passed for ten
 recorded motor sequences using test-profile builds.
 
 [Flightmare's pinned dynamics](https://github.com/uzh-rpg/flightmare/blob/d4218aedac18cbe9364a0a0df10ab992c4b65e4f/flightlib/src/dynamics/quadrotor_dynamics.cpp)
@@ -76,6 +76,10 @@ Reward is `upright / (1 + distance_squared / (1 m²))`. Distance is measured fro
 `[0, 1]`. Ground contact or leaving `x,z ∈ [-10,10]` and `y ∈ [0,10]` metres
 terminates the episode and earns zero. Reset starts upright with independent
 uniform offsets of ±0.2 metres on X/Z and ±0.1 metres on Y.
+
+`DroneHover::disturbed()` keeps these dynamics and adds bounded tilt and velocity
+on every reset. See [the recovery lesson](DRONE_RECOVERY.md) for its distribution,
+seed contract, and baseline comparison. The default constructor remains calm.
 
 The [28-line hover guide](../examples/robots/hover.rs) holds four commands of 0.5
 for ten simulated seconds. It is a diagnostic baseline. No trained policy is

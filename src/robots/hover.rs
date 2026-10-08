@@ -5,7 +5,7 @@ use std::{fmt, time::Duration};
 use bevy::math::{Quat, Vec3};
 use rapier3d::prelude::{
     ColliderBuilder, ColliderHandle, ContactPair, IntegrationParameters, PhysicsWorld,
-    RigidBodyBuilder, RigidBodyHandle, Vector,
+    RigidBodyBuilder, RigidBodyHandle, Rotation, Vector,
 };
 
 use super::{DroneAction, DroneObservation};
@@ -41,6 +41,17 @@ pub struct DroneHover {
     random: SplitMix64,
     /// Whether actions can still advance this episode.
     episode: Flight,
+    /// Initial-condition distribution retained across episode resets.
+    reset_profile: ResetProfile,
+}
+
+/// Initial conditions selected by the two public constructors.
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum ResetProfile {
+    /// Upright and stationary, with only position offsets.
+    Calm,
+    /// Bounded tilt, heading, and velocity for feedback-control lessons.
+    Disturbed,
 }
 
 /// Legal lifecycle states for one hover episode.
@@ -77,6 +88,22 @@ const MOTORS: [(Vector, f32); 4] = [
 ];
 
 impl DroneHover {
+    /// Construct a hover lesson with randomized tilt and velocity on every reset.
+    ///
+    /// The initial episode uses seed zero. Position offsets match the calm task.
+    /// Yaw spans ±π radians; pitch and roll span ±π/12 radians. Each world linear
+    /// velocity component spans ±0.5 m/s, and each angular component ±0.5 rad/s.
+    /// Reset preserves this profile. Actions, rewards, and termination are unchanged.
+    #[must_use]
+    pub fn disturbed() -> Self {
+        let mut environment = Self {
+            reset_profile: ResetProfile::Disturbed,
+            ..Self::default()
+        };
+        environment.reset(Some(0));
+        environment
+    }
+
     /// Construct a fresh solver and proxy at a finite, internally chosen position.
     fn at_position(position: Vec3, random: SplitMix64) -> Self {
         let mut world = PhysicsWorld {
@@ -107,7 +134,31 @@ impl DroneHover {
             collider,
             random,
             episode: Flight::Flying,
+            reset_profile: ResetProfile::Calm,
         }
+    }
+
+    /// Sample bounded initial motion after rebuilding the solver at a safe position.
+    fn disturb_start(&mut self) {
+        let mut sample = |bound: f64| self.random.f64_between(-bound, bound) as f32;
+        // Angles are radians. The rightmost rotation acts first in R_y * R_x * R_z.
+        let yaw = sample(std::f64::consts::PI);
+        let pitch = sample(std::f64::consts::PI / 12.0);
+        let roll = sample(std::f64::consts::PI / 12.0);
+        let rotation = Rotation::from_rotation_y(yaw)
+            * Rotation::from_rotation_x(pitch)
+            * Rotation::from_rotation_z(roll);
+        // These world-frame components are m/s and rad/s respectively.
+        let linear_velocity = Vector::new(sample(0.5), sample(0.5), sample(0.5));
+        let angular_velocity = Vector::new(sample(0.5), sample(0.5), sample(0.5));
+        let body = self
+            .world
+            .bodies
+            .get_mut(self.body)
+            .expect("private body exists");
+        body.set_rotation(rotation, true);
+        body.set_linvel(linear_velocity, true);
+        body.set_angvel(angular_velocity, true);
     }
 
     /// Copy the solver's current state across the private engine boundary.
@@ -192,7 +243,12 @@ impl Env for DroneHover {
             random.f64_between(-0.2, 0.2) as f32,
         );
         // Rebuilding also clears cached contacts, islands, and solver impulses.
+        let profile = self.reset_profile;
         *self = Self::at_position(TARGET + offset, random);
+        self.reset_profile = profile;
+        if profile == ResetProfile::Disturbed {
+            self.disturb_start();
+        }
         Reset {
             observation: self.observation(),
             info: (),
@@ -233,8 +289,6 @@ impl Env for DroneHover {
 
 #[cfg(test)]
 mod tests {
-    use rapier3d::prelude::Rotation;
-
     use super::*;
 
     #[test]
@@ -338,5 +392,28 @@ mod tests {
         assert!(description.contains("DroneHover"));
         assert!(description.contains("Flying"));
         assert!(description.contains("observation"));
+    }
+
+    #[test]
+    fn resetting_either_profile_discards_accumulated_motor_forces() {
+        for mut drone in [DroneHover::default(), DroneHover::disturbed()] {
+            let action = DroneAction::try_from([1.0, 0.0, 0.0, 0.0]).expect("one motor");
+            drone.step(action);
+            let body = drone
+                .world
+                .bodies
+                .get(drone.body)
+                .expect("private body exists");
+            assert!(body.user_force().length_squared() > 0.0);
+            assert!(body.user_torque().length_squared() > 0.0);
+            drone.reset(None);
+            let body = drone
+                .world
+                .bodies
+                .get(drone.body)
+                .expect("private body exists");
+            assert_eq!(body.user_force(), Vector::ZERO);
+            assert_eq!(body.user_torque(), Vector::ZERO);
+        }
     }
 }

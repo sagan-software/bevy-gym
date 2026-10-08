@@ -153,6 +153,11 @@ path = "examples/robots/hover.rs"
 required-features = ["robots"]
 
 [[example]]
+name = "drone-recovery"
+path = "examples/robots/recovery.rs"
+required-features = ["robots"]
+
+[[example]]
 name = "cartpole"
 path = "examples/classic-control/cart_pole.rs"
 

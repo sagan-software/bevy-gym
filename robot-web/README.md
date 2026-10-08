@@ -19,19 +19,23 @@ bundle to `/bevy-gym/robots/hover/`. Its Examples link points to the deployed
 gallery; that sibling route is absent from the standalone local server.
 
 The scene starts paused. Run and Pause toggle continuous stepping. Step advances
-one 20 ms action while paused. Reset restores seed 42 and the hover command.
+one 20 ms action while paused. Calm start and Disturbed start select the initial
+conditions and begin a paused episode. Reset retains that choice and restores
+seed 42 and the hover command.
 The four presets apply power-off, balanced hover, climb, or asymmetric thrust.
 Keyboard shortcuts appear on the buttons. Ground contact, leaving the flight
 region, or 500 actions ends the episode; Reset starts another.
 
 This is manual control of the [drone environment](../docs/ROBOT_ENVIRONMENT.md).
 The 28-line [headless guide](../examples/robots/hover.rs) introduces its API.
+The 25-line [recovery guide](../examples/robots/recovery.rs) uses
+`DroneHover::disturbed()` to add initial tilt and velocity.
 The [visual guide](../examples/robots/flight.rs) connects the environment to Bevy.
 Its private modules contain the session, scene, and controls. Rendering reads the
 physics observation and never writes the authoritative pose. Rotor animation
 illustrates the command; the environment models force rather than rotor RPM.
 
-The [recording](../docs/progress/drone-flight.mp4) shows the browser simulation.
+The [recording](../docs/progress/drone-recovery.mp4) compares calm and disturbed starts.
 It contains no learned policy. Browser execution, focused tests, and the exact
 remaining coverage gaps are recorded in [the status document](../docs/EXAMPLE_STATUS.md).
 Native window interaction and mobile device input remain unverified.
