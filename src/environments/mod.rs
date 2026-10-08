@@ -23,3 +23,11 @@ pub use continuous_mountain_car::ContinuousMountainCar;
 pub use continuous_mountain_car_action::{
     ContinuousMountainCarAction, InvalidContinuousMountainCarAction,
 };
+
+mod pendulum;
+mod pendulum_action;
+mod pendulum_state;
+
+pub use pendulum::Pendulum;
+pub use pendulum_action::{InvalidPendulumAction, PendulumAction};
+pub use pendulum_state::{InvalidPendulumState, PendulumState};

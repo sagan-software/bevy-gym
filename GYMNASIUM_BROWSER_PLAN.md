@@ -364,7 +364,12 @@ fresh PPO seeds passed qualification, and offline Chromium training scored
 Browser-to-native policy loading preserves the browser score within 0.00001.
 Publication and final deployed verification remain pending.
 
-The next task is Pendulum, followed by Acrobot and Toy Text. MuJoCo follows
+Pendulum's shared environment and native adapter now preserve double-precision
+state and match 420 pinned Python transitions. The three shared modules have
+100% measured line and region coverage. Fresh training has started;
+qualification and browser integration remain pending.
+
+Pendulum is followed by Acrobot and Toy Text. MuJoCo follows
 Toy Text, as requested on 2026-10-07; Box2D follows MuJoCo. Both engine
 integrations still require their browser feasibility gates.
 

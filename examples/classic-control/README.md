@@ -56,19 +56,35 @@ cargo run --release --example mountain-car-continuous
 
 ## Pendulum-v1
 
-The environment uses Gymnasium's exact torque bounds, transition equations,
-reward, 200-step limit, 500x500 rod geometry, rounded ends, axle, and torque
-arrow. Gymnasium publishes no solve threshold. The selected recurrent PPO
-profile uses actor rate `0.003`, critic rate `0.001`, and training reward scale
-`0.1`. It improved the 100-episode held-out mean from about `-1436.88` to
-`-653.65`; the best held-out episode returned `-382.996`.
+The native example uses the shared `bevy_gym::environments::Pendulum` port.
+State remains double precision; actions and observations use float32.
+The environment clips torque before computing the pre-transition cost and
+applies the original velocity limit before integrating the angle.
+`TimeLimit` truncates episodes after 200 transitions.
+Custom gravity and reset bounds are unsupported.
+
+The pinned Gymnasium source and NumPy 2.4.4 provide 420 oracle transitions.
+Tests also check reset bounds and moments, invalid inputs, and the time limit.
+The three shared Pendulum modules have 100% measured line and region coverage.
+
+The recurrent PPO profile uses actor rate `0.003`, critic rate `0.001`, and
+training reward scale `0.1`, with a two-million-transition budget.
+The project requires mean return at least `-200` and upright dwell rate at
+least `0.70` over steps 50 through 199 inclusive.
+Upright requires absolute angle at most 15 degrees and angular speed at most
+1 radian per second. Qualification of the corrected dynamics is in progress.
 
 ```sh
 cargo run --no-default-features --release --example pendulum -- train
 cargo run --release --example pendulum
 ```
 
-![Trained Pendulum-v1 policy](../../docs/images/pendulum.gif)
+The renderer retains the 500x500 rod geometry, rounded ends, axle, and original
+torque arrow. The media below shows the earlier float32 implementation.
+Its held-out mean improved from about `-1436.88` to `-653.65`, with best episode
+`-382.996`; those scores do not qualify the corrected dynamics.
+
+![Historical Pendulum-v1 policy](../../docs/images/pendulum.gif)
 
 [30-second checkpoint progression](../../docs/videos/pendulum.mp4)
 

@@ -1,0 +1,6801 @@
+{
+  "gymnasium_commit": "7a1191388aa4aa973d3a5e4b039899cd99cc991f",
+  "numpy_version": "2.4.4",
+  "action_dtype": "float32",
+  "state_dtype": "float64",
+  "observation_dtype": "float32",
+  "cases": [
+    {
+      "name": "upright",
+      "initial_state": [
+        0.0,
+        0.0
+      ],
+      "steps": [
+        {
+          "action": 0.0,
+          "state": [
+            0.0,
+            0.0
+          ],
+          "observation_bits": [
+            1065353216,
+            0,
+            0
+          ],
+          "reward": -0.0,
+          "last_torque": 0.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 2.0,
+          "state": [
+            0.015000000000000003,
+            0.30000000000000004
+          ],
+          "observation_bits": [
+            1065351329,
+            1014349875,
+            1050253722
+          ],
+          "reward": -0.004000000189989805,
+          "last_torque": 2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -2.0,
+          "state": [
+            0.015562478906487306,
+            0.011249578129746085
+          ],
+          "observation_bits": [
+            1065351184,
+            1014953762,
+            1010323495
+          ],
+          "reward": -0.013225000189989811,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.10000000149011612,
+          "state": [
+            0.017458527245252757,
+            0.037920966775309
+          ],
+          "observation_bits": [
+            1065350659,
+            1016005459,
+            1025200900
+          ],
+          "reward": -0.0002648460520909605,
+          "last_torque": 0.10000000149011612,
+          "terminated": false,
+          "truncated": false
+        }
+      ]
+    },
+    {
+      "name": "reward_before_step",
+      "initial_state": [
+        0.5,
+        -0.25
+      ],
+      "steps": [
+        {
+          "action": 0.0,
+          "state": [
+            0.5054784576976576,
+            0.10956915395315225
+          ],
+          "observation_bits": [
+            1063255106,
+            1056435324,
+            1038116299
+          ],
+          "reward": -0.25625,
+          "last_torque": 0.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.12345679104328156,
+          "state": [
+            0.5300413208239568,
+            0.4912572625259828
+          ],
+          "observation_bits": [
+            1063051150,
+            1057058040,
+            1056671250
+          ],
+          "reward": -0.2567242527258074,
+          "last_torque": 0.12345679104328156,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.75,
+          "state": [
+            0.5679380211754683,
+            0.7579340070302302
+          ],
+          "observation_bits": [
+            1062719393,
+            1057600379,
+            1061292023
+          ],
+          "reward": -0.30563967161325034,
+          "last_torque": -0.75,
+          "terminated": false,
+          "truncated": false
+        }
+      ]
+    },
+    {
+      "name": "positive_pi",
+      "initial_state": [
+        3.141592653589793,
+        1.0
+      ],
+      "steps": [
+        {
+          "action": 5.0,
+          "state": [
+            3.206592653589793,
+            1.3
+          ],
+          "observation_bits": [
+            3212801435,
+            3179611834,
+            1067869798
+          ],
+          "reward": -9.973604401279347,
+          "last_torque": 2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -5.0,
+          "state": [
+            3.254156869633489,
+            0.9512843208739132
+          ],
+          "observation_bits": [
+            3212730687,
+            3185970052,
+            1064535903
+          ],
+          "reward": -9.638422356312677,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 2.000000238418579,
+          "state": [
+            3.312508836103057,
+            1.1670393293913612
+          ],
+          "observation_bits": [
+            3212592409,
+            3190696660,
+            1066754443
+          ],
+          "reward": -9.269507461566995,
+          "last_torque": 2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -2.000000238418579,
+          "state": [
+            3.3494826055677085,
+            0.7394753892930328
+          ],
+          "observation_bits": [
+            3212475627,
+            3193133416,
+            1060982338
+          ],
+          "reward": -8.96511677563232,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        }
+      ]
+    },
+    {
+      "name": "negative_pi",
+      "initial_state": [
+        -3.141592653589793,
+        -1.0
+      ],
+      "steps": [
+        {
+          "action": 0.0,
+          "state": [
+            -3.191592653589793,
+            -1.0
+          ],
+          "observation_bits": [
+            3212815897,
+            1028437749,
+            3212836864
+          ],
+          "reward": -9.969604401089358,
+          "last_torque": 0.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.0,
+          "state": [
+            -3.2322184347421423,
+            -0.8125156230469914
+          ],
+          "observation_bits": [
+            3212768015,
+            1035557119,
+            3209691398
+          ],
+          "reward": -9.658945135777877,
+          "last_torque": 1.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.0,
+          "state": [
+            -3.276950399144193,
+            -0.8946392880410129
+          ],
+          "observation_bits": [
+            3212683405,
+            1040854776,
+            3211069205
+          ],
+          "reward": -9.37541702052776,
+          "last_torque": -1.0,
+          "terminated": false,
+          "truncated": false
+        }
+      ]
+    },
+    {
+      "name": "upper_velocity_cap",
+      "initial_state": [
+        1.5707963267948966,
+        8.0
+      ],
+      "steps": [
+        {
+          "action": 2.0,
+          "state": [
+            1.9707963267948965,
+            8.0
+          ],
+          "observation_bits": [
+            3200737751,
+            1064028839,
+            1090519040
+          ],
+          "reward": -8.871401100462329,
+          "last_torque": 2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 2.0,
+          "state": [
+            2.3707963267948964,
+            8.0
+          ],
+          "observation_bits": [
+            3208094886,
+            1060264799,
+            1090519040
+          ],
+          "reward": -10.288038161898248,
+          "last_torque": 2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -2.0,
+          "state": [
+            2.7707963267948963,
+            8.0
+          ],
+          "observation_bits": [
+            3211696669,
+            1052346101,
+            1090519040
+          ],
+          "reward": -12.024675223334164,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        }
+      ]
+    },
+    {
+      "name": "lower_velocity_cap",
+      "initial_state": [
+        -1.5707963267948966,
+        -8.0
+      ],
+      "steps": [
+        {
+          "action": -2.0,
+          "state": [
+            -1.9707963267948965,
+            -8.0
+          ],
+          "observation_bits": [
+            3200737751,
+            3211512487,
+            3238002688
+          ],
+          "reward": -8.871401100462329,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -2.0,
+          "state": [
+            -2.3707963267948964,
+            -8.0
+          ],
+          "observation_bits": [
+            3208094886,
+            3207748447,
+            3238002688
+          ],
+          "reward": -10.288038161898246,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 2.0,
+          "state": [
+            -2.7707963267948963,
+            -8.0
+          ],
+          "observation_bits": [
+            3211696669,
+            3199829749,
+            3238002688
+          ],
+          "reward": -12.024675223334164,
+          "last_torque": 2.0,
+          "terminated": false,
+          "truncated": false
+        }
+      ]
+    },
+    {
+      "name": "unwrapped_angle",
+      "initial_state": [
+        53.40707511102649,
+        0.2
+      ],
+      "steps": [
+        {
+          "action": 0.25,
+          "state": [
+            53.41895011102649,
+            0.2374999999999989
+          ],
+          "observation_bits": [
+            3212835681,
+            3158478384,
+            1047737139
+          ],
+          "reward": -9.873666901092282,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.43225480899242,
+            0.26609395931858776
+          ],
+          "observation_bits": [
+            3212831546,
+            3167633427,
+            1049116024
+          ],
+          "reward": -9.800835716194502,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.44649036805872,
+            0.2847111813260459
+          ],
+          "observation_bits": [
+            3212823833,
+            3173082929,
+            1049740714
+          ],
+          "reward": -9.719172809501805,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.46112323766949,
+            0.2926573922154166
+          ],
+          "observation_bits": [
+            3212812365,
+            3177006587,
+            1050007345
+          ],
+          "reward": -9.63167314539278,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.4756052891707,
+            0.28964103002417146
+          ],
+          "observation_bits": [
+            3212797483,
+            3180084591,
+            1049906132
+          ],
+          "reward": -9.541558540803877,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.48939447004498,
+            0.2757836174854619
+          ],
+          "observation_bits": [
+            3212780051,
+            3181930067,
+            1049441155
+          ],
+          "reward": -9.452164670621976,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.50197516024515,
+            0.2516138040034538
+          ],
+          "observation_bits": [
+            3212761373,
+            3183611983,
+            1048630150
+          ],
+          "reward": -9.366821251247453,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.51287743789276,
+            0.21804555295218142
+          ],
+          "observation_bits": [
+            3212743048,
+            3185067893,
+            1046431573
+          ],
+          "reward": -9.288729276169157,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.52169452642371,
+            0.17634177061892536
+          ],
+          "observation_bits": [
+            3212726778,
+            3186244119,
+            1043632880
+          ],
+          "reward": -9.220839794147274,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.52809779210466,
+            0.12806531361903983
+          ],
+          "observation_bits": [
+            3212714150,
+            3187097591,
+            1040393102
+          ],
+          "reward": -9.16573912674349,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.53184877761876,
+            0.07501971028205533
+          ],
+          "observation_bits": [
+            3212706436,
+            3187597242,
+            1033479151
+          ],
+          "reward": -9.125545531297007,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.532807882031065,
+            0.019182088246073842
+          ],
+          "observation_bits": [
+            3212704425,
+            3187698001,
+            1016931265
+          ],
+          "reward": -9.101822096004732,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.530939420686025,
+            -0.03736922690087385
+          ],
+          "observation_bits": [
+            3212708327,
+            3187476132,
+            3172536441
+          ],
+          "reward": -9.095510126640777,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.52631291594403,
+            -0.09253009483989505
+          ],
+          "observation_bits": [
+            3212717739,
+            3186859755,
+            3183313003
+          ],
+          "reward": -9.10688650367488,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.51910058149969,
+            -0.1442466888868245
+          ],
+          "observation_bits": [
+            3212731699,
+            3185898199,
+            3188962663
+          ],
+          "reward": -9.135547513140676,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.50957107319269,
+            -0.19059016614008803
+          ],
+          "observation_bits": [
+            3212748815,
+            3184626525,
+            3192072722
+          ],
+          "reward": -9.18042052774542,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.498079692541396,
+            -0.22982761302582816
+          ],
+          "observation_bits": [
+            3212767439,
+            3183091400,
+            3194705902
+          ],
+          "reward": -9.239803660967675,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.48505534866324,
+            -0.2604868775631092
+          ],
+          "observation_bits": [
+            3212785879,
+            3181349550,
+            3196411529
+          ],
+          "reward": -9.3114321586594,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.470984708668915,
+            -0.28141279988646567
+          ],
+          "observation_bits": [
+            3212802613,
+            3179465787,
+            3197113687
+          ],
+          "reward": -9.392568876522816,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.456394089896754,
+            -0.291812375443235
+          ],
+          "observation_bits": [
+            3212816464,
+            3175738812,
+            3197462639
+          ],
+          "reward": -9.48011480926247,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.44182975908574,
+            -0.2912866162202509
+          ],
+          "observation_bits": [
+            3212826733,
+            3171832718,
+            3197444997
+          ],
+          "reward": -9.570734425612546,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.4278373913294,
+            -0.2798473551269016
+          ],
+          "observation_bits": [
+            3212833248,
+            3165262472,
+            3197061159
+          ],
+          "reward": -9.660989681890841,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.41494149399826,
+            -0.2579179466227517
+          ],
+          "observation_bits": [
+            3212836345,
+            3154174377,
+            3196325330
+          ],
+          "reward": -9.74747617305006,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.403625610347994,
+            -0.22631767300532005
+          ],
+          "observation_bits": [
+            3212836764,
+            996282599,
+            3194470354
+          ],
+          "reward": -9.826955005883478,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.39431408271663,
+            -0.18623055262717367
+          ],
+          "observation_bits": [
+            3212835498,
+            1011946030,
+            3191780153
+          ],
+          "reward": -9.853126917078503,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.38735608065916,
+            -0.13916004114953193
+          ],
+          "observation_bits": [
+            3212833602,
+            1017218848,
+            3188621304
+          ],
+          "reward": -9.793118021228105,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.383012494319196,
+            -0.08687172679926611
+          ],
+          "observation_bits": [
+            3212832007,
+            1019550232,
+            3182553550
+          ],
+          "reward": -9.748093971080458,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.38144616903025,
+            -0.03132650577890825
+          ],
+          "observation_bits": [
+            3212831354,
+            1020390887,
+            3170914361
+          ],
+          "reward": -9.719810700559297,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.382715823855975,
+            0.02539309651454793
+          ],
+          "observation_bits": [
+            3212831887,
+            1019709459,
+            1020265775
+          ],
+          "reward": -9.70939048696728,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.38677386161459,
+            0.08116075517242297
+          ],
+          "observation_bits": [
+            3212833407,
+            1017531362,
+            1034303388
+          ],
+          "reward": -9.717270841655758,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.39346814393367,
+            0.13388564638143105
+          ],
+          "observation_bits": [
+            3212835311,
+            1012854271,
+            1040783698
+          ],
+          "reward": -9.743181236615827,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.40254767177309,
+            0.18159055678847463
+          ],
+          "observation_bits": [
+            3212836692,
+            999578313,
+            1043985120
+          ],
+          "reward": -9.78614949156361,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.41367197800451,
+            0.222486124628266
+          ],
+          "observation_bits": [
+            3212836499,
+            3151505953,
+            1046729575
+          ],
+          "reward": -9.844538172033966,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.42642390351853,
+            0.2550385102805168
+          ],
+          "observation_bits": [
+            3212833724,
+            3164503764,
+            1048745064
+          ],
+          "reward": -9.833211089641736,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.4403252945865,
+            0.27802782135942017
+          ],
+          "observation_bits": [
+            3212827591,
+            3171429100,
+            1049516458
+          ],
+          "reward": -9.754973692338147,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.454855033511784,
+            0.29059477850564797
+          ],
+          "observation_bits": [
+            3212817717,
+            3175326162,
+            1049938135
+          ],
+          "reward": -9.669585357938738,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.46946870700223,
+            0.2922734698089176
+          ],
+          "observation_bits": [
+            3212804218,
+            3179243005,
+            1049994462
+          ],
+          "reward": -9.580184247676703,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.48361913844702,
+            0.28300862889581796
+          ],
+          "observation_bits": [
+            3212787739,
+            3181157360,
+            1049683586
+          ],
+          "reward": -9.490071714529645,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.49677697098346,
+            0.26315665072885697
+          ],
+          "observation_bits": [
+            3212769411,
+            3182917264,
+            1049017464
+          ],
+          "reward": -9.402594969187993,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.50845049307676,
+            0.23347044186595614
+          ],
+          "observation_bits": [
+            3212750728,
+            3184476904,
+            1047466720
+          ],
+          "reward": -9.321025058545962,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.51820394644538,
+            0.19506906737243984
+          ],
+          "observation_bits": [
+            3212733374,
+            3185778603,
+            1044889648
+          ],
+          "reward": -9.248434402892691,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.52567364068262,
+            0.1493938847447934
+          ],
+          "observation_bits": [
+            3212719011,
+            3186774559,
+            1041824438
+          ],
+          "reward": -9.187578647350414,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.53058130873287,
+            0.09815336100508279
+          ],
+          "observation_bits": [
+            3212709069,
+            3187428434,
+            1036584097
+          ],
+          "reward": -9.140787826620322,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.53274425999501,
+            0.04325902524281388
+          ],
+          "observation_bits": [
+            3212704559,
+            3187693765,
+            1026633824
+          ],
+          "reward": -9.109871763417509,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.532082012502066,
+            -0.013244949858998996
+          ],
+          "observation_bits": [
+            3212705948,
+            3187628303,
+            3159949657
+          ],
+          "reward": -9.096044220056443,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.528619205721235,
+            -0.06925613561667174
+          ],
+          "observation_bits": [
+            3212713092,
+            3187167060,
+            3180189225
+          ],
+          "reward": -9.09986964273112,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.522484709396025,
+            -0.12268992650418245
+          ],
+          "observation_bits": [
+            3212725257,
+            3186349475,
+            3187360987
+          ],
+          "reward": -9.121235439319063,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.51390695413429,
+            -0.1715551052346908
+          ],
+          "observation_bits": [
+            3212741215,
+            3185205292,
+            3190795300
+          ],
+          "reward": -9.15935166551168,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.50320562088598,
+            -0.2140266649663372
+          ],
+          "observation_bits": [
+            3212759404,
+            3183776380,
+            3193645518
+          ],
+          "reward": -9.212778792253467,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.49077994313586,
+            -0.2485135550022728
+          ],
+          "observation_bits": [
+            3212778124,
+            3182115382,
+            3195959894
+          ],
+          "reward": -9.279482910228948,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.4770939983841,
+            -0.2737188950352926
+          ],
+          "observation_bits": [
+            3212795754,
+            3180283923,
+            3196855522
+          ],
+          "reward": -9.356916327463162,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.4626594903163,
+            -0.28869016135594466
+          ],
+          "observation_bits": [
+            3212810953,
+            3177418352,
+            3197357874
+          ],
+          "reward": -9.442120104758645,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.44801664120177,
+            -0.2928569822906617
+          ],
+          "observation_bits": [
+            3212822805,
+            3173492304,
+            3197497690
+          ],
+          "reward": -9.531843769977247,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.4337139135857,
+            -0.286054552321426
+          ],
+          "observation_bits": [
+            3212830912,
+            3168416515,
+            3197269438
+          ],
+          "reward": -9.62267641034228,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.42028734901685,
+            -0.2685312913769721
+          ],
+          "observation_bits": [
+            3212835400,
+            3159914120,
+            3196681455
+          ],
+          "reward": -9.711182714743597,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.40824033993806,
+            -0.24094018157589236
+          ],
+          "observation_bits": [
+            3212836853,
+            3130571414,
+            3195451654
+          ],
+          "reward": -9.794037430153871,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.39802463478497,
+            -0.20431410306181189
+          ],
+          "observation_bits": [
+            3212836177,
+            1007962094,
+            3192993719
+          ],
+          "reward": -9.868152126783777,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.39002331785761,
+            -0.16002633854712486
+          ],
+          "observation_bits": [
+            3212834425,
+            1015787128,
+            3190021618
+          ],
+          "reward": -9.817057418139829,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.384536412186776,
+            -0.1097381134166629
+          ],
+          "observation_bits": [
+            3212832603,
+            1018732307,
+            3185622624
+          ],
+          "reward": -9.765378931345785,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.381769636164876,
+            -0.05533552043803101
+          ],
+          "observation_bits": [
+            3212831492,
+            1020217283,
+            3177359232
+          ],
+          "reward": -9.729764317998768,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.38182671417358,
+            0.0011415601739704073
+          ],
+          "observation_bits": [
+            3212831517,
+            1020186650,
+            982884455
+          ],
+          "reward": -9.711614482290882,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.3847055064713,
+            0.057575845954403355
+          ],
+          "observation_bits": [
+            3212832667,
+            1018641548,
+            1030476966
+          ],
+          "reward": -9.711664156815893,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.390298088980764,
+            0.11185165018925063
+          ],
+          "observation_bits": [
+            3212834503,
+            1015639633,
+            1038422650
+          ],
+          "reward": -9.729946427435447,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.39839478030359,
+            0.1619338264565107
+          ],
+          "observation_bits": [
+            3212836232,
+            1007564669,
+            1042665979
+          ],
+          "reward": -9.76578631031014,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.40869197994075,
+            0.20594399274314135
+          ],
+          "observation_bits": [
+            3212836842,
+            3134450968,
+            1045619451
+          ],
+          "reward": -9.817824379189354,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.420803547020036,
+            0.2422313415858094
+          ],
+          "observation_bits": [
+            3212835283,
+            3160468333,
+            1048054654
+          ],
+          "reward": -9.863751721166388,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.43427531392065,
+            0.26943533801231256
+          ],
+          "observation_bits": [
+            3212830658,
+            3168717805,
+            1049228142
+          ],
+          "reward": -9.789464666006577,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.4486021989837,
+            0.2865377012609261
+          ],
+          "observation_bits": [
+            3212822400,
+            3173649355,
+            1049802002
+          ],
+          "reward": -9.70676237708983,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.463247265793655,
+            0.2929013361990731
+          ],
+          "observation_bits": [
+            3212810402,
+            3177575886,
+            1050015530
+          ],
+          "reward": -9.618679396648204,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.47766198437894,
+            0.2882943717056771
+          ],
+          "observation_bits": [
+            3212795085,
+            3180359968,
+            1049860946
+          ],
+          "reward": -9.528461273832502,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.491306892788266,
+            0.2728981681865609
+          ],
+          "observation_bits": [
+            3212777382,
+            3182185858,
+            1049344335
+          ],
+          "reward": -9.439450366729789,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.50367184320613,
+            0.247299008357208
+          ],
+          "observation_bits": [
+            3212758651,
+            3183838665,
+            1048394740
+          ],
+          "reward": -9.354965341607876,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.514295046897224,
+            0.2124640738218831
+          ],
+          "observation_bits": [
+            3212740520,
+            3185257083,
+            1046057007
+          ],
+          "reward": -9.278178341360874,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.522780202395396,
+            0.16970310996337903
+          ],
+          "observation_bits": [
+            3212724685,
+            3186388871,
+            1043187367
+          ],
+          "reward": -9.211994388307193,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.52881109187229,
+            0.12061778953793642
+          ],
+          "observation_bits": [
+            3212712701,
+            3187192624,
+            1039599222
+          ],
+          "reward": -9.158937953759095,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.532163149243644,
+            0.06704114742700443
+          ],
+          "observation_bits": [
+            3212705778,
+            3187639107,
+            1032408286
+          ],
+          "reward": -9.121051689034656,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.53271162845691,
+            0.010969584265269283
+          ],
+          "observation_bits": [
+            3212704628,
+            3187691593,
+            1010022853
+          ],
+          "reward": -9.099812046112172,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.53043612295033,
+            -0.04551011013168486
+          ],
+          "observation_bits": [
+            3212709368,
+            3187409096,
+            3174721743
+          ],
+          "reward": -9.096065948418184,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.52542130369955,
+            -0.10029638501554673
+          ],
+          "observation_bits": [
+            3212719512,
+            3186740929,
+            3184355377
+          ],
+          "reward": -9.109991859768938,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.5178538545689,
+            -0.15134898261308233
+          ],
+          "observation_bits": [
+            3212734025,
+            3185731903,
+            3189439290
+          ],
+          "reward": -9.141087599933204,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.50801569402457,
+            -0.19676321088653875
+          ],
+          "observation_bits": [
+            3212751465,
+            3184418845,
+            3192486988
+          ],
+          "reward": -9.188186108793426,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.496273686367175,
+            -0.23484015314798168
+          ],
+          "observation_bits": [
+            3212770165,
+            3182849985,
+            3195042288
+          ],
+          "reward": -9.24949909051245,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.483066165984525,
+            -0.264150407653018
+          ],
+          "observation_bits": [
+            3212788446,
+            3181083357,
+            3196534457
+          ],
+          "reward": -9.322687098686183,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.468886722880534,
+            -0.283588862079761
+          ],
+          "observation_bits": [
+            3212804824,
+            3179087081,
+            3197186703
+          ],
+          "reward": -9.40495320532282,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.45426582006321,
+            -0.29241805634635487
+          ],
+          "observation_bits": [
+            3212818186,
+            3175168174,
+            3197482962
+          ],
+          "reward": -9.493156029307455,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.43975092240866,
+            -0.2902979530910625
+          ],
+          "observation_bits": [
+            3212827908,
+            3171275002,
+            3197411823
+          ],
+          "reward": -9.583936726424461,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.425885899867176,
+            -0.27730045082970056
+          ],
+          "observation_bits": [
+            3212833896,
+            3164214978,
+            3196975699
+          ],
+          "reward": -9.673853721921988,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.413190514344166,
+            -0.2539077104601648
+          ],
+          "observation_bits": [
+            3212836550,
+            3150472039,
+            3196190769
+          ],
+          "reward": -9.759518628811897,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.40214080262615,
+            -0.22099423436037646
+          ],
+          "observation_bits": [
+            3212836660,
+            1000452048,
+            3194113104
+          ],
+          "reward": -9.837726999520013,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.39315112672229,
+            -0.17979351807730384
+          ],
+          "observation_bits": [
+            3212835238,
+            1013194633,
+            3191348171
+          ],
+          "reward": -9.843571919611724,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.38655858335784,
+            -0.13185086728901244
+          ],
+          "observation_bits": [
+            3212833333,
+            1017646914,
+            3188130794
+          ],
+          "reward": -9.785606375747994,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.38261035580723,
+            -0.07896455101219163
+          ],
+          "observation_bits": [
+            3212831843,
+            1019766065,
+            3181492267
+          ],
+          "reward": -9.742917148918448,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.3814544650629,
+            -0.023117814886628535
+          ],
+          "observation_bits": [
+            3212831358,
+            1020386435,
+            3166527890
+          ],
+          "reward": -9.71717237483459,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.38313424343415,
+            0.03359556742500976
+          ],
+          "observation_bits": [
+            3212832056,
+            1019484888,
+            1024039809
+          ],
+          "reward": -9.709397495649629,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.38758671857963,
+            0.08904950290957331
+          ],
+          "observation_bits": [
+            3212833678,
+            1017095049,
+            1035362198
+          ],
+          "reward": -9.719928024951155,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.39464496218248,
+            0.14116487205709094
+          ],
+          "observation_bits": [
+            3212835568,
+            1011590779,
+            1041272198
+          ],
+          "reward": -9.748390498846717,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.40404432436355,
+            0.18798724362133504
+          ],
+          "observation_bits": [
+            3212836787,
+            994484246,
+            1044414394
+          ],
+          "reward": -9.793713233220243,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.415432340870474,
+            0.2277603301385656
+          ],
+          "observation_bits": [
+            3212836278,
+            3154701403,
+            1047083521
+          ],
+          "reward": -9.854167012906778,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.42838196490634,
+            0.25899248071737313
+          ],
+          "observation_bits": [
+            3212833056,
+            3165554773,
+            1048877738
+          ],
+          "reward": -9.82241419741701,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.442407642376146,
+            0.2805135493961105
+          ],
+          "observation_bits": [
+            3212826393,
+            3171987747,
+            1049599865
+          ],
+          "reward": -9.74295368238126,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.45698362558251,
+            0.2915196641272295
+          ],
+          "observation_bits": [
+            3212815973,
+            3175896870,
+            1049969169
+          ],
+          "reward": -9.656783232161738,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.47156381636572,
+            0.29160381566423427
+          ],
+          "observation_bits": [
+            3212801990,
+            3179543353,
+            1049971992
+          ],
+          "reward": -9.567071687013195,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.4856023565701,
+            0.28077080408742483
+          ],
+          "observation_bits": [
+            3212785162,
+            3181422744,
+            1049608497
+          ],
+          "reward": -9.477134486873126,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.49857415063658,
+            0.2594358813296124
+          ],
+          "observation_bits": [
+            3212766683,
+            3183157488,
+            1048892616
+          ],
+          "reward": -9.390315418414836,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.509994516443626,
+            0.22840731614097531
+          ],
+          "observation_bits": [
+            3212748087,
+            3184683059,
+            1047126940
+          ],
+          "reward": -9.30986425169485,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.51943721446438,
+            0.18885396041506308
+          ],
+          "observation_bits": [
+            3212731067,
+            3185943097,
+            1044472559
+          ],
+          "reward": -9.238814599369741,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.526550194253346,
+            0.14225959577932545
+          ],
+          "observation_bits": [
+            3212717265,
+            3186891376,
+            1041345664
+          ],
+          "reward": -9.179866807812981,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.53106850970801,
+            0.0903663090932502
+          ],
+          "observation_bits": [
+            3212708060,
+            3187493325,
+            1035538937
+          ],
+          "reward": -9.135280888358416,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.532823978053514,
+            0.03510936691017198
+          ],
+          "observation_bits": [
+            3212704392,
+            3187699073,
+            1024446167
+          ],
+          "reward": -9.106784370207803,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.531751281806244,
+            -0.021453924945444625
+          ],
+          "observation_bits": [
+            3212706639,
+            3187584258,
+            3165634596
+          ],
+          "reward": -9.095499511716648,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.52789033214934,
+            -0.07721899313812622
+          ],
+          "observation_bits": [
+            3212714570,
+            3187069949,
+            3181257982
+          ],
+          "reward": -9.101893591343401,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.52138482526778,
+            -0.13011013763113424
+          ],
+          "observation_bits": [
+            3212727372,
+            3186202824,
+            3188013976
+          ],
+          "reward": -9.125755073794608,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.51247703332981,
+            -0.17815583875937935
+          ],
+          "observation_bits": [
+            3212743756,
+            3185014451,
+            3191238268
+          ],
+          "reward": -9.166197359664896,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.50149898380081,
+            -0.21956099058004702
+          ],
+          "observation_bits": [
+            3212762128,
+            3183548358,
+            3194016921
+          ],
+          "reward": -9.22169060704125,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.4888602983899,
+            -0.25277370821812506
+          ],
+          "observation_bits": [
+            3212780785,
+            3181858613,
+            3196152718
+          ],
+          "reward": -9.290120781637867,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.47503308634796,
+            -0.27654424083872736
+          ],
+          "observation_bits": [
+            3212798138,
+            3180007970,
+            3196950325
+          ],
+          "reward": -9.368873685134288,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.46053441133728,
+            -0.2899735002136469
+          ],
+          "observation_bits": [
+            3212812896,
+            3176848753,
+            3197400936
+          ],
+          "reward": -9.454940307170608,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.44590696731077,
+            -0.29254888053016853
+          ],
+          "observation_bits": [
+            3212824216,
+            3172926444,
+            3197487352
+          ],
+          "reward": -9.54503857071975,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.43169869461516,
+            -0.28416545391229503
+          ],
+          "observation_bits": [
+            3212831778,
+            3167334958,
+            3197206050
+          ],
+          "reward": -9.635745550048842,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.418442130843346,
+            -0.2651312754363008
+          ],
+          "observation_bits": [
+            3212835780,
+            3157932982,
+            3196567369
+          ],
+          "reward": -9.723633683866348,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.40663431300786,
+            -0.23615635670977614
+          ],
+          "observation_bits": [
+            3212836862,
+            971447016,
+            3195130617
+          ],
+          "reward": -9.805404477653537,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.39671802509753,
+            -0.19832575820651074
+          ],
+          "observation_bits": [
+            3212835964,
+            1009364990,
+            3192591848
+          ],
+          "reward": -9.872474462242618,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.389065120965846,
+            -0.15305808263362544
+          ],
+          "observation_bits": [
+            3212834143,
+            1016301477,
+            3189553986
+          ],
+          "reward": -9.808631990824098,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.38396255495131,
+            -0.10205132029076963
+          ],
+          "observation_bits": [
+            3212832383,
+            1019040314,
+            3184590920
+          ],
+          "reward": -9.759173833568791,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.381601632626015,
+            -0.04721844650592651
+          ],
+          "observation_bits": [
+            3212831421,
+            1020307451,
+            3175180321
+          ],
+          "reward": -9.726022065795096,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.382070862433515,
+            0.009384596149990113
+          ],
+          "observation_bits": [
+            3212831620,
+            1020055615,
+            1008320985
+          ],
+          "reward": -9.710484172154636,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.38535265386026,
+            0.06563582853487027
+          ],
+          "observation_bits": [
+            3212832906,
+            1018294198,
+            1032219668
+          ],
+          "reward": -9.713194593228092,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.39132397336931,
+            0.11942639018096725
+          ],
+          "observation_bits": [
+            3212834783,
+            1015088938,
+            1039439315
+          ],
+          "reward": -9.734083348733735,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.39976093611686,
+            0.1687392549510245
+          ],
+          "observation_bits": [
+            3212836415,
+            1005562675,
+            1043122684
+          ],
+          "reward": -9.7723739489981,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.41034717797798,
+            0.21172483722242874
+          ],
+          "observation_bits": [
+            3212836774,
+            3143004179,
+            1046007397
+          ],
+          "reward": -9.826611375536832,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.422685717547374,
+            0.24677079138781965
+          ],
+          "observation_bits": [
+            3212834820,
+            3162489080,
+            1048359291
+          ],
+          "reward": -9.853601345190357,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.436313883147974,
+            0.2725633120119684
+          ],
+          "observation_bits": [
+            3212829693,
+            3169811818,
+            1049333099
+          ],
+          "reward": -9.777915840948292,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.45072075101481,
+            0.28813735733676055
+          ],
+          "observation_bits": [
+            3212820887,
+            3174217534,
+            1049855677
+          ],
+          "reward": -9.694238259399242,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.46536642697264,
+            0.2929135191566662
+          ],
+          "observation_bits": [
+            3212808369,
+            3178143812,
+            1050015939
+          ],
+          "reward": -9.605640512754468,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.4797024162894,
+            0.2867197863350664
+          ],
+          "observation_bits": [
+            3212792636,
+            3180633129,
+            1049808112
+          ],
+          "reward": -9.51538947168848,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.49319227533426,
+            0.2697971808972643
+          ],
+          "observation_bits": [
+            3212774691,
+            3182437993,
+            1049240283
+          ],
+          "reward": -9.42683163282166,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.50533173085762,
+            0.24278911046726429
+          ],
+          "observation_bits": [
+            3212755942,
+            3184060395,
+            1048092085
+          ],
+          "reward": -9.343272017488182,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.51566748905797,
+            0.20671516400701292
+          ],
+          "observation_bits": [
+            3212738040,
+            3185440218,
+            1045671204
+          ],
+          "reward": -9.267851369592966,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.52381403182947,
+            0.16293085543001756
+          ],
+          "observation_bits": [
+            3212722674,
+            3186526693,
+            1042732889
+          ],
+          "reward": -9.203426287442808,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.529467801517555,
+            0.11307539376175968
+          ],
+          "observation_bits": [
+            3212711360,
+            3187280110,
+            1038586898
+          ],
+          "reward": -9.1524572511224,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.53241829572574,
+            0.05900988416374727
+          ],
+          "observation_bits": [
+            3212705244,
+            3187672062,
+            1030861913
+          ],
+          "reward": -9.116909521645704,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.532555718692876,
+            0.002748459342688775
+          ],
+          "observation_bits": [
+            3212704955,
+            3187681212,
+            993271679
+          ],
+          "reward": -9.09817157522833,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.52987495753101,
+            -0.05361522323736023
+          ],
+          "observation_bits": [
+            3212710524,
+            3187334348,
+            3176897443
+          ],
+          "reward": -9.096995128970061,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.52447576713567,
+            -0.10798380790672532
+          ],
+          "observation_bits": [
+            3212721377,
+            3186614901,
+            3185387165
+          ],
+          "reward": -9.113459971328986,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.51655915843872,
+            -0.15833217393906437
+          ],
+          "observation_bits": [
+            3212736412,
+            3185559185,
+            3189907924
+          ],
+          "reward": -9.146965787905692,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.50642009529074,
+            -0.20278126295944943
+          ],
+          "observation_bits": [
+            3212754141,
+            3184205760,
+            3192890852
+          ],
+          "reward": -9.196252007389434,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.49443672019684,
+            -0.23966750187807628
+          ],
+          "observation_bits": [
+            3212772882,
+            3182604391,
+            3195366246
+          ],
+          "reward": -9.259445405580374,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.4810564503456,
+            -0.267605397024741
+          ],
+          "observation_bits": [
+            3212790972,
+            3180814376,
+            3196650387
+          ],
+          "reward": -9.334133823844091,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.466779410311915,
+            -0.28554080067363025
+          ],
+          "observation_bits": [
+            3212806971,
+            3178522447,
+            3197252199
+          ],
+          "reward": -9.417462940296145,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.45213978895639,
+            -0.2927924271105372
+          ],
+          "observation_bits": [
+            3212819831,
+            3174598079,
+            3197495524
+          ],
+          "reward": -9.506251683284724,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.437685814110935,
+            -0.28907949690909146
+          ],
+          "observation_bits": [
+            3212829004,
+            3170548038,
+            3197370938
+          ],
+          "reward": -9.597120744584604,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.42395911715824,
+            -0.2745339390538588
+          ],
+          "observation_bits": [
+            3212834473,
+            3163180709,
+            3196882870
+          ],
+          "reward": -9.686627891926282,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.411474300057165,
+            -0.24969634202150837
+          ],
+          "observation_bits": [
+            3212836702,
+            3146786548,
+            3196039270
+          ],
+          "reward": -9.77140351987126,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.400699513899546,
+            -0.21549572315241516
+          ],
+          "observation_bits": [
+            3212836523,
+            1003547142,
+            3193744105
+          ],
+          "reward": -9.848280160397236,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.39203881101446,
+            -0.17321405770174458
+          ],
+          "observation_bits": [
+            3212834967,
+            1014388848,
+            3190906631
+          ],
+          "reward": -9.834292331808264,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.3858169481328,
+            -0.12443725763315247
+          ],
+          "observation_bits": [
+            3212833073,
+            1018044990,
+            3187595510
+          ],
+          "reward": -9.778417443079054,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.38226720631873,
+            -0.07099483628144754
+          ],
+          "observation_bits": [
+            3212831702,
+            1019950236,
+            3180422590
+          ],
+          "reward": -9.738098296939464,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.381522665511746,
+            -0.014890816139628914
+          ],
+          "observation_bits": [
+            3212831387,
+            1020349832,
+            3161716892
+          ],
+          "reward": -9.714913697544535,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.383611237140634,
+            0.0417714325778022
+          ],
+          "observation_bits": [
+            3212832246,
+            1019228876,
+            1026234502
+          ],
+          "reward": -9.709791251983914,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.38845462330425,
+            0.09686772327226251
+          ],
+          "observation_bits": [
+            3212833956,
+            1016629181,
+            1036411542
+          ],
+          "reward": -9.722964072078916,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.39587123740725,
+            0.1483322820600269
+          ],
+          "observation_bits": [
+            3212835811,
+            1010274168,
+            1041753195
+          ],
+          "reward": -9.753955984367652,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.40558298798111,
+            0.1942350114772792
+          ],
+          "observation_bits": [
+            3212836845,
+            985895763,
+            1044833675
+          ],
+          "reward": -9.80159666035867,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.41722569314842,
+            0.23285410334604478
+          ],
+          "observation_bits": [
+            3212836000,
+            3156626917,
+            1047425358
+          ],
+          "reward": -9.864066565896671,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.430362758022724,
+            0.26274129748620983
+          ],
+          "observation_bits": [
+            3212832315,
+            3166617938,
+            1049003527
+          ],
+          "reward": -9.811414050306416,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.444501615065214,
+            0.28277714084981187
+          ],
+          "observation_bits": [
+            3212825115,
+            3172549471,
+            1049675818
+          ],
+          "reward": -9.730791913089831,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.459112305839064,
+            0.29221381547696945
+          ],
+          "observation_bits": [
+            3212814154,
+            3176467541,
+            1049992461
+          ],
+          "reward": -9.643906275160377,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.473647482375334,
+            0.2907035307254271
+          ],
+          "observation_bits": [
+            3212799700,
+            3179822418,
+            1049941784
+          ],
+          "reward": -9.553954324258624,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.487563038582465,
+            0.27831112414260195
+          ],
+          "observation_bits": [
+            3212782549,
+            3181685070,
+            1049525964
+          ],
+          "reward": -9.464263090473777,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.50033855535994,
+            0.25551033554951463
+          ],
+          "observation_bits": [
+            3212763952,
+            3183393293,
+            1048760896
+          ],
+          "reward": -9.378170351931631,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.5114967608452,
+            0.22316410970516753
+          ],
+          "observation_bits": [
+            3212745479,
+            3184883604,
+            1046775074
+          ],
+          "reward": -9.29890202116562,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.52062126684126,
+            0.18249011992123715
+          ],
+          "observation_bits": [
+            3212728828,
+            3186101005,
+            1044045489
+          ],
+          "reward": -9.229450428136861,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.52737193559718,
+            0.13501337511843164
+          ],
+          "observation_bits": [
+            3212715616,
+            3187000876,
+            1040859378
+          ],
+          "reward": -9.172458357077373,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.5314973459028,
+            0.08250820611235607
+          ],
+          "observation_bits": [
+            3212707168,
+            3187550439,
+            1034484240
+          ],
+          "reward": -9.13011384759726,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.53284395163091,
+            0.026932114562206122
+          ],
+          "observation_bits": [
+            3212704349,
+            3187700403,
+            1021092029
+          ],
+          "reward": -9.104060595970234,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.531361649672185,
+            -0.029646039174530125
+          ],
+          "observation_bits": [
+            3212707451,
+            3187532367,
+            3170032704
+          ],
+          "reward": -9.095328304852025,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.52710559245011,
+            -0.08512114444139102
+          ],
+          "observation_bits": [
+            3212716152,
+            3186965386,
+            3182318591
+          ],
+          "reward": -9.10428658004587,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.52023419262352,
+            -0.137427996531825
+          ],
+          "observation_bits": [
+            3212729563,
+            3186049386,
+            3188505069
+          ],
+          "reward": -9.130625021191552,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.511003377687565,
+            -0.18461629871906526
+          ],
+          "observation_bits": [
+            3212746339,
+            3184817743,
+            3191671822
+          ],
+          "reward": -9.173361045398831,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.49975726482636,
+            -0.2249222572241026
+          ],
+          "observation_bits": [
+            3212764858,
+            3183315610,
+            3194376709
+          ],
+          "reward": -9.230875745393243,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.486915544923455,
+            -0.2568343980579775
+          ],
+          "observation_bits": [
+            3212783419,
+            3181598444,
+            3196288972
+          ],
+          "reward": -9.30097673791164,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.47295798862598,
+            -0.2791511259495115
+          ],
+          "observation_bits": [
+            3212800466,
+            3179730079,
+            3197037797
+          ],
+          "reward": -9.380985545599485,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.45840661133166,
+            -0.2910275458863356
+          ],
+          "observation_bits": [
+            3212814766,
+            3176278360,
+            3197436304
+          ],
+          "reward": -9.46784566123712,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.44380614800546,
+            -0.29200926652412895
+          ],
+          "observation_bits": [
+            3212825548,
+            3172362912,
+            3197469245
+          ],
+          "reward": -9.558246198749412,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.429703580499016,
+            -0.2820513501288094
+          ],
+          "observation_bits": [
+            3212832569,
+            3166264138,
+            3197135113
+          ],
+          "reward": -9.648755099479734,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.41662751780334,
+            -0.26152125391351605
+          ],
+          "observation_bits": [
+            3212836099,
+            3155984663,
+            3196446237
+          ],
+          "reward": -9.735955378220185,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.40506824530127,
+            -0.23118545004133642
+          ],
+          "observation_bits": [
+            3212836830,
+            990086553,
+            3194797025
+          ],
+          "reward": -9.816577944283868,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.39545923021338,
+            -0.19218030175776085
+          ],
+          "observation_bits": [
+            3212835732,
+            1010716529,
+            3192179434
+          ],
+          "reward": -9.862406090595302,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.388160800860334,
+            -0.14596858706105617
+          ],
+          "observation_bits": [
+            3212833863,
+            1016786897,
+            3189078218
+          ],
+          "reward": -9.800510424962921,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.383446615847916,
+            -0.09428370024829015
+          ],
+          "observation_bits": [
+            3212832181,
+            1019317231,
+            3183548368
+          ],
+          "reward": -9.753313219330884,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.38149341695746,
+            -0.039063977809023744
+          ],
+          "observation_bits": [
+            3212831375,
+            1020365529,
+            3172991373
+          ],
+          "reward": -9.722651934753268,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.38237442696521,
+            0.017620200154866462
+          ],
+          "observation_bits": [
+            3212831746,
+            1019892690,
+            1016092733
+          ],
+          "reward": -9.709739399292731,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.38605661843765,
+            0.07364382944891076
+          ],
+          "observation_bits": [
+            3212833158,
+            1017916346,
+            1033294483
+          ],
+          "reward": -9.715109096859655,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.392401945349164,
+            0.12690653823026965
+          ],
+          "observation_bits": [
+            3212835058,
+            1013998978,
+            1040315338
+          ],
+          "reward": -9.738587935671426,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.401172496229044,
+            0.17541101759765537
+          ],
+          "observation_bits": [
+            3212836572,
+            1002531439,
+            1043570418
+          ],
+          "reward": -9.779298510834359,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.41203939387851,
+            0.21733795298925762
+          ],
+          "observation_bits": [
+            3212836657,
+            3148000064,
+            1046384087
+          ],
+          "reward": -9.835691421894008,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.42459513168565,
+            0.2511147561427592
+          ],
+          "observation_bits": [
+            3212834289,
+            3163522116,
+            1048613405
+          ],
+          "reward": -9.843223614701008,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.43836890232874,
+            0.27547541286182325
+          ],
+          "observation_bits": [
+            3212828650,
+            3170904208,
+            1049430813
+          ],
+          "reward": -9.766198177904311,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.45284434732645,
+            0.28950889995416573
+          ],
+          "observation_bits": [
+            3212819294,
+            3174787013,
+            1049901699
+          ],
+          "reward": -9.68161018305927,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.46747904514045,
+            0.29269395628001715
+          ],
+          "observation_bits": [
+            3212806266,
+            3178709915,
+            1050008571
+          ],
+          "reward": -9.592566671358286,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.25,
+          "state": [
+            53.48172497262343,
+            0.2849185496596233
+          ],
+          "observation_bits": [
+            3212790139,
+            3180903856,
+            1049747672
+          ],
+          "reward": -9.50235340023231,
+          "last_torque": 0.25,
+          "terminated": false,
+          "truncated": false
+        }
+      ]
+    },
+    {
+      "name": "mixed",
+      "initial_state": [
+        -2.13,
+        0.713
+      ],
+      "steps": [
+        {
+          "action": 3.4507479667663574,
+          "state": [
+            -2.111137919005009,
+            0.37724161989982263
+          ],
+          "observation_bits": [
+            3204690334,
+            3210446664,
+            1052845520
+          ],
+          "reward": -4.591736900189989,
+          "last_torque": 2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -3.3902690410614014,
+          "state": [
+            -2.1394333257528895,
+            -0.565908134957614
+          ],
+          "observation_bits": [
+            3205093911,
+            3210196729,
+            3205554011
+          ],
+          "reward": -4.475134437229253,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.5774454474449158,
+          "state": [
+            -2.194996730992048,
+            -1.11126810478317
+          ],
+          "observation_bits": [
+            3205865069,
+            3209673196,
+            3213770249
+          ],
+          "reward": -4.609533600347224,
+          "last_torque": 0.5774454474449158,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.3192006349563599,
+          "state": [
+            -2.2908827925988917,
+            -1.917721232136874
+          ],
+          "observation_bits": [
+            3207123378,
+            3208671899,
+            3220535268
+          ],
+          "reward": -4.943242619454299,
+          "last_torque": -1.3192006349563599,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -2.8505804538726807,
+          "state": [
+            -2.429959430909665,
+            -2.7815327662154634
+          ],
+          "observation_bits": [
+            3208764971,
+            3207016369,
+            3224503458
+          ],
+          "reward": -5.619909442034544,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.1417596340179443,
+          "state": [
+            -2.602089446785474,
+            -3.4426003175161726
+          ],
+          "observation_bits": [
+            3210453895,
+            3204678269,
+            3227276176
+          ],
+          "reward": -6.679698903984791,
+          "last_torque": -1.1417596340179443,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.7183550000190735,
+          "state": [
+            -2.798871243725009,
+            -3.935635938790707
+          ],
+          "observation_bits": [
+            3211861162,
+            3198947056,
+            3229344118
+          ],
+          "reward": -7.9565352175946025,
+          "last_torque": -0.7183550000190735,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.1134310960769653,
+          "state": [
+            -2.999904237492453,
+            -4.020659875348876
+          ],
+          "observation_bits": [
+            3212668739,
+            3188759198,
+            3229657407
+          ],
+          "reward": -9.383842992101926,
+          "last_torque": 1.1134310960769653,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 2.363858699798584,
+          "state": [
+            -3.1912327866940187,
+            -3.8265709840313127
+          ],
+          "observation_bits": [
+            3212816198,
+            1028341268,
+            3228886666
+          ],
+          "reward": -10.619996017639211,
+          "last_torque": 2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -4.847103595733643,
+          "state": [
+            -3.3957005953123476,
+            -4.089356172366574
+          ],
+          "observation_bits": [
+            3212298113,
+            1048622375,
+            3229801473
+          ],
+          "reward": -11.028434938710081,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -2.4595909118652344,
+          "state": [
+            -3.6057415753182354,
+            -4.200819600117752
+          ],
+          "observation_bits": [
+            3211061883,
+            1055208434,
+            3230035229
+          ],
+          "reward": -10.01385135190428,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.0414584875106812,
+          "state": [
+            -3.791184294702553,
+            -3.7088543876863516
+          ],
+          "observation_bits": [
+            3209419863,
+            1058723888,
+            3228392927
+          ],
+          "reward": -8.934478104289678,
+          "last_torque": 1.0414584875106812,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -4.162632942199707,
+          "state": [
+            -3.968944716559692,
+            -3.555208437142786
+          ],
+          "observation_bits": [
+            3207414927,
+            1060926409,
+            3227748489
+          ],
+          "reward": -7.5896291332825765,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 4.977636814117432,
+          "state": [
+            -4.104099822504767,
+            -2.703102118901495
+          ],
+          "observation_bits": [
+            3205647229,
+            1062343835,
+            3224174496
+          ],
+          "reward": -6.623660214615832,
+          "last_torque": 2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 3.3234612941741943,
+          "state": [
+            -4.193481419564819,
+            -1.787631941201023
+          ],
+          "observation_bits": [
+            3204311750,
+            1063144688,
+            3219444000
+          ],
+          "reward": -5.483089656231456,
+          "last_torque": 2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -4.632226467132568,
+          "state": [
+            -4.265299461385034,
+            -1.4363608364042975
+          ],
+          "observation_bits": [
+            3202178062,
+            1063704171,
+            3216497324
+          ],
+          "reward": -4.690425133822476,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.6753981113433838,
+          "state": [
+            -4.298237920656709,
+            -0.6587691854335052
+          ],
+          "observation_bits": [
+            3201173776,
+            1063934841,
+            3207111961
+          ],
+          "reward": -4.278632694505554,
+          "last_torque": 0.6753981113433838,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.093401312828064,
+          "state": [
+            -4.28864618507292,
+            0.1918347116757937
+          ],
+          "observation_bits": [
+            3201467787,
+            1063869378,
+            1044672594
+          ],
+          "reward": -3.9846093377970964,
+          "last_torque": 1.093401312828064,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -4.930734157562256,
+          "state": [
+            -4.259871085071876,
+            0.575502000020865
+          ],
+          "observation_bits": [
+            3202342091,
+            1063664573,
+            1058231321
+          ],
+          "reward": -3.9858663654643953,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -3.2091612815856934,
+          "state": [
+            -4.212370395639358,
+            0.9500137886503652
+          ],
+          "observation_bits": [
+            3203758439,
+            1063299243,
+            1064514587
+          ],
+          "reward": -4.130920696776119,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -3.3507778644561768,
+          "state": [
+            -4.146960694266691,
+            1.308194027453323
+          ],
+          "observation_bits": [
+            3205048503,
+            1062741997,
+            1067938535
+          ],
+          "reward": -4.382527017909936,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.38042089343070984,
+          "state": [
+            -4.05274067907745,
+            1.884400303784825
+          ],
+          "observation_bits": [
+            3206341380,
+            1061833487,
+            1072772103
+          ],
+          "reward": -4.7347374782242655,
+          "last_torque": -0.38042089343070984,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.6700361371040344,
+          "state": [
+            -3.9238625996472765,
+            2.577561588603478
+          ],
+          "observation_bits": [
+            3207959984,
+            1060402114,
+            1076164293
+          ],
+          "reward": -5.330428637961881,
+          "last_torque": 0.6700361371040344,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.48090776801109314,
+          "state": [
+            -3.772157903103179,
+            3.0340939308819523
+          ],
+          "observation_bits": [
+            3209610511,
+            1058467870,
+            1078079128
+          ],
+          "reward": -6.231017284875602,
+          "last_torque": -0.48090776801109314,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 4.197756767272949,
+          "state": [
+            -3.5833431540232357,
+            3.7762949815988662
+          ],
+          "observation_bits": [
+            3211226330,
+            1054532669,
+            1081192145
+          ],
+          "reward": -7.229831222354161,
+          "last_torque": 2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 3.1492421627044678,
+          "state": [
+            -3.3634963081991773,
+            4.396936916481167
+          ],
+          "observation_bits": [
+            3212425491,
+            1046568572,
+            1082962869
+          ],
+          "reward": -8.719188030954784,
+          "last_torque": 2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.9883394837379456,
+          "state": [
+            -3.142808746219089,
+            4.41375123960177
+          ],
+          "observation_bits": [
+            3212836852,
+            983524682,
+            1082998131
+          ],
+          "reward": -10.458866090523545,
+          "last_torque": -0.9883394837379456,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -2.9683845043182373,
+          "state": [
+            -2.937075580776642,
+            4.114663308848934
+          ],
+          "observation_bits": [
+            3212487213,
+            3192911861,
+            1082370898
+          ],
+          "reward": -11.814084945328688,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.416744589805603,
+          "state": [
+            -2.749584036497901,
+            3.7498308855748195
+          ],
+          "observation_bits": [
+            3211564204,
+            3200490358,
+            1081081147
+          ],
+          "reward": -10.321465546938438,
+          "last_torque": -1.416744589805603,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 3.6203503608703613,
+          "state": [
+            -2.561419196034551,
+            3.763296809267001
+          ],
+          "observation_bits": [
+            3210091568,
+            3205256398,
+            1081137627
+          ],
+          "reward": -8.970335540995166,
+          "last_torque": 2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.5118443965911865,
+          "state": [
+            -2.40514952617383,
+            3.1253933972144194
+          ],
+          "observation_bits": [
+            3208489254,
+            3207328183,
+            1078462066
+          ],
+          "reward": -7.979394258794077,
+          "last_torque": -1.5118443965911865,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 4.910656452178955,
+          "state": [
+            -2.2590669943109836,
+            2.921650637256929
+          ],
+          "observation_bits": [
+            3206716577,
+            3209017458,
+            1077607507
+          ],
+          "reward": -6.765552632179338,
+          "last_torque": 2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.6576883792877197,
+          "state": [
+            -2.137014761314774,
+            2.44104465992419
+          ],
+          "observation_bits": [
+            3205059693,
+            3210218538,
+            1075591699
+          ],
+          "reward": -5.9574204834248885,
+          "last_torque": 0.6576883792877197,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -2.6315414905548096,
+          "state": [
+            -2.0616101134888645,
+            1.508092956518195
+          ],
+          "observation_bits": [
+            3203486712,
+            3210856307,
+            1069615409
+          ],
+          "reward": -5.166701993441671,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.5869730710983276,
+          "state": [
+            -2.0073762770804224,
+            1.0846767281688434
+          ],
+          "observation_bits": [
+            3201859286,
+            3211263213,
+            1066063536
+          ],
+          "reward": -4.480189180259976,
+          "last_torque": 1.5869730710983276,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.6022651195526123,
+          "state": [
+            -1.9751080692417067,
+            0.6453641567743129
+          ],
+          "observation_bits": [
+            3200870887,
+            3211484174,
+            1059403414
+          ],
+          "reward": -4.149779132022396,
+          "last_torque": 1.6022651195526123,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.14607572555541992,
+          "state": [
+            -1.9762207946804604,
+            -0.02225450877507562
+          ],
+          "observation_bits": [
+            3200905205,
+            3211476820,
+            3166064406
+          ],
+          "reward": -3.9427227127876447,
+          "last_torque": 0.14607572555541992,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -2.2090702056884766,
+          "state": [
+            -2.0267935850965393,
+            -1.0114558083215752
+          ],
+          "observation_bits": [
+            3202446999,
+            3211122607,
+            3212932962
+          ],
+          "reward": -3.909498155833542,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.2991819381713867,
+          "state": [
+            -2.1012908481315606,
+            -1.4899452607004244
+          ],
+          "observation_bits": [
+            3204548247,
+            3210530953,
+            3216946823
+          ],
+          "reward": -4.211884395660598,
+          "last_torque": 1.2991819381713867,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.20809176564216614,
+          "state": [
+            -2.209694685783442,
+            -2.168076753037626
+          ],
+          "observation_bits": [
+            3206064094,
+            3209527611,
+            3221930437
+          ],
+          "reward": -4.637460218614896,
+          "last_torque": -0.20809176564216614,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.5328881740570068,
+          "state": [
+            -2.3367051064518587,
+            -2.540208413368336
+          ],
+          "observation_bits": [
+            3207689485,
+            3208151872,
+            3223491270
+          ],
+          "reward": -5.35515603149933,
+          "last_torque": 1.5328881740570068,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.4224027693271637,
+          "state": [
+            -2.487575732379546,
+            -3.0174125185537477
+          ],
+          "observation_bits": [
+            3209374825,
+            3206266559,
+            3225492809
+          ],
+          "reward": -6.1056350569705415,
+          "last_torque": 0.4224027693271637,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -3.787888526916504,
+          "state": [
+            -2.676260582825928,
+            -3.77369700892764
+          ],
+          "observation_bits": [
+            3211052986,
+            3202727571,
+            3228664896
+          ],
+          "reward": -7.102510855226112,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 4.087380409240723,
+          "state": [
+            -2.866772417849543,
+            -3.810236700472302
+          ],
+          "observation_bits": [
+            3212207282,
+            3196776838,
+            3228818155
+          ],
+          "reward": -8.590449618896708,
+          "last_torque": 2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -4.82786750793457,
+          "state": [
+            -3.082460774982519,
+            -4.313767142659515
+          ],
+          "observation_bits": [
+            3212807541,
+            3178369060,
+            3230272097
+          ],
+          "reward": -9.67417446729551,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.892393708229065,
+          "state": [
+            -3.3145582386533556,
+            -4.641949273416737
+          ],
+          "observation_bits": [
+            3212586526,
+            1043348517,
+            3230960345
+          ],
+          "reward": -11.366004279342086,
+          "last_torque": -1.892393708229065,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -3.2863643169403076,
+          "state": [
+            -3.5552017859631913,
+            -4.812870946196714
+          ],
+          "observation_bits": [
+            3211422146,
+            1053673480,
+            3231318794
+          ],
+          "reward": -10.971515977874049,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.5695003271102905,
+          "state": [
+            -3.7925447078604577,
+            -4.74685843794533
+          ],
+          "observation_bits": [
+            3209406045,
+            1058742054,
+            3231180356
+          ],
+          "reward": -9.760730097948695,
+          "last_torque": -1.5695003271102905,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.175147294998169,
+          "state": [
+            -3.9983511233078977,
+            -4.116128308948794
+          ],
+          "observation_bits": [
+            3207046889,
+            1061254940,
+            3229857619
+          ],
+          "reward": -8.457938069249678,
+          "last_torque": 1.175147294998169,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.5083732604980469,
+          "state": [
+            -4.172005100953978,
+            -3.473079552921601
+          ],
+          "observation_bits": [
+            3204690942,
+            1062962651,
+            3227404015
+          ],
+          "reward": -6.914976916773011,
+          "last_torque": 0.5083732604980469,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 2.1609528064727783,
+          "state": [
+            -4.298502406652329,
+            -2.529946113967016
+          ],
+          "observation_bits": [
+            3201165652,
+            1063936626,
+            3223448227
+          ],
+          "reward": -5.667310021441002,
+          "last_torque": 2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.10546266287565231,
+          "state": [
+            -4.39145700697544,
+            -1.8590920064622138
+          ],
+          "observation_bits": [
+            3198255822,
+            1064496602,
+            3220043450
+          ],
+          "reward": -4.579040071976476,
+          "last_torque": -0.10546266287565231,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 3.414979934692383,
+          "state": [
+            -4.433826288365519,
+            -0.8473856278015877
+          ],
+          "observation_bits": [
+            3196897637,
+            1064706482,
+            3210276420
+          ],
+          "reward": -3.928258270832429,
+          "last_torque": 2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.5204929113388062,
+          "state": [
+            -4.451544829280621,
+            -0.35437081830205475
+          ],
+          "observation_bits": [
+            3196324602,
+            1064785687,
+            3199561752
+          ],
+          "reward": -3.4942469195504793,
+          "last_torque": -1.5204929113388062,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.48045021295547485,
+          "state": [
+            -4.4294285202367405,
+            0.4423261808776119
+          ],
+          "observation_bits": [
+            3197039424,
+            1064686038,
+            1055029396
+          ],
+          "reward": -3.367695540382666,
+          "last_torque": 0.48045021295547485,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.0443929061293602,
+          "state": [
+            -4.370970523610869,
+            1.1691599325174313
+          ],
+          "observation_bits": [
+            3198905870,
+            1064384847,
+            1066772232
+          ],
+          "reward": -3.4559814408958225,
+          "last_torque": 0.0443929061293602,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -4.779443264007568,
+          "state": [
+            -4.2921770014759275,
+            1.5758704426988275
+          ],
+          "observation_bits": [
+            3201359705,
+            1063893640,
+            1070183967
+          ],
+          "reward": -3.7972588734691617,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -2.720210552215576,
+          "state": [
+            -4.194145886221652,
+            1.960622305085498
+          ],
+          "observation_bits": [
+            3204292385,
+            1063150213,
+            1073411500
+          ],
+          "reward": -4.216450838788123,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -4.163427829742432,
+          "state": [
+            -4.078538865536625,
+            2.312140413700558
+          ],
+          "observation_bits": [
+            3205995977,
+            1062094296,
+            1075051036
+          ],
+          "reward": -4.752489684826126,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -2.5118021965026855,
+          "state": [
+            -3.947716097973143,
+            2.616455351269628
+          ],
+          "observation_bits": [
+            3207674531,
+            1060682588,
+            1076327425
+          ],
+          "reward": -5.399065262105701,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -4.934122085571289,
+          "state": [
+            -3.8048329981645606,
+            2.8576619961716485
+          ],
+          "observation_bits": [
+            3209280117,
+            1058905287,
+            1077339119
+          ],
+          "reward": -6.143000287860105,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -2.0679171085357666,
+          "state": [
+            -3.653862143016262,
+            3.019417102965973
+          ],
+          "observation_bits": [
+            3210683246,
+            1056634321,
+            1078017569
+          ],
+          "reward": -6.962853376226474,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.2611274719238281,
+          "state": [
+            -3.493968868691764,
+            3.197865486489958
+          ],
+          "observation_bits": [
+            3211805992,
+            1051767999,
+            1078766036
+          ],
+          "reward": -7.826618708385082,
+          "last_torque": -1.2611274719238281,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.468235731124878,
+          "state": [
+            -3.310121489895632,
+            3.676947575922637
+          ],
+          "observation_bits": [
+            3212599174,
+            1043055102,
+            1080775452
+          ],
+          "reward": -8.804518423997202,
+          "last_torque": 1.468235731124878,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 3.4372060298919678,
+          "state": [
+            -3.104984153225218,
+            4.102746733408289
+          ],
+          "observation_bits": [
+            3212825623,
+            3172330041,
+            1082345908
+          ],
+          "reward": -10.195102809441362,
+          "last_torque": 2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.8450989723205566,
+          "state": [
+            -2.907557570993525,
+            3.948531644633859
+          ],
+          "observation_bits": [
+            3212379493,
+            3194845278,
+            1081914558
+          ],
+          "reward": -11.3248938599123,
+          "last_torque": -0.8450989723205566,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.3166848421096802,
+          "state": [
+            -2.7089522701948114,
+            3.9721060159742763
+          ],
+          "observation_bits": [
+            3211291043,
+            3201739385,
+            1082013436
+          ],
+          "reward": -10.014714902577387,
+          "last_torque": 1.3166848421096802,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.19765347242355347,
+          "state": [
+            -2.524587169524674,
+            3.687302013402742
+          ],
+          "observation_bits": [
+            3209743392,
+            3205766868,
+            1080818882
+          ],
+          "reward": -8.91622408930497,
+          "last_torque": 0.19765347242355347,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -2.6927289962768555,
+          "state": [
+            -2.3769193958695296,
+            2.9533554731028917
+          ],
+          "observation_bits": [
+            3208166231,
+            3207674536,
+            1077740487
+          ],
+          "reward": -7.737159990522987,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -3.010749578475952,
+          "state": [
+            -2.270212919295026,
+            2.134129531490071
+          ],
+          "observation_bits": [
+            3206860339,
+            3208897874,
+            1074304404
+          ],
+          "reward": -6.525976669701439,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.4771275818347931,
+          "state": [
+            -2.1957805708537004,
+            1.4886469688265134
+          ],
+          "observation_bits": [
+            3205875737,
+            3209665506,
+            1069452284
+          ],
+          "reward": -5.609545235395758,
+          "last_torque": -0.4771275818347931,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 2.943634510040283,
+          "state": [
+            -2.136759685093479,
+            1.1804177152044257
+          ],
+          "observation_bits": [
+            3205056081,
+            3210220833,
+            1066866669
+          ],
+          "reward": -5.0470592953082285,
+          "last_torque": 2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.9327738285064697,
+          "state": [
+            -2.1023957110439406,
+            0.6872794809907685
+          ],
+          "observation_bits": [
+            3204564231,
+            3210521565,
+            1060106636
+          ],
+          "reward": -4.705950617121788,
+          "last_torque": 0.9327738285064697,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.993220567703247,
+          "state": [
+            -2.085407485587578,
+            0.3397645091272515
+          ],
+          "observation_bits": [
+            3204186411,
+            3210663949,
+            1051587997
+          ],
+          "reward": -4.471275962820442,
+          "last_torque": 1.993220567703247,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 2.3022425174713135,
+          "state": [
+            -2.086062416669174,
+            -0.013098621631911389
+          ],
+          "observation_bits": [
+            3204205537,
+            3210658538,
+            3159792538
+          ],
+          "reward": -4.3644683733009435,
+          "last_torque": 2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.2126529216766357,
+          "state": [
+            -2.1102535120739523,
+            -0.4838219080955635
+          ],
+          "observation_bits": [
+            3204677606,
+            3210454292,
+            3203905409
+          ],
+          "reward": -4.353144090774511,
+          "last_torque": 1.2126529216766357,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -2.5571107864379883,
+          "state": [
+            -2.181619143812754,
+            -1.4273126347760348
+          ],
+          "observation_bits": [
+            3205682081,
+            3209803147,
+            3216421422
+          ],
+          "reward": -4.480578249285764,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.5829646587371826,
+          "state": [
+            -2.2880761245673824,
+            -2.1291396150925648
+          ],
+          "observation_bits": [
+            3207087936,
+            3208702901,
+            3221767123
+          ],
+          "reward": -4.963524072204183,
+          "last_torque": -0.5829646587371826,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.13655847311019897,
+          "state": [
+            -2.4217687894645876,
+            -2.6738532979441048
+          ],
+          "observation_bits": [
+            3208674803,
+            3207120065,
+            3224051818
+          ],
+          "reward": -5.688634550088463,
+          "last_torque": 0.13655847311019897,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -4.888876914978027,
+          "state": [
+            -2.595183413428695,
+            -3.468292479282147
+          ],
+          "observation_bits": [
+            3210394032,
+            3204777470,
+            3227383937
+          ],
+          "reward": -6.583913215707421,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -2.044954299926758,
+          "state": [
+            -2.8030838869571215,
+            -4.158009470568533
+          ],
+          "observation_bits": [
+            3211884772,
+            3198813824,
+            3229945450
+          ],
+          "reward": -7.941882221709911,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.407317042350769,
+          "state": [
+            -3.0339922700544197,
+            -4.618167661945967
+          ],
+          "observation_bits": [
+            3212739836,
+            3185307852,
+            3230910472
+          ],
+          "reward": -9.588164094326357,
+          "last_torque": -1.407317042350769,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -4.896596431732178,
+          "state": [
+            -3.2839278859135206,
+            -4.998712317182016
+          ],
+          "observation_bits": [
+            3212667203,
+            1041318520,
+            3231708532
+          ],
+          "reward": -11.34185635032431,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.6216740012168884,
+          "state": [
+            -3.5238813800453084,
+            -4.799069882635754
+          ],
+          "observation_bits": [
+            3211625772,
+            1052704704,
+            3231289851
+          ],
+          "reward": -11.494644040597386,
+          "last_torque": 0.6216740012168884,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.48902586102485657,
+          "state": [
+            -3.7461779943178923,
+            -4.44593228545168
+          ],
+          "observation_bits": [
+            3209862899,
+            1058112521,
+            3230549268
+          ],
+          "reward": -9.917104482446634,
+          "last_torque": 0.48902586102485657,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -4.105164051055908,
+          "state": [
+            -3.9621588222435786,
+            -4.31961655851373
+          ],
+          "observation_bits": [
+            3207498474,
+            1060849070,
+            3230284365
+          ],
+          "reward": -8.417037494385863,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -2.5076849460601807,
+          "state": [
+            -4.165707201489809,
+            -4.070967584924608
+          ],
+          "observation_bits": [
+            3204781376,
+            1062908008,
+            3229762910
+          ],
+          "reward": -7.2570726652229895,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 4.042858123779297,
+          "state": [
+            -4.322221047588193,
+            -3.13027692196768
+          ],
+          "observation_bits": [
+            3200433258,
+            1064092328,
+            3225966197
+          ],
+          "reward": -6.144991236016247,
+          "last_torque": 2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.6173641681671143,
+          "state": [
+            -4.448683429921131,
+            -2.529247646658755
+          ],
+          "observation_bits": [
+            3196417331,
+            1064773240,
+            3223445298
+          ],
+          "reward": -4.825625326740139,
+          "last_torque": -0.6173641681671143,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -2.3954596519470215,
+          "state": [
+            -4.553942160232948,
+            -2.1051746062363517
+          ],
+          "observation_bits": [
+            3189871182,
+            1065143057,
+            3221666606
+          ],
+          "reward": -4.009106503667672,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 3.62684965133667,
+          "state": [
+            -4.607170632707511,
+            -1.0645694494912712
+          ],
+          "observation_bits": [
+            3184989948,
+            1065260432,
+            3213378512
+          ],
+          "reward": -3.4374578737261405,
+          "last_torque": 2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.44328436255455017,
+          "state": [
+            -4.626431125777719,
+            -0.3852098614041535
+          ],
+          "observation_bits": [
+            3182416690,
+            1065291273,
+            3200596538
+          ],
+          "reward": -2.922552501369889,
+          "last_torque": -0.44328436255455017,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.2534853219985962,
+          "state": [
+            -4.598928932467727,
+            0.5500438661998405
+          ],
+          "observation_bits": [
+            3186089522,
+            1065245344,
+            1057804205
+          ],
+          "reward": -2.761244306792941,
+          "last_torque": 1.2534853219985962,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 4.038509368896484,
+          "state": [
+            -4.519167852504528,
+            1.5952215992639824
+          ],
+          "observation_bits": [
+            3192168748,
+            1065041005,
+            1070346297
+          ],
+          "reward": -2.8709743614219314,
+          "last_torque": 2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.44977548718452454,
+          "state": [
+            -4.39923130119863,
+            2.3987310261179555
+          ],
+          "observation_bits": [
+            3198007962,
+            1064537265,
+            1075414223
+          ],
+          "reward": -3.3664330734638503,
+          "last_torque": 0.44977548718452454,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -3.424879789352417,
+          "state": [
+            -4.2586185419044496,
+            2.8122551858836156
+          ],
+          "observation_bits": [
+            3202379877,
+            1063655373,
+            1077148669
+          ],
+          "reward": -4.128673750407772,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 2.1392781734466553,
+          "state": [
+            -4.069300756548228,
+            3.7863557071244314
+          ],
+          "observation_bits": [
+            3206120435,
+            1062001928,
+            1081234343
+          ],
+          "reward": -4.89374851029955,
+          "last_torque": 2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 4.355076313018799,
+          "state": [
+            -3.8349736838378514,
+            4.686541454207527
+          ],
+          "observation_bits": [
+            3208962828,
+            1059299009,
+            1083570214
+          ],
+          "reward": -6.338933757801577,
+          "last_torque": 2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.8167411684989929,
+          "state": [
+            -3.5828043768002753,
+            5.0433861407515215
+          ],
+          "observation_bits": [
+            3211230192,
+            1054516324,
+            1084318571
+          ],
+          "reward": -8.19077429906304,
+          "last_torque": -0.8167411684989929,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.6174286603927612,
+          "state": [
+            -3.3024905253318995,
+            5.60627702936752
+          ],
+          "observation_bits": [
+            3212620167,
+            1042549929,
+            1085499039
+          ],
+          "reward": -9.838247621194721,
+          "last_torque": 1.6174286603927612,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 3.7426931858062744,
+          "state": [
+            -3.0011690033976413,
+            6.026430438685165
+          ],
+          "observation_bits": [
+            3212671722,
+            3188675164,
+            1086380165
+          ],
+          "reward": -12.03157559572541,
+          "last_torque": 2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -3.4387166500091553,
+          "state": [
+            -2.7200960792373654,
+            5.6214584832055206
+          ],
+          "observation_bits": [
+            3211368483,
+            3201399047,
+            1085530877
+          ],
+          "reward": -12.642801770375888,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 2.824603796005249,
+          "state": [
+            -2.4393653988796444,
+            5.614613607154415
+          ],
+          "observation_bits": [
+            3208867466,
+            3206896380,
+            1085516522
+          ],
+          "reward": -10.56300222831281,
+          "last_torque": 2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.2615664303302765,
+          "state": [
+            -2.184818451310925,
+            5.0909389513743895
+          ],
+          "observation_bits": [
+            3205726001,
+            3209772292,
+            1084418297
+          ],
+          "reward": -9.102960562016474,
+          "last_torque": -0.2615664303302765,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.5258846879005432,
+          "state": [
+            -1.9569775153047864,
+            4.556818720122774
+          ],
+          "observation_bits": [
+            3200309438,
+            3211601292,
+            1083298165
+          ],
+          "reward": -7.365474160575898,
+          "last_torque": 0.5258846879005432,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 4.242513179779053,
+          "state": [
+            -1.7488748610524651,
+            4.162053085046424
+          ],
+          "observation_bits": [
+            3191170017,
+            3212571547,
+            1082470282
+          ],
+          "reward": -5.9102206804046205,
+          "last_torque": 2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 3.131539821624756,
+          "state": [
+            -1.5626791771343458,
+            3.723913678362388
+          ],
+          "observation_bits": [
+            1006959979,
+            3212836311,
+            1080972442
+          ],
+          "reward": -4.794831868085716,
+          "last_torque": 2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -3.6606688499450684,
+          "state": [
+            -1.4289822578207856,
+            2.673938386271204
+          ],
+          "observation_bits": [
+            1041283897,
+            3212668441,
+            1076568526
+          ],
+          "reward": -3.832719519228715,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.8523412346839905,
+          "state": [
+            -1.3388014438985971,
+            1.803616278443771
+          ],
+          "observation_bits": [
+            1047228415,
+            3212387397,
+            1072094438
+          ],
+          "reward": -2.7577114281489647,
+          "last_torque": -0.8523412346839905,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.757789969444275,
+          "state": [
+            -1.271932568108514,
+            1.3373775158016588
+          ],
+          "observation_bits": [
+            1050066975,
+            3212093158,
+            1068183344
+          ],
+          "reward": -2.1207823000272725,
+          "last_torque": 1.757789969444275,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 3.1172101497650146,
+          "state": [
+            -1.2259013793670697,
+            0.9206237748288866
+          ],
+          "observation_bits": [
+            1051532072,
+            3211848870,
+            1064021504
+          ],
+          "reward": -1.8006703199822913,
+          "last_torque": 2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -3.3927929401397705,
+          "state": [
+            -1.230161852219791,
+            -0.08520945705442728
+          ],
+          "observation_bits": [
+            1051397430,
+            3211872894,
+            3182330444
+          ],
+          "reward": -1.5915890056020927,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 2.0125527381896973,
+          "state": [
+            -1.2547676833239405,
+            -0.4921166220829894
+          ],
+          "observation_bits": [
+            1050615919,
+            3212006009,
+            3204183734
+          ],
+          "reward": -1.5180242480039678,
+          "last_torque": 2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.18919211626052856,
+          "state": [
+            -1.3135974680032976,
+            -1.1765956935871391
+          ],
+          "observation_bits": [
+            1048722719,
+            3212284999,
+            3214318256
+          ],
+          "reward": -1.5986956097459193,
+          "last_torque": 0.18919211626052856,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -4.222419261932373,
+          "state": [
+            -1.4236937391121192,
+            -2.2019254221764317
+          ],
+          "observation_bits": [
+            1041635107,
+            3212655669,
+            3222072409
+          ],
+          "reward": -1.8679760507514445,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.1945711374282837,
+          "state": [
+            -1.5694257233472215,
+            -2.9146396847020464
+          ],
+          "observation_bits": [
+            984851918,
+            3212836848,
+            3225061749
+          ],
+          "reward": -2.511789277197696,
+          "last_torque": 0.1945711374282837,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.5119789838790894,
+          "state": [
+            -1.7564975147385387,
+            -3.741435827826341
+          ],
+          "observation_bits": [
+            3191673125,
+            3212548414,
+            3228529583
+          ],
+          "reward": -3.3128716727528094,
+          "last_torque": -0.5119789838790894,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.5614694356918335,
+          "state": [
+            -1.9846355904442363,
+            -4.5627615141139515
+          ],
+          "observation_bits": [
+            3201164198,
+            3211420594,
+            3230794276
+          ],
+          "reward": -4.485432972604503,
+          "last_torque": -0.5614694356918335,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -2.324509859085083,
+          "state": [
+            -2.2621080549421535,
+            -5.549449289958346
+          ],
+          "observation_bits": [
+            3206755934,
+            3208984989,
+            3232863511
+          ],
+          "reward": -6.024657690515877,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.3478881120681763,
+          "state": [
+            -2.5785800701279737,
+            -6.329440303716401
+          ],
+          "observation_bits": [
+            3210247318,
+            3205014256,
+            3234499270
+          ],
+          "reward": -8.198588396841402,
+          "last_torque": -1.3478881120681763,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 2.618762731552124,
+          "state": [
+            -2.9000671932024753,
+            -6.429742461490027
+          ],
+          "observation_bits": [
+            3212349893,
+            3195333804,
+            3234709619
+          ],
+          "reward": -10.659256634082134,
+          "last_torque": 2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.5771480798721313,
+          "state": [
+            -3.2423523304322415,
+            -6.8457027445953225
+          ],
+          "observation_bits": [
+            3212751771,
+            1036911039,
+            3235581951
+          ],
+          "reward": -12.547035933320954,
+          "last_torque": -1.5771480798721313,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 3.5884032249450684,
+          "state": [
+            -3.5658653700599108,
+            -6.470260792553385
+          ],
+          "observation_bits": [
+            3211349369,
+            1054000345,
+            3234794592
+          ],
+          "reward": -13.937029799400097,
+          "last_torque": 2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 2.020627021789551,
+          "state": [
+            -3.8589412313392226,
+            -5.86151722558624
+          ],
+          "observation_bits": [
+            3208702142,
+            1059605157,
+            3233517965
+          ],
+          "reward": -11.574255113223426,
+          "last_torque": 2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 2.523819923400879,
+          "state": [
+            -4.112365005039044,
+            -5.068475473996431
+          ],
+          "observation_bits": [
+            3205533109,
+            1062422607,
+            3231854835
+          ],
+          "reward": -9.316697758021508,
+          "last_torque": 2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.973482608795166,
+          "state": [
+            -4.342140320410804,
+            -4.595506307435202
+          ],
+          "observation_bits": [
+            3199812619,
+            1064216348,
+            3230862947
+          ],
+          "reward": -7.282352815627634,
+          "last_torque": -0.973482608795166,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -3.2727596759796143,
+          "state": [
+            -4.551956733376338,
+            -4.196328259310681
+          ],
+          "observation_bits": [
+            3190002732,
+            1065137768,
+            3230025810
+          ],
+          "reward": -5.883523463017884,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -4.903279781341553,
+          "state": [
+            -4.739754709104345,
+            -3.755959514560135
+          ],
+          "observation_bits": [
+            1021322990,
+            1065346934,
+            3228590500
+          ],
+          "reward": -4.76206946093176,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.9295659065246582,
+          "state": [
+            -4.8970384698133,
+            -3.1456752141790956
+          ],
+          "observation_bits": [
+            1044120105,
+            1065068014,
+            3226030782
+          ],
+          "reward": -3.793765291360847,
+          "last_torque": -0.9295659065246582,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.34318605065345764,
+          "state": [
+            -5.020033601022178,
+            -2.459902624177585
+          ],
+          "observation_bits": [
+            1050348167,
+            1064565517,
+            3223154443
+          ],
+          "reward": -2.9110480867186768,
+          "last_torque": -0.34318605065345764,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.1492255926132202,
+          "state": [
+            -5.115908569264305,
+            -1.917499364842541
+          ],
+          "observation_bits": [
+            1053362797,
+            1064005749,
+            3220533407
+          ],
+          "reward": -2.2019850442980498,
+          "last_torque": -1.1492255926132202,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -3.9659533500671387,
+          "state": [
+            -5.192295361273415,
+            -1.5277358401821948
+          ],
+          "observation_bits": [
+            1055679344,
+            1063458031,
+            3217263833
+          ],
+          "reward": -1.7342153644852845,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -4.565737724304199,
+          "state": [
+            -5.250418222648218,
+            -1.1624572274960523
+          ],
+          "observation_bits": [
+            1057173395,
+            1062982935,
+            3214199654
+          ],
+          "reward": -1.4274385540068781,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 3.7762210369110107,
+          "state": [
+            -5.261339074551636,
+            -0.21841703806837542
+          ],
+          "observation_bits": [
+            1057330215,
+            1062888187,
+            3193940151
+          ],
+          "reward": -1.2057385316571931,
+          "last_torque": 2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.091434121131897,
+          "state": [
+            -5.2484554517443405,
+            0.257672456145921
+          ],
+          "observation_bits": [
+            1057145101,
+            1062999782,
+            1048833445
+          ],
+          "reward": -1.0501315517831182,
+          "last_torque": -1.091434121131897,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 3.676062822341919,
+          "state": [
+            -5.188332163588546,
+            1.2024657631158833
+          ],
+          "observation_bits": [
+            1055561261,
+            1063488613,
+            1067051622
+          ],
+          "reward": -1.0813053833846615,
+          "last_torque": 2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 3.3293843269348145,
+          "state": [
+            -5.0798765889756154,
+            2.1691114922586188
+          ],
+          "observation_bits": [
+            1052242557,
+            1064233050,
+            1074451129
+          ],
+          "reward": -1.3472957973677586,
+          "last_torque": 2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.7464880347251892,
+          "state": [
+            -4.930826119688264,
+            2.9810093857470177
+          ],
+          "observation_bits": [
+            1046341554,
+            1064954544,
+            1077856476
+          ],
+          "reward": -1.9190135822966061,
+          "last_torque": 0.7464880347251892,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 3.6423392295837402,
+          "state": [
+            -4.730166750906104,
+            4.013187375643203
+          ],
+          "observation_bits": [
+            1016176825,
+            1065350565,
+            1082158088
+          ],
+          "reward": -2.7215170679733593,
+          "last_torque": 2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 4.5184102058410645,
+          "state": [
+            -4.47701330788896,
+            5.063068860342874
+          ],
+          "observation_bits": [
+            3194932777,
+            1064890614,
+            1084359849
+          ],
+          "reward": -4.026433927521959,
+          "last_torque": 2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.3709161281585693,
+          "state": [
+            -4.17711198950653,
+            5.998026367648604
+          ],
+          "observation_bits": [
+            3204617359,
+            1063006543,
+            1086320597
+          ],
+          "reward": -5.827603330529916,
+          "last_torque": 1.3709161281585693,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -4.971965789794922,
+          "state": [
+            -3.859955894563185,
+            6.343121898866899
+          ],
+          "observation_bits": [
+            3208690945,
+            1059617979,
+            1087044315
+          ],
+          "reward": -8.037176850305174,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.4097269773483276,
+          "state": [
+            -3.5075461001701838,
+            7.048195887860027
+          ],
+          "observation_bits": [
+            3211725927,
+            1052194502,
+            1088522962
+          ],
+          "reward": -9.897547658940397,
+          "last_torque": 1.4097269773483276,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.06663795560598373,
+          "state": [
+            -3.1422170990804696,
+            7.3065800217942805
+          ],
+          "observation_bits": [
+            3212836861,
+            975417811,
+            1089064833
+          ],
+          "reward": -12.671883975469916,
+          "last_torque": -0.06663795560598373,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 2.9071707725524902,
+          "state": [
+            -2.761864681286377,
+            7.607048355881851
+          ],
+          "observation_bits": [
+            3211641747,
+            3200108589,
+            1089694961
+          ],
+          "reward": -15.208292445967695,
+          "last_torque": 2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.4087035655975342,
+          "state": [
+            -2.4059775833828634,
+            7.117741958070275
+          ],
+          "observation_bits": [
+            3208498581,
+            3207317887,
+            1088668811
+          ],
+          "reward": -13.416599432453424,
+          "last_torque": -1.4087035655975342,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.934470295906067,
+          "state": [
+            -2.060746081965485,
+            6.9046300283475714
+          ],
+          "observation_bits": [
+            3203461137,
+            3210863134,
+            1088221883
+          ],
+          "reward": -10.858695365317821,
+          "last_torque": 1.934470295906067,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.3489586114883423,
+          "state": [
+            -1.7587201393328111,
+            6.040518852653479
+          ],
+          "observation_bits": [
+            3191819687,
+            3212541488,
+            1086409710
+          ],
+          "reward": -9.015885686697288,
+          "last_torque": -1.3489586114883423,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.8400495052337646,
+          "state": [
+            -1.487233608841441,
+            5.4297306098274
+          ],
+          "observation_bits": [
+            1034612726,
+            3212778323,
+            1085128794
+          ],
+          "reward": -6.7425890126174615,
+          "last_torque": 0.8400495052337646,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.4831606149673462,
+          "state": [
+            -1.2567399329828874,
+            4.609873517171072
+          ],
+          "observation_bits": [
+            1050552999,
+            3212016262,
+            1083409429
+          ],
+          "reward": -5.160294700993256,
+          "last_torque": -0.4831606149673462,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -2.892512559890747,
+          "state": [
+            -1.076912068386298,
+            3.596557291931788
+          ],
+          "observation_bits": [
+            1056093855,
+            3210831956,
+            1080438271
+          ],
+          "reward": -3.708488643775341,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.796891212463379,
+          "state": [
+            -0.9435795694295378,
+            2.6666499791352054
+          ],
+          "observation_bits": [
+            1058422440,
+            3209643558,
+            1076537957
+          ],
+          "reward": -2.4564908565172443,
+          "last_torque": -1.796891212463379,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -4.362032413482666,
+          "state": [
+            -0.8556094745729266,
+            1.7594018971322236
+          ],
+          "observation_bits": [
+            1059577802,
+            3208725955,
+            1071723541
+          ],
+          "reward": -1.6054446151570012,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.23674476146698,
+          "state": [
+            -0.7866751964705722,
+            1.378685562047088
+          ],
+          "observation_bits": [
+            1060424124,
+            3207938071,
+            1068529861
+          ],
+          "reward": -1.0431466141491907,
+          "last_torque": 1.23674476146698,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 3.9225621223449707,
+          "state": [
+            -0.7292912634847438,
+            1.147678659716566
+          ],
+          "observation_bits": [
+            1061085878,
+            3207239001,
+            1066592034
+          ],
+          "reward": -0.8129352528317124,
+          "last_torque": 2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.9547291398048401,
+          "state": [
+            -0.6897346618733158,
+            0.7911320322285611
+          ],
+          "observation_bits": [
+            1061518194,
+            3206735536,
+            1061848993
+          ],
+          "reward": -0.6644938853475731,
+          "last_torque": 0.9547291398048401,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -3.2992613315582275,
+          "state": [
+            -0.6890405297185397,
+            0.01388264309552123
+          ],
+          "observation_bits": [
+            1061525602,
+            3206726550,
+            1013150727
+          ],
+          "reward": -0.5423228932212963,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.3809882402420044,
+          "state": [
+            -0.7093313695761381,
+            -0.4058167971519666
+          ],
+          "observation_bits": [
+            1061306510,
+            3206987094,
+            3201287992
+          ],
+          "reward": -0.47494127640930367,
+          "last_torque": 0.3809882402420044,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -2.4012348651885986,
+          "state": [
+            -0.7690469554911179,
+            -1.1943117182995955
+          ],
+          "observation_bits": [
+            1060631668,
+            3207727375,
+            3214466869
+          ],
+          "reward": -0.523619719339818,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.1647708415985107,
+          "state": [
+            -0.8635777247841518,
+            -1.8906153858606793
+          ],
+          "observation_bits": [
+            1059476525,
+            3208813217,
+            3220307887
+          ],
+          "reward": -0.7354279590354008,
+          "last_torque": -1.1647708415985107,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -4.974789619445801,
+          "state": [
+            -1.0016149421791163,
+            -2.7607443478992906
+          ],
+          "observation_bits": [
+            1057617958,
+            3210191809,
+            3224416265
+          ],
+          "reward": -1.107209140658675,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 4.590175628662109,
+          "state": [
+            -1.1562400012284992,
+            -3.092501180987659
+          ],
+          "observation_bits": [
+            1053702576,
+            3211415752,
+            3225807754
+          ],
+          "reward": -1.7694034280322517,
+          "last_torque": 2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.2292168289422989,
+          "state": [
+            -1.343469500854205,
+            -3.7445899925141135
+          ],
+          "observation_bits": [
+            1046923373,
+            3212405225,
+            3228542813
+          ],
+          "reward": -2.2932998362375687,
+          "last_torque": 0.2292168289422989,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.715117871761322,
+          "state": [
+            -1.5618708293047876,
+            -4.36802656901165
+          ],
+          "observation_bits": [
+            1007827905,
+            3212836196,
+            3230385888
+          ],
+          "reward": -3.2076171145204277,
+          "last_torque": 0.715117871761322,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -4.052894592285156,
+          "state": [
+            -1.8327706640558092,
+            -5.417996695020433
+          ],
+          "observation_bits": [
+            3196361236,
+            3212264434,
+            3232587835
+          ],
+          "reward": -4.351406098382384,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -3.6822762489318848,
+          "state": [
+            -2.1548910187288737,
+            -6.442407093461283
+          ],
+          "observation_bits": [
+            3205311350,
+            3210055397,
+            3234736179
+          ],
+          "reward": -6.298517125938796,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 3.82195782661438,
+          "state": [
+            -2.49329431045415,
+            -6.7680658345055225
+          ],
+          "observation_bits": [
+            3209432976,
+            3206190249,
+            3235419135
+          ],
+          "reward": -8.798016218576379,
+          "last_torque": 2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 3.4590487480163574,
+          "state": [
+            -2.8393412597567944,
+            -6.920938986052885
+          ],
+          "observation_bits": [
+            3212076332,
+            3197659198,
+            3235739733
+          ],
+          "reward": -10.80118803275312,
+          "last_torque": 2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.7364684343338013,
+          "state": [
+            -3.1835273315499903,
+            -6.883721435863921
+          ],
+          "observation_bits": [
+            3212822115,
+            1026275023,
+            3235661682
+          ],
+          "reward": -12.85481375706754,
+          "last_torque": 1.7364684343338013,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.9493365287780762,
+          "state": [
+            -3.511521289806153,
+            -6.559879165123249
+          ],
+          "observation_bits": [
+            3211701938,
+            1052318960,
+            3234982536
+          ],
+          "reward": -14.350241559759652,
+          "last_torque": 1.9493365287780762,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 4.31513786315918,
+          "state": [
+            -3.8109571644384195,
+            -5.9887174926453275
+          ],
+          "observation_bits": [
+            3209216612,
+            1058986057,
+            3233784723
+          ],
+          "reward": -11.989322891494442,
+          "last_torque": 2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.7633366584777832,
+          "state": [
+            -4.073899723450353,
+            -5.258851180238674
+          ],
+          "observation_bits": [
+            3206058584,
+            1062048055,
+            3232254082
+          ],
+          "reward": -9.701495066821503,
+          "last_torque": 1.7633366584777832,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.0150916576385498,
+          "state": [
+            -4.299116705614359,
+            -4.504339643280121
+          ],
+          "observation_bits": [
+            3201146777,
+            1063940768,
+            3230671757
+          ],
+          "reward": -7.647524775285607,
+          "last_torque": 1.0150916576385498,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -3.5155656337738037,
+          "state": [
+            -4.504990754438242,
+            -4.117480976477667
+          ],
+          "observation_bits": [
+            3193101126,
+            1064993680,
+            3229860455
+          ],
+          "reward": -5.969435778109476,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -2.7053277492523193,
+          "state": [
+            -4.689168429409044,
+            -3.683553499416038
+          ],
+          "observation_bits": [
+            3166581926,
+            1065348693,
+            3228286807
+          ],
+          "reward": -4.861340826754528,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -2.8089120388031006,
+          "state": [
+            -4.850856213812856,
+            -3.2337556880762386
+          ],
+          "observation_bits": [
+            1041061497,
+            1065192637,
+            3226400218
+          ],
+          "reward": -3.9017464451133517,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -4.563650608062744,
+          "state": [
+            -4.990402921218279,
+            -2.7909341481084673
+          ],
+          "observation_bits": [
+            1049396285,
+            1064709011,
+            3224542890
+          ],
+          "reward": -3.101284216911293,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.8622939586639404,
+          "state": [
+            -5.1003567432682635,
+            -2.199076440999693
+          ],
+          "observation_bits": [
+            1052881302,
+            1064106330,
+            3222060459
+          ],
+          "reward": -2.45096119030654,
+          "last_torque": -0.8622939586639404,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -4.540390491485596,
+          "state": [
+            -5.190597573478133,
+            -1.8048166041973888
+          ],
+          "observation_bits": [
+            1055628788,
+            1063471160,
+            3219588155
+          ],
+          "reward": -1.8866771311304995,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 4.083413600921631,
+          "state": [
+            -5.232545126181876,
+            -0.8389510540748537
+          ],
+          "observation_bits": [
+            1056864469,
+            1063134288,
+            3210134911
+          ],
+          "reward": -1.5234842535035273,
+          "last_torque": 2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.2296943664550781,
+          "state": [
+            -5.232729661761454,
+            -0.0036907115915683075
+          ],
+          "observation_bits": [
+            1056869842,
+            1063132749,
+            3144802270
+          ],
+          "reward": -1.1757408253413502,
+          "last_torque": 1.2296943664550781,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.6645996570587158,
+          "state": [
+            -5.212861825933383,
+            0.39735671656140664
+          ],
+          "observation_bits": [
+            1056288166,
+            1063295587,
+            1053520471
+          ],
+          "reward": -1.1062293172376154,
+          "last_torque": -1.6645996570587158,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -2.354201316833496,
+          "state": [
+            -5.175093148746785,
+            0.7553735437319544
+          ],
+          "observation_bits": [
+            1055165069,
+            1063589070,
+            1061249065
+          ],
+          "reward": -1.165381590716627,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 2.3728978633880615,
+          "state": [
+            -5.088767644846629,
+            1.7265100780031168
+          ],
+          "observation_bits": [
+            1052520493,
+            1064178841,
+            1071447624
+          ],
+          "reward": -1.2889271508272708,
+          "last_torque": 2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 3.983429431915283,
+          "state": [
+            -4.95256707454005,
+            2.7240114061315888
+          ],
+          "observation_bits": [
+            1047762346,
+            1064871637,
+            1076778548
+          ],
+          "reward": -1.7287172572275482,
+          "last_torque": 2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 4.948351860046387,
+          "state": [
+            -4.7649429182584875,
+            3.7524831256312536
+          ],
+          "observation_bits": [
+            1029122415,
+            1065330053,
+            1081092271
+          ],
+          "reward": -2.516568695296253,
+          "last_torque": 2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -4.159357070922852,
+          "state": [
+            -4.554870535991226,
+            4.201447645345234
+          ],
+          "observation_bits": [
+            3189809656,
+            1065145507,
+            1082552898
+          ],
+          "reward": -3.7171729125215647,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.5472564697265625,
+          "state": [
+            -4.311866842238322,
+            4.860073875058069
+          ],
+          "observation_bits": [
+            3200753887,
+            1064025426,
+            1083934138
+          ],
+          "reward": -4.752587669615054,
+          "last_torque": -0.5472564697265625,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 4.7316131591796875,
+          "state": [
+            -4.019330990799652,
+            5.8507170287733885
+          ],
+          "observation_bits": [
+            3206778488,
+            1061482643,
+            1086011667
+          ],
+          "reward": -6.252128297510568,
+          "last_torque": 2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 0.8713734745979309,
+          "state": [
+            -3.691411242356859,
+            6.55839496885586
+          ],
+          "observation_bits": [
+            3210364227,
+            1057342642,
+            1087495775
+          ],
+          "reward": -8.548884632623588,
+          "last_torque": 0.8713734745979309,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 3.0071256160736084,
+          "state": [
+            -3.32889652280884,
+            7.25029439096038
+          ],
+          "observation_bits": [
+            3212543428,
+            1044295166,
+            1088946793
+          ],
+          "reward": -11.0225472600291,
+          "last_torque": 2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.1489676237106323,
+          "state": [
+            -2.9680161626436226,
+            7.217607203304345
+          ],
+          "observation_bits": [
+            3212584759,
+            3190872549,
+            1088878243
+          ],
+          "reward": -13.98581922371722,
+          "last_torque": -1.1489676237106323,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 3.748492479324341,
+          "state": [
+            -2.5986122847728645,
+            7.388077557415159
+          ],
+          "observation_bits": [
+            3210423840,
+            3204728268,
+            1089235746
+          ],
+          "reward": -14.02250531602284,
+          "last_torque": 2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 4.648018836975098,
+          "state": [
+            -2.233584281626354,
+            7.30056006293021
+          ],
+          "observation_bits": [
+            3206382953,
+            3209284789,
+            1089052208
+          ],
+          "reward": -12.215154806200593,
+          "last_torque": 2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -2.315248966217041,
+          "state": [
+            -1.9131167717838735,
+            6.409350196849606
+          ],
+          "observation_bits": [
+            3198934384,
+            3211863421,
+            1087183206
+          ],
+          "reward": -10.322716466563461,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -1.6614091396331787,
+          "state": [
+            -1.6404340157547468,
+            5.4536551205825345
+          ],
+          "observation_bits": [
+            3180232884,
+            3212796201,
+            1085178968
+          ],
+          "reward": -7.770753057455696,
+          "last_torque": -1.6614091396331787,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -0.8146423697471619,
+          "state": [
+            -1.4112701876938842,
+            4.58327656121725
+          ],
+          "observation_bits": [
+            1042459053,
+            3212623838,
+            1083353652
+          ],
+          "reward": -5.66592281966032,
+          "last_torque": -0.8146423697471619,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 4.626801013946533,
+          "state": [
+            -1.2041302096531477,
+            4.142799560814731
+          ],
+          "observation_bits": [
+            1052216829,
+            3211721645,
+            1082429904
+          ],
+          "reward": -4.096325946523863,
+          "last_torque": 2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": -4.328979015350342,
+          "state": [
+            -1.0469975220710293,
+            3.14265375164237
+          ],
+          "observation_bits": [
+            1056967514,
+            3210587465,
+            1078534461
+          ],
+          "reward": -3.1702083820979956,
+          "last_torque": -2.0,
+          "terminated": false,
+          "truncated": false
+        },
+        {
+          "action": 1.0685230493545532,
+          "state": [
+            -0.9143231127668572,
+            2.653488186083441
+          ],
+          "observation_bits": [
+            1058815586,
+            3209349714,
+            1076482752
+          ],
+          "reward": -2.084972813016649,
+          "last_torque": 1.0685230493545532,
+          "terminated": false,
+          "truncated": false
+        }
+      ]
+    }
+  ]
+}

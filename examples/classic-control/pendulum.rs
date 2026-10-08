@@ -97,43 +97,32 @@ use bevy as _;
 #[cfg(feature = "bevy-mcp")]
 use bevy_brp_extras as _;
 use burn as _;
+use serde as _;
 use serde_json as _;
 
-/// `MAX_SPEED` used by this example.
+/// Angular-velocity observation scale, in radians per second.
 const MAX_SPEED: f32 = 8.0;
-/// `MAX_TORQUE` used by this example.
+/// Source torque limit, in newton metres, used by the arrow renderer.
+#[cfg(feature = "render")]
 const MAX_TORQUE: f32 = 2.0;
-/// `TIME_STEP` used by this example.
-const TIME_STEP: f32 = 0.05;
-/// `GRAVITY` used by this example.
-const GRAVITY: f32 = 10.0;
-/// `MASS` used by this example.
-const MASS: f32 = 1.0;
-/// `LENGTH` used by this example.
-const LENGTH: f32 = 1.0;
-/// `MAX_EPISODE_STEPS` used by this example.
+/// Default external episode cap.
 const MAX_EPISODE_STEPS: usize = 200;
 
-/// Exact default Gymnasium Pendulum-v1 dynamics.
+/// Native workflow adapter around the shared Gymnasium dynamics.
 #[derive(Debug, Clone)]
 struct Pendulum {
-    /// Unwrapped angle and angular velocity.
-    state: [f32; 2],
-    /// Last clipped torque for rendering.
-    last_torque: Option<f32>,
-    /// Current episode transition count.
-    elapsed_steps: usize,
-    /// Deterministic reset generator.
-    rng: SplitMix64,
+    /// Original dynamics with the external 200-transition limit.
+    inner: bevy_gym::TimeLimit<bevy_gym::environments::Pendulum>,
 }
 
 impl Default for Pendulum {
     fn default() -> Self {
         Self {
-            state: [std::f32::consts::PI, 0.0],
-            last_torque: None,
-            elapsed_steps: 0,
-            rng: SplitMix64::new(0),
+            inner: bevy_gym::TimeLimit::new(
+                bevy_gym::environments::Pendulum::default(),
+                MAX_EPISODE_STEPS,
+            )
+            .expect("positive episode cap"),
         }
     }
 }
@@ -141,18 +130,16 @@ impl Default for Pendulum {
 impl Pendulum {
     /// Construct one controlled state for transition tests.
     #[cfg(test)]
-    const fn from_state(angle: f32, angular_velocity: f32) -> Self {
+    fn from_state(angle: f64, angular_velocity: f64) -> Self {
+        let state = bevy_gym::environments::PendulumState::try_from([angle, angular_velocity])
+            .expect("finite diagnostic state");
         Self {
-            state: [angle, angular_velocity],
-            last_torque: None,
-            elapsed_steps: 0,
-            rng: SplitMix64::new(0),
+            inner: bevy_gym::TimeLimit::new(
+                bevy_gym::environments::Pendulum::from_state(state),
+                MAX_EPISODE_STEPS,
+            )
+            .expect("positive episode cap"),
         }
-    }
-
-    /// Return Gymnasium's observable cosine, sine, and angular velocity.
-    fn observation(&self) -> Vec<f32> {
-        vec![self.state[0].cos(), self.state[0].sin(), self.state[1]]
     }
 }
 
@@ -162,59 +149,25 @@ impl Env for Pendulum {
     type Info = ();
 
     fn reset(&mut self, seed: Option<u64>) -> Reset<Self::Observation, Self::Info> {
-        if let Some(seed) = seed {
-            self.rng = SplitMix64::new(seed);
-        }
-        self.state = [
-            self.rng
-                .f32_between(-std::f32::consts::PI, std::f32::consts::PI),
-            self.rng.f32_between(-1.0, 1.0),
-        ];
-        self.last_torque = None;
-        self.elapsed_steps = 0;
+        let result = self.inner.reset(seed);
         Reset {
-            observation: self.observation(),
-            info: (),
+            observation: result.observation.to_vec(),
+            info: result.info,
         }
     }
 
     fn step(&mut self, action: Self::Action) -> Step<Self::Observation, Self::Info> {
-        let torque = action
-            .first()
-            .copied()
-            .unwrap_or(0.0)
-            .clamp(-MAX_TORQUE, MAX_TORQUE);
-        let [angle, angular_velocity] = self.state;
-        let normalized_angle = angle_normalize(f64::from(angle));
-        let state_cost =
-            normalized_angle.mul_add(normalized_angle, 0.1 * f64::from(angular_velocity).powi(2));
-        let reward = (-0.001_f64).mul_add(f64::from(torque).powi(2), -state_cost);
-        let acceleration = (3.0 * GRAVITY / (2.0 * LENGTH))
-            .mul_add(angle.sin(), (3.0 / (MASS * LENGTH.powi(2))) * torque);
-        let next_velocity = acceleration
-            .mul_add(TIME_STEP, angular_velocity)
-            .clamp(-MAX_SPEED, MAX_SPEED);
-        let next_angle = next_velocity.mul_add(TIME_STEP, angle);
-        self.state = [next_angle, next_velocity];
-        self.last_torque = Some(torque);
-        self.elapsed_steps += 1;
-        let status = if self.elapsed_steps >= MAX_EPISODE_STEPS {
-            EpisodeStatus::Truncated
-        } else {
-            EpisodeStatus::Continuing
-        };
+        let raw = action.first().copied().unwrap_or(0.0);
+        let torque = bevy_gym::environments::PendulumAction::try_from(raw)
+            .expect("policy torque must be finite");
+        let result = self.inner.step(torque);
         Step {
-            observation: self.observation(),
-            reward,
-            status,
-            info: (),
+            observation: result.observation.to_vec(),
+            reward: result.reward,
+            status: result.status,
+            info: result.info,
         }
     }
-}
-
-/// Normalize an angle into Gymnasium's half-open `[-pi, pi)` interval.
-fn angle_normalize(angle: f64) -> f64 {
-    (angle + std::f64::consts::PI).rem_euclid(std::f64::consts::TAU) - std::f64::consts::PI
 }
 
 impl ContinuousPpoExample for Pendulum {
@@ -223,7 +176,7 @@ impl ContinuousPpoExample for Pendulum {
     const OBSERVATION_DIM: usize = 3;
     const ACTION_LOW: &'static [f32] = &[-2.0];
     const ACTION_HIGH: &'static [f32] = &[2.0];
-    const DEFAULT_TRAIN_STEPS: usize = 100_000;
+    const DEFAULT_TRAIN_STEPS: usize = 2_000_000;
     const ROLLOUT_STEPS_PER_ENV: usize = 64;
     const DEFAULT_NUM_ENVS: usize = 8;
     const DEFAULT_EVAL_INTERVAL: usize = 10_000;
@@ -231,7 +184,7 @@ impl ContinuousPpoExample for Pendulum {
     const DEFAULT_ACTOR_LEARNING_RATE: f64 = 0.003;
     const DEFAULT_CRITIC_LEARNING_RATE: f64 = 0.001;
     const DEFAULT_REWARD_SCALE: f64 = 0.1;
-    const SOLVED_MEAN_REWARD: f64 = -700.0;
+    const SOLVED_MEAN_REWARD: f64 = -200.0;
     const GIF_PATH: &'static str = "docs/images/pendulum.gif";
 
     fn ppo_config(actor_learning_rate: f64, critic_learning_rate: f64) -> RecurrentPpoConfig {
@@ -283,35 +236,6 @@ impl ContinuousPpoExample for Pendulum {
 
 fn main() -> Result<(), Box<dyn Error>> {
     run_continuous_workflow::<Pendulum>()
-}
-
-/// Small deterministic generator used for reset sampling.
-#[derive(Debug, Clone, Copy)]
-struct SplitMix64 {
-    /// Current generator state.
-    state: u64,
-}
-
-impl SplitMix64 {
-    /// Construct a stream from one root seed.
-    const fn new(seed: u64) -> Self {
-        Self { state: seed }
-    }
-
-    /// Generate a uniform scalar in `[0, 1)`.
-    fn unit_f32(&mut self) -> f32 {
-        self.state = self.state.wrapping_add(0x9e37_79b9_7f4a_7c15);
-        let mut value = self.state;
-        value = (value ^ (value >> 30)).wrapping_mul(0xbf58_476d_1ce4_e5b9);
-        value = (value ^ (value >> 27)).wrapping_mul(0x94d0_49bb_1331_11eb);
-        value ^= value >> 31;
-        (value >> 40) as f32 / (1_u32 << 24) as f32
-    }
-
-    /// Generate one scalar in `[low, high)`.
-    fn f32_between(&mut self, low: f32, high: f32) -> f32 {
-        self.unit_f32().mul_add(high - low, low)
-    }
 }
 
 /// Render-only scene implementation.
@@ -416,7 +340,8 @@ mod render {
         } else {
             app.add_systems(Update, (advance_watch, sync_scene).chain());
         }
-        println!("watching checkpoint={}", checkpoint.display());
+        let checkpoint = checkpoint.display();
+        println!("watching checkpoint={checkpoint}");
         app.run();
         Ok(())
     }
@@ -530,12 +455,12 @@ mod render {
         arrow: &mut (Mut<'_, Sprite>, Mut<'_, Visibility>),
     ) {
         const SCALE: f32 = 500.0 / 4.4;
-        let rotation = env.state[0] + std::f32::consts::FRAC_PI_2;
+        let rotation = env.inner.inner().state()[0] as f32 + std::f32::consts::FRAC_PI_2;
         let direction = Vec2::from_angle(rotation);
         rod.translation = (direction * (SCALE * 0.5)).extend(1.0);
         rod.rotation = Quat::from_rotation_z(rotation);
         end.translation = (direction * SCALE).extend(2.0);
-        if let Some(torque) = env.last_torque {
+        if let Some(torque) = env.inner.inner().last_torque() {
             arrow.0.image = torque_image.0.clone();
             arrow.0.custom_size = Some(Vec2::splat(SCALE * torque.abs() / MAX_TORQUE));
             arrow.0.flip_x = torque > 0.0;
@@ -606,6 +531,22 @@ mod tests {
     use super::*;
 
     #[test]
+    fn adapter_preserves_seeded_resets_and_empty_action_coasts() {
+        let mut native = Pendulum::default();
+        let mut shared = bevy_gym::environments::Pendulum::default();
+        assert_eq!(
+            native.reset(Some(42)).observation,
+            shared.reset(Some(42)).observation
+        );
+        let torque = bevy_gym::environments::PendulumAction::try_from(0.0).expect("zero torque");
+        let result = native.step(vec![]);
+        let expected = shared.step(torque);
+        assert_eq!(result.observation, expected.observation);
+        assert_eq!(result.reward.to_bits(), expected.reward.to_bits());
+        assert_eq!(result.status, expected.status);
+    }
+
+    #[test]
     fn zero_torque_step_matches_gymnasium_equations() {
         let mut pendulum = Pendulum::from_state(0.5, -0.25);
 
@@ -620,7 +561,7 @@ mod tests {
 
     #[test]
     fn reward_uses_pre_transition_state_and_clipped_torque() {
-        let mut pendulum = Pendulum::from_state(std::f32::consts::PI, 1.0);
+        let mut pendulum = Pendulum::from_state(std::f64::consts::PI, 1.0);
 
         let step = pendulum.step(vec![5.0]);
 
