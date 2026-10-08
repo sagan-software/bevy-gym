@@ -4,7 +4,9 @@ use std::sync::Arc;
 use bevy::prelude::*;
 
 use crate::components::{CurrentObservation, EnvComponent, EnvId, EnvStats, QueuedAction};
-use crate::events::{ActionRequest, ActionResponse, EpisodeEndEvent, TransitionEvent};
+use crate::events::{
+    ActionRequest, ActionResponse, EpisodeEndEvent, EpisodeFinished, TransitionEvent,
+};
 use crate::systems::{
     reset::{auto_reset_system, manual_reset_system},
     step::step_system,
@@ -24,8 +26,8 @@ pub struct GymConfig {
     pub auto_reset: bool,
 }
 
-/// Deterministic seed schedule used by automatic environment resets.
-#[derive(Resource, Clone)]
+/// Deterministic seed schedule retained by each spawned environment entity.
+#[derive(Component, Clone)]
 pub(crate) struct ResetSeedSchedule {
     /// Maps `(environment id, zero-based episode index)` to a reset seed.
     seed_for: Arc<dyn Fn(usize, u64) -> Option<u64> + Send + Sync>,
@@ -206,10 +208,10 @@ impl<E: Env + Send + Sync + 'static> Plugin for BevyGymPlugin<E> {
             tick_rate: self.tick_rate,
             auto_reset: self.auto_reset,
         });
-        app.insert_resource(self.reset_seed_schedule.clone());
 
         app.add_message::<TransitionEvent<E>>();
         app.add_message::<EpisodeEndEvent>();
+        app.add_message::<EpisodeFinished<E>>();
         app.add_message::<ActionRequest<E>>();
         app.add_message::<ActionResponse<E>>();
 
@@ -284,6 +286,7 @@ fn spawn_environments_seeded<E: Env + Send + Sync + 'static>(
                     },
                     QueuedAction::<E>::default(),
                     EnvStats::default(),
+                    reset_seed_schedule.clone(),
                 ))
                 .id();
 

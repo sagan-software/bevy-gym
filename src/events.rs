@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::marker::PhantomData;
 
 use bevy::prelude::*;
 
@@ -63,4 +64,23 @@ pub struct ActionResponse<E: Env + Send + Sync + 'static> {
 
     /// Action to apply on the next runner step.
     pub action: E::Action,
+}
+
+/// Private lifecycle signal that public reporting consumers cannot drain.
+#[derive(Message, Debug)]
+pub(crate) struct EpisodeFinished<E: Env + Send + Sync + 'static> {
+    /// Exact entity that produced the terminal transition.
+    pub(crate) entity: Entity,
+    /// Keeps different environment types in separate message queues.
+    environment: PhantomData<fn() -> E>,
+}
+
+impl<E: Env + Send + Sync + 'static> EpisodeFinished<E> {
+    /// Record one completed environment without copying its observation or action.
+    pub(crate) const fn new(entity: Entity) -> Self {
+        Self {
+            entity,
+            environment: PhantomData,
+        }
+    }
 }

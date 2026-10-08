@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 use crate::components::{CurrentObservation, EnvComponent, EnvId, EnvStats, QueuedAction};
-use crate::events::{ActionRequest, EpisodeEndEvent};
+use crate::events::{ActionRequest, EpisodeFinished};
 use crate::plugin::ResetSeedSchedule;
 use crate::Env;
 
@@ -16,10 +16,11 @@ type AutoResetQuery<'world, 'state, E> = Query<
         &'static mut CurrentObservation<E>,
         &'static mut EnvStats,
         &'static mut QueuedAction<E>,
+        &'static ResetSeedSchedule,
     ),
 >;
 
-/// Watches for `EpisodeEndEvent`s and automatically resets the
+/// Watches for private completion signals and automatically resets the
 /// corresponding environment, then fires `ActionRequest` so the
 /// policy knows to provide the first action of the new episode.
 ///
@@ -27,35 +28,33 @@ type AutoResetQuery<'world, 'state, E> = Query<
 /// happens within the same tick that the episode ended, so there is never
 /// a tick where an environment sits idle between episodes.
 pub(crate) fn auto_reset_system<E: Env + Send + Sync + 'static>(
-    mut episode_end_events: MessageReader<'_, '_, EpisodeEndEvent>,
+    mut completions: MessageReader<'_, '_, EpisodeFinished<E>>,
     mut query: AutoResetQuery<'_, '_, E>,
     mut action_writer: MessageWriter<'_, ActionRequest<E>>,
-    reset_seed_schedule: Res<'_, ResetSeedSchedule>,
 ) {
-    for event in episode_end_events.read() {
-        for (entity, id, mut env_comp, mut obs, mut stats, mut pending) in &mut query {
-            if id.0 != event.env_id {
-                continue;
-            }
+    for event in completions.read() {
+        // Environment IDs are local to a pool. The typed message and entity locate
+        // exactly one owner, even when different plugins both assign EnvId(0).
+        let Ok((entity, id, mut env_comp, mut obs, mut stats, mut pending, seeds)) =
+            query.get_mut(event.entity)
+        else {
+            // A despawned entity or a different environment type cannot be reset.
+            continue;
+        };
 
-            let episode = stats.total_episodes.saturating_add(1) as u64;
-            let reset = env_comp
-                .env
-                .reset(reset_seed_schedule.seed_for(id.0, episode));
-            obs.observation = reset.observation.clone();
-            obs.info = reset.info.clone();
-            pending.action = None;
-            stats.record_episode_end();
+        let episode = stats.total_episodes.saturating_add(1) as u64;
+        let reset = env_comp.env.reset(seeds.seed_for(id.0, episode));
+        obs.observation = reset.observation.clone();
+        obs.info = reset.info.clone();
+        pending.action = None;
+        stats.record_episode_end();
 
-            action_writer.write(ActionRequest {
-                env_id: id.0,
-                entity,
-                observation: reset.observation,
-                info: reset.info,
-            });
-
-            break;
-        }
+        action_writer.write(ActionRequest {
+            env_id: id.0,
+            entity,
+            observation: reset.observation,
+            info: reset.info,
+        });
     }
 }
 
