@@ -6,20 +6,8 @@ use std::fmt::Write as _;
 use std::path::{Path, PathBuf};
 use std::process::Output;
 
-#[cfg(feature = "ecosystem-inference")]
-use avian2d as _;
-use bevy as _;
-#[cfg(feature = "bevy-mcp")]
-use bevy_brp_extras as _;
-use bevy_gym as _;
-#[cfg(feature = "render")]
-use bevy_inspector_egui as _;
-use burn as _;
 use clap::Parser;
-#[cfg(feature = "mujoco")]
-use mujoco_rs as _;
 use serde::{Deserialize, Serialize};
-use shakmaty as _;
 use tokio::process::Command;
 
 #[path = "shared/qualification.rs"]

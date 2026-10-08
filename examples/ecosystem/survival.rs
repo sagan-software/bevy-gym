@@ -23,9 +23,6 @@
 //! See [`examples/ecosystem/README.md`](README.md) for the observation,
 //! evidence, and video contracts.
 
-use shakmaty as _;
-use tokio as _;
-
 #[path = "shared/mod.rs"]
 mod shared;
 

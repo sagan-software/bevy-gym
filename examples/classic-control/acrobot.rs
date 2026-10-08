@@ -19,30 +19,14 @@
 //! The Gymnasium source derives from `RLPy` under BSD-3-Clause; see
 //! `LICENSES/ACROBOT-BSD-3-Clause.txt`.
 
-use shakmaty as _;
-use tokio as _;
-
 use std::error::Error;
 
-use clap as _;
-#[cfg(feature = "mujoco")]
-use mujoco_rs as _;
 use std::path::Path;
 
 use bevy_gym::training::DqnConfig;
 use bevy_gym::{Env, EpisodeStatus, Reset, Step};
 
 use bevy_gym::training::{run_discrete_workflow, DiscreteDqnExample, DqnAction};
-
-#[cfg(feature = "ecosystem-inference")]
-use avian2d as _;
-use bevy as _;
-#[cfg(feature = "bevy-mcp")]
-use bevy_brp_extras as _;
-use burn as _;
-#[cfg(not(feature = "render"))]
-use serde as _;
-use serde_json as _;
 
 /// `MAX_VELOCITY_1` used by this example.
 const MAX_VELOCITY_1: f64 = 4.0 * std::f64::consts::PI;
@@ -248,9 +232,6 @@ mod render {
     use bevy::window::{PresentMode, WindowResolution};
     use bevy_gym::recording::{encode_gif, GifCapture};
     use bevy_gym::training::DqnPolicy;
-    use bevy_inspector_egui as _;
-    use serde as _;
-    use tokio as _;
 
     /// Environment-specific renderer registered by visual modes.
     pub(super) struct ExampleRendererPlugin;

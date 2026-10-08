@@ -9,9 +9,6 @@
 //! cargo run --no-default-features --release --example ecosystem-sprint -- train
 //! ```
 
-use shakmaty as _;
-use tokio as _;
-
 #[path = "shared/mod.rs"]
 mod shared;
 

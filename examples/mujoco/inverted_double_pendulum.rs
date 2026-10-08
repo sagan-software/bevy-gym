@@ -1,9 +1,6 @@
 //! MuJoCo-backed `InvertedDoublePendulum-v5` using Gymnasium's exact model,
 //! observation, reset distribution, reward, termination, and time limit.
 
-#[cfg(feature = "bevy-mcp")]
-use bevy_brp_extras as _;
-
 use std::error::Error;
 use std::path::Path;
 
@@ -13,16 +10,6 @@ use bevy_gym::training::{
     SplitMix64,
 };
 use bevy_gym::{Env, EpisodeStatus, Reset, Step};
-
-#[cfg(feature = "ecosystem-inference")]
-use avian2d as _;
-use bevy as _;
-use burn as _;
-use clap as _;
-use mujoco_rs as _;
-use serde_json as _;
-use shakmaty as _;
-use tokio as _;
 
 /// `MODEL_XML` used by this example.
 const MODEL_XML: &str = include_str!("assets/inverted_double_pendulum.xml");
@@ -294,9 +281,6 @@ mod render {
         BevyGymRecorderPlugin, RecordingCallbackError, RecordingFrame, RecordingSettings,
     };
     use bevy_gym::training::RecurrentPpoPolicy;
-    use bevy_inspector_egui as _;
-    use serde as _;
-    use tokio as _;
 
     use super::{ContinuousPpoExample, Env, EpisodeStatus, Error, InvertedDoublePendulum, Path};
 

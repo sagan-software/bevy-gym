@@ -91,14 +91,8 @@
 //! * v1: `max_time_steps` raised to 1000 for robot based tasks (including inverted pendulum).
 //! * v0: Initial versions release.
 
-use shakmaty as _;
-use tokio as _;
-
 use std::error::Error;
 
-use clap as _;
-#[cfg(feature = "mujoco")]
-use mujoco_rs as _;
 use std::path::Path;
 
 use bevy_gym::training::RecurrentPpoConfig;
@@ -106,14 +100,6 @@ use bevy_gym::{Env, EpisodeStatus, Reset, Step};
 
 use bevy_gym::training::SplitMix64;
 use bevy_gym::training::{run_continuous_workflow, ContinuousPpoExample};
-
-#[cfg(feature = "ecosystem-inference")]
-use avian2d as _;
-use bevy as _;
-#[cfg(feature = "bevy-mcp")]
-use bevy_brp_extras as _;
-use burn as _;
-use serde_json as _;
 
 /// `TIME_STEP` used by this example.
 const TIME_STEP: f32 = 0.04;
@@ -412,9 +398,6 @@ mod render {
         BevyGymRecorderPlugin, RecordingCallbackError, RecordingFrame, RecordingSettings,
     };
     use bevy_gym::training::RecurrentPpoPolicy;
-    use bevy_inspector_egui as _;
-    use serde as _;
-    use tokio as _;
 
     /// Environment-specific renderer registered by visual modes.
     pub(super) struct ExampleRendererPlugin;

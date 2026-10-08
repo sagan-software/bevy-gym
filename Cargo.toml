@@ -370,7 +370,9 @@ unsafe-attr-outside-unsafe = "warn"
 unsafe-code = "warn"
 unsafe-op-in-unsafe-fn = "warn"
 unstable-features = { level = "allow", priority = 1 }
-unused-crate-dependencies = "warn"
+# Examples share this package's dependencies but each teaches a smaller subset.
+# Requiring dummy imports hides that subset from readers.
+unused-crate-dependencies = "allow"
 unused-extern-crates = "warn"
 unused-import-braces = "warn"
 unused-lifetimes = "warn"

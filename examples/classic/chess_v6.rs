@@ -115,19 +115,6 @@ use std::error::Error;
 use std::fmt;
 use std::path::Path;
 
-#[cfg(feature = "ecosystem-inference")]
-use avian2d as _;
-use bevy as _;
-#[cfg(feature = "bevy-mcp")]
-use bevy_brp_extras as _;
-use burn as _;
-use clap as _;
-#[cfg(feature = "mujoco")]
-use mujoco_rs as _;
-use serde as _;
-use serde_json as _;
-use tokio as _;
-
 use bevy_gym::training::{
     run_discrete_workflow, DiscreteDqnExample, DiscreteEvaluation, DqnAction, DqnConfig,
 };
@@ -836,7 +823,6 @@ mod render {
     use bevy::window::{PresentMode, WindowResolution};
     use bevy_gym::recording::{encode_gif, GifCapture};
     use bevy_gym::training::DqnPolicy;
-    use bevy_inspector_egui as _;
     use shakmaty::{Color as ChessColor, Position, Square};
 
     /// Documentation GIF viewport and source square scale.

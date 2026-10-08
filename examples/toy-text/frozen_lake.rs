@@ -138,28 +138,14 @@
 //!  * v1: Bug fixes to rewards (v1.3, added reward customization)
 //!  * v0: Initial version release
 
-use shakmaty as _;
-use tokio as _;
-
 use bevy_gym::{Env, EpisodeStatus, Reset, Step};
 use std::error::Error;
 
-use clap as _;
-#[cfg(feature = "mujoco")]
-use mujoco_rs as _;
 use std::path::Path;
 
 use bevy_gym::training::{
     run_tabular_workflow, IndexedAction, TabularEvaluation as Evaluation, TabularExample,
 };
-
-#[cfg(feature = "ecosystem-inference")]
-use avian2d as _;
-use bevy as _;
-#[cfg(feature = "bevy-mcp")]
-use bevy_brp_extras as _;
-use burn as _;
-use serde_json as _;
 
 /// Gymnasium's four discrete movement actions.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -390,9 +376,6 @@ mod render {
     use bevy::window::{PresentMode, WindowResolution};
     use bevy_gym::recording::{encode_gif, GifCapture};
     use bevy_gym::training::{TabularQPolicy, TabularQTrainer};
-    use bevy_inspector_egui as _;
-    use serde as _;
-    use tokio as _;
 
     /// Environment-specific renderer registered by visual modes.
     pub(super) struct ExampleRendererPlugin;

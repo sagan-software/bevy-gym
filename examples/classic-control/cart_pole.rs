@@ -19,20 +19,12 @@
     clippy::too_many_lines,
     clippy::disallowed_methods,
     clippy::disallowed_types,
-    unused_crate_dependencies,
     reason = "the synchronous example keeps its complete workflow readable in one target"
 )]
-
-use tokio as _;
 
 use std::env;
 use std::error::Error;
 
-#[cfg(feature = "ecosystem-inference")]
-use avian2d as _;
-use clap as _;
-#[cfg(feature = "mujoco")]
-use mujoco_rs as _;
 use std::fmt;
 use std::fs::{self, File, OpenOptions};
 use std::io::Write;

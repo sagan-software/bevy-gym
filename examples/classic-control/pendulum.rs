@@ -19,29 +19,14 @@
 //! Source: [Gymnasium Pendulum at revision 7a119138](https://github.com/Farama-Foundation/Gymnasium/blob/7a1191388aa4aa973d3a5e4b039899cd99cc991f/gymnasium/envs/classic_control/pendulum.py).
 //! See `gymnasium-web/PENDULUM.md` for browser controls and qualification gates.
 
-use shakmaty as _;
-use tokio as _;
-
 use std::error::Error;
 
-use clap as _;
-#[cfg(feature = "mujoco")]
-use mujoco_rs as _;
 use std::path::Path;
 
 use bevy_gym::training::RecurrentPpoConfig;
 use bevy_gym::{Env, EpisodeStatus, Reset, Step};
 
 use bevy_gym::training::{run_continuous_workflow, ContinuousPpoExample};
-
-#[cfg(feature = "ecosystem-inference")]
-use avian2d as _;
-use bevy as _;
-#[cfg(feature = "bevy-mcp")]
-use bevy_brp_extras as _;
-use burn as _;
-use serde as _;
-use serde_json as _;
 
 /// Angular-velocity observation scale, in radians per second.
 const MAX_SPEED: f32 = 8.0;
@@ -191,9 +176,6 @@ mod render {
     use bevy::window::{PresentMode, WindowResolution};
     use bevy_gym::recording::{encode_gif, GifCapture};
     use bevy_gym::training::RecurrentPpoPolicy;
-    use bevy_inspector_egui as _;
-    use serde as _;
-    use tokio as _;
 
     /// Environment-specific renderer registered by visual modes.
     pub(super) struct ExampleRendererPlugin;

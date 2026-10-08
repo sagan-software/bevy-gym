@@ -18,15 +18,6 @@ use std::error::Error;
 use std::io::{self, Write as _};
 
 use bevy_gym::EpisodeStatus;
-use clap as _;
-#[cfg(feature = "mujoco")]
-use mujoco_rs as _;
-
-// The recurrent trainer slice will use Burn directly. Retain the example-level
-// dependency signal while the deterministic environment slice lands first.
-#[cfg(feature = "bevy-mcp")]
-use bevy_brp_extras as _;
-use burn as _;
 
 pub(crate) use domain::CurriculumStage;
 use domain::{LocomotionAction, SimulationConfig};
