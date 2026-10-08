@@ -66,6 +66,10 @@ Validation uses 100 seeds; the 200 held-out seeds are disjoint.
 
 ## Checks
 
+`nix run .#browser-runtime-check` verifies that all three browser engines can
+create a page before CI compiles the site. It records engine versions and
+sets a 20-second test timeout per engine.
+
 ```sh
 nix develop --command cargo test -p bevy-gym-browser
 nix develop --command cargo test -p bevy-gym-browser --test learning -- --ignored --nocapture

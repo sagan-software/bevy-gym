@@ -33,6 +33,9 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: cachix/install-nix-action@v31
+      - run: nix run .#browser-runtime-check
+        env:
+          DEBUG: pw:browser
       - uses: Swatinem/rust-cache@v2.9.2
         with:
           cmd-format: "nix develop --command {0}"

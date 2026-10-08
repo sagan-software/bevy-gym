@@ -263,6 +263,16 @@
           '';
         };
 
+        browserRuntimeCheck = pkgs.writeShellApplication {
+          name = "bevy-gym-browser-runtime-check";
+          runtimeInputs = [ pkgs.playwright-test ];
+          text = ''
+            export NO_COLOR=true
+            export PLAYWRIGHT_BROWSERS_PATH="${pkgs.playwright-driver.browsers}"
+            playwright test --config gymnasium-web/playwright.config.cjs --grep 'browser runtime starts$' "$@"
+          '';
+        };
+
         gymnasiumCheck = pkgs.writeShellApplication {
           name = "bevy-gym-browser-check";
           runtimeInputs = [
@@ -328,6 +338,10 @@
           web-serve-tailscale-https = {
             type = "app";
             program = lib.getExe webServeTailscaleHttps;
+          };
+          browser-runtime-check = {
+            type = "app";
+            program = lib.getExe browserRuntimeCheck;
           };
           gymnasium-check = {
             type = "app";
