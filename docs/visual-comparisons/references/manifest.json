@@ -1,0 +1,214 @@
+{
+  "source_revision": "7a1191388aa4aa973d3a5e4b039899cd99cc991f",
+  "frames_per_sheet": 6,
+  "sampling": "FFmpeg fps=6/duration, chronological left to right",
+  "references": [
+    {
+      "environment": "acrobot",
+      "family": "classic_control",
+      "url": "https://gymnasium.farama.org/_images/acrobot.gif",
+      "sha256": "94fc1228702fd0f9875fdc387d452b0f3dd8c92664ce9d717f75724f676ea01c",
+      "duration_seconds": 15.05,
+      "matches_pinned_repository": false,
+      "contact_sheet": "acrobot.png"
+    },
+    {
+      "environment": "cart_pole",
+      "family": "classic_control",
+      "url": "https://gymnasium.farama.org/_images/cart_pole.gif",
+      "sha256": "138970b88db6d95f452da3a9e8a1562215265e7dcaa71d9b7bb081b6bff275b4",
+      "duration_seconds": 15.05,
+      "matches_pinned_repository": false,
+      "contact_sheet": "cart_pole.png"
+    },
+    {
+      "environment": "mountain_car",
+      "family": "classic_control",
+      "url": "https://gymnasium.farama.org/_images/mountain_car.gif",
+      "sha256": "461482427f1dd78d76f42712e4b346af5f9d93fcc8ede1c0288d93829f768b45",
+      "duration_seconds": 15.05,
+      "matches_pinned_repository": false,
+      "contact_sheet": "mountain_car.png"
+    },
+    {
+      "environment": "mountain_car_continuous",
+      "family": "classic_control",
+      "url": "https://gymnasium.farama.org/_images/mountain_car_continuous.gif",
+      "sha256": "007a3c8533b0819db45d42929a77d672656fc165b46716f72f10d2ec7f55d9f9",
+      "duration_seconds": 15.05,
+      "matches_pinned_repository": false,
+      "contact_sheet": "mountain_car_continuous.png"
+    },
+    {
+      "environment": "pendulum",
+      "family": "classic_control",
+      "url": "https://gymnasium.farama.org/_images/pendulum.gif",
+      "sha256": "07ada8a6de1d0fda97fa3c1d48b93808b61449083a054d19c3e1e6541a29ff88",
+      "duration_seconds": 15.05,
+      "matches_pinned_repository": false,
+      "contact_sheet": "pendulum.png"
+    },
+    {
+      "environment": "blackjack",
+      "family": "toy_text",
+      "url": "https://gymnasium.farama.org/_images/blackjack.gif",
+      "sha256": "fd56e202f496b888eadcf79b8f8ee571fda65eb77a0b11d33871c69e525fb9be",
+      "duration_seconds": 15.1,
+      "matches_pinned_repository": false,
+      "contact_sheet": "blackjack.png"
+    },
+    {
+      "environment": "cliff_walking",
+      "family": "toy_text",
+      "url": "https://gymnasium.farama.org/_images/cliff_walking.gif",
+      "sha256": "11394035808b022d65d97c6bcd90b969b4c263372efb2f6d2fd3f884b5523c55",
+      "duration_seconds": 15.05,
+      "matches_pinned_repository": false,
+      "contact_sheet": "cliff_walking.png"
+    },
+    {
+      "environment": "frozen_lake",
+      "family": "toy_text",
+      "url": "https://gymnasium.farama.org/_images/frozen_lake.gif",
+      "sha256": "08bdae9069cff75c4f9e21ac9efa598a8fe42a57a5da28443180b52f6ca89998",
+      "duration_seconds": 4.5,
+      "matches_pinned_repository": false,
+      "contact_sheet": "frozen_lake.png"
+    },
+    {
+      "environment": "taxi",
+      "family": "toy_text",
+      "url": "https://gymnasium.farama.org/_images/taxi.gif",
+      "sha256": "5a7eea1089a293399db9b78950a41b00b092cfce7552f08b7c1bd3a58093eac6",
+      "duration_seconds": 15.05,
+      "matches_pinned_repository": false,
+      "contact_sheet": "taxi.png"
+    },
+    {
+      "environment": "bipedal_walker",
+      "family": "box2d",
+      "url": "https://gymnasium.farama.org/_images/bipedal_walker.gif",
+      "sha256": "5c4152dc92b1c5eef8bb34db7d47f860f5135e5a643d89750267229a6f1ffc6f",
+      "duration_seconds": 15.05,
+      "matches_pinned_repository": false,
+      "contact_sheet": "bipedal_walker.png"
+    },
+    {
+      "environment": "car_racing",
+      "family": "box2d",
+      "url": "https://gymnasium.farama.org/_images/car_racing.gif",
+      "sha256": "248163a5767519e687f5d9a9d51e194d2115d0d672e8168d32dcde8d4fb72dd1",
+      "duration_seconds": 15.05,
+      "matches_pinned_repository": false,
+      "contact_sheet": "car_racing.png"
+    },
+    {
+      "environment": "lunar_lander",
+      "family": "box2d",
+      "url": "https://gymnasium.farama.org/_images/lunar_lander.gif",
+      "sha256": "f79c85eea075b025ead2e955f78dc70bc43401175e7b9c316289cec2fb0ca96a",
+      "duration_seconds": 15.05,
+      "matches_pinned_repository": false,
+      "contact_sheet": "lunar_lander.png"
+    },
+    {
+      "environment": "ant",
+      "family": "mujoco",
+      "url": "https://gymnasium.farama.org/_images/ant.gif",
+      "sha256": "bc6f838e8639beea8a057efcdbf102c6d75c3db96d20c61d482d669d3b4a6a22",
+      "duration_seconds": 15.05,
+      "matches_pinned_repository": false,
+      "contact_sheet": "ant.png"
+    },
+    {
+      "environment": "half_cheetah",
+      "family": "mujoco",
+      "url": "https://gymnasium.farama.org/_images/half_cheetah.gif",
+      "sha256": "c1e5b28db1ba090af47a978f977a58653a8f82a8766bfa336308891993724fda",
+      "duration_seconds": 15.05,
+      "matches_pinned_repository": false,
+      "contact_sheet": "half_cheetah.png"
+    },
+    {
+      "environment": "hopper",
+      "family": "mujoco",
+      "url": "https://gymnasium.farama.org/_images/hopper.gif",
+      "sha256": "bb7b5942c23cb30aafc400bd80a89f082bebe3f66c37926c50d9ff0588228bf0",
+      "duration_seconds": 15.05,
+      "matches_pinned_repository": false,
+      "contact_sheet": "hopper.png"
+    },
+    {
+      "environment": "humanoid",
+      "family": "mujoco",
+      "url": "https://gymnasium.farama.org/_images/humanoid.gif",
+      "sha256": "a31527565bf0e46bfbe22097506d457f10872c21e74f0869ac2ac7a9b566e386",
+      "duration_seconds": 15.05,
+      "matches_pinned_repository": false,
+      "contact_sheet": "humanoid.png"
+    },
+    {
+      "environment": "humanoid_standup",
+      "family": "mujoco",
+      "url": "https://gymnasium.farama.org/_images/humanoid_standup.gif",
+      "sha256": "b5156b80a08d3dc4142d262ebed74fb37a6b23308ab589b95234a884d56196ad",
+      "duration_seconds": 15.05,
+      "matches_pinned_repository": true,
+      "contact_sheet": "humanoid_standup.png"
+    },
+    {
+      "environment": "inverted_double_pendulum",
+      "family": "mujoco",
+      "url": "https://gymnasium.farama.org/_images/inverted_double_pendulum.gif",
+      "sha256": "247d24eb13ecf28f494bdd32eaee25bf77f4b9fcbc4e14d7d3f9e42dc446bbd6",
+      "duration_seconds": 15.05,
+      "matches_pinned_repository": false,
+      "contact_sheet": "inverted_double_pendulum.png"
+    },
+    {
+      "environment": "inverted_pendulum",
+      "family": "mujoco",
+      "url": "https://gymnasium.farama.org/_images/inverted_pendulum.gif",
+      "sha256": "1cd2686d3f5fe263a864f233d54aa377b4caa746a65023d3ae9d84867b21d242",
+      "duration_seconds": 15.05,
+      "matches_pinned_repository": false,
+      "contact_sheet": "inverted_pendulum.png"
+    },
+    {
+      "environment": "pusher",
+      "family": "mujoco",
+      "url": "https://gymnasium.farama.org/_images/pusher.gif",
+      "sha256": "5a5dd0d1fb0905ebe46ccf0746475bfef9c240f2b03b640b570a6493df7263e2",
+      "duration_seconds": 15.05,
+      "matches_pinned_repository": false,
+      "contact_sheet": "pusher.png"
+    },
+    {
+      "environment": "reacher",
+      "family": "mujoco",
+      "url": "https://gymnasium.farama.org/_images/reacher.gif",
+      "sha256": "a8a68b7c8f9315e74f1b75e622d4bd7674d5aa2ed094004437814f6d75c240c3",
+      "duration_seconds": 15.05,
+      "matches_pinned_repository": false,
+      "contact_sheet": "reacher.png"
+    },
+    {
+      "environment": "swimmer",
+      "family": "mujoco",
+      "url": "https://gymnasium.farama.org/_images/swimmer.gif",
+      "sha256": "e342618905bbfb1bac120ff94866e088708be93d1f241ec7ccd1314c334056ab",
+      "duration_seconds": 15.05,
+      "matches_pinned_repository": false,
+      "contact_sheet": "swimmer.png"
+    },
+    {
+      "environment": "walker2d",
+      "family": "mujoco",
+      "url": "https://gymnasium.farama.org/_images/walker2d.gif",
+      "sha256": "e3f048482b8afef2a22b9a25f4005227d6465ca935f863870bb0d603e9eb4131",
+      "duration_seconds": 15.05,
+      "matches_pinned_repository": false,
+      "contact_sheet": "walker2d.png"
+    }
+  ]
+}

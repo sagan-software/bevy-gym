@@ -9,6 +9,7 @@
   <link data-trunk rel="rust" href="Cargo.toml" data-bin="gymnasium-worker" data-type="worker" data-loader-shim data-bindgen-target="web">
   <link data-trunk rel="css" href="styles.css">
   <link data-trunk rel="copy-file" href="app.js">
+  <link data-trunk rel="copy-file" href="renderers.js">
   <link data-trunk rel="copy-dir" href="models">
 </head>
 <body>
@@ -17,7 +18,7 @@
     <div class="heading"><label class="environment-choice">Environment <select id="environment"><option value="cartpole">CartPole-v1</option><option value="mountain-car">MountainCar-v0</option></select></label><h1>CartPole-v1</h1><span id="mode">Inference</span><span id="policy-source">Bundled model</span></div>
     <div class="workspace">
       <section class="simulation" aria-label="Simulation">
-        <canvas id="scene" width="900" height="480" aria-label="CartPole simulation: a cart balances an upright pole"></canvas>
+        <canvas id="scene" width="600" height="400" aria-label="CartPole simulation: a cart balances an upright pole"></canvas>
         <div class="transport">
           <button id="pause" disabled>Pause</button><button id="step" disabled>Step</button><button id="restart" disabled>Restart</button>
           <label>Speed <select id="speed"><option value="1">1×</option><option value="2">2×</option><option value="4">4×</option><option value="8">8×</option><option value="16">16×</option></select></label>

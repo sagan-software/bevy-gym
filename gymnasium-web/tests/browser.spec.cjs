@@ -316,3 +316,26 @@ for (const qualification of [
   expect(result.test.full).toBeGreaterThanOrEqual(qualification.minimumSuccesses);
   expect(result.test.mean - result.baseline.mean).toBeGreaterThanOrEqual(qualification.improvement);
 });
+
+test("learning rate uses optimizer updates on its horizontal axis", async ({ page }) => {
+  await page.addInitScript(() => {
+    const original = CanvasRenderingContext2D.prototype.fillText;
+    window.chartLabels = {};
+    CanvasRenderingContext2D.prototype.fillText = function (text, ...args) {
+      const labels = window.chartLabels[this.canvas.id] ?? [];
+      window.chartLabels[this.canvas.id] = [...labels, String(text)].slice(-6);
+      return original.call(this, text, ...args);
+    };
+  });
+  await page.goto("./");
+  await expect(page.locator("#status")).toHaveText("Running frozen policy");
+  await page.locator("#speed").selectOption("16");
+  await page.getByRole("button", { name: "Train from scratch", exact: true }).click();
+  await expect.poll(async () => Number((await page.locator("#updates").innerText()).replaceAll(",", ""))).toBeGreaterThan(20);
+  await paused(page);
+  const updates = await page.locator("#updates").innerText();
+  const transitions = await page.locator("#transitions").innerText();
+  expect(updates).not.toBe(transitions);
+  expect(await page.evaluate(() => window.chartLabels["rate-chart"].slice(-2))).toEqual([updates, "Optimizer updates"]);
+  expect(await page.evaluate(() => window.chartLabels["returns-chart"].at(-1))).toBe("Transitions");
+});

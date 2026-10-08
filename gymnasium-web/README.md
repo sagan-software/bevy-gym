@@ -37,7 +37,8 @@ mean was 497.59, with 199 of 200 episodes reaching the time limit.
 [Model provenance and qualification results](models/cartpole.json) record the
 architecture, model hash, validation seeds, held-out seeds, and each run's curve.
 The model uses the default `DqnConfig`, including Adam learning rate 0.0003.
-Learning rate and episode return are separate charts.
+Learning rate uses optimizer updates on its horizontal axis. Episode return
+uses environment transitions.
 
 ## Verified MountainCar model
 
@@ -63,6 +64,13 @@ models. It scored -102.41 with 200/200 goals on separate held-out seeds.
 The gate requires mean at least -110, at least 190/200 goals, and improvement
 of at least 80 from initialization, within one million transitions per seed.
 Validation uses 100 seeds; the 200 held-out seeds are disjoint.
+
+## Visual fidelity
+
+CartPole and MountainCar preserve Gymnasium's 600 by 400 scene proportions,
+procedural shapes, and colors. The dashboard scales each scene without stretching.
+[Visual comparisons](../docs/visual-comparisons/README.md) include official GIF
+contact sheets, browser recordings, fixed-state fixtures, and comparison gates.
 
 ## Checks
 

@@ -1,3 +1,4 @@
+import { drawCartPole, drawMountainCar } from "./renderers.js";
 const $ = (id) => document.getElementById(id);
 const taskName = new URL(location.href).searchParams.get("env") === "mountain-car" ? "mountain-car" : "cartpole";
 const task = taskName === "mountain-car"
@@ -108,7 +109,7 @@ function update(snapshot) {
   returns.push(...snapshot.completed.map((episode) => [episode.transition, episode.reward]));
   if (returns.length > 2000) returns.splice(0, returns.length - 2000);
   if (snapshot.optimizer_steps > 0) {
-    rates = [[0, snapshot.learning_rate], [snapshot.transitions, snapshot.learning_rate]];
+    rates = [[0, snapshot.learning_rate], [snapshot.optimizer_steps, snapshot.learning_rate]];
     $("rate-summary").textContent = `Adam · constant ${snapshot.learning_rate} · ${snapshot.optimizer_steps.toLocaleString()} updates`;
   }
   if (returns.length) {
@@ -195,35 +196,11 @@ function context(id) {
   const ctx = canvas.getContext("2d"); ctx.scale(dpr, dpr); return [ctx, bounds.width, bounds.height];
 }
 function drawScene(state) {
-  if (taskName === "mountain-car") { drawMountainCar(state); return; }
-  const [ctx, width, height] = context("scene"), scale = width / 6, floor = height * .74;
-  const cart = width / 2 + state[0] * scale, poleLength = Math.min(scale, height * .5);
-  ctx.strokeStyle = "#34453a"; ctx.lineWidth = 1;
-  ctx.beginPath(); ctx.moveTo(0, floor + 22); ctx.lineTo(width, floor + 22); ctx.stroke();
-  for (const limit of [-2.4, 2.4]) { const x = width / 2 + limit * scale; ctx.setLineDash([4, 6]); ctx.beginPath(); ctx.moveTo(x, 24); ctx.lineTo(x, floor + 22); ctx.stroke(); }
-  ctx.setLineDash([]); ctx.fillStyle = "#76937d"; ctx.fillRect(cart - 30, floor - 12, 60, 24);
-  ctx.fillStyle = "#a5b2a8";
-  for (const offset of [-20, 20]) { ctx.beginPath(); ctx.arc(cart + offset, floor + 16, 6, 0, Math.PI * 2); ctx.fill(); }
-  ctx.strokeStyle = "#b6ee63"; ctx.lineWidth = 9; ctx.lineCap = "round";
-  ctx.beginPath(); ctx.moveTo(cart, floor - 6); ctx.lineTo(cart + Math.sin(state[2]) * poleLength, floor - 6 - Math.cos(state[2]) * poleLength); ctx.stroke();
-  ctx.fillStyle = "#ecf1e8"; ctx.beginPath(); ctx.arc(cart, floor - 6, 5, 0, Math.PI * 2); ctx.fill();
+  const canvas = $("scene");
+  if (taskName === "mountain-car") drawMountainCar(canvas, state);
+  else drawCartPole(canvas, state);
 }
-function drawMountainCar(state) {
-  const [ctx, width, height] = context("scene");
-  const x = position => 24 + (position + 1.2) / 1.8 * (width - 48);
-  const y = position => height - 24 - (Math.sin(3 * position) * .45 + .55) * (height - 60);
-  ctx.strokeStyle = "#76937d"; ctx.lineWidth = 2; ctx.beginPath();
-  for (let i = 0; i <= 120; i++) { const position = -1.2 + 1.8 * i / 120; if (i) ctx.lineTo(x(position), y(position)); else ctx.moveTo(x(position), y(position)); }
-  ctx.stroke();
-  ctx.strokeStyle = "#b6ee63"; ctx.beginPath(); ctx.moveTo(x(.5), y(.5)); ctx.lineTo(x(.5), y(.5)-30); ctx.stroke();
-  ctx.fillStyle = "#b6ee63"; ctx.beginPath(); ctx.moveTo(x(.5), y(.5)-30); ctx.lineTo(x(.5)+18,y(.5)-23); ctx.lineTo(x(.5),y(.5)-16); ctx.fill();
-  ctx.save(); ctx.translate(x(state[0]), y(state[0])-9);
-  ctx.rotate(Math.atan2(-1.35 * Math.cos(3 * state[0]) * (height-60), (width-48)/1.8));
-  ctx.fillStyle = "#b6ee63"; ctx.fillRect(-15,-10,30,14); ctx.fillStyle = "#a5b2a8";
-  for (const offset of [-10,10]) { ctx.beginPath(); ctx.arc(offset,5,5,0,Math.PI*2); ctx.fill(); }
-  ctx.restore();
-}
-function chart(id, points, maximum, target, moving, minimum = 0) {
+function chart(id, points, maximum, target, moving, minimum = 0, horizontalLabel = "Transitions") {
   const [ctx, width, height] = context(id), left = 48, right = width - 12, top = 22, bottom = height - 34;
   const first = points[0]?.[0] ?? 0, last = Math.max(first + 1, points.at(-1)?.[0] ?? 1);
   const x = (value) => left + (value - first) / (last - first) * (right - left);
@@ -237,9 +214,9 @@ function chart(id, points, maximum, target, moving, minimum = 0) {
   const line = (series, color) => { ctx.strokeStyle = color;ctx.lineWidth = 1.5;ctx.beginPath();series.forEach((point,index)=>{if(index)ctx.lineTo(x(point[0]),y(point[1]));else ctx.moveTo(x(point[0]),y(point[1]));});ctx.stroke(); };
   line(points, moving ? "#76937d" : "#b6ee63");
   if (moving) line(points.map((point,index)=>{const batch=points.slice(Math.max(0,index-19),index+1);return [point[0],batch.reduce((sum,p)=>sum+p[1],0)/batch.length];}),"#b6ee63");
-  ctx.fillStyle="#a5b2a8";ctx.textAlign="left";ctx.fillText(first.toLocaleString(),left,bottom+18);ctx.textAlign="right";ctx.fillText(last.toLocaleString(),right,bottom+18);ctx.textAlign="center";ctx.fillText("Transitions",(left+right)/2,height-3);
+  ctx.fillStyle="#a5b2a8";ctx.textAlign="left";ctx.fillText(first.toLocaleString(),left,bottom+18);ctx.textAlign="right";ctx.fillText(last.toLocaleString(),right,bottom+18);ctx.textAlign="center";ctx.fillText(horizontalLabel,(left+right)/2,height-3);
 }
-function drawCharts() { chart("returns-chart", returns, task.maximum, task.target, true, task.minimum); chart("rate-chart", rates, task.rateMaximum, null, false); }
+function drawCharts() { chart("returns-chart", returns, task.maximum, task.target, true, task.minimum); chart("rate-chart", rates, task.rateMaximum, null, false, 0, "Optimizer updates"); }
 window.addEventListener("resize",()=>{drawScene(latest?.state ?? [0,0,0,0]);drawCharts();});
 drawScene([0,0,0,0]);drawCharts();requestAnimationFrame(frame);
 const initialGeneration = generation;
