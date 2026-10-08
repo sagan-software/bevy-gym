@@ -13,8 +13,10 @@ pub(super) enum Control {
     Playback,
     /// Apply exactly one action while paused.
     Step,
-    /// Restore the seeded initial state and hover command.
+    /// Restore the seeded initial state and clear policy memory.
     Reset,
+    /// Reset the episode with the bundled recovery policy.
+    Learned,
     /// Select one of the four bounded motor commands.
     Preset(MotorPreset),
     /// Replace the episode with the selected initial conditions.
@@ -60,14 +62,6 @@ fn header(root: &mut ChildSpawnerCommands<'_>, font: &Handle<Font>) {
                 },
             ));
             header.spawn((
-                Text::new("Manual motor commands"),
-                TextFont {
-                    font: font.clone(),
-                    font_size: 15.0,
-                    ..default()
-                },
-            ));
-            header.spawn((
                 StatusText,
                 Text::new("Loading drone model…"),
                 TextFont {
@@ -103,6 +97,7 @@ fn footer(root: &mut ChildSpawnerCommands<'_>, font: &Handle<Font>) {
                 button(row, "Reset [R]", Control::Reset, font);
             });
             footer.spawn(row()).with_children(|row| {
+                button(row, "Learned policy [P]", Control::Learned, font);
                 for (label, preset) in [
                     ("Power off [1]", MotorPreset::PowerOff),
                     ("Hover [2]", MotorPreset::Hover),
@@ -197,6 +192,7 @@ pub(super) fn interact(keys: Res<'_, ButtonInput<KeyCode>>, mut session: ResMut<
         (KeyCode::Space, Control::Playback),
         (KeyCode::KeyN, Control::Step),
         (KeyCode::KeyR, Control::Reset),
+        (KeyCode::KeyP, Control::Learned),
         (KeyCode::KeyC, Control::Start(StartProfile::Calm)),
         (KeyCode::KeyD, Control::Start(StartProfile::Disturbed)),
         (KeyCode::Digit1, Control::Preset(MotorPreset::PowerOff)),
@@ -219,6 +215,7 @@ fn apply(control: Control, session: &mut Session) {
         Control::Playback => session.toggle_playback(),
         Control::Step => session.single_step(),
         Control::Reset => session.reset(),
+        Control::Learned => session.select_learned(),
         Control::Preset(preset) => session.select(preset),
         Control::Start(profile) => session.select_start(profile),
     }
@@ -227,16 +224,17 @@ fn apply(control: Control, session: &mut Session) {
 /// Completion disables stepping; reset and motor selection remain available.
 fn enabled(control: Control, session: &Session) -> bool {
     match control {
-        Control::Playback => !session.status().is_done(),
-        Control::Step => !session.status().is_done() && session.playback() == Playback::Paused,
-        Control::Reset | Control::Preset(_) | Control::Start(_) => true,
+        Control::Playback => session.can_step(),
+        Control::Step => session.can_step() && session.playback() == Playback::Paused,
+        Control::Reset | Control::Learned | Control::Preset(_) | Control::Start(_) => true,
     }
 }
 
 /// Highlight the current motor command and initial-condition choice.
 fn selected(control: Control, session: &Session) -> bool {
     match control {
-        Control::Preset(preset) => preset == session.preset(),
+        Control::Preset(preset) => Some(preset) == session.preset(),
+        Control::Learned => session.is_learned(),
         Control::Start(profile) => profile == session.start_profile(),
         Control::Playback | Control::Step | Control::Reset => false,
     }
@@ -283,6 +281,9 @@ pub(super) fn refresh(
 
 /// Derive visible state from the authoritative result and current playback choice.
 fn status_label(session: &Session) -> String {
+    if let Some(error) = session.error() {
+        return format!("Policy failed: {error}\nReset or choose a controller to continue.");
+    }
     let state = match session.status() {
         EpisodeStatus::Terminated => "Episode ended",
         EpisodeStatus::Truncated => "Time limit",
@@ -292,10 +293,11 @@ fn status_label(session: &Session) -> String {
         },
     };
     let command = match session.preset() {
-        MotorPreset::PowerOff => "Power off",
-        MotorPreset::Hover => "Hover",
-        MotorPreset::Climb => "Climb",
-        MotorPreset::Tilt => "Tilt",
+        Some(MotorPreset::PowerOff) => "Power off",
+        Some(MotorPreset::Hover) => "Hover",
+        Some(MotorPreset::Climb) => "Climb",
+        Some(MotorPreset::Tilt) => "Tilt",
+        None => "Learned policy",
     };
     let steps = session.steps();
     let height = session.observation().position().y;
@@ -317,6 +319,74 @@ mod tests {
             pointer::{Location, PointerId},
         },
     };
+
+    #[test]
+    fn viewer_offers_a_labeled_learned_policy_button() {
+        let mut app = App::new();
+        app.add_plugins((MinimalPlugins, AssetPlugin::default()))
+            .init_asset::<Font>()
+            .add_systems(Startup, setup);
+        app.update();
+        let world = app.world_mut();
+        let button = world
+            .query::<(Entity, &Control)>()
+            .iter(world)
+            .find_map(|(entity, control)| matches!(control, Control::Learned).then_some(entity))
+            .expect("the viewer exposes learned inference");
+        let labels = world.get::<Children>(button).unwrap();
+        assert!(labels.iter().any(|child| {
+            world
+                .get::<Text>(child)
+                .is_some_and(|text| text.0 == "Learned policy [P]")
+        }));
+    }
+
+    #[test]
+    fn learned_selection_reports_state_and_faults_disable_only_playback() {
+        let mut session = Session::default();
+        assert!(!selected(Control::Learned, &session));
+        apply(Control::Learned, &mut session);
+        assert!(selected(Control::Learned, &session));
+        assert!(!selected(Control::Preset(MotorPreset::Hover), &session));
+        assert!(status_label(&session).starts_with("Paused | Learned policy | Step 0/500"));
+        session.select_policy(Vec::new());
+        assert!(status_label(&session).starts_with("Policy failed:"));
+        assert!(status_label(&session).ends_with("Reset or choose a controller to continue."));
+        assert!(!enabled(Control::Playback, &session));
+        assert!(!enabled(Control::Step, &session));
+        assert!(!selected(Control::Learned, &session));
+        for control in [
+            Control::Reset,
+            Control::Learned,
+            Control::Preset(MotorPreset::Hover),
+        ] {
+            assert!(enabled(control, &session));
+        }
+        apply(Control::Playback, &mut session);
+        apply(Control::Step, &mut session);
+        assert_eq!(session.steps(), 0);
+        apply(Control::Reset, &mut session);
+        assert!(enabled(Control::Playback, &session));
+    }
+
+    #[test]
+    fn learned_keyboard_shortcut_resets_a_running_episode() {
+        let mut app = App::new();
+        app.init_resource::<Session>()
+            .init_resource::<ButtonInput<KeyCode>>()
+            .add_systems(Update, interact);
+        let mut session = app.world_mut().resource_mut::<Session>();
+        session.toggle_playback();
+        session.advance();
+        app.world_mut()
+            .resource_mut::<ButtonInput<KeyCode>>()
+            .press(KeyCode::KeyP);
+        app.update();
+        let session = app.world().resource::<Session>();
+        assert!(session.is_learned());
+        assert_eq!(session.steps(), 0);
+        assert_eq!(session.playback(), Playback::Paused);
+    }
 
     #[test]
     fn selecting_a_start_updates_the_label_and_restarts_after_completion() {
@@ -425,12 +495,18 @@ mod tests {
             Control::Preset(MotorPreset::Climb)
         ));
         world.trigger(click(parent, PointerButton::Primary));
-        assert_eq!(world.resource::<Session>().preset(), MotorPreset::Climb);
+        assert_eq!(
+            world.resource::<Session>().preset(),
+            Some(MotorPreset::Climb)
+        );
         world.resource_mut::<Session>().reset();
         // Both complete clicks arrive between application updates, on child text.
         world.trigger(click(labels[0], PointerButton::Primary));
         world.trigger(click(labels[1], PointerButton::Primary));
-        assert_eq!(world.resource::<Session>().preset(), MotorPreset::Climb);
+        assert_eq!(
+            world.resource::<Session>().preset(),
+            Some(MotorPreset::Climb)
+        );
         assert_eq!(world.resource::<Session>().steps(), 1);
         for button in [PointerButton::Secondary, PointerButton::Middle] {
             world.trigger(click(labels[1], button));
@@ -505,7 +581,7 @@ mod tests {
             keys.clear();
             keys.press(key);
             app.update();
-            assert_eq!(app.world().resource::<Session>().preset(), preset);
+            assert_eq!(app.world().resource::<Session>().preset(), Some(preset));
         }
         let mut keys = app.world_mut().resource_mut::<ButtonInput<KeyCode>>();
         keys.clear();

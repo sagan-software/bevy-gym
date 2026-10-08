@@ -40,9 +40,10 @@ The synchronous training guide also exposed a lint that bans `std::fs` writes.
 A function-local exception keeps checkpoint output synchronous. The guide uses
 no asynchronous runtime solely to satisfy that lint.
 
-The new thumbnail index links to the manual drone viewer and five Classic Control
-tasks. Pendulum now appears in the existing environment selector. The public
-deployment remains gated by the browser workflow; the previous run timed out.
+The thumbnail index links to the drone viewer and five Classic Control tasks.
+The local drone viewer offers learned inference and manual control. Pendulum now
+appears in the existing environment selector. The public gallery and manual viewer
+are deployed; newer checkpoints remain gated by the browser workflow.
 Current documents do not establish all 23 tasks as browser-ready.
 
 The manifest declares only three native MuJoCo examples behind `mujoco`; eleven
@@ -97,23 +98,27 @@ These are review targets, not proven defects without their stated counterexample
 
 ## Personal-lint backlog
 
-Repository strict Clippy passes. The stricter personal suite still reports 50
+Repository strict Clippy passes. The stricter personal suite still reports 51
 errors and two warnings in unchanged code. The
 [diagnostic inventory](progress/personal-lint-backlog.json) records each location.
 Most findings concern function length; others concern complexity, wildcard enum
 matches, midpoint expressions, and a stale lint expectation. Fix these in scoped
 follow-up changes with behavioral tests. Do not hide them with broader allowances.
-The user-requested unused-dependency allowance is the only lint-policy exception.
+This audit changed the workspace lint level only for unused dependencies. The
+training guide also retains the scoped synchronous-file exception described above.
 
-The same personal rules report no diagnostics on this checkpoint's changed lines.
-This scoped pass does not make the full-package gate green.
+The strict pass stops in library code, so its filtered output cannot qualify an
+example it never checks. A separate discovery pass retains warnings without
+promoting them to errors and reaches the inference viewer. It reports no viewer
+diagnostics. The full-package strict gate remains unresolved.
 
 ## Validation boundary
 
 The exact root `cargo test`, formatting, all-target/all-feature strict Clippy, and
 robot WASM compile checks pass. The drone suite covers eight external contracts
-and five internal invariants. Manual browser flight has visual evidence; no trained
-drone controller is qualified.
+and five internal invariants. The recovery policy now passes separate native and
+browser qualification. [The learning guide](DRONE_LEARNING.md) records the limits
+of those results; damage recovery, perception, and pursuit remain unqualified.
 [Coverage evidence](progress/drone-foundation-coverage.json) records source hashes,
 command scope, full-file coverage, and uncovered changed lines. All 339 instrumented
 added source lines were hit, including internal test code. No added instrumented
@@ -122,13 +127,14 @@ are outside the changed lines. Module declarations and comments are not executab
 coverage targets. Two compile-fail documentation tests separately protect unchecked
 action construction and raw-world access.
 
-The viewer adds twelve tests for playback, completion, reset, keyboard shortcuts,
-clicks, model alignment, rotor pivots, and read-only projection. Its session has
-full measured coverage. Graphics startup and asset-state projection retain gaps
-in [the viewer record](progress/drone-viewer-coverage.json). The default coverage
-export omitted example source; the record uses the instrumented example executable.
+The viewer now has 25 tests for playback, completion, reset, keyboard shortcuts,
+clicks, model alignment, rotor pivots, policy failures, and read-only projection.
+Its session and controller have full measured line coverage. Graphics startup and
+asset-state projection retain gaps in the
+[inference record](progress/drone-inference-coverage.json). The default coverage
+export omits example source when Cargo uses a separate build directory; the record
+explicitly exports the instrumented example executable.
 Browser interaction is separate evidence and does not count as native coverage.
 
-The current deployment still offers three Classic Control tasks. Existing source
-work for additional tasks does not establish deployed qualification. Every remaining
+Existing source work for additional tasks does not establish deployed qualification. Every remaining
 area in the status document still requires its own behavioral and visual evidence.

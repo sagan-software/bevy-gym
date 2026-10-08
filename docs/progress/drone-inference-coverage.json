@@ -1,0 +1,675 @@
+{
+  "date": "2026-10-08",
+  "baseline_commit": "503cf8144994813d943ef9dd2d6e9ea65c673bac",
+  "scope": "Learned inference, episode memory, controller selection, and shared model recipe",
+  "rust": "1.97.1",
+  "coverage_command": "cargo llvm-cov --branch --features robots --example drone-flight --test drone_learning --json",
+  "coverage_export": "LLVM 22.1.6 export with explicit drone_flight example and drone_learning integration executables from coverage-build/llvm-cov-target; default discovery omits this separate build directory.",
+  "changed_lines": {
+    "instrumented": 292,
+    "unhit": 0,
+    "includes_internal_test_code": true
+  },
+  "files": [
+    {
+      "path": "examples/robots/flight.rs",
+      "sha256": "2785892e8ddd20d1e87e5a6cbd74667cd68fb9eeed2afcfc09fbff4fa858c3ff",
+      "summary": {
+        "branches": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "functions": {
+          "count": 3,
+          "covered": 0,
+          "percent": 0
+        },
+        "instantiations": {
+          "count": 3,
+          "covered": 0,
+          "percent": 0
+        },
+        "lines": {
+          "count": 38,
+          "covered": 0,
+          "percent": 0
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 29,
+          "covered": 0,
+          "notcovered": 29,
+          "percent": 0
+        }
+      },
+      "changed_instrumented_lines": [],
+      "unhit_changed_lines": []
+    },
+    {
+      "path": "examples/robots/flight/controls.rs",
+      "sha256": "898c5669a53fe848416855308a508ba6cd9b03369e94dfa0f033159a0e1ec5ea",
+      "summary": {
+        "branches": {
+          "count": 16,
+          "covered": 14,
+          "notcovered": 2,
+          "percent": 87.5
+        },
+        "functions": {
+          "count": 37,
+          "covered": 34,
+          "percent": 91.8918918918919
+        },
+        "instantiations": {
+          "count": 37,
+          "covered": 34,
+          "percent": 91.8918918918919
+        },
+        "lines": {
+          "count": 492,
+          "covered": 460,
+          "percent": 93.4959349593496
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 783,
+          "covered": 733,
+          "notcovered": 50,
+          "percent": 93.61430395913155
+        }
+      },
+      "changed_instrumented_lines": [
+        100,
+        195,
+        218,
+        227,
+        228,
+        229,
+        236,
+        237,
+        284,
+        285,
+        286,
+        296,
+        297,
+        298,
+        299,
+        300,
+        324,
+        325,
+        326,
+        327,
+        328,
+        329,
+        330,
+        331,
+        332,
+        333,
+        334,
+        335,
+        336,
+        337,
+        338,
+        339,
+        340,
+        341,
+        342,
+        345,
+        346,
+        347,
+        348,
+        349,
+        350,
+        351,
+        352,
+        353,
+        354,
+        355,
+        356,
+        357,
+        358,
+        359,
+        360,
+        361,
+        362,
+        363,
+        365,
+        366,
+        367,
+        368,
+        369,
+        370,
+        373,
+        374,
+        375,
+        376,
+        377,
+        378,
+        379,
+        380,
+        381,
+        382,
+        383,
+        384,
+        385,
+        386,
+        387,
+        388,
+        389,
+        498,
+        499,
+        506,
+        507,
+        584
+      ],
+      "unhit_changed_lines": []
+    },
+    {
+      "path": "examples/robots/flight/pilot.rs",
+      "sha256": "d248ea3b1af2cb38bc06986b196fb648d69667d1c2a6067011d1fe86e81d8cf7",
+      "summary": {
+        "branches": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "functions": {
+          "count": 6,
+          "covered": 6,
+          "percent": 100
+        },
+        "instantiations": {
+          "count": 6,
+          "covered": 6,
+          "percent": 100
+        },
+        "lines": {
+          "count": 48,
+          "covered": 48,
+          "percent": 100
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 98,
+          "covered": 98,
+          "notcovered": 0,
+          "percent": 100
+        }
+      },
+      "changed_instrumented_lines": [
+        20,
+        21,
+        22,
+        25,
+        26,
+        27,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        43,
+        44,
+        45,
+        46,
+        57,
+        58,
+        59,
+        61,
+        62,
+        65,
+        66,
+        67,
+        68,
+        70,
+        71,
+        72,
+        73,
+        74,
+        76,
+        79,
+        80,
+        81,
+        82,
+        83,
+        84,
+        85,
+        86,
+        87,
+        88,
+        89,
+        90,
+        91
+      ],
+      "unhit_changed_lines": []
+    },
+    {
+      "path": "examples/robots/flight/scene.rs",
+      "sha256": "9d195d0a7d1db8f32e0653fd8fd652a84965c1da2cb5926913fd20363ad867ac",
+      "summary": {
+        "branches": {
+          "count": 2,
+          "covered": 2,
+          "notcovered": 0,
+          "percent": 100
+        },
+        "functions": {
+          "count": 10,
+          "covered": 7,
+          "percent": 70
+        },
+        "instantiations": {
+          "count": 10,
+          "covered": 7,
+          "percent": 70
+        },
+        "lines": {
+          "count": 158,
+          "covered": 97,
+          "percent": 61.39240506329114
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 262,
+          "covered": 189,
+          "notcovered": 73,
+          "percent": 72.13740458015268
+        }
+      },
+      "changed_instrumented_lines": [
+        107
+      ],
+      "unhit_changed_lines": []
+    },
+    {
+      "path": "examples/robots/flight/session.rs",
+      "sha256": "3008394e99e2a39ef35dea24a3bce7749e94e34556196d1410c070b19c164ba2",
+      "summary": {
+        "branches": {
+          "count": 14,
+          "covered": 14,
+          "notcovered": 0,
+          "percent": 100
+        },
+        "functions": {
+          "count": 32,
+          "covered": 32,
+          "percent": 100
+        },
+        "instantiations": {
+          "count": 32,
+          "covered": 32,
+          "percent": 100
+        },
+        "lines": {
+          "count": 302,
+          "covered": 302,
+          "percent": 100
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 578,
+          "covered": 578,
+          "notcovered": 0,
+          "percent": 100
+        }
+      },
+      "changed_instrumented_lines": [
+        106,
+        107,
+        129,
+        130,
+        131,
+        132,
+        134,
+        137,
+        138,
+        139,
+        142,
+        143,
+        144,
+        145,
+        147,
+        150,
+        151,
+        152,
+        155,
+        156,
+        171,
+        172,
+        176,
+        177,
+        178,
+        181,
+        182,
+        183,
+        186,
+        187,
+        188,
+        189,
+        190,
+        191,
+        192,
+        198,
+        208,
+        215,
+        222,
+        223,
+        225,
+        226,
+        227,
+        228,
+        233,
+        234,
+        235,
+        236,
+        239,
+        240,
+        241,
+        242,
+        243,
+        244,
+        245,
+        247,
+        250,
+        251,
+        252,
+        263,
+        264,
+        265,
+        266,
+        267,
+        268,
+        269,
+        270,
+        271,
+        272,
+        273,
+        274,
+        275,
+        276,
+        277,
+        278,
+        279,
+        280,
+        281,
+        282,
+        284,
+        285,
+        286,
+        287,
+        288,
+        289,
+        290,
+        291,
+        292,
+        293,
+        294,
+        295,
+        296,
+        297,
+        300,
+        304,
+        308,
+        309,
+        310,
+        311,
+        313,
+        314,
+        315,
+        316,
+        317,
+        318,
+        319,
+        320,
+        321,
+        324,
+        325,
+        326,
+        327,
+        328,
+        329,
+        332,
+        333,
+        334,
+        335,
+        336,
+        337,
+        338,
+        339,
+        340,
+        341,
+        342,
+        343,
+        344,
+        345,
+        346,
+        347,
+        348,
+        349,
+        350,
+        351,
+        352,
+        353,
+        354,
+        355,
+        356,
+        357,
+        358,
+        359,
+        360,
+        361,
+        376,
+        436
+      ],
+      "unhit_changed_lines": []
+    },
+    {
+      "path": "examples/robots/learning/model.rs",
+      "sha256": "52110a41d3e7f91c3aae7ffb567aeb36a0c2c43b888717ab8987cfb09908cff1",
+      "summary": {
+        "branches": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "functions": {
+          "count": 2,
+          "covered": 2,
+          "percent": 100
+        },
+        "instantiations": {
+          "count": 2,
+          "covered": 2,
+          "percent": 100
+        },
+        "lines": {
+          "count": 15,
+          "covered": 15,
+          "percent": 100
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 10,
+          "covered": 10,
+          "notcovered": 0,
+          "percent": 100
+        }
+      },
+      "changed_instrumented_lines": [
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        25,
+        26,
+        27
+      ],
+      "unhit_changed_lines": []
+    },
+    {
+      "path": "examples/robots/learning/mod.rs",
+      "sha256": "d3b3a5331d91210354fccf2f4e23a03e961f4bd21d77242762f1c46c0eae3e0c",
+      "summary": {
+        "branches": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "functions": {
+          "count": 1,
+          "covered": 1,
+          "percent": 100
+        },
+        "instantiations": {
+          "count": 1,
+          "covered": 1,
+          "percent": 100
+        },
+        "lines": {
+          "count": 7,
+          "covered": 7,
+          "percent": 100
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 8,
+          "covered": 8,
+          "notcovered": 0,
+          "percent": 100
+        }
+      },
+      "changed_instrumented_lines": [],
+      "unhit_changed_lines": []
+    }
+  ],
+  "behavior": {
+    "viewer_tests_passed": 25,
+    "learning_tests_passed": 10,
+    "file_qualification_test": "ignored by its existing configuration; bundled qualification passed",
+    "failure_cases": [
+      "empty checkpoint",
+      "reserved MessagePack byte 0xc1",
+      "11 inputs instead of 12",
+      "three motors instead of four",
+      "motor range [2, 3] instead of [0, 1]"
+    ],
+    "invariants": [
+      "failed inference preserves physics, action, step count, and recurrent memory",
+      "failure pauses playback and disables stepping",
+      "reset preserves learned weights and clears memory",
+      "reset reproduces the first action and pose",
+      "start changes preserve a learned controller",
+      "manual selection replaces a learned controller without stepping"
+    ]
+  },
+  "browser": {
+    "engine": "T3 Chromium preview",
+    "build": "optimized WASM release",
+    "wasm_bytes": 36444646,
+    "wasm_gzip_9_bytes": 11133806,
+    "wasm_sha256": "40d3321ad8012f5ea45a11d22c6c05f43a6f21cf894a7c514502a25fe5dfae50",
+    "checkpoint_sha256": "bb0bef6e7412fd79ea097fa95036d428d22962af3b259c52c82b38c894df9b76",
+    "seed": 42,
+    "learned_actions": 500,
+    "learned_end": "time limit",
+    "constant_half_thrust_actions": 274,
+    "constant_half_thrust_end": "ground contact",
+    "video_seconds": 19.014867,
+    "desktop": [
+      1280,
+      800
+    ],
+    "narrow_review": "390 CSS-pixel same-origin frame; viewer document and scroll widths both 390. Gallery document and scroll widths both 375 with the frame scrollbar.",
+    "mobile_device_and_touch": "unverified",
+    "native_window": "unverified",
+    "preview_visibility": "Tool reports visible=false; document reports visible. Recording keeps frames advancing; idle preview wall-clock speed is unverified.",
+    "artifacts": [
+      {
+        "path": "docs/progress/drone-inference.png",
+        "bytes": 641979,
+        "sha256": "021530d40063dda12755e709d71e650b9898524898fe7b6c494e9c0775ca24d5"
+      },
+      {
+        "path": "docs/progress/drone-inference-narrow.png",
+        "bytes": 239884,
+        "sha256": "1d23ccdb2f77c0481fa85c7de117a017ccd6bb2ed7572f611d7787f3a18f1962"
+      },
+      {
+        "path": "docs/progress/drone-inference.mp4",
+        "bytes": 2315171,
+        "sha256": "3dce1c4949f43162696fc798120fffcfd40431cff7acdf8e0d468c229586af05"
+      },
+      {
+        "path": "docs/progress/drone-inference-contact-sheet.png",
+        "bytes": 311993,
+        "sha256": "6767290959d7230411c08a19e5858abc0508ec6f6d94c754f94a18007ec27f13"
+      }
+    ]
+  },
+  "personal_lints": {
+    "strict_full_package": "unresolved: 51 existing errors and two existing warnings",
+    "changed_line_diagnostics": [],
+    "verification_boundary": "The strict pass stops in unchanged library code. A separate --no-deny-warnings discovery pass retains diagnostics and reaches every example; the viewer has no diagnostics. This does not make the strict gate pass.",
+    "extra_example_only_attempt": "blocked by three existing wildcard enum match errors in dqn.rs:1268, ppo.rs:712, recurrent_ppo/mod.rs:2003"
+  },
+  "remaining_gaps": [
+    "Unchanged native window and graphics initialization lack instrumented coverage.",
+    "Unchanged UI asset-loading, asset-failure, playback-label and color refresh code retains uncovered lines and two instrumented branches.",
+    "Native window and mobile touch interaction are unverified.",
+    "Browser training controls, curriculum, damage, perception, pursuit, and the jumping quadruped remain unfinished."
+  ]
+}

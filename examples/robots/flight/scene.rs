@@ -104,7 +104,7 @@ pub(super) fn project(
     let position = observation.position();
     **camera = Transform::from_translation(position + CAMERA_OFFSET).looking_at(position, Vec3::Y);
     let phase = session.steps() as f32 * 0.02 * 200.0;
-    let fractions = session.preset().action().fractions();
+    let fractions = session.last_action().fractions();
     for (name, mut transform) in &mut rotors {
         if let Some((pivot, motor, sign)) = rotor(name.as_str()) {
             // This illustrates a spinning rotor; the physics command is force, not RPM.

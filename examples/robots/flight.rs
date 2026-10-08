@@ -1,4 +1,4 @@
-//! Inspect real hover physics with manual motor commands.
+//! Compare manual motor commands with learned drone recovery.
 //!
 //! Run `cargo run --features robots --example drone-flight`.
 //! The short `hover.rs` guide introduces the environment loop. Here, `Session`
@@ -6,6 +6,12 @@
 
 #[path = "flight/controls.rs"]
 mod controls;
+#[path = "learning/encoding.rs"]
+mod encoding;
+#[path = "learning/model.rs"]
+mod model;
+#[path = "flight/pilot.rs"]
+mod pilot;
 #[path = "flight/scene.rs"]
 mod scene;
 #[path = "flight/session.rs"]

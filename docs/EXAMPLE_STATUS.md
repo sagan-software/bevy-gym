@@ -6,11 +6,14 @@ Updated: 2026-10-08. Goal status: active.
 
 Read [the roadmap](EXAMPLE_ROADMAP.md), [quality audit](QUALITY_AUDIT.md),
 [reference research](EXAMPLE_RESEARCH.md), and [drone contract](ROBOT_ENVIRONMENT.md).
-Continue P1 by adding the qualified recovery policy to the viewer, then separate
-browser training controls and a curriculum.
+Continue P1 with separate browser training controls and a curriculum. The qualified
+recovery policy is now selectable in the viewer and has browser video evidence.
+Confirm this inference checkpoint's GitHub CI and Pages status before reporting
+it as deployed. Its local checks pass; publication is recorded by Git history.
 The disturbed-start task and native/browser comparison are pushed and pass CI.
 The public examples page and manual viewer are deployed and visually verified.
-The disturbed-start deployment is still running. Manual Bevy flight runs in WASM.
+The disturbed-start deployment passed. The training checkpoint's deployment is
+running. Learned and manual Bevy flight both run in WASM locally.
 Perception, damage adaptation, pursuit, and the jumping quadruped remain pending.
 Do not start later port families before the custom robot milestones.
 
@@ -55,7 +58,7 @@ finalizing each commit. Never add AI attribution.
   The 28-line guide demonstrates a seeded, time-limited constant hover command.
 - Added native robot tests and a robot WASM compile check to CI.
 
-## Verification
+## Foundation verification
 
 Passed after the source changes:
 
@@ -89,8 +92,8 @@ and Cargo TOML checks pass. The remaining CI commands also passed: both Python
 contract/dependency checks, robot tests without default features, both browser
 package test suites, and browser-package Clippy for native and WASM targets.
 Opt-in long training qualification tests remain ignored by their existing configuration.
-The manual viewer is deployed and verified. The recovery policy now passes native
-and browser qualification below; it is not yet selectable in the viewer.
+The manual viewer is deployed and verified. The recovery policy passes native
+and browser qualification below and is selectable in the local inference viewer.
 
 Earlier missing-API tests failed with `E0432` before production code existed.
 The initial reset regressions also failed before their fixes. These logs are retained
@@ -115,7 +118,7 @@ A click-event regression failed before switching buttons to Bevy pointer click o
 Buttons use one hit target. Apparent browser click misses were traced to preview input:
 the tool omits movement, and synthetic offsets needed correction for 1.75× display scaling.
 Corrected pointer input verified reset, motor selection, single-step, run, and pause.
-The runtime remains manual control; rotor spin illustrates thrust rather than measured RPM.
+That checkpoint used manual control. Rotor spin illustrates thrust rather than measured RPM.
 
 The [flight recording](progress/drone-flight.mp4) shows hover, power-off, ground contact,
 climb, pause, reset, and asymmetric thrust. Its [contact sheet](progress/drone-flight-contact-sheet.png)
@@ -225,11 +228,54 @@ records 350/350 lines and 14/14 branches across the guide and helper files, incl
 internal test code. Both JSON and model write failures were exercised.
 The file-based ignored qualification helper ran separately without coverage;
 the bundled qualification ran under coverage. Native window and touch checks remain
-unavailable. Learned inference and browser training controls remain unfinished.
+unavailable. Browser training controls remain unfinished.
 
-The updated `drone-browser-check` wrapper builds and prints help; its new learning
-suite awaits CI. Interactive browser execution is verified at port 8772 through
+The updated `drone-browser-check` wrapper and its learning suite pass CI.
+Interactive browser execution is verified at port 8772 through
 `bevy-gym-drone-learning-browser-20261008.service`.
+
+## Learned inference viewer
+
+The viewer shares the training lesson's encoding and model recipe. Its controller
+is manual, learned, or failed. A failure pauses playback before physics advances.
+Reset preserves learned weights and clears memory; manual reset restores hover.
+No library API changed. [The inference guide](DRONE_INFERENCE.md) records the contract.
+
+All 25 viewer tests and ten learning tests pass. The exact root test, formatting,
+all-target/all-feature strict Clippy, WASM viewer Clippy, and optimized build pass.
+[Coverage](progress/drone-inference-coverage.json) records 292/292 instrumented
+changed lines, including tests. Session and policy code have full line coverage;
+all fourteen session branches are hit. Unchanged graphics initialization and UI
+asset-state/color projection retain the recorded coverage gaps.
+
+The strict personal lint pass remains blocked by 51 existing library errors.
+The filtered output alone does not prove that example Clippy ran. An additional
+`--no-deny-warnings` discovery pass reaches the viewer without hiding diagnostics;
+it reports no viewer diagnostics. Dylint retains two existing warnings.
+A separate strict example-only attempt stops on three existing wildcard enum
+matches in `dqn.rs`, `ppo.rs`, and `recurrent_ppo/mod.rs`.
+
+The [19-second recording](progress/drone-inference.mp4),
+[contact sheet](progress/drone-inference-contact-sheet.png),
+[desktop screenshot](progress/drone-inference.png), and
+[narrow screenshot](progress/drone-inference-narrow.png) were inspected and shared.
+Seed 42 reaches action 500 under the learned policy and ground contact during
+action 274 under constant half-thrust. Learned selection works through the button
+and keyboard shortcut. Reset and single-step are included in the recording.
+
+Desktop and 390-pixel frame layouts pass the visual check. The gallery's scrollbar
+leaves 375 content pixels; neither surface overflows horizontally. Mobile touch
+and native window interaction remain unverified. T3 recording keeps frames
+advancing; idle preview wall-clock speed is unverified. Synthetic pointer movement
+needs `button: -1` and device-scale-adjusted coordinates before the tool's click.
+
+Local inference is served at `http://100.105.254.50:8768/robots/hover/`.
+The optimized WASM is 36,444,646 bytes. Its checksum, source hashes, exact checks,
+and remaining gaps are in the coverage record. Validation units use the prefix
+`bevy-gym-inference-` and retain logs under the existing validation cache.
+The hover, recovery, and one-update training guides pass after the final prose
+edit. Four documentation tests pass; one existing plugin example remains ignored.
+Changed Markdown passes its configured check.
 
 ## Published checkpoints
 
@@ -264,6 +310,12 @@ suite awaits CI. Interactive browser execution is verified at port 8772 through
   Pushed to GitHub `main`; remote revision verified.
   [CI](https://github.com/sagan-software/bevy-gym/actions/runs/37848277209) passed.
   [Browser deployment](https://github.com/sagan-software/bevy-gym/actions/runs/37848277060)
+  passed. Its newly deployed route has not received a separate visual check.
+- `503cf81`: native recovery training, qualified checkpoint, browser learning tests,
+  metrics, and training guide. Pushed to GitHub `main`; remote revision verified.
+  [CI](https://github.com/sagan-software/bevy-gym/actions/runs/37853641788) passed,
+  including the new headless browser learning suite.
+  [Browser deployment](https://github.com/sagan-software/bevy-gym/actions/runs/37853641770)
   is running.
 
 ## Local evidence and active validation

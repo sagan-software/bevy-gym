@@ -4,8 +4,8 @@ Status: trained checkpoint qualified on native and browser tests, 2026-10-08.
 
 The [training guide](../examples/robots/train.rs) trains the existing recurrent PPO
 implementation on `DroneHover::disturbed()`. Its support code stays beside the
-examples; the library API remains unchanged. The visual viewer still has manual
-controls. Learned inference and browser training controls are the next checkpoint.
+examples; the library API remains unchanged. The visual viewer now offers the
+bundled policy alongside manual controls. Browser training controls are next.
 
 ## Run the lesson
 
@@ -28,7 +28,7 @@ The actor has 32 recurrent units; the critic has two 64-unit hidden layers.
 Actor and critic learning rates are 0.0003 and 0.001. Each rollout receives four
 PPO epochs with eight sequences per minibatch. Discount is 0.995, GAE decay is
 0.95, initial log standard deviation is -2, and entropy coefficient is 0.001.
-The [recipe](../examples/robots/learning/mod.rs) records the remaining defaults.
+The [recipe](../examples/robots/learning/model.rs) records the remaining defaults.
 
 ## Recorded result
 
@@ -51,7 +51,8 @@ across multiple independent training runs.
 The browser runs the same qualification assertions against the bundled checkpoint.
 The [browser screenshot](progress/drone-learning-browser.png) shows all ten tests
 passing, including optimization, checkpoint reload, and held-out recovery.
-This is browser test evidence; it is not a learned-flight recording.
+The [inference guide](DRONE_INFERENCE.md) adds a learned-flight recording and
+compares the policy with constant half-thrust from the same disturbed start.
 
 ## Invariants
 
@@ -113,16 +114,17 @@ perception, pursuit, or performance beyond ten seconds.
 - [x] Train and retain metrics, configuration, checkpoint, and source revision.
 - [x] Beat constant half-thrust on selection seeds and separate final seeds.
 - [ ] Show learned inference and training as distinct browser modes.
-- [ ] Share browser screenshots and video, including reset and disturbed recovery.
+- [x] Share browser screenshots and video, including reset and disturbed recovery.
 - [x] Run exact Rust gates, personal lints, coverage, and browser checks.
-- [ ] Finish documentation, run the guides, and publish the tested checkpoint.
+- [x] Finish documentation, run the guides, and publish the tested training checkpoint.
 
 Root tests, strict Clippy, WASM Clippy, and the Nix wrapper checks pass. The
 personal lint scan reports no diagnostics on changed lines; its full-package
 Clippy pass still fails on 51 existing errors, and Dylint retains two existing
 warnings. That backlog is unresolved.
-The updated wrapper builds and prints help. Its new learning suite awaits headless
-CI; the interactive browser execution above passes locally.
+The updated wrapper and its learning suite pass
+[GitHub CI](https://github.com/sagan-software/bevy-gym/actions/runs/37853641788).
+The interactive browser execution above also passes locally.
 
 The [coverage record](progress/drone-learning-coverage.json) separates helper
 coverage from the command-line entry point. All 350 instrumented lines and all
