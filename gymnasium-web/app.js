@@ -8,7 +8,7 @@ $("environment").onchange = () => { location.search = new URLSearchParams({ env:
 document.querySelector("h1").textContent = task.title;
 $("score-target").textContent = `Target mean ≥${task.target}`;
 $("scene").setAttribute("aria-label", taskName === "mountain-car" ? "MountainCar simulation: a car climbs the right hill" : "CartPole simulation: a cart balances an upright pole");
-let worker, generation = 0;
+let worker, generation = 0, uploadGeneration = 0, cancelPolicyValidation;
 /** @type {"loading" | "running" | "advancing" | "pausing" | "paused" | "failed"} */
 let phase = "loading";
 let currentMode = "inference", initialBytes, initialSource, bundledBytes, latest, lastTime = 0, debt = 0;
@@ -42,6 +42,7 @@ function start(mode, bytes, source = "Bundled model") {
   let runSeed;
   try { runSeed = seed(); } catch (error) { $("error").textContent = error.message; $("error").hidden = false; return; }
   const run = ++generation;
+  ++uploadGeneration; cancelPolicyValidation?.();
   worker?.terminate();
   currentMode = mode; initialBytes = bytes; initialSource = source; latest = undefined;
   setPhase("loading"); debt = 0; returns = []; rates = [];
@@ -137,15 +138,45 @@ $("restart").onclick = () => start(currentMode, initialBytes, initialSource);
 $("train").onclick = () => start("training");
 $("bundled").onclick = () => { if (bundledBytes) start("inference", bundledBytes); };
 $("export").onclick = () => post({ command: "export" });
+// Validate in an isolated worker before replacing the active simulation or optimizer.
+function validatePolicy(bytes) {
+  return new Promise((resolve, reject) => {
+    const candidate = new Worker(new URL("gymnasium-worker_loader.js", document.baseURI), { type: "module", name: taskName });
+    const finish = (error) => {
+      clearTimeout(timeout); candidate.terminate();
+      if (cancelPolicyValidation === cancel) cancelPolicyValidation = undefined;
+      if (error) reject(error); else resolve();
+    };
+    const cancel = () => finish(new Error("Policy validation superseded."));
+    const timeout = setTimeout(() => finish(new Error("Policy validation timed out. Try uploading again.")), 10000);
+    cancelPolicyValidation = cancel;
+    candidate.onerror = event => finish(new Error(event.message || "Policy validation failed."));
+    candidate.onmessage = ({ data }) => {
+      try {
+        const message = JSON.parse(data);
+        if (message.event === "ready" && message.protocol === 1) {
+          candidate.postMessage(JSON.stringify({ command: "start_inference", seed: 0, bytes: Array.from(bytes) }));
+        } else if (message.event === "started") finish();
+        else finish(new Error(message.message || "Policy validator returned an invalid response."));
+      } catch (error) { finish(error); }
+    };
+  });
+}
 $("import").onchange = async (event) => {
   const file = event.target.files[0]; if (!file) return;
-  const run = generation;
+  event.target.value = "";
+  const run = generation, upload = ++uploadGeneration;
+  cancelPolicyValidation?.();
+  const current = () => run === generation && upload === uploadGeneration;
   try {
     if (file.size > 131072) throw new Error("Policy exceeds the 128 KiB limit.");
     const bytes = new Uint8Array(await file.arrayBuffer());
-    if (run === generation) start("inference", bytes, `Uploaded policy: ${file.name}`);
-  } catch (error) { if (run === generation) fail(error.message); }
-  event.target.value = "";
+    if (!current()) return;
+    await validatePolicy(bytes);
+    if (current()) start("inference", bytes, `Uploaded policy: ${file.name}`);
+  } catch (error) {
+    if (current()) { $("error").textContent = error.message; $("error").hidden = false; }
+  }
 };
 function context(id) {
   const canvas = $(id), bounds = canvas.getBoundingClientRect(), dpr = Math.min(devicePixelRatio || 1, 2);

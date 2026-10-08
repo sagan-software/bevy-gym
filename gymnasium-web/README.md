@@ -17,6 +17,9 @@ transition. Hardware limits can reduce achieved speed.
 
 Pause takes effect after the current worker batch, at most 64 transitions.
 Downloaded policies contain inference parameters, not resumable training state.
+Uploads are validated in a temporary worker before replacing the active session.
+Invalid, oversized, or timed-out uploads leave the current session intact.
+Starting another session cancels pending validation; late results are ignored.
 
 ## Verified CartPole model
 
@@ -88,8 +91,9 @@ initialization. Firefox and WebKit check training updates, inference, controls,
 and rejection of stale loading results. Full qualification cases for Firefox
 and WebKit are explicitly skipped.
 
-Both environments passed the 17 browser checks, including all speed settings
-and the WebKit pause regression. MountainCar passed offline training, scoring -102.41 across
+The UI suite passed 24 checks across all three engines, including all speed
+settings, the WebKit pause regression, and upload validation failures.
+MountainCar passed offline training, scoring -102.41 across
 200 held-out episodes after 390,000 transitions. Qualification jobs retain
 both metric reports and the selected policy record as downloadable artifacts.
 

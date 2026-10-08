@@ -37,6 +37,83 @@ test("every speed advances inference without optimizer updates", async ({ page }
   }
 });
 
+test("invalid uploads preserve the paused inference session", async ({ page }) => {
+  await page.goto("./");
+  await expect(page.locator("#status")).toHaveText("Running frozen policy");
+  await paused(page);
+  const before = await page.locator("#transitions").innerText();
+  for (const buffer of [Buffer.from([0, 1, 2]), Buffer.alloc(131073)]) {
+    await page.locator("#import").setInputFiles({ name: "invalid.mpk", mimeType: "application/octet-stream", buffer });
+    await expect(page.locator("#error")).toBeVisible();
+    await expect(page.locator("#status")).toHaveText("Paused");
+    await expect(page.locator("#transitions")).toHaveText(before);
+    await expect(page.locator("#policy-source")).toHaveText("Bundled model");
+  }
+  await page.getByRole("button", { name: "Step", exact: true }).click();
+  await expect(page.locator("#transitions")).toHaveText((Number(before.replaceAll(",", "")) + 1).toLocaleString("en-US"));
+});
+
+test("late upload validation cannot replace a newer training session", async ({ page }) => {
+  await page.addInitScript(() => {
+    const NativeWorker = window.Worker;
+    window.Worker = class extends NativeWorker {
+      constructor(...args) {
+        super(...args);
+        this.addEventListener("message", event => {
+          if (window.holdPolicyValidation && JSON.parse(event.data).event === "started") {
+            event.stopImmediatePropagation();
+            window.releasePolicyValidation = () => this.dispatchEvent(new MessageEvent("message", { data: event.data }));
+          }
+        });
+      }
+    };
+  });
+  await page.goto("./");
+  await expect(page.locator("#status")).toHaveText("Running frozen policy");
+  await paused(page);
+  const downloadEvent = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Download policy", exact: true }).click();
+  const download = await downloadEvent;
+  await page.evaluate(() => { window.holdPolicyValidation = true; });
+  await page.locator("#import").setInputFiles(await download.path());
+  await expect.poll(() => page.evaluate(() => Boolean(window.releasePolicyValidation))).toBe(true);
+  await page.evaluate(() => { window.holdPolicyValidation = false; });
+  await page.getByRole("button", { name: "Train from scratch", exact: true }).click();
+  await expect(page.locator("#mode")).toHaveText("Training · DQN");
+  await expect.poll(async () => Number(await page.locator("#transitions").innerText())).toBeGreaterThan(0);
+  await page.evaluate(() => window.releasePolicyValidation());
+  await expect(page.locator("#mode")).toHaveText("Training · DQN");
+  await expect(page.locator("#error")).toBeHidden();
+});
+
+test("validator failures preserve the active policy", async ({ page }) => {
+  await page.goto("./");
+  await expect(page.locator("#status")).toHaveText("Running frozen policy");
+  await paused(page);
+  const before = await page.locator("#transitions").innerText();
+  for (const failure of ["constructor", "worker", "protocol", "json", "timeout"]) {
+    await page.evaluate(failure => {
+      document.getElementById("error").hidden = true;
+      window.Worker = class {
+        constructor() {
+          if (failure === "constructor") throw new Error("Constructor failed");
+          queueMicrotask(() => {
+            if (failure === "worker") this.onerror({ message: "Worker failed" });
+            if (failure === "protocol") this.onmessage({ data: '{"event":"ready","protocol":99}' });
+            if (failure === "json") this.onmessage({ data: "invalid JSON" });
+          });
+        }
+        terminate() {}
+      };
+    }, failure);
+    await page.locator("#import").setInputFiles({ name: `${failure}.mpk`, mimeType: "application/octet-stream", buffer: Buffer.from([0]) });
+    await expect(page.locator("#error")).toBeVisible();
+    await expect(page.locator("#status")).toHaveText("Paused");
+    await expect(page.locator("#transitions")).toHaveText(before);
+    await expect(page.locator("#policy-source")).toHaveText("Bundled model");
+  }
+});
+
 // Exercise the shipped UI and actual Rust worker, including the repository URL prefix.
 test("training, frozen inference, pause, step, speed, and policy round trip", async ({ page }) => {
   const failures = [];
