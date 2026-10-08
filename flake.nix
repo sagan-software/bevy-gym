@@ -254,6 +254,10 @@
             fi
             export NO_COLOR=true
             export PLAYWRIGHT_BROWSERS_PATH="${pkgs.playwright-driver.browsers}"
+            # Pin EGL to Nix Mesa on Ubuntu runners as well as NixOS.
+            # https://github.com/NixOS/nixpkgs/pull/510475
+            export __EGL_VENDOR_LIBRARY_FILENAMES="${pkgs.mesa}/share/glvnd/egl_vendor.d/50_mesa.json"
+            export LIBGL_ALWAYS_SOFTWARE=1
             export TRUNK_OFFLINE=true
             trunk build --config web/Trunk.toml --release --locked
             python -m http.server 4173 --bind 127.0.0.1 --directory dist >/dev/null 2>&1 &
@@ -269,6 +273,10 @@
           text = ''
             export NO_COLOR=true
             export PLAYWRIGHT_BROWSERS_PATH="${pkgs.playwright-driver.browsers}"
+            # Pin EGL to Nix Mesa on Ubuntu runners as well as NixOS.
+            # https://github.com/NixOS/nixpkgs/pull/510475
+            export __EGL_VENDOR_LIBRARY_FILENAMES="${pkgs.mesa}/share/glvnd/egl_vendor.d/50_mesa.json"
+            export LIBGL_ALWAYS_SOFTWARE=1
             playwright test --config gymnasium-web/playwright.config.cjs --grep 'browser runtime starts$' "$@"
           '';
         };
@@ -286,6 +294,10 @@
           text = ''
             export NO_COLOR=true
             export PLAYWRIGHT_BROWSERS_PATH="${pkgs.playwright-driver.browsers}"
+            # Pin EGL to Nix Mesa on Ubuntu runners as well as NixOS.
+            # https://github.com/NixOS/nixpkgs/pull/510475
+            export __EGL_VENDOR_LIBRARY_FILENAMES="${pkgs.mesa}/share/glvnd/egl_vendor.d/50_mesa.json"
+            export LIBGL_ALWAYS_SOFTWARE=1
             trunk build --config gymnasium-web/Trunk.toml --release --locked --public-url /bevy-gym/
             serve_root=$(mktemp -d)
             ln -s "$PWD/site" "$serve_root/bevy-gym"
