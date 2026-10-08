@@ -301,6 +301,7 @@
             # https://github.com/NixOS/nixpkgs/pull/510475
             export __EGL_VENDOR_LIBRARY_FILENAMES="${pkgs.mesa}/share/glvnd/egl_vendor.d/50_mesa.json"
             export LIBGL_ALWAYS_SOFTWARE=1
+            python tests/test_browser_assets.py
             trunk build --config gymnasium-web/Trunk.toml --release --locked --public-url /bevy-gym/
             serve_root=$(mktemp -d)
             ln -s "$PWD/site" "$serve_root/bevy-gym"
@@ -395,6 +396,7 @@
           packages = [
             rustToolchain
             pkgs.pkg-config
+            pkgs.python3
             mujoco
           ]
           ++ renderNativeBuildInputs

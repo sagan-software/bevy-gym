@@ -362,12 +362,19 @@ fresh PPO seeds passed qualification, and offline Chromium training scored
 95.43 with 200/200 goals. The selected bundle scored 98.44 with 200/200 goals.
 
 Browser-to-native policy loading preserves the browser score within 0.00001.
-Publication and final deployed verification remain pending.
+The full local suite passed 81 cases, with six non-Chromium learning cases skipped.
+GitHub CI and Pages deployment passed for commit `976cd46`.
+Deployed inference, pause, single-step, and fresh training were recorded after
+refreshing stale cached worker assets. A build-directory versioning fix passes
+its regression in all three engines; publication of that fix remains pending.
 
 Pendulum's shared environment and native adapter now preserve double-precision
 state and match 420 pinned Python transitions. The three shared modules have
-100% measured line and region coverage. Fresh training has started;
-qualification and browser integration remain pending.
+100% measured line and region coverage. Its browser session now trains both
+networks and replays frozen policies with native transition agreement.
+All twelve fixed-state renderer comparisons pass. The
+[Pendulum port contract](gymnasium-web/PENDULUM.md) records the remaining
+qualification and page-integration work. Durable local training is running.
 
 Pendulum is followed by Acrobot and Toy Text. MuJoCo follows
 Toy Text, as requested on 2026-10-07; Box2D follows MuJoCo. Both engine

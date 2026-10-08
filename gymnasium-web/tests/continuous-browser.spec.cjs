@@ -42,8 +42,9 @@ test("bundled continuous policy passes held-out scores without optimizer updates
   await page.getByRole("button", { name: "Pause", exact: true }).click();
   await expect(page.locator("#status")).toHaveText("Paused");
   const result = await page.evaluate(async () => {
-    const bytes = Array.from(new Uint8Array(await (await fetch("models/mountain-car-continuous.mpk")).arrayBuffer()));
-    const worker = new Worker(new URL("gymnasium-worker_loader.js", document.baseURI), { type: "module", name: "mountain-car-continuous" });
+    const assetBase = new URL(".", document.querySelector('script[type="module"]').src);
+    const bytes = Array.from(new Uint8Array(await (await fetch(new URL("models/mountain-car-continuous.mpk", assetBase))).arrayBuffer()));
+    const worker = new Worker(new URL("gymnasium-worker_loader.js", assetBase), { type: "module", name: "mountain-car-continuous" });
     await new Promise((resolve, reject) => {
       worker.onerror = event => reject(new Error(event.message));
       worker.onmessage = event => JSON.parse(event.data).event === "ready" ? resolve() : reject(new Error("worker initialization failed"));

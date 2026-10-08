@@ -70,6 +70,21 @@ The [browser recording](classic-control/mountain-car-continuous.webm) shows
 bundled inference, fresh PPO training, and the mobile layout. This task reuses
 the upstream MountainCar geometry with its goal flag at position 0.45.
 
+The [deployed recording](classic-control/mountain-car-continuous-deployed.mp4)
+shows inference, pause, single-step, and fresh training on GitHub Pages.
+Its [training screenshot](classic-control/mountain-car-continuous-deployed-training.png)
+retains the optimizer counters and curves. This capture followed a refresh of
+stale worker assets from an earlier deployment. Asset versioning now has a
+separate browser regression.
+
+## Pendulum
+
+The browser renderer uses the original 500 by 500 geometry and unmodified
+torque-arrow image. Four fixed states cover upright, downward, positive-torque,
+and negative-torque rendering. All three browser engines pass the comparison.
+The [port contract](../../gymnasium-web/PENDULUM.md) records pending training
+qualification, page controls, and motion review.
+
 ## Automated comparison
 
 CartPole and MountainCar draw procedural shapes; their upstream renderers use
@@ -77,8 +92,9 @@ no sprite assets. The browser ports those drawing operations from Gymnasium
 revision `7a1191388aa4aa973d3a5e4b039899cd99cc991f`. Other environments must reuse
 upstream image or model assets where their renderers use them.
 
-Six fixed-state PNGs come directly from the pinned Pygame renderer:
-CartPole upright and tilted; both MountainCar tasks in the valley and on the slope.
+Ten fixed-state PNGs come directly from the pinned Pygame renderer:
+CartPole upright and tilted; both MountainCar tasks in the valley and on the slope;
+and Pendulum upright, downward, with positive torque, and with negative torque.
 `tests/fixtures/gymnasium/generate_rendering.py` regenerates them with NumPy,
 Pygame, and Pillow. Set `PYTHONPATH=ref/gymnasium` and
 `SDL_VIDEODRIVER=dummy` before running the generator.

@@ -10,6 +10,7 @@ on:
       - "examples/ecosystem/shared/**"
       - "web/**"
       - "gymnasium-web/**"
+      - "tests/test_browser_assets.py"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
 

@@ -5,6 +5,11 @@ public_url = "/"
 filehash = true
 inject_scripts = false
 
+[[hooks]]
+stage = "post_build"
+command = "sh"
+command_arguments = ["-c", 'python3 "$TRUNK_SOURCE_DIR/version_assets.py"']
+
 [serve]
 addresses = ["127.0.0.1"]
 port = 8081

@@ -258,8 +258,9 @@ for (const qualification of [
   } else await expect(page.locator("#status")).toHaveText("Running frozen policy");
   await paused(page);
   const evaluation = page.evaluate(async qualification => {
+    const assetBase = new URL(".", document.querySelector('script[type="module"]').src);
     async function client() {
-      const worker = new Worker(new URL("gymnasium-worker_loader.js", document.baseURI), { type: "module", name: qualification.task });
+      const worker = new Worker(new URL("gymnasium-worker_loader.js", assetBase), { type: "module", name: qualification.task });
       await new Promise((resolve, reject) => {
         worker.onerror = event => reject(new Error(event.message));
         worker.onmessage = event => { const message = JSON.parse(event.data); if (message.event === "ready" && message.protocol === 1) resolve(); else reject(new Error("worker protocol mismatch")); };

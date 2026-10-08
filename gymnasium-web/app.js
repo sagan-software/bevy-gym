@@ -1,4 +1,5 @@
 import { drawCartPole, drawMountainCar } from "./renderers.js";
+const assetBase = new URL(".", import.meta.url);
 const $ = (id) => document.getElementById(id);
 const tasks = {
   "cartpole": { title: "CartPole-v1", algorithm: "DQN", hz: 50, minimum: 0, maximum: 500, target: 475, rateMaximum: .0004, replay: 1000, lanes: 1 },
@@ -77,7 +78,7 @@ function start(mode, bytes, source = "Bundled model") {
   $("return-summary").textContent = "No completed episodes";
   $("rate-summary").textContent = mode === "training" ? "Waiting for the first optimizer update." : "Inference performs no optimizer updates.";
   drawScene([0, 0, 0, 0]); drawCharts();
-  worker = new Worker(new URL("gymnasium-worker_loader.js", document.baseURI), { type: "module", name: taskName });
+  worker = new Worker(new URL("gymnasium-worker_loader.js", assetBase), { type: "module", name: taskName });
   worker.onerror = (event) => { if (run === generation) fail(event.message || "The Rust worker failed."); };
   worker.onmessage = ({ data }) => {
     if (run !== generation) return;
@@ -169,7 +170,7 @@ $("export").onclick = () => post({ command: "export" });
 // Validate in an isolated worker before replacing the active simulation or optimizer.
 function validatePolicy(bytes) {
   return new Promise((resolve, reject) => {
-    const candidate = new Worker(new URL("gymnasium-worker_loader.js", document.baseURI), { type: "module", name: taskName });
+    const candidate = new Worker(new URL("gymnasium-worker_loader.js", assetBase), { type: "module", name: taskName });
     const finish = (error) => {
       clearTimeout(timeout); candidate.terminate();
       if (cancelPolicyValidation === cancel) cancelPolicyValidation = undefined;
@@ -244,8 +245,8 @@ const initialGeneration = generation;
 $("bundled").disabled = true;
 try {
   const [response, metadataResponse] = await Promise.all([
-    fetch(new URL(`models/${taskName}.mpk`, document.baseURI)),
-    fetch(new URL(`models/${taskName}.json`, document.baseURI)),
+    fetch(new URL(`models/${taskName}.mpk`, assetBase)),
+    fetch(new URL(`models/${taskName}.json`, assetBase)),
   ]);
   if (!response.ok || !metadataResponse.ok) throw new Error("Bundled policy or qualification report failed to load.");
   const metadata = await metadataResponse.json();

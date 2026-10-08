@@ -149,6 +149,20 @@ The explicit state-injection tests compare against the pinned Python oracle.
 
 Other Gymnasium environments remain in the
 [browser implementation plan](../GYMNASIUM_BROWSER_PLAN.md).
+The [Pendulum port](PENDULUM.md) records its implemented session and renderer
+contracts and pending qualification gates.
+
+## Deployment assets
+
+Each build places the application, worker, WebAssembly, models, and images in
+one SHA-256-addressed directory. The application resolves asset URLs relative
+to its own module. This prevents a cached worker from loading with a newer page
+that supports additional environments. Trunk's hashed CSS remains at the root.
+
+The post-build hook versions unpublished staging output before Trunk publishes
+it. Unit tests check deterministic naming and invalidation for each asset type.
+A browser regression blocks every old unversioned application, worker, and
+model URL and requires continuous MountainCar inference to start successfully.
 
 The deployment also runs `nix run .#gymnasium-check`. This launches the built
 site under `/bevy-gym/`, exercises its controls and policy round trip, and trains
@@ -164,17 +178,22 @@ MountainCar passed offline training, scoring -102.41 across
 200 held-out episodes after 390,000 transitions. Qualification jobs retain
 both metric reports and the selected policy record as downloadable artifacts.
 
-Native session coverage records 38 of 38 facade lines and 96 of 97 discrete-session
-lines. Unhit regions propagate errors from configuration creation, policy calls,
+Native session coverage records 48 of 49 facade lines and 96 of 97 discrete-session
+lines. The uncovered facade span propagates a Pendulum initialization error
+that the fixed valid recipe cannot produce. Unhit regions propagate errors from
+configuration creation, policy calls,
 environment stepping, and optimizer updates. Tests do not inject failures into
 an active optimizer. WebAssembly worker behavior is checked
 by browser tests; native LLVM cannot execute its browser entry point.
 
-The continuous-session modules have 100% line coverage. Unhit regions propagate
-configuration, inference, and optimizer errors that the fixed valid recipe and
-validated model cannot directly produce. Episode validation and rollout advantage
-calculation have 100% region coverage. Line coverage alone does not establish
-complete branch coverage.
+The continuous-session facade, rollout, training, task profile, and observation
+modules have 100% line coverage. Unhit regions propagate configuration,
+inference, and optimizer errors that tests do not inject into an active learner.
+Rollout advantage calculation has 100% region coverage.
+The episode summary reports 139 of 145 lines, while its annotated production
+lines all have hits. LLVM also reports one function with mismatched counters
+after a clean coverage run. That reporting discrepancy remains unresolved;
+these measurements do not establish complete branch coverage.
 
 ## Worker contract
 
