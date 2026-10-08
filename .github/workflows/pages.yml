@@ -10,6 +10,13 @@ on:
       - "examples/ecosystem/shared/**"
       - "web/**"
       - "gymnasium-web/**"
+      - "robot-web/**"
+      - "gallery/**"
+      - "examples/robots/**"
+      - "assets/robots/**"
+      - "assets/fonts/**"
+      - "LICENSES/**"
+      - "scripts/build_drone_viewer.sh"
       - "tests/test_browser_assets.py"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
@@ -30,7 +37,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v7
       - uses: cachix/install-nix-action@v31
@@ -50,6 +57,7 @@ jobs:
       - run: nix run .#gymnasium-check
         env:
           DEBUG: pw:browser
+      - run: nix develop --command scripts/build_drone_viewer.sh --release
       - uses: actions/upload-artifact@v7
         if: always()
         with:
@@ -57,6 +65,7 @@ jobs:
           path: test-results/gymnasium
           retention-days: 14
       - run: mkdir -p site/ecosystem && cp -a dist/. site/ecosystem/
+      - run: mkdir -p site/robots/hover site/examples && cp -a robot-web/dist-release/. site/robots/hover/ && cp -a gallery/. site/examples/
       - run: touch site/.nojekyll
       - uses: actions/upload-pages-artifact@v5
         with:

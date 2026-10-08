@@ -6,9 +6,10 @@ Updated: 2026-10-08. Goal status: active.
 
 Read [the roadmap](EXAMPLE_ROADMAP.md), [quality audit](QUALITY_AUDIT.md),
 [reference research](EXAMPLE_RESEARCH.md), and [drone contract](ROBOT_ENVIRONMENT.md).
-Continue P1 with a Bevy scene driven by `DroneHover`, then browser rollout comparison
-and learned hover. The headless foundation is implemented. Rendered flight,
-perception, damage adaptation, pursuit, and the jumping quadruped remain pending.
+Continue P1 with native/browser rollout comparison, then a disturbed hover task
+and learned control. Publish the tested manual viewer checkpoint and monitor its
+deployment. Manual Bevy flight runs in WASM.
+Perception, damage adaptation, pursuit, and the jumping quadruped remain pending.
 Do not start later port families before the custom robot milestones.
 
 Working checkout: `/home/sagan/Code/github.com/sagan-software/bevy-gym-quality`.
@@ -86,7 +87,8 @@ and Cargo TOML checks pass. The remaining CI commands also passed: both Python
 contract/dependency checks, robot tests without default features, both browser
 package test suites, and browser-package Clippy for native and WASM targets.
 Opt-in long training qualification tests remain ignored by their existing configuration.
-No drone browser execution, trained policy, or new deployment is qualified yet.
+The new viewer has run in the T3 browser with manual controls. A trained drone policy,
+native/browser rollout comparison, and new deployment remain unqualified.
 
 Earlier missing-API tests failed with `E0432` before production code existed.
 The initial reset regressions also failed before their fixes. These logs are retained
@@ -98,15 +100,57 @@ compile-fail checks for unchecked action construction and raw-world access.
 T3 preview is available. Inspected the official Bevy gallery and deployed Bevy Gym
 page. The deployment offers three Classic Control environments. Started fresh
 CartPole training and observed replay collection, then paused it. No optimizer
-update was observed. The preview reports `visible: false`; the page reports
+update was observed during that initial review. The preview reports `visible: false`;
+the page reports
 `visibilityState: visible`. Foreground training speed remains unverified.
-The preview resize tool failed for mobile dimensions, so mobile visual review is
-still pending. Historical browser qualification is not current audit evidence.
+The preview resize tool failed. Narrow layouts were instead inspected in
+390-pixel same-origin frames; mobile device and touch behavior remain unverified.
+Historical browser qualification is not current audit evidence.
+
+The manual viewer checkpoint lives in `examples/robots/flight.rs`, its `flight/` modules,
+`robot-web/`, `gallery/`, and `scripts/build_drone_viewer.sh`. Twelve viewer tests pass.
+A click-event regression failed before switching buttons to Bevy pointer click observers.
+Buttons use one hit target. Apparent browser click misses were traced to preview input:
+the tool omits movement, and synthetic offsets needed correction for 1.75× display scaling.
+Corrected pointer input verified reset, motor selection, single-step, run, and pause.
+The runtime remains manual control; rotor spin illustrates thrust rather than measured RPM.
+
+The [flight recording](progress/drone-flight.mp4) shows hover, power-off, ground contact,
+climb, pause, reset, and asymmetric thrust. Its [contact sheet](progress/drone-flight-contact-sheet.png)
+was inspected. Desktop and 390-pixel frame layouts were inspected. The preview resize
+API remains unavailable, so this does not establish mobile-device or touch qualification.
+The initial debug WASM is 103 MB. The tested optimized release is 34,801,765 bytes;
+local gzip level 9 produces 10,685,070 bytes. This is not a measured network transfer.
+`bevy-gym-flight-release-build-20261008` passed; its log is `flight-release-build.log`.
+The abandoned shared-cache release unit was stopped to let tests use the build lock.
+
+The local viewer is at `http://100.105.254.50:8767/`; the local gallery review is at
+`http://100.105.254.50:8768/examples/`. Both serve ignored build/review directories.
+The public routes will be `/bevy-gym/robots/hover/` and `/bevy-gym/examples/` after deployment.
 
 A temporary asset viewer serves only `runs/quality-research/media` at
 `http://100.105.254.50:8766/drone-viewer.html` through
 `bevy-gym-drone-viewer-lan-20261008.service`. It is an inspection page, not a
-published example. The next visual checkpoint must show the Bevy physics state.
+published example. Use the flight recording above for the Bevy physics state.
+
+## Viewer checks and remaining gaps
+
+The final Rust edits passed the exact root test, formatting, and strict Clippy commands,
+the twelve viewer tests, debug and optimized WASM builds, and personal lints scoped
+against `decad5c`. The full-package personal backlog remains unresolved. Shell lint,
+JavaScript syntax, workflow syntax, six gallery routes, and all thumbnail files pass.
+
+[Viewer coverage](progress/drone-viewer-coverage.json) records the final source hashes.
+The session has full line and branch coverage. Native window setup, graphics/asset
+initialization, loading/failure text, and color projection retain instrumented gaps.
+The CPU tests do not start a native window. Asset-loader failure fixtures remain
+pending; the successful browser load does not cover those failure branches.
+Browser video covers visible behavior; it does not supply native coverage hits.
+The native window, touch input, and native/browser numerical parity remain unverified.
+
+The next learning lesson must include tilt or velocity disturbances. Constant half
+thrust already solves the calm diagnostic baseline. Require held-out improvement
+against that baseline before describing a policy as learned hover control.
 
 ## Published checkpoints
 
@@ -114,10 +158,14 @@ published example. The next visual checkpoint must show the Bevy physics state.
   [CI run 37809258024](https://github.com/sagan-software/bevy-gym/actions/runs/37809258024) passed.
 - `9cc5672`: inspected visual references. GitHub
   [CI run 37819131154](https://github.com/sagan-software/bevy-gym/actions/runs/37819131154) passed.
-- `5b4a87c`: remove dependency-only example imports. Committed locally.
-- `f268233`: isolate automatic resets and seed schedules. Committed locally.
-- Drone foundation is preparing for publication. Verify the remote before reporting
-  any of these three source checkpoints as pushed.
+- `5b4a87c`: remove dependency-only example imports. Pushed to GitHub `main`.
+- `f268233`: isolate automatic resets and seed schedules. Pushed to GitHub `main`.
+- `decad5c`: typed drone hover, licensed asset, guide, and validation evidence.
+  Pushed to GitHub `main`; remote revision verified.
+  [CI](https://github.com/sagan-software/bevy-gym/actions/runs/37830890969) passed.
+  [Browser deployment](https://github.com/sagan-software/bevy-gym/actions/runs/37830890801)
+  reached its 45-minute job limit during Gymnasium qualification. Deployment was skipped.
+  The pending viewer checkpoint raises the job limit to 90 minutes without removing tests.
 
 ## Local evidence and active validation
 
@@ -129,8 +177,10 @@ four jobs, or two for coverage/WASM, with development and test debug information
 
 Detached units use `bevy-gym-*-20261008.service`. A passed unit has
 `SubState=exited` and `ExecMainStatus=0`; status zero while running is not a pass.
-Logs append across reruns, so read the final invocation. Both `bevy-gym-quality-ci-remainder-20261008` and
-`bevy-gym-drone-guides-20261008` passed. No validation unit remains running.
+Logs append across reruns, so read the final invocation.
+Both `bevy-gym-quality-ci-remainder-20261008` and `bevy-gym-drone-guides-20261008`
+passed. All viewer validation units passed. The release build and WASM execution
+also passed.
 Full coverage uses `RUSTC_BOOTSTRAP=1` only for nightly branch instrumentation.
 The command and output scopes are retained in the coverage record.
 

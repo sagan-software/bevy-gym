@@ -124,8 +124,15 @@ nix develop --command cargo run --no-default-features --features robots --exampl
 
 The [hover guide](examples/robots/hover.rs) applies four validated motor commands
 in a private Rapier world and prints the resulting position. It runs without a
-window. The constant hover command is a diagnostic baseline; rendered flight and
-learned control are the next checkpoints. See the
+window. Open the visual lesson with:
+
+```sh
+nix develop --command cargo run --features robots --example drone-flight
+```
+
+Its manual controls show hover, climb, power-off, and tilt. The
+[browser build guide](robot-web/README.md) uses the same Bevy example in WebAssembly.
+No trained drone policy is qualified yet. See the
 [physics contract](docs/ROBOT_ENVIRONMENT.md) and [execution status](docs/EXAMPLE_STATUS.md).
 
 ## Train in your browser

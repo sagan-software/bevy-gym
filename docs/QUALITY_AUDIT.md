@@ -25,9 +25,9 @@ versioned contract and explain only the actions and observations used by the les
 
 ## Confirmed delivery gaps
 
-`gymnasium-web/index.html` exposes CartPole, MountainCar, continuous MountainCar,
-and Acrobot through a selector. It is not the requested thumbnail-based Bevy-style
-gallery. Pendulum has renderer work and pending qualification described elsewhere.
+The new thumbnail index links to the manual drone viewer and five Classic Control
+tasks. Pendulum now appears in the existing environment selector. The public
+deployment remains gated by the browser workflow; the previous run timed out.
 Current documents do not establish all 23 tasks as browser-ready.
 
 The manifest declares only three native MuJoCo examples behind `mujoco`; eleven
@@ -97,7 +97,8 @@ This scoped pass does not make the full-package gate green.
 
 The exact root `cargo test`, formatting, all-target/all-feature strict Clippy, and
 robot WASM compile checks pass. The drone suite covers eight external contracts
-and five internal invariants. No trained controller or browser flight is qualified.
+and five internal invariants. Manual browser flight has visual evidence; no trained
+drone controller is qualified.
 [Coverage evidence](progress/drone-foundation-coverage.json) records source hashes,
 command scope, full-file coverage, and uncovered changed lines. All 339 instrumented
 added source lines were hit, including internal test code. No added instrumented
@@ -105,6 +106,13 @@ line is uncovered. The full `plugin.rs` line rate is 75.54%; its uncovered paths
 are outside the changed lines. Module declarations and comments are not executable
 coverage targets. Two compile-fail documentation tests separately protect unchecked
 action construction and raw-world access.
+
+The viewer adds twelve tests for playback, completion, reset, keyboard shortcuts,
+clicks, model alignment, rotor pivots, and read-only projection. Its session has
+full measured coverage. Graphics startup and asset-state projection retain gaps
+in [the viewer record](progress/drone-viewer-coverage.json). The default coverage
+export omitted example source; the record uses the instrumented example executable.
+Browser interaction is separate evidence and does not count as native coverage.
 
 The current deployment still offers three Classic Control tasks. Existing source
 work for additional tasks does not establish deployed qualification. Every remaining

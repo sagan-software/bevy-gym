@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Run Bevy Gym examples in your browser and read their source.">
+    <title>Examples | Bevy Gym</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header>
+      <a class="brand" href="./">Bevy Gym</a>
+      <nav aria-label="Project"><a href="../ecosystem/">Ecosystem demos</a><a href="https://github.com/sagan-software/bevy-gym">GitHub</a></nav>
+    </header>
+    <main>
+      <h1>Examples</h1>
+      <div class="catalog">
+        <nav class="categories" aria-label="Categories"><a href="#robots">Robots</a><a href="#classic-control">Classic control</a></nav>
+        <div>
+          <section id="robots" aria-labelledby="robots-title">
+            <h2 id="robots-title">Robots</h2>
+            <div class="examples">
+              <a class="example" href="../robots/hover/">
+                <img src="images/drone.png" width="600" height="400" alt="A four-rotor drone in flight">
+                <div><h3>Drone hover</h3><p>Control four motors. Inspect hover, climb, loss of thrust, and tilt.</p><span class="mode">Manual control</span></div>
+              </a>
+            </div>
+          </section>
+          <section id="classic-control" aria-labelledby="classic-title">
+            <h2 id="classic-title">Classic control</h2>
+            <div class="examples">
+              <a class="example" href="../?env=cartpole"><img src="images/cartpole.png" width="600" height="400" alt="A cart with an upright pole" loading="lazy"><div><h3>CartPole</h3><p>Balance a pole by moving its cart.</p><span class="mode">Training and inference</span></div></a>
+              <a class="example" href="../?env=mountain-car"><img src="images/mountain-car.png" width="600" height="400" alt="A car on a sloping track" loading="lazy"><div><h3>MountainCar</h3><p>Build momentum to reach the hilltop.</p><span class="mode">Training and inference</span></div></a>
+              <a class="example" href="../?env=mountain-car-continuous"><img src="images/mountain-car.png" width="600" height="400" alt="A car on a sloping track" loading="lazy"><div><h3>Continuous MountainCar</h3><p>Reach the hilltop with continuous throttle.</p><span class="mode">Training and inference</span></div></a>
+              <a class="example" href="../?env=pendulum"><img src="images/pendulum.png" width="500" height="500" alt="A pendulum suspended from its pivot" loading="lazy"><div><h3>Pendulum</h3><p>Swing a pendulum upright using torque.</p><span class="mode">Training and inference</span></div></a>
+              <a class="example" href="../?env=acrobot"><img src="images/acrobot.png" width="500" height="500" alt="Two connected links below a target line" loading="lazy"><div><h3>Acrobot</h3><p>Swing two links above the target line.</p><span class="mode">Training and inference</span></div></a>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+    <footer>Drone model: <a href="https://poly.pizza/m/DNbUoMtG3H">NateGazzard</a>, <a href="https://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</footer>
+  </body>
+</html>

@@ -1,7 +1,7 @@
 # First drone environment contract
 
-Status: headless physics and typed Bevy integration implemented. Updated 2026-10-08.
-Rendered flight, browser rollouts, and learning remain pending.
+Status: headless physics, typed Bevy integration, and manual browser flight implemented.
+Updated 2026-10-08. Native/browser rollout comparison and learning remain pending.
 This defines the first P1 checkpoint in [the roadmap](EXAMPLE_ROADMAP.md).
 It is an original game simulation informed by the references, not an ARC Raiders
 source port or a claim about Embark's unpublished controller.
@@ -97,9 +97,12 @@ qualified for this task yet.
 - [x] Two Bevy environments run through typed action and transition messages.
 - [ ] Native/WASM rollout comparison passes in an actual browser.
 - [x] The model has provenance, a retained license, and a documented actuator map.
-- [ ] Bevy desktop and browser render the real state; visual checks cover motion
-      and repeated resets. Baseline and learned-policy labels remain distinct.
+- [x] Bevy browser rendering reads the real state; visual checks cover motion
+      and repeated resets. The viewer labels its manual controls.
+- [ ] Native window interaction and mobile device input are verified.
 - [x] Required root Rust gates and changed-line personal lints pass.
-- [x] New drone source lines and branches have 100% measured coverage.
+- [x] The core `robots` module has 100% measured line and branch coverage.
+- [ ] Viewer coverage is complete. Its session has full coverage; graphics startup
+      and asset-state branches remain unhit in [the viewer record](progress/drone-viewer-coverage.json).
 - [ ] Full-package personal lints pass; baseline findings remain in the audit.
 - [x] Final prose-only documentation, the guide, and documentation tests pass.

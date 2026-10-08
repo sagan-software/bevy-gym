@@ -37,6 +37,7 @@ jobs:
       - run: nix develop --command cargo fmt --all -- --check
       - run: nix develop --command cargo test
       - run: nix develop --command cargo test --no-default-features --features robots --lib --test drone_hover
+      - run: nix develop --command cargo test --features robots --example drone-flight
       - run: nix develop --command cargo check --no-default-features --features robots,browser --target wasm32-unknown-unknown
       - run: nix develop --command cargo test -p bevy-gym-web --locked
       - run: nix develop --command cargo test -p bevy-gym-browser --locked

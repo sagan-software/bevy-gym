@@ -16,3 +16,8 @@ __pycache__/
 /CLAUDE.md
 
 /site/
+
+# Generated robot browser bundle.
+/robot-web/dist/
+
+/robot-web/dist-release/

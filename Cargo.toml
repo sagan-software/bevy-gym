@@ -29,18 +29,24 @@ ecosystem-inference = ["dep:avian2d"]
 # Local iteration only. Bevy dynamic linking is the largest rebuild-time win,
 # but should not be enabled for published or shipping builds.
 fast-compile = ["bevy/dynamic_linking"]
-render = [
+# Portable rendering for native and browser examples.
+render-core = [
   "bevy/2d_bevy_render",
   "bevy/3d_bevy_render",
   "bevy/default_app",
   "bevy/default_font",
-  "bevy/bevy_remote",
   "bevy/bevy_gizmos",
   "bevy/bevy_mikktspace",
   "bevy/bevy_text",
   "bevy/bevy_ui",
   "bevy/bevy_ui_render",
   "bevy/bevy_winit",
+  "bevy/ui_picking",
+]
+# Native examples also include remote inspection and desktop window backends.
+render = [
+  "render-core",
+  "bevy/bevy_remote",
   "bevy/wayland",
   "bevy/x11",
   "dep:bevy-inspector-egui",
@@ -131,6 +137,11 @@ version = "0.30.1"
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies.tokio]
 features = ["fs", "io-util", "process", "rt"]
 version = "1"
+
+[[example]]
+name = "drone-flight"
+path = "examples/robots/flight.rs"
+required-features = ["robots", "render-core"]
 
 [[example]]
 name = "drone-hover"
