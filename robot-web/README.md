@@ -47,3 +47,20 @@ Native window interaction and mobile device input remain unverified.
 
 The build includes the [model attribution and license](../assets/robots/README.md)
 and the [font license](../assets/fonts/README.md). Preserve them when distributing it.
+
+## Training worker
+
+The viewer build also includes a dedicated CPU training worker. Its
+[protocol and verification record](../docs/DRONE_BROWSER_TRAINING.md) describe the
+fixed recovery recipe, progress metrics, and checkpoint export. The page's
+training controls are still pending.
+
+Build the worker independently during development:
+
+```sh
+nix develop --command scripts/build_drone_worker.sh --release
+nix develop --command cargo test -p bevy-gym-drone-worker --locked
+```
+
+The worker uses `worker.js` as its module entry point and announces protocol 1
+after initialization. Keep its generated JavaScript and WASM files together.

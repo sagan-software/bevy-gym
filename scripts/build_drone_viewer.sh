@@ -40,3 +40,6 @@ cp -- robot-web/index.html robot-web/styles.css robot-web/start.js "$viewer_dist
 cp -- assets/fonts/MonaSans-VariableFont.ttf assets/fonts/OFL.txt "$viewer_dist/assets/fonts/"
 cp -- assets/robots/drone.glb assets/robots/README.md "$viewer_dist/assets/robots/"
 cp -- LICENSES/DRONE-CC-BY-3.0.txt "$viewer_dist/LICENSES/DRONE-CC-BY-3.0.txt"
+
+# Include the independent training worker in the same deployment.
+scripts/build_drone_worker.sh "${viewer_flags[@]}"

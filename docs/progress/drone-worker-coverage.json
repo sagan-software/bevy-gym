@@ -1,0 +1,146 @@
+{
+  "date": "2026-10-08",
+  "scope": "Native protocol integration test, including private invariant tests. Counts include test code.",
+  "tests_passed": 12,
+  "command": "nix develop --command cargo llvm-cov --branch -p bevy-gym-drone-worker --test protocol --json --output-path <external-log>",
+  "report_note": "Cargo report omitted the integration binary in the separate build directory. Exported that exact instrumented protocol binary with llvm-cov and the generated profdata.",
+  "files": [
+    {
+      "path": "robot-web/src/protocol.rs",
+      "sha256": "f2fab8049f1ead923508337668d4ae3a5de16c548d925963fb7993d9f25f2528",
+      "summary": {
+        "branches": {
+          "count": 4,
+          "covered": 4,
+          "notcovered": 0,
+          "percent": 100
+        },
+        "functions": {
+          "count": 9,
+          "covered": 9,
+          "percent": 100
+        },
+        "instantiations": {
+          "count": 9,
+          "covered": 9,
+          "percent": 100
+        },
+        "lines": {
+          "count": 61,
+          "covered": 61,
+          "percent": 100
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 113,
+          "covered": 110,
+          "notcovered": 3,
+          "percent": 97.34513274336283
+        }
+      }
+    },
+    {
+      "path": "robot-web/src/session.rs",
+      "sha256": "33d5e27edc89528b7c505c0c7ff9689a0dfa294291e92d9d48ff572ae9f6de85",
+      "summary": {
+        "branches": {
+          "count": 6,
+          "covered": 6,
+          "notcovered": 0,
+          "percent": 100
+        },
+        "functions": {
+          "count": 12,
+          "covered": 10,
+          "percent": 83.33333333333334
+        },
+        "instantiations": {
+          "count": 18,
+          "covered": 15,
+          "percent": 83.33333333333334
+        },
+        "lines": {
+          "count": 165,
+          "covered": 163,
+          "percent": 98.7878787878788
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 216,
+          "covered": 208,
+          "notcovered": 8,
+          "percent": 96.29629629629629
+        }
+      }
+    },
+    {
+      "path": "robot-web/tests/protocol.rs",
+      "sha256": "89962b138467aa00e427ec2bf505e0b933d2cfc362d612e9959633c8aca554fb",
+      "summary": {
+        "branches": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "functions": {
+          "count": 5,
+          "covered": 5,
+          "percent": 100
+        },
+        "instantiations": {
+          "count": 5,
+          "covered": 5,
+          "percent": 100
+        },
+        "lines": {
+          "count": 115,
+          "covered": 115,
+          "percent": 100
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 217,
+          "covered": 217,
+          "notcovered": 0,
+          "percent": 100
+        }
+      }
+    }
+  ],
+  "uncovered": [
+    {
+      "path": "robot-web/src/session.rs",
+      "line": 78,
+      "reason": "Initialization error conversion. The fixed valid recipe does not expose an input that causes RecurrentPpoAgent::new to return Err."
+    },
+    {
+      "path": "robot-web/src/session.rs",
+      "line": 133,
+      "reason": "Checkpoint serialization error conversion. The private valid tensor shapes and in-memory MessagePack recorder provide no deterministic failing input."
+    }
+  ],
+  "wasm_adapter": {
+    "path": "robot-web/src/main.rs",
+    "native_coverage": "Not measured by native protocol tests. The native main is empty. Browser tests execute WASM initialization, readiness, JSON-string requests, and rejection of non-string data. post_message failure branches and panic handling remain unforced."
+  },
+  "personal_lints": {
+    "native": "Selected worker package, all targets/features, strict Clippy and Dylint pass. Raw output contains no diagnostics and records worker binary and protocol test artifacts.",
+    "wasm": "Selected worker binary passes the same strict personal Clippy flags with --no-deps. An earlier dependency-inclusive run stopped on existing wildcard matches in src/training/dqn.rs:1268 and src/training/recurrent_ppo/mod.rs:2003. The root personal-lint backlog remains unresolved."
+  }
+}

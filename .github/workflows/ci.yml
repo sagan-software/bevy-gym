@@ -42,6 +42,7 @@ jobs:
       - run: nix run .#drone-browser-check
       - run: nix develop --command cargo test -p bevy-gym-web --locked
       - run: nix develop --command cargo test -p bevy-gym-browser --locked
+      - run: nix develop --command cargo test -p bevy-gym-drone-worker --locked
   strict:
     runs-on: ubuntu-latest
     steps:
@@ -56,3 +57,5 @@ jobs:
       - run: nix develop --command cargo clippy --all-targets --all-features -- -D warnings
       - run: nix develop --command cargo clippy -p bevy-gym-browser --all-targets -- -D warnings
       - run: nix develop --command cargo clippy -p bevy-gym-browser --target wasm32-unknown-unknown -- -D warnings
+      - run: nix develop --command cargo clippy -p bevy-gym-drone-worker --all-targets --all-features -- -D warnings
+      - run: nix develop --command cargo clippy -p bevy-gym-drone-worker --target wasm32-unknown-unknown --all-features -- -D warnings

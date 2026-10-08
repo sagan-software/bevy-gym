@@ -624,6 +624,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "bevy-gym-drone-worker"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+ "bevy-gym",
+ "console_error_panic_hook",
+ "js-sys",
+ "serde",
+ "serde_json",
+ "wasm-bindgen",
+ "web-sys",
+]
+
+[[package]]
 name = "bevy-gym-web"
 version = "0.1.0"
 dependencies = [

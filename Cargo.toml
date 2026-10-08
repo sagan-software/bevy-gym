@@ -9,7 +9,7 @@ keywords = ["bevy", "gym", "ecs", "simulation", "rl"]
 categories = ["game-engines", "science"]
 
 [workspace]
-members = ["web", "gymnasium-web"]
+members = ["web", "gymnasium-web", "robot-web"]
 default-members = ["."]
 resolver = "2"
 

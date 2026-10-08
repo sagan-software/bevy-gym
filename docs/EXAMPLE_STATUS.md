@@ -8,7 +8,8 @@ Read [the roadmap](EXAMPLE_ROADMAP.md), [quality audit](QUALITY_AUDIT.md),
 [reference research](EXAMPLE_RESEARCH.md), and [drone contract](ROBOT_ENVIRONMENT.md).
 Continue P1 with separate browser training controls and a curriculum. The qualified
 recovery policy is now selectable in the viewer and has browser video evidence.
-The inference checkpoint is pushed and passes CI. Its Pages deployment is pending.
+The inference and Pages-cache checkpoints are pushed and pass CI.
+Their Pages deployment is pending.
 Confirm Pages status before reporting it as deployed.
 The disturbed-start task and native/browser comparison are pushed and pass CI.
 The public examples page and manual viewer are deployed and visually verified.
@@ -57,6 +58,35 @@ finalizing each commit. Never add AI attribution.
   `DroneObservation`, and a private Rapier 0.36 world in `DroneHover`.
   The 28-line guide demonstrates a seeded, time-limited constant hover command.
 - Added native robot tests and a robot WASM compile check to CI.
+
+## Browser training worker checkpoint
+
+The worker now reuses the recovery lesson's model, encoder, collector, and evaluator.
+Its private protocol supports fresh training, one 512-transition update, checkpoint
+export, and independent evaluation. Runs stop at 260 updates. Failed updates discard
+the run; malformed requests preserve it. The library API and tutorial examples
+are unchanged. There are no lint-only imports or new third-party crate versions.
+
+All twelve native protocol and invariant tests pass. Root tests, root strict
+Clippy, worker native/WASM Clippy, selected-package personal lints, and shell/workflow
+checks pass. [Coverage](progress/drone-worker-coverage.json) records the exact
+initialization/serialization error gaps and unmeasured WASM adapter paths.
+The root personal-lint backlog remains open.
+
+The actual browser worker completed two updates and exported changed weights.
+A 10 ms page timer fired 288 times during the second update. The first update's
+policy failed all five selection episodes. Do not describe that checkpoint as
+qualified. [The browser record](progress/drone-worker-browser.json) retains the
+observed metrics, model size, browser version, and WASM hash.
+
+A full seed-7 run is active in T3 tab_1 at port 8768. Inspect
+`window.droneWorkerCheck.fullRun` before navigating or restarting the page.
+It began with the same worker after update two and continues to update 260.
+Its `state`, `updates`, `latest`, and `milestones` show progress. Completion retains
+`finalBytes` for export and qualification. Do not send extra requests while its
+loop owns the worker. The page has no training controls yet. Implement the host
+controller, cancellation/stale-response tests, and explicit selection of trained
+weights next; then show screenshots and recordings.
 
 ## Foundation verification
 

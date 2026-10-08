@@ -1,0 +1,128 @@
+{
+  "verified_at": "2026-10-08",
+  "scope": "Actual dedicated WASM worker in the T3 browser; two updates, checkpoint export and independent scoring. Full browser training qualification is separate.",
+  "wasm_sha256": "6683abfc3bdaefac1682bd905b491d433235b03f366e28667fa27389b62beb8b",
+  "wasm_bytes": 4234599,
+  "observed": {
+    "browser": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) T3Code(Alpha)/0.0.45 Chrome/152.0.7977.78 Electron/44.3.0 Safari/537.36",
+    "checkpointBytes": 46343,
+    "evaluationAfterFirstUpdate": {
+      "baseline": [
+        {
+          "final_distance": 6.703430652618408,
+          "reward": 39.76732603833079,
+          "seed": "0",
+          "steps": 85,
+          "survived": false
+        },
+        {
+          "final_distance": 8.140289306640625,
+          "reward": 67.04166154097766,
+          "seed": "1",
+          "steps": 130,
+          "survived": false
+        },
+        {
+          "final_distance": 11.053842544555664,
+          "reward": 85.61805526912212,
+          "seed": "2",
+          "steps": 176,
+          "survived": false
+        },
+        {
+          "final_distance": 9.496874809265137,
+          "reward": 44.842814203351736,
+          "seed": "42",
+          "steps": 274,
+          "survived": false
+        },
+        {
+          "final_distance": 4.324670314788818,
+          "reward": 46.12651114910841,
+          "seed": "18446744073709551615",
+          "steps": 79,
+          "survived": false
+        }
+      ],
+      "episodes": [
+        {
+          "final_distance": 2.7730956077575684,
+          "reward": 23.136587559594773,
+          "seed": "0",
+          "steps": 47,
+          "survived": false
+        },
+        {
+          "final_distance": 2.902195930480957,
+          "reward": 27.51453606315772,
+          "seed": "1",
+          "steps": 51,
+          "survived": false
+        },
+        {
+          "final_distance": 2.8632938861846924,
+          "reward": 26.95928077737335,
+          "seed": "2",
+          "steps": 51,
+          "survived": false
+        },
+        {
+          "final_distance": 2.575986623764038,
+          "reward": 23.833850113675,
+          "seed": "42",
+          "steps": 48,
+          "survived": false
+        },
+        {
+          "final_distance": 2.5900940895080566,
+          "reward": 26.184700813144445,
+          "seed": "18446744073709551615",
+          "steps": 49,
+          "survived": false
+        }
+      ],
+      "event": "evaluation"
+    },
+    "firstUpdate": {
+      "actor_learning_rate": 0.0003,
+      "actor_loss": -0.008772888766543474,
+      "approximate_kl": 0.012513895785332367,
+      "critic_learning_rate": 0.001,
+      "critic_loss": 23.31278373952955,
+      "entropy": -2.323277482530102,
+      "event": "progress",
+      "optimizer_steps": 8,
+      "status": "training",
+      "transitions": 512,
+      "updates": 1
+    },
+    "firstUpdateMilliseconds": 3176.3999999910593,
+    "nonString": {
+      "code": "invalid_request",
+      "event": "error",
+      "message": "Worker requires a JSON string."
+    },
+    "ready": {
+      "event": "ready",
+      "protocol": 1
+    },
+    "secondUpdate": {
+      "elapsedMilliseconds": 2880.7000000029802,
+      "mainThreadTimerTicks": 288,
+      "progress": {
+        "actor_learning_rate": 0.0003,
+        "actor_loss": -0.0020704332418972626,
+        "approximate_kl": 0.003632015413614997,
+        "critic_learning_rate": 0.001,
+        "critic_loss": 18.37676977668889,
+        "entropy": -2.323133038706146,
+        "event": "progress",
+        "optimizer_steps": 16,
+        "status": "training",
+        "transitions": 1024,
+        "updates": 2
+      }
+    },
+    "weightsChanged": true
+  }
+}
