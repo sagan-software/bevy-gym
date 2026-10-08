@@ -356,5 +356,5 @@ pending. Other environments are not yet browser-qualified.
 The Box2D/MuJoCo engine replacements remain planned.
 
 The broader controls and performance checks above remain acceptance work,
-including hidden-tab behavior, explicit worker crashes, speed-independent replay,
+including physical tab-switch verification, explicit worker crashes, speed-independent replay,
 200% zoom, latency budgets, and 30-minute resource stability.

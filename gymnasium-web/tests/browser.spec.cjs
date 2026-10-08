@@ -114,6 +114,53 @@ test("validator failures preserve the active policy", async ({ page }) => {
   }
 });
 
+for (const mode of ["inference", "training"]) test(`hidden ${mode} pauses after the in-flight batch without automatic resume`, async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(document, "hidden", { get: () => Boolean(window.testHidden) });
+    const NativeWorker = window.Worker;
+    window.Worker = class extends NativeWorker {
+      constructor(...args) {
+        super(...args);
+        this.addEventListener("message", event => {
+          if (window.holdSnapshot && JSON.parse(event.data).event === "snapshot") {
+            event.stopImmediatePropagation();
+            window.releaseSnapshot = () => this.dispatchEvent(new MessageEvent("message", { data: event.data }));
+          }
+        });
+      }
+    };
+  });
+  await page.goto("./");
+  await expect(page.locator("#status")).toHaveText("Running frozen policy");
+  await page.locator("#speed").selectOption("16");
+  if (mode === "training") {
+    await page.getByRole("button", { name: "Train from scratch", exact: true }).click();
+    await expect.poll(async () => Number((await page.locator("#updates").innerText()).replaceAll(",", ""))).toBeGreaterThan(0);
+  }
+  await page.evaluate(() => { window.holdSnapshot = true; });
+  await expect.poll(() => page.evaluate(() => Boolean(window.releaseSnapshot))).toBe(true);
+  await page.evaluate(() => { window.testHidden = true; document.dispatchEvent(new Event("visibilitychange")); });
+  await expect(page.locator("#status")).toHaveText("Pausing after the current batch");
+  await page.evaluate(() => { window.holdSnapshot = false; window.releaseSnapshot(); });
+  await expect(page.locator("#status")).toHaveText("Paused · tab hidden");
+  const transitions = await page.locator("#transitions").innerText();
+  const updates = await page.locator("#updates").innerText();
+  await page.evaluate(() => { window.testHidden = false; document.dispatchEvent(new Event("visibilitychange")); });
+  await expect(page.locator("#status")).toHaveText("Paused");
+  await page.waitForTimeout(200);
+  await expect(page.locator("#transitions")).toHaveText(transitions);
+  await expect(page.locator("#updates")).toHaveText(updates);
+  await page.getByRole("button", { name: "Resume", exact: true }).click();
+  await expect(page.locator("#transitions")).not.toHaveText(transitions);
+});
+
+test("a session started in a hidden page waits for explicit resume", async ({ page }) => {
+  await page.addInitScript(() => { Object.defineProperty(document, "hidden", { get: () => true }); });
+  await page.goto("./");
+  await expect(page.locator("#status")).toHaveText("Paused · tab hidden");
+  await expect(page.locator("#transitions")).toHaveText("0");
+});
+
 // Exercise the shipped UI and actual Rust worker, including the repository URL prefix.
 test("training, frozen inference, pause, step, speed, and policy round trip", async ({ page }) => {
   const failures = [];

@@ -21,6 +21,11 @@ Uploads are validated in a temporary worker before replacing the active session.
 Invalid, oversized, or timed-out uploads leave the current session intact.
 Starting another session cancels pending validation; late results are ignored.
 
+A hidden page pauses after its current worker batch. Returning to the page
+keeps it paused until Resume is selected. A session started while hidden
+waits without advancing. Visibility-event tests hold a worker response to
+verify that simulation and optimizer progress stop together.
+
 ## Verified CartPole model
 
 The bundled model was trained through the browser session API with seed 42.
@@ -91,7 +96,7 @@ initialization. Firefox and WebKit check training updates, inference, controls,
 and rejection of stale loading results. Full qualification cases for Firefox
 and WebKit are explicitly skipped.
 
-The UI suite passed 24 checks across all three engines, including all speed
+The UI suite passed 33 checks across all three engines, including all speed
 settings, the WebKit pause regression, and upload validation failures.
 MountainCar passed offline training, scoring -102.41 across
 200 held-out episodes after 390,000 transitions. Qualification jobs retain

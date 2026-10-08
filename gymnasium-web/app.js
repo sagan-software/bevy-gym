@@ -25,6 +25,16 @@ function setPhase(next) {
   // WebKit can cancel a held click when its text node is replaced by a snapshot.
   if ($("pause").textContent !== label) $("pause").textContent = label;
 }
+function pausedStatus() { return document.hidden ? "Paused · tab hidden" : "Paused"; }
+function syncVisibility() {
+  if (document.hidden && (phase === "running" || phase === "advancing")) {
+    setPhase(phase === "advancing" ? "pausing" : "paused");
+    debt = 0;
+    $("achieved").textContent = "0.0× actual";
+    $("status").textContent = phase === "pausing" ? "Pausing after the current batch" : pausedStatus();
+  } else if (phase === "paused") $("status").textContent = pausedStatus();
+}
+document.addEventListener("visibilitychange", syncVisibility);
 function fail(message) {
   if (worker) worker.onmessage = null;
   worker?.terminate();
@@ -72,6 +82,7 @@ function start(mode, bytes, source = "Bundled model") {
         setPhase("running"); lastTime = performance.now();
         speedWindow = { time: lastTime, transitions: 0 };
         $("status").textContent = mode === "training" ? "Collecting replay transitions" : "Running frozen policy";
+        syncVisibility();
         break;
       case "snapshot": setPhase(phase === "pausing" ? "paused" : "running"); update(message.snapshot); break;
       case "policy": {
@@ -105,7 +116,7 @@ function update(snapshot) {
     const mean = recent.reduce((sum, point) => sum + point[1], 0) / recent.length;
     $("return-summary").textContent = `Mean of last ${recent.length} episodes: ${mean.toFixed(1)} · raw returns and rolling mean`;
   }
-  $("status").textContent = phase === "paused" ? "Paused" : currentMode === "inference" ? "Running frozen policy"
+  $("status").textContent = phase === "paused" ? pausedStatus() : currentMode === "inference" ? "Running frozen policy"
     : snapshot.optimizer_steps ? "Training in this browser" : `Collecting replay transitions · ${snapshot.transitions}/${task.replay.toLocaleString()}`;
   const now = performance.now();
   if (phase === "running" && now - speedWindow.time >= 1000) {
@@ -129,7 +140,7 @@ $("pause").onclick = () => {
   const next = transitions[phase];
   if (!next) return;
   setPhase(next); debt = 0;
-  $("status").textContent = phase === "pausing" ? "Pausing after the current batch" : phase === "paused" ? "Paused" : "Running";
+  $("status").textContent = phase === "pausing" ? "Pausing after the current batch" : phase === "paused" ? pausedStatus() : "Running";
   speedWindow = { time: performance.now(), transitions: latest?.transitions ?? 0 };
   if (phase === "paused" || phase === "pausing") $("achieved").textContent = "0.0× actual";
 };
