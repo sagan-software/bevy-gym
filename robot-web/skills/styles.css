@@ -1,0 +1,15 @@
+@font-face { font-family: Mona; src: url("assets/fonts/MonaSans-VariableFont.ttf") format("truetype"); font-display: swap; }
+:root { color-scheme: dark; font-family: Mona, sans-serif; background: #171a1c; color: #edf0f1; }
+* { box-sizing: border-box; }
+body { margin: 0; }
+main { height: 100dvh; min-height: 640px; display: flex; flex-direction: column; }
+.simulation { position: relative; flex: 1; min-height: 480px; }
+canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
+#loading { position: absolute; z-index: 1; margin: 20px; padding: 12px; background: #171a1c; }
+footer { display: flex; flex-wrap: wrap; gap: 12px 24px; padding: 18px; font-size: 14px; }
+a { color: #b8e1e6; text-underline-offset: 3px; }
+a:hover { color: white; }
+:focus-visible { outline: 2px solid #b8e1e6; outline-offset: -3px; }
+::selection { background: #b8e1e6; color: #171a1c; }
+code { font-variant-numeric: tabular-nums; }
+@media (max-width: 600px) { .simulation { min-height: 520px; } footer { gap: 10px 20px; } }

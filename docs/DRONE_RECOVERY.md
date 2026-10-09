@@ -1,7 +1,7 @@
 # Drone recovery lesson
 
-Status: native frozen-policy inference implemented, 2026-10-09.
-Separate browser lesson scenes and standalone checkpoint transfer remain pending.
+Status: native and browser frozen-policy inference implemented, 2026-10-09.
+Standalone checkpoint transfer remains pending.
 
 Use `DroneHover::disturbed()` for a hover task that needs feedback control.
 `DroneHover::default()` and its committed traces remain unchanged. The new constructor
@@ -90,6 +90,21 @@ The earlier constant-thrust guide terminated seed 42 during action 274, after at
 most 5.48 simulated seconds. Its initial linear velocity was approximately
 `(-0.282, 0.301, -0.160)` m/s. All five baseline seeds, 0, 1, 2, 42, and `u64::MAX`,
 terminated before 500 actions. Those results are historical physics evidence.
+
+### Separate frozen-policy scene
+
+```sh
+nix develop --command cargo run --features robots --example drone-recovery-scene
+```
+
+The [browser build guide](../robot-web/skills/README.md) serves this lesson at
+`/recovery/`. The scene embeds the recorded RL curriculum checkpoint and exposes
+only Run, Step, and Reset. Reset restores seed 42 and clears recurrent memory.
+Every motor command comes from inference; failures stop playback visibly.
+The [recording](progress/skill-scenes/recovery-desktop.mp4) completed 500 actions
+and ended 0.26 metres from the target. This one episode illustrates playback;
+the 32-seed evaluation establishes qualification. See the
+[validation record](progress/drone-skill-scenes.json) for gates and coverage gaps.
 
 ### Historical viewer evidence
 

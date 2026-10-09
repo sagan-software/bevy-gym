@@ -575,3 +575,13 @@ unwrap_used = { level = "warn", priority = 2 }
 name = "drone-impact"
 path = "examples/robots/impact.rs"
 required-features = ["robots"]
+
+[[example]]
+name = "drone-hover-scene"
+path = "examples/robots/hover_scene.rs"
+required-features = ["robots", "render-core"]
+
+[[example]]
+name = "drone-recovery-scene"
+path = "examples/robots/recovery_scene.rs"
+required-features = ["robots", "render-core"]

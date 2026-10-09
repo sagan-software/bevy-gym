@@ -1,7 +1,7 @@
 # Drone hover lesson
 
 The native `drone-hover` command runs frozen RL inference. The shared trainer
-supports standalone hover training. Separate browser lesson scenes remain unfinished.
+supports standalone hover training. The separate scene runs the same frozen policy.
 
 ## Run
 
@@ -22,6 +22,19 @@ The command prints the checkpoint path, inference mode, and complete episode sco
 Missing, corrupt, or incompatible weights return an error before any action.
 A custom checkpoint is not qualified merely because it loads or survives one episode.
 The native CLI reads files; it is not a browser entry point.
+
+## Scene
+
+```sh
+nix develop --command cargo run --features robots --example drone-hover-scene
+```
+
+The [browser build guide](../robot-web/skills/README.md) serves this lesson at
+`/hover/`. Run, Step, and Reset control playback. The policy supplies every motor
+command; the scene has no manual, imitation, or fallback controller.
+Reset restores seed 42 and clears recurrent memory. Policy errors stop playback
+and remain visible. The scene embeds the recorded checkpoint; custom checkpoint
+selection remains available through the native inference command above.
 
 ## Environment and policy
 
@@ -70,6 +83,11 @@ The [existing evidence](progress/drone-curriculum.json) records PPO training wit
 imitation, seed 7, 280 hover updates, 20 recovery updates, and 153,600 transitions.
 Its held-out recovery result was 32/32 survivors, mean return 443.4709, and mean
 final distance 0.1580 metres. This does not qualify navigation, damage, or combat.
+
+A separate calm-start replay passed all 32 held-out seeds in native and browser
+tests. Native mean return was 464.4299, with mean final distance 0.06235 metres.
+The [scene evidence](progress/drone-skill-scenes.json) includes the test gates,
+coverage limits, and browser recordings.
 
 The separate [recovery command](DRONE_RECOVERY.md) uses the same checkpoint with
 disturbed starts. Historical constant-thrust evidence remains in the earlier

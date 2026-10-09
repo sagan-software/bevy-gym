@@ -124,19 +124,21 @@ nix develop --command cargo run --no-default-features --features robots --exampl
 
 The [hover lesson](docs/DRONE_HOVER.md) loads the qualified RL curriculum checkpoint,
 infers four motor commands per step, and prints the episode score. It runs without
-a window. Missing or incompatible weights fail visibly. Open the existing viewer with:
+a window. Missing or incompatible weights fail visibly. Open either separate scene:
 
 ```sh
-nix develop --command cargo run --features robots --example drone-flight
+nix develop --command cargo run --features robots --example drone-hover-scene
+nix develop --command cargo run --features robots --example drone-recovery-scene
 ```
 
-Select Disturbed start, Bundled policy, and Run to watch recovery.
-Select Fly east and Run to watch
-the [waypoint pilot](docs/DRONE_TRACKING.md) fly eight metres. Manual controls
-provide hover, climb, power-off, and tilt for comparison. The
-[recovery guide](examples/robots/recovery.rs) adds initial tilt and
-velocity through `DroneHover::disturbed()`. The
-[browser build guide](robot-web/README.md) uses the same Bevy example in WebAssembly.
+The scenes use the same RL checkpoint and physics as curriculum evaluation.
+Run, Step, and Reset affect playback; policies supply all motor commands.
+The [browser build guide](robot-web/skills/README.md) serves both lessons separately.
+The [recovery guide](docs/DRONE_RECOVERY.md) defines disturbed starts.
+
+The older `drone-flight` viewer remains a historical workbench containing manual,
+imitation, and RL modes. It is not a qualification of RL-only agent behaviour.
+Its [build guide](robot-web/README.md) and earlier recordings remain available.
 
 The [learning guide](docs/DRONE_LEARNING.md) trains a recovery policy and records
 its native and browser qualification. The bundled policy survived all 32 native

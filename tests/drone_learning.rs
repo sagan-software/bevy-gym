@@ -174,6 +174,39 @@ fn curriculum_checkpoint_recovers_on_held_out_seeds() {
     qualify(&policy);
 }
 
+/// Replay the earlier lesson after recovery training to detect loss of hover.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn curriculum_checkpoint_retains_hover_on_held_out_seeds() {
+    let policy = load_policy(include_bytes!("../docs/progress/drone-curriculum.mpk").to_vec())
+        .expect("load frozen curriculum checkpoint");
+    let seeds: Vec<_> = (1..=32).map(|offset| u64::MAX - offset).collect();
+    let episodes = learning::evaluation::evaluate_with(&policy, &seeds, DroneHover::default)
+        .expect("evaluate calm replay episodes");
+    let survived = episodes.iter().filter(|episode| episode.survived).count();
+    let mean_reward = episodes.iter().map(|episode| episode.reward).sum::<f64>() / 32.0;
+    let mean_distance = episodes
+        .iter()
+        .map(|episode| f64::from(episode.final_distance))
+        .sum::<f64>()
+        / 32.0;
+    let record = serde_json::json!({"profile": "calm", "episodes": episodes,
+        "survived": survived, "mean_reward": mean_reward, "mean_final_distance": mean_distance});
+    println!("{record}");
+    assert!(
+        survived >= 30,
+        "at least 30 of 32 calm episodes must survive"
+    );
+    assert!(
+        mean_reward >= 400.0,
+        "mean return {mean_reward} must reach 400"
+    );
+    assert!(
+        mean_distance <= 0.5,
+        "mean final distance {mean_distance} m must be at most 0.5 m"
+    );
+}
+
 /// Apply the frozen success gates to the final seed partition.
 fn qualify(policy: &bevy_gym::training::RecurrentPpoPolicy) {
     let seeds: Vec<_> = (1..=32).map(|offset| u64::MAX - offset).collect();

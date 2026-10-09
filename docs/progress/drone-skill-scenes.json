@@ -1,0 +1,422 @@
+{
+  "date": "2026-10-09",
+  "base_commit": "52c3a65eda215de134e91e4db44571d1ea7ffd5d",
+  "checkpoint": {
+    "path": "docs/progress/drone-curriculum.mpk",
+    "sha256": "8b94182a1368f5449a52db5c0859160fc5819d6772c0547f31d240df7a0a465a",
+    "training": "PPO, seed 7; 280 hover updates and 20 recovery updates; 153600 transitions",
+    "prior_evidence": "docs/progress/drone-curriculum.json"
+  },
+  "hover_held_out_native": {
+    "episodes": [
+      {
+        "final_distance": 0.052984628826379776,
+        "reward": 467.26447707414627,
+        "seed": 18446744073709551614,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.05192141607403755,
+        "reward": 466.15333515405655,
+        "seed": 18446744073709551613,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.06520739942789078,
+        "reward": 465.53936421871185,
+        "seed": 18446744073709551612,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.07355694472789764,
+        "reward": 458.798952460289,
+        "seed": 18446744073709551611,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.056266531348228455,
+        "reward": 466.6025375723839,
+        "seed": 18446744073709551610,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.06122203543782234,
+        "reward": 464.54012989997864,
+        "seed": 18446744073709551609,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.07327631860971451,
+        "reward": 461.98769479990005,
+        "seed": 18446744073709551608,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.06283172965049744,
+        "reward": 460.7571992278099,
+        "seed": 18446744073709551607,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.05594073608517647,
+        "reward": 467.72110229730606,
+        "seed": 18446744073709551606,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.07338688522577286,
+        "reward": 463.2896186709404,
+        "seed": 18446744073709551605,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.052497562021017075,
+        "reward": 466.34410589933395,
+        "seed": 18446744073709551604,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.060623954981565475,
+        "reward": 467.50042748451233,
+        "seed": 18446744073709551603,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.0673937201499939,
+        "reward": 462.31687635183334,
+        "seed": 18446744073709551602,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.0523240752518177,
+        "reward": 466.58045876026154,
+        "seed": 18446744073709551601,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.0869360938668251,
+        "reward": 458.4065918326378,
+        "seed": 18446744073709551600,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.053939998149871826,
+        "reward": 466.51240235567093,
+        "seed": 18446744073709551599,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.05487425997853279,
+        "reward": 466.99347031116486,
+        "seed": 18446744073709551598,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.049776818603277206,
+        "reward": 465.8939735889435,
+        "seed": 18446744073709551597,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.05956611409783363,
+        "reward": 457.88674634695053,
+        "seed": 18446744073709551596,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.06743556261062622,
+        "reward": 466.76103895902634,
+        "seed": 18446744073709551595,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.053133491426706314,
+        "reward": 466.0321192741394,
+        "seed": 18446744073709551594,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.06177295744419098,
+        "reward": 467.409461081028,
+        "seed": 18446744073709551593,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.062746562063694,
+        "reward": 462.52996557950974,
+        "seed": 18446744073709551592,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.059025827795267105,
+        "reward": 467.9298549890518,
+        "seed": 18446744073709551591,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.05868210643529892,
+        "reward": 467.31050407886505,
+        "seed": 18446744073709551590,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.05702979862689972,
+        "reward": 465.00338780879974,
+        "seed": 18446744073709551589,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.08163974434137344,
+        "reward": 459.039317548275,
+        "seed": 18446744073709551588,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.06411922723054886,
+        "reward": 462.59776014089584,
+        "seed": 18446744073709551587,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.07950561493635178,
+        "reward": 458.55600130558014,
+        "seed": 18446744073709551586,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.06838762015104294,
+        "reward": 465.82415521144867,
+        "seed": 18446744073709551585,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.05628905072808266,
+        "reward": 465.7310495376587,
+        "seed": 18446744073709551584,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.060940612107515335,
+        "reward": 465.9434031844139,
+        "seed": 18446744073709551583,
+        "steps": 500,
+        "survived": true
+      }
+    ],
+    "mean_final_distance": 0.06235110620036721,
+    "mean_reward": 464.4299213439226,
+    "profile": "calm",
+    "survived": 32
+  },
+  "qualification": {
+    "hover": "32/32 held-out survivors; return >= 400, distance <= 0.5 m; native and WASM tests pass",
+    "recovery": "Existing 32-seed qualification rerun natively and in WASM; no retraining",
+    "not_qualified": [
+      "navigation",
+      "combat",
+      "damaged flight",
+      "physical droid locomotion",
+      "competition"
+    ]
+  },
+  "tests": {
+    "red": "Missing skill_scene/session.rs failed the external test before implementation",
+    "native_learning": "16 passed, 1 ignored",
+    "native_session": "5 passed",
+    "scene_examples": "4 passed per executable",
+    "root": "cargo test passed",
+    "format": "cargo fmt --all -- --check passed",
+    "strict": "cargo clippy --all-targets --all-features -- -D warnings passed",
+    "wasm_strict": "cargo clippy --no-default-features --features robots,browser,browser-training --target wasm32-unknown-unknown --test drone_learning --test drone_skill_session -- -D warnings passed",
+    "wasm_core": "cargo check --no-default-features --features robots,browser --target wasm32-unknown-unknown passed",
+    "browser": "nix run .#drone-browser-check passed with inherited LD_LIBRARY_PATH unset",
+    "personal": "Changed-line Rust Clippy and Dylint with --no-deny-warnings, shell and Nix runners passed without candidate diagnostics. Strict personal Clippy exits 101 on unchanged repository diagnostics; the changed-line filter reports none.",
+    "personal_strict_examples": [
+      [
+        "src/ecosystem/../../examples/ecosystem/shared/domain.rs",
+        671,
+        "this function has too many lines (89/50)"
+      ],
+      [
+        "src/ecosystem/../../examples/ecosystem/shared/simulation.rs",
+        695,
+        "this function has too many lines (83/50)"
+      ],
+      [
+        "src/ecosystem/../../examples/ecosystem/shared/simulation.rs",
+        820,
+        "this function has too many lines (103/50)"
+      ],
+      [
+        "src/ecosystem/../../examples/ecosystem/shared/simulation.rs",
+        975,
+        "this function has too many lines (64/50)"
+      ],
+      [
+        "src/ecosystem/../../examples/ecosystem/shared/simulation.rs",
+        1647,
+        "this function has too many lines (111/50)"
+      ],
+      [
+        "src/ecosystem/../../examples/ecosystem/shared/simulation.rs",
+        1963,
+        "this function has too many lines (121/50)"
+      ]
+    ]
+  },
+  "coverage": {
+    "method": "cargo llvm-cov --branch, then fresh LLVM profiles from the exact instrumented session integration-test binary",
+    "session_file_including_unit_tests": {
+      "branches": {
+        "count": 8,
+        "covered": 7,
+        "notcovered": 1,
+        "percent": 87.5
+      },
+      "functions": {
+        "count": 10,
+        "covered": 10,
+        "percent": 100
+      },
+      "instantiations": {
+        "count": 10,
+        "covered": 10,
+        "percent": 100
+      },
+      "lines": {
+        "count": 111,
+        "covered": 111,
+        "percent": 100
+      },
+      "mcdc": {
+        "count": 0,
+        "covered": 0,
+        "notcovered": 0,
+        "percent": 0
+      },
+      "regions": {
+        "count": 178,
+        "covered": 176,
+        "notcovered": 2,
+        "percent": 98.87640449438202
+      }
+    },
+    "production_branch_outcomes": "6/6; remaining unhit branch is the impossible alternate arm of a unit-test setup if-let",
+    "gaps": [
+      "Session::load positive fixed TimeLimit::new(..., 500) error-propagation region is unreachable with the fixed horizon.",
+      "Renderer and entry points are not LLVM-instrumented in this record. view::apply is behavior-tested in both example binaries; setup, controls, header, footer, button, keyboard, project, refresh, run and advance are visually or interactively exercised without line counts.",
+      "Policy-load and inference error text, failed model loading, non-primary pointer events and crashed-scene presentation lack rendered browser fault-injection evidence. Session rejection and sticky inference failure are directly tested.",
+      "No full-package coverage percentage is claimed."
+    ]
+  },
+  "browser": {
+    "tool": "T3 collaborative preview",
+    "viewports_css_pixels": [
+      [
+        1280,
+        800
+      ],
+      [
+        390,
+        844
+      ]
+    ],
+    "seed": 42,
+    "hover": "500 actions, final displayed distance 0.06 m; step, pause, resume and reset exercised",
+    "recovery": "500 actions, final displayed distance 0.26 m; reset exercised",
+    "fix": "Absolute-positioned canvas fills the flex-sized scene on mobile; compact panels preserve scene visibility.",
+    "records": [
+      "docs/progress/skill-scenes/hover-mobile.mp4",
+      "docs/progress/skill-scenes/recovery-desktop.mp4"
+    ],
+    "contact_sheets": [
+      "docs/progress/skill-scenes/hover-contact.png",
+      "docs/progress/skill-scenes/recovery-contact.png"
+    ],
+    "contact_sheets_inspected": true,
+    "limits": [
+      "390-pixel desktop-browser emulation is not physical mobile-device validation.",
+      "Native scene interaction is unverified.",
+      "Local visual evidence uses development WASM bundles; release deployment remains a separate CI gate.",
+      "Cold renderer initialization precedes fully loaded models and text; early blank captures were rejected as evidence."
+    ]
+  },
+  "visual_review": {
+    "method": "In-thread review substituted because the user prohibited subagents",
+    "disposition": "ship",
+    "persistence": "Existing model, palette, font and gallery conventions retained; guide and evidence record the surface.",
+    "fidelity": "Licensed physical drone, learned pose, checkpoint identity and playback controls match; mobile canvas defect fixed.",
+    "ceiling": "Task-focused existing visual system retained.",
+    "material_fixes": [],
+    "keep": "Physics remains authoritative and controls cannot choose agent actions.",
+    "detector_findings": []
+  },
+  "seed11_damage": {
+    "service": "bevy-gym-rl-curriculum-seed11-20261009.service",
+    "status": "failed",
+    "exit_code": 1,
+    "hover_passed_update": 300,
+    "front_left_budget": 600,
+    "front_left_passed": false,
+    "error": "Lesson front-left exhausted its update budget without passing.",
+    "artifacts": "runs/rl-curriculum/seed11-20261009",
+    "investigation": "Training resets with the failed motor; evaluation requires intact flight then failure at two seconds. This mismatch is an investigation target, not a proven complete cause."
+  },
+  "logs_prefix": "/home/sagan/.cache/bevy-gym-quality-validation/skill-scenes-",
+  "source_sha256": {
+    "examples/robots/hover_scene.rs": "85d96e6dbf92016fdbf2557d63bdd23b2cf19b82beeca7662efbaf7e2e8155ce",
+    "examples/robots/recovery_scene.rs": "056dcb2bd6b04d450d3f8b77f29a2eccbd652d5d828dbe1ed2b6cd8b8e034c41",
+    "examples/robots/skill_scene/mod.rs": "59b56f30fd97ee52881ea2b3ad1a9c63dcb23dd6b2546a25b0c066334b6ab547",
+    "examples/robots/skill_scene/session.rs": "5d6caa661fec6c6f6d979718590d020f0f8b14972a122843af715066476829ed",
+    "examples/robots/skill_scene/view.rs": "e018f838ac71be7edad61dd39e44bcc255225e63b78314a25f21716006990327",
+    "tests/drone_skill_session.rs": "653dee829e07ba5aaf7f99125912691da9aefaf768bce092f67e118aaae70297",
+    "tests/drone_learning.rs": "145f1a53865434de76e631931bddab1505a6f21a8da046878e3aedbeeef297ea",
+    "scripts/build_drone_skills.sh": "d486df59b79d35c139465d01cdcb1d7015ac43ef317b8d987cc1af77956c9746",
+    "robot-web/skills/index.html": "eb1348e1b2172cc729b2fc0014aaeb5c5fb1ec27653f7514994e030ab3bcbaf4",
+    "robot-web/skills/styles.css": "3e4067ca073290fa4d475df99d59e4e2205df4a9ad0e4363eb95c3f0e721dd00",
+    "robot-web/skills/start.js": "5cd43ad287ecdbe72127933e3d95a93b29370cbbb2cdc82195bf47bfa4e135c4"
+  },
+  "artifact_sha256": {
+    "docs/progress/skill-scenes/gallery-desktop.png": "42677326db4723f17b78a758819e1082ecac020075d84c0f6d3380cb15d072b3",
+    "docs/progress/skill-scenes/gallery-mobile-lessons.png": "6b7a3941450d23fe8825e1c38734eb05bb66c243ca768ef40f7a3b7867cc2f24",
+    "docs/progress/skill-scenes/hover-contact.png": "a316f42685a22a579f56d68ba4ac3cb1061a4fa4cc67260944dcd0f6eed42753",
+    "docs/progress/skill-scenes/hover-desktop.png": "2914b2e35fe6d2655b817df0871d4249e9fd5217b34b7447373940efd13f4df5",
+    "docs/progress/skill-scenes/hover-mobile.mp4": "95970f8e1bf68178b88c09ef84ed7813f6173f96beddfb262d69c643078eb150",
+    "docs/progress/skill-scenes/hover-mobile.png": "df4c61541a54fd400fc87b62370fc79a1fced1cb456950f6e4407fd0d73f857e",
+    "docs/progress/skill-scenes/recovery-contact.png": "25bb55140c384fad3be95ec868ab291acd139069598fdadd9ed9823eefda4b40",
+    "docs/progress/skill-scenes/recovery-desktop.mp4": "2aae921c9e4f39c446303f888f350ef7c2ca5cdcfbd033eb80a68f9ba0bcefa0",
+    "docs/progress/skill-scenes/recovery-desktop.png": "4317537548d7c66f0ee78758f6e308624e570abf7bf9329cc0d27e1b597fc7a7",
+    "docs/progress/skill-scenes/recovery-mobile.png": "b356860f2d8e75f0893e226c6da9aa8eff5fec9fcde6b1e16f627228734f368b"
+  }
+}

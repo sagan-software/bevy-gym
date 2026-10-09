@@ -4,6 +4,59 @@ Updated: 2026-10-09. Current work: RL-only drone/droid curriculum.
 
 ## Resume here
 
+### Standalone RL browser scenes, 2026-10-09
+
+`drone-hover-scene` and `drone-recovery-scene` now run separate frozen-policy scenes.
+They share the same `DroneHover` factories and encoding as curriculum training and
+evaluation. Every motor command comes from the recorded PPO checkpoint. The renderer
+reads physical poses; Run, Step, and Reset cannot select agent actions. Load or
+inference failures stop playback without a fallback. Each scene identifies its
+checkpoint. The gallery distinguishes these scenes from the historical workbench.
+
+The [browser guide](../robot-web/skills/README.md), [hover guide](DRONE_HOVER.md),
+[recovery guide](DRONE_RECOVERY.md), and [evidence](progress/drone-skill-scenes.json)
+record the commands, contracts, qualification, and remaining limits. The unchanged
+checkpoint is `docs/progress/drone-curriculum.mpk`, SHA-256
+`8b94182a1368f5449a52db5c0859160fc5819d6772c0547f31d240df7a0a465a`.
+New calm-start evaluation passed 32/32 held-out episodes natively and in WASM.
+Native mean return was 464.4299 and mean final distance was 0.06235 metres.
+The existing 32-seed disturbed-recovery qualification also passes again.
+
+Native tests, strict native/WASM Clippy, the complete browser suite, and changed-line
+personal Rust lint pass. Strict personal Clippy still fails on the unchanged
+repository backlog; the changed-line pass reports no diagnostics. Shell and Nix
+personal lint pass. Session coverage records
+111/111 lines including its unit tests and 6/6 production branch outcomes. The
+remaining unhit branch belongs to test setup; the fixed positive horizon cannot
+exercise its error-propagation region. Renderer line coverage and browser fault
+injection for displayed load/inference/model errors remain gaps. The evidence names
+each boundary; no full-package coverage claim is made.
+
+Actual T3 browser playback completed both 500-action episodes. Hover ended 0.06 metres
+from the target; recovery ended 0.26 metres away. Playback controls and 1280-pixel and
+390-pixel layouts were inspected. A mobile canvas sizing defect was fixed. Videos
+and inspected contact sheets are under `docs/progress/skill-scenes/`. Review ran in
+this thread because subagents were prohibited. Native window interaction and physical
+mobile devices remain unverified. Local captures use development WASM bundles.
+
+Seed 11 exhausted all 600 fixed front-left updates and exited with status 1.
+`bevy-gym-rl-curriculum-seed11-20261009.service` is failed. The final error is
+`Lesson front-left exhausted its update budget without passing.` Hover passed at
+update 300. Training resets with the failed motor; evaluation requires intact flight
+before a two-second failure and retained healthy flight. This distribution mismatch
+is an investigation target, not a proven explanation for every failure. Preserve
+both seed-7 and seed-11 artifacts. No training job is running for this task.
+
+Logs use `/home/sagan/.cache/bevy-gym-quality-validation/skill-scenes-`.
+The preview server on port 8782 serves `robot-web/skills-dist`.
+The previous checkpoint `52c3a65eda215de134e91e4db44571d1ea7ffd5d` is on GitHub main
+and its CI passed. Browser deployment remains queued behind the preceding build.
+This scene checkpoint's remote CI and release deployment are unverified until pushed.
+
+Next: implement qualified standalone checkpoint transfer. Later drone lessons,
+physical droid lessons, competition, and the shared spectator 3v3 arena remain
+unfinished. The active goal remains the complete RL-only curriculum and arena.
+
 ### Standalone training selection, 2026-10-09
 
 The shared `drone-curriculum` trainer now accepts `--lesson hover` and

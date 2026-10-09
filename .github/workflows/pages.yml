@@ -17,6 +17,7 @@ on:
       - "assets/fonts/**"
       - "LICENSES/**"
       - "scripts/build_drone_viewer.sh"
+      - "scripts/build_drone_skills.sh"
       - "scripts/build_pursuit_viewer.sh"
       - "tests/test_browser_assets.py"
       - ".github/workflows/pages.yml"
@@ -96,6 +97,7 @@ jobs:
             site
             test-results/gymnasium
       - run: nix develop --command scripts/build_drone_viewer.sh --release
+      - run: nix develop --command scripts/build_drone_skills.sh --release
       - run: nix develop --command scripts/build_pursuit_viewer.sh --release
       - uses: actions/upload-artifact@v7
         if: always()
@@ -106,6 +108,7 @@ jobs:
       - run: mkdir -p site/ecosystem && cp -a dist/. site/ecosystem/
       - run: mkdir -p site/robots/hover site/examples && cp -a robot-web/dist-release/. site/robots/hover/ && cp -a gallery/. site/examples/
       - run: mkdir -p site/robots/pursuit && cp -a robot-web/pursuit-dist-release/. site/robots/pursuit/
+      - run: mkdir -p site/robots/skills && cp -a robot-web/skills-dist-release/. site/robots/skills/
       - run: touch site/.nojekyll
       - uses: actions/upload-pages-artifact@v5
         with:

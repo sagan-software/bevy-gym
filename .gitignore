@@ -25,3 +25,7 @@ __pycache__/
 # Generated pursuit scene bundles.
 /robot-web/pursuit-dist/
 /robot-web/pursuit-dist-release/
+
+# Independent RL lesson browser bundles.
+/robot-web/skills-dist/
+/robot-web/skills-dist-release/
