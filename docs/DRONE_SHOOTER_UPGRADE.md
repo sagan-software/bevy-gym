@@ -137,3 +137,36 @@ mismatch described above. The [optimized recording](progress/shooter-projectile-
 confirms a rotor hit and smoke in runtime
 `538f1f48ffff24f85185adfb167955d5164087560218045c0cfce25df8e97659`.
 The audio event path is tested; audible sound quality remains unverified.
+
+## Shared weapon frame and arm constraints
+
+The pistol, both wrists, muzzle effects, and projectile launch use one weapon frame.
+The frame pivots near the right shoulder and retracts before intersecting cover.
+The projectile converges from the muzzle toward the selected aim point. The arm
+solver preserves each source bone length and clamps unreachable targets; it leaves
+incomplete or degenerate skeletons unchanged. The source neutral pistol animation
+supplies each wrist offset and orientation relative to the weapon.
+
+Recoil moves the weapon back up to 3.5 cm and raises its barrel up to 0.04 radians.
+It settles during the first 120 ms of the existing 250 ms shot cooldown. The pelvis
+turn uses exponential settling with a 100 ms time constant. These changes do not
+add a second movement simulation or change collision movement.
+
+The bundled mannequin has no directional strafe clips. The adapted forward clip
+still needs replacement or further animation work. The initial recordings establish
+grip stability during reversal and steep aim. The final-source
+[strafe recording](progress/shooter-grip-strafe.mp4), [contact sheet](progress/shooter-grip-strafe.jpg),
+and [close-up frames](progress/shooter-grip-close.jpg) include turn smoothing before WASM optimization.
+[Coverage](progress/shooter-grip-coverage.json) retains the exact file scopes and gaps.
+
+The [published Rapier 0.34.0 manifest](https://docs.rs/crate/bevy_rapier3d/0.34.0/source/Cargo.toml)
+requires Bevy 0.18.1. Local compatibility probes compile the ragdoll core and Rapier
+backend from revision `05ca5a920c88cec9cfaa661c483aa4e26924e08f` with those versions.
+No ragdoll runtime is integrated yet. Preserve upstream licenses and revision metadata
+when adding the compatible source; validate physical death and reset independently.
+
+The optimized [recording](progress/shooter-grip-final.mp4) and
+[contact sheet](progress/shooter-grip-final.jpg) confirm the final build.
+The desktop path is qualified for keyboard and mouse. The narrow layout still has
+an existing Fire/instruction overlap and lacks complete touch aiming; include those
+in the gameplay UI work rather than reporting mobile acceptance.

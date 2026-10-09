@@ -40,8 +40,7 @@ fn project(
     let Some((_, gun)) = guns.iter().find(|(kind, _)| **kind == Visual::Held) else {
         return;
     };
-    // The licensed mesh's barrel ends at x=-0.372 m, above the grip at y=0.12 m.
-    let muzzle = gun.transform_point(Vec3::new(-0.372, 0.12, 0.0));
+    let muzzle = super::weapon_pose::muzzle(gun);
     materials.spawn(
         &mut commands,
         muzzle,

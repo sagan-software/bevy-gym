@@ -149,6 +149,11 @@ impl Combat {
         self.pistol.rounds()
     }
 
+    /// The bounded weapon cooldown also controls its visual recoil envelope.
+    pub(super) fn recoil(&self) -> f32 {
+        self.pistol.recoil()
+    }
+
     /// Borrow the target for camera queries and rendering.
     pub(super) const fn target(&self) -> &Target {
         &self.target
@@ -242,9 +247,16 @@ impl Combat {
 
     /// Keep cooldown rejection quiet while retaining all other firing outcomes.
     fn fire(&mut self, arena: &Arena, direction: Dir3) {
-        let from = Self::origin(arena.position());
-        let aim = Aim::try_from((from, *direction))
-            .expect("Arena position and typed direction are valid");
+        let chest = Self::origin(arena.position());
+        let sight = Aim::try_from((chest, *direction)).expect("Finite chest aim");
+        let point = self.target.aim_point(arena, sight);
+        let pose = super::weapon_pose::clear(
+            arena,
+            super::weapon_pose::pose(arena.position(), direction, 0.0),
+        );
+        let from = super::weapon_pose::muzzle(&pose);
+        let travel = Dir3::new(point - from).unwrap_or(direction);
+        let aim = Aim::try_from((from, *travel)).expect("Finite muzzle aim");
         match self.pistol.fire() {
             Ok(()) => {
                 self.projectile = Some(Projectile {
@@ -270,6 +282,34 @@ mod tests {
     use crate::arena::Movement;
 
     #[test]
+    fn cover_retracts_the_shared_muzzle_and_blocks_the_projectile() {
+        let mut arena = Arena::default();
+        let mut combat = Combat::default();
+        combat.act(&arena, Action::PickUp);
+        for _ in 0..22 {
+            arena.step(Movement::Right);
+        }
+        for _ in 0..50 {
+            arena.step(Movement::Forward);
+        }
+        combat.act(&arena, Action::Fire(Dir3::NEG_Z));
+        let trace = combat.trace().expect("Accepted shot");
+        assert!((6.0..6.01).contains(&trace.from.z));
+        let visible = super::super::weapon_pose::clear(
+            &arena,
+            super::super::weapon_pose::pose(arena.position(), Dir3::NEG_Z, 0.0),
+        );
+        assert_eq!(trace.from, super::super::weapon_pose::muzzle(&visible));
+        assert!(combat.advance(Duration::from_millis(20), &arena).is_none());
+        assert!(matches!(
+            combat.feedback(),
+            Feedback::Fired(Shot::Wall { .. })
+        ));
+        assert_eq!(combat.target().health().body_hits_remaining(), 6);
+        assert_eq!(combat.rounds(), 11);
+    }
+
+    #[test]
     fn projectile_segments_do_not_damage_before_arrival_and_cannot_replay_a_hit() {
         let arena = Arena::default();
         let mut combat = Combat::default();
@@ -282,13 +322,19 @@ mod tests {
         assert_eq!(combat.target().health().body_hits_remaining(), 6);
         assert!(combat.advance(Duration::from_millis(20), &arena).is_none());
         let trace = combat.trace().expect("Travelling segment");
-        assert_eq!(trace.from, origin);
-        assert!((trace.to.distance(origin) - 2.4).abs() < 0.00001);
+        let muzzle = super::super::weapon_pose::muzzle(&super::super::weapon_pose::pose(
+            arena.position(),
+            aim,
+            0.0,
+        ));
+        assert!(trace.from.abs_diff_eq(muzzle, 0.00001));
+        assert!((trace.to.distance(muzzle) - 2.4).abs() < 0.00001);
         assert_eq!(combat.target().health().body_hits_remaining(), 6);
         let hit = combat
             .advance(Duration::from_millis(80), &arena)
             .expect("Arrived hit");
-        assert_eq!(hit.direction, aim);
+        let travel = (trace.to - trace.from).normalize();
+        assert!((*hit.direction).abs_diff_eq(travel, 0.00001));
         assert_eq!(combat.target().health().body_hits_remaining(), 5);
         assert!(combat.advance(Duration::from_secs(1), &arena).is_none());
         assert_eq!(combat.target().health().body_hits_remaining(), 5);

@@ -158,3 +158,23 @@ fn rejection_order_and_zero_elapsed_time_are_stable() {
     pistol.advance(Duration::ZERO);
     assert_eq!(pistol.fire(), Err(FireError::Empty));
 }
+
+/// Recoil derives from the existing cooldown and cannot outlast it or survive reset.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn recoil_recovers_before_the_next_accepted_shot() {
+    let mut pistol = Pistol::default();
+    assert!(pistol.recoil().abs() < f32::EPSILON);
+    pistol.pick_up(Pistol::LOCATION).expect("Pickup");
+    assert!(pistol.recoil().abs() < f32::EPSILON);
+    pistol.fire().expect("First shot");
+    assert!((pistol.recoil() - 1.0).abs() < 0.00001);
+    pistol.advance(Duration::from_millis(60));
+    assert!((pistol.recoil() - 0.5).abs() < 0.00001);
+    assert_eq!(pistol.fire(), Err(FireError::CoolingDown));
+    assert!((pistol.recoil() - 0.5).abs() < 0.00001);
+    pistol.advance(Duration::from_millis(60));
+    assert!(pistol.recoil().abs() < f32::EPSILON);
+    pistol.advance(Duration::MAX);
+    assert!(pistol.recoil().abs() < f32::EPSILON);
+}

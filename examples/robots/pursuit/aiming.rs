@@ -107,7 +107,9 @@ mod tests {
         game.advance_combat(std::time::Duration::from_millis(100));
         assert_eq!(game.combat.target().health().body_hits_remaining(), 5);
         let trace = game.combat.trace().expect("Accepted shot");
-        assert_eq!(trace.from, Combat::origin(game.arena.position()));
+        let muzzle =
+            crate::weapon_pose::muzzle(&crate::weapon_pose::pose(game.arena.position(), aim, 0.0));
+        assert!(trace.from.abs_diff_eq(muzzle, 0.00001));
     }
 
     #[test]

@@ -5,6 +5,9 @@ mod animation;
 #[path = "robot/locomotion.rs"]
 mod locomotion;
 pub(super) use locomotion::pose;
+#[path = "robot/grip.rs"]
+mod grip;
+pub(super) use grip::pose as grip_pose;
 
 use super::{scene::Character, Game};
 use bevy::{animation::AnimationTargetId, prelude::*};
@@ -72,6 +75,9 @@ pub(super) fn load(
                     commands.entity(entity).insert(Hand);
                 }
                 if let Ok((name, _)) = hierarchy.get(entity) {
+                    if let Some(arm) = grip::Arm::named(name.as_str()) {
+                        commands.entity(entity).insert(arm);
+                    }
                     let bone = match name.as_str() {
                         "pelvis" => Some(locomotion::Bone::Pelvis),
                         "spine_01" => Some(locomotion::Bone::Spine),

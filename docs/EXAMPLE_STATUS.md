@@ -4,6 +4,43 @@ Updated: 2026-10-09. Goal status: active.
 
 ## Resume here
 
+### Weapon grip checkpoint, 2026-10-09
+
+Projectile checkpoint `7cabda0` is confirmed on GitHub main. The current checkpoint
+changes share one weapon frame between the pistol, both wrists, muzzle feedback,
+and projectile launch. A two-bone arm solver preserves bone lengths; the muzzle
+retracts before cover. Recoil derives from the pistol cooldown. Pelvis direction
+changes now settle with a 100 ms time constant.
+
+Native root tests, 113 scene tests, strict native/WASM Clippy, and asset checks pass.
+The standard browser suite passes for this production code. Personal lint reports no candidate diagnostics in either raw pass; unrelated
+repository diagnostics remain. The [coverage record](progress/shooter-grip-coverage.json)
+lists exact gaps. The [strafe recording](progress/shooter-grip-strafe.mp4) and
+[close-up contact sheet](progress/shooter-grip-close.jpg) show the final source before
+WASM optimization. The optimized release completed successfully.
+
+Runtime: `9c2080fa21925205d022c8e2f3d75bb5a36e3ae61e9a0329bc2761f67f75a4c9`.
+URL: `http://100.105.254.50:8781/robots/pursuit/?build=9c2080fa`.
+The optimized [recording](progress/shooter-grip-final.mp4),
+[contact sheet](progress/shooter-grip-final.jpg), and
+[desktop capture](progress/shooter-grip-desktop.png) were inspected. The
+[narrow capture](progress/shooter-grip-narrow.png) retains the existing Fire/instruction
+HUD overlap; touch aiming remains incomplete. Desktop keyboard/mouse play is the
+qualified path.
+
+Next: run the guides/documentation checks, commit, and push this checkpoint.
+Then integrate physical death. Compatibility probes compile the unmodified ragdoll
+core and Rapier backend at upstream `05ca5a920c88cec9cfaa661c483aa4e26924e08f`
+against Bevy 0.18.1 and bevy_rapier3d 0.34.0. Those probes have not established runtime
+correctness. Their minimal manifests omit upstream lint configuration and emit
+`unexpected_cfgs` warnings for `dylint_lib`.
+
+The authoritative worktree remains `bevy-gym-quality`. Validation logs are under
+`/home/sagan/.cache/bevy-gym-quality-validation/grip-*`; compatibility probes remain
+under ignored `runs/quality-research/shooter/*compat-probe` directories.
+Ragdolls, authored strafing, two-versus-two agents, state lights, and raytraced audio
+remain unfinished. Do not mark the shooter or the broader roadmap complete.
+
 ### Projectile checkpoint, 2026-10-09
 
 The authoritative worktree remains `bevy-gym-quality`. Camera checkpoint `09f7372`

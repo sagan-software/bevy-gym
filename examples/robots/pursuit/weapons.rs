@@ -109,6 +109,9 @@ pub(super) fn traces(game: Res<'_, Game>, mut gizmos: Gizmos<'_, '_>) {
 
 /// Place the grip at the animated hand; the native barrel points along negative X.
 fn held_pose(game: &Game, hand: Option<&GlobalTransform>) -> Transform {
+    if game.robot_health.is_alive() {
+        return game.weapon_pose();
+    }
     let facing = Quat::from_rotation_y(game.facing());
     let direction = game.aim.map_or(facing * Vec3::NEG_Z, |aim| *aim);
     let pitch = direction.y.clamp(-1.0, 1.0).asin();
@@ -120,4 +123,27 @@ fn held_pose(game: &Game, hand: Option<&GlobalTransform>) -> Transform {
     Transform::from_translation(position).with_rotation(
         facing * Quat::from_rotation_x(pitch) * Quat::from_rotation_y(-std::f32::consts::FRAC_PI_2),
     )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn disabled_robot_retains_a_finite_weapon_pose_with_or_without_a_hand() {
+        let mut game = Game::default();
+        for _ in 0..1000 {
+            game.step(super::super::Movement::Idle);
+            if !game.robot_health.is_alive() {
+                break;
+            }
+        }
+        assert!(!game.robot_health.is_alive());
+        let hand = GlobalTransform::from_translation(Vec3::new(1.0, 0.2, 3.0));
+        let pose = held_pose(&game, Some(&hand));
+        assert_eq!(pose.translation, hand.translation());
+        let fallback = held_pose(&game, None);
+        assert!(fallback.translation.is_finite());
+        assert!(fallback.rotation.is_normalized());
+    }
 }

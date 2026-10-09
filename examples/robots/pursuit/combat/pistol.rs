@@ -92,6 +92,17 @@ impl Pistol {
         Ok(())
     }
 
+    /// Recover the visual kick during the first 120 milliseconds of the firing cooldown.
+    pub(crate) fn recoil(&self) -> f32 {
+        self.owned.as_ref().map_or(0.0, |pistol| {
+            pistol
+                .cooldown
+                .saturating_sub(Duration::from_millis(130))
+                .as_secs_f32()
+                / 0.12
+        })
+    }
+
     /// Advance simulation time; excess elapsed time cannot underflow the cooldown.
     pub(crate) const fn advance(&mut self, elapsed: Duration) {
         if let Some(pistol) = &mut self.owned {

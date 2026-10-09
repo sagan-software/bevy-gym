@@ -250,14 +250,14 @@ mod tests {
         let mut game = Game::default();
         game.act(Action::PickUp);
         rig.advance(&game, 0.02, &mut player, &mut graph);
-        game.act(Action::Fire(Dir3::Y));
+        game.act(Action::Fire(Dir3::NEG_Z));
         rig.advance(&game, 0.02, &mut player, &mut graph);
         assert!(player.is_playing_animation(rig.shoot));
         player
             .animation_mut(rig.shoot)
             .expect("Recoil")
             .seek_to(0.1);
-        game.act(Action::Fire(Dir3::Y));
+        game.act(Action::Fire(Dir3::NEG_Z));
         rig.advance(&game, 0.02, &mut player, &mut graph);
         assert_eq!(
             player.animation(rig.shoot).expect("Recoil").seek_time(),

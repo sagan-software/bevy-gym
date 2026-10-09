@@ -82,6 +82,8 @@ mod camera;
 mod gun_feedback;
 #[path = "pursuit/view.rs"]
 mod view;
+#[path = "pursuit/weapon_pose.rs"]
+mod weapon_pose;
 use camera::EYE_OFFSET as DRONE_EYE;
 
 /// One character's simulation and measured motion for visual animation.
@@ -227,10 +229,25 @@ impl Game {
             .map_or(self.heading, |aim| (-aim.x).atan2(-aim.z))
     }
 
+    /// The visible gun and arm targets use one shoulder-relative frame.
+    fn weapon_pose(&self) -> Transform {
+        let direction = self.aim.unwrap_or_else(|| {
+            Dir3::new(Quat::from_rotation_y(self.facing()) * Vec3::NEG_Z)
+                .expect("Finite character heading")
+        });
+        weapon_pose::clear(
+            &self.arena,
+            weapon_pose::pose(self.arena.position(), direction, self.combat.recoil()),
+        )
+    }
+
     /// Interactions use the current arena position rather than a caller-supplied origin.
     fn act(&mut self, action: firing::Action) {
         if !self.robot_health.is_alive() {
             return;
+        }
+        if let firing::Action::Fire(direction) = action {
+            self.aim = Some(direction);
         }
         let previous_rounds = self.combat.rounds();
         self.combat.act(&self.arena, action);
@@ -396,7 +413,7 @@ fn main() {
         )
         .add_systems(
             PostUpdate,
-            (robot::pose, weapons::project)
+            (robot::pose, robot::grip_pose, weapons::project)
                 .chain()
                 .after(bevy::app::AnimationSystems)
                 .before(TransformSystems::Propagate),
@@ -520,6 +537,16 @@ mod tests {
         return_fire::install(&mut app);
         app.update();
         app
+    }
+
+    #[test]
+    fn a_player_projectile_starts_at_the_shared_weapon_muzzle() {
+        let mut game = Game::default();
+        game.act(firing::Action::PickUp);
+        game.act(firing::Action::Fire(Dir3::NEG_Z));
+        let shot = game.combat.trace().expect("Launched projectile");
+        let muzzle = game.arena.position() + Vec3::new(0.18, 0.64, -0.772);
+        assert!(shot.from.abs_diff_eq(muzzle, 0.00001));
     }
 
     #[test]
@@ -960,7 +987,7 @@ mod tests {
     }
 
     #[test]
-    fn aiming_keeps_the_pistol_grip_at_the_right_hand() {
+    fn aiming_keeps_the_pistol_in_the_shared_weapon_frame() {
         let mut app = app();
         app.world_mut()
             .spawn((robot::Hand, Transform::from_xyz(2.0, 1.2, 3.0)));
@@ -980,7 +1007,7 @@ mod tests {
                 .iter(world)
                 .find_map(|(kind, pose)| (*kind == weapons::Visual::Held).then_some(pose))
                 .expect("Held pistol");
-            assert!(gun.translation.distance(Vec3::new(2.0, 1.2, 3.0)) < 1.0e-5);
+            assert_eq!(gun, world.resource::<Game>().weapon_pose());
             assert!((gun.rotation * Vec3::NEG_X).distance(*aim) < 1.0e-5);
             if aim.y.abs() < 0.99 {
                 let upright = (Vec3::Y - *aim * aim.y).normalize();
@@ -1000,7 +1027,7 @@ mod tests {
     }
 
     #[test]
-    fn held_pistol_uses_current_hand_pose_before_transform_propagation() {
+    fn stale_hand_transforms_cannot_move_the_shared_weapon_frame() {
         let mut app = app();
         let hand = app
             .world_mut()
@@ -1020,7 +1047,8 @@ mod tests {
             .iter(world)
             .find_map(|(kind, pose)| (*kind == weapons::Visual::Held).then_some(pose.translation))
             .expect("Held pistol");
-        assert!(pistol.distance(world.get::<Transform>(hand).expect("Hand").translation) < 1e-5);
+        assert!(pistol.abs_diff_eq(world.resource::<Game>().weapon_pose().translation, 1e-5));
+        assert!(pistol.distance(world.get::<Transform>(hand).expect("Hand").translation) > 1.0);
     }
 
     #[test]

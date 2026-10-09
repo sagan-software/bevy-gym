@@ -46,9 +46,27 @@ pub(crate) enum Bone {
     Spine,
 }
 
+/// Presentation-only turn history prevents abrupt pelvis reversals.
+#[derive(Default)]
+pub(crate) struct Turn {
+    /// Current pelvis yaw in radians, relative to the aiming torso.
+    yaw: f32,
+}
+
+impl Turn {
+    /// Exponential settling uses a 100 ms time constant and is frame-rate independent.
+    fn advance(&mut self, target: f32, elapsed: std::time::Duration) -> f32 {
+        let blend = 1.0 - (-elapsed.as_secs_f32() / 0.1).exp();
+        self.yaw = (target - self.yaw).mul_add(blend, self.yaw);
+        self.yaw
+    }
+}
+
 /// Apply world-up rotation in each bone parent's basis after animation evaluation.
 pub(crate) fn pose(
     game: Res<'_, Game>,
+    time: Res<'_, Time>,
+    mut turn: Local<'_, Turn>,
     bones: Query<'_, '_, (Entity, &Bone, &ChildOf)>,
     mut transforms: ParamSet<'_, '_, (TransformHelper<'_, '_>, Query<'_, '_, &mut Transform>)>,
 ) {
@@ -56,7 +74,8 @@ pub(crate) fn pose(
         return;
     }
     let stride = Stride::new(game.motion, game.facing());
-    for (kind, angle) in [(Bone::Pelvis, stride.yaw), (Bone::Spine, -stride.yaw)] {
+    let yaw = turn.advance(stride.yaw, time.delta());
+    for (kind, angle) in [(Bone::Pelvis, yaw), (Bone::Spine, -yaw)] {
         for (entity, bone, parent) in &bones {
             if *bone != kind {
                 continue;
@@ -79,7 +98,9 @@ mod tests {
     #[test]
     fn missing_parent_and_disabled_robot_leave_bones_unchanged() {
         let mut app = App::new();
-        app.init_resource::<Game>().add_systems(Update, pose);
+        app.init_resource::<Game>()
+            .init_resource::<Time>()
+            .add_systems(Update, pose);
         let valid_parent = app.world_mut().spawn(Transform::default()).id();
         let incomplete = app
             .world_mut()
@@ -118,7 +139,11 @@ mod tests {
         game.act(super::super::super::firing::Action::PickUp);
         game.aim = Some(Dir3::NEG_Z);
         game.motion = Vec3::NEG_X * 0.08;
-        app.insert_resource(game).add_systems(Update, pose);
+        let mut time = Time::<()>::default();
+        time.advance_by(std::time::Duration::from_millis(100));
+        app.insert_resource(game)
+            .insert_resource(time)
+            .add_systems(Update, pose);
         let basis = Quat::from_rotation_x(-std::f32::consts::FRAC_PI_2);
         let root = app.world_mut().spawn(Transform::from_rotation(basis)).id();
         let pelvis = app
@@ -137,10 +162,26 @@ mod tests {
             .rotation;
         let spine_pose = app.world().get::<Transform>(spine).expect("Spine").rotation;
         assert!((basis * pelvis_pose).abs_diff_eq(
-            Quat::from_rotation_y(std::f32::consts::FRAC_PI_2) * basis,
+            Quat::from_rotation_y(std::f32::consts::FRAC_PI_2 * (1.0 - (-1.0_f32).exp())) * basis,
             1e-5
         ));
         assert!((basis * pelvis_pose * spine_pose).abs_diff_eq(basis, 1e-5));
+    }
+
+    #[test]
+    fn direction_reversal_is_smooth_and_frame_rate_independent() {
+        let mut whole = Turn::default();
+        let mut split = Turn::default();
+        let target = std::f32::consts::FRAC_PI_2;
+        let angle = whole.advance(target, std::time::Duration::from_millis(100));
+        assert!(angle > 0.0 && angle < target);
+        for _ in 0..10 {
+            split.advance(target, std::time::Duration::from_millis(10));
+        }
+        assert!((whole.yaw - split.yaw).abs() < 0.00001);
+        let reversed = whole.advance(-target, std::time::Duration::from_millis(16));
+        assert!(reversed > 0.0 && reversed < angle);
+        assert!((whole.advance(-target, std::time::Duration::ZERO) - reversed).abs() < 0.00001);
     }
 
     #[test]

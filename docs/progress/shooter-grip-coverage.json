@@ -1,0 +1,242 @@
+{
+  "scope": "Selected complete files, including test code; not a whole-change coverage percentage. Integration path aliases can contain several instantiations.",
+  "command": "cargo llvm-cov --branch --features robots --lib --test drone_impulse --example drone-pursuit --test pursuit_navigation --test pursuit_shots --test pursuit_combat --json",
+  "export": "Explicit example binary and all five other test binaries exported with llvm-cov.",
+  "files": {
+    "examples/robots/pursuit/robot/grip.rs": {
+      "sha256": "6f8fedab2c9c4ca2fa8b092aa601a26499d6e667607d7bee1d333aa703c90cde",
+      "summary": {
+        "branches": {
+          "count": 16,
+          "covered": 16,
+          "notcovered": 0,
+          "percent": 100
+        },
+        "functions": {
+          "count": 11,
+          "covered": 11,
+          "percent": 100
+        },
+        "instantiations": {
+          "count": 11,
+          "covered": 11,
+          "percent": 100
+        },
+        "lines": {
+          "count": 210,
+          "covered": 210,
+          "percent": 100
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 440,
+          "covered": 432,
+          "notcovered": 8,
+          "percent": 98.18181818181819
+        }
+      }
+    },
+    "examples/robots/pursuit/weapon_pose.rs": {
+      "sha256": "cd8b22dec634a35d45912306b8d59afa269c83f279f5f7a014c245229245bd22",
+      "summary": {
+        "branches": {
+          "count": 2,
+          "covered": 2,
+          "notcovered": 0,
+          "percent": 100
+        },
+        "functions": {
+          "count": 4,
+          "covered": 4,
+          "percent": 100
+        },
+        "instantiations": {
+          "count": 4,
+          "covered": 4,
+          "percent": 100
+        },
+        "lines": {
+          "count": 34,
+          "covered": 34,
+          "percent": 100
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 81,
+          "covered": 81,
+          "notcovered": 0,
+          "percent": 100
+        }
+      }
+    },
+    "examples/robots/pursuit/robot/locomotion.rs": {
+      "sha256": "ccfc00d4fbd254f1aa5f99fbf3de4f9f2c94af2d14e6967c61fb53a419d06511",
+      "summary": {
+        "branches": {
+          "count": 22,
+          "covered": 18,
+          "notcovered": 4,
+          "percent": 81.81818181818183
+        },
+        "functions": {
+          "count": 7,
+          "covered": 7,
+          "percent": 100
+        },
+        "instantiations": {
+          "count": 7,
+          "covered": 7,
+          "percent": 100
+        },
+        "lines": {
+          "count": 140,
+          "covered": 140,
+          "percent": 100
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 252,
+          "covered": 252,
+          "notcovered": 0,
+          "percent": 100
+        }
+      }
+    },
+    "examples/robots/pursuit/firing.rs": {
+      "sha256": "488306f20c056186b4724bbef1f65bcb21c9dd3ae89f17cdc2fc875b07762a94",
+      "summary": {
+        "branches": {
+          "count": 14,
+          "covered": 14,
+          "notcovered": 0,
+          "percent": 100
+        },
+        "functions": {
+          "count": 24,
+          "covered": 24,
+          "percent": 100
+        },
+        "instantiations": {
+          "count": 24,
+          "covered": 24,
+          "percent": 100
+        },
+        "lines": {
+          "count": 301,
+          "covered": 301,
+          "percent": 100
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 673,
+          "covered": 668,
+          "notcovered": 5,
+          "percent": 99.25705794947994
+        }
+      }
+    },
+    "examples/robots/pursuit/weapons.rs": {
+      "sha256": "6caa70f7da8933173cb23a73bd07f6314a7444c80b272888ae32f40d5f6df0b7",
+      "summary": {
+        "branches": {
+          "count": 12,
+          "covered": 12,
+          "notcovered": 0,
+          "percent": 100
+        },
+        "functions": {
+          "count": 10,
+          "covered": 9,
+          "percent": 90
+        },
+        "instantiations": {
+          "count": 10,
+          "covered": 9,
+          "percent": 90
+        },
+        "lines": {
+          "count": 97,
+          "covered": 96,
+          "percent": 98.96907216494846
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 164,
+          "covered": 163,
+          "notcovered": 1,
+          "percent": 99.39024390243902
+        }
+      }
+    },
+    "tests/../examples/robots/pursuit/combat/pistol.rs": {
+      "sha256": "47fe0b4a24bcfe784bfe123566422d7277cb2861b94946afcdf92b66f524a0c8",
+      "summary": {
+        "branches": {
+          "count": 14,
+          "covered": 14,
+          "notcovered": 0,
+          "percent": 100
+        },
+        "functions": {
+          "count": 7,
+          "covered": 7,
+          "percent": 100
+        },
+        "instantiations": {
+          "count": 14,
+          "covered": 11,
+          "percent": 78.57142857142857
+        },
+        "lines": {
+          "count": 50,
+          "covered": 50,
+          "percent": 100
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 60,
+          "covered": 60,
+          "notcovered": 0,
+          "percent": 100
+        }
+      }
+    }
+  },
+  "gaps": [
+    "locomotion.rs compound test assertions have unexecuted failure branches; production branch outcomes are covered.",
+    "grip.rs fallible accesses after successful hierarchy validation retain unreachable defensive exits under exclusive ECS access. Missing parents, missing transforms, degenerate bones, unarmed and dead states are tested.",
+    "Broader unchanged viewer paths retain the gaps recorded in earlier checkpoint coverage. Browser execution does not carry native branch instrumentation.",
+    "weapons.rs:116: the retained-aim closure in the pre-existing death fallback is not exercised. Death tests cover absent aim and both present/missing hand transforms; this fallback remains until ragdoll integration.",
+    "grip.rs:77-78: missing intermediate parent exits are not individually exercised. Tests cover a missing hand parent and a complete chain with missing transforms."
+  ]
+}
