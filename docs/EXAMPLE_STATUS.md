@@ -112,7 +112,7 @@ an incompatible `LD_LIBRARY_PATH`; the passing command removes that variable
 before `nix run .#drone-browser-check`. Do not wrap this runner in `nix develop`,
 which can restore the conflicting library path.
 
-The damage-aware training checkpoint is ready to publish.
+Damage-aware training implementation: `32be3f9`.
 The guide is `drone-train-damage`; its separate policy has sixteen inputs.
 The shared rollout collector now supports typed drone tasks and fixed-width encoders.
 Existing healthy checkpoint qualification still passes. Sixteen damage-training tests
@@ -124,6 +124,9 @@ remain unmeasured; no damage-aware checkpoint has passed its gates yet.
 The final logs are `damage-training-gates2`, `damage-training-wasm2`,
 `damage-training-personal2`, and `damage-training-coverage-final`, with supplemental
 one/two-update and filesystem-failure CLI checks in the same validation directory.
+The final guide/documentation log is `damage-training-guide-final3`: the one-update
+run reported budget exhaustion, and six documentation tests passed with one
+existing ignored plugin example.
 
 Seed 7 is training under `bevy-gym-damage-curriculum-20261009.service`.
 Its log is `/home/sagan/.cache/bevy-gym-quality-validation/damage-curriculum-seed7.log`;
