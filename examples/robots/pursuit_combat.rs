@@ -1,30 +1,40 @@
-//! Collect a pistol and destroy one rotor through the shared combat rules.
-
-#[expect(
+//! Collect a pistol and aim two shots at a rotor in the shared arena.
+#![expect(
     dead_code,
-    reason = "This guide shows rotor hits; the shared helper also handles body damage and crashes."
+    reason = "Walking, body hits, and pose inspection are tested separately."
 )]
+
+#[path = "pursuit/arena.rs"]
+mod arena;
 #[path = "pursuit/combat.rs"]
 mod combat;
+#[path = "pursuit/shot.rs"]
+mod shot;
 
+use arena::Arena;
+use bevy::math::{Quat, Vec3};
 use bevy_gym::robots::DroneMotor;
-use combat::{health::DroneHealth, pistol::Pistol};
+use combat::pistol::Pistol;
+use shot::{aim::Aim, target::Target};
 use std::time::Duration;
 
-/// Two accepted pistol shots destroy a weak point; each shot consumes ammunition.
+/// Two clear shots destroy a weak point; walls and closer body parts would block them.
 fn main() {
+    let arena = Arena::default();
     let mut pistol = Pistol::default();
-    let mut drone = DroneHealth::default();
     pistol
         .pick_up(Pistol::LOCATION)
         .expect("Standing at the pickup");
+    let mut drone =
+        Target::try_from((Vec3::new(0.0, 3.0, 0.0), Quat::IDENTITY)).expect("Finite target pose");
+    let rotor = drone.rotor_centre(DroneMotor::FrontLeft);
+    let aim = Aim::try_from((rotor + Vec3::Y, Vec3::NEG_Y)).expect("Aim down at the rotor");
 
     for _ in 0..2 {
-        pistol
-            .fire()
-            .expect("Loaded pistol with no remaining cooldown");
-        let damage = drone.hit_rotor(DroneMotor::FrontLeft);
-        println!("Rotor hit: {damage:?}");
+        let shot = drone
+            .shoot(&arena, &mut pistol, aim)
+            .expect("Loaded pistol with no cooldown");
+        println!("Shot: {shot:?}");
         pistol.advance(Duration::from_millis(250));
     }
     let rounds = pistol.rounds();

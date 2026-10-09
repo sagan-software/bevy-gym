@@ -186,8 +186,52 @@ without spending a round. Each accepted shot spends one round and starts a
 `advance` consumes simulation time and saturates at zero.
 There is no reload yet. Replacing each helper with `Default` restores its initial state.
 
-The guide applies hits directly after accepted shots. Aiming, hitbox selection,
-wall obstruction, live motor failure, effects, and player controls still need to
-connect through the arena. The library's qualified hover environment is unchanged.
+The guide now traces aimed shots through the arena. Live motor failure, effects,
+and player controls still need to connect to these rules. The library's qualified
+hover environment is unchanged.
 [Coverage evidence](progress/pursuit-combat-coverage.json) records the tested
 health and pistol branches; it does not claim a playable combat scene.
+
+## Aimed shots
+
+`Aim::try_from` accepts an origin within ±1,000 metres on each axis and a finite,
+nonzero direction. `Target::try_from` accepts the same position bounds and a finite,
+nonzero quaternion. Bounds include both endpoints. Each constructor validates
+position first. Scaling before normalization supports finite subnormal and large
+magnitudes without overflowing or underflowing their squared lengths.
+
+Invalid aim origins return `InvalidAim::Origin`. Invalid directions retain Bevy's
+`InvalidDirectionError` inside `InvalidAim::Direction`. Invalid target positions
+and rotations return `InvalidTarget::Position` and `InvalidTarget::Rotation`.
+The stored direction is `Dir3`; the stored quaternion is normalized.
+
+A shot travels at most 30 metres, including an impact at exactly that distance.
+It spends one pistol round before querying geometry. Unarmed, empty, or cooling
+pistols return their existing error without changing target health. Misses and
+wall impacts spend a round. A miss returns the world point exactly 30 metres
+along the aim direction.
+
+The nearest live part receives damage. Static geometry wins equal-distance ties,
+including a muzzle inside both a wall and the body. Body/rotor ties prefer the
+body; rotor ties follow `DroneMotor::ALL`. Destroyed rotor hitboxes disappear, and
+body death removes all target hitboxes. The same arena geometry blocks movement,
+shots, and camera sight lines; windows and pipe openings remain open.
+
+The central shot box has half extents X=0.17, Y=0.104, Z=0.18 metres. Each rotor
+uses a sphere of radius 0.12 metres at its existing motor centre. Front-left is
+(-0.2505, 0.0875, -0.2606) metres; front-right has positive X. Rear-right has
+positive X and Z; rear-left has negative X and positive Z. These are shot proxies;
+the qualified flight mass and inertia collider are unchanged.
+
+Rays transform into body coordinates before querying the box and four spheres.
+[Parry 0.31.1's RayCast](https://docs.rs/parry3d/0.31.1/parry3d/query/trait.RayCast.html),
+re-exported by Rapier 0.36, supplies these intersections. Unit ray direction makes
+the returned impact parameter a distance in metres. Solid queries report zero
+when the muzzle starts inside a hitbox. One arena query resolves static occlusion.
+
+Thirteen native cases include two existing arena checks. Eleven external shot
+cases also pass in Chrome/WASM. They cover rotated weak points, nearer-part
+shielding, wall/window/pipe geometry, range, malformed inputs, extreme finite
+magnitudes, death, and rejected firing. [Coverage evidence](progress/pursuit-shots-coverage.json)
+records every measured shot-helper line and both outcomes of thirteen conditions.
+Visible aiming and combat integration remain pending.

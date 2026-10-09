@@ -269,8 +269,26 @@ The personal Nix check retains the same two unchanged source-filter findings
 described above. Validation logs use the `pursuit-combat-` prefix in
 `/home/sagan/.cache/bevy-gym-quality-validation`.
 
-The combat helpers are not connected to the visible arena. Next, implement aiming,
-rotor/body hitboxes, wall-blocked shots, and visible pistol pickup. Then connect
+The combat-rules checkpoint is published as `09ceba4`.
+[CI](https://github.com/sagan-software/bevy-gym/actions/runs/37889499029) passed;
+[Pages](https://github.com/sagan-software/bevy-gym/actions/runs/37889499033) is pending.
+
+The aimed-shot model now validates aim and target poses, resolves nearest body or
+rotor hits, and blocks damage through static geometry. The headless combat guide
+uses actual rays. Thirteen native cases pass, including two existing arena cases;
+eleven external cases pass in Chrome/WASM. Root tests, strict Clippy, format checks,
+Nix formatting, and Actionlint pass. Coverage hits all 113 measured helper lines
+and both outcomes of thirteen instrumented conditions.
+
+[The shot coverage record](progress/pursuit-shots-coverage.json) retains source
+hashes and execution evidence. The personal Nix check still reports the two unchanged
+source-filter false positives above. Logs use the `pursuit-shots-` prefix in the
+validation cache. Personal Rust discovery reports no diagnostics in the changed
+shot files or guide; the full-project strict backlog remains. The guide and
+documentation tests run last.
+
+These helpers are not connected to the visible arena. Next, add visible pistol
+pickup, aiming controls, and shot feedback using this tested model. Then connect
 drone motor failure and destruction effects, occlusion-aware sensing, telegraphed
 fire, pursuit training, and the humanoid policy. Keep the frozen recovery
 checkpoints and promotion gates. The full sequence is in
