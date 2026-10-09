@@ -28,9 +28,10 @@ perception. A successful hover policy alone does not complete this requirement.
 [Flightmare's supplement, section 5.2](https://rpg.ifi.uzh.ch/docs/CoRL20_Yunlong.pdf)
 uses three direct motor-thrust outputs after losing one propeller. Its state
 includes position, orientation, linear velocity, and body angular velocity.
-Its reward excludes yaw angle and yaw rate. Section 4.2 reports 100 parallel drones and 25 million training steps per task.
-This supports testing position and tilt recovery while permitting rotation. Its experiment does not establish that
-our different geometry, inertia, force limits, or reward will recover.
+Its reward excludes yaw angle and yaw rate. Section 4.2 reports 100 parallel drones and 25 million
+training steps per task.
+This supports testing position and tilt recovery while permitting rotation. Its experiment does not
+establish that our different geometry, inertia, force limits, or reward will recover.
 
 The existing model has four parallel thrust axes and alternating reaction moments.
 For one missing corner, zero static roll and pitch torque require its opposite
@@ -157,6 +158,40 @@ and the actual browser robot tests pass. Personal discovery found no diagnostics
 in the changed robot files; the full-project strict backlog remains.
 
 The first narrow inspection found the controls overlapping the landing gear.
-The small-screen canvas now has a 760-pixel minimum height. The final bundle passes [desktop](progress/drone-visible-damage-desktop.png) and
+The small-screen canvas now has a 760-pixel minimum height. The final bundle passes
+[desktop](progress/drone-visible-damage-desktop.png) and
 [narrow-layout](progress/drone-visible-damage-narrow.png) inspection without CSS overrides.
 Native window interaction and mobile touch input remain unverified.
+
+## Scheduled-failure comparison
+
+Run the comparison before training a damage-aware policy:
+
+```sh
+nix develop --command cargo run --no-default-features --features robots --example drone-damage-baseline
+```
+
+The guide prints one JSON record per paired trial. It compares constant half
+thrust with the bundled intact-flight policy on 32 held-out reset seeds, every
+motor, and failures after two or five seconds. Each controller receives a fresh
+environment and ten seconds after failure. Recurrent memory resets between trials.
+Episodes that terminate before failure have a separate `before_failure` outcome.
+
+All 256 trials per controller crashed after failure. Constant thrust lasted
+36–37 actions; the intact policy lasted 34–38 actions. Each action lasts 20 ms.
+Mean post-failure returns were 17.6860 and 16.6963, respectively. These calm-start
+results establish a baseline; they do not qualify damage recovery.
+[The result record](progress/drone-damage-baseline.json) contains every paired trial,
+the checkpoint hash, source hashes, and the command.
+
+Seven native and browser tests check failure timing, every corner, early
+termination, a complete survival window, controller errors, phase-local metrics,
+and serialized outcomes. A diagnostic controller survives by applying full thrust
+to the remaining diagonal pair. It permits yaw rotation and is not learned control.
+
+Root tests, strict all-target/all-feature Clippy, and the browser robot suite pass.
+Personal Rust discovery reports no diagnostics in the changed files; the existing
+full-project strict backlog remains. [Coverage](progress/drone-damage-baseline-coverage.json)
+hits all 63 measured assessment lines and both outcomes of its two instrumented
+conditions. The runnable guide's 24 measured source lines are also hit. The record
+explains unreachable error propagation and the four unhit test panic lines.

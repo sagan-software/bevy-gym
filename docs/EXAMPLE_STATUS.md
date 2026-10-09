@@ -25,7 +25,7 @@ build pass. The full root personal-lint backlog remains.
 The seed-7 browser run is complete. Do not retrain it to recover evidence.
 `docs/progress/drone-browser-curriculum.json` contains the run and qualification;
 `drone-browser-curriculum.mpk` contains its final 46,343-byte checkpoint.
-The T3 tab remains at `http://100.105.254.50:8777/robots/hover/` for inspection.
+The saved curriculum bundle remains at `http://100.105.254.50:8777/robots/hover/`.
 Its server is `bevy-gym-curriculum-ui-server-20261009.service`, and its runtime is
 `build-460aff23e4292a9214631a7180419359b53bd03d4bc1ae1898455e45b38d883b`.
 The final gate units end with `final-gates2-20261009`, `final-wasm-20261009`,
@@ -49,7 +49,10 @@ as `17c92c2`. [The research record](EXAMPLE_RESEARCH.md) links their visual evid
 The target's valid GLB is under `runs/quality-research/media/quaternius-adventurer.glb`;
 the earlier `.gltf` download is a quota-error HTML page and must not be used.
 
-The visible actuator-failure checkpoint is ready to publish. All 35 viewer tests,
+The visible actuator-failure checkpoint is published as `0821b4d`.
+[CI](https://github.com/sagan-software/bevy-gym/actions/runs/37877715282) passed;
+[Pages](https://github.com/sagan-software/bevy-gym/actions/runs/37877715381) is pending.
+All 35 viewer tests,
 four public damage tests, root tests, strict native/WASM Clippy, and actual browser
 robot tests pass. Personal discovery found no diagnostics in the changed robot
 files. The full personal strict gate retains its existing library/test backlog.
@@ -85,7 +88,27 @@ Its runtime is `build-85b4ba1609c7a202f04f63a69e36ee1003b6aa94968938e312796b26f5
 No validation or recording job remains active. The preview is 1280×800 CSS pixels.
 Do not resize during recording.
 
-After that checkpoint, train a separate damage-aware policy. Preserve the healthy model and its
+The scheduled-failure baseline is ready to publish. The new
+`drone-damage-baseline` guide compares 32 seeds, four motors, and two failure times.
+Both controllers reached damage in all 256 cases and then crashed. Constant
+half-thrust lasted 36–37 actions; the intact policy lasted 34–38 actions.
+Results and source/checkpoint hashes are in `docs/progress/drone-damage-baseline.json`.
+Seven assessment tests pass natively and in the actual browser. Root tests,
+strict all-target/all-feature Clippy, and `nixfmt --check flake.nix` pass.
+The focused personal Nix check also passes with no findings.
+Personal Rust discovery has no diagnostics in the changed files; its full-project
+strict backlog remains. Coverage hits every measured assessment and guide source
+line, plus both outcomes of the assessment's two instrumented conditions.
+Four test panic lines remain intentionally unhit.
+
+Final logs use `damage-baseline-gates4`, `damage-baseline-wasm4`,
+`damage-baseline-personal3`, and `damage-baseline-coverage-final2` under
+`/home/sagan/.cache/bevy-gym-quality-validation`. The first browser run inherited
+an incompatible `LD_LIBRARY_PATH`; the passing command removes that variable
+before `nix run .#drone-browser-check`. Do not wrap this runner in `nix develop`,
+which can restore the conflicting library path.
+
+Next, train a separate damage-aware policy. Preserve the healthy model and its
 qualification. The damage contract records the current model's static thrust limit;
 do not assume recovery follows from the intact-flight force budget.
 Perception, damage adaptation, pursuit, detached parts, and the jumping quadruped
@@ -240,8 +263,9 @@ Corrected pointer input verified reset, motor selection, single-step, run, and p
 That checkpoint used manual control. Rotor spin illustrates thrust rather than measured RPM.
 
 The [flight recording](progress/drone-flight.mp4) shows hover, power-off, ground contact,
-climb, pause, reset, and asymmetric thrust. Its [contact sheet](progress/drone-flight-contact-sheet.png)
-was inspected. Desktop and 390-pixel frame layouts were inspected. The preview resize
+climb, pause, reset, and asymmetric thrust.
+Its [contact sheet](progress/drone-flight-contact-sheet.png) was inspected.
+Desktop and 390-pixel frame layouts were inspected. The preview resize
 API remains unavailable, so this does not establish mobile-device or touch qualification.
 The initial debug WASM is 103 MB. The tested optimized release is 34,801,765 bytes;
 local gzip level 9 produces 10,685,070 bytes. This is not a measured network transfer.
@@ -425,7 +449,8 @@ need CI evidence. No speed improvement has been measured yet.
   [CI](https://github.com/sagan-software/bevy-gym/actions/runs/37841619148) passed.
   [Browser deployment](https://github.com/sagan-software/bevy-gym/actions/runs/37841619198)
   passed. Opened the public gallery and drone route in T3, then verified keyboard
-  playback, climb, tilt, pause, and reset. The [live gallery screenshot](progress/examples-live.png),
+  playback, climb, tilt, pause, and reset.
+  The [live gallery screenshot](progress/examples-live.png),
   [viewer screenshot](progress/drone-live.png), and [recording](progress/drone-live.mp4)
   show the deployed build. This deployment predates the disturbed-start controls.
 - `9f98657`: native/browser bit comparison and browser contract-test harness.
