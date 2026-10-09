@@ -167,6 +167,11 @@ path = "examples/robots/flight.rs"
 required-features = ["robots", "render-core"]
 
 [[example]]
+name = "drone-obstacles"
+path = "examples/robots/obstacles.rs"
+required-features = ["robots"]
+
+[[example]]
 name = "drone-hover"
 path = "examples/robots/hover.rs"
 required-features = ["robots"]

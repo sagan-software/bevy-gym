@@ -7,7 +7,38 @@ Updated: 2026-10-09. Goal status: active.
 Read [the roadmap](EXAMPLE_ROADMAP.md), [quality audit](QUALITY_AUDIT.md),
 [reference research](EXAMPLE_RESEARCH.md), and [drone contract](ROBOT_ENVIRONMENT.md).
 
-The current destruction checkpoint connects combat to rotor flashes, smoke, body explosions, and
+The current flight-collision checkpoint adds `DroneObstacle` and
+`DroneHover::with_obstacles`. The arena can supply its immutable boxes without
+exposing the solver or duplicating motor dynamics. The new thirty-line
+`drone-obstacles` guide drops the drone onto a platform. Viewer integration is
+next; the playable scene still uses its stationary target.
+
+Seven new external tests pass natively and in Chrome/WASM. Existing hover, damage,
+and native bitwise-parity tests pass. Root tests, strict all-target/all-feature
+Clippy, and the changed-line personal Rust gate pass. The full-project personal
+lint backlog remains. Nix lint reports two existing `unfiltered_source_root`
+warnings at `flake.nix:119` and `flake.nix:199`; neither is on the changed command.
+
+[Coverage](progress/drone-obstacles-coverage.json) records all changed measured
+lines hit and both outcomes of the reported production branches. The guide entry
+is executed separately. Logs use the `drone-obstacles-` validation-cache prefix.
+The external test first failed because the requested API did not exist.
+
+Next, construct the viewer's flight world from `Arena::blocks()`, omitting the
+floor already owned by `DroneHover`. Use the bundled healthy hover policy as the
+initial controller and label it accordingly. It does not demonstrate pursuit or
+damage recovery. Project the authoritative flight pose into shot hitboxes without
+resetting health.
+
+Apply each rotor destruction to `fail_motor` before the next
+flight action. Route a terminal collision through the existing one-time body
+death event, and pass impact velocity into debris. Reset must rebuild flight,
+clear policy memory, restore health, and remove presentation effects together.
+Then add occlusion-aware sensing, telegraphed return fire, and pursuit training.
+
+## Earlier checkpoints
+
+The destruction checkpoint `2f80f89` connects combat to rotor flashes, smoke, body explosions, and
 eight colliding debris proxies. It shares the hover viewer's renderer and uses the
 arena's immutable geometry for debris collisions. The target remains stationary;
 flight coupling, sensing, return fire, and learned pursuit are unfinished.
@@ -39,8 +70,6 @@ Next, connect the drone to live flight and arena collision geometry. Rotor damag
 must stop its motor forces, and fatal collisions must trigger the same destruction
 path. Keep the qualified hover profile unchanged. Then add occlusion-aware sensing,
 telegraphed return fire, and pursuit training.
-
-## Earlier checkpoints
 
 The combat checkpoint `5164de6` connects visible pistol pickup, mouse aiming, ammunition,
 body damage, and rotor weak points to the playable arena. The drone remains a

@@ -1,7 +1,7 @@
 # First drone environment contract
 
-Status: headless physics, typed Bevy integration, and manual browser flight implemented.
-Updated 2026-10-08. Native/browser rollout comparison passed; learning remains pending.
+Status: headless physics, learned hover recovery, and browser playback implemented.
+Updated 2026-10-09. Pursuit and learned damage recovery remain unfinished.
 This defines the first P1 checkpoint in [the roadmap](EXAMPLE_ROADMAP.md).
 It is an original game simulation informed by the references, not an ARC Raiders
 source port or a claim about Embark's unpublished controller.
@@ -46,6 +46,39 @@ These control the comparison cases, not our game's mass or reward choices.
 
 ## Physical model
 
+### Static flight obstacles
+
+`DroneHover::with_obstacles` adds immutable `DroneObstacle` boxes to the existing
+floor. Each box validates its centre, half extents, and rotation before it can
+enter the solver. Centres must be finite and within ±1,000 metres on each axis.
+Half extents must be finite and in `(0, 1000]` metres. Quaternions must be finite
+and nonzero; construction normalizes them after scaling to avoid overflow.
+Validation returns `Centre`, `HalfExtents`, or `Rotation` in that order.
+
+The environment retains the box descriptions across reset and rebuilds their
+fixed colliders. Construction collects the supplied iterator once. Reset takes
+time proportional to the number of boxes and retains one description per box,
+in addition to the solver's collision storage. No mutable solver is exposed.
+
+Any active obstacle contact ends flight at the first contacting physics substep.
+A box overlapping the spawn is allowed and terminates flight on contact.
+The existing floor, flight region, motor forces, reward, and reset distribution
+remain unchanged. An empty obstacle list reproduces the existing trajectories
+exactly. These boxes do not add moving obstacles or character contact.
+
+Run the thirty-line [platform guide](../examples/robots/obstacles.rs):
+
+```sh
+nix develop --command cargo run --features robots --example drone-obstacles
+```
+
+The guide drops an unpowered drone onto a platform above the floor. The native
+and browser tests cover rotated contact, reset retention, independent worlds,
+initial overlap, absorbing termination, and invalid geometry. The collision
+builder follows the pinned Rapier 0.36 source described above.
+
+### Actuators and body
+
 The first lesson uses a rigid body and four ideal thrust actuators. It includes
 gravity, rotational inertia, contact impulses, and reaction torque. The
 [actuator-failure lesson](DRONE_DAMAGE.md) disables individual motors while
@@ -71,6 +104,7 @@ The body mass is 1 kilogram. The collision proxy has half-extents
 `(0.287, 0.104, 0.297)` metres. Motor centres are 0.2505 metres to either side,
 0.0875 metres above, and 0.2606 metres forward or behind. The reaction arm
 `kappa` is 0.016 metres, with signs `+1, -1, +1, -1` in action order.
+
 [Asset attribution and alignment](../assets/robots/README.md) record the source
 model transform. The proxy omits individual rotor blades. A renderer must never
 set the authoritative body pose.

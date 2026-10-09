@@ -8,7 +8,9 @@ use rapier3d::prelude::{
     RigidBodyBuilder, RigidBodyHandle, Rotation, Vector,
 };
 
-use super::{DroneAction, DroneEpisodeEnded, DroneMotor, DroneMotorState, DroneObservation};
+use super::{
+    DroneAction, DroneEpisodeEnded, DroneMotor, DroneMotorState, DroneObservation, DroneObstacle,
+};
 use crate::training::SplitMix64;
 use crate::{Env, EpisodeStatus, Reset, Step};
 
@@ -45,6 +47,8 @@ pub struct DroneHover {
     reset_profile: ResetProfile,
     /// Actuator health restored to working whenever the world is reset.
     motor_states: [DroneMotorState; 4],
+    /// Immutable static boxes retained when the solver is rebuilt on reset.
+    obstacles: Vec<DroneObstacle>,
 }
 
 /// Initial conditions selected by the two public constructors.
@@ -90,6 +94,17 @@ const MOTORS: [(Vector, f32); 4] = [
 ];
 
 impl DroneHover {
+    /// Add immutable collision boxes while retaining the default hover task.
+    ///
+    /// The floor remains present. Reset preserves all supplied boxes. Any active
+    /// contact ends flight, including an obstacle overlapping the initial pose.
+    /// Empty input reproduces [`Self::default`] exactly. Construction collects
+    /// the iterator once; reset rebuilds the collision world in linear time.
+    #[must_use]
+    pub fn with_obstacles(obstacles: impl IntoIterator<Item = DroneObstacle>) -> Self {
+        Self::at_position(TARGET, SplitMix64::new(0), obstacles.into_iter().collect())
+    }
+
     /// Disable one motor's force and reaction torque until reset.
     ///
     /// Repeated failure during flight succeeds without further changes. Failure
@@ -137,7 +152,7 @@ impl DroneHover {
     }
 
     /// Construct a fresh solver and proxy at a finite, internally chosen position.
-    fn at_position(position: Vec3, random: SplitMix64) -> Self {
+    fn at_position(position: Vec3, random: SplitMix64, obstacles: Vec<DroneObstacle>) -> Self {
         let mut world = PhysicsWorld {
             gravity: Vector::Y * -GRAVITY,
             integration_parameters: IntegrationParameters {
@@ -160,6 +175,10 @@ impl DroneHover {
                 .ccd_enabled(true),
             ColliderBuilder::cuboid(0.287, 0.104, 0.297).mass(MASS_KG),
         );
+        // Existing floor and drone insertion order stays unchanged for default tasks.
+        for obstacle in &obstacles {
+            obstacle.insert(&mut world);
+        }
         Self {
             world,
             body,
@@ -168,6 +187,7 @@ impl DroneHover {
             episode: Flight::Flying,
             reset_profile: ResetProfile::Calm,
             motor_states: [DroneMotorState::Working; 4],
+            obstacles,
         }
     }
 
@@ -267,7 +287,7 @@ impl DroneHover {
 
 impl Default for DroneHover {
     fn default() -> Self {
-        Self::at_position(TARGET, SplitMix64::new(0))
+        Self::at_position(TARGET, SplitMix64::new(0), Vec::new())
     }
 }
 
@@ -296,7 +316,8 @@ impl Env for DroneHover {
         );
         // Rebuilding also clears cached contacts, islands, and solver impulses.
         let profile = self.reset_profile;
-        *self = Self::at_position(TARGET + offset, random);
+        let obstacles = std::mem::take(&mut self.obstacles);
+        *self = Self::at_position(TARGET + offset, random, obstacles);
         self.reset_profile = profile;
         if profile == ResetProfile::Disturbed {
             self.disturb_start();
@@ -411,7 +432,7 @@ mod tests {
 
     #[test]
     fn ceiling_exit_stops_after_the_first_terminal_substep() {
-        let mut drone = DroneHover::at_position(Vec3::Y * 10.0, SplitMix64::new(0));
+        let mut drone = DroneHover::at_position(Vec3::Y * 10.0, SplitMix64::new(0), Vec::new());
         let full = DroneAction::try_from([1.0; 4]).expect("full power");
         let step = drone.step(full);
         assert_eq!(step.status, EpisodeStatus::Terminated);
@@ -424,7 +445,7 @@ mod tests {
         let hover = DroneAction::try_from([0.5; 4]).expect("balanced action");
         let mut centred = DroneHover::default();
         assert!((centred.step(hover).reward - 1.0).abs() < 1e-6);
-        let mut offset = DroneHover::at_position(TARGET + Vec3::X, SplitMix64::new(0));
+        let mut offset = DroneHover::at_position(TARGET + Vec3::X, SplitMix64::new(0), Vec::new());
         assert!((offset.step(hover).reward - 0.5).abs() < 1e-6);
 
         let mut tilted = DroneHover::default();

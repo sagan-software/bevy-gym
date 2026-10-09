@@ -6,6 +6,7 @@ mod hover;
 mod motor;
 mod motor_state;
 mod observation;
+mod obstacle;
 
 pub use action::{DroneAction, InvalidDroneAction};
 pub use episode_ended::DroneEpisodeEnded;
@@ -13,3 +14,4 @@ pub use hover::DroneHover;
 pub use motor::DroneMotor;
 pub use motor_state::DroneMotorState;
 pub use observation::DroneObservation;
+pub use obstacle::{DroneObstacle, InvalidDroneObstacle};
