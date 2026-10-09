@@ -156,6 +156,15 @@ fn browser_trained_checkpoint_recovers_on_held_out_seeds() {
 }
 
 /// Apply the frozen success gates to the final seed partition.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn curriculum_checkpoint_recovers_on_held_out_seeds() {
+    let policy = load_policy(include_bytes!("../docs/progress/drone-curriculum.mpk").to_vec())
+        .expect("load curriculum recovery policy");
+    qualify(&policy);
+}
+
+/// Apply the frozen success gates to the final seed partition.
 fn qualify(policy: &bevy_gym::training::RecurrentPpoPolicy) {
     let seeds: Vec<_> = (1..=32).map(|offset| u64::MAX - offset).collect();
     let episodes = evaluate(policy, &seeds).expect("final evaluation");
@@ -181,4 +190,36 @@ fn qualify(policy: &bevy_gym::training::RecurrentPpoPolicy) {
         survived >= 30,
         "at least 30 of 32 episodes must survive; observed {survived}"
     );
+}
+
+/// Curriculum collection starts each lane in the requested environment profile.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn curriculum_batches_use_the_selected_profile_without_changing_direct_recovery() {
+    let policy = new_agent(7).unwrap().policy();
+    let mut calm = RecoveryBatch::with_environment(7, &policy, DroneHover::default);
+    let calm_sequences = calm.collect(&policy).unwrap();
+    let first = &calm_sequences[0].observations[0];
+    assert_eq!(&first[3..6], &[0.0, 1.0, 0.0]);
+    assert_eq!(&first[6..12], &[0.0; 6]);
+    let mut explicit = RecoveryBatch::with_environment(7, &policy, DroneHover::disturbed);
+    let mut original = RecoveryBatch::new(7, &policy);
+    assert_eq!(
+        explicit.collect(&policy).unwrap(),
+        original.collect(&policy).unwrap()
+    );
+}
+
+/// Evaluation accepts a lesson factory while preserving the recovery default.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn curriculum_evaluation_uses_separate_calm_and_disturbed_episodes() {
+    let policy = load_policy(include_bytes!("../assets/robots/recovery.mpk").to_vec()).unwrap();
+    let before = policy.to_bytes().unwrap();
+    let calm = learning::evaluation::evaluate_with(&policy, &[42], DroneHover::default).unwrap();
+    let disturbed =
+        learning::evaluation::evaluate_with(&policy, &[42], DroneHover::disturbed).unwrap();
+    assert_eq!(disturbed, evaluate(&policy, &[42]).unwrap());
+    assert_ne!(calm, disturbed);
+    assert_eq!(policy.to_bytes().unwrap(), before);
 }

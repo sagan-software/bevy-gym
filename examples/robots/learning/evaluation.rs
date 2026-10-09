@@ -33,10 +33,19 @@ pub(crate) fn evaluate(
     policy: &RecurrentPpoPolicy,
     seeds: &[u64],
 ) -> Result<Vec<EpisodeScore>, Box<dyn Error>> {
+    evaluate_with(policy, seeds, DroneHover::disturbed)
+}
+
+/// Score the selected lesson using independent environments and episode memory.
+pub(crate) fn evaluate_with(
+    policy: &RecurrentPpoPolicy,
+    seeds: &[u64],
+    make_environment: fn() -> DroneHover,
+) -> Result<Vec<EpisodeScore>, Box<dyn Error>> {
     let mut episodes = Vec::with_capacity(seeds.len());
     for &seed in seeds {
         let mut memory = policy.initial_memory();
-        episodes.push(evaluate_episode(seed, |observation| {
+        episodes.push(evaluate_episode(seed, make_environment(), |observation| {
             let action = policy.mean_action(&encode(observation), &memory)?;
             memory = action.next_memory;
             Ok(decode_action(&action.action)?)
@@ -50,7 +59,9 @@ pub(crate) fn baseline(seeds: &[u64]) -> Result<Vec<EpisodeScore>, Box<dyn Error
     let action = DroneAction::try_from([0.5; 4])?;
     let mut episodes = Vec::with_capacity(seeds.len());
     for &seed in seeds {
-        episodes.push(evaluate_episode(seed, |_| Ok(action))?);
+        episodes.push(evaluate_episode(seed, DroneHover::disturbed(), |_| {
+            Ok(action)
+        })?);
     }
     Ok(episodes)
 }
@@ -58,9 +69,10 @@ pub(crate) fn baseline(seeds: &[u64]) -> Result<Vec<EpisodeScore>, Box<dyn Error
 /// Stop at the first completion result; reset observations never enter the score.
 fn evaluate_episode(
     seed: u64,
+    environment: DroneHover,
     mut action: impl FnMut(DroneObservation) -> Result<DroneAction, Box<dyn Error>>,
 ) -> Result<EpisodeScore, Box<dyn Error>> {
-    let mut environment = TimeLimit::new(DroneHover::disturbed(), 500)?;
+    let mut environment = TimeLimit::new(environment, 500)?;
     let mut observation = environment.reset(Some(seed)).observation;
     let mut reward = 0.0;
     let mut steps = 0;

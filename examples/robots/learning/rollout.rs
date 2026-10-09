@@ -53,10 +53,19 @@ struct Transition {
 impl RecoveryBatch {
     /// Initialize disturbed episodes and independent samplers from one root seed.
     pub(crate) fn new(seed: u64, policy: &RecurrentPpoPolicy) -> Self {
+        Self::with_environment(seed, policy, DroneHover::disturbed)
+    }
+
+    /// Start fresh lanes for one lesson without replacing the caller's optimizer.
+    pub(crate) fn with_environment(
+        seed: u64,
+        policy: &RecurrentPpoPolicy,
+        make_environment: fn() -> DroneHover,
+    ) -> Self {
         let seeds = SeedConfig::from_root(seed);
         let lanes = std::array::from_fn(|index| {
             let mut environment =
-                TimeLimit::new(DroneHover::disturbed(), 500).expect("positive task limit");
+                TimeLimit::new(make_environment(), 500).expect("positive task limit");
             let observation = environment
                 .reset(Some(training_seed(seeds, index, 0)))
                 .observation;

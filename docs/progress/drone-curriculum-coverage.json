@@ -1,0 +1,499 @@
+{
+  "date": "2026-10-08",
+  "baseline_commit": "79356c4364797d7294640ab0efbc43ddb3b11ef6",
+  "commands": [
+    "cargo llvm-cov --branch --features robots --example drone-curriculum --test drone_learning --no-report",
+    "cargo llvm-cov run --branch --no-report --features robots --example drone-curriculum -- --updates 2 --output runs/drone-curriculum/coverage-exhausted",
+    "LLVM export with the curriculum test executable, learning test executable, and instrumented curriculum CLI executable"
+  ],
+  "files": [
+    {
+      "path": "examples/robots/curriculum.rs",
+      "sha256": "5cf9ed5a6042fe37fb68fe837e2358fddba42ec4b93e9e575768cd82089204c2",
+      "summary": {
+        "branches": {
+          "count": 8,
+          "covered": 5,
+          "notcovered": 3,
+          "percent": 62.5
+        },
+        "functions": {
+          "count": 1,
+          "covered": 1,
+          "percent": 100
+        },
+        "instantiations": {
+          "count": 2,
+          "covered": 1,
+          "percent": 50
+        },
+        "lines": {
+          "count": 37,
+          "covered": 30,
+          "percent": 81.08108108108108
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 88,
+          "covered": 67,
+          "notcovered": 21,
+          "percent": 76.13636363636364
+        }
+      }
+    },
+    {
+      "path": "examples/robots/curriculum/lesson.rs",
+      "sha256": "c076192fecc42e546ba290d60df876aec6782d80d869fbf80b3ca5ac07110783",
+      "summary": {
+        "branches": {
+          "count": 8,
+          "covered": 8,
+          "notcovered": 0,
+          "percent": 100
+        },
+        "functions": {
+          "count": 12,
+          "covered": 12,
+          "percent": 100
+        },
+        "instantiations": {
+          "count": 18,
+          "covered": 17,
+          "percent": 94.44444444444444
+        },
+        "lines": {
+          "count": 90,
+          "covered": 90,
+          "percent": 100
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 148,
+          "covered": 148,
+          "notcovered": 0,
+          "percent": 100
+        }
+      }
+    },
+    {
+      "path": "examples/robots/learning/encoding.rs",
+      "sha256": "8dcc6b34457006fa2b1fa2ae09ac0a8503b86abf4918b10013e33619382c1de0",
+      "summary": {
+        "branches": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "functions": {
+          "count": 6,
+          "covered": 6,
+          "percent": 100
+        },
+        "instantiations": {
+          "count": 11,
+          "covered": 8,
+          "percent": 72.72727272727273
+        },
+        "lines": {
+          "count": 46,
+          "covered": 46,
+          "percent": 100
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 83,
+          "covered": 83,
+          "notcovered": 0,
+          "percent": 100
+        }
+      }
+    },
+    {
+      "path": "examples/robots/learning/evaluation.rs",
+      "sha256": "8bfb59a0fe8858d11e2ae47c9458e5c1514fb31bafc418622a02b3c4fcd12d83",
+      "summary": {
+        "branches": {
+          "count": 2,
+          "covered": 2,
+          "notcovered": 0,
+          "percent": 100
+        },
+        "functions": {
+          "count": 6,
+          "covered": 4,
+          "percent": 66.66666666666666
+        },
+        "instantiations": {
+          "count": 13,
+          "covered": 7,
+          "percent": 53.84615384615385
+        },
+        "lines": {
+          "count": 57,
+          "covered": 46,
+          "percent": 80.7017543859649
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 91,
+          "covered": 68,
+          "notcovered": 23,
+          "percent": 74.72527472527473
+        }
+      }
+    },
+    {
+      "path": "examples/robots/learning/mod.rs",
+      "sha256": "a499f893853e82eb857414ad807d3c3b00c16ff45169660acc755b2fdc439d8d",
+      "summary": {
+        "branches": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "functions": {
+          "count": 1,
+          "covered": 1,
+          "percent": 100
+        },
+        "instantiations": {
+          "count": 2,
+          "covered": 2,
+          "percent": 100
+        },
+        "lines": {
+          "count": 7,
+          "covered": 7,
+          "percent": 100
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 8,
+          "covered": 8,
+          "notcovered": 0,
+          "percent": 100
+        }
+      }
+    },
+    {
+      "path": "examples/robots/learning/model.rs",
+      "sha256": "52110a41d3e7f91c3aae7ffb567aeb36a0c2c43b888717ab8987cfb09908cff1",
+      "summary": {
+        "branches": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "functions": {
+          "count": 2,
+          "covered": 2,
+          "percent": 100
+        },
+        "instantiations": {
+          "count": 4,
+          "covered": 4,
+          "percent": 100
+        },
+        "lines": {
+          "count": 15,
+          "covered": 15,
+          "percent": 100
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 10,
+          "covered": 10,
+          "notcovered": 0,
+          "percent": 100
+        }
+      }
+    },
+    {
+      "path": "examples/robots/learning/rollout.rs",
+      "sha256": "22477751bbe189901815ceb0e32475b352230a6ebab8565a20d65625a31c67a5",
+      "summary": {
+        "branches": {
+          "count": 6,
+          "covered": 6,
+          "notcovered": 0,
+          "percent": 100
+        },
+        "functions": {
+          "count": 13,
+          "covered": 13,
+          "percent": 100
+        },
+        "instantiations": {
+          "count": 19,
+          "covered": 18,
+          "percent": 94.73684210526315
+        },
+        "lines": {
+          "count": 205,
+          "covered": 205,
+          "percent": 100
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 377,
+          "covered": 375,
+          "notcovered": 2,
+          "percent": 99.46949602122017
+        }
+      }
+    },
+    {
+      "path": "tests/../examples/robots/learning/encoding.rs",
+      "sha256": "8dcc6b34457006fa2b1fa2ae09ac0a8503b86abf4918b10013e33619382c1de0",
+      "summary": {
+        "branches": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "functions": {
+          "count": 6,
+          "covered": 6,
+          "percent": 100
+        },
+        "instantiations": {
+          "count": 6,
+          "covered": 6,
+          "percent": 100
+        },
+        "lines": {
+          "count": 46,
+          "covered": 46,
+          "percent": 100
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 83,
+          "covered": 83,
+          "notcovered": 0,
+          "percent": 100
+        }
+      }
+    },
+    {
+      "path": "tests/../examples/robots/learning/evaluation.rs",
+      "sha256": "8bfb59a0fe8858d11e2ae47c9458e5c1514fb31bafc418622a02b3c4fcd12d83",
+      "summary": {
+        "branches": {
+          "count": 2,
+          "covered": 2,
+          "notcovered": 0,
+          "percent": 100
+        },
+        "functions": {
+          "count": 6,
+          "covered": 6,
+          "percent": 100
+        },
+        "instantiations": {
+          "count": 7,
+          "covered": 7,
+          "percent": 100
+        },
+        "lines": {
+          "count": 57,
+          "covered": 56,
+          "percent": 98.24561403508771
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 91,
+          "covered": 88,
+          "notcovered": 3,
+          "percent": 96.7032967032967
+        }
+      }
+    },
+    {
+      "path": "tests/../examples/robots/learning/mod.rs",
+      "sha256": "a499f893853e82eb857414ad807d3c3b00c16ff45169660acc755b2fdc439d8d",
+      "summary": {
+        "branches": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "functions": {
+          "count": 1,
+          "covered": 1,
+          "percent": 100
+        },
+        "instantiations": {
+          "count": 1,
+          "covered": 1,
+          "percent": 100
+        },
+        "lines": {
+          "count": 7,
+          "covered": 7,
+          "percent": 100
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 8,
+          "covered": 8,
+          "notcovered": 0,
+          "percent": 100
+        }
+      }
+    },
+    {
+      "path": "tests/../examples/robots/learning/model.rs",
+      "sha256": "52110a41d3e7f91c3aae7ffb567aeb36a0c2c43b888717ab8987cfb09908cff1",
+      "summary": {
+        "branches": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "functions": {
+          "count": 2,
+          "covered": 2,
+          "percent": 100
+        },
+        "instantiations": {
+          "count": 2,
+          "covered": 2,
+          "percent": 100
+        },
+        "lines": {
+          "count": 15,
+          "covered": 15,
+          "percent": 100
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 10,
+          "covered": 10,
+          "notcovered": 0,
+          "percent": 100
+        }
+      }
+    },
+    {
+      "path": "tests/../examples/robots/learning/rollout.rs",
+      "sha256": "22477751bbe189901815ceb0e32475b352230a6ebab8565a20d65625a31c67a5",
+      "summary": {
+        "branches": {
+          "count": 6,
+          "covered": 6,
+          "notcovered": 0,
+          "percent": 100
+        },
+        "functions": {
+          "count": 13,
+          "covered": 13,
+          "percent": 100
+        },
+        "instantiations": {
+          "count": 13,
+          "covered": 13,
+          "percent": 100
+        },
+        "lines": {
+          "count": 205,
+          "covered": 205,
+          "percent": 100
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 377,
+          "covered": 375,
+          "notcovered": 2,
+          "percent": 99.46949602122017
+        }
+      }
+    }
+  ],
+  "native_tests": {
+    "learning_passed": 14,
+    "learning_ignored": 1,
+    "curriculum_passed": 8
+  },
+  "browser_tests": {
+    "learning_passed": 14,
+    "seconds": 5.99
+  },
+  "cli_checks": {
+    "zero_updates": "Exit 2 before output creation",
+    "one_update": "Exit 1, failed hover checkpoint saved, no recovery artifacts",
+    "instrumented_two_updates": "Expected exit 1 and only hover-2 artifacts"
+  },
+  "gaps": [
+    "The real uninstrumented run completed both lessons, promotion breaks, final baseline output, and successful exit. Instrumented CLI coverage remains 30/37 lines and 5/8 branch outcomes; those successful paths have behavioral evidence but no measured hits.",
+    "File creation, model serialization/reload, and write error propagation are not all forced by this scope.",
+    "Shared source files have separate reported paths when included from the integration test. Per-file summaries retain those contexts instead of treating one context as whole-file coverage."
+  ],
+  "run": "bevy-gym-curriculum-run-20261008.service exited successfully. Hover passed at update 280; recovery passed at update 20. Final checkpoint qualified on all 32 held-out seeds."
+}

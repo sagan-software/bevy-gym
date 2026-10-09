@@ -6,11 +6,21 @@ Updated: 2026-10-08. Goal status: active.
 
 Read [the roadmap](EXAMPLE_ROADMAP.md), [quality audit](QUALITY_AUDIT.md),
 [reference research](EXAMPLE_RESEARCH.md), and [drone contract](ROBOT_ENVIRONMENT.md).
-Continue P1 with a curriculum, then damaged-motor recovery and perception.
+The native [curriculum](DRONE_CURRICULUM.md) is qualified. Seed 7 passed calm hover
+at update 280 and disturbed recovery after 20 more updates. Its saved checkpoint
+survived 32/32 held-out episodes natively and in the browser. Fourteen learning
+tests, eight curriculum tests, root tests, and strict native/WASM Clippy pass.
+The full personal-lint backlog remains; changed-line discovery is clear.
+Add browser curriculum controls next, then damaged-motor recovery and perception.
+The full native run is finished; do not restart it. Its model, scores, learning
+curve, and browser flight recording are retained under `docs/progress`.
 The browser training panel and explicit checkpoint playback are implemented.
 A full browser seed-7 run passed all 32 held-out recovery episodes on native and
 WASM targets. The original bundled model remains unchanged.
-The worker checkpoint `4741945` passes CI; its Pages build is running.
+The training-panel checkpoint `79356c4` is pushed and passes
+[CI](https://github.com/sagan-software/bevy-gym/actions/runs/37865485961).
+Its [Pages build](https://github.com/sagan-software/bevy-gym/actions/runs/37865485901)
+is in progress; the preceding worker checkpoint deployment passed.
 The earlier inference/cache Pages builds were superseded. Confirm deployment
 status before reporting the new panel as public. Local screenshots and recordings
 are linked in [the browser training guide](DRONE_BROWSER_TRAINING.md).
