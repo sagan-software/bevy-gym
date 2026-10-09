@@ -2,6 +2,9 @@
 
 #[path = "robot/animation.rs"]
 mod animation;
+#[path = "robot/locomotion.rs"]
+mod locomotion;
+pub(super) use locomotion::pose;
 
 use super::{scene::Character, Game};
 use bevy::{animation::AnimationTargetId, prelude::*};
@@ -67,6 +70,16 @@ pub(super) fn load(
                     .is_ok_and(|(name, _)| name.as_str() == "hand_r")
                 {
                     commands.entity(entity).insert(Hand);
+                }
+                if let Ok((name, _)) = hierarchy.get(entity) {
+                    let bone = match name.as_str() {
+                        "pelvis" => Some(locomotion::Bone::Pelvis),
+                        "spine_01" => Some(locomotion::Bone::Spine),
+                        _ => None,
+                    };
+                    if let Some(bone) = bone {
+                        commands.entity(entity).insert(bone);
+                    }
                 }
                 graph.add_target_to_mask_group(*target, u32::from(!upper_body(entity, &hierarchy)));
             }

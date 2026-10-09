@@ -1,0 +1,132 @@
+{
+  "scope": "Whole selected files, including their test code; not a changed-line percentage",
+  "tests": {
+    "scene": 97,
+    "navigation": 20
+  },
+  "files": {
+    "examples/robots/pursuit/robot/locomotion.rs": {
+      "branches": {
+        "count": 14,
+        "covered": 14,
+        "notcovered": 0,
+        "percent": 100
+      },
+      "functions": {
+        "count": 5,
+        "covered": 5,
+        "percent": 100
+      },
+      "instantiations": {
+        "count": 5,
+        "covered": 5,
+        "percent": 100
+      },
+      "lines": {
+        "count": 112,
+        "covered": 112,
+        "percent": 100
+      },
+      "mcdc": {
+        "count": 0,
+        "covered": 0,
+        "notcovered": 0,
+        "percent": 0
+      },
+      "regions": {
+        "count": 198,
+        "covered": 198,
+        "notcovered": 0,
+        "percent": 100
+      }
+    },
+    "examples/robots/pursuit/view.rs": {
+      "branches": {
+        "count": 24,
+        "covered": 24,
+        "notcovered": 0,
+        "percent": 100
+      },
+      "functions": {
+        "count": 24,
+        "covered": 24,
+        "percent": 100
+      },
+      "instantiations": {
+        "count": 24,
+        "covered": 24,
+        "percent": 100
+      },
+      "lines": {
+        "count": 313,
+        "covered": 313,
+        "percent": 100
+      },
+      "mcdc": {
+        "count": 0,
+        "covered": 0,
+        "notcovered": 0,
+        "percent": 0
+      },
+      "regions": {
+        "count": 389,
+        "covered": 388,
+        "notcovered": 1,
+        "percent": 99.74293059125964
+      }
+    },
+    "examples/robots/pursuit/weapons.rs": {
+      "branches": {
+        "count": 12,
+        "covered": 12,
+        "notcovered": 0,
+        "percent": 100
+      },
+      "functions": {
+        "count": 9,
+        "covered": 9,
+        "percent": 100
+      },
+      "instantiations": {
+        "count": 9,
+        "covered": 9,
+        "percent": 100
+      },
+      "lines": {
+        "count": 91,
+        "covered": 91,
+        "percent": 100
+      },
+      "mcdc": {
+        "count": 0,
+        "covered": 0,
+        "notcovered": 0,
+        "percent": 0
+      },
+      "regions": {
+        "count": 145,
+        "covered": 145,
+        "notcovered": 0,
+        "percent": 100
+      }
+    }
+  },
+  "native_coverage_limits": [
+    {
+      "path": "examples/robots/pursuit/aiming.rs:41",
+      "gap": "View-present centre-reticle branch is exercised in the browser, not hit by the instrumented headless aiming fixture."
+    },
+    {
+      "path": "examples/robots/pursuit/hud.rs:60",
+      "gap": "StartingPistol hides pickup in the browser; the instrumented HUD fixture starts without that resource."
+    },
+    {
+      "path": "examples/robots/pursuit/robot.rs:74",
+      "gap": "Missing Name/ChildOf during asynchronous scene assembly is not simulated in the loaded-model fixture."
+    },
+    {
+      "path": "examples/robots/pursuit/view.rs",
+      "gap": "WASM FFI adapters are excluded from native coverage; camera.js has 100% line, branch, and function coverage, and browser ADS/drag was inspected."
+    }
+  ]
+}

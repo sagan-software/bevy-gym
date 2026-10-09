@@ -9,7 +9,7 @@ import test from "node:test";
 async function boot(t, bindings, assertions) {
   const directory = await mkdtemp(join(tmpdir(), "pursuit-start-"));
   t.after(() => rm(directory, { recursive: true, force: true }));
-  for (const name of ["start.js", "audio.js"]) {
+  for (const name of ["start.js", "audio.js", "camera.js"]) {
     await copyFile(new URL(`../pursuit/${name}`, import.meta.url), join(directory, name));
   }
   await writeFile(join(directory, "package.json"), '{"type":"module"}');
@@ -22,7 +22,8 @@ async function boot(t, bindings, assertions) {
     };
     const loading = { removed: false, remove() { this.removed = true; } };
     globalThis.document = new EventTarget();
-    document.querySelector = () => loading;
+    const canvas = new EventTarget();
+    document.querySelector = selector => selector === "#pursuit-canvas" ? canvas : loading;
     const errors = [];
     console.error = error => errors.push(error.message);
     await import("./start.js");
@@ -38,6 +39,7 @@ test("audio activation precedes the bindings' captured constructor", async t => 
   await boot(t, `
     const CapturedContext = globalThis.AudioContext;
     export default async function init() {
+      if (typeof globalThis.droneCameraCapture !== "function") throw new Error("camera adapter missing");
       globalThis.context = new CapturedContext();
     }
   `, `

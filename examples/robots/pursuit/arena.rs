@@ -85,10 +85,16 @@ impl Arena {
 
     /// Advance one 20-millisecond action through collision-aware movement.
     pub(super) fn step(&mut self, movement: Movement) {
+        self.step_relative(movement, 0.0);
+    }
+
+    /// Rotate player-local walking by camera yaw, in radians, before collision resolution.
+    pub(super) fn step_relative(&mut self, movement: Movement, yaw: f32) {
         // Speed is 4 m/s; gravity is 9.81 m/s². The step is measured in seconds.
         self.vertical_velocity = 9.81_f32.mul_add(-STEP_SECONDS, self.vertical_velocity);
-        let desired = movement.direction() * (4.0 * STEP_SECONDS)
-            + Vec3::Y * (self.vertical_velocity * STEP_SECONDS);
+        let desired =
+            bevy::math::Quat::from_rotation_y(yaw) * movement.direction() * (4.0 * STEP_SECONDS)
+                + Vec3::Y * (self.vertical_velocity * STEP_SECONDS);
         let controller = KinematicCharacterController {
             offset: CharacterLength::Absolute(0.01),
             autostep: Some(CharacterAutostep {

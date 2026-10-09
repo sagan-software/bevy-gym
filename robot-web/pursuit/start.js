@@ -1,6 +1,8 @@
 import { activateAudio } from "./audio.js";
+import { activateCamera } from "./camera.js";
 
 activateAudio(globalThis, document);
+activateCamera(globalThis, document);
 
 const loading = document.querySelector("#loading");
 try {

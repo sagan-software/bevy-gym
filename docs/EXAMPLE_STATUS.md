@@ -4,6 +4,49 @@ Updated: 2026-10-09. Goal status: active.
 
 ## Resume here
 
+### Shooter camera checkpoint, 2026-10-09
+
+The current work follows [the shooter upgrade plan](DRONE_SHOOTER_UPGRADE.md).
+The shoulder camera uses PanOrbit 0.34 with camera-relative WASD, right-button ADS,
+a centre reticle, collision clearance, and an equipped starting pistol.
+Weapon projection reads the current animated hand after animation evaluation.
+Direction changes remain abrupt; the forward clip is still adapted for side travel.
+
+The camera work is in `bevy-gym-quality` on `quality-roadmap-20261008`.
+A separate `bevy-gym-impacts` worktree on `shooter-impacts-20261009` contains the next
+public impulse API, player-hit connection, and first-hit rotor smoke. Preserve both.
+Its 88 scene tests and five public impulse tests pass; browser validation and the
+full final gates remain pending. That work is not merged into the camera checkpoint.
+The original `bevy-gym` checkout remains deliberately dirty.
+
+Native root tests, 97 scene tests, 20 navigation tests, strict native/WASM Clippy,
+asset contracts, and the standard browser suite pass. Personal lint's changed-line
+filter is clean; its raw strict run still reports unrelated repository diagnostics.
+[Coverage](progress/shooter-camera-coverage.json) records full line and branch coverage
+for the camera, locomotion helper, and weapon projection, plus explicit gaps elsewhere.
+The earlier mannequin checkpoint coverage also completed; its
+[record](progress/drone-survival-coverage.json) replaces the pending status below.
+
+The [ADS recording](progress/shooter-ads-strafe.mp4) and
+[contact sheet](progress/shooter-ads-strafe.jpg) were inspected.
+Camera orbit and ADS were verified in T3 tab `tab_1`; right-button drag works when
+the embedded browser refuses pointer lock. Normal captured-mouse operation remains
+unverified in that browser. Desktop and narrow layouts were inspected; this remains
+a keyboard-and-mouse shooter, without a complete touch aiming interface.
+
+Next: finish and qualify the impulse API, connect swept player projectiles and
+rotor-specific smoke, improve directional animation, resolve bevy-ragdoll's Bevy
+0.19 boundary, then add two drones/two droids and state-aware lights/audio.
+Do not report the complete shooter or the broader examples roadmap as finished.
+
+The optimized local build is `a7e93bc80af7fdb86834af24d4a26ff28d853d172259d4841af8cc6262ce862b`
+at `http://100.105.254.50:8781/robots/pursuit/?build=a7e93bc8`.
+The [final recording](progress/shooter-camera-final.mp4),
+[contact sheet](progress/shooter-camera-final.jpg), and
+[desktop capture](progress/shooter-camera-desktop.png) use that build.
+
+### Previous mannequin checkpoint
+
 ### Survival model checkpoint
 
 Work continues in `/home/sagan/Code/github.com/sagan-software/bevy-gym-quality`.
@@ -27,13 +70,12 @@ Its local URL is `http://100.105.254.50:8781/robots/pursuit/?build=survival-mode
 T3 tab `tab_1` is at the desktop viewport, with recording stopped.
 The tool reports preview visibility as false; screenshots confirm browser rendering.
 
-Branch coverage is still compiling in `bevy-gym-survival-branch-coverage-20261009.service`.
-Read `survival-branch-coverage.log` under `/home/sagan/.cache/bevy-gym-quality-validation`.
-The earlier coverage unit was stopped because it lacked `RUSTC_BOOTSTRAP=1`.
-Its output is not coverage evidence. The corrected unit uses that setting.
-No coverage percentage is claimed for this checkpoint.
+Branch coverage completed in `survival-branch-coverage.log` under
+`/home/sagan/.cache/bevy-gym-quality-validation`. The corrected run used
+`RUSTC_BOOTSTRAP=1`; the earlier stopped run is not coverage evidence.
+See `progress/drone-survival-coverage.json` for exact file summaries and gaps.
+Directional locomotion and hand attachment work continues in the camera checkpoint above.
 
-Next, finish coverage and improve directional locomotion and hand attachment timing.
 The current game has one drone; defeating it ends the run. Buildings and the pipe remain blockout meshes.
 The navigator still uses programmed search over learned motor control.
 Preserve these changes and the original checkout's unrelated dirty files.

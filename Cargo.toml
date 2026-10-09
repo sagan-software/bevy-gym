@@ -31,6 +31,7 @@ ecosystem-inference = ["dep:avian2d"]
 fast-compile = ["bevy/dynamic_linking"]
 # Portable rendering for native and browser examples.
 render-core = [
+  "dep:bevy_panorbit_camera",
   "bevy/2d_bevy_render",
   "bevy/3d_bevy_render",
   "bevy/default_app",
@@ -65,6 +66,11 @@ mujoco = ["dep:mujoco-rs"]
 default-features = false
 features = ["bevy_log"]
 version = "0.18"
+
+[dependencies.bevy_panorbit_camera]
+version = "=0.34.0"
+default-features = false
+optional = true
 
 [dependencies.burn]
 default-features = false

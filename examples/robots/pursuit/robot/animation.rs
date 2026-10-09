@@ -119,7 +119,12 @@ impl Rig {
             .play(self.idle)
             .repeat()
             .set_weight(1.0 - self.running);
-        player.play(self.run).repeat().set_weight(self.running);
+        let stride = super::locomotion::Stride::new(game.motion, game.facing());
+        player
+            .play(self.run)
+            .repeat()
+            .set_weight(self.running)
+            .set_speed(stride.speed);
     }
 
     /// Play recoil only for a newly spent round; dry fire cannot restart it.

@@ -78,6 +78,8 @@ mod survival;
 
 #[path = "pursuit/camera.rs"]
 mod camera;
+#[path = "pursuit/view.rs"]
+mod view;
 use camera::EYE_OFFSET as DRONE_EYE;
 
 /// One character's simulation and measured motion for visual animation.
@@ -111,6 +113,8 @@ struct Game {
     motion: Vec3,
     /// Last nonzero movement heading in radians; retained while idle.
     heading: f32,
+    /// Camera yaw in radians converts player buttons to world movement.
+    movement_yaw: Option<f32>,
     /// Latest validated pointing direction, separate from walking direction.
     aim: Option<Dir3>,
 }
@@ -138,6 +142,7 @@ impl Default for Game {
             footstep_distance: 0.0,
             motion: Vec3::ZERO,
             heading: 0.0,
+            movement_yaw: None,
             aim: None,
         }
     }
@@ -163,6 +168,7 @@ impl Game {
         self.footstep_distance = 0.0;
         self.motion = Vec3::ZERO;
         self.heading = 0.0;
+        self.movement_yaw = None;
         self.aim = None;
     }
 
@@ -277,7 +283,10 @@ impl Game {
         } else {
             Movement::Idle
         };
-        self.arena.step(movement);
+        match self.movement_yaw {
+            Some(yaw) => self.arena.step_relative(movement, yaw),
+            None => self.arena.step(movement),
+        }
         self.motion = (self.arena.position() - previous) * Vec3::new(1.0, 0.0, 1.0);
         let distance = self.motion.length();
         self.distance += distance;
@@ -349,8 +358,6 @@ fn main() {
             Update,
             (
                 scene::project,
-                aiming::read,
-                weapons::project,
                 weapons::rotors,
                 weapons::traces,
                 robot::load,
@@ -361,7 +368,15 @@ fn main() {
             )
                 .chain(),
         )
+        .add_systems(
+            PostUpdate,
+            (robot::pose, weapons::project)
+                .chain()
+                .after(bevy::app::AnimationSystems)
+                .before(TransformSystems::Propagate),
+        )
         .add_plugins((
+            view::install,
             effects::install,
             perception::install,
             return_fire::install,
@@ -395,7 +410,12 @@ fn viewer_plugins() -> bevy::app::PluginGroupBuilder {
 }
 
 /// Player buttons and future policy output enter the same fixed action boundary.
-fn advance(mut game: ResMut<'_, Game>, mut input: ResMut<'_, controls::Input>) {
+fn advance(
+    mut game: ResMut<'_, Game>,
+    mut input: ResMut<'_, controls::Input>,
+    view: Option<Res<'_, view::View>>,
+) {
+    game.movement_yaw = view.map(|view| view.yaw);
     game.step(input.movement);
     game.aim = input.aim;
     if let Some(action) = input.action.take() {
@@ -422,6 +442,20 @@ mod tests {
             .init_resource::<controls::Input>()
             .init_resource::<ButtonInput<KeyCode>>()
             .init_resource::<ButtonInput<MouseButton>>()
+            .init_resource::<Touches>()
+            .add_message::<bevy::input::mouse::MouseMotion>()
+            .add_message::<bevy::input::mouse::MouseWheel>()
+            .add_message::<bevy::input::gestures::PinchGesture>()
+            .init_resource::<view::View>()
+            .add_plugins(bevy_panorbit_camera::PanOrbitCameraPlugin)
+            .add_systems(
+                PostUpdate,
+                view::follow.before(bevy_panorbit_camera::PanOrbitCameraSystemSet),
+            )
+            .add_systems(
+                PostUpdate,
+                view::collision.after(bevy_panorbit_camera::PanOrbitCameraSystemSet),
+            )
             .add_systems(
                 Startup,
                 (
@@ -600,7 +634,7 @@ mod tests {
         }
         app.update();
         let game = app.world().resource::<Game>();
-        let target = game.arena.position() + Vec3::Y * 0.4;
+        let target = game.arena.position() + Vec3::Y * 0.45;
         let world = app.world_mut();
         let mut cameras = world.query_filtered::<&Transform, With<Camera3d>>();
         let eye = cameras.single(world).expect("one camera").translation;
@@ -612,7 +646,7 @@ mod tests {
             .is_none());
     }
     #[test]
-    fn open_arena_keeps_the_original_camera_offset() {
+    fn open_arena_uses_a_lower_right_shoulder_camera() {
         let mut app = app();
         app.update();
         let world = app.world_mut();
@@ -622,11 +656,13 @@ mod tests {
             .single(world)
             .expect("One camera")
             .translation;
-        assert!((eye - target).abs_diff_eq(Vec3::new(0.0, 3.3, 6.0), 1e-5));
+        assert!((eye.x - target.x - 0.65).abs() < 1e-5);
+        assert!(eye.y - target.y < 0.6);
+        assert!((eye - target).length() < 3.5);
     }
 
     #[test]
-    fn pipe_camera_keeps_the_upper_subject_view_clear_of_the_ceiling() {
+    fn pipe_camera_boom_does_not_cross_the_ceiling() {
         let mut app = app();
         for _ in 0..62 {
             app.world_mut()
@@ -645,23 +681,17 @@ mod tests {
             if position.z >= 4.0 {
                 continue;
             }
-            let mut cameras = world.query_filtered::<(&Transform, &Projection), With<Camera3d>>();
-            let (eye, projection) = cameras.single(world).expect("One camera");
-            let Projection::Perspective(projection) = projection else {
-                panic!("Perspective camera");
-            };
-            let upper =
-                eye.rotation * Vec3::new(0.0, (projection.fov * 0.5).tan() * 0.5, -1.0).normalize();
-            let from = eye.translation;
-            let end = from + upper * from.distance(position);
-            assert!(
-                world
-                    .resource::<Game>()
-                    .arena
-                    .obstruction(from, end)
-                    .is_none(),
-                "Pipe camera upper subject view is obstructed at {position:?}: {from:?} -> {end:?}"
-            );
+            let eye = world
+                .query_filtered::<&Transform, With<Camera3d>>()
+                .single(world)
+                .expect("One camera")
+                .translation;
+            let pivot = position + Vec3::Y * 0.45;
+            assert!(world
+                .resource::<Game>()
+                .arena
+                .obstruction(pivot, eye)
+                .is_none());
         }
     }
 
@@ -859,10 +889,8 @@ mod tests {
     #[test]
     fn aiming_keeps_the_pistol_grip_at_the_right_hand() {
         let mut app = app();
-        app.world_mut().spawn((
-            robot::Hand,
-            GlobalTransform::from_translation(Vec3::new(2.0, 1.2, 3.0)),
-        ));
+        app.world_mut()
+            .spawn((robot::Hand, Transform::from_xyz(2.0, 1.2, 3.0)));
         app.world_mut()
             .resource_mut::<Game>()
             .act(firing::Action::PickUp);
@@ -887,6 +915,41 @@ mod tests {
             }
         }
     }
+    #[test]
+    fn forward_movement_uses_the_camera_horizontal_basis() {
+        let mut game = Game::default();
+        let start = game.arena.position();
+        game.movement_yaw = Some(std::f32::consts::FRAC_PI_2);
+        game.step(Movement::Forward);
+        let displacement = game.arena.position() - start;
+        assert!(displacement.x < -0.07);
+        assert!(displacement.z.abs() < 1e-5);
+    }
+
+    #[test]
+    fn held_pistol_uses_current_hand_pose_before_transform_propagation() {
+        let mut app = app();
+        let hand = app
+            .world_mut()
+            .spawn((
+                robot::Hand,
+                Transform::from_xyz(2.0, 1.2, 3.0),
+                GlobalTransform::from_translation(Vec3::new(-5.0, 1.2, 3.0)),
+            ))
+            .id();
+        app.world_mut()
+            .resource_mut::<Game>()
+            .act(firing::Action::PickUp);
+        app.update();
+        let world = app.world_mut();
+        let pistol = world
+            .query::<(&weapons::Visual, &Transform)>()
+            .iter(world)
+            .find_map(|(kind, pose)| (*kind == weapons::Visual::Held).then_some(pose.translation))
+            .expect("Held pistol");
+        assert!(pistol.distance(world.get::<Transform>(hand).expect("Hand").translation) < 1e-5);
+    }
+
     #[test]
     fn body_destruction_hides_the_target_and_reset_restores_it() {
         let mut app = app();

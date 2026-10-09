@@ -26,7 +26,11 @@ pub(super) enum ActionButton {
 pub(super) struct Status;
 
 /// Keep the target's current prototype status and weapon actions visible.
-pub(super) fn setup(mut commands: Commands<'_, '_>, assets: Res<'_, AssetServer>) {
+pub(super) fn setup(
+    mut commands: Commands<'_, '_>,
+    assets: Res<'_, AssetServer>,
+    loadout: Option<Res<'_, super::view::StartingPistol>>,
+) {
     let font = assets.load("fonts/MonaSans-VariableFont.ttf");
     commands
         .spawn(Node {
@@ -40,57 +44,48 @@ pub(super) fn setup(mut commands: Commands<'_, '_>, assets: Res<'_, AssetServer>
             ..default()
         })
         .with_children(|root| {
-            root.spawn((
+            status_label(
+                root,
                 super::return_fire::Status,
-                Text::new("Robot 3/3 · Drone idle"),
-                TextFont {
-                    font: font.clone(),
-                    font_size: 16.0,
-                    ..default()
-                },
-                Node {
-                    padding: UiRect::all(px(8)),
-                    ..default()
-                },
-                BackgroundColor(Color::srgb(0.09, 0.11, 0.12)),
-            ));
-            root.spawn((
-                super::perception::Status,
-                Text::new("Drone sight: none"),
-                TextFont {
-                    font: font.clone(),
-                    font_size: 16.0,
-                    ..default()
-                },
-                Node {
-                    padding: UiRect::all(px(8)),
-                    ..default()
-                },
-                BackgroundColor(Color::srgb(0.09, 0.11, 0.12)),
-            ));
-            root.spawn((
-                Status,
-                Text::new("Programmed search · learned flight"),
-                TextFont {
-                    font: font.clone(),
-                    font_size: 16.0,
-                    ..default()
-                },
-                Node {
-                    padding: UiRect::all(px(8)),
-                    ..default()
-                },
-                BackgroundColor(Color::srgb(0.09, 0.11, 0.12)),
-            ));
+                "Robot 3/3 · Drone idle",
+                &font,
+            );
+            status_label(root, super::perception::Status, "Drone sight: none", &font);
+            status_label(root, Status, "Programmed search · learned flight", &font);
             root.spawn(Node {
                 column_gap: px(6),
                 ..default()
             })
             .with_children(|row| {
-                controls::button(row, "Pick up · E", ActionButton::PickUp, &font);
+                if loadout.is_none() {
+                    controls::button(row, "Pick up · E", ActionButton::PickUp, &font);
+                }
                 controls::button(row, "Fire · Space", ActionButton::Fire, &font);
             });
         });
+}
+
+/// Share the same compact style across health, perception, and weapon feedback.
+fn status_label(
+    root: &mut ChildSpawnerCommands<'_>,
+    marker: impl Component,
+    text: &str,
+    font: &Handle<Font>,
+) {
+    root.spawn((
+        marker,
+        Text::new(text),
+        TextFont {
+            font: font.clone(),
+            font_size: 16.0,
+            ..default()
+        },
+        Node {
+            padding: UiRect::all(px(8)),
+            ..default()
+        },
+        BackgroundColor(Color::srgb(0.09, 0.11, 0.12)),
+    ));
 }
 
 /// Avoid formatting or allocating HUD text while its values remain unchanged.

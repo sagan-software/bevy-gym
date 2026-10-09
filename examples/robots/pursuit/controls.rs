@@ -54,6 +54,7 @@ pub(super) fn read(
     mut input: ResMut<'_, Input>,
     mut game: ResMut<'_, Game>,
     mut reset_held: Local<'_, bool>,
+    loadout: Option<Res<'_, super::view::StartingPistol>>,
 ) {
     let mut forward = keys.pressed(KeyCode::KeyW);
     let mut backward = keys.pressed(KeyCode::KeyS);
@@ -76,6 +77,9 @@ pub(super) fn read(
     }
     if reset && !*reset_held {
         game.reset();
+        if loadout.is_some() {
+            game.act(super::firing::Action::PickUp);
+        }
         input.action = None;
         input.aim = None;
     }
@@ -95,7 +99,12 @@ fn movement_buttons(root: &mut ChildSpawnerCommands<'_>, font: &Handle<Font>) {
         ..default()
     })
     .with_children(|controls| {
-        label(controls, "WASD to move · R to reset", 16.0, font);
+        label(
+            controls,
+            "WASD move · Right mouse aim/drag · Esc release · R reset",
+            16.0,
+            font,
+        );
         controls
             .spawn(Node {
                 flex_wrap: FlexWrap::Wrap,

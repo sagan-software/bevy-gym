@@ -40,11 +40,23 @@ pub(super) fn setup(mut commands: Commands<'_, '_>, assets: Res<'_, AssetServer>
 /// Project ownership and authoritative target health into model visibility and poses.
 pub(super) fn project(
     game: Res<'_, Game>,
-    hand: Query<'_, '_, &GlobalTransform, With<super::robot::Hand>>,
-    mut roots: Query<'_, '_, (&Visual, &mut Transform, &mut Visibility), Without<Name>>,
+    hand: Query<'_, '_, Entity, With<super::robot::Hand>>,
+    mut poses: ParamSet<
+        '_,
+        '_,
+        (
+            TransformHelper<'_, '_>,
+            Query<'_, '_, (&Visual, &mut Transform, &mut Visibility), Without<Name>>,
+        ),
+    >,
 ) {
+    // Animation has written local bones, but global propagation has not run yet.
+    let hand = hand
+        .single()
+        .ok()
+        .and_then(|entity| poses.p0().compute_global_transform(entity).ok());
     let target = game.combat.target();
-    for (kind, mut transform, mut visible) in &mut roots {
+    for (kind, mut transform, mut visible) in &mut poses.p1() {
         let shown = match kind {
             Visual::Drone => {
                 transform.translation = target.position();
@@ -58,7 +70,7 @@ pub(super) fn project(
                 !game.combat.is_armed()
             }
             Visual::Held => {
-                *transform = held_pose(&game, hand.single().ok());
+                *transform = held_pose(&game, hand.as_ref());
                 game.combat.is_armed()
             }
         };

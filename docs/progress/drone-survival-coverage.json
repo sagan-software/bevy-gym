@@ -1,0 +1,273 @@
+{
+  "commit": "c48a2fcca82ea546f8c5bf92bc21b4931de5f873",
+  "tests": 86,
+  "scope": "Exact instrumented drone-pursuit test binary; full files include test code. Not changed-line coverage.",
+  "files": [
+    {
+      "path": "examples/robots/pursuit.rs",
+      "summary": {
+        "branches": {
+          "count": 66,
+          "covered": 64,
+          "notcovered": 2,
+          "percent": 96.96969696969697
+        },
+        "functions": {
+          "count": 41,
+          "covered": 39,
+          "percent": 95.1219512195122
+        },
+        "instantiations": {
+          "count": 41,
+          "covered": 39,
+          "percent": 95.1219512195122
+        },
+        "lines": {
+          "count": 729,
+          "covered": 666,
+          "percent": 91.35802469135803
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 1057,
+          "covered": 1022,
+          "notcovered": 35,
+          "percent": 96.68874172185431
+        }
+      },
+      "branch_gaps": [
+        {
+          "line": 268,
+          "true": 0,
+          "false": 5826,
+          "source": "if let Err(error) = self.combat.project_flight(step.observation) {"
+        },
+        {
+          "line": 650,
+          "true": 34,
+          "false": 0,
+          "source": "let Projection::Perspective(projection) = projection else {"
+        }
+      ]
+    },
+    {
+      "path": "examples/robots/pursuit/robot.rs",
+      "summary": {
+        "branches": {
+          "count": 26,
+          "covered": 24,
+          "notcovered": 2,
+          "percent": 92.3076923076923
+        },
+        "functions": {
+          "count": 21,
+          "covered": 21,
+          "percent": 100
+        },
+        "instantiations": {
+          "count": 22,
+          "covered": 22,
+          "percent": 100
+        },
+        "lines": {
+          "count": 233,
+          "covered": 232,
+          "percent": 99.57081545064378
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 309,
+          "covered": 307,
+          "notcovered": 2,
+          "percent": 99.35275080906149
+        }
+      },
+      "branch_gaps": [
+        {
+          "line": 64,
+          "true": 67,
+          "false": 0,
+          "source": "if owner.0 == player {"
+        },
+        {
+          "line": 110,
+          "true": 3,
+          "false": 0,
+          "source": "if let Some(graph) = graphs.get_mut(&graph.0) {"
+        },
+        {
+          "line": 218,
+          "true": 1,
+          "false": 0,
+          "source": "if done(app.world_mut()) {"
+        }
+      ]
+    },
+    {
+      "path": "examples/robots/pursuit/robot/animation.rs",
+      "summary": {
+        "branches": {
+          "count": 22,
+          "covered": 22,
+          "notcovered": 0,
+          "percent": 100
+        },
+        "functions": {
+          "count": 13,
+          "covered": 13,
+          "percent": 100
+        },
+        "instantiations": {
+          "count": 13,
+          "covered": 13,
+          "percent": 100
+        },
+        "lines": {
+          "count": 224,
+          "covered": 224,
+          "percent": 100
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 443,
+          "covered": 443,
+          "notcovered": 0,
+          "percent": 100
+        }
+      },
+      "branch_gaps": []
+    },
+    {
+      "path": "examples/robots/pursuit/scene.rs",
+      "summary": {
+        "branches": {
+          "count": 4,
+          "covered": 4,
+          "notcovered": 0,
+          "percent": 100
+        },
+        "functions": {
+          "count": 6,
+          "covered": 5,
+          "percent": 83.33333333333334
+        },
+        "instantiations": {
+          "count": 6,
+          "covered": 5,
+          "percent": 83.33333333333334
+        },
+        "lines": {
+          "count": 106,
+          "covered": 102,
+          "percent": 96.22641509433963
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 133,
+          "covered": 126,
+          "notcovered": 7,
+          "percent": 94.73684210526315
+        }
+      },
+      "branch_gaps": []
+    },
+    {
+      "path": "examples/robots/pursuit/survival.rs",
+      "summary": {
+        "branches": {
+          "count": 4,
+          "covered": 4,
+          "notcovered": 0,
+          "percent": 100
+        },
+        "functions": {
+          "count": 8,
+          "covered": 8,
+          "percent": 100
+        },
+        "instantiations": {
+          "count": 8,
+          "covered": 8,
+          "percent": 100
+        },
+        "lines": {
+          "count": 97,
+          "covered": 97,
+          "percent": 100
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 102,
+          "covered": 102,
+          "notcovered": 0,
+          "percent": 100
+        }
+      },
+      "branch_gaps": []
+    },
+    {
+      "path": "examples/robots/pursuit/weapons.rs",
+      "summary": {
+        "branches": {
+          "count": 12,
+          "covered": 12,
+          "notcovered": 0,
+          "percent": 100
+        },
+        "functions": {
+          "count": 8,
+          "covered": 8,
+          "percent": 100
+        },
+        "instantiations": {
+          "count": 8,
+          "covered": 8,
+          "percent": 100
+        },
+        "lines": {
+          "count": 79,
+          "covered": 79,
+          "percent": 100
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 137,
+          "covered": 137,
+          "notcovered": 0,
+          "percent": 100
+        }
+      },
+      "branch_gaps": []
+    }
+  ]
+}

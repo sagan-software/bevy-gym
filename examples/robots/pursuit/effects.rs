@@ -42,7 +42,7 @@ pub(super) fn install(app: &mut App) {
             Update,
             (observe, smoke, wreckage, particles::animate)
                 .chain()
-                .after(super::weapons::project),
+                .after(super::scene::project),
         );
 }
 

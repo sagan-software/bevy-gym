@@ -18,6 +18,7 @@ pub(super) fn read(
     buttons: Query<'_, '_, (Option<&ActionButton>, Ref<'_, Interaction>)>,
     mut input: ResMut<'_, Input>,
     game: Res<'_, Game>,
+    view: Option<Res<'_, super::view::View>>,
 ) {
     if keys.pressed(KeyCode::KeyR) || keys.just_pressed(KeyCode::KeyR) {
         return;
@@ -37,7 +38,12 @@ pub(super) fn read(
     }
     if !over_ui {
         if let (Ok(window), Ok((camera, transform))) = (windows.single(), cameras.single()) {
-            if let Some(cursor) = window.cursor_position() {
+            let cursor = if view.is_some() {
+                Some(window.size() * 0.5)
+            } else {
+                window.cursor_position()
+            };
+            if let Some(cursor) = cursor {
                 input.aim = direction(&game, camera, transform, cursor);
             }
         }

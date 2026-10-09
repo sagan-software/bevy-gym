@@ -61,6 +61,7 @@ pub(super) fn setup(
     ));
     commands.spawn((
         Camera3d::default(),
+        super::view::camera(),
         SpatialListener::new(0.2),
         Transform::default(),
     ));
@@ -105,33 +106,10 @@ mod tests {
 pub(super) fn project(
     game: Res<'_, Game>,
     mut character: Query<'_, '_, &mut Transform, (With<Character>, Without<Camera3d>)>,
-    mut camera: Query<'_, '_, &mut Transform, (With<Camera3d>, Without<Character>)>,
 ) {
     let position = game.arena.position();
     for mut transform in &mut character {
         transform.translation = position;
         transform.rotation = Quat::from_rotation_y(game.facing());
-    }
-    let target = position + Vec3::Y * 0.4;
-    // Lower the view under a ceiling so the pipe lip cannot obscure the upper frame.
-    let offset = if game
-        .arena
-        .obstruction(target, target + Vec3::Y * 3.3)
-        .is_some()
-    {
-        Vec3::new(0.0, 0.6, 3.0)
-    } else {
-        Vec3::new(0.0, 3.3, 6.0)
-    };
-    let desired = target + offset;
-    for mut transform in &mut camera {
-        *transform = Transform::from_translation(
-            game.arena
-                .obstruction(target, desired)
-                .map_or(desired, |distance| {
-                    target + (desired - target).normalize() * (distance - 0.2).max(0.1)
-                }),
-        )
-        .looking_at(target, Vec3::Y);
     }
 }
