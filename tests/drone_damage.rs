@@ -125,3 +125,22 @@ fn terminal_failure_cannot_change_the_absorbing_observation() {
     );
     assert!(std::error::Error::source(&DroneEpisodeEnded).is_none());
 }
+
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn reading_damage_does_not_advance_motion_or_random_state() {
+    let mut drone = DroneHover::disturbed();
+    let mut reference = DroneHover::disturbed();
+    let initial = drone.reset(Some(42)).observation;
+    reference.reset(Some(42));
+    assert_eq!(drone.observation(), initial);
+    drone.fail_motor(DroneMotor::FrontLeft).expect("active");
+    let damaged = drone.observation();
+    same_motion(damaged, initial);
+    assert_eq!(
+        damaged.motor_state(DroneMotor::FrontLeft),
+        DroneMotorState::Failed
+    );
+    assert_eq!(drone.observation(), damaged);
+    assert_eq!(drone.reset(None), reference.reset(None));
+}

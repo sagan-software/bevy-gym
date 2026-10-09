@@ -1,0 +1,98 @@
+{
+  "date": "2026-10-08",
+  "recorded_runtime": "build-5b452e462393351f5d98a7fcd02ffb6dc0a19daa1e5e1e72f5b5617e7c763f4c",
+  "url": "http://100.105.254.50:8778/robots/hover/",
+  "desktop": {
+    "width": 1280,
+    "height": 800,
+    "observed": [
+      "Failure by button and F shortcut updates the paused step-0 observation.",
+      "Red ring identifies the front-left actuator.",
+      "Constant half-thrust ends the failed episode at step 36.",
+      "Reset returns to paused step 0, restores the initial pose, and removes the ring."
+    ],
+    "final_bundle_verified": true,
+    "horizontal_overflow": false
+  },
+  "narrow": {
+    "width": 390,
+    "height": 780,
+    "initial_issue": "The controls overlapped the landing gear.",
+    "correction": "Minimum scene height 760 CSS pixels below 480 CSS-pixel viewport width.",
+    "live_override_verified": true,
+    "final_bundle_verified": true,
+    "touch_verified": false,
+    "horizontal_overflow": false
+  },
+  "errors_since_navigation": [],
+  "failed_network_since_navigation": [],
+  "limitations": [
+    "Recorded bundle precedes the Panics rustdoc addition and narrow-layout CSS correction.",
+    "This is actuator failure with unchanged mass and collision geometry.",
+    "The bundled policy was trained for intact flight. Learned damage recovery is pending.",
+    "Native window and actual mobile touch interaction remain unverified."
+  ],
+  "final_runtime": "build-85b4ba1609c7a202f04f63a69e36ee1003b6aa94968938e312796b26f5f35bd6",
+  "temporary_style_overrides_in_final_check": 0,
+  "accessible_f_shortcut_verified": true,
+  "browser": "T3 Code 0.0.45 / Electron 44.3.0 / Chrome 152.0.7977.78; Linux x86_64 desktop user agent for both viewport sizes",
+  "artifacts": [
+    {
+      "path": "docs/progress/drone-visible-damage-contact.png",
+      "bytes": 252192,
+      "sha256": "b5e40c464d10fcd42eee9eaa9666814ce7b218e5629d91a618d01f82a3125405"
+    },
+    {
+      "path": "docs/progress/drone-visible-damage-coverage.json",
+      "bytes": 9942,
+      "sha256": "d4600d01d8a344f3c81cf20135503f2b1d17dcaec3326fbf1ea95f330f19fc84"
+    },
+    {
+      "path": "docs/progress/drone-visible-damage-desktop.png",
+      "bytes": 597277,
+      "sha256": "bdff130cf16343346647d31314143b4f714b97572f8c3ede1ab59e2254cf16f3"
+    },
+    {
+      "path": "docs/progress/drone-visible-damage-ended.png",
+      "bytes": 622324,
+      "sha256": "6e0ae15358b1f1fcaf020acf800937b60143783580673e2191b27224551af68f"
+    },
+    {
+      "path": "docs/progress/drone-visible-damage-narrow.png",
+      "bytes": 323968,
+      "sha256": "e2ea569a6eddd16e1ad0648a08c1f1e0609e6c7ca4aefbc77450e0a5aabe8a89"
+    },
+    {
+      "path": "docs/progress/drone-visible-damage-paused.png",
+      "bytes": 597277,
+      "sha256": "bdff130cf16343346647d31314143b4f714b97572f8c3ede1ab59e2254cf16f3"
+    },
+    {
+      "path": "docs/progress/drone-visible-damage-reset.png",
+      "bytes": 593332,
+      "sha256": "dce546e325bf76dca0d2725024e0579f35abc71aae17314d340d17ccaafca818"
+    },
+    {
+      "path": "docs/progress/drone-visible-damage.mp4",
+      "bytes": 658387,
+      "sha256": "ef7e3947f75c26e5f128847d519b53371bc819bff8183cbf13d54066448f3793"
+    }
+  ],
+  "gates": {
+    "viewer_tests": 35,
+    "native_damage_tests": 4,
+    "native_library_tests": 90,
+    "browser_damage_tests": 4,
+    "browser_hover_tests": 8,
+    "browser_recovery_tests": 4,
+    "browser_parity_tests": 1,
+    "browser_learning_tests": 15,
+    "documentation_tests_passed": 6,
+    "documentation_tests_existing_ignored": 1,
+    "native_and_wasm_strict_clippy": "passed",
+    "personal_changed_robot_file_diagnostics": 0,
+    "full_personal_strict_gate": "Existing backlog remains; not a full-project pass.",
+    "damage_guide": "Ended 36 actions after failure.",
+    "recording_duration_seconds": 11.8089
+  }
+}

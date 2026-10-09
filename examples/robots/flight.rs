@@ -55,7 +55,13 @@ fn main() {
     .add_systems(FixedUpdate, advance)
     .add_systems(
         Update,
-        (controls::interact, scene::project, controls::refresh).chain(),
+        (
+            controls::interact,
+            scene::project,
+            scene::project_damage,
+            controls::refresh,
+        )
+            .chain(),
     );
     #[cfg(all(target_arch = "wasm32", feature = "browser"))]
     app.add_systems(Update, checkpoint::apply.before(controls::interact));

@@ -1,0 +1,508 @@
+{
+  "date": "2026-10-08",
+  "baseline_commit": "5c40d2356b59dd9057791f3490ce7ced35d7e67f",
+  "command": "cargo llvm-cov --branch --features robots --example drone-flight --test drone_damage --lib --json",
+  "export": "Explicit LLVM export with library, drone_damage, and drone-flight executables from coverage-build; line hits from llvm-cov show, merged across instantiations.",
+  "test_counts": {
+    "library": 90,
+    "damage": 4,
+    "viewer": 35
+  },
+  "files": [
+    {
+      "path": "examples/robots/flight.rs",
+      "sha256": "14b7900aa855e17d79ff7119ed9b6bee2104257ea6fb64241417699b6352a189",
+      "summary": {
+        "branches": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "functions": {
+          "count": 3,
+          "covered": 0,
+          "percent": 0
+        },
+        "instantiations": {
+          "count": 3,
+          "covered": 0,
+          "percent": 0
+        },
+        "lines": {
+          "count": 43,
+          "covered": 0,
+          "percent": 0
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 33,
+          "covered": 0,
+          "notcovered": 33,
+          "percent": 0
+        }
+      },
+      "changed_instrumented_lines": [
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64
+      ],
+      "unhit_changed_lines": [
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64
+      ]
+    },
+    {
+      "path": "examples/robots/flight/controls.rs",
+      "sha256": "f7b262551889c09e9ab6e9bd52477f97da5af58992d8301801e79731ef247a62",
+      "summary": {
+        "branches": {
+          "count": 20,
+          "covered": 18,
+          "notcovered": 2,
+          "percent": 90
+        },
+        "functions": {
+          "count": 44,
+          "covered": 41,
+          "percent": 93.18181818181817
+        },
+        "instantiations": {
+          "count": 44,
+          "covered": 41,
+          "percent": 93.18181818181817
+        },
+        "lines": {
+          "count": 565,
+          "covered": 533,
+          "percent": 94.33628318584071
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 930,
+          "covered": 880,
+          "notcovered": 50,
+          "percent": 94.6236559139785
+        }
+      },
+      "changed_instrumented_lines": [
+        101,
+        197,
+        221,
+        235,
+        236,
+        237,
+        250,
+        321,
+        322,
+        323,
+        325,
+        333,
+        334,
+        335,
+        336,
+        337,
+        338,
+        339,
+        340,
+        341,
+        342,
+        343,
+        344,
+        345,
+        346,
+        347,
+        348,
+        349,
+        350,
+        353,
+        354,
+        355,
+        356,
+        357,
+        358,
+        359,
+        360,
+        361,
+        362,
+        363,
+        364,
+        365,
+        366,
+        367,
+        368,
+        369,
+        372,
+        373,
+        374,
+        375,
+        376,
+        377,
+        378,
+        379,
+        380,
+        381,
+        382,
+        383,
+        384
+      ],
+      "unhit_changed_lines": []
+    },
+    {
+      "path": "examples/robots/flight/scene.rs",
+      "sha256": "69fc7e204d960c8fd2195166c5b68e2766447b9eb263d8d0f8a57337764f9955",
+      "summary": {
+        "branches": {
+          "count": 4,
+          "covered": 4,
+          "notcovered": 0,
+          "percent": 100
+        },
+        "functions": {
+          "count": 14,
+          "covered": 14,
+          "percent": 100
+        },
+        "instantiations": {
+          "count": 14,
+          "covered": 14,
+          "percent": 100
+        },
+        "lines": {
+          "count": 246,
+          "covered": 246,
+          "percent": 100
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 430,
+          "covered": 430,
+          "notcovered": 0,
+          "percent": 100
+        }
+      },
+      "changed_instrumented_lines": [
+        42,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80,
+        81,
+        82,
+        137,
+        138,
+        139,
+        140,
+        141,
+        142,
+        143,
+        144,
+        145,
+        148,
+        154,
+        155,
+        156,
+        157,
+        158,
+        159,
+        160,
+        162,
+        165,
+        167,
+        168,
+        169,
+        170,
+        187,
+        188,
+        189,
+        190,
+        191,
+        192,
+        193,
+        194,
+        195,
+        196,
+        197,
+        198,
+        199,
+        200,
+        201,
+        202,
+        203,
+        205,
+        207,
+        210,
+        214,
+        215,
+        216,
+        217,
+        218,
+        219,
+        220,
+        221,
+        222,
+        223,
+        224,
+        225,
+        226,
+        227,
+        228,
+        229,
+        230,
+        231,
+        232,
+        233,
+        234,
+        235,
+        236,
+        237,
+        238,
+        239,
+        240,
+        241,
+        244,
+        245,
+        246,
+        247,
+        248,
+        249,
+        250,
+        252,
+        309,
+        311,
+        314
+      ],
+      "unhit_changed_lines": []
+    },
+    {
+      "path": "examples/robots/flight/session.rs",
+      "sha256": "1a72e232f49a6115ae850b108e3f5705ebcb0715aa3ba6df1a17144b5edcdefa",
+      "summary": {
+        "branches": {
+          "count": 18,
+          "covered": 17,
+          "notcovered": 1,
+          "percent": 94.44444444444444
+        },
+        "functions": {
+          "count": 37,
+          "covered": 37,
+          "percent": 100
+        },
+        "instantiations": {
+          "count": 37,
+          "covered": 37,
+          "percent": 100
+        },
+        "lines": {
+          "count": 364,
+          "covered": 364,
+          "percent": 100
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 713,
+          "covered": 712,
+          "notcovered": 1,
+          "percent": 99.85974754558204
+        }
+      },
+      "changed_instrumented_lines": [
+        253,
+        254,
+        255,
+        256,
+        257,
+        258,
+        259,
+        260,
+        261,
+        295,
+        298,
+        299,
+        300,
+        301,
+        302,
+        303,
+        304,
+        305,
+        306,
+        307,
+        308,
+        311,
+        312,
+        313,
+        314,
+        315,
+        316,
+        317,
+        318,
+        319,
+        320,
+        321,
+        322,
+        325,
+        328,
+        329,
+        330,
+        331,
+        332,
+        333,
+        334,
+        335,
+        336,
+        337,
+        338,
+        339,
+        340,
+        341
+      ],
+      "unhit_changed_lines": []
+    },
+    {
+      "path": "src/robots/hover.rs",
+      "sha256": "fb44e43e712f61bf817924b4fc2c69f8de743636704a19df03789d06bf430a6c",
+      "summary": {
+        "branches": {
+          "count": 16,
+          "covered": 16,
+          "notcovered": 0,
+          "percent": 100
+        },
+        "functions": {
+          "count": 21,
+          "covered": 21,
+          "percent": 100
+        },
+        "instantiations": {
+          "count": 33,
+          "covered": 32,
+          "percent": 96.96969696969697
+        },
+        "lines": {
+          "count": 320,
+          "covered": 320,
+          "percent": 100
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 538,
+          "covered": 538,
+          "notcovered": 0,
+          "percent": 100
+        }
+      },
+      "changed_instrumented_lines": [
+        207
+      ],
+      "unhit_changed_lines": []
+    },
+    {
+      "path": "tests/drone_damage.rs",
+      "sha256": "16d8aa27ea3816abc2b5e7f1ce7b04606ceefbc8029116b5fc1a0f4b41c1c939",
+      "summary": {
+        "branches": {
+          "count": 6,
+          "covered": 6,
+          "notcovered": 0,
+          "percent": 100
+        },
+        "functions": {
+          "count": 5,
+          "covered": 5,
+          "percent": 100
+        },
+        "instantiations": {
+          "count": 5,
+          "covered": 5,
+          "percent": 100
+        },
+        "lines": {
+          "count": 92,
+          "covered": 92,
+          "percent": 100
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 255,
+          "covered": 255,
+          "notcovered": 0,
+          "percent": 100
+        }
+      },
+      "changed_instrumented_lines": [
+        131,
+        132,
+        133,
+        134,
+        135,
+        136,
+        137,
+        138,
+        139,
+        140,
+        141,
+        144,
+        145,
+        146
+      ],
+      "unhit_changed_lines": []
+    }
+  ],
+  "gaps": [
+    "The changed main-function scheduling lines are not executed by the test binary. Browser startup and system registration require separate rendered evidence.",
+    "Existing controls::refresh asset-state/color projection and the unreachable bundled-policy load-failure branch remain outside full branch coverage. No new changed executable lines in controls, session, scene, or the observation accessor are unhit.",
+    "Browser rendering, native windows, pointer/touch input, and WebAssembly execution are not measured by this native coverage run."
+  ]
+}

@@ -48,3 +48,7 @@ progress { display: block; width: 100%; height: 8px; accent-color: #9ed6d9; }
   .training { border-left: 0; border-top: 1px solid #43494c; overflow: visible; }
   .training h1 { margin-bottom: 16px; }
 }
+
+@media (max-width: 480px) {
+  .simulation { height: max(760px, 85dvh); }
+}

@@ -194,8 +194,17 @@ impl DroneHover {
         body.set_angvel(angular_velocity, true);
     }
 
-    /// Copy the solver's current state across the private engine boundary.
-    fn observation(&self) -> DroneObservation {
+    /// Read the current pose, velocity, and motor health without advancing physics.
+    ///
+    /// This snapshot reflects motor failure immediately, including while a viewer
+    /// is paused. Reading it consumes no random values and exposes no mutable state.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the internal physics body is missing. Public operations preserve
+    /// that body throughout the environment's lifetime.
+    #[must_use]
+    pub fn observation(&self) -> DroneObservation {
         let body = self
             .world
             .bodies

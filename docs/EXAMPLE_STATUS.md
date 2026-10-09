@@ -13,7 +13,9 @@ qualification in WASM. Mean return is 426.9936; mean final distance is 0.3300 m.
 The earlier native curriculum passed at 300 total updates. Both checkpoints and
 their separate evidence remain under `docs/progress`.
 
-Browser curriculum controls and worker transitions are ready to publish.
+Browser curriculum controls and worker transitions are published as `5c40d23`.
+[CI](https://github.com/sagan-software/bevy-gym/actions/runs/37874595348) passed;
+[Pages](https://github.com/sagan-software/bevy-gym/actions/runs/37874595397) is running.
 The final 25 worker tests, 20 controller tests, fifteen browser learning tests,
 root tests, and strict native/WASM Clippy pass. The selected-worker personal
 checks pass with no raw diagnostics. Three large test functions missed by earlier
@@ -38,7 +40,7 @@ The [motor-failure API and guide](DRONE_DAMAGE.md) are pushed as `c3ae4ad`.
 Native/WASM tests cover all sixteen actuator combinations, reset, and terminal
 rejection. Compile-fail tests protect identifiers and private health state.
 [CI](https://github.com/sagan-software/bevy-gym/actions/runs/37871626023) passed;
-[Pages](https://github.com/sagan-software/bevy-gym/actions/runs/37871625987) is running.
+[Pages](https://github.com/sagan-software/bevy-gym/actions/runs/37871625987) passed.
 The native curriculum's earlier pending Pages build was superseded.
 The damage model currently preserves mass and collision geometry.
 
@@ -47,8 +49,43 @@ as `17c92c2`. [The research record](EXAMPLE_RESEARCH.md) links their visual evid
 The target's valid GLB is under `runs/quality-research/media/quaternius-adventurer.glb`;
 the earlier `.gltf` download is a quota-error HTML page and must not be used.
 
-Next, publish the browser curriculum checkpoint, then add visible actuator failure
-and train a separate damage-aware policy. Preserve the healthy model and its
+The visible actuator-failure checkpoint is ready to publish. All 35 viewer tests,
+four public damage tests, root tests, strict native/WASM Clippy, and actual browser
+robot tests pass. Personal discovery found no diagnostics in the changed robot
+files. The full personal strict gate retains its existing library/test backlog.
+Six documentation tests pass; one existing plugin example is ignored.
+
+The browser demonstrates paused failure, a stopped rotor, its red marker, a
+36-action fall under constant half-thrust, and reset. The final desktop and narrow
+views pass without temporary CSS overrides. The accessible canvas label includes
+F. Small-screen scene height is now at least 760 pixels, which clears the control
+panel from the drone. Native window and mobile touch input remain unverified.
+[The evidence record](progress/drone-visible-damage.json) retains artifact hashes,
+validation counts, runtime versions, and the recording's verification boundary.
+
+`DroneHover::observation` exposes a read-only snapshot for paused viewers. Its
+external regression first failed with `E0624`, then passed. Viewer tests first
+failed on the missing control/session/marker API, then passed. Clippy required a
+`# Panics` section for the private-body invariant; the final gate passes.
+
+Completed validation services use the prefix `bevy-gym-visible-damage-` and suffix
+`-20261009`: `gates2`, `wasm`, `personal2`, `coverage2`, and `release2`.
+Logs remain in the validation log directory. The first personal invocation failed
+before analysis because it lacked Nix's Wayland pkg-config paths; `personal2`
+ran inside `nix develop`. Personal caches remain separate from native build caches.
+
+Final coverage hits every changed executable line except seven startup lines
+exercised by the browser. The coverage record includes those exact line numbers,
+source hashes, and the existing asset/error branch gaps. The headless damage
+guide also ends 36 actions after failure.
+
+The preview is `http://100.105.254.50:8778/robots/hover/?build=final`, served by
+`bevy-gym-visible-damage-server-20261009` from `runs/quality-research/site-visible-damage`.
+Its runtime is `build-85b4ba1609c7a202f04f63a69e36ee1003b6aa94968938e312796b26f5f35bd6`.
+No validation or recording job remains active. The preview is 1280×800 CSS pixels.
+Do not resize during recording.
+
+After that checkpoint, train a separate damage-aware policy. Preserve the healthy model and its
 qualification. The damage contract records the current model's static thrust limit;
 do not assume recovery follows from the intact-flight force budget.
 Perception, damage adaptation, pursuit, detached parts, and the jumping quadruped

@@ -25,6 +25,9 @@ model and begins a paused episode. Reset retains the start choice and restores
 seed 42. It preserves learned weights and clears recurrent memory. Manual reset
 restores the hover command.
 The four presets apply power-off, balanced hover, climb, or asymmetric thrust.
+Fail front left disables that actuator until Reset. A red ring and state label
+identify it; the rotor stops even while paused. The body retains its mass and
+collision shape. The bundled policy was trained with all four motors working.
 Keyboard shortcuts appear on the buttons. Ground contact, leaving the flight
 region, or 500 actions ends the episode; Reset starts another.
 

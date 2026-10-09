@@ -1,6 +1,6 @@
 # Drone motor damage
 
-Status: actuator failure implemented; learned recovery and visuals pending, 2026-10-08.
+Status: actuator failure and browser controls implemented; learned recovery pending, 2026-10-08.
 
 ## Quick start
 
@@ -28,8 +28,8 @@ perception. A successful hover policy alone does not complete this requirement.
 [Flightmare's supplement, section 5.2](https://rpg.ifi.uzh.ch/docs/CoRL20_Yunlong.pdf)
 uses three direct motor-thrust outputs after losing one propeller. Its state
 includes position, orientation, linear velocity, and body angular velocity.
-Its reward excludes yaw angle and yaw rate. This supports testing position and
-tilt recovery while permitting rotation. Its experiment does not establish that
+Its reward excludes yaw angle and yaw rate. Section 4.2 reports 100 parallel drones and 25 million training steps per task.
+This supports testing position and tilt recovery while permitting rotation. Its experiment does not establish that
 our different geometry, inertia, force limits, or reward will recover.
 
 The existing model has four parallel thrust axes and alternating reaction moments.
@@ -68,6 +68,25 @@ behavior; do not assume it follows from the intact model's thrust margin.
 The public API uses the closed `DroneMotor` identifier and the
 `DroneEpisodeEnded` error. Health storage and the physics world remain private.
 It exposes no repair operation during flight.
+
+## Viewer acceptance checks
+
+The viewer exposes one diagnostic action, `Fail front left [F]`.
+It must update the motor state while paused without advancing the episode.
+A red ring identifies the failed rotor; the state label also names it.
+The failed rotor retains its last displayed angle. Other rotors continue moving.
+Reset restores all motor states and removes the ring.
+
+Completed episodes and controller failures reject the action before mutation.
+This includes the wrapper's time limit, even when the underlying drone remains active.
+The existing bundled policy remains an intact-flight policy; this control does not
+establish learned damage recovery. Marker transforms never enter physics.
+
+Required gates are the public observation regression, viewer session/control/scene
+tests, root tests, strict native/WASM Clippy, personal lints, and branch coverage.
+Run `nix run .#drone-browser-check` after changing the public observation boundary.
+Inspect desktop and narrow browser views, record a failure and reset, and run the
+runnable guides and documentation tests after the final prose edit.
 
 ## Training and visual milestones
 
@@ -121,3 +140,23 @@ The full personal strict gate still reports the existing library/test backlog.
 and 16/16 branches in `hover.rs`, including internal tests; observation and error
 methods also have complete measured line coverage. The guide was run separately
 without coverage instrumentation. No damaged-flight policy is qualified yet.
+
+## Visible failure checkpoint
+
+Run `nix develop --command cargo run --features robots --example drone-flight`.
+Choose Fail front left, then Run. The constant half-thrust command ends the seeded
+episode after 36 actions. Reset restores the initial pose and all four motors.
+`DroneHover::observation()` reads the updated motor state without advancing physics.
+
+The [browser recording](progress/drone-visible-damage.mp4) shows the fall and reset.
+Screenshots retain the [paused failure](progress/drone-visible-damage-paused.png),
+[ended episode](progress/drone-visible-damage-ended.png), and
+[reset](progress/drone-visible-damage-reset.png).
+All 35 viewer tests and four public damage tests pass. Strict native/WASM Clippy
+and the actual browser robot tests pass. Personal discovery found no diagnostics
+in the changed robot files; the full-project strict backlog remains.
+
+The first narrow inspection found the controls overlapping the landing gear.
+The small-screen canvas now has a 760-pixel minimum height. The final bundle passes [desktop](progress/drone-visible-damage-desktop.png) and
+[narrow-layout](progress/drone-visible-damage-narrow.png) inspection without CSS overrides.
+Native window interaction and mobile touch input remain unverified.

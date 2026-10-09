@@ -1,7 +1,7 @@
 //! Deterministic playback and controller selection for the rendered hover lesson.
 
 use bevy::prelude::Resource;
-use bevy_gym::robots::{DroneAction, DroneHover, DroneObservation};
+use bevy_gym::robots::{DroneAction, DroneHover, DroneMotor, DroneObservation};
 use bevy_gym::{Env, EpisodeStatus, Step, TimeLimit};
 
 use super::pilot::RecoveryPilot;
@@ -249,6 +249,17 @@ impl Session {
         }
     }
 
+    /// Fail an actuator without stepping; wrapper completion still prevents mutation.
+    pub(super) fn fail_motor(&mut self, motor: DroneMotor) {
+        if self.can_step() {
+            self.environment
+                .inner_mut()
+                .fail_motor(motor)
+                .expect("a continuing session has an active drone");
+            self.last.observation = self.environment.inner().observation();
+        }
+    }
+
     /// Apply one validated action and retain its atomic result for rendering.
     fn take_step(&mut self) {
         let command = match &mut self.controller {
@@ -279,6 +290,55 @@ mod tests {
     use bevy_gym::EpisodeStatus;
 
     use super::{MotorPreset, Playback, Session, StartProfile};
+
+    #[test]
+    fn motor_failure_is_visible_while_paused_and_reset_repairs_it() {
+        use bevy_gym::robots::{DroneMotor, DroneMotorState};
+
+        let mut session = Session::default();
+        let initial = session.observation();
+        let action = session.last_action();
+        session.fail_motor(DroneMotor::FrontLeft);
+        let damaged = session.observation();
+        assert_eq!(damaged.position(), initial.position());
+        assert_eq!(damaged.orientation(), initial.orientation());
+        assert_eq!(damaged.linear_velocity(), initial.linear_velocity());
+        assert_eq!(damaged.angular_velocity(), initial.angular_velocity());
+        assert_eq!(
+            damaged.motor_state(DroneMotor::FrontLeft),
+            DroneMotorState::Failed
+        );
+        assert_eq!(session.steps(), 0);
+        assert_eq!(session.playback(), Playback::Paused);
+        assert_eq!(session.last_action(), action);
+        assert_eq!(session.status(), EpisodeStatus::Continuing);
+        assert_eq!(session.last.reward.to_bits(), 0.0_f64.to_bits());
+        session.fail_motor(DroneMotor::FrontLeft);
+        assert_eq!(session.observation(), damaged);
+        session.single_step();
+        assert!(session.observation().position().y < initial.position().y);
+        session.reset();
+        assert_eq!(session.observation(), initial);
+    }
+
+    #[test]
+    fn motor_failure_cannot_change_completed_or_failed_sessions() {
+        use bevy_gym::robots::DroneMotor;
+
+        let mut session = Session::default();
+        for _ in 0..500 {
+            session.single_step();
+        }
+        assert_eq!(session.status(), EpisodeStatus::Truncated);
+        let terminal = session.observation();
+        session.fail_motor(DroneMotor::FrontLeft);
+        assert_eq!(session.observation(), terminal);
+        session.reset();
+        session.select_policy(Vec::new());
+        let failed = session.observation();
+        session.fail_motor(DroneMotor::FrontLeft);
+        assert_eq!(session.observation(), failed);
+    }
 
     #[test]
     fn checkpoint_failures_stop_playback_and_allow_explicit_recovery() {

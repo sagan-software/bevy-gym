@@ -1,6 +1,7 @@
 //! Buttons and keyboard shortcuts for the same deterministic session controls.
 
 use bevy::prelude::*;
+use bevy_gym::robots::{DroneMotor, DroneMotorState};
 use bevy_gym::EpisodeStatus;
 
 use super::scene::DroneModel;
@@ -11,6 +12,8 @@ use super::session::{MotorPreset, Playback, Session, StartProfile};
 pub(super) enum Control {
     /// Toggle continuous stepping while the episode is active.
     Playback,
+    /// Disable the front-left actuator until reset.
+    FailMotor,
     /// Apply exactly one action while paused.
     Step,
     /// Restore the seeded initial state and clear policy memory.
@@ -95,6 +98,7 @@ fn footer(root: &mut ChildSpawnerCommands<'_>, font: &Handle<Font>) {
                 button(row, "Run [Space]", Control::Playback, font);
                 button(row, "Step [N]", Control::Step, font);
                 button(row, "Reset [R]", Control::Reset, font);
+                button(row, "Fail front left [F]", Control::FailMotor, font);
             });
             footer.spawn(row()).with_children(|row| {
                 button(row, "Bundled policy [P]", Control::Learned, font);
@@ -190,6 +194,7 @@ fn button(
 pub(super) fn interact(keys: Res<'_, ButtonInput<KeyCode>>, mut session: ResMut<'_, Session>) {
     for (key, control) in [
         (KeyCode::Space, Control::Playback),
+        (KeyCode::KeyF, Control::FailMotor),
         (KeyCode::KeyN, Control::Step),
         (KeyCode::KeyR, Control::Reset),
         (KeyCode::KeyP, Control::Learned),
@@ -213,6 +218,7 @@ fn apply(control: Control, session: &mut Session) {
     }
     match control {
         Control::Playback => session.toggle_playback(),
+        Control::FailMotor => session.fail_motor(DroneMotor::FrontLeft),
         Control::Step => session.single_step(),
         Control::Reset => session.reset(),
         Control::Learned => session.select_learned(),
@@ -225,6 +231,11 @@ fn apply(control: Control, session: &mut Session) {
 fn enabled(control: Control, session: &Session) -> bool {
     match control {
         Control::Playback => session.can_step(),
+        Control::FailMotor => {
+            session.can_step()
+                && session.observation().motor_state(DroneMotor::FrontLeft)
+                    == DroneMotorState::Working
+        }
         Control::Step => session.can_step() && session.playback() == Playback::Paused,
         Control::Reset | Control::Learned | Control::Preset(_) | Control::Start(_) => true,
     }
@@ -236,7 +247,7 @@ fn selected(control: Control, session: &Session) -> bool {
         Control::Preset(preset) => Some(preset) == session.preset(),
         Control::Learned => session.is_bundled(),
         Control::Start(profile) => profile == session.start_profile(),
-        Control::Playback | Control::Step | Control::Reset => false,
+        Control::Playback | Control::Step | Control::Reset | Control::FailMotor => false,
     }
 }
 
@@ -307,12 +318,70 @@ fn status_label(session: &Session) -> String {
         StartProfile::Calm => "Calm start",
         StartProfile::Disturbed => "Disturbed start",
     };
-    format!("{state} | {command} | Step {steps}/500\n{start} | Height {height:.2} m | Vertical speed {velocity:.2} m/s")
+    let damage = match session.observation().motor_state(DroneMotor::FrontLeft) {
+        DroneMotorState::Working => "",
+        DroneMotorState::Failed => "\nFront-left motor failed",
+    };
+    format!("{state} | {command} | Step {steps}/500\n{start} | Height {height:.2} m | Vertical speed {velocity:.2} m/s{damage}")
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn failure_control_updates_status_and_disables_until_reset() {
+        let mut session = Session::default();
+        assert!(enabled(Control::FailMotor, &session));
+        assert!(!selected(Control::FailMotor, &session));
+        apply(Control::FailMotor, &mut session);
+        assert!(!enabled(Control::FailMotor, &session));
+        assert!(status_label(&session).contains("Front-left motor failed"));
+        let damaged = session.observation();
+        apply(Control::FailMotor, &mut session);
+        assert_eq!(session.observation(), damaged);
+        apply(Control::Reset, &mut session);
+        assert!(enabled(Control::FailMotor, &session));
+        assert!(!status_label(&session).contains("motor failed"));
+        for _ in 0..500 {
+            session.single_step();
+        }
+        assert!(!enabled(Control::FailMotor, &session));
+    }
+
+    #[test]
+    fn viewer_offers_a_labeled_motor_failure_button() {
+        let mut app = App::new();
+        app.add_plugins((MinimalPlugins, AssetPlugin::default()))
+            .init_asset::<Font>()
+            .add_systems(Startup, setup);
+        app.update();
+        let world = app.world_mut();
+        let button = world
+            .query::<(Entity, &Control)>()
+            .iter(world)
+            .find_map(|(entity, control)| matches!(control, Control::FailMotor).then_some(entity))
+            .expect("motor failure control");
+        let children = world.get::<Children>(button).expect("button label");
+        assert!(children.iter().any(|child| world
+            .get::<Text>(child)
+            .is_some_and(|text| text.0 == "Fail front left [F]")));
+    }
+
+    #[test]
+    fn failure_shortcut_does_not_advance_a_paused_episode() {
+        let mut app = App::new();
+        app.init_resource::<Session>()
+            .init_resource::<ButtonInput<KeyCode>>()
+            .add_systems(Update, interact);
+        app.world_mut()
+            .resource_mut::<ButtonInput<KeyCode>>()
+            .press(KeyCode::KeyF);
+        app.update();
+        let session = app.world().resource::<Session>();
+        assert_eq!(session.steps(), 0);
+        assert!(status_label(session).contains("Front-left motor failed"));
+    }
 
     #[test]
     fn browser_checkpoint_label_does_not_select_the_bundled_button() {
