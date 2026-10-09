@@ -1,0 +1,44 @@
+{
+  "runtime": "build-42ebdf885689457dd8e9749a99f645a2023906e8fc0e01954f76a9978c4b673c",
+  "release_build": "passed including wasm-opt",
+  "browser": "T3 Chromium, WebGL2, NVIDIA RTX 5070 Ti",
+  "viewports_css_px": [
+    [
+      1280,
+      800
+    ],
+    [
+      390,
+      844
+    ]
+  ],
+  "observed": [
+    "Front-left failure hides its rotor mesh and emits soft smoke.",
+    "Constant half thrust crashes at step 36.",
+    "Crash hides the body and emits sparks, smoke, and eight colliding debris proxies.",
+    "Reset removes effects and restores the intact drone."
+  ],
+  "limits": [
+    "Proxy boxes are not fractured model geometry.",
+    "No learned damaged-flight policy qualified.",
+    "Native window and mobile touch input remain unverified."
+  ],
+  "artifacts": [
+    {
+      "path": "docs/progress/drone-destruction.mp4",
+      "sha256": "4dc690173cfbc43eb16617f5156af993e4606dce0cd428cd73b58ac6661311d7"
+    },
+    {
+      "path": "docs/progress/drone-destruction-smoke.png",
+      "sha256": "8c9a2fcaf2cd2cacb2fa7b1b363e3f704aa3914a5e7dedd893a40aa90f9fba37"
+    },
+    {
+      "path": "docs/progress/drone-destruction-debris.png",
+      "sha256": "7433caf692d673e5dbff4faa325f37b353820710cb7c593ee256da235be7a947"
+    },
+    {
+      "path": "docs/progress/drone-destruction-narrow.png",
+      "sha256": "6b0c4de49845393a41b83af1bc1a7aa3a9a4eacb21fd42418d63086b648064bd"
+    }
+  ]
+}

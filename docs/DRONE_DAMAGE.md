@@ -92,7 +92,7 @@ runnable guides and documentation tests after the final prose edit.
 ## Training and visual milestones
 
 1. Add a short guide that fails one named motor during a seeded flight.
-2. Verify the force boundary and lifecycle before training a damaged-flight policy.
+2. Before training a damaged-flight policy, verify the force boundary and lifecycle.
 3. Add motor-state features to a separate damaged-flight encoder and checkpoint recipe.
 4. Train intact flight, fixed-corner failure, then randomized corner and failure time.
 5. Evaluate unseen seeds, every motor, and failures after a stable approach.
@@ -107,7 +107,7 @@ changes require their own documented model and regression evidence.
 
 Use position error, tilt, survival time, post-failure altitude loss, and motor
 commands as evaluation metrics. Record angular velocity without penalizing yaw
-merely because it differs from intact hover. Freeze held-out thresholds before
+because it differs from intact hover. Freeze held-out thresholds before
 selecting a trained checkpoint. Compare with the existing intact policy and a
 constant-thrust baseline on exactly the same damage schedule.
 
@@ -215,6 +215,7 @@ format remains unchanged. The damage recipe rejects those healthy checkpoints.
 Lessons retain one actor, critic, and optimizer. The first lesson learns intact
 calm hover. The second starts with the front-left motor failed. The third chooses
 one motor and either 100 or 250 intact actions independently on each episode reset.
+
 Failure changes the returned observation after the last intact action. It never
 advances physics itself. Termination takes precedence over a pending failure.
 
@@ -226,11 +227,15 @@ benchmark partition. Evaluation starts fresh environments and recurrent memory.
 
 Freeze these selection gates before training: every intact case must survive 500
 actions, earn at least 400 return, and finish within 0.5 metres of the target.
+
 Every damaged case must also survive 500 post-failure actions, earn at least 400
 post-failure return, and finish within 0.5 metres. Its minimum body-centre height
 must be at least 1 metre and peak tilt at most 45 degrees. Yaw rotation is allowed.
+
 The fixed-corner lesson tests all five selection seeds after two intact seconds.
+
 The scheduled lesson tests all five seeds, four motors, and both failure times.
+
 Incomplete or reordered matrices cannot pass. Later lessons must retain intact
 hover. No damaged-flight model has passed these gates yet.
 
@@ -243,7 +248,7 @@ Rust backlog remains.
 
 [Coverage](progress/drone-damage-training-coverage.json) records the added helper
 code and the runnable guide. Successful CLI promotion and final completion remain
-unmeasured until a trained policy passes the gates. The active training run is
+unmeasured until a trained policy passes the gates. The completed training run is
 recorded in [the status document](EXAMPLE_STATUS.md).
 
 ## Watch a saved policy
@@ -274,3 +279,22 @@ The selected recipe names its inputs, not its demonstrated ability. In particula
 `hover-260.mpk` passed intact hover only. The front-left training run has not
 qualified damaged flight. The viewer does not label uploaded weights as trained
 or qualified because they load.
+
+## Destruction effects
+
+The viewer hides each failed rotor mesh and emits one flash, twelve sparks, and
+four seconds of smoke. Smoke follows the failed rotor's position. Repeated
+observations cannot restart the effect. Reset restores the rotor and clears effects.
+
+Every task termination hides the drone body and emits a larger burst, two seconds
+of smoke, and eight colliding debris proxies. This includes ground crashes and
+flight-region exits. A time-limit truncation leaves the body intact.
+
+Debris uses a separate Rapier world with gravity and a floor. It expires after
+five seconds. Reset removes that world and every particle immediately. Shared
+meshes, materials, and a soft smoke mask avoid per-particle asset allocation.
+Effects continue while flight is paused or ended.
+
+The fragments are box proxies, not fractured pieces of the GLB. Hiding a rotor
+does not change the environment's retained mass or collision geometry. Visual
+destruction leaves the trained dynamics, rewards, and terminal rules unchanged.

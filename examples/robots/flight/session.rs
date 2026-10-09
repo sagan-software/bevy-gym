@@ -60,11 +60,17 @@ enum Controller {
     Failed(String),
 }
 
+/// Opaque reset revision used only to invalidate presentation state.
+#[derive(Clone, Copy, Default, PartialEq, Eq)]
+pub(super) struct EpisodeRevision(u64);
+
 /// Physics owns the pose; the viewer retains its last result and playback controls.
 #[derive(Resource)]
 pub(super) struct Session {
     /// Ten-second task using the same environment as the headless guide.
     environment: TimeLimit<DroneHover>,
+    /// Changes on every explicit reset, even if no physics action occurred.
+    revision: EpisodeRevision,
     /// Most recent atomic observation, reward, and completion status.
     last: Step<DroneObservation>,
     /// User's playback choice, independent of the environment's completion status.
@@ -86,6 +92,11 @@ impl Default for Session {
 }
 
 impl Session {
+    /// Read an opaque reset token without exposing mutable environment state.
+    pub(super) const fn revision(&self) -> EpisodeRevision {
+        self.revision
+    }
+
     /// Build a paused, seeded episode for either documented start distribution.
     fn starting(start_profile: StartProfile) -> Self {
         let drone = match start_profile {
@@ -96,6 +107,7 @@ impl Session {
         let initial = environment.reset(Some(42));
         Self {
             environment,
+            revision: EpisodeRevision::default(),
             last: Step {
                 observation: initial.observation,
                 reward: 0.0,
@@ -256,7 +268,9 @@ impl Session {
     pub(super) fn reset(&mut self) {
         let controller =
             std::mem::replace(&mut self.controller, Controller::Manual(MotorPreset::Hover));
+        let revision = EpisodeRevision(self.revision.0.wrapping_add(1));
         *self = Self::starting(self.start_profile);
+        self.revision = revision;
         if let Controller::Learned(mut pilot) = controller {
             pilot.reset();
             self.controller = Controller::Learned(pilot);

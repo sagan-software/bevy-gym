@@ -11,6 +11,8 @@ mod checkpoint;
 mod controls;
 #[path = "damage/training/encoding.rs"]
 mod damage_encoding;
+#[path = "flight/effects.rs"]
+mod effects;
 #[path = "learning/encoding.rs"]
 mod encoding;
 #[path = "learning/model.rs"]
@@ -83,6 +85,7 @@ fn run(session: Session) {
     );
     #[cfg(all(target_arch = "wasm32", feature = "browser"))]
     app.add_systems(Update, checkpoint::apply.before(controls::interact));
+    effects::install(&mut app);
     app.run();
 }
 

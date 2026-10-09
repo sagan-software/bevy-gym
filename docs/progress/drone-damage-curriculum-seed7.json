@@ -1,0 +1,185 @@
+{
+  "recipe_commit": "32be3f9",
+  "seed": 7,
+  "updates_per_lesson": 600,
+  "unit": "bevy-gym-damage-curriculum-20261009.service",
+  "exit_code": 1,
+  "error": "Lesson front-left exhausted its update budget without passing.",
+  "hover": {
+    "assessment": {
+      "damaged": [],
+      "healthy": [
+        {
+          "final_distance": 0.20286494493484497,
+          "reward": 456.5420879125595,
+          "seed": 0,
+          "steps": 500,
+          "survived": true
+        },
+        {
+          "final_distance": 0.23794585466384888,
+          "reward": 462.9300320148468,
+          "seed": 1,
+          "steps": 500,
+          "survived": true
+        },
+        {
+          "final_distance": 0.2238708734512329,
+          "reward": 462.4439253807068,
+          "seed": 2,
+          "steps": 500,
+          "survived": true
+        },
+        {
+          "final_distance": 0.2193339616060257,
+          "reward": 460.40442234277725,
+          "seed": 42,
+          "steps": 500,
+          "survived": true
+        },
+        {
+          "final_distance": 0.20182237029075623,
+          "reward": 459.10797971487045,
+          "seed": 18446744073709551615,
+          "steps": 500,
+          "survived": true
+        }
+      ],
+      "lesson": "hover"
+    },
+    "lesson": "hover",
+    "optimizer_steps": 2008,
+    "passed": true,
+    "update": 260
+  },
+  "front_left": {
+    "assessment": {
+      "damaged": [
+        {
+          "failure": "two_seconds",
+          "motor": "front_left",
+          "outcome": {
+            "final_body_yaw_rate_radians_per_second": 3.9720797538757324,
+            "final_distance_m": 1.9527366161346436,
+            "minimum_height_m": 0.3864712417125702,
+            "outcome": "before_failure",
+            "peak_tilt_radians": 2.9362144470214844,
+            "reward": 18.32509718835354,
+            "steps": 41
+          },
+          "seed": 0
+        },
+        {
+          "failure": "two_seconds",
+          "motor": "front_left",
+          "outcome": {
+            "final_body_yaw_rate_radians_per_second": 4.17454719543457,
+            "final_distance_m": 2.102555751800537,
+            "minimum_height_m": 0.3913489282131195,
+            "outcome": "before_failure",
+            "peak_tilt_radians": 2.9406847953796387,
+            "reward": 18.166440229397267,
+            "steps": 42
+          },
+          "seed": 1
+        },
+        {
+          "failure": "two_seconds",
+          "motor": "front_left",
+          "outcome": {
+            "final_body_yaw_rate_radians_per_second": 4.167338848114014,
+            "final_distance_m": 2.024446725845337,
+            "minimum_height_m": 0.3914536237716675,
+            "outcome": "before_failure",
+            "peak_tilt_radians": 2.939763069152832,
+            "reward": 19.052550415042788,
+            "steps": 42
+          },
+          "seed": 2
+        },
+        {
+          "failure": "two_seconds",
+          "motor": "front_left",
+          "outcome": {
+            "final_body_yaw_rate_radians_per_second": 4.051383972167969,
+            "final_distance_m": 1.975732445716858,
+            "minimum_height_m": 0.37569814920425415,
+            "outcome": "before_failure",
+            "peak_tilt_radians": 2.938999652862549,
+            "reward": 18.71018394269049,
+            "steps": 41
+          },
+          "seed": 42
+        },
+        {
+          "failure": "two_seconds",
+          "motor": "front_left",
+          "outcome": {
+            "final_body_yaw_rate_radians_per_second": 5.006789684295654,
+            "final_distance_m": 2.00581431388855,
+            "minimum_height_m": 0.3895515501499176,
+            "outcome": "before_failure",
+            "peak_tilt_radians": 2.9356257915496826,
+            "reward": 18.628990462981164,
+            "steps": 42
+          },
+          "seed": 18446744073709551615
+        }
+      ],
+      "healthy": [
+        {
+          "final_distance": 1.9527366161346436,
+          "reward": 18.32509718835354,
+          "seed": 0,
+          "steps": 41,
+          "survived": false
+        },
+        {
+          "final_distance": 2.102555751800537,
+          "reward": 18.166440229397267,
+          "seed": 1,
+          "steps": 42,
+          "survived": false
+        },
+        {
+          "final_distance": 2.024446725845337,
+          "reward": 19.052550415042788,
+          "seed": 2,
+          "steps": 42,
+          "survived": false
+        },
+        {
+          "final_distance": 1.975732445716858,
+          "reward": 18.71018394269049,
+          "seed": 42,
+          "steps": 41,
+          "survived": false
+        },
+        {
+          "final_distance": 2.00581431388855,
+          "reward": 18.628990462981164,
+          "seed": 18446744073709551615,
+          "steps": 42,
+          "survived": false
+        }
+      ],
+      "lesson": "front_left"
+    },
+    "lesson": "front-left",
+    "optimizer_steps": 7452,
+    "passed": false,
+    "update": 600
+  },
+  "scheduled": "Not reached because front-left selection failed.",
+  "checkpoints": [
+    {
+      "path": "runs/drone-damage-curriculum-seed7/hover-260.mpk",
+      "sha256": "0bd3bea62bc23a2a38da70093610ecf9d21861b3a50abecd6ec0be17104b60b3"
+    },
+    {
+      "path": "runs/drone-damage-curriculum-seed7/front-left-600.mpk",
+      "sha256": "2a0cfc9f104f57c88fc784e66f39425b667dd6a74a5c880827ec2413d14e4c79"
+    }
+  ],
+  "next_experiment": "Mix healthy-flight rehearsal into failure training; preserve the frozen healthy and damaged promotion thresholds."
+}

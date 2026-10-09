@@ -86,5 +86,7 @@ hover environment's mass, thrust, reward, or terminal rules for visual effects.
   kills, and resource use on withheld layouts, seeds, and opponents.
 - Browser playback, player input, training, and reset work at desktop and narrow sizes.
 
-Current status: planned. The existing viewer supports visible actuator failure,
-but has no explosions, smoke, debris, arena, humanoid gameplay, or weapons yet.
+Current status: checkpoint loading and destruction effects are implemented. Rotor
+failure emits a burst and smoke; task termination hides the body and spawns eight
+colliding debris proxies. The arena, humanoid gameplay, weapons, and pursuit remain
+pending. These effects do not demonstrate learned damage recovery.

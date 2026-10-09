@@ -162,7 +162,7 @@ pub(super) fn project_damage(
 }
 
 /// Source-space pivots and motor identities for the four named mesh nodes.
-fn rotor(name: &str) -> Option<(Vec3, DroneMotor, f32)> {
+pub(super) fn rotor(name: &str) -> Option<(Vec3, DroneMotor, f32)> {
     let (x, z, motor, sign) = match name {
         "Rotor_FL" => (0.250_664_5, 0.126_471, DroneMotor::FrontLeft, 1.0),
         "Rotor_FR" => (-0.250_420_5, 0.126_471, DroneMotor::FrontRight, -1.0),
