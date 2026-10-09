@@ -78,6 +78,8 @@ mod survival;
 
 #[path = "pursuit/camera.rs"]
 mod camera;
+#[path = "pursuit/gun_feedback.rs"]
+mod gun_feedback;
 #[path = "pursuit/view.rs"]
 mod view;
 use camera::EYE_OFFSET as DRONE_EYE;
@@ -232,7 +234,10 @@ impl Game {
         }
         let previous_rounds = self.combat.rounds();
         self.combat.act(&self.arena, action);
-        self.hit_reaction(action, previous_rounds);
+        if self.combat.rounds() < previous_rounds {
+            self.sound
+                .shot(firing::Combat::origin(self.arena.position()));
+        }
         if !self.combat.target().health().is_alive() {
             self.gun.disable();
             self.sight.forget();
@@ -247,26 +252,24 @@ impl Game {
         self.finish_run();
     }
 
-    /// Apply momentum only for a newly accepted hit, never retained HUD feedback.
-    fn hit_reaction(&mut self, action: firing::Action, previous_rounds: u8) {
-        if self.combat.rounds() >= previous_rounds {
-            return;
+    /// Resolve projectile travel and apply each physical hit once at the simulation boundary.
+    fn advance_combat(&mut self, elapsed: std::time::Duration) {
+        if let Some(hit) = self.combat.advance(elapsed, &self.arena) {
+            let target = self.combat.target();
+            let local = target.rotation().inverse() * (hit.point - target.position());
+            // A 0.4 N·s hit changes this one-kilogram body's velocity by 0.4 m/s.
+            let impulse = bevy_gym::robots::DroneImpulse::try_from((local, *hit.direction * 0.4))
+                .expect("Owned hitboxes fit the bounded drone body");
+            if let Err(error) = self.flight.impact(impulse) {
+                self.flight.fail(error.to_string());
+            }
         }
-        let firing::Action::Fire(direction) = action else {
-            return;
-        };
-        let firing::Feedback::Fired(shot::target::Shot::Hit { point, .. }) = self.combat.feedback()
-        else {
-            return;
-        };
-        let target = self.combat.target();
-        let local = target.rotation().inverse() * (point - target.position());
-        // A 0.4 N·s hit changes this one-kilogram body's velocity by 0.4 m/s.
-        let impulse = bevy_gym::robots::DroneImpulse::try_from((local, *direction * 0.4))
-            .expect("Owned hitboxes fit the bounded drone body");
-        if let Err(error) = self.flight.impact(impulse) {
-            self.flight.fail(error.to_string());
+        if !self.combat.target().health().is_alive() {
+            self.gun.disable();
+            self.sight.forget();
+            self.hearing.forget();
         }
+        self.finish_run();
     }
 
     /// Preserve the first terminal result, preferring a disabled player on simultaneous damage.
@@ -288,7 +291,7 @@ impl Game {
     /// Animate measured displacement, so holding a blocked direction does not walk in place.
     fn step(&mut self, movement: Movement) {
         self.run.tick();
-        self.combat.advance(std::time::Duration::from_millis(20));
+        self.advance_combat(std::time::Duration::from_millis(20));
         self.hearing.advance(std::time::Duration::from_millis(20));
         if let Some(step) = self
             .flight
@@ -401,6 +404,7 @@ fn main() {
         .add_plugins((
             view::install,
             effects::install,
+            gun_feedback::install,
             perception::install,
             return_fire::install,
             audio::install,
@@ -519,6 +523,25 @@ mod tests {
     }
 
     #[test]
+    fn a_player_projectile_damages_only_after_travel_reaches_the_target() {
+        let mut game = Game::default();
+        game.act(firing::Action::PickUp);
+        let aim = Dir3::new(
+            game.combat.target().position() - firing::Combat::origin(game.arena.position()),
+        )
+        .expect("Visible body");
+        game.act(firing::Action::Fire(aim));
+        assert_eq!(game.combat.rounds(), 11);
+        assert_eq!(game.combat.target().health().body_hits_remaining(), 6);
+        game.step(Movement::Idle);
+        assert_eq!(game.combat.target().health().body_hits_remaining(), 6);
+        for _ in 0..4 {
+            game.step(Movement::Idle);
+        }
+        assert_eq!(game.combat.target().health().body_hits_remaining(), 5);
+    }
+
+    #[test]
     fn a_player_hit_pushes_the_drone_once_and_reset_clears_the_impulse() {
         let mut game = Game::default();
         game.act(firing::Action::PickUp);
@@ -530,10 +553,12 @@ mod tests {
         let direction = Dir3::new(point - firing::Combat::origin(game.arena.position()))
             .expect("Visible rotor");
         game.act(firing::Action::Fire(direction));
+        game.advance_combat(std::time::Duration::from_millis(100));
         let hit = game.flight.observation();
         assert!((hit.linear_velocity() - before.linear_velocity()).length() > 0.1);
         assert!((hit.angular_velocity() - before.angular_velocity()).length() > 0.1);
         game.act(firing::Action::Fire(direction));
+        game.advance_combat(std::time::Duration::from_millis(100));
         assert_eq!(game.flight.observation(), hit);
         game.reset();
         assert_eq!(game.flight.observation(), before);
@@ -751,10 +776,12 @@ mod tests {
         let origin = firing::Combat::origin(game.arena.position());
         let direction = Dir3::new(target - origin).expect("Target ahead");
         game.act(firing::Action::Fire(direction));
+        game.advance_combat(std::time::Duration::from_millis(100));
         assert_eq!(game.combat.rounds(), 11);
         assert_eq!(game.combat.target().health().body_hits_remaining(), 5);
         assert!(game.combat.trace().is_some());
         game.act(firing::Action::Fire(direction));
+        game.advance_combat(std::time::Duration::from_millis(100));
         assert_eq!(game.combat.rounds(), 11);
         for _ in 0..20 {
             game.step(Movement::Idle);
@@ -871,10 +898,12 @@ mod tests {
             let aim = Dir3::new(centre - firing::Combat::origin(game.arena.position()))
                 .expect("Rotor direction");
             game.act(firing::Action::Fire(aim));
+            game.advance_combat(std::time::Duration::from_millis(100));
             for _ in 0..13 {
                 game.step(Movement::Idle);
             }
             game.act(firing::Action::Fire(aim));
+            game.advance_combat(std::time::Duration::from_millis(100));
         }
         app.update();
         assert_eq!(
@@ -1040,6 +1069,7 @@ mod tests {
             let aim = Dir3::new(centre - firing::Combat::origin(game.arena.position()))
                 .expect("Rotor direction");
             game.act(firing::Action::Fire(aim));
+            game.advance_combat(std::time::Duration::from_millis(100));
         }
         let rotor = app
             .world_mut()

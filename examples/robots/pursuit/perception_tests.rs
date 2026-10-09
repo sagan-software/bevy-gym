@@ -36,8 +36,9 @@ fn body_death_clears_sight_before_the_next_physics_action() {
         Dir3::new(game.combat.target().position() - firing::Combat::origin(game.arena.position()))
             .expect("Aim");
     for _ in 0..6 {
-        game.combat.advance(Duration::from_millis(250));
+        game.advance_combat(Duration::from_millis(250));
         game.act(firing::Action::Fire(aim));
+        game.advance_combat(Duration::from_millis(100));
     }
     assert!(!game.combat.target().health().is_alive());
     assert_eq!(game.sight.contact(), sight::Contact::Unknown);

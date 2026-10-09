@@ -37,7 +37,7 @@ fn flight_pose_updates_preserve_damage_and_reject_invalid_state_atomically() {
     pistol.pick_up(Pistol::LOCATION).expect("Pickup");
     let mut target = Target::try_from((Vec3::new(0.0, 3.0, 0.0), Quat::IDENTITY)).expect("Target");
     let aim = Aim::try_from((Vec3::new(0.0, 4.0, 0.0), Vec3::NEG_Y)).expect("Aim");
-    target.shoot(&arena, &mut pistol, aim).expect("Body hit");
+    shoot(&mut target, &arena, &mut pistol, aim).expect("Body hit");
     let health = target.health().clone();
     target
         .move_to(Vec3::new(1.0, 3.0, 0.0), Quat::from_rotation_y(0.4))
@@ -142,15 +142,15 @@ fn each_rotor_can_be_aimed_at_independently() {
             let aim = Aim::try_from((centre + up, -up)).unwrap();
             let mut pistol = pistol();
             assert!(
-                matches!(target.shoot(&arena, &mut pistol, aim), Ok(Shot::Hit { part: Part::Rotor(hit), damage: Damage::Hit, .. }) if hit == motor)
+                matches!(shoot(&mut target, &arena, &mut pistol, aim), Ok(Shot::Hit { part: Part::Rotor(hit), damage: Damage::Hit, .. }) if hit == motor)
             );
             pistol.advance(Duration::from_secs(1));
             assert!(
-                matches!(target.shoot(&arena, &mut pistol, aim), Ok(Shot::Hit { damage: Damage::RotorDestroyed(hit), .. }) if hit == motor)
+                matches!(shoot(&mut target, &arena, &mut pistol, aim), Ok(Shot::Hit { damage: Damage::RotorDestroyed(hit), .. }) if hit == motor)
             );
             pistol.advance(Duration::from_secs(1));
             assert!(matches!(
-                target.shoot(&arena, &mut pistol, aim),
+                shoot(&mut target, &arena, &mut pistol, aim),
                 Ok(Shot::Wall { .. })
             ));
             assert_eq!(target.health().body_hits_remaining(), 6);
@@ -167,12 +167,12 @@ fn body_dies_once_and_rejected_shots_preserve_health() {
     let aim = Aim::try_from((Vec3::new(0.0, 3.0, 2.0), Vec3::NEG_Z)).unwrap();
     let mut unarmed = Pistol::default();
     assert_eq!(
-        target.shoot(&arena, &mut unarmed, aim),
+        shoot(&mut target, &arena, &mut unarmed, aim),
         Err(FireError::Unarmed)
     );
     let mut pistol = pistol();
     for hit in 1..=6 {
-        let shot = target.shoot(&arena, &mut pistol, aim).unwrap();
+        let shot = shoot(&mut target, &arena, &mut pistol, aim).unwrap();
         let expected = if hit == 6 {
             Damage::Destroyed
         } else {
@@ -182,13 +182,13 @@ fn body_dies_once_and_rejected_shots_preserve_health() {
             matches!(shot, Shot::Hit { part: Part::Body, damage, point } if damage == expected && (point.z - 0.18).abs() < 1.0e-5)
         );
         assert_eq!(
-            target.shoot(&arena, &mut pistol, aim),
+            shoot(&mut target, &arena, &mut pistol, aim),
             Err(FireError::CoolingDown)
         );
         pistol.advance(Duration::from_secs(1));
     }
     assert!(matches!(
-        target.shoot(&arena, &mut pistol, aim),
+        shoot(&mut target, &arena, &mut pistol, aim),
         Ok(Shot::Miss { .. })
     ));
     assert_eq!(target.health().body_hits_remaining(), 0);
@@ -207,7 +207,7 @@ fn authored_geometry_blocks_only_closed_surfaces() {
         let mut target = Target::try_from((position, Quat::IDENTITY)).unwrap();
         let mut pistol = pistol();
         let aim = Aim::try_from((origin, position - origin)).unwrap();
-        let shot = target.shoot(&arena, &mut pistol, aim).unwrap();
+        let shot = shoot(&mut target, &arena, &mut pistol, aim).unwrap();
         assert_eq!(
             matches!(
                 shot,
@@ -235,7 +235,7 @@ fn range_and_inside_shape_queries_have_defined_results() {
         let mut target = Target::try_from((Vec3::new(0.0, height, 0.0), Quat::IDENTITY)).unwrap();
         let mut pistol = pistol();
         let aim = Aim::try_from((Vec3::Y, Vec3::Y)).unwrap();
-        let shot = target.shoot(&arena, &mut pistol, aim).unwrap();
+        let shot = shoot(&mut target, &arena, &mut pistol, aim).unwrap();
         if hit {
             assert!(matches!(shot, Shot::Hit { point, .. } if (point.y - 31.0).abs() < 1.0e-5));
         } else {
@@ -252,7 +252,7 @@ fn range_and_inside_shape_queries_have_defined_results() {
     let origin = target.position();
     let aim = Aim::try_from((origin, Vec3::Y)).unwrap();
     assert!(
-        matches!(target.shoot(&arena,&mut pistol,aim),Ok(Shot::Hit { point, .. }) if point == origin)
+        matches!(shoot(&mut target, &arena,&mut pistol,aim),Ok(Shot::Hit { point, .. }) if point == origin)
     );
 }
 
@@ -266,7 +266,7 @@ fn static_geometry_wins_zero_distance_ties() {
     let mut pistol = pistol();
     let aim = Aim::try_from((origin, Vec3::Z)).unwrap();
     assert_eq!(
-        target.shoot(&arena, &mut pistol, aim),
+        shoot(&mut target, &arena, &mut pistol, aim),
         Ok(Shot::Wall { point: origin })
     );
     assert_eq!(target.health().body_hits_remaining(), 6);
@@ -287,7 +287,7 @@ fn nearest_rotor_shields_the_farther_rotor() {
         DroneMotor::FrontRight,
     ] {
         assert!(
-            matches!(target.shoot(&arena,&mut pistol,aim),Ok(Shot::Hit { part:Part::Rotor(actual), .. }) if actual == expected)
+            matches!(shoot(&mut target, &arena,&mut pistol,aim),Ok(Shot::Hit { part:Part::Rotor(actual), .. }) if actual == expected)
         );
         pistol.advance(Duration::from_secs(1));
     }
@@ -346,7 +346,7 @@ fn body_shields_a_rotor_behind_it() {
     let aim = Aim::try_from((origin, target.rotor_centre(DroneMotor::RearRight) - origin)).unwrap();
     let mut pistol = pistol();
     assert!(matches!(
-        target.shoot(&arena, &mut pistol, aim),
+        shoot(&mut target, &arena, &mut pistol, aim),
         Ok(Shot::Hit {
             part: Part::Body,
             ..
@@ -374,4 +374,38 @@ fn visible_aim_points_respect_target_wall_and_range() {
     assert!(hidden.aim_point(&arena, aim).z > 0.0);
     assert_eq!(target.health().body_hits_remaining(), 6);
     assert_eq!(hidden.health().body_hits_remaining(), 6);
+}
+
+/// Keep the original geometry cases independent of projectile scheduling.
+fn shoot(
+    target: &mut Target,
+    arena: &Arena,
+    pistol: &mut Pistol,
+    aim: Aim,
+) -> Result<Shot, FireError> {
+    pistol.fire()?;
+    Ok(target
+        .sweep(arena, aim, Aim::RANGE)
+        .unwrap_or_else(|| Shot::Miss {
+            point: aim.point(Aim::RANGE),
+        }))
+}
+
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn a_swept_segment_hits_only_within_its_travelled_distance() {
+    let arena = Arena::default();
+    let mut target = Target::try_from((Vec3::new(0.0, 3.0, 0.0), Quat::IDENTITY))
+        .expect("Target above the floor");
+    let aim = Aim::try_from((Vec3::new(0.0, 5.0, 0.0), Vec3::NEG_Y)).expect("Downward aim");
+    assert!(target.sweep(&arena, aim, 1.8).is_none());
+    assert_eq!(target.health().body_hits_remaining(), 6);
+    assert!(matches!(
+        target.sweep(&arena, aim, 2.0),
+        Some(Shot::Hit {
+            part: Part::Body,
+            ..
+        })
+    ));
+    assert_eq!(target.health().body_hits_remaining(), 5);
 }

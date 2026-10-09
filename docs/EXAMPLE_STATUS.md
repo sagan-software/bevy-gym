@@ -4,7 +4,26 @@ Updated: 2026-10-09. Goal status: active.
 
 ## Resume here
 
-### Shooter camera checkpoint, 2026-10-09
+### Projectile checkpoint, 2026-10-09
+
+The authoritative worktree remains `bevy-gym-quality`. Camera checkpoint `09f7372`
+and impact checkpoint `d0a53df` are pushed to GitHub main. The current changes add
+swept player projectiles, muzzle flash/smoke, camera recoil, and player discharge
+audio. Native and browser gates pass. The optimized build was inspected after a
+rotor hit; the [recording](progress/shooter-projectile-final.mp4) and
+[contact sheet](progress/shooter-projectile-final.jpg) retain that evidence.
+
+The runtime is `538f1f48ffff24f85185adfb167955d5164087560218045c0cfce25df8e97659`
+at `http://100.105.254.50:8781/robots/pursuit/?build=538f1f48`.
+The [upgrade plan](DRONE_SHOOTER_UPGRADE.md#projectile-checkpoint) records behavior,
+limits, test scope, and remaining work.
+
+Next: align the physical projectile origin, visible muzzle, and both animated hands.
+The current chest-origin tracer starts below the visible barrel. Directional
+locomotion still changes abruptly. Ragdolls,
+two drones/two droids, and state-aware lights/raytraced audio remain pending.
+
+### Shooter camera and impact checkpoints, 2026-10-09
 
 The current work follows [the shooter upgrade plan](DRONE_SHOOTER_UPGRADE.md).
 The shoulder camera uses PanOrbit 0.34 with camera-relative WASD, right-button ADS,
@@ -28,7 +47,7 @@ and attached smoke. They use final Rust source before WASM optimization.
 [Coverage](progress/shooter-impact-coverage.json) records the exact remaining gaps.
 The impulse value has 37/37 covered lines and 8/8 branches, including test code.
 
-Player shots still use hitscan; swept projectiles remain the next checkpoint.
+Player shots used hitscan at the impact checkpoint; the current changes replace it.
 The separate `bevy-gym-impacts` worktree is now an outdated scratch copy. Do not copy
 its files over this worktree. The original `bevy-gym` checkout remains deliberately dirty.
 
@@ -47,7 +66,7 @@ the embedded browser refuses pointer lock. Normal captured-mouse operation remai
 unverified in that browser. Desktop and narrow layouts were inspected; this remains
 a keyboard-and-mouse shooter, without a complete touch aiming interface.
 
-Next: connect swept player projectiles and muzzle feedback, improve directional animation, resolve bevy-ragdoll's Bevy
+Next after the current projectile checkpoint: improve directional animation, resolve bevy-ragdoll's Bevy
 0.19 boundary, then add two drones/two droids and state-aware lights/audio.
 Do not report the complete shooter or the broader examples roadmap as finished.
 

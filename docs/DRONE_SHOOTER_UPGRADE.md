@@ -99,3 +99,41 @@ and the remaining uncovered paths.
 The optimized runtime is `a7e93bc80af7fdb86834af24d4a26ff28d853d172259d4841af8cc6262ce862b`.
 Its [final recording](progress/shooter-camera-final.mp4) and
 [contact sheet](progress/shooter-camera-final.jpg) show ADS, orbit, strafing, and shooting.
+
+### Projectile checkpoint
+
+Player shots now launch at 120 metres per second and stop at 30 metres. Each fixed
+step sweeps the travelled segment against walls and the current target pose.
+Walls win exact distance ties. Only an arrival changes health or applies impulse;
+a target can move away before arrival. Cooldown lasts 250 milliseconds, so at most
+one player projectile remains in flight. Reset clears travel and presentation.
+
+This is a straight projectile with no gravity or penetration. Collision uses the
+current target pose at each fixed step, without a swept moving-target volume.
+
+The simulation retains a chest origin so an animated barrel cannot shoot through
+nearby cover. The visible flash uses the animated model's barrel end. Aligning the
+physical launch point with the animated muzzle remains part of the hand/aim work.
+
+The new feedback uses a 45-millisecond muzzle flash, 350-millisecond smoke puff,
+a 0.7-degree camera kick, and the existing original mechanical discharge sound.
+The authored recoil animation remains. This is not yet a finished pistol sound;
+raytraced audio and footsteps remain pending. Orange rotor markers are removed;
+rotor smoke now carries the damage cue.
+
+Native root tests, 105 scene tests, 14 shot geometry tests, strict native/WASM Clippy,
+asset checks, and the standard browser suite pass. The browser suite includes all
+14 shot geometry cases. Personal Rust lint reports no candidate diagnostics;
+unrelated raw repository diagnostics remain. The
+[coverage record](progress/shooter-projectile-coverage.json) records selected-file
+coverage and the remaining gaps. Animation, ragdolls, two-versus-two agents, and
+state lights/audio remain unfinished.
+
+The [strafe recording](progress/shooter-projectiles.mp4),
+[contact sheet](progress/shooter-projectiles.jpg), and
+[muzzle close-up](progress/shooter-muzzle.jpg) were inspected. They confirm finite
+tracers and small discharge effects, while retaining the hand/physical-origin
+mismatch described above. The [optimized recording](progress/shooter-projectile-final.mp4)
+confirms a rotor hit and smoke in runtime
+`538f1f48ffff24f85185adfb167955d5164087560218045c0cfce25df8e97659`.
+The audio event path is tested; audible sound quality remains unverified.

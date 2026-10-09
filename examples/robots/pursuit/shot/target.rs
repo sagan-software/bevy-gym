@@ -7,10 +7,7 @@
 
 use super::super::{
     arena::Arena,
-    combat::{
-        health::{Damage, DroneHealth, RotorHealth},
-        pistol::{FireError, Pistol},
-    },
+    combat::health::{Damage, DroneHealth, RotorHealth},
 };
 use super::aim::{valid_position, Aim};
 use bevy::math::{Quat, Vec3, Vec4};
@@ -140,35 +137,24 @@ impl Target {
         aim.point(target.min(wall))
     }
 
-    /// Spend one round, query nearest geometry, and apply at most one health transition.
-    pub(crate) fn shoot(
-        &mut self,
-        arena: &Arena,
-        pistol: &mut Pistol,
-        aim: Aim,
-    ) -> Result<Shot, FireError> {
-        pistol.fire()?;
-        let hit = self.nearest(aim);
-        let distance = hit.map_or(Aim::RANGE, |(_, distance)| distance);
-        // Static geometry wins ties, including rays starting inside a wall.
+    /// Sweep an owned projectile segment in metres; walls win exact distance ties.
+    pub(crate) fn sweep(&mut self, arena: &Arena, aim: Aim, distance: f32) -> Option<Shot> {
+        let hit = self.nearest(aim).filter(|(_, hit)| *hit <= distance);
+        let nearest = hit.map_or(distance, |(_, hit)| hit);
         if let Some(blocked) = arena
-            .obstruction(aim.origin(), aim.point(Aim::RANGE))
-            .filter(|blocked| *blocked <= distance)
+            .obstruction(aim.origin(), aim.point(distance))
+            .filter(|blocked| *blocked <= nearest)
         {
-            return Ok(Shot::Wall {
+            return Some(Shot::Wall {
                 point: aim.point(blocked),
             });
         }
-        let Some((part, distance)) = hit else {
-            return Ok(Shot::Miss {
-                point: aim.point(Aim::RANGE),
-            });
-        };
+        let (part, distance) = hit?;
         let damage = match part {
             Part::Body => self.health.hit_body(),
             Part::Rotor(motor) => self.health.hit_rotor(motor),
         };
-        Ok(Shot::Hit {
+        Some(Shot::Hit {
             part,
             point: aim.point(distance),
             damage,

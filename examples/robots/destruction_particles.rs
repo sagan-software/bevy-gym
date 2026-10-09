@@ -26,7 +26,7 @@ pub(super) struct Particle {
 
 /// Visual particle recipes; no values flow into training observations.
 #[derive(Clone, Copy)]
-enum Kind {
+pub(super) enum Kind {
     /// Short bright sphere at the impact.
     Flash,
     /// Small outward particle accelerated by gravity.
@@ -137,7 +137,7 @@ impl Materials {
     }
 
     /// Retain only per-particle motion and lifetime; all GPU assets are shared.
-    fn spawn(
+    pub(super) fn spawn(
         &self,
         commands: &mut Commands<'_, '_>,
         position: Vec3,
@@ -208,7 +208,7 @@ pub(super) fn animate(
                 particle.velocity.y = 9.81_f32.mul_add(-delta.as_secs_f32(), particle.velocity.y);
             }
             Kind::Smoke => {
-                transform.scale = Vec3::splat(age.mul_add(0.13, 0.07));
+                transform.scale = Vec3::splat(age.mul_add(0.13, particle.radius));
                 let [dense, medium, thin, faint] = &materials.smoke;
                 material.0 = if fraction < 0.25 {
                     dense

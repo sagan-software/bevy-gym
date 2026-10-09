@@ -1,0 +1,197 @@
+{
+  "scope": "Whole selected files including test code; not a whole-change percentage. The integration test includes target.rs through a relative path; its separate entry covers every branch.",
+  "tests": {
+    "scene": 105,
+    "shot_geometry_native_and_browser": 14,
+    "navigation": 20
+  },
+  "files": {
+    "examples/robots/pursuit/firing.rs": {
+      "branches": {
+        "count": 14,
+        "covered": 14,
+        "notcovered": 0,
+        "percent": 100
+      },
+      "functions": {
+        "count": 22,
+        "covered": 22,
+        "percent": 100
+      },
+      "instantiations": {
+        "count": 22,
+        "covered": 22,
+        "percent": 100
+      },
+      "lines": {
+        "count": 263,
+        "covered": 263,
+        "percent": 100
+      },
+      "mcdc": {
+        "count": 0,
+        "covered": 0,
+        "notcovered": 0,
+        "percent": 0
+      },
+      "regions": {
+        "count": 577,
+        "covered": 573,
+        "notcovered": 4,
+        "percent": 99.30675909878683
+      }
+    },
+    "examples/robots/pursuit/gun_feedback.rs": {
+      "branches": {
+        "count": 8,
+        "covered": 8,
+        "notcovered": 0,
+        "percent": 100
+      },
+      "functions": {
+        "count": 7,
+        "covered": 7,
+        "percent": 100
+      },
+      "instantiations": {
+        "count": 7,
+        "covered": 7,
+        "percent": 100
+      },
+      "lines": {
+        "count": 95,
+        "covered": 95,
+        "percent": 100
+      },
+      "mcdc": {
+        "count": 0,
+        "covered": 0,
+        "notcovered": 0,
+        "percent": 0
+      },
+      "regions": {
+        "count": 143,
+        "covered": 143,
+        "notcovered": 0,
+        "percent": 100
+      }
+    },
+    "examples/robots/pursuit/shot/target.rs": {
+      "branches": {
+        "count": 16,
+        "covered": 12,
+        "notcovered": 4,
+        "percent": 75
+      },
+      "functions": {
+        "count": 15,
+        "covered": 15,
+        "percent": 100
+      },
+      "instantiations": {
+        "count": 15,
+        "covered": 15,
+        "percent": 100
+      },
+      "lines": {
+        "count": 103,
+        "covered": 101,
+        "percent": 98.05825242718447
+      },
+      "mcdc": {
+        "count": 0,
+        "covered": 0,
+        "notcovered": 0,
+        "percent": 0
+      },
+      "regions": {
+        "count": 171,
+        "covered": 167,
+        "notcovered": 4,
+        "percent": 97.6608187134503
+      }
+    },
+    "examples/robots/pursuit/view.rs": {
+      "branches": {
+        "count": 24,
+        "covered": 24,
+        "notcovered": 0,
+        "percent": 100
+      },
+      "functions": {
+        "count": 26,
+        "covered": 26,
+        "percent": 100
+      },
+      "instantiations": {
+        "count": 26,
+        "covered": 26,
+        "percent": 100
+      },
+      "lines": {
+        "count": 326,
+        "covered": 326,
+        "percent": 100
+      },
+      "mcdc": {
+        "count": 0,
+        "covered": 0,
+        "notcovered": 0,
+        "percent": 0
+      },
+      "regions": {
+        "count": 407,
+        "covered": 406,
+        "notcovered": 1,
+        "percent": 99.75429975429975
+      }
+    },
+    "tests/../examples/robots/pursuit/shot/target.rs": {
+      "branches": {
+        "count": 16,
+        "covered": 16,
+        "notcovered": 0,
+        "percent": 100
+      },
+      "functions": {
+        "count": 15,
+        "covered": 15,
+        "percent": 100
+      },
+      "instantiations": {
+        "count": 15,
+        "covered": 15,
+        "percent": 100
+      },
+      "lines": {
+        "count": 103,
+        "covered": 103,
+        "percent": 100
+      },
+      "mcdc": {
+        "count": 0,
+        "covered": 0,
+        "notcovered": 0,
+        "percent": 0
+      },
+      "regions": {
+        "count": 171,
+        "covered": 171,
+        "notcovered": 0,
+        "percent": 100
+      }
+    }
+  },
+  "gaps": [
+    "Game::advance_combat flight rejection after a geometry hit is not exercised; successful hits use a live flight episode.",
+    "Existing flight initialization/reset error closures and missing-fragment pose branch remain uncovered.",
+    "GPU effects, audible playback quality, and pointer capture are not established by native coverage."
+  ],
+  "source_sha256": {
+    "examples/robots/pursuit/firing.rs": "1d8553065e829e19d83ca5b5771c69b9ed34be65160505bfb7fccd1964816cb9",
+    "examples/robots/pursuit/gun_feedback.rs": "82b9ebf47c9f66812d89def49805af53a1826f967a7e155f1ae8ec420acbb60f",
+    "examples/robots/pursuit/shot/target.rs": "4a9936fd1b33e8694950a6225029cc52b28c93e05b4401c639ba1e4faaad26b0"
+  },
+  "runtime": "538f1f48ffff24f85185adfb167955d5164087560218045c0cfce25df8e97659",
+  "visual": "shooter-projectile-final.mp4/.jpg and shooter-projectile-desktop.png use the optimized build; shooter-projectiles.mp4/.jpg and shooter-muzzle.jpg use the same source before WASM optimization."
+}

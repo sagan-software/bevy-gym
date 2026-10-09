@@ -54,7 +54,7 @@ impl Aim {
     }
 
     /// Point on the ray at a distance in metres selected by the query.
-    pub(super) fn point(self, distance: f32) -> Vec3 {
+    pub(crate) fn point(self, distance: f32) -> Vec3 {
         self.origin + *self.direction * distance
     }
 }

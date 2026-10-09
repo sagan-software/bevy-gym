@@ -104,6 +104,7 @@ mod tests {
         let aim = direction(&game, &camera(), &pose, Vec2::splat(400.0)).expect("Visible target");
         game.act(Action::PickUp);
         game.act(Action::Fire(aim));
+        game.advance_combat(std::time::Duration::from_millis(100));
         assert_eq!(game.combat.target().health().body_hits_remaining(), 5);
         let trace = game.combat.trace().expect("Accepted shot");
         assert_eq!(trace.from, Combat::origin(game.arena.position()));
@@ -146,6 +147,9 @@ mod tests {
         assert!(matches!(action, Action::PickUp));
         app.world_mut().resource_mut::<Game>().act(action);
         app.world_mut()
+            .resource_mut::<Game>()
+            .advance_combat(std::time::Duration::from_millis(100));
+        app.world_mut()
             .resource_mut::<ButtonInput<KeyCode>>()
             .reset_all();
         app.update();
@@ -156,6 +160,9 @@ mod tests {
             .take()
             .expect("Shot queued");
         app.world_mut().resource_mut::<Game>().act(action);
+        app.world_mut()
+            .resource_mut::<Game>()
+            .advance_combat(std::time::Duration::from_millis(100));
         assert_eq!(
             app.world()
                 .resource::<Game>()

@@ -38,6 +38,11 @@ impl Default for View {
 }
 
 impl View {
+    /// A discharged pistol lifts aim by 0.7 degrees without changing the orbit limits.
+    pub(super) fn recoil(&mut self) {
+        self.pitch = (self.pitch + 0.7_f32.to_radians()).min(1.1);
+    }
+
     /// Convert pointer pixels to radians without frame-rate scaling.
     fn turn(&mut self, delta: Vec2) {
         let sensitivity = if self.mode == AimMode::Sight {
@@ -262,6 +267,18 @@ pub(super) fn collision(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn recoil_lifts_aim_and_preserves_the_pitch_limit() {
+        let mut view = View::default();
+        let before = view.pitch;
+        view.recoil();
+        assert!((view.pitch - before - 0.7_f32.to_radians()).abs() < 0.00001);
+        view.pitch = 1.1;
+        view.recoil();
+        assert_eq!(view.pitch, 1.1);
+        assert_eq!(view.yaw, 0.0);
+    }
 
     #[test]
     fn installed_camera_creates_reticle_and_preserves_orthographic_lens() {

@@ -130,6 +130,7 @@ const fn message(feedback: Feedback) -> &'static str {
         Feedback::Rejected(FireError::Unarmed) => "Collect the pistol first",
         Feedback::Rejected(FireError::Empty) => "Out of ammo · R to reset",
         Feedback::Rejected(FireError::CoolingDown) => "Weapon cooling down",
+        Feedback::Launched => "Fired",
         Feedback::Fired(Shot::Miss { .. }) => "Miss",
         Feedback::Fired(Shot::Wall { .. }) => "Shot blocked",
         Feedback::Fired(Shot::Hit {
@@ -187,6 +188,7 @@ mod tests {
                 Feedback::Rejected(FireError::CoolingDown),
                 "Weapon cooling down",
             ),
+            (Feedback::Launched, "Fired"),
             (Feedback::Fired(Shot::Miss { point: Vec3::ZERO }), "Miss"),
             (
                 Feedback::Fired(Shot::Wall { point: Vec3::ZERO }),

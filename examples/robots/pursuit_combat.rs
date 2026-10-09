@@ -31,9 +31,10 @@ fn main() {
     let aim = Aim::try_from((rotor + Vec3::Y, Vec3::NEG_Y)).expect("Aim down at the rotor");
 
     for _ in 0..2 {
+        pistol.fire().expect("Loaded pistol with no cooldown");
         let shot = drone
-            .shoot(&arena, &mut pistol, aim)
-            .expect("Loaded pistol with no cooldown");
+            .sweep(&arena, aim, 1.0)
+            .expect("The one-metre segment reaches the rotor");
         println!("Shot: {shot:?}");
         pistol.advance(Duration::from_millis(250));
     }

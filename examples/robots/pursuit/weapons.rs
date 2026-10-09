@@ -100,23 +100,10 @@ pub(super) fn rotors(
     }
 }
 
-/// Draw a bounded tracer and impact pulse; mark a rotor after its first hit.
+/// Draw only the projectile's latest swept segment; rotor smoke identifies damage.
 pub(super) fn traces(game: Res<'_, Game>, mut gizmos: Gizmos<'_, '_>) {
     if let Some(trace) = game.combat.trace() {
         gizmos.line(trace.from, trace.to, Color::srgb(1.0, 0.78, 0.3));
-        gizmos.sphere(Isometry3d::from_translation(trace.to), 0.05, Color::WHITE);
-    }
-    let target = game.combat.target();
-    if target.health().is_alive() {
-        for motor in bevy_gym::robots::DroneMotor::ALL {
-            if target.health().rotor(motor) == RotorHealth::Damaged {
-                gizmos.sphere(
-                    Isometry3d::from_translation(target.rotor_centre(motor)),
-                    0.12,
-                    Color::srgb(1.0, 0.6, 0.1),
-                );
-            }
-        }
     }
 }
 

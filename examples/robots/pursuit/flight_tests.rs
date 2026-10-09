@@ -35,8 +35,9 @@ fn body_death_stops_flight_before_another_policy_action() {
     let point = game.combat.target().position();
     let aim = Dir3::new(point - firing::Combat::origin(game.arena.position())).expect("Aim");
     for _ in 0..6 {
-        game.combat.advance(std::time::Duration::from_millis(250));
+        game.advance_combat(std::time::Duration::from_millis(250));
         game.act(firing::Action::Fire(aim));
+        game.advance_combat(std::time::Duration::from_millis(100));
     }
     assert!(!game.combat.target().health().is_alive());
     let observation = game.flight.observation();
@@ -55,8 +56,9 @@ fn rotor_hits_disable_motor_forces_and_a_crash_ends_combat_once() {
     let point = game.combat.target().rotor_centre(DroneMotor::RearRight);
     let aim = Dir3::new(point - firing::Combat::origin(game.arena.position())).expect("Aim");
     for _ in 0..2 {
-        game.combat.advance(std::time::Duration::from_millis(250));
+        game.advance_combat(std::time::Duration::from_millis(250));
         game.act(firing::Action::Fire(aim));
+        game.advance_combat(std::time::Duration::from_millis(100));
     }
     game.step(Movement::Idle);
     assert_eq!(

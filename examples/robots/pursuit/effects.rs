@@ -229,8 +229,9 @@ mod tests {
         let aim = Dir3::new(point - crate::firing::Combat::origin(game.arena.position()))
             .expect("Authored target direction");
         for _ in 0..hits {
-            game.combat.advance(Duration::from_millis(250));
+            game.advance_combat(Duration::from_millis(250));
             game.act(Action::Fire(aim));
+            game.advance_combat(Duration::from_millis(100));
         }
     }
 
