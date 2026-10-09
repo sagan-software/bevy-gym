@@ -153,8 +153,8 @@ The pipe runs along Z=-2..4 metres, centred at X=5 and Y=1.7 metres.
 The same static geometry answers nearest-obstruction queries for the camera.
 Invalid query coordinates fail closed at zero distance; zero-length segments
 have no obstruction. This is the geometry basis for later sight and shot queries.
-The geometric sight model below now queries this layout. It is not yet connected
-to the rendered game or a pursuit actor.
+The geometric sight model below queries this layout from the rendered drone's
+body-mounted camera. A pursuit actor remains unfinished.
 
 Tests cover all sixteen button combinations, fixed movement, walls, door and pipe
 traversal, window and roof obstruction, gravity, reset, camera obstruction, walking
@@ -389,9 +389,44 @@ Seven sensor cases pass natively and in Chrome/WASM. Native execution also runs
 two shared arena cases. Tests cover range and cone boundaries, exposed body points,
 wall-face rounding, invalid centres, hidden movement, exact expiry, saturation,
 reacquisition, and reset. [Coverage](progress/pursuit-sight-coverage.json) records
-all 48 instrumented sensor lines, both outcomes of all ten instrumented sensor
-branches, and all 17 instrumented guide lines.
+checkpoint `7f5fd6a`: all 48 instrumented sensor lines, both outcomes of all ten
+instrumented sensor branches, and all 17 instrumented guide lines.
 
-The model and guide are implemented. The rendered game still needs a camera
-orientation, sensor sampling, visible detection feedback, and sensor-only actor
-inputs before pursuit training. Hearing and return fire remain pending.
+The model and guide are implemented. The rendered integration is described below.
+Sensor-only pursuit actor inputs, hearing, and return fire remain pending.
+
+## Body-mounted sight in the arena
+
+The playable drone now samples sight after flight and character movement on each
+20-millisecond action. Its camera centre is at body-local (0, 0, −0.22) metres,
+facing local negative Z. The physical body orientation determines camera direction;
+the sensor never turns toward a hidden character position. The existing healthy
+hover policy receives the same twelve flight features as before.
+
+`Game` owns one `Sight`. Its read-only `contact` accessor returns the latest
+filtered observation without querying world state again. Body damage clears
+memory immediately on death. Flight termination and controller failure clear
+memory before the next observation. Reset also discards every prior sighting.
+
+The HUD reports `Drone sight: visible`, `last seen`, `none`, or `offline`.
+An original camera-lens mesh follows the same eye pose. Its red, amber, cyan,
+and dark materials match those states; text supplies the same information without
+requiring colour recognition. Reset and observation changes reuse existing assets.
+The lens is too small to assess its colour in the wide browser captures.
+
+Thirty-nine pursuit-viewer tests and all 50 hover-viewer tests pass. Nine native
+sensor cases include the shared arena tests; seven sensor cases pass in Chrome.
+The integration tests cover actual character movement into view, camera pose,
+immediate body death, physical death, controller failure, and reset. Projection
+tests check every label, material choice, visibility state, and stable asset counts.
+[Coverage](progress/pursuit-perception-coverage.json) records the native-startup gap,
+the existing invalid-solver-pose guard, and unhit test-only fallback paths.
+
+[The browser recording](progress/pursuit-perception.mp4) shows the robot entering
+view, walking into the house, and losing its remembered sighting. Desktop and
+390-pixel views were inspected. Narrow reset and pistol pickup work with keyboard
+input; actual mobile touch input remains unverified. [The visual record](progress/pursuit-perception.json)
+retains source and media hashes and distinguishes observed behavior from test evidence.
+
+The drone still hovers. It does not choose where to look, pursue the robot, or fire.
+Finite sound events and telegraphed return fire come next, before pursuit training.

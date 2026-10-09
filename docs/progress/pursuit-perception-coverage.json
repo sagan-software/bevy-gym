@@ -1,0 +1,552 @@
+{
+  "baseline_commit": "7f5fd6a982c982271e2270c476132fdc1da4d5fa",
+  "tests": {
+    "pursuit_viewer": 39,
+    "sight_native_including_arena": 9,
+    "sight_wasm": 7
+  },
+  "method": "LLVM show of exactly the two native test binaries and the runnable sight guide run in this checkpoint, with canonical source paths.",
+  "files": [
+    {
+      "path": "tests/pursuit_sight.rs",
+      "sha256": "b199cc69adda7ffd1a083d18c5e34e81be882f79b11a6aa9c216874cad1133db",
+      "changed_instrumented_lines": [
+        29
+      ],
+      "unhit_changed_lines": [],
+      "source_branches": {
+        "150:17": [
+          true,
+          false
+        ]
+      }
+    },
+    {
+      "path": "examples/robots/pursuit.rs",
+      "sha256": "ae827c8a343aa30a0ae8f504757be8a4b1f34094a82d1f074469122119894272",
+      "changed_instrumented_lines": [
+        96,
+        111,
+        122,
+        123,
+        124,
+        125,
+        126,
+        128,
+        131,
+        132,
+        133,
+        134,
+        135,
+        136,
+        137,
+        138,
+        139,
+        140,
+        141,
+        142,
+        144,
+        161,
+        162,
+        163,
+        184,
+        235,
+        289
+      ],
+      "unhit_changed_lines": [
+        235
+      ],
+      "source_branches": {
+        "132:12": [
+          true,
+          true
+        ],
+        "132:57": [
+          true,
+          true
+        ],
+        "161:12": [
+          true,
+          true
+        ],
+        "169:16": [
+          true,
+          true
+        ],
+        "170:20": [
+          false,
+          true
+        ],
+        "172:23": [
+          true,
+          true
+        ],
+        "181:12": [
+          true,
+          true
+        ],
+        "243:12": [
+          true,
+          true
+        ],
+        "489:16": [
+          true,
+          true
+        ],
+        "563:20": [
+          true,
+          true
+        ],
+        "580:20": [
+          true,
+          true
+        ]
+      }
+    },
+    {
+      "path": "examples/robots/pursuit/flight_tests.rs",
+      "sha256": "6ff1d6d21a9951e6f9f1efd7aa85749c55572f87dbbe1b65bd89ad383ec44cc0",
+      "changed_instrumented_lines": [
+        65
+      ],
+      "unhit_changed_lines": [],
+      "source_branches": {
+        "37:11": [
+          true,
+          true
+        ],
+        "46:11": [
+          true,
+          true
+        ],
+        "60:12": [
+          true,
+          true
+        ],
+        "69:15": [
+          true,
+          true
+        ],
+        "70:12": [
+          true,
+          true
+        ]
+      }
+    },
+    {
+      "path": "examples/robots/pursuit/hud.rs",
+      "sha256": "71d9b10d9011bc30c6dae12db7b2710eeb0e239c51c83bab836ce4b1a533dade",
+      "changed_instrumented_lines": [
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56
+      ],
+      "unhit_changed_lines": [],
+      "source_branches": {
+        "94:8": [
+          true,
+          true
+        ],
+        "102:25": [
+          true,
+          true
+        ],
+        "104:19": [
+          true,
+          true
+        ]
+      }
+    },
+    {
+      "path": "examples/robots/pursuit/perception.rs",
+      "sha256": "69caf393b4ce44e45e6c12ccff11180a17e49e9da0de1cdc2fbb61c3322e1c46",
+      "changed_instrumented_lines": [
+        7,
+        8,
+        9,
+        10,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        36,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        46,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        79,
+        83,
+        84,
+        85,
+        86,
+        87,
+        88,
+        89,
+        90,
+        91,
+        92,
+        93,
+        94,
+        95,
+        96,
+        97,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        112,
+        113,
+        114,
+        115,
+        116,
+        117,
+        118,
+        119,
+        120,
+        121,
+        122,
+        123,
+        124,
+        125,
+        126,
+        127,
+        128,
+        129,
+        130,
+        131,
+        132,
+        133,
+        134,
+        135,
+        137,
+        140,
+        141,
+        142,
+        143,
+        144,
+        145,
+        146,
+        154,
+        155,
+        156,
+        157,
+        158,
+        159,
+        160,
+        161,
+        162,
+        163,
+        164,
+        165,
+        168,
+        169,
+        170,
+        171,
+        172,
+        173,
+        174,
+        175,
+        176,
+        177,
+        178,
+        180,
+        182,
+        183,
+        184,
+        185,
+        186,
+        187,
+        188,
+        189,
+        192,
+        193,
+        194,
+        195,
+        196,
+        197,
+        198,
+        199,
+        200,
+        202,
+        203,
+        204,
+        205,
+        206,
+        207,
+        208,
+        209,
+        210,
+        211,
+        212,
+        213,
+        214,
+        215,
+        216,
+        217,
+        219,
+        220,
+        221,
+        222,
+        223,
+        224,
+        225,
+        226,
+        227,
+        228,
+        229,
+        230,
+        231,
+        232,
+        233,
+        234,
+        236,
+        237,
+        238,
+        239,
+        240,
+        241,
+        242,
+        243,
+        244,
+        246,
+        247,
+        248,
+        249,
+        250,
+        251,
+        253,
+        254,
+        255,
+        256,
+        257,
+        258,
+        259,
+        260,
+        261,
+        262,
+        263,
+        264,
+        267
+      ],
+      "unhit_changed_lines": [],
+      "source_branches": {
+        "28:12": [
+          true,
+          true
+        ],
+        "28:57": [
+          true,
+          true
+        ],
+        "134:26": [
+          true,
+          true
+        ],
+        "140:8": [
+          true,
+          true
+        ]
+      }
+    },
+    {
+      "path": "examples/robots/pursuit/perception_tests.rs",
+      "sha256": "0a1c0cff07c39d9cbacc340deab47b8575ae5493dfa54db616ba4ab4f30ec787",
+      "changed_instrumented_lines": [
+        7,
+        8,
+        9,
+        10,
+        12,
+        15,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        56,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        70,
+        71,
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80,
+        81,
+        82,
+        83,
+        84,
+        85,
+        86,
+        87,
+        88,
+        89
+      ],
+      "unhit_changed_lines": [
+        53,
+        54,
+        56,
+        67,
+        70
+      ],
+      "source_branches": {
+        "51:27": [
+          true,
+          false
+        ],
+        "53:19": [
+          false,
+          false
+        ],
+        "59:16": [
+          true,
+          true
+        ],
+        "63:20": [
+          true,
+          false
+        ]
+      }
+    },
+    {
+      "path": "examples/robots/pursuit/sight.rs",
+      "sha256": "9e98145252b0f784523aaa76222c6352faec02d60b584276af33b2130ec0f50f",
+      "changed_instrumented_lines": [
+        37,
+        38,
+        39
+      ],
+      "unhit_changed_lines": [],
+      "source_branches": {
+        "50:16": [
+          true,
+          true
+        ],
+        "61:27": [
+          true,
+          true
+        ],
+        "78:8": [
+          true,
+          true
+        ],
+        "79:12": [
+          true,
+          true
+        ],
+        "80:12": [
+          true,
+          true
+        ],
+        "81:12": [
+          true,
+          true
+        ],
+        "95:13": [
+          true,
+          true
+        ],
+        "96:20": [
+          true,
+          true
+        ],
+        "97:20": [
+          true,
+          true
+        ],
+        "98:20": [
+          true,
+          true
+        ]
+      }
+    },
+    {
+      "path": "examples/robots/pursuit_sight.rs",
+      "sha256": "0988f8c3c3dadddd807caf6bb489be6384dab18ca34206d5172c2dcbdfc91185",
+      "changed_instrumented_lines": [
+        33,
+        34
+      ],
+      "unhit_changed_lines": [],
+      "source_branches": {}
+    }
+  ],
+  "gaps": [
+    "Native window startup at examples/robots/pursuit.rs:235 is not exercised by LLVM tests. The optimized browser viewer is verified separately.",
+    "The existing invalid-solver-pose guard at examples/robots/pursuit.rs:170 remains unhit. Public DroneObservation construction is unavailable; rejection is tested at the target boundary.",
+    "The movement regression reaches visibility on its first route. Its fallback routes and final failure path remain unhit; they are test code, not production branches.",
+    "Actual mobile touch input remains unverified."
+  ]
+}

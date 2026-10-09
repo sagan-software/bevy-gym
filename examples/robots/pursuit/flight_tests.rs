@@ -62,6 +62,7 @@ fn rotor_hits_disable_motor_forces_and_a_crash_ends_combat_once() {
         }
     }
     assert!(!game.combat.target().health().is_alive());
+    assert_eq!(game.sight.contact(), sight::Contact::Unknown);
     let terminal = game.flight.observation();
     assert_eq!(game.combat.target().position(), terminal.position());
     let mut deaths = 0;

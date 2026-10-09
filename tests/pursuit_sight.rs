@@ -26,6 +26,7 @@ fn window_sighting_does_not_follow_hidden_movement_and_expires() {
     let mut sight = Sight::default();
     let seen = sight.sample(&arena, eye, Dir3::NEG_Z, character, Duration::ZERO);
     assert_eq!(seen, Contact::Visible(character + Vec3::Y * 0.6));
+    assert_eq!(sight.contact(), seen);
     let mut other = sight.clone();
     let hidden = Vec3::new(-7.0, 1.1, -2.0);
     let moved = Vec3::new(-7.5, 1.1, -2.0);

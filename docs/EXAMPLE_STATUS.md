@@ -7,7 +7,36 @@ Updated: 2026-10-09. Goal status: active.
 Read [the roadmap](EXAMPLE_ROADMAP.md), [quality audit](QUALITY_AUDIT.md),
 [reference research](EXAMPLE_RESEARCH.md), and [drone contract](ROBOT_ENVIRONMENT.md).
 
-The current checkpoint adds a tested geometric sight model and the
+The current checkpoint connects sight to the playable drone's body-mounted camera.
+Every 20-millisecond action samples after flight and character movement. The HUD
+shows visible, last seen, none, or offline; a small lens mesh follows the same
+camera pose. Death, controller failure, and reset discard remembered sightings.
+The existing healthy hover policy remains unchanged; pursuit is unfinished.
+
+All 39 pursuit-viewer tests, 50 hover-viewer tests, nine native sensor cases, and
+seven Chrome/WASM sensor cases pass. Root tests, strict native/WASM Clippy, and
+changed-line personal Rust gates pass. [Coverage](progress/pursuit-perception-coverage.json)
+records native startup, the existing invalid-solver-pose guard, and test-only
+fallback paths that were not exercised. The full personal Rust backlog remains.
+
+The release build passed under `bevy-gym-pursuit-perception-build-20261009`.
+Its runtime is `build-271cf1f5da77a865c346725b3ec92aed28605aadf60d9087f5a50db2ae29bd03`.
+The preview is `http://100.105.254.50:8781/robots/pursuit/?build=perception`, served
+by `bevy-gym-pursuit-server-20261009`. [The recording](progress/pursuit-perception.mp4)
+shows sight, remembered information, and expiry after the robot enters the house.
+Desktop and narrow views pass; narrow reset and keyboard pickup also pass.
+[The visual record](progress/pursuit-perception.json) retains source and media hashes.
+
+Logs use the `pursuit-perception-` validation-cache prefix. No recording is active.
+Native window execution, actual mobile touch input, and lens-colour readability
+in the wide browser view remain unverified. The browser has its existing WebGL
+feature warnings, with no new console errors or failed requests in this capture.
+
+Next, add finite sound events and telegraphed return fire, then train pursuit
+without passing hidden character coordinates into the actor. Search must choose
+where to look; current camera direction only follows physical body orientation.
+
+The sensor checkpoint `7f5fd6a` adds a tested geometric sight model and the
 `pursuit-sight` guide. The sensor checks exposed head, chest, and hip points
 through the arena geometry. Its 90-degree cone reaches 20 metres; last-seen
 memory expires at three seconds. Hidden movement cannot update the remembered
@@ -24,11 +53,8 @@ Nix lint still reports pre-existing unfiltered-source warnings at
 `flake.nix:119` and `flake.nix:199`; this checkpoint changes the browser test list.
 Logs use the `pursuit-sight-` validation-cache prefix.
 
-This checkpoint does not change the rendered game. Next, connect sight to the
-playable arena with an explicit camera orientation and visible detection feedback.
-Keep privileged character coordinates outside the future pursuit actor's input.
-Then add sound events, telegraphed return fire, and pursuit training. The sensor
-contract and remaining integration work are in [the game plan](DRONE_PURSUIT_GAME.md).
+Checkpoint `7f5fd6a` supplied the sensor and guide before viewer integration.
+The sensor contract and remaining work are in [the game plan](DRONE_PURSUIT_GAME.md).
 
 The live-flight checkpoint `73e1194` connects the playable arena to live flight. The bundled
 healthy hover policy drives `DroneHover` with arena obstacles. Rotor hits disable

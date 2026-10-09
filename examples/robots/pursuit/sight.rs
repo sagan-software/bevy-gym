@@ -33,6 +33,11 @@ pub(crate) struct Sight {
 }
 
 impl Sight {
+    /// Read the latest filtered observation without refreshing it from world state.
+    pub(crate) const fn contact(&self) -> Contact {
+        self.contact
+    }
+
     /// Query up to three body points, then age memory by elapsed simulation time.
     pub(crate) fn sample(
         &mut self,

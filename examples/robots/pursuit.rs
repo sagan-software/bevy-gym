@@ -32,6 +32,10 @@ mod aiming;
 mod effects;
 #[path = "pursuit/hud.rs"]
 mod hud;
+#[path = "pursuit/perception.rs"]
+mod perception;
+#[path = "pursuit/sight.rs"]
+mod sight;
 #[path = "pursuit/weapons.rs"]
 mod weapons;
 
@@ -42,12 +46,19 @@ use bevy::{asset::AssetMetaCheck, prelude::*};
 #[path = "pursuit/flight_tests.rs"]
 mod flight_tests;
 
+#[cfg(test)]
+#[path = "pursuit/perception_tests.rs"]
+mod perception_tests;
+
 #[path = "learning/encoding.rs"]
 mod encoding;
 #[path = "pursuit/flight.rs"]
 mod flight;
 #[path = "learning/model.rs"]
 mod model;
+
+/// Camera centre in body-local metres; its forward direction is local negative Z.
+const DRONE_EYE: Vec3 = Vec3::new(0.0, 0.0, -0.22);
 
 /// One character's simulation and measured motion for visual animation.
 #[derive(Resource)]
@@ -58,6 +69,8 @@ struct Game {
     combat: firing::Combat,
     /// Private flight physics and the bundled healthy hover controller.
     flight: flight::Flight,
+    /// Current sighting or bounded last-seen memory, without hidden target state.
+    sight: sight::Sight,
     /// Distance walked in metres since reset, used as animation phase.
     distance: f32,
     /// Last horizontal displacement, in metres per action.
@@ -80,6 +93,7 @@ impl Default for Game {
             arena,
             combat,
             flight,
+            sight: sight::Sight::default(),
             distance: 0.0,
             motion: Vec3::ZERO,
             heading: 0.0,
@@ -94,6 +108,7 @@ impl Game {
         self.arena.reset();
         self.combat = firing::Combat::default();
         self.flight.reset();
+        self.sight.forget();
         self.combat
             .project_flight(self.flight.observation())
             .expect("Reset flight pose is valid");
@@ -101,6 +116,31 @@ impl Game {
         self.motion = Vec3::ZERO;
         self.heading = 0.0;
         self.aim = None;
+    }
+
+    /// Derive the same body-mounted camera pose used by sensing and the lens mesh.
+    fn eye(&self) -> Isometry3d {
+        let target = self.combat.target();
+        Isometry3d::new(
+            target.position() + target.rotation() * DRONE_EYE,
+            target.rotation(),
+        )
+    }
+
+    /// Sample after motion; unavailable flight cannot retain a target observation.
+    fn sample_sight(&mut self) {
+        if !self.combat.target().health().is_alive() || self.flight.error().is_some() {
+            self.sight.forget();
+            return;
+        }
+        let eye = self.eye();
+        self.sight.sample(
+            &self.arena,
+            eye.translation.into(),
+            eye.rotation * Dir3::NEG_Z,
+            self.arena.position(),
+            std::time::Duration::from_millis(20),
+        );
     }
 
     /// Armed characters face their aim while retaining independent movement.
@@ -118,6 +158,9 @@ impl Game {
     /// Interactions use the current arena position rather than a caller-supplied origin.
     fn act(&mut self, action: firing::Action) {
         self.combat.act(&self.arena, action);
+        if !self.combat.target().health().is_alive() {
+            self.sight.forget();
+        }
     }
 
     /// Animate measured displacement, so holding a blocked direction does not walk in place.
@@ -138,6 +181,7 @@ impl Game {
         if distance > 0.001 {
             self.heading = (-self.motion.x).atan2(-self.motion.z);
         }
+        self.sample_sight();
     }
 }
 
@@ -188,7 +232,7 @@ fn main() {
             )
                 .chain(),
         )
-        .add_plugins(effects::install)
+        .add_plugins((effects::install, perception::install))
         .run();
 }
 
@@ -242,6 +286,7 @@ mod tests {
         app.insert_resource(gizmos)
             .init_resource::<bevy::gizmos::gizmos::GizmoStorage<DefaultGizmoConfigGroup, ()>>();
         effects::install(&mut app);
+        perception::install(&mut app);
         app.update();
         app
     }

@@ -30,7 +30,8 @@ fn main() {
 
     // The character moves behind the wall. Only the previous sighting survives.
     let hidden = Vec3::new(-7.0, 1.1, -2.0);
-    let remembered = sight.sample(&arena, eye, Dir3::NEG_Z, hidden, Duration::from_secs(1));
+    sight.sample(&arena, eye, Dir3::NEG_Z, hidden, Duration::from_secs(1));
+    let remembered = sight.contact();
     assert!(matches!(remembered, Contact::Remembered { .. }));
     println!("Behind the wall: {remembered:?}");
 

@@ -1,0 +1,60 @@
+{
+  "baseline_commit": "7f5fd6a982c982271e2270c476132fdc1da4d5fa",
+  "runtime": "build-271cf1f5da77a865c346725b3ec92aed28605aadf60d9087f5a50db2ae29bd03",
+  "recorded_utc": "2026-10-09T08:22:19.692702+00:00",
+  "viewport_css_pixels": {
+    "desktop": [
+      1280,
+      800
+    ],
+    "narrow": [
+      390,
+      844
+    ]
+  },
+  "observed": [
+    "The robot enters the body-mounted camera view and the HUD reports visible",
+    "Walking into the house changes the HUD to last seen, then none",
+    "Narrow reset restores the drone, ground pistol, and no sighting",
+    "The armed message wraps within the narrow canvas and all controls remain visible"
+  ],
+  "recording": {
+    "started_utc": "2026-10-09T08:19:58.325Z",
+    "duration_seconds": 8.996667,
+    "note": "Original browser recording copied without retiming. Standard keyboard events move the character; no simulation state is edited."
+  },
+  "validation": {
+    "pursuit_viewer_native": 39,
+    "hover_viewer_native": 50,
+    "sight_native_including_arena": 9,
+    "sight_wasm": 7,
+    "new_browser_console_errors": 0,
+    "new_failed_network_requests": 0
+  },
+  "limitations": [
+    "The healthy hover controller does not pursue or choose where to look",
+    "The body-mounted camera direction follows physical yaw; search control is unfinished",
+    "Sight uses geometric body proxies, not rendered pixels",
+    "Lens material states are tested natively; the small lens is not legible in these wide browser captures",
+    "Native window execution and actual mobile touch input remain unverified",
+    "Existing WebGL feature warnings and the full-project personal Rust lint backlog remain"
+  ],
+  "sources": {
+    "examples/robots/pursuit.rs": "ae827c8a343aa30a0ae8f504757be8a4b1f34094a82d1f074469122119894272",
+    "examples/robots/pursuit/flight_tests.rs": "6ff1d6d21a9951e6f9f1efd7aa85749c55572f87dbbe1b65bd89ad383ec44cc0",
+    "examples/robots/pursuit/hud.rs": "71d9b10d9011bc30c6dae12db7b2710eeb0e239c51c83bab836ce4b1a533dade",
+    "examples/robots/pursuit/perception.rs": "69caf393b4ce44e45e6c12ccff11180a17e49e9da0de1cdc2fbb61c3322e1c46",
+    "examples/robots/pursuit/perception_tests.rs": "0a1c0cff07c39d9cbacc340deab47b8575ae5493dfa54db616ba4ab4f30ec787",
+    "examples/robots/pursuit/sight.rs": "9e98145252b0f784523aaa76222c6352faec02d60b584276af33b2130ec0f50f",
+    "examples/robots/pursuit_sight.rs": "0988f8c3c3dadddd807caf6bb489be6384dab18ca34206d5172c2dcbdfc91185",
+    "tests/pursuit_sight.rs": "b199cc69adda7ffd1a083d18c5e34e81be882f79b11a6aa9c216874cad1133db"
+  },
+  "media": {
+    "pursuit-perception.mp4": "9ba3337f6875529ac551f1e1683ad23950c3f2e06299f1757bca944aedd702fd",
+    "pursuit-perception-forgotten.png": "2f6b6c984852ff3fc4796eec4ab26dfe79f5457716fa16b58b873ed1133e7164",
+    "pursuit-perception-narrow.png": "8966c457d4649494744c1ce1a936b80630bd9653c3c53a4f6f16ef2ecfa7344f",
+    "pursuit-perception-remembered.png": "1b2ad67e02192159550e6cee4883bc113279a1621a7600541931f91166d962a6",
+    "pursuit-perception-reset.png": "f662415b73a87e713e3e594f98f720c5850953f26fe8c1a26491f958068ab7c5",
+    "pursuit-perception-visible.png": "907e33c531e4431564956f59840951d74c6129b34d039d53828ec875d6e9a08b"
+  }
+}
