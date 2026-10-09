@@ -1,6 +1,6 @@
 # Examples execution status
 
-Updated: 2026-10-09. Goal status: active.
+Updated: 2026-10-09. Current work: RL-only drone/droid curriculum.
 
 ## Resume here
 
@@ -12,8 +12,12 @@ point to that source. Follow [the skill curriculum](ROBOT_SKILL_CURRICULUM.md) f
 separate drone/droid lessons, prerequisite transfer, independent promotion, the
 curriculum walkthrough, and the final trainable 3v3 scene.
 
-The goal service rejected a new goal because the earlier broad goal is unfinished.
-Do not mark that earlier work complete. The new objective is recorded in the curriculum.
+The user superseded the earlier broad goal on 2026-10-09. Its unfinished audit and
+reference ports remain deferred history, not the current execution objective.
+Current objective: implement and qualify RL-only drone/droid skill scenes, curriculum
+training and progression, and spectator-first competitive 3v3 inference.
+The goal service still stores the earlier blocked goal and exposes no clear/cancel
+operation. A new service goal has not been created; do not claim otherwise.
 
 The existing RL damage trainer is running seed 11 with a 600-update limit per lesson.
 Unit: `bevy-gym-rl-curriculum-seed11-20261009.service`.

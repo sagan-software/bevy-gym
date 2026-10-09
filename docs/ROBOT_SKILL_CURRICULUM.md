@@ -1,9 +1,10 @@
 # Robot skill curriculum
 
 Status: implementation in progress; most lessons are not implemented or trained.
-Updated: 2026-10-09. This is the current priority under the unfinished examples goal.
-The goal service rejected creation of a replacement because that goal is unfinished.
-The requested objective is recorded here without falsely completing the earlier work.
+Updated: 2026-10-09. The user superseded the earlier broad examples goal.
+This curriculum is the current execution objective. The earlier unfinished audit
+and reference ports remain deferred. The goal service exposes no clear/cancel
+operation and still stores the earlier blocked goal; no replacement service goal exists.
 
 Deliver separate drone and droid skill examples, a curriculum walkthrough, and a
 final competitive three-versus-three environment. Every autonomous action must come
@@ -124,8 +125,8 @@ Do not use reward curves or selected footage alone as proof of a learned skill.
    jumping, and weapon handling. Use separate tested milestones for each skill.
 5. Implement and qualify drone travel, clearance, perception, firing, and graded damage.
 6. Implement shared competitive training, grow team size, and qualify 3v3 inference.
-7. Inspect all scenes in the browser, publish evidence and checkpoints, and resume
-   the remaining examples roadmap. Do not mark the broad goal complete early.
+7. Inspect all scenes in the browser, publish evidence and checkpoints, and report
+   the curriculum results. Keep the deferred examples roadmap separate.
 
 Each milestone requires focused failing tests before changed behaviour, native and
 WASM checks, strict/personal lint, measured coverage with exact gaps, documentation,
