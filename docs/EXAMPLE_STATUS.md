@@ -50,7 +50,21 @@ Its exact source is archived as `runs/quality-research/drone-sequence-full-sourc
 The temporary test runner was removed after archiving; the active executable
 continues independently. No production source changed in this research checkpoint.
 
-Next, inspect the complete-episode results and archive the terminal log.
+The [heading diagnostic](DRONE_SEARCH.md#heading-target-diagnostic) measured a
+scalar yaw-label discontinuity in all ten teacher trials. A five-component
+vector-heading teacher passes all ten native trials. Its 600-update learner run
+finished successfully but produced no qualified checkpoint. The
+[diagnostic archive](progress/drone-heading-diagnostic.json) retains exact sources,
+measured counterexamples, calibration, evaluations, logs, and two reproduced traces.
+
+The selected diagnostic model is `docs/progress/drone-vector-300.mpk`.
+Temporary tests were archived and removed. In the seed-42 house trace, the drone
+never reaches the teacher's 0.25-metre waypoint radius; its nearest sample is
+0.389 metres away. Check safe arrival regions before repeating distillation.
+Neither new candidate is qualified for gameplay.
+
+Next, inspect the existing complete-episode training unit and archive its terminal
+results. Then calibrate teacher waypoint transitions against physical clearance.
 If a candidate passes both permanent-cover routes, qualify earlier moving-target
 profiles, fresh seeds, and browser execution before gameplay integration.
 Preserve the motor pilot's zero-memory contract. The full roadmap remains active.

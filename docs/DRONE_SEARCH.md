@@ -160,3 +160,37 @@ route-choice observations. It retains the same model initialization and settings
 but removing random chunk-start draws also changes later episode selections.
 This comparison can test the combined recipe; it cannot isolate chunk length alone.
 The follow-up remains active in the status document until its terminal result is recorded.
+
+## Heading-target diagnostic
+
+The [heading diagnostic](progress/drone-heading-diagnostic.json) found a target
+discontinuity in all ten teacher trials. At the first two decisions, the scalar
+yaw label changes from -1.0 to about +0.995574. The requested physical heading
+barely changes. In house seed 0, decoding both targets into world headings gives
+a difference below 0.00001 degrees. Averaging scalar labels near these opposite
+ends would request approximately zero rotation, which faces the wrong direction.
+
+![Measured scalar labels and decoded headings](progress/drone-heading-labels.png)
+
+A research variant emits five action components: body displacement X, Y, Z,
+then world heading X, Z. Displacement still scales by three metres and uses the
+existing goal bounds. The heading pair becomes a unit direction. A zero pair
+retains the drone's current horizontal heading. The teacher survives all ten
+trials and retains sight in every final 100-sample window with this representation.
+
+The finite learner trial starts a fresh five-output actor with seed 43 and the
+same chunk recipe, for 600 updates. It cannot reuse the four-output checkpoint.
+Initialization, action dimension, loss weighting, and update budget also change;
+this trial cannot isolate heading encoding as the cause of a measured improvement.
+No production API, checkpoint format, or gameplay controller changes.
+
+The run completed all 600 updates without a qualified checkpoint.
+At update 300, all ten cases survived. House trials retained sight in only
+91–100 of 506 held samples; pipe trials retained sight in 451–456 of 522.
+The saved model and two seed-42 traces remain diagnostic artifacts.
+
+The house trace never enters the teacher's 0.25-metre arrival radius around
+`(-1, 2, 1.5)` metres. Its closest sampled position is 0.389 metres away at
+6.1 seconds. Teacher arrival checks use these same decision boundaries.
+This motivates checking safe arrival regions before another distillation run.
+It does not establish the cause of every failure.
