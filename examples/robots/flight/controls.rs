@@ -308,8 +308,7 @@ fn status_label(session: &Session) -> String {
         Some(MotorPreset::Hover) => "Hover",
         Some(MotorPreset::Climb) => "Climb",
         Some(MotorPreset::Tilt) => "Tilt",
-        None if session.is_bundled() => "Bundled policy",
-        None => "Browser checkpoint",
+        None => session.policy_label().unwrap_or("Policy unavailable"),
     };
     let steps = session.steps();
     let height = session.observation().position().y;

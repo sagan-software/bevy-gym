@@ -36,7 +36,7 @@ if [[ "$viewer_profile" == "release" ]]; then
     -o "$viewer_dist/drone-flight_optimized.wasm"
   mv -- "$viewer_dist/drone-flight_optimized.wasm" "$viewer_dist/drone-flight_bg.wasm"
 fi
-cp -- robot-web/index.html robot-web/styles.css robot-web/start.js robot-web/training.mjs robot-web/training-panel.mjs "$viewer_dist/"
+cp -- robot-web/index.html robot-web/styles.css robot-web/start.js robot-web/training.mjs robot-web/training-panel.mjs robot-web/checkpoint-file.mjs robot-web/checkpoint-file-panel.mjs "$viewer_dist/"
 cp -- assets/fonts/MonaSans-VariableFont.ttf assets/fonts/OFL.txt "$viewer_dist/assets/fonts/"
 cp -- assets/robots/drone.glb assets/robots/README.md "$viewer_dist/assets/robots/"
 cp -- LICENSES/DRONE-CC-BY-3.0.txt "$viewer_dist/LICENSES/DRONE-CC-BY-3.0.txt"
@@ -46,7 +46,7 @@ scripts/build_drone_worker.sh "${viewer_flags[@]}"
 
 # Keep module imports and their WASM bindings in one immutable runtime directory.
 # Bevy resolves the unchanged model and font paths against the document root.
-runtime_files=(drone-flight.js drone-flight_bg.wasm drone-worker.js drone-worker_bg.wasm worker.js start.js training.mjs training-panel.mjs styles.css)
+runtime_files=(drone-flight.js drone-flight_bg.wasm drone-worker.js drone-worker_bg.wasm worker.js start.js training.mjs training-panel.mjs checkpoint-file.mjs checkpoint-file-panel.mjs styles.css)
 runtime_hash="$(cd -- "$viewer_dist" && sha256sum "${runtime_files[@]}" | sha256sum | cut -d ' ' -f 1)"
 runtime_directory="build-$runtime_hash"
 mkdir -p -- "$viewer_dist/$runtime_directory"

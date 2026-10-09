@@ -9,7 +9,10 @@ mod environment;
 mod lesson;
 pub(crate) use lesson::Lesson;
 
-pub(crate) use encoding::encode;
+/// Add actuator health while retaining the healthy recipe's motion features.
+pub(crate) fn encode(observation: bevy_gym::robots::DroneObservation) -> [f32; 16] {
+    encoding::with_motor_health(observation, crate::learning::encode(observation))
+}
 pub(crate) use environment::DamageTask;
 
 use bevy_gym::training::{RecurrentPpoAgent, RecurrentPpoError, RecurrentPpoPolicy, SeedConfig};

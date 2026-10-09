@@ -1,0 +1,50 @@
+{
+  "base_commit": "55510c501edf2032ae3cd33e947de79f417c63d3",
+  "build": "release compiled before wasm-opt; current file loader with unchanged prior training worker",
+  "viewer_wasm_sha256": "08ade7d1dcb9240d2ee26a2bdb1b9c508b1c8dc075dea23d0fd63bef32c7c2fe",
+  "viewport_desktop": [
+    1280,
+    800
+  ],
+  "viewport_narrow": [
+    390,
+    844
+  ],
+  "model": "hover-260.mpk: sixteen-input policy, intact hover qualified only",
+  "observations": [
+    "File load displayed Motor-failure checkpoint and began calm playback.",
+    "Recorded hover reached step 228 at height 1.72 m before the failure action.",
+    "After front-left failure, the episode ended at step 287 with the failed-motor marker visible.",
+    "Malformed bad.mpk produced a recoverable file error.",
+    "A later twelve-input recovery.mpk selection loaded successfully.",
+    "Narrow viewport had no horizontal overflow."
+  ],
+  "limits": [
+    "The OS picker was not tested; a File was assigned to the visible input before clicking Watch file.",
+    "Native window and touch interaction were not tested.",
+    "This recording is not damaged-flight qualification.",
+    "Final immutable optimized packaging is tracked separately in the status document."
+  ],
+  "files": [
+    {
+      "path": "docs/progress/drone-checkpoint-file.mp4",
+      "sha256": "2ea44cdf91f20ef62a3a0ed868a9153afa3b0c59510587cdd46383495948760f"
+    },
+    {
+      "path": "docs/progress/drone-checkpoint-file-hover.png",
+      "sha256": "9d1ac7ede30bf318f0ab18d7f318f11d09dddbbe37cb3cca106e4451b652c05a"
+    },
+    {
+      "path": "docs/progress/drone-checkpoint-file-crash.png",
+      "sha256": "10937f01e64edb9646fdc1065768cbef3a07bf9623659efec7589f97cbbbf61b"
+    },
+    {
+      "path": "docs/progress/drone-checkpoint-file-narrow.png",
+      "sha256": "ebd13ced1b09d74d5bc98dc687c25ad2d1264456db51568fa564613c1eea4352"
+    },
+    {
+      "path": "runs/drone-damage-curriculum-seed7/hover-260.mpk",
+      "sha256": "0bd3bea62bc23a2a38da70093610ecf9d21861b3a50abecd6ec0be17104b60b3"
+    }
+  ]
+}

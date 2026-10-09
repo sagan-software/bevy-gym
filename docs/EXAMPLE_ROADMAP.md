@@ -70,6 +70,11 @@ observed behavior, published methods, and project design choices.
 7. Publish the robot gallery and beginner integration guide. Re-audit the public
    API against the examples before proceeding to Gymnasium.
 
+The playable pursuit expansion is specified in [DRONE_PURSUIT_GAME.md](DRONE_PURSUIT_GAME.md).
+It adds rotor explosions and smoke, crash debris, a blockout arena, player or
+learned humanoid control, a lootable pistol, weak points, and telegraphed drone fire.
+Deliver these within P1 and retain the focused flight tutorials.
+
 Select one attractive Creative Commons four-thruster model after inspecting its
 geometry, materials, license, and browser cost. Record model node-to-actuator
 mapping. Reuse licensed humanoid animation where possible. Use original robot art

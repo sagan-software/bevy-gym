@@ -136,12 +136,52 @@ process first. It permits 600 updates per lesson and retains the optimizer acros
 intact hover, front-left failure, and scheduled failures. The frozen promotion
 thresholds are in `DRONE_DAMAGE.md`. No damaged-flight checkpoint is qualified.
 
-Next, inspect the active training run and its saved selection reports.
-Add explicit sixteen-input checkpoint inference to the viewer before recording
-this policy. Keep the existing healthy viewer mode and checkpoint available.
-Preserve the healthy model and its
-qualification. The damage contract records the current model's static thrust limit;
-do not assume recovery follows from the intact-flight force budget.
+The sixteen-input run passed intact hover at update 260. At front-left update 340,
+all five healthy cases crashed before the scheduled failure. This is evidence of
+lost intact-flight performance during fixed-failure training. No damaged-flight
+checkpoint has qualified. Keep its reports; assess healthy rehearsal before a new
+training recipe. Do not weaken the existing promotion gates.
+
+The viewer now loads local twelve-input recovery and sixteen-input motor-failure
+checkpoints. Native CLI validation happens before opening a window. Browser file
+validation preserves the existing policy on rejection and ignores stale reads.
+The recorded `progress/drone-checkpoint-file.mp4` shows hover-260 followed by a
+front-left failure and crash. It does not demonstrate damage adaptation.
+Screenshots record intact flight, the crash, and the narrow error state.
+
+The recording used the release-compiled viewer before WASM size optimization,
+with the unchanged prior training worker. Desktop and 390-pixel layouts were
+inspected. The OS file picker, native window, and touch input remain unverified;
+the browser test supplied a File to the visible input, then clicked Watch file.
+
+Gates: 43 native viewer tests, 16 damage-training tests, root tests, strict native
+and WASM Clippy, browser physics/training tests, and 25 JavaScript tests pass.
+The file-reader module has 100% measured Node line, branch, and function coverage.
+Rust coverage gaps are recorded in `progress/drone-checkpoint-file-coverage.json`.
+Personal Rust discovery has no changed-file diagnostics; the strict full-project
+backlog remains. The focused personal shell check passes.
+
+The Markdown check still reports existing paragraph-length and wording findings;
+all remaining flagged paragraphs match the previous revision. New prose has no findings.
+
+The final optimized bundle is building under
+`bevy-gym-checkpoint-file-build-20261009.service`; its log is
+`/home/sagan/.cache/bevy-gym-quality-validation/damage-viewer-release-unit.log`.
+Check completion before replacing the preview at port 8779. The first build and
+final rebuild are serialized because both package into `robot-web/dist-release`.
+The previous published revision `55510c5` passed CI run `37881380204`.
+Its Pages run `37881380232` was still pending at the last check.
+
+Next, verify the final optimized bundle, then implement rotor bursts, smoke, and
+crash debris from [DRONE_PURSUIT_GAME.md](DRONE_PURSUIT_GAME.md). The user's expanded
+scope includes a blockout arena, humanoid robot controlled by a policy or player,
+pistol looting, rotor weak points, telegraphed drone fire, cover, windows, pipes,
+and adversarial training. The plan and reference contact-sheet evidence are saved.
+
+Preserve the healthy checkpoint and its qualification. The damage contract records
+the current model's static thrust limit; do not assume damage recovery follows
+from the intact-flight force budget.
+
 Perception, damage adaptation, pursuit, detached parts, and the jumping quadruped
 remain pending. Do not start later port families before the custom robot milestones.
 

@@ -1,0 +1,446 @@
+{
+  "baseline_commit": "55510c501edf2032ae3cd33e947de79f417c63d3",
+  "tests": {
+    "viewer": 43,
+    "damage_training": 16
+  },
+  "method": "LLVM show of both test binaries; source coordinates unioned across module instances and canonical paths.",
+  "files": [
+    {
+      "path": "examples/robots/flight/session.rs",
+      "sha256": "159d9c64abb9691eb91c954de3d87f41144b2d186cc243fe04f93d3e446a39b8",
+      "changed_instrumented_lines": [
+        174,
+        175,
+        176,
+        177,
+        179,
+        199,
+        200,
+        201,
+        202,
+        203,
+        204,
+        222,
+        223,
+        224
+      ],
+      "unhit_changed_lines": [
+        204
+      ],
+      "source_branches": {
+        "165:9": [
+          true,
+          true
+        ],
+        "233:12": [
+          true,
+          true
+        ],
+        "243:12": [
+          true,
+          true
+        ],
+        "243:50": [
+          true,
+          true
+        ],
+        "250:12": [
+          true,
+          true
+        ],
+        "250:49": [
+          true,
+          true
+        ],
+        "260:16": [
+          true,
+          true
+        ],
+        "268:12": [
+          true,
+          true
+        ]
+      }
+    },
+    {
+      "path": "examples/robots/damage/training/encoding.rs",
+      "sha256": "26417ae86c40137100ffd540fb2802a08d202d800a7d2925f9b91e4117aa23cc",
+      "changed_instrumented_lines": [
+        6,
+        8
+      ],
+      "unhit_changed_lines": [],
+      "source_branches": {}
+    },
+    {
+      "path": "examples/robots/flight.rs",
+      "sha256": "fb1e6dddffb91bb0781122eab141ded62e8c24d616bf96f585f0377eab7f7de8",
+      "changed_instrumented_lines": [
+        38,
+        39,
+        40,
+        41,
+        50,
+        71
+      ],
+      "unhit_changed_lines": [
+        38,
+        39,
+        40,
+        41,
+        50,
+        71
+      ],
+      "source_branches": {}
+    },
+    {
+      "path": "examples/robots/flight/checkpoint.rs",
+      "sha256": "0e1ef35e9f19e1aadcd7b1a07b68800a096906ea55ad3bc6951fc89974a75333",
+      "changed_instrumented_lines": [
+        17,
+        26,
+        27,
+        28,
+        29,
+        30,
+        168,
+        169,
+        170,
+        171,
+        172,
+        173,
+        174,
+        175,
+        176,
+        177,
+        178,
+        179,
+        180,
+        181,
+        182,
+        183,
+        184,
+        185,
+        186,
+        187,
+        188,
+        189,
+        190,
+        191,
+        192,
+        193,
+        194,
+        195,
+        196,
+        197,
+        199,
+        200,
+        201,
+        202,
+        203,
+        204,
+        205,
+        206,
+        207,
+        208,
+        209,
+        210,
+        213,
+        214,
+        215,
+        216,
+        217,
+        218,
+        221
+      ],
+      "unhit_changed_lines": [],
+      "source_branches": {
+        "17:12": [
+          true,
+          true
+        ]
+      }
+    },
+    {
+      "path": "examples/robots/flight/controls.rs",
+      "sha256": "80239b0d038551ccea22a6e3d18638578158f3070e6cb62d284508b34858f385",
+      "changed_instrumented_lines": [
+        311
+      ],
+      "unhit_changed_lines": [],
+      "source_branches": {
+        "171:20": [
+          true,
+          true
+        ],
+        "208:12": [
+          true,
+          true
+        ],
+        "216:8": [
+          true,
+          true
+        ],
+        "235:13": [
+          true,
+          true
+        ],
+        "239:26": [
+          true,
+          true
+        ],
+        "295:12": [
+          true,
+          true
+        ],
+        "555:21": [
+          true,
+          false
+        ],
+        "555:47": [
+          true,
+          false
+        ],
+        "640:28": [
+          true,
+          true
+        ]
+      }
+    },
+    {
+      "path": "examples/robots/flight/options.rs",
+      "sha256": "d6042049cd9edcc7f141a8e989b862a2c7853d0168f6328dd5d9174d2630c96b",
+      "changed_instrumented_lines": [
+        27,
+        28,
+        29,
+        32,
+        33,
+        34,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80,
+        83,
+        84,
+        85,
+        86,
+        87,
+        88,
+        89,
+        90,
+        91,
+        92,
+        93,
+        94,
+        95,
+        96,
+        97,
+        98,
+        99,
+        100,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ],
+      "unhit_changed_lines": [
+        27,
+        28,
+        29
+      ],
+      "source_branches": {
+        "34:12": [
+          true,
+          true
+        ]
+      }
+    },
+    {
+      "path": "examples/robots/flight/pilot.rs",
+      "sha256": "347296b2f1afd3cc448d811832b5914517e012cd5023b4d298b041c55891cf87",
+      "changed_instrumented_lines": [
+        56,
+        57,
+        58,
+        59,
+        60,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        74,
+        75,
+        76,
+        77,
+        79,
+        80,
+        81,
+        82,
+        85,
+        86,
+        87,
+        88,
+        90,
+        93,
+        94,
+        95,
+        96,
+        97,
+        98,
+        113,
+        114,
+        115,
+        116,
+        117,
+        118,
+        192,
+        193,
+        194,
+        195,
+        196,
+        197,
+        198,
+        199,
+        200,
+        201,
+        202,
+        203,
+        204,
+        205,
+        206,
+        207,
+        208,
+        209,
+        210,
+        211,
+        212,
+        213,
+        214,
+        215,
+        216,
+        217,
+        218,
+        219,
+        220,
+        221,
+        222,
+        223,
+        224,
+        227,
+        228,
+        230,
+        231,
+        232,
+        233,
+        234,
+        235,
+        238,
+        239,
+        240,
+        241,
+        242,
+        243,
+        244,
+        245,
+        246,
+        247,
+        249,
+        250,
+        251,
+        252,
+        253,
+        254,
+        255,
+        256,
+        257,
+        258,
+        259,
+        260,
+        261,
+        262,
+        263,
+        264,
+        272,
+        273,
+        274,
+        275,
+        276,
+        277,
+        278,
+        279,
+        280,
+        281,
+        282,
+        285
+      ],
+      "unhit_changed_lines": [],
+      "source_branches": {
+        "64:12": [
+          true,
+          true
+        ]
+      }
+    },
+    {
+      "path": "examples/robots/damage/training.rs",
+      "sha256": "ce340689ccb44cc0ac1c69e40e06b78f5d1db573eea77e5e0c7628db1d711f5c",
+      "changed_instrumented_lines": [
+        13,
+        14,
+        15
+      ],
+      "unhit_changed_lines": [],
+      "source_branches": {}
+    }
+  ],
+  "gaps": [
+    "Native window startup and its CLI process entry are not covered by instrumented tests. Native option parsing and file IO helpers are tested.",
+    "Bevy rendering, the browser exports, and DOM wiring are checked separately in the browser without Rust instrumentation.",
+    "The bundled-checkpoint decode failure is unreachable with the committed valid asset."
+  ]
+}

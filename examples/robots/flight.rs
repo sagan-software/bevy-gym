@@ -9,10 +9,15 @@
 mod checkpoint;
 #[path = "flight/controls.rs"]
 mod controls;
+#[path = "damage/training/encoding.rs"]
+mod damage_encoding;
 #[path = "learning/encoding.rs"]
 mod encoding;
 #[path = "learning/model.rs"]
 mod model;
+#[cfg(not(target_arch = "wasm32"))]
+#[path = "flight/options.rs"]
+mod options;
 #[path = "flight/pilot.rs"]
 mod pilot;
 #[path = "flight/scene.rs"]
@@ -26,10 +31,23 @@ use session::Session;
 
 /// Browser entry point for selecting validated checkpoint weights.
 #[cfg(all(target_arch = "wasm32", feature = "browser"))]
-pub use checkpoint::watch_checkpoint;
+pub use checkpoint::{watch_checkpoint, watch_motor_failure_file, watch_recovery_file};
 
-/// Open one seeded environment, paused so the reader can choose a command.
+/// Validate native arguments before opening the renderer.
+#[cfg(not(target_arch = "wasm32"))]
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    run(options::initial_session()?);
+    Ok(())
+}
+
+/// Open the browser scene paused so the reader can choose a command.
+#[cfg(target_arch = "wasm32")]
 fn main() {
+    run(Session::default());
+}
+
+/// Project one environment and its selected controller into the viewer.
+fn run(session: Session) {
     let mut app = App::new();
     app.add_plugins(
         DefaultPlugins
@@ -50,7 +68,7 @@ fn main() {
     )
     // One environment action advances 20 ms, regardless of the display rate.
     .insert_resource(Time::<Fixed>::from_seconds(0.02))
-    .init_resource::<Session>()
+    .insert_resource(session)
     .add_systems(Startup, (scene::setup, controls::setup))
     .add_systems(FixedUpdate, advance)
     .add_systems(

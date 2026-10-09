@@ -54,6 +54,20 @@
         <p id="checkpoint-hint">Pause training to watch or download its checkpoint.</p>
         <p id="checkpoint-score" hidden></p>
         <p id="checkpoint-status" role="status"></p>
+        <details class="checkpoint-import">
+          <summary>Load checkpoint file</summary>
+          <form id="checkpoint-file-form">
+            <label for="checkpoint-kind">Policy type</label>
+            <select id="checkpoint-kind">
+              <option value="recovery">Recovery</option>
+              <option value="damage">Motor failure</option>
+            </select>
+            <label for="checkpoint-file">Checkpoint (.mpk, up to 1 MiB)</label>
+            <input id="checkpoint-file" type="file" accept=".mpk" required>
+            <button id="watch-file" type="submit" disabled>Watch file</button>
+          </form>
+          <p id="file-status" role="status"></p>
+        </details>
       </section>
     </main>
     <footer>

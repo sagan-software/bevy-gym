@@ -245,3 +245,32 @@ Rust backlog remains.
 code and the runnable guide. Successful CLI promotion and final completion remain
 unmeasured until a trained policy passes the gates. The active training run is
 recorded in [the status document](EXAMPLE_STATUS.md).
+
+## Watch a saved policy
+
+The browser viewer accepts local `.mpk` files under Load checkpoint file.
+Choose Recovery for twelve-input recovery weights or Motor failure for
+sixteen-input weights from `drone-train-damage`.
+
+Select the file, then click
+Watch file. Playback resets the episode and its recurrent memory. Recovery
+starts disturbed; motor-failure policies start calm. Press `F` to disable the
+front-left motor. Press `R` to repair the drone and reset the episode.
+
+Native playback uses the same validation and observation recipes:
+
+```sh
+nix develop --command cargo run --features robots --example drone-flight -- \
+  --checkpoint runs/drone-damage-curriculum-seed7/hover-260.mpk \
+  --policy motor-failure
+```
+
+The file must exist. `--policy recovery` selects the twelve-input recipe and is
+the default when a checkpoint is supplied. Both loaders reject files over 1 MiB,
+malformed records, and mismatched architectures. Browser rejection preserves the
+current policy. A valid selection replaces any older pending selection.
+
+The selected recipe names its inputs, not its demonstrated ability. In particular,
+`hover-260.mpk` passed intact hover only. The front-left training run has not
+qualified damaged flight. The viewer does not label uploaded weights as trained
+or qualified because they load.

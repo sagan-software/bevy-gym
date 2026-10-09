@@ -1,0 +1,26 @@
+{
+  "source_url": "https://www.youtube.com/watch?v=DRlhpzc7ImA",
+  "start_seconds": 154,
+  "duration_seconds": 13,
+  "samples_per_second": 4,
+  "order": "left to right, then top to bottom; last four cells blank",
+  "observations": [
+    "A bright light appears on the airborne drone.",
+    "The player shoots toward the drone beside a red wall.",
+    "A bright burst and dark smoke appear near the wall; parts fall."
+  ],
+  "limits": [
+    "This sequence does not establish exact weapon wind-up time or hit counts.",
+    "It does not isolate rotor destruction from body destruction."
+  ],
+  "files": [
+    {
+      "path": "runs/quality-research/arc-documentary.mp4",
+      "sha256": "2c9f1f7abc50aabf5cef8eb90f3dd5944aa93be5a1f7942f9886652317f7bcbf"
+    },
+    {
+      "path": "runs/quality-research/arc-wasp-volley-destruction-contact.jpg",
+      "sha256": "accc40ad67222db59daa8c918eeeaad6e0391797d6f5314397d87ecccb5c9c7f"
+    }
+  ]
+}

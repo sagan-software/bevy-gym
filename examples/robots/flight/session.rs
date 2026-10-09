@@ -4,7 +4,7 @@ use bevy::prelude::Resource;
 use bevy_gym::robots::{DroneAction, DroneHover, DroneMotor, DroneObservation};
 use bevy_gym::{Env, EpisodeStatus, Step, TimeLimit};
 
-use super::pilot::RecoveryPilot;
+use super::pilot::{CheckpointKind, RecoveryPilot};
 
 /// Whether fixed updates may request another action; completion comes from `Step`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -170,6 +170,14 @@ impl Session {
         self.steps
     }
 
+    /// Report a selected policy's source, or no policy during manual/error states.
+    pub(super) fn policy_label(&self) -> Option<&'static str> {
+        match &self.controller {
+            Controller::Learned(pilot) => Some(pilot.label()),
+            Controller::Manual(_) | Controller::Failed(_) => None,
+        }
+    }
+
     /// Read the initial-condition choice without exposing mutable physics state.
     pub(super) const fn start_profile(&self) -> StartProfile {
         self.start_profile
@@ -188,13 +196,17 @@ impl Session {
 
     /// Start a paused episode using the checkpoint qualified by the training lesson.
     pub(super) fn select_learned(&mut self) {
-        self.select_policy(include_bytes!("../../../assets/robots/recovery.mpk").to_vec());
-        if let Controller::Learned(pilot) = &mut self.controller {
-            pilot.mark_bundled();
+        match RecoveryPilot::bundled() {
+            Ok(pilot) => {
+                self.controller = Controller::Learned(Box::new(pilot));
+                self.reset();
+            }
+            Err(error) => self.fail(error.to_string()),
         }
     }
 
     /// Reject a malformed checkpoint before it can supply any motor command.
+    #[cfg(test)]
     pub(super) fn select_policy(&mut self, bytes: Vec<u8>) {
         match RecoveryPilot::load(bytes) {
             Ok(pilot) => {
@@ -205,10 +217,12 @@ impl Session {
         }
     }
 
-    /// Watch validated browser weights from the disturbed seed-42 start.
-    #[cfg(any(test, all(target_arch = "wasm32", feature = "browser")))]
+    /// Watch validated weights from the seed-42 start matching their observation recipe.
     pub(super) fn watch_policy(&mut self, pilot: RecoveryPilot) {
-        self.start_profile = StartProfile::Disturbed;
+        self.start_profile = match pilot.kind() {
+            CheckpointKind::Recovery => StartProfile::Disturbed,
+            CheckpointKind::MotorFailure => StartProfile::Calm,
+        };
         self.controller = Controller::Learned(Box::new(pilot));
         self.reset();
         self.playback = Playback::Running;
