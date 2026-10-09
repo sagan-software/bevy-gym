@@ -5,12 +5,16 @@
 
 #[path = "pursuit/arena.rs"]
 mod arena;
+#[path = "pursuit/audio.rs"]
+mod audio;
 #[path = "pursuit/controls.rs"]
 mod controls;
 #[path = "destruction_debris.rs"]
 mod debris;
 #[path = "destruction_particles.rs"]
 mod particles;
+#[path = "pursuit/return_fire.rs"]
+mod return_fire;
 #[path = "pursuit/robot.rs"]
 mod robot;
 #[path = "pursuit/scene.rs"]
@@ -18,6 +22,8 @@ mod scene;
 
 #[path = "pursuit/combat.rs"]
 mod combat;
+#[path = "pursuit/enemy.rs"]
+mod enemy;
 #[path = "pursuit/firing.rs"]
 mod firing;
 #[path = "pursuit/shot.rs"]
@@ -28,6 +34,10 @@ mod drone_model;
 
 #[path = "pursuit/aiming.rs"]
 mod aiming;
+#[cfg(test)]
+#[path = "pursuit/return_fire_tests.rs"]
+mod return_fire_tests;
+
 #[path = "pursuit/effects.rs"]
 mod effects;
 #[path = "pursuit/hearing.rs"]
@@ -77,6 +87,14 @@ struct Game {
     flight: flight::Flight,
     /// Current sighting or bounded last-seen memory, without hidden target state.
     sight: sight::Sight,
+    /// Bounded sound events cannot affect aiming, damage, or observations.
+    sound: audio::Events,
+    /// Drone weapon timing uses only the current filtered sighting.
+    gun: enemy::gun::Gun,
+    /// At most three moving rounds, independent of the drone's later survival.
+    projectiles: enemy::projectile::Projectiles,
+    /// Authoritative humanoid life; death blocks player and future policy actions.
+    robot_health: enemy::robot_health::RobotHealth,
     /// Last audible event; hidden source coordinates are never retained.
     hearing: hearing::Hearing,
     /// Distance walked in metres since reset, used as animation phase.
@@ -105,6 +123,10 @@ impl Default for Game {
             flight,
             sight: sight::Sight::default(),
             hearing: hearing::Hearing::default(),
+            sound: audio::Events::default(),
+            gun: enemy::gun::Gun::default(),
+            projectiles: enemy::projectile::Projectiles::default(),
+            robot_health: enemy::robot_health::RobotHealth::default(),
             distance: 0.0,
             footstep_distance: 0.0,
             motion: Vec3::ZERO,
@@ -122,6 +144,10 @@ impl Game {
         self.flight.reset();
         self.sight.forget();
         self.hearing.forget();
+        self.sound.reset();
+        self.gun = enemy::gun::Gun::default();
+        self.projectiles = enemy::projectile::Projectiles::default();
+        self.robot_health = enemy::robot_health::RobotHealth::default();
         self.combat
             .project_flight(self.flight.observation())
             .expect("Reset flight pose is valid");
@@ -143,7 +169,10 @@ impl Game {
 
     /// Sample after motion; unavailable flight cannot retain a target observation.
     fn sample_sight(&mut self) {
-        if !self.combat.target().health().is_alive() || self.flight.error().is_some() {
+        if !self.combat.target().health().is_alive()
+            || self.flight.error().is_some()
+            || !self.robot_health.is_alive()
+        {
             self.sight.forget();
             self.hearing.forget();
             return;
@@ -158,9 +187,18 @@ impl Game {
         );
     }
 
+    /// Original under-body weapon position, derived from the authoritative flight pose.
+    fn muzzle(&self) -> Vec3 {
+        let target = self.combat.target();
+        target.position() + target.rotation() * Vec3::new(0.0, -0.14, -0.22)
+    }
+
     /// Submit an actual event only while the listener can sense.
     fn hear(&mut self, source: Vec3, noise: hearing::Noise) {
-        if self.combat.target().health().is_alive() && self.flight.error().is_none() {
+        if self.combat.target().health().is_alive()
+            && self.flight.error().is_none()
+            && self.robot_health.is_alive()
+        {
             self.hearing
                 .hear(&self.arena, self.combat.target().position(), source, noise);
         }
@@ -180,9 +218,13 @@ impl Game {
 
     /// Interactions use the current arena position rather than a caller-supplied origin.
     fn act(&mut self, action: firing::Action) {
+        if !self.robot_health.is_alive() {
+            return;
+        }
         let previous_rounds = self.combat.rounds();
         self.combat.act(&self.arena, action);
         if !self.combat.target().health().is_alive() {
+            self.gun.disable();
             self.sight.forget();
             self.hearing.forget();
         } else if self.combat.rounds() < previous_rounds {
@@ -206,6 +248,11 @@ impl Game {
             }
         }
         let previous = self.arena.position();
+        let movement = if self.robot_health.is_alive() {
+            movement
+        } else {
+            Movement::Idle
+        };
         self.arena.step(movement);
         self.motion = (self.arena.position() - previous) * Vec3::new(1.0, 0.0, 1.0);
         let distance = self.motion.length();
@@ -213,7 +260,26 @@ impl Game {
         if distance > 0.001 {
             self.heading = (-self.motion.x).atan2(-self.motion.z);
         }
+        self.projectiles
+            .advance(&self.arena, &mut self.robot_health);
         self.sample_sight();
+        if self.robot_health.is_alive()
+            && self.combat.target().health().is_alive()
+            && self.flight.error().is_none()
+        {
+            if let Some(projectile) =
+                self.gun
+                    .advance(&self.arena, self.muzzle(), self.sight.contact())
+            {
+                // A volley expires before another can finish its full warning and cooldown.
+                self.sound.shot(projectile.position());
+                self.projectiles
+                    .launch(projectile)
+                    .expect("Weapon cadence bounds live projectiles to three");
+            }
+        } else {
+            self.gun.disable();
+        }
         // Only measured grounded travel crosses a walking stride. A blocked input is silent.
         if self.arena.is_grounded() {
             self.footstep_distance += distance;
@@ -277,7 +343,12 @@ fn main() {
             )
                 .chain(),
         )
-        .add_plugins((effects::install, perception::install))
+        .add_plugins((
+            effects::install,
+            perception::install,
+            return_fire::install,
+            audio::install,
+        ))
         .run();
 }
 
@@ -332,6 +403,7 @@ mod tests {
             .init_resource::<bevy::gizmos::gizmos::GizmoStorage<DefaultGizmoConfigGroup, ()>>();
         effects::install(&mut app);
         perception::install(&mut app);
+        return_fire::install(&mut app);
         app.update();
         app
     }

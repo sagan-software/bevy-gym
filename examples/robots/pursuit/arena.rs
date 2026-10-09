@@ -131,6 +131,23 @@ impl Arena {
         self.grounded = false;
     }
 
+    /// Intersect the same movement capsule with a normalized finite segment.
+    pub(super) fn character_hit(&self, from: Vec3, to: Vec3) -> Option<f32> {
+        let offset = to - from;
+        let distance = offset.length();
+        if !from.is_finite() || !to.is_finite() || !distance.is_finite() || distance <= f32::EPSILON
+        {
+            return None;
+        }
+        let ray = Ray::new(
+            Vector::from_array(from.to_array()),
+            Vector::from_array((offset / distance).to_array()),
+        );
+        let pose = Pose::from_translation(Vector::from_array(self.position.to_array()));
+        // Parry 0.31.1: solid=true reports zero when a segment starts inside the capsule.
+        self.shape.cast_ray(&pose, &ray, distance, true)
+    }
+
     /// Return the first obstruction distance in metres; invalid coordinates return zero.
     pub(super) fn obstruction(&self, from: Vec3, to: Vec3) -> Option<f32> {
         let direction = to - from;

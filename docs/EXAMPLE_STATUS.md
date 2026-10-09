@@ -7,45 +7,64 @@ Updated: 2026-10-09. Goal status: active.
 Read [the roadmap](EXAMPLE_ROADMAP.md), [quality audit](QUALITY_AUDIT.md),
 [reference research](EXAMPLE_RESEARCH.md), and [drone contract](ROBOT_ENVIRONMENT.md).
 
-The current checkpoint adds event-driven hearing to the playable arena. Measured
-grounded strides and accepted pistol rounds produce coarse direction cues; blocked
-movement, falling, and rejected shots stay silent. Obstructions halve range.
-Cues expire at two seconds. Death, controller failure, and reset clear both senses.
-The healthy hover policy remains unchanged; pursuit and return fire are unfinished.
+The current checkpoint adds telegraphed drone return fire. A full 800 ms warning
+precedes three moving rounds, spaced 120 ms apart. Solid cover intercepts shots;
+window and pipe openings permit them. Three impacts disable the robot. Reset
+restores health and removes shots, sound events, and playing sounds. The weapon
+uses current sight only.
 
-All 45 pursuit-viewer tests, 50 hover-viewer tests, eight native hearing cases,
-and six Chrome/WASM hearing cases pass. Root tests, strict native/WASM Clippy,
+The healthy hover policy remains unchanged.
+
+All 57 pursuit-viewer tests, 50 hover-viewer tests, eleven native weapon cases,
+and eight Chrome/WASM weapon cases pass. Root tests, strict native/WASM Clippy,
 the exact native robot CI command, and changed-line personal Rust gates pass.
-[Coverage](progress/pursuit-hearing-coverage.json) includes the runnable guide and
-hits every changed instrumented line and both outcomes of every added production
-branch. Native startup and the existing invalid-solver-pose branch remain unhit.
+[Coverage](progress/pursuit-return-fire-coverage.json) includes the runnable guide
+and both outcomes of every added production branch. Native startup lines 346–351
+and the existing invalid-solver-pose branch at line 244 remain unhit.
 The full personal Rust backlog and existing Nix source-root warnings remain.
+The Nix warning locations are now `flake.nix:119` and `flake.nix:200`.
 
-The release build passed under `bevy-gym-pursuit-hearing-build-20261009`.
-Its runtime is `build-3f7307468de4f859554b14ab010d1cbda6c222bc74f21fac49774446be91e9f8`.
-The preview is `http://100.105.254.50:8781/robots/pursuit/?build=hearing`, served
-by `bevy-gym-pursuit-server-20261009`. [The recording](progress/pursuit-hearing.mp4)
-shows gunshot and footstep cues expiring independently of sight. Desktop and
-390-pixel views pass; the narrow hearing and combat labels fit with all controls.
-[The visual record](progress/pursuit-hearing.json) retains source and media hashes.
+The original WAV assets pass decoding and reproducibility tests. The browser audio
+activation helper has 100% line, branch, and function coverage. All 29 Node tests
+pass. Python and shell lint pass. A diagnostic Web Audio probe measured nonzero
+output during warning and firing. Actual speakers and volume remain unverified.
 
-Logs use the `pursuit-hearing-` validation-cache prefix. No recording is active.
-Native window execution, actual mobile touch input, and audible sound playback
-remain unverified or unfinished. The browser has its existing WebGL feature
-warnings, with no new console errors or failed requests in this capture.
-The first final-validation script used the nonexistent `webgl2` feature; the
-corrected `bevy/webgl2` command passed in `pursuit-hearing-wasm-clippy.log`.
+The release build passed under `bevy-gym-pursuit-return-fire-audio-build-20261009`.
+Its runtime is `build-e648e66df4ffc55ddee3fbe33bec19bdcb7a737dfec6d4ead38fed828a480149`.
+The [recording](progress/pursuit-return-fire.mp4) shows warning, robot death,
+and reset. Desktop and 390-pixel views fit. The
+[visual record](progress/pursuit-return-fire.json) retains source hashes,
+media hashes, audio measurements, and the diagnostic probe source.
 
-Next, add telegraphed return fire, then train pursuit without passing hidden
-character coordinates into the actor. Search must choose where to look; current
-camera direction only follows physical body orientation. Hearing retains no exact
-source position. Its range, obstruction, and lifetime rules are local game choices.
+The audio startup regression reproduced captured-constructor import ordering.
+The entry module now installs activation before dynamically importing the WASM
+bindings. Normal initialization and import failure have direct tests and V8
+coverage. A real suspended context resumes on keyboard input; weapon output is
+nonzero and reset returns it to silence. The MP4 contains video only.
 
-The preceding sight-integration checkpoint is `d096947`; its CI passed at
-[run 37904786027](https://github.com/sagan-software/bevy-gym/actions/runs/37904786027).
-Its Pages build was still running during this checkpoint. The obstacle checkpoint's
-Pages build, [run 37898629829](https://github.com/sagan-software/bevy-gym/actions/runs/37898629829),
+Logs use the `pursuit-return-fire-` validation-cache prefix. The `ui-gates`,
+`ui-ci-native`, `ui-browser`, and `ui-personal` logs cover final Rust sources.
+`final-node` covers all 29 JavaScript cases. The release log also contains an
+earlier, fixed `if-let` warning; the final release and strict gates pass.
+
+The worktree is `bevy-gym-quality`; preserve the original dirty checkout.
+No recording is active. This checkpoint's remote CI and Pages results must be
+checked after push; local browser evidence does not establish remote deployment.
+
+The preceding hearing checkpoint is `5c91099`; its CI passed at
+[run 37909451819](https://github.com/sagan-software/bevy-gym/actions/runs/37909451819).
+Its Pages build was still running during this checkpoint. The sight checkpoint's
+Pages build, [run 37904786112](https://github.com/sagan-software/bevy-gym/actions/runs/37904786112),
 passed. Local browser evidence and remote deployment status remain separate gates.
+
+Next, train pursuit without passing hidden character coordinates into the actor.
+Search must choose where to look; current camera direction follows physical body
+orientation. Hearing retains no exact source position. Qualify approach and
+reacquisition before training armed opponents or claiming learned combat.
+
+The fixed follow camera can lose a nearby drone below the view; improve enemy
+tracking alongside pursuit. Native window execution and actual mobile touch
+input remain unverified. The larger roadmap and required port order remain active.
 
 The sensor checkpoint `7f5fd6a` adds a tested geometric sight model and the
 `pursuit-sight` guide. The sensor checks exposed head, chest, and hip points

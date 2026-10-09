@@ -184,3 +184,28 @@ fn character_enters_door_and_pipe_but_cannot_walk_through_window_sill() {
 fn blocked(arena: &Arena, from: Vec3, to: Vec3) -> bool {
     arena.obstruction(from, to).is_some()
 }
+
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn movement_capsule_intercepts_a_complete_projectile_segment() {
+    let arena = Arena::default();
+    let centre = arena.position();
+    let from = centre - Vec3::Z * 2.0;
+    let distance = arena
+        .character_hit(from, centre + Vec3::Z * 2.0)
+        .expect("Capsule impact");
+    assert!((distance - 1.7).abs() < 0.0001);
+    assert!(arena
+        .character_hit(from + Vec3::X, centre + Vec3::X)
+        .is_none());
+    assert!(arena.character_hit(from, centre - Vec3::Z).is_none());
+    assert_eq!(arena.character_hit(centre, centre + Vec3::Z), Some(0.0));
+    assert!(arena.character_hit(from, from).is_none());
+    assert!(arena.character_hit(Vec3::splat(f32::NAN), centre).is_none());
+    assert!(arena
+        .character_hit(from, Vec3::splat(f32::INFINITY))
+        .is_none());
+    assert!(arena
+        .character_hit(Vec3::splat(f32::MAX), -Vec3::splat(f32::MAX))
+        .is_none());
+}

@@ -41,6 +41,20 @@ pub(super) fn setup(mut commands: Commands<'_, '_>, assets: Res<'_, AssetServer>
         })
         .with_children(|root| {
             root.spawn((
+                super::return_fire::Status,
+                Text::new("Robot 3/3 · Drone idle"),
+                TextFont {
+                    font: font.clone(),
+                    font_size: 16.0,
+                    ..default()
+                },
+                Node {
+                    padding: UiRect::all(px(8)),
+                    ..default()
+                },
+                BackgroundColor(Color::srgb(0.09, 0.11, 0.12)),
+            ));
+            root.spawn((
                 super::perception::Status,
                 Text::new("Drone sight: none"),
                 TextFont {

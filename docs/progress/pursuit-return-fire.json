@@ -1,0 +1,96 @@
+{
+  "baseline_commit": "5c91099fd69e3e797b7e7fb725b03cc952d817fe",
+  "runtime": "build-e648e66df4ffc55ddee3fbe33bec19bdcb7a737dfec6d4ead38fed828a480149",
+  "recorded_utc": "2026-10-09T10:27:08.262573+00:00",
+  "viewport_css_pixels": {
+    "desktop": [
+      1280,
+      800
+    ],
+    "narrow": [
+      390,
+      844
+    ]
+  },
+  "observed": [
+    "Current sight starts the warning before firing",
+    "Moving shots reduce robot health to disabled",
+    "Unavailable pickup and weapon controls disappear after death",
+    "Reset restores health and weapon controls",
+    "Narrow controls fit without horizontal overflow"
+  ],
+  "recording": {
+    "started_utc": "2026-10-09T10:25:11.001Z",
+    "duration_seconds": 5.8765,
+    "note": "Original browser recording copied without retiming. Video only; browser audio has separate signal measurements. Standard keyboard events control the character."
+  },
+  "audio": {
+    "method": "Diagnostic page installs a passive AnalyserNode before the unchanged application modules. It explicitly suspends the real output context. A trusted keyboard event resumes it through the application helper. No simulation state is edited.",
+    "probe_source": "// Diagnostic only: observe the actual game's Web Audio output without resuming it.\nwindow.pursuitAudioProbe = [];\nconst originalConnect = AudioNode.prototype.connect;\nAudioNode.prototype.connect = function (...args) {\n  const probe = window.pursuitAudioProbe.find(p => p.context === this.context);\n  if (probe && args[0] === this.context.destination && this !== probe.analyser) {\n    originalConnect.call(this, probe.analyser);\n    probe.connections += 1;\n  }\n  return Reflect.apply(originalConnect, this, args);\n};\nwindow.AudioContext = new Proxy(window.AudioContext, {\n  construct(target, args, constructor) {\n    const context = Reflect.construct(target, args, constructor);\n    const analyser = context.createAnalyser();\n    analyser.fftSize = 2048;\n    const probe = {context, analyser, samples: new Float32Array(2048), peak: 0,\n      nonzeroWindows: 0, connections: 0};\n    window.pursuitAudioProbe.push(probe);\n    return context;\n  },\n});\nsetInterval(() => {\n  for (const probe of window.pursuitAudioProbe) {\n    probe.analyser.getFloatTimeDomainData(probe.samples);\n    let peak = 0;\n    for (const sample of probe.samples) peak = Math.max(peak, Math.abs(sample));\n    probe.peak = Math.max(probe.peak, peak);\n    if (peak > 0) probe.nonzeroWindows += 1;\n  }\n}, 20);\n",
+    "suspended_before_key": true,
+    "during_weapon": [
+      {
+        "nonzeroWindows": 59,
+        "peak": 0.06901931762695312,
+        "sampleRate": 44100,
+        "state": "running"
+      }
+    ],
+    "after_reset": [
+      {
+        "peak": 0,
+        "state": "running"
+      }
+    ],
+    "reference": "https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode/getFloatTimeDomainData",
+    "hardware_speakers_verified": false
+  },
+  "validation": {
+    "pursuit_viewer_native": 57,
+    "hover_viewer_native": 50,
+    "return_fire_native_including_shared_units": 11,
+    "return_fire_wasm": 8,
+    "node_tests": 29,
+    "new_browser_console_errors": 0,
+    "new_failed_network_requests": 0
+  },
+  "limitations": [
+    "The qualified hover policy does not pursue or search for the robot",
+    "Weapon timing is a deterministic local game profile, not measured ARC parity",
+    "The follow camera can lose a nearby drone below the view",
+    "Robot hit reactions and trained humanoid combat remain pending",
+    "Native window execution, actual mobile touch input, and hardware speakers remain unverified",
+    "Existing WebGL warnings and the full-project personal Rust lint backlog remain"
+  ],
+  "sources": {
+    "examples/robots/pursuit.rs": "6b5dff5b7b3b8dc94955b6b59e7e5e10d43651740c4364ebe08b2bf2c8bf1ace",
+    "examples/robots/pursuit/arena.rs": "0e6523e56ba9c19e89fd855afd6286b154b54a65652209a0863729b3cd849862",
+    "examples/robots/pursuit/audio.rs": "a3946592432d3c824f7ad8ce26e109031f5f3b56199a661b073f3cb9a85ae108",
+    "examples/robots/pursuit/enemy.rs": "63e9d0e5d2d6b163818dd994b47ad148a0292e02ccc92bd1f6e35fd0d58deee7",
+    "examples/robots/pursuit/enemy/gun.rs": "61d9fbb49375eef48f3d33847d10cc3b2f3d9179c5b0a946b5a5eac4df912bef",
+    "examples/robots/pursuit/enemy/projectile.rs": "a386e1fdb297b3abbe3f008c96dbed3936a2171347d34bb089e4c692e46c6f14",
+    "examples/robots/pursuit/enemy/robot_health.rs": "fde059d77c0d3160a4f3ee944ee3784460179127729ab7b27845d2f97df39f00",
+    "examples/robots/pursuit/hud.rs": "2234bead6ef4a4f5e9cac3a506162241b132b69e5db3a5d08beb4cc8d8e0518c",
+    "examples/robots/pursuit/return_fire.rs": "f7d72b52d0122b3ccef6fd2f3328234929893bdf2bd1b859e6b330e0c7ddfa80",
+    "examples/robots/pursuit/return_fire_tests.rs": "b776f049b9905245a7f548e412f924e946bdb9b32737003119faaf6683d5292c",
+    "examples/robots/pursuit/scene.rs": "1eac0b84ed89aa196d62f7af1029075b54933142f272733cad6b6d3b73730e05",
+    "examples/robots/pursuit_return_fire.rs": "6c2b4788a096396b1508255bcd0299216502aa1bdad73449c22a04da6596545e",
+    "robot-web/pursuit/audio.js": "af923087f79956f7d32f43c2adf34ebd160d82bde597e4d4243d1798474df097",
+    "robot-web/pursuit/start.js": "87180d9dab7b4d5ca327f1f909f1a5c6bed40ce8f5cb29b9230adb78b7dba47c",
+    "robot-web/tests/pursuit-audio.test.mjs": "e05a69b3277bcf377922840d23cd3df28b6120912b74b33137fa39f376fe1226",
+    "scripts/build_pursuit_viewer.sh": "c1769395680f3648db85782738aa5b8a4c33ddb0c9dcaa12ffdc4e27e4f78ba8",
+    "scripts/generate_drone_audio.py": "c214883eca49b3808084c691422eea784cfed51b7d90259fa2f8e72a1688a652",
+    "tests/pursuit_arena.rs": "66c0b5eaf77bf57932a81bc266c524dca2d9cfe35653cf58be3db9005c05e8c1",
+    "tests/pursuit_return_fire.rs": "80864c7bd2ef75eda2dce98271b954e34825fd179593fe125dce99a826917b58",
+    "tests/test_drone_audio.py": "c59bf0ac49b4268be759fd22e03fc3aa3a99961d169b2888eadb5efdd9e4e9f9",
+    "robot-web/tests/pursuit-start.test.mjs": "56f0ce011619b9927d56e5246ebaea63657ec42275c0d5aac6dbfc229bb5a7c8"
+  },
+  "media": {
+    "docs/progress/pursuit-return-fire-disabled.png": "7b7715f1197580fa16f522085a8b0f78a837620b33c3a4756daed06a499320a7",
+    "docs/progress/pursuit-return-fire-firing.png": "7a67a1fdc69fe6518cf5523fc88b4396ecd4ad5bd1ba8979e8974184ddc7e5d7",
+    "docs/progress/pursuit-return-fire-narrow.png": "9a239c4978269f51f3c848d42d5cb31fb1e50e7f6726124436c0ca2eea977c92",
+    "docs/progress/pursuit-return-fire-reset.png": "8a2edee01d5aba237bcc53b97b7ae3dcc5df08423e78f6db1ecf437c68da0e37",
+    "docs/progress/pursuit-return-fire-warning.png": "7041aecc2d985ab875d0aced3c85bc9682cea1a08e2ee659157ba278801f8b10",
+    "docs/progress/pursuit-return-fire.mp4": "975ca0c9fa566223b209db6e18519d1e3aa7a3547aa9923aad52ffaa83193dbd"
+  }
+}

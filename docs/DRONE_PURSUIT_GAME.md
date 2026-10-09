@@ -393,7 +393,7 @@ checkpoint `7f5fd6a`: all 48 instrumented sensor lines, both outcomes of all ten
 instrumented sensor branches, and all 17 instrumented guide lines.
 
 The model and guide are implemented. The rendered integration is described below.
-Sensor-only pursuit actor inputs and return fire remain pending. Hearing is described below.
+Sensor-only pursuit actor inputs remain pending. Hearing and return fire are described below.
 
 ## Body-mounted sight in the arena
 
@@ -429,7 +429,7 @@ input; actual mobile touch input remains unverified. [The visual record](progres
 retains source and media hashes and distinguishes observed behavior from test evidence.
 
 The drone still hovers. It does not choose where to look, pursue the robot, or fire.
-Hearing is connected below. Telegraphed return fire comes next, before pursuit training.
+Hearing and telegraphed return fire are connected below. Pursuit training comes next.
 
 ## Finite hearing events
 
@@ -488,3 +488,87 @@ footsteps, and expiry after stopping. Desktop and 390-pixel views were inspected
 hearing text and controls fit. Actual mobile touch input remains unverified.
 [The visual record](progress/pursuit-hearing.json) retains source and media hashes.
 The healthy hover policy receives no new inputs and does not pursue these cues.
+
+## Telegraphed return fire
+
+The drone has an original under-body gun and a deterministic weapon controller.
+This does not train pursuit or change the qualified hover policy. The 800 ms
+warning, three-round volley, hit counts, and speeds are local game choices.
+Official reference footage did not establish those values.
+
+A current visible contact within 20 metres must remain unobstructed from the
+muzzle throughout charging and each discharge. Memory and hearing cannot authorize
+a shot. The first valid observation starts the full 800 ms warning. Later actions
+advance its clock by 20 ms. Losing the opportunity cancels charging to idle.
+
+A volley emits three rounds 120 ms apart. Losing the opportunity during a volley
+cancels its remaining rounds. Completed and cancelled volleys both recover for
+1,200 ms before another warning can start. Disabled weapons require reset.
+
+Each point projectile travels 18 metres per second without homing or gravity and expires
+after two seconds. Each action checks its complete 0.36-metre segment against
+arena boxes and the movement capsule. The nearest hit wins; walls win ties.
+
+The robot moves before this query. This samples the resulting capsule pose and
+does not sweep the character between its old and new positions. Three slots bound
+live projectiles. Already fired rounds continue after drone death; reset clears them.
+
+Three impacts disable the robot. It cannot move, collect the pistol, or fire while
+disabled. The pickup prompt and weapon buttons disappear until reset.
+
+Death clears observations and stops new drone rounds. Press R to restore
+health, the weapon, ammunition, projectiles, observations, and presentation state.
+
+The barrel follows current sight; amber light grows during warning and becomes red
+for the volley. Three reusable meshes display projectiles. The HUD names the phase
+and remaining robot health. Original mono sounds accompany warning and discharge.
+The generator and asset attribution record their provenance.
+
+Browser input resumes
+suspended audio contexts; rejected resume attempts can retry on a later gesture.
+Reset clears pending and playing sounds. Cancelled warnings stop their sound.
+
+Run the minimal headless weapon guide:
+
+```sh
+nix develop --command cargo run --features robots --example pursuit-return-fire
+```
+
+The ray queries use Rapier 0.36 and Parry 0.31.1. A normalized direction makes ray
+hit distances metres; solid queries detect origins inside colliders. Playback uses
+Bevy 0.18.1 AudioPlayer and DESPAWN one-shots. Spatial sound uses stereo panning;
+it is not an acoustic propagation model.
+
+The controlling references are [Rapier scene queries](https://rapier.rs/docs/user_guides/rust/scene_queries/),
+[Bevy AudioPlayer](https://docs.rs/bevy/0.18.1/bevy/audio/struct.AudioPlayer.html),
+and [Bevy PlaybackSettings](https://docs.rs/bevy/0.18.1/bevy/audio/struct.PlaybackSettings.html).
+
+Fifty-seven pursuit-viewer tests, eleven native weapon cases including shared
+units, and eight Chrome/WASM weapon cases pass. Tests cover exact timing,
+cancellation, malformed geometry, range, walls, window and pipe openings,
+projectile expiry, capacity, dodging, terminal health, reset, and audio ownership.
+A regression also prevents a last footstep from restoring a cue after robot death.
+All 50 hover-viewer tests and the native robot CI command remain green.
+
+[Coverage](progress/pursuit-return-fire-coverage.json) includes the runnable guide.
+Every added production branch has both outcomes. Native window startup remains
+uncovered; the existing invalid-solver-pose branch also remains unhit.
+The browser audio activation helper has 100% line, branch, and function coverage.
+The generated WAV files decode correctly and reproduce byte for byte.
+
+Pursuit and humanoid training remain pending. The current follow camera can place
+a nearby drone below the view when the robot passes it. Search, enemy tracking,
+robot hit reactions, and trained combat should be evaluated in later checkpoints.
+
+[The recording](progress/pursuit-return-fire.mp4) shows the warning, disabled
+robot, hidden weapon controls, and reset. [The visual record](progress/pursuit-return-fire.json)
+contains desktop and narrow captures, source hashes, and browser audio measurements.
+The recording has no audio track. A separate diagnostic measures the real Web Audio
+signal; it does not verify hardware speakers or volume.
+
+The entry module installs audio activation before dynamically importing the WASM
+bindings. Static import was incorrect because the generated bindings capture the
+constructor during module evaluation. A regression reproduces that ordering;
+another checks the reload instruction after a bindings import fails.
+The real browser test suspends the output context, resumes it through a key press,
+measures nonzero weapon output, and measures silence after reset.

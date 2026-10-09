@@ -46,7 +46,11 @@ pub(super) fn setup(
         },
         Transform::from_xyz(8.0, 14.0, 5.0).looking_at(Vec3::ZERO, Vec3::Y),
     ));
-    commands.spawn((Camera3d::default(), Transform::default()));
+    commands.spawn((
+        Camera3d::default(),
+        SpatialListener::new(0.2),
+        Transform::default(),
+    ));
 }
 
 /// Follow from above and behind; the capsule remains the only movement authority.

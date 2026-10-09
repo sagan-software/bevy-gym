@@ -35,6 +35,8 @@ render-core = [
   "bevy/3d_bevy_render",
   "bevy/default_app",
   "bevy/default_font",
+  "bevy/bevy_audio",
+  "bevy/wav",
   "bevy/bevy_gizmos",
   "bevy/bevy_mikktspace",
   "bevy/bevy_text",
@@ -154,6 +156,11 @@ required-features = ["robots", "render-core"]
 [[example]]
 name = "pursuit-combat"
 path = "examples/robots/pursuit_combat.rs"
+required-features = ["robots"]
+
+[[example]]
+name = "pursuit-return-fire"
+path = "examples/robots/pursuit_return_fire.rs"
 required-features = ["robots"]
 
 [[example]]

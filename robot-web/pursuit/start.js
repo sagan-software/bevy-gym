@@ -1,7 +1,11 @@
-import init from "./drone-pursuit.js";
+import { activateAudio } from "./audio.js";
+
+activateAudio(globalThis, document);
 
 const loading = document.querySelector("#loading");
 try {
+  // The generated bindings capture AudioContext while their module evaluates.
+  const { default: init } = await import("./drone-pursuit.js");
   await init();
   loading.remove();
 } catch (error) {
