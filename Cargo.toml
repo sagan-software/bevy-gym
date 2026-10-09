@@ -21,7 +21,7 @@ default = ["render"]
 # Deterministic rigid-body drone environments for native and browser lessons.
 robots = ["dep:rapier3d"]
 # Opt into JavaScript entropy for browser applications, without forcing it on WASI.
-browser = ["dep:getrandom"]
+browser = ["dep:getrandom", "dep:wasm-bindgen"]
 # Enables CPU autodiff in browser workers without native run-file orchestration.
 browser-training = ["burn/autodiff"]
 # Portable ecosystem simulation and read-only visual projection used by WASM inference.
@@ -130,6 +130,10 @@ version = "1"
 
 [dependencies.serde_json]
 version = "1"
+
+[target.'cfg(target_arch = "wasm32")'.dependencies.wasm-bindgen]
+version = "=0.2.121"
+optional = true
 
 # Match the locked wasm-bindgen 0.2.121 runner used by the Nix environment.
 [target.'cfg(target_arch = "wasm32")'.dev-dependencies.wasm-bindgen-test]

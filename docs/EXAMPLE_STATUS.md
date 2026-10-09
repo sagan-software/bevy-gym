@@ -6,15 +6,14 @@ Updated: 2026-10-08. Goal status: active.
 
 Read [the roadmap](EXAMPLE_ROADMAP.md), [quality audit](QUALITY_AUDIT.md),
 [reference research](EXAMPLE_RESEARCH.md), and [drone contract](ROBOT_ENVIRONMENT.md).
-Continue P1 with separate browser training controls and a curriculum. The qualified
-recovery policy is now selectable in the viewer and has browser video evidence.
-The inference and Pages-cache checkpoints are pushed and pass CI.
-Their Pages deployment is pending.
-Confirm Pages status before reporting it as deployed.
-The disturbed-start task and native/browser comparison are pushed and pass CI.
-The public examples page and manual viewer are deployed and visually verified.
-The disturbed-start deployment passed. The training checkpoint's deployment is
-running. Learned and manual Bevy flight both run in WASM locally.
+Continue P1 with a curriculum, then damaged-motor recovery and perception.
+The browser training panel and explicit checkpoint playback are implemented.
+A full browser seed-7 run passed all 32 held-out recovery episodes on native and
+WASM targets. The original bundled model remains unchanged.
+The worker checkpoint `4741945` passes CI; its Pages build is running.
+The earlier inference/cache Pages builds were superseded. Confirm deployment
+status before reporting the new panel as public. Local screenshots and recordings
+are linked in [the browser training guide](DRONE_BROWSER_TRAINING.md).
 Perception, damage adaptation, pursuit, and the jumping quadruped remain pending.
 Do not start later port families before the custom robot milestones.
 
@@ -79,14 +78,30 @@ policy failed all five selection episodes. Do not describe that checkpoint as
 qualified. [The browser record](progress/drone-worker-browser.json) retains the
 observed metrics, model size, browser version, and WASM hash.
 
-A full seed-7 run is active in T3 tab_1 at port 8768. Inspect
-`window.droneWorkerCheck.fullRun` before navigating or restarting the page.
-It began with the same worker after update two and continues to update 260.
-Its `state`, `updates`, `latest`, and `milestones` show progress. Completion retains
-`finalBytes` for export and qualification. Do not send extra requests while its
-loop owns the worker. The page has no training controls yet. Implement the host
-controller, cancellation/stale-response tests, and explicit selection of trained
-weights next; then show screenshots and recordings.
+The full seed-7 browser run is complete and its worker has been terminated.
+[The retained model and record](progress/drone-browser-training.json) include all
+selection milestones and final qualification. It survived 32/32 episodes with
+mean return 469.4906 and mean final distance 0.2131 m. Eleven learning tests passed
+in the actual browser, including both bundled and browser-trained qualification.
+
+The new panel supports start, pause, resume, discard, learning-rate metrics,
+checkpoint playback, and checkpoint download. Fifteen host-controller tests cover
+cancellation, stale replies, validation, completion, and transport errors.
+Twenty-eight viewer tests pass. Root tests, strict native/WASM Clippy, formatting,
+workflow checks, and shell checks pass. The strict personal-lint backlog remains
+unresolved; warning-enabled discovery found no new candidate diagnostics.
+[Coverage](progress/drone-training-ui-coverage.json) records exact remaining gaps.
+
+The final optimized release build passes. Desktop and 390×780 layouts were
+inspected in T3. Watch checkpoint returned focus to the canvas and scrolled to
+the scene. The saved final browser model reached action 500 in a separate
+[recording](progress/drone-browser-trained-flight.mp4). Its panel remained idle
+because playback loaded the saved model through the checkpoint API.
+
+The local review server uses port 8773 and `runs/quality-research/site-training`.
+The earlier 8768 full-training page is no longer active. Do not restart training
+merely to recover evidence; model bytes and metrics are saved in `docs/progress`.
+The interactive WASM test server on port 8774 completed eleven tests successfully.
 
 ## Foundation verification
 
@@ -258,7 +273,7 @@ records 350/350 lines and 14/14 branches across the guide and helper files, incl
 internal test code. Both JSON and model write failures were exercised.
 The file-based ignored qualification helper ran separately without coverage;
 the bundled qualification ran under coverage. Native window and touch checks remain
-unavailable. Browser training controls remain unfinished.
+unavailable. Browser training controls were added in the later UI checkpoint.
 
 The updated `drone-browser-check` wrapper and its learning suite pass CI.
 Interactive browser execution is verified at port 8772 through
@@ -356,12 +371,20 @@ need CI evidence. No speed improvement has been measured yet.
   [CI](https://github.com/sagan-software/bevy-gym/actions/runs/37853641788) passed,
   including the new headless browser learning suite.
   [Browser deployment](https://github.com/sagan-software/bevy-gym/actions/runs/37853641770)
-  is running.
+  passed. Its deployed route has not received a separate visual check.
 - `12ff6a4`: learned-policy viewer, reset/failure guards, 25 viewer tests, and
   browser recording. Pushed to GitHub `main`; remote revision verified.
   [CI](https://github.com/sagan-software/bevy-gym/actions/runs/37857449446) passed.
   [Browser deployment](https://github.com/sagan-software/bevy-gym/actions/runs/37857449451)
-  is pending behind the active build.
+  was superseded while pending.
+- `e2a450f`: cache qualified Gymnasium deployment output. Pushed to GitHub `main`.
+  [CI](https://github.com/sagan-software/bevy-gym/actions/runs/37858799219) passed.
+  Its pending deployment was superseded by the worker checkpoint.
+- `4741945`: browser recovery training worker, protocol tests, and browser evidence.
+  Pushed to GitHub `main`; remote revision verified.
+  [CI](https://github.com/sagan-software/bevy-gym/actions/runs/37861862828) passed.
+  [Browser deployment](https://github.com/sagan-software/bevy-gym/actions/runs/37861862768)
+  is running Gymnasium qualification.
 
 ## Local evidence and active validation
 

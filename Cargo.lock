@@ -605,6 +605,7 @@ dependencies = [
  "serde_json",
  "shakmaty",
  "tokio",
+ "wasm-bindgen",
  "wasm-bindgen-test",
 ]
 

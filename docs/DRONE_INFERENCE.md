@@ -4,7 +4,8 @@ Status: native tests and browser inference verified, 2026-10-08.
 
 The viewer loads the qualified recovery checkpoint and runs its mean action
 through the same validated motor boundary as the training lesson. The library
-API is unchanged. Browser training controls remain unfinished.
+API is unchanged. [Browser training controls](DRONE_BROWSER_TRAINING.md) now select
+frozen checkpoints explicitly.
 
 ## Run the comparison
 
@@ -15,7 +16,7 @@ nix develop --command cargo run --features robots --example drone-flight
 Use the [browser build guide](../robot-web/README.md) for WebAssembly.
 
 1. Select Disturbed start.
-2. Select Learned policy.
+2. Select Bundled policy.
 3. Select Run.
 4. Select Reset after the ten-second episode.
 5. Select Hover, then Run, to compare constant half-thrust.

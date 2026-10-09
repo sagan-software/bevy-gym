@@ -43,6 +43,7 @@ jobs:
       - run: nix develop --command cargo test -p bevy-gym-web --locked
       - run: nix develop --command cargo test -p bevy-gym-browser --locked
       - run: nix develop --command cargo test -p bevy-gym-drone-worker --locked
+      - run: nix develop --command node --test robot-web/tests/*.test.mjs
   strict:
     runs-on: ubuntu-latest
     steps:

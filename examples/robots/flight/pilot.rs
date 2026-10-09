@@ -7,18 +7,39 @@ use bevy_gym::training::{RecurrentMemory, RecurrentPpoError, RecurrentPpoPolicy}
 
 use super::{encoding, model};
 
+/// Where the user obtained these weights, independent of their measured performance.
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum Origin {
+    /// The repository's qualified recovery checkpoint.
+    Bundled,
+    /// A checkpoint supplied by the browser training panel.
+    Browser,
+}
+
 /// One fixed policy and the memory of its current episode.
 pub(super) struct RecoveryPilot {
-    /// Qualified weights retained across episode resets.
+    /// Frozen weights retained across episode resets.
     policy: RecurrentPpoPolicy,
     /// Recurrent state belonging only to this episode.
     memory: RecurrentMemory,
+    /// Source shown in the viewer without claiming that new weights are qualified.
+    origin: Origin,
 }
 
 impl RecoveryPilot {
     /// Load the shared architecture without advancing an environment.
     pub(super) fn load(bytes: Vec<u8>) -> Result<Self, RecurrentPpoError> {
         model::load_policy(bytes).map(Self::from)
+    }
+
+    /// Identify the repository's bundled model for its selection highlight.
+    pub(super) fn is_bundled(&self) -> bool {
+        self.origin == Origin::Bundled
+    }
+
+    /// Mark the known repository checkpoint after its bytes have loaded successfully.
+    pub(super) const fn mark_bundled(&mut self) {
+        self.origin = Origin::Bundled;
     }
 
     /// Clear episode memory while retaining the learned weights.
@@ -42,7 +63,11 @@ impl RecoveryPilot {
 impl From<RecurrentPpoPolicy> for RecoveryPilot {
     fn from(policy: RecurrentPpoPolicy) -> Self {
         let memory = policy.initial_memory();
-        Self { policy, memory }
+        Self {
+            policy,
+            memory,
+            origin: Origin::Browser,
+        }
     }
 }
 

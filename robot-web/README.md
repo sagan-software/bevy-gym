@@ -20,7 +20,7 @@ gallery; that sibling route is absent from the standalone local server.
 
 The scene starts paused. Run and Pause toggle continuous stepping. Step advances
 one 20 ms action while paused. Calm start and Disturbed start select the initial
-conditions and begin a paused episode. Learned policy loads the bundled recovery
+conditions and begin a paused episode. Bundled policy loads the bundled recovery
 model and begins a paused episode. Reset retains the start choice and restores
 seed 42. It preserves learned weights and clears recurrent memory. Manual reset
 restores the hover command.
@@ -41,7 +41,13 @@ illustrates the command; the environment models force rather than rotor RPM.
 The [recording](../docs/progress/drone-inference.mp4) compares learned recovery with
 constant half-thrust from the same disturbed start. The
 [inference guide](../docs/DRONE_INFERENCE.md) records controls and failure behavior.
-Browser training controls remain unfinished. Browser execution, focused tests, and the exact
+The training panel starts a separate worker from random weights. Pause training
+before watching or downloading a checkpoint. Watch checkpoint selects frozen
+weights and starts a disturbed episode; later optimizer updates do not change
+those weights. Resume training continues the run. Discard run permits a fresh
+seed and preserves the current scene policy.
+
+Browser execution, focused tests, and the exact
 remaining coverage gaps are recorded in [the status document](../docs/EXAMPLE_STATUS.md).
 Native window interaction and mobile device input remain unverified.
 
@@ -52,8 +58,8 @@ and the [font license](../assets/fonts/README.md). Preserve them when distributi
 
 The viewer build also includes a dedicated CPU training worker. Its
 [protocol and verification record](../docs/DRONE_BROWSER_TRAINING.md) describe the
-fixed recovery recipe, progress metrics, and checkpoint export. The page's
-training controls are still pending.
+fixed recovery recipe, progress metrics, and checkpoint export. The default
+seed-7 browser run passed the same 32-episode qualification as native training.
 
 Build the worker independently during development:
 

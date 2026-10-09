@@ -145,6 +145,16 @@ fn bundled_checkpoint_recovers_on_held_out_seeds() {
     qualify(&policy);
 }
 
+/// Qualify the frozen checkpoint produced by the actual browser worker run.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn browser_trained_checkpoint_recovers_on_held_out_seeds() {
+    let policy =
+        load_policy(include_bytes!("../docs/progress/drone-browser-training.mpk").to_vec())
+            .expect("load browser-trained recovery policy");
+    qualify(&policy);
+}
+
 /// Apply the frozen success gates to the final seed partition.
 fn qualify(policy: &bevy_gym::training::RecurrentPpoPolicy) {
     let seeds: Vec<_> = (1..=32).map(|offset| u64::MAX - offset).collect();

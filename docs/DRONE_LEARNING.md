@@ -5,7 +5,7 @@ Status: trained checkpoint qualified on native and browser tests, 2026-10-08.
 The [training guide](../examples/robots/train.rs) trains the existing recurrent PPO
 implementation on `DroneHover::disturbed()`. Its support code stays beside the
 examples; the library API remains unchanged. The visual viewer now offers the
-bundled policy alongside manual controls. Browser training controls are next.
+bundled policy alongside manual controls. [Browser training controls](DRONE_BROWSER_TRAINING.md) can train and select fresh weights.
 
 ## Run the lesson
 
@@ -113,7 +113,7 @@ perception, pursuit, or performance beyond ten seconds.
 - [x] Verify saved and loaded policies reproduce actions.
 - [x] Train and retain metrics, configuration, checkpoint, and source revision.
 - [x] Beat constant half-thrust on selection seeds and separate final seeds.
-- [ ] Show learned inference and training as distinct browser modes.
+- [x] Show learned inference and training as distinct browser modes.
 - [x] Share browser screenshots and video, including reset and disturbed recovery.
 - [x] Run exact Rust gates, personal lints, coverage, and browser checks.
 - [x] Finish documentation, run the guides, and publish the tested training checkpoint.

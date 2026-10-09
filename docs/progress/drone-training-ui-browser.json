@@ -1,0 +1,70 @@
+{
+  "date": "2026-10-08",
+  "runtime_directory": "build-bafae08607aebc70cc65c80a4a5e713eafe46fbb759cfbe61cd2da0f5789a240",
+  "files": {
+    "training.mjs": {
+      "bytes": 7694,
+      "sha256": "1a2620293663ca4dc9ef6a502b1a8bcf569a9a4dcee80eb57b97076b98721e2b"
+    },
+    "drone-worker.js": {
+      "bytes": 12375,
+      "sha256": "6fe4a99a50aeec32e70f22f6a4964d9efeee43259e9b725b92a765b32744e4eb"
+    },
+    "worker.js": {
+      "bytes": 136,
+      "sha256": "811a9a17343143542e8e613c249687cc6157feb2dc0fa4939eb90a84d174dea5"
+    },
+    "training-panel.mjs": {
+      "bytes": 4925,
+      "sha256": "eb0115221b709e1119986efb6fd3a12b17e853a0b34ba847d4f8d0277bbfdec9"
+    },
+    "drone-flight.js": {
+      "bytes": 104976,
+      "sha256": "9cb0a2dc4fc5031e43b6c5f8c233519065af827a3e4e4ee55da927aa5ecde995"
+    },
+    "styles.css": {
+      "bytes": 2767,
+      "sha256": "a35fa29ac0dd03a9b6c60bcc234c50d1bdbdcd0faaafea55aa7991f05d5394bd"
+    },
+    "drone-worker_bg.wasm": {
+      "bytes": 4234597,
+      "sha256": "6e9b3fc0a35073d9777a9159cc0da5386a05699e46e772e05f8db9019f8f2141"
+    },
+    "drone-flight_bg.wasm": {
+      "bytes": 36448882,
+      "sha256": "0a445b24828acf63f03ff8a6cecdd234fa23403c9ad0c5f3f0f73b3994639cac"
+    },
+    "start.js": {
+      "bytes": 370,
+      "sha256": "6c1ed6bf10772e4a72819974754cd8b695613068f481a19ad5aeb8212a545a58"
+    }
+  },
+  "desktop_viewport": [
+    1280,
+    800
+  ],
+  "narrow_viewport": [
+    390,
+    780
+  ],
+  "browser": "T3 Electron Chromium 152, desktop user agent",
+  "recording": "drone-training-controls.mp4",
+  "recording_seconds": 28.458633,
+  "recording_note": "Initial UI build. Final build adds checkpoint canvas focus and scroll; verified separately.",
+  "gallery_layouts": "Desktop and narrow layouts inspected; narrow body and scroll widths both 375 CSS pixels.",
+  "final_checks": {
+    "runtime_loaded": "build-bafae08607aebc70cc65c80a4a5e713eafe46fbb759cfbe61cd2da0f5789a240",
+    "invalid_seed_minus_one": "Rejected before training started",
+    "panel_keydown": "KeyP did not reach the window listener",
+    "training": "Seed 7 completed three real updates, paused, evaluated, and selected a checkpoint",
+    "watch_focus": "drone-canvas",
+    "watch_scroll_y": 0,
+    "narrow_body_and_scroll_width": 375,
+    "discard": "Returned to idle after checkpoint playback",
+    "qualified_model_playback": "Saved update-260 browser model loaded through the same WASM checkpoint API; disturbed seed 42 reached action 500",
+    "qualified_model_recording": "drone-browser-trained-flight.mp4",
+    "qualified_model_recording_seconds": 23.2039,
+    "qualified_model_screenshot": "drone-browser-trained-flight.png",
+    "mobile_watch_screenshot": "drone-training-watch-narrow.png"
+  }
+}

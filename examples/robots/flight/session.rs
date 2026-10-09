@@ -134,8 +134,17 @@ impl Session {
     }
 
     /// Identify learned inference without exposing policy weights or memory.
+    #[cfg(test)]
     pub(super) const fn is_learned(&self) -> bool {
         matches!(self.controller, Controller::Learned(_))
+    }
+
+    /// Highlight the bundled policy only while those exact source weights are selected.
+    pub(super) fn is_bundled(&self) -> bool {
+        match &self.controller {
+            Controller::Learned(pilot) => pilot.is_bundled(),
+            Controller::Manual(_) | Controller::Failed(_) => false,
+        }
     }
 
     /// Read a controller failure for the visible recovery message.
@@ -180,6 +189,9 @@ impl Session {
     /// Start a paused episode using the checkpoint qualified by the training lesson.
     pub(super) fn select_learned(&mut self) {
         self.select_policy(include_bytes!("../../../assets/robots/recovery.mpk").to_vec());
+        if let Controller::Learned(pilot) = &mut self.controller {
+            pilot.mark_bundled();
+        }
     }
 
     /// Reject a malformed checkpoint before it can supply any motor command.
@@ -191,6 +203,15 @@ impl Session {
             }
             Err(error) => self.fail(error.to_string()),
         }
+    }
+
+    /// Watch validated browser weights from the disturbed seed-42 start.
+    #[cfg(any(test, all(target_arch = "wasm32", feature = "browser")))]
+    pub(super) fn watch_policy(&mut self, pilot: RecoveryPilot) {
+        self.start_profile = StartProfile::Disturbed;
+        self.controller = Controller::Learned(Box::new(pilot));
+        self.reset();
+        self.playback = Playback::Running;
     }
 
     /// Toggle playback only while another action is allowed.

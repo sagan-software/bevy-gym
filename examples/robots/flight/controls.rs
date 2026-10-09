@@ -97,7 +97,7 @@ fn footer(root: &mut ChildSpawnerCommands<'_>, font: &Handle<Font>) {
                 button(row, "Reset [R]", Control::Reset, font);
             });
             footer.spawn(row()).with_children(|row| {
-                button(row, "Learned policy [P]", Control::Learned, font);
+                button(row, "Bundled policy [P]", Control::Learned, font);
                 for (label, preset) in [
                     ("Power off [1]", MotorPreset::PowerOff),
                     ("Hover [2]", MotorPreset::Hover),
@@ -234,7 +234,7 @@ fn enabled(control: Control, session: &Session) -> bool {
 fn selected(control: Control, session: &Session) -> bool {
     match control {
         Control::Preset(preset) => Some(preset) == session.preset(),
-        Control::Learned => session.is_learned(),
+        Control::Learned => session.is_bundled(),
         Control::Start(profile) => profile == session.start_profile(),
         Control::Playback | Control::Step | Control::Reset => false,
     }
@@ -297,7 +297,8 @@ fn status_label(session: &Session) -> String {
         Some(MotorPreset::Hover) => "Hover",
         Some(MotorPreset::Climb) => "Climb",
         Some(MotorPreset::Tilt) => "Tilt",
-        None => "Learned policy",
+        None if session.is_bundled() => "Bundled policy",
+        None => "Browser checkpoint",
     };
     let steps = session.steps();
     let height = session.observation().position().y;
@@ -312,6 +313,21 @@ fn status_label(session: &Session) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn browser_checkpoint_label_does_not_select_the_bundled_button() {
+        let mut session = Session::default();
+        let pilot = crate::pilot::RecoveryPilot::load(
+            include_bytes!("../../../docs/progress/drone-browser-training.mpk").to_vec(),
+        )
+        .expect("qualified browser checkpoint");
+        session.watch_policy(pilot);
+        assert!(status_label(&session).starts_with("Running | Browser checkpoint | Step 0/500"));
+        assert!(!session.is_bundled());
+        session.select_learned();
+        assert!(status_label(&session).starts_with("Paused | Bundled policy | Step 0/500"));
+        assert!(session.is_bundled());
+    }
     use bevy::{
         camera::NormalizedRenderTarget,
         picking::{
@@ -337,7 +353,7 @@ mod tests {
         assert!(labels.iter().any(|child| {
             world
                 .get::<Text>(child)
-                .is_some_and(|text| text.0 == "Learned policy [P]")
+                .is_some_and(|text| text.0 == "Bundled policy [P]")
         }));
     }
 
@@ -348,7 +364,7 @@ mod tests {
         apply(Control::Learned, &mut session);
         assert!(selected(Control::Learned, &session));
         assert!(!selected(Control::Preset(MotorPreset::Hover), &session));
-        assert!(status_label(&session).starts_with("Paused | Learned policy | Step 0/500"));
+        assert!(status_label(&session).starts_with("Paused | Bundled policy | Step 0/500"));
         session.select_policy(Vec::new());
         assert!(status_label(&session).starts_with("Policy failed:"));
         assert!(status_label(&session).ends_with("Reset or choose a controller to continue."));

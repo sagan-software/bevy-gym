@@ -10,14 +10,52 @@
   </head>
   <body>
     <main>
+      <section class="simulation" aria-label="Drone simulation">
       <p id="loading" role="status">Loading drone simulation…</p>
-      <canvas id="drone-canvas" tabindex="0" aria-label="Drone hover. P selects the learned policy. C selects a calm start; D selects a disturbed start. Space toggles playback. N steps once. R resets. Keys 1 through 4 select power off, hover, climb, and tilt."></canvas>
+      <canvas id="drone-canvas" tabindex="0" aria-label="Drone hover. P selects the bundled policy. C selects a calm start; D selects a disturbed start. Space toggles playback. N steps once. R resets. Keys 1 through 4 select power off, hover, climb, and tilt."></canvas>
+      </section>
+      <section class="training" aria-labelledby="training-title">
+        <h1 id="training-title">Train recovery</h1>
+        <form id="training-form">
+          <label for="training-seed">Seed</label>
+          <input id="training-seed" name="seed" type="number" required min="0" max="4294967295" step="1" value="7">
+          <div class="actions">
+            <button id="training-toggle" type="submit" disabled>Start training</button>
+            <button id="training-discard" type="button" hidden>Discard run</button>
+          </div>
+        </form>
+        <p id="training-status" role="status">Training starts from random weights.</p>
+        <label for="training-progress" id="training-count">0 / 260 updates</label>
+        <progress id="training-progress" max="260" value="0"></progress>
+        <p id="training-steps">0 simulation steps</p>
+        <dl class="rates">
+          <dt>Policy learning rate</dt><dd id="policy-rate">Not started</dd>
+          <dt>Value learning rate</dt><dd id="value-rate">Not started</dd>
+        </dl>
+        <details>
+          <summary>Training metrics</summary>
+          <dl>
+            <dt>Policy loss</dt><dd id="policy-loss">Not started</dd>
+            <dt>Value loss</dt><dd id="value-loss">Not started</dd>
+            <dt>Entropy</dt><dd id="entropy">Not started</dd>
+            <dt>Approximate KL</dt><dd id="kl">Not started</dd>
+          </dl>
+        </details>
+        <div class="checkpoint-actions">
+          <button id="watch-checkpoint" type="button" disabled>Watch checkpoint</button>
+          <button id="download-checkpoint" type="button" disabled>Download checkpoint</button>
+        </div>
+        <p id="checkpoint-hint">Pause training to watch or download its checkpoint.</p>
+        <p id="checkpoint-score" hidden></p>
+        <p id="checkpoint-status" role="status"></p>
+      </section>
     </main>
     <footer>
       <a href="../../examples/">Examples</a>
       <a href="https://poly.pizza/m/DNbUoMtG3H">Drone by NateGazzard</a>
       <a href="https://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>
-      <a href="https://github.com/sagan-software/bevy-gym/blob/main/examples/robots/flight.rs">Source</a>
+      <a href="https://github.com/sagan-software/bevy-gym/blob/main/examples/robots/flight.rs">Scene source</a>
+      <a href="https://github.com/sagan-software/bevy-gym/blob/main/examples/robots/train.rs">Training source</a>
     </footer>
     <script type="module" src="start.js"></script>
   </body>

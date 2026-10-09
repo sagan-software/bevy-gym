@@ -1,7 +1,8 @@
 # Drone browser training
 
-Status: worker protocol and two browser updates verified, 2026-10-08.
-Browser controls are not connected. Full browser training qualification is running.
+Status: browser training and checkpoint playback verified, 2026-10-08.
+A seed-7 browser run completed 260 updates and passed the frozen 32-episode
+qualification on both native and browser targets.
 
 ## Contract and acceptance
 
@@ -62,11 +63,37 @@ Required checks for this checkpoint:
 - Test completion, failed updates, restart, independent scoring, and export purity.
 - Run formatting, native tests, exact root Clippy, worker native/WASM Clippy,
   personal lints, coverage, and an actual browser worker exchange.
-- Keep learner controls and worker cancellation/stale-response tests pending until implemented.
+- Exercise start, pause, resume, discard, checkpoint download, and explicit playback.
+- Reject stale replies after discard, including already-resolved promise continuations.
 
-The next UI checkpoint must exercise start, pause, resume, restart, export, and
-explicit selection of trained weights. A stale response from a terminated worker
-must never replace the current run or its viewer policy.
+A stale response from a terminated worker must never replace the current run or
+its viewer policy. The host controller tests discard run A, start run B, complete
+B, then resolve A last. They also cover discard between export and evaluation.
+
+## Browser controls
+
+1. Select a seed and press Start training.
+2. Press Pause training to stop after the current update.
+3. Press Watch checkpoint to evaluate five episodes and select those frozen weights.
+4. Press Resume training to continue the same optimizer and rollout state.
+
+Download checkpoint saves the current weights after the same independent scoring.
+Discard run terminates the worker and allows a fresh seed. It preserves the
+selected scene policy. Training never changes the scene policy automatically.
+
+The host states are idle, starting, running, pausing, paused, inspecting, complete,
+and failed. Only paused or complete runs with at least one update can export.
+Loading, pausing, and evaluation disable conflicting actions. Failure allows retry.
+Worker identity guards every asynchronous continuation and pending response.
+
+Watch checkpoint validates at most 1 MiB of model bytes before replacing the
+pending scene selection. The next Bevy update starts disturbed seed 42 with fresh
+recurrent memory. Rejected bytes preserve the previous selection. Bundled policy
+selects the original qualified weights. The scene labels these sources separately.
+
+On narrow screens, Watch checkpoint focuses and scrolls to the scene. Keyboard
+input in the training panel does not activate the scene shortcuts. The build keeps
+JavaScript, CSS, and matching WASM files in one content-addressed directory.
 
 ## Verification
 
@@ -95,7 +122,41 @@ it does not measure rendering frame rate or qualify training speed generally.
 The first update's policy failed all five selection episodes. That is expected
 at this early stage and is not a qualified recovery policy.
 
-The optimized worker WASM is 4,234,599 bytes. The full viewer build includes its
-module entry point, generated bindings, and WASM. Training controls, cancellation,
-stale-response tests, and selecting freshly trained weights in the viewer remain
-for the next checkpoint.
+The full seed-7 browser run completed 260 updates and 133,120 transitions.
+Its checkpoint survived all 32 held-out episodes, with mean return 469.4906 and
+mean final distance 0.2131 m. The pre-existing gates require at least 30 survivors,
+return at least 400, and distance at most 0.5 m. The original bundled model remains
+unchanged. [The training record](progress/drone-browser-training.json) includes
+selection milestones, qualification episodes, and the checkpoint hash.
+
+All eleven learning tests passed in the actual browser, including qualification
+of both frozen models. An extra update after completion returned `complete` and
+left exported weights unchanged. The training worker was then terminated.
+
+The host's fifteen Node tests pass. All 28 viewer tests pass. The new inbox has
+full native line and branch coverage. [The coverage record](progress/drone-training-ui-coverage.json)
+records startup, WASM adapter, DOM, and defensive-branch measurement gaps. The
+root personal-lint gate still fails on existing library findings. A separate
+warning-enabled discovery run reached the viewer and found no new diagnostics.
+
+The [desktop screenshot](progress/drone-training-desktop.png),
+[narrow screenshot](progress/drone-training-narrow.png), and
+[28-second recording](progress/drone-training-controls.mp4) show the first real UI
+update, pause, checkpoint playback, resume, and discard. That early checkpoint
+fails all five selection episodes. It is different from the qualified final model.
+Download was clicked; the operating-system download receipt was not inspected.
+Native window interaction and physical mobile input remain unverified.
+
+The final optimized build passed a separate desktop and narrow-screen check.
+[Its browser record](progress/drone-training-ui-browser.json) retains runtime hashes,
+seed validation, keyboard isolation, and checkpoint focus/scroll results. Empty
+and oversized checkpoints also returned errors through the actual WASM entry point.
+
+The [23-second recovery recording](progress/drone-browser-trained-flight.mp4),
+[screenshot](progress/drone-browser-trained-flight.png), and
+[contact sheet](progress/drone-browser-trained-flight-contact-sheet.png) show the
+saved update-260 browser model reaching action 500. This recording loads the saved
+model through the checkpoint API; its training panel remains idle. The
+[narrow playback screenshot](progress/drone-training-watch-narrow.png) instead
+shows the freshly trained update-three model after Watch checkpoint returned focus
+to the scene. These checks do not establish touch-device compatibility.
