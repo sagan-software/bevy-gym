@@ -5209,7 +5209,7 @@
     "service_status": "stopped by experiment operator after failed selection; exit status is not a completed training result"
   },
   "residual_heading": {
-    "status": "running_unqualified",
+    "status": "stopped_unqualified",
     "service": "bevy-gym-heading-residual-probe-20261009.service",
     "log": "/home/sagan/.cache/bevy-gym-quality-validation/heading-residual-probe.log",
     "artifacts": "runs/quality-research/heading-residual-probe",
@@ -5228,7 +5228,7 @@
     "architecture": "LSTM hidden size 16, critic [32,32], scalar action; healthy recipe except initial log std -1.0.",
     "maximum_updates": 600,
     "reference": "https://arxiv.org/abs/1812.03201v2",
-    "last_evaluated_update": 20,
+    "last_evaluated_update": 100,
     "selection_at_update_20": [
       {
         "distance": 0.5529857277870178,
@@ -5271,7 +5271,8 @@
         "yaw_error": -0.9532198309898376
       }
     ],
-    "settled_counter_comparison": "distance < 0.5f32 and abs(yaw_error / pi) < 0.083333336f32; reset counter to zero after either fails"
+    "settled_counter_comparison": "distance < 0.5f32 and abs(yaw_error / pi) < 0.083333336f32; reset counter to zero after either fails",
+    "follow_up_record": "docs/progress/drone-heading-candidate.json"
   },
   "validation": {
     "native": "All archived probes compiled and ran; direct and bounded waypoint probes completed. Actor insertion preserved action and recurrent output exactly for the checked seed. A separate temporary regression checked all five selection seeds and unchanged physics and termination; all seven tests including shared units passed.",

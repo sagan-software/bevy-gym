@@ -7,53 +7,67 @@ Updated: 2026-10-09. Goal status: active.
 Read [the roadmap](EXAMPLE_ROADMAP.md), [quality audit](QUALITY_AUDIT.md),
 [reference research](EXAMPLE_RESEARCH.md), and [drone contract](ROBOT_ENVIRONMENT.md).
 
-The active work is learned heading and pursuit. [Navigation probe evidence](progress/drone-navigation-probes.json)
-retains the experiment sources and measured episodes. Direct commands at 0.5,
-1, and 2 metres each settled in all 20 cases: five reset seeds and four cardinal
-directions. At 4 metres, only seven survived and six settled. These are empty-world
-measurements, not evidence of obstacle avoidance or pursuit.
+A new flight candidate is native-qualified. Its frozen weights are
+[drone-heading-candidate.mpk](progress/drone-heading-candidate.mpk); the
+[record](progress/drone-heading-candidate.json) contains source, hashes, criteria,
+case results, and failed experiments. The playable browser still uses the old
+hover policy. No production Rust or browser runtime changed in this checkpoint.
 
-A one-metre displacement cap plus a deterministic yaw servo kept all tested
-flights alive out to eight metres, but none settled at eight metres within
-20 seconds. That servo is a baseline, not learned turning. A two-metre cap caused
-failures at six and eight metres. Do not expose arbitrary distant goals to the
-qualified hover actor.
+The candidate passed both native qualification tests. All 128 fresh heading cases
+survived 500 actions, returned at least 400, ended within 0.5 metres, and held
+position and heading within the required band for the final 100 actions.
+They cover 32 previously unused high-bit seeds and four cardinal headings.
+The minimum return was 418.62; maximum final position error was 5.362 millimetres.
 
-Direct actor transfer preserved every checked mean action before training.
-After 60 PPO updates, one selection flight terminated at action 410 and all five
-ended more than 1.6 metres from the hover target. No case qualified. The experiment
-was stopped before its 600-update budget; its stopped service status does not
-mean training completed. The qualified game checkpoint remains unchanged.
+All 80 waypoint cases survived and held the final position/heading band when
+requested displacement was capped at three metres. Targets were zero, two, four,
+and eight metres away, across four directions and five selection seeds.
+These are separate waypoint checks, not additional unseen seeds. No hover-return
+threshold applies to travel toward displaced targets. Without the displacement
+cap, nine of twenty eight-metre cases failed.
 
-A residual-heading experiment is running under
-`bevy-gym-heading-residual-probe-20261009.service`. It freezes the healthy flight
-policy and learns one bounded diagonal motor correction. It has not qualified.
+Training used imitation learning, not PPO updates. An original deterministic
+controller supplied four-motor demonstrations. The final variant used a fresh
+64-unit actor, shuffled bounded replay, and new labels at learner-visited states.
+It uses thirteen inputs and ZERO recurrent memory on every action. Carrying
+returned memory would create a different, unqualified controller.
 
-Check that service before starting another run. Its log is
-`/home/sagan/.cache/bevy-gym-quality-validation/heading-residual-probe.log`;
-checkpoints and scores are under `runs/quality-research/heading-residual-probe`.
-The evidence JSON embeds both the experiment and collector sources. They were
-compiled as a temporary native test; the temporary test files have been removed.
+The checkpoint is update 200, with SHA-256
+`4e9f539f54b261bdaf67ab3636700a76b8c7fbe28d31d6579202b500c1d577e1`.
+The first twelve inputs retain the flight feature ordering and units; the final
+input is signed horizontal heading error divided by pi. The current hover loader
+expects twelve inputs and a 32-unit actor, so this candidate needs its own helper.
+The waypoint adapter
+clamps displacement before converting it to the body frame and dividing by two
+metres. This is low-level flight control; it has no character observations.
 
-No experimental controller has been added to the public API or browser example.
-At residual update 20, all five flights survived but none qualified. Archived
-prototypes have compiler warnings and have not passed strict lint, coverage, or
-browser gates. Treat them as experiment records, not tutorial examples.
+Next, add the small typed inference helper and guide, qualify the frozen model
+in Chrome/WASM, and show the new controller in the browser. Preserve zero-memory
+inference and the three-metre displacement limit. Then train navigation from
+filtered sight, finite memory, hearing bearings, and obstacle observations.
+Do not describe imitation flight as learned pursuit or search.
 
-Next, assess the saved residual checkpoints against the frozen five-seed criteria.
-A candidate needs 500 actions, return at least 400, final distance at most
-0.5 metres, and 100 final consecutive actions within 0.5 metres and 15 degrees
-of north. Then qualify frozen weights on separate high-bit seeds and in the browser.
-Keep failed models out of the game. Learn waypoint tracking and sensor-only search
-only after heading and flight remain qualified together.
+All heading experiment services are stopped; none needs resuming. Logs use the
+`heading-` and `tracking-teacher-` prefixes under the validation cache.
+`heading-markov-final-qualification.log` records both passing assertion-based tests.
+The record embeds the temporary test sources and their restore paths; the root
+test files were removed after archiving. They have not passed strict lint or
+coverage, so they are research records, not finished tutorial examples.
+
+[The measurements figure](progress/drone-heading-measurements.png) shows one
+preselected unseen heading seed and four eight-metre routes from seed zero.
+It is native telemetry, not browser footage. The browser was inspected at
+1280 by 800; it remains the published combat build. No recording is active.
 
 The published combat checkpoint is `53dc4b6`. Its
 [CI passed](https://github.com/sagan-software/bevy-gym/actions/runs/37917936689).
-Its [Pages run](https://github.com/sagan-software/bevy-gym/actions/runs/37917936588)
-is queued behind the preceding hearing deployment. This status was checked on
-2026-10-09; local browser evidence and remote deployment remain separate gates.
+Check the latest Pages run separately; local browser evidence does not establish
+remote deployment. Preserve the original dirty checkout and work only in
+`bevy-gym-quality`.
 
-The current checkpoint adds telegraphed drone return fire. A full 800 ms warning
+## Current browser build
+
+The playable combat checkpoint adds telegraphed drone return fire. A full 800 ms warning
 precedes three moving rounds, spaced 120 ms apart. Solid cover intercepts shots;
 window and pipe openings permit them. Three impacts disable the robot. Reset
 restores health and removes shots, sound events, and playing sounds. The weapon
@@ -95,11 +109,14 @@ earlier, fixed `if-let` warning; the final release and strict gates pass.
 
 The worktree is `bevy-gym-quality`; preserve the original dirty checkout.
 No recording is active. The published combat CI passed; its Pages deployment
-remains queued. Recheck the active experiment and remote deployment when resuming.
+[37917936588](https://github.com/sagan-software/bevy-gym/actions/runs/37917936588)
+is running. The research checkpoint `f5a2e06` also passed
+[CI](https://github.com/sagan-software/bevy-gym/actions/runs/37920078799).
 
 The preceding hearing checkpoint is `5c91099`; its CI passed at
 [run 37909451819](https://github.com/sagan-software/bevy-gym/actions/runs/37909451819).
-Its Pages build was still running during this checkpoint. The sight checkpoint's
+Its [Pages build](https://github.com/sagan-software/bevy-gym/actions/runs/37909451860)
+passed. The sight checkpoint's
 Pages build, [run 37904786112](https://github.com/sagan-software/bevy-gym/actions/runs/37904786112),
 passed. Local browser evidence and remote deployment status remain separate gates.
 
@@ -111,6 +128,11 @@ reacquisition before training armed opponents or claiming learned combat.
 The fixed follow camera can lose a nearby drone below the view; improve enemy
 tracking alongside pursuit. Native window execution and actual mobile touch
 input remain unverified. The larger roadmap and required port order remain active.
+
+## Historical checkpoint notes
+
+The remaining notes retain status as recorded at each checkpoint. Follow the
+resume section above for current work.
 
 The sensor checkpoint `7f5fd6a` adds a tested geometric sight model and the
 `pursuit-sight` guide. The sensor checks exposed head, chest, and hip points

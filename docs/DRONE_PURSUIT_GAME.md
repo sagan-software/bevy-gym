@@ -573,28 +573,59 @@ another checks the reload instruction after a bindings import fails.
 The real browser test suspends the output context, resumes it through a key press,
 measures nonzero weapon output, and measures silence after reset.
 
-## Navigation experiments before pursuit
+## Native heading and waypoint candidate
 
-The [probe record](progress/drone-navigation-probes.json) stores source and measured
-results for target displacement, heading transfer, and a pending residual controller.
-The live game still uses its qualified hover actor.
+The [candidate record](progress/drone-heading-candidate.json) stores frozen
+weights, exact experiment sources, case results, and earlier failed approaches.
+The live game still uses its qualified hover actor. Browser integration of the
+new candidate remains pending.
 
-The hover actor can reach nearby displaced targets, but larger jumps frequently
-terminate flight. Limiting requested displacement improves survival and slows
-travel. This measures an empty world; it does not qualify arena navigation.
+The candidate passed 128 native heading cases across four directions and
+32 fresh high-bit reset seeds. Every case survived ten seconds, returned at
+least 400, ended within half a metre, and held the final position/heading band
+for at least 100 actions. The observed maximum final position error was
+5.362 millimetres. These measurements concern flight in an empty world.
 
-Adding one zero-weight heading input preserves initial actor outputs. Subsequent
-PPO updates in the first transfer experiment degraded hover and failed the fixed
-heading criteria. That candidate was rejected at its last evaluated update, 60.
+It also passed 80 waypoint cases with requested displacement limited to three
+metres on each action. The actual targets ranged from zero to eight metres away.
+Each case survived and held position within half a metre and heading within
+15 degrees for its final 100 actions. This counter does not test speed.
+The hover-return threshold does not apply to displaced-target travel.
+Direct eight-metre commands failed nine of twenty cases, so retain the limit.
 
-The next experiment freezes flight weights and learns a scalar correction to
-alternating motor pairs. Final motor fractions remain in [0, 1]. Bounded correction
-does not guarantee stable flight, so it retains the same evaluation requirements.
+The new controller learns by imitation. A deterministic physical controller
+supplies demonstrations and labels states reached by the learner. A bounded
+replay buffer mixes those samples. The actor has 64 hidden units and thirteen
+inputs, with recurrent memory reset to zero for every action. No PPO update or
+scripted teacher executes in candidate inference.
 
-The architecture uses the decomposition described in
-[Residual Reinforcement Learning for Robot Control, version 2](https://arxiv.org/abs/1812.03201v2).
-That paper concerns robot assembly. It does not establish drone stability or
-Embark's implementation. Our frozen base is itself a learned hover controller.
+The teacher separates tilt correction from yaw correction, preserves the original
+mass and motor limits, and applies validated four-motor commands. Its initial
+full-attitude variants failed some translations. The final reference survived
+and reached all 80 targets; eight-metre travel did not meet the hover-return
+threshold. It remains a teaching reference, not learned gameplay.
 
-No character position enters either heading experiment. Heading qualification
-alone will not prove pursuit, obstacle avoidance, or reacquisition.
+[Lee, Leok, and McClamroch's 2010 paper](https://mleok.science/pdf/LeLeMc2010_quadrotor.pdf)
+provides the position/attitude decomposition and force/moment model. Our Y-up
+rectangular geometry, reduced tilt error, saturation, and gains differ.
+[PX4's attitude controller](https://github.com/PX4/PX4-Autopilot/blob/main/src/modules/mc_att_control/AttitudeControl/AttitudeControl.cpp)
+provided a reference for prioritizing tilt. No source code was copied.
+Neither source proves stability of this local controller.
+
+The dataset includes states reached by the learner, following the motivation in
+[Ross, Gordon, and Bagnell's 2011 imitation-learning work](https://proceedings.mlr.press/v15/ross11a.html).
+The finite local recipe does not inherit its theorem guarantees.
+The preceding residual experiment follows the decomposition described in
+[Residual Reinforcement Learning for Robot Control](https://arxiv.org/abs/1812.03201v2),
+but its frozen flight controller limited performance. That candidate survived
+all 128 evaluation flights and met the full criteria in only 84; it was rejected.
+
+[The figure](progress/drone-heading-measurements.png) plots recorded native
+samples without smoothing. Its first two panels use one preselected unseen
+reset seed across four headings. The last panel shows four bounded eight-metre
+moves from seed zero. It does not show browser execution.
+
+Next, implement and verify a small inference guide, then connect the controller
+to browser flight. Pursuit, search, moving targets, arena obstacles, and failed
+motors still require training and evaluation. No hidden character coordinates
+entered these heading or waypoint lessons.
