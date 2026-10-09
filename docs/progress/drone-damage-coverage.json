@@ -1,0 +1,174 @@
+{
+  "date": "2026-10-08",
+  "baseline_commit": "7b68da2f78ffe099a70d4f9ebe6c14f5de272f0e",
+  "command": "cargo llvm-cov --branch --no-default-features --features robots --lib --test drone_damage --test drone_hover --json",
+  "export": "Explicit llvm-cov export with the library, drone_damage, and drone_hover instrumented executables; required because build and target directories differ.",
+  "native_test_counts": {
+    "library": 90,
+    "damage": 3,
+    "hover": 8
+  },
+  "files": [
+    {
+      "path": "src/robots/action.rs",
+      "sha256": "1b6f198d12ec7aabbf555955390ede662a6d11263b067d6755d0231402f655b0",
+      "summary": {
+        "branches": {
+          "count": 4,
+          "covered": 4,
+          "notcovered": 0,
+          "percent": 100
+        },
+        "functions": {
+          "count": 4,
+          "covered": 4,
+          "percent": 100
+        },
+        "instantiations": {
+          "count": 8,
+          "covered": 7,
+          "percent": 87.5
+        },
+        "lines": {
+          "count": 14,
+          "covered": 14,
+          "percent": 100
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 19,
+          "covered": 19,
+          "notcovered": 0,
+          "percent": 100
+        }
+      }
+    },
+    {
+      "path": "src/robots/episode_ended.rs",
+      "sha256": "5df4e612d1e8369fafc2f53fbf39eb7fa8d40e51d836cd0220f1f33473a33435",
+      "summary": {
+        "branches": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "functions": {
+          "count": 1,
+          "covered": 1,
+          "percent": 100
+        },
+        "instantiations": {
+          "count": 2,
+          "covered": 1,
+          "percent": 50
+        },
+        "lines": {
+          "count": 3,
+          "covered": 3,
+          "percent": 100
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 5,
+          "covered": 5,
+          "notcovered": 0,
+          "percent": 100
+        }
+      }
+    },
+    {
+      "path": "src/robots/hover.rs",
+      "sha256": "3c845c284661e83a213a6806dcf6c51f2a0ed3caebfd17dbac8ca6dfe1168fd0",
+      "summary": {
+        "branches": {
+          "count": 16,
+          "covered": 16,
+          "notcovered": 0,
+          "percent": 100
+        },
+        "functions": {
+          "count": 21,
+          "covered": 21,
+          "percent": 100
+        },
+        "instantiations": {
+          "count": 33,
+          "covered": 32,
+          "percent": 96.96969696969697
+        },
+        "lines": {
+          "count": 320,
+          "covered": 320,
+          "percent": 100
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 538,
+          "covered": 538,
+          "notcovered": 0,
+          "percent": 100
+        }
+      }
+    },
+    {
+      "path": "src/robots/observation.rs",
+      "sha256": "d7fd4cd045cf6e894b5e2dbd56a5679548417149f8c47da6cde6701f4965f4a0",
+      "summary": {
+        "branches": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "functions": {
+          "count": 5,
+          "covered": 5,
+          "percent": 100
+        },
+        "instantiations": {
+          "count": 10,
+          "covered": 10,
+          "percent": 100
+        },
+        "lines": {
+          "count": 20,
+          "covered": 20,
+          "percent": 100
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 24,
+          "covered": 24,
+          "notcovered": 0,
+          "percent": 100
+        }
+      }
+    }
+  ],
+  "gaps": [
+    "The motor identity and state enums contain no executable functions in the LLVM report. Their variants are exercised by all sixteen failure combinations.",
+    "The runnable damage guide is validated separately without coverage instrumentation. Its unreachable invalid-constant and terminal-before-failure error paths are not measured.",
+    "Coverage includes internal test code; line hits do not independently establish physical correctness. Native and WASM assertions compare damaged forces with explicit zero motor commands."
+  ]
+}

@@ -2,6 +2,8 @@
 
 use bevy::math::{Quat, Vec3};
 
+use super::{DroneMotor, DroneMotorState};
+
 /// Drone state in a right-handed frame with +X right, +Y up, and -Z forward.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct DroneObservation {
@@ -13,9 +15,29 @@ pub struct DroneObservation {
     pub(super) linear_velocity: Vec3,
     /// World angular velocity in radians per second.
     pub(super) angular_velocity: Vec3,
+    /// Actuator health in the documented motor-command order.
+    pub(super) motor_states: [DroneMotorState; 4],
 }
 
 impl DroneObservation {
+    /// Return one motor's health without exposing writable environment state.
+    ///
+    /// ```compile_fail
+    /// use bevy_gym::{Env, robots::{DroneHover, DroneMotorState}};
+    /// let mut observation = DroneHover::default().reset(Some(0)).observation;
+    /// observation.motor_states = [DroneMotorState::Failed; 4];
+    /// ```
+    #[must_use]
+    pub const fn motor_state(self, motor: DroneMotor) -> DroneMotorState {
+        let [front_left, front_right, rear_right, rear_left] = self.motor_states;
+        match motor {
+            DroneMotor::FrontLeft => front_left,
+            DroneMotor::FrontRight => front_right,
+            DroneMotor::RearRight => rear_right,
+            DroneMotor::RearLeft => rear_left,
+        }
+    }
+
     /// Return the body centre position in metres.
     #[must_use]
     pub const fn position(self) -> Vec3 {

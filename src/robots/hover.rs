@@ -8,7 +8,7 @@ use rapier3d::prelude::{
     RigidBodyBuilder, RigidBodyHandle, Rotation, Vector,
 };
 
-use super::{DroneAction, DroneObservation};
+use super::{DroneAction, DroneEpisodeEnded, DroneMotor, DroneMotorState, DroneObservation};
 use crate::training::SplitMix64;
 use crate::{Env, EpisodeStatus, Reset, Step};
 
@@ -43,6 +43,8 @@ pub struct DroneHover {
     episode: Flight,
     /// Initial-condition distribution retained across episode resets.
     reset_profile: ResetProfile,
+    /// Actuator health restored to working whenever the world is reset.
+    motor_states: [DroneMotorState; 4],
 }
 
 /// Initial conditions selected by the two public constructors.
@@ -88,6 +90,36 @@ const MOTORS: [(Vector, f32); 4] = [
 ];
 
 impl DroneHover {
+    /// Disable one motor's force and reaction torque until reset.
+    ///
+    /// Repeated failure during flight succeeds without further changes. Failure
+    /// retains body mass, collision geometry, pose, and velocity. It models an
+    /// actuator failure, not a detached part.
+    ///
+    /// # Errors
+    ///
+    /// Returns `DroneEpisodeEnded` after termination, preserving the terminal state.
+    ///
+    /// ```compile_fail
+    /// use bevy_gym::robots::DroneHover;
+    /// DroneHover::default().fail_motor(4);
+    /// ```
+    pub fn fail_motor(&mut self, motor: DroneMotor) -> Result<(), DroneEpisodeEnded> {
+        // Reject terminal mutations before changing any health or solver state.
+        if self.episode == Flight::Ended {
+            return Err(DroneEpisodeEnded);
+        }
+        let [front_left, front_right, rear_right, rear_left] = &mut self.motor_states;
+        let state = match motor {
+            DroneMotor::FrontLeft => front_left,
+            DroneMotor::FrontRight => front_right,
+            DroneMotor::RearRight => rear_right,
+            DroneMotor::RearLeft => rear_left,
+        };
+        *state = DroneMotorState::Failed;
+        Ok(())
+    }
+
     /// Construct a hover lesson with randomized tilt and velocity on every reset.
     ///
     /// The initial episode uses seed zero. Position offsets match the calm task.
@@ -135,6 +167,7 @@ impl DroneHover {
             random,
             episode: Flight::Flying,
             reset_profile: ResetProfile::Calm,
+            motor_states: [DroneMotorState::Working; 4],
         }
     }
 
@@ -173,6 +206,7 @@ impl DroneHover {
             orientation: Quat::from_array(body.rotation().to_array()),
             linear_velocity: Vec3::from_array(body.linvel().to_array()),
             angular_velocity: Vec3::from_array(body.angvel().to_array()),
+            motor_states: self.motor_states,
         }
     }
 
@@ -191,7 +225,16 @@ impl DroneHover {
 
         // A force in newtons at a world-space point produces torque in newton-metres.
         // Alternating reaction moments cancel when all motor commands are equal.
-        for ((offset, sign), fraction) in MOTORS.into_iter().zip(action.fractions()) {
+        for (((offset, sign), fraction), state) in MOTORS
+            .into_iter()
+            .zip(action.fractions())
+            .zip(self.motor_states)
+        {
+            // A failed actuator contributes neither lift nor its reaction moment.
+            let fraction = match state {
+                DroneMotorState::Working => fraction,
+                DroneMotorState::Failed => 0.0,
+            };
             let force = fraction * MAX_THRUST;
             body.add_force_at_point(up * force, position + rotation * offset, true);
             body.add_torque(up * (sign * REACTION_ARM * force), true);
@@ -392,6 +435,59 @@ mod tests {
         assert!(description.contains("DroneHover"));
         assert!(description.contains("Flying"));
         assert!(description.contains("observation"));
+    }
+
+    #[test]
+    fn failure_changes_only_health_before_the_next_physics_step() {
+        let mut drone = DroneHover::disturbed();
+        let before = drone.observation();
+        drone
+            .fail_motor(DroneMotor::FrontLeft)
+            .expect("active flight");
+        let after = drone.observation();
+        assert_eq!(before.position(), after.position());
+        assert_eq!(before.orientation(), after.orientation());
+        assert_eq!(before.linear_velocity(), after.linear_velocity());
+        assert_eq!(before.angular_velocity(), after.angular_velocity());
+        assert_eq!(
+            after.motor_state(DroneMotor::FrontLeft),
+            DroneMotorState::Failed
+        );
+    }
+
+    #[test]
+    fn failed_motors_clear_previously_applied_force_and_reaction() {
+        let mut drone = DroneHover::default();
+        let full = DroneAction::try_from([1.0; 4]).expect("full power");
+        let asymmetric = DroneAction::try_from([1.0, 0.0, 0.0, 0.0]).expect("one motor");
+        drone.apply_motors(asymmetric);
+        assert!(
+            drone
+                .world
+                .bodies
+                .get(drone.body)
+                .expect("body")
+                .user_force()
+                .y
+                > 0.0
+        );
+        assert!(
+            drone
+                .world
+                .bodies
+                .get(drone.body)
+                .expect("body")
+                .user_torque()
+                .length()
+                > 0.0
+        );
+        for motor in DroneMotor::ALL {
+            drone.fail_motor(motor).expect("active flight");
+        }
+        drone.apply_motors(full);
+        let body = drone.world.bodies.get(drone.body).expect("body");
+        assert_eq!(body.user_force(), Vector::ZERO);
+        assert_eq!(body.user_torque(), Vector::ZERO);
     }
 
     #[test]
