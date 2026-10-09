@@ -80,6 +80,29 @@ to pursuit and damage. Select the physics library only after checking current Be
 compatibility and browser support. Keep a simple baseline controller for diagnosis;
 learned-policy claims require trained weights and held-out results.
 
+## Additional locomotion reference
+
+[ARC-RL](https://github.com/CarloRomeo427/ARC_RL/tree/abca8c8377f25379b87c9705614911d6824af9c9)
+is an independent project with a twelve-joint quadruped model named Leaper.
+At this pinned revision, its MJCF uses primitive geometry and its environment
+rewards forward-speed tracking, health, and gait compliance. It is a locomotion
+reference; it does not implement our requested jump attacks, limb destruction,
+perception, or pursuit experience.
+
+Its README calls the license MIT, but the actual LICENSE adds an author-
+acknowledgment condition and contains a placeholder surname. Preserve the actual
+license text and resolve attribution before copying code or models. No code or
+models from this project have been added to distributable assets.
+
+[Embark's Unreal Engine interview](https://www.unrealengine.com/developer-interviews/embark-studios-build-the-award-winning-arc-raiders-with-unreal-engine)
+describes physics, learned locomotion, and procedural animation together. It also
+describes player-facing acoustic simulation. It does not specify an enemy hearing
+sensor or publish a reproducible drone controller.
+
+[The motor-damage contract](DRONE_DAMAGE.md) separates force failure, physical
+thruster separation, and learned recovery. It records the current model's static
+lift and yaw constraints before changing the public API.
+
 ## Model candidates
 
 [Alexandre.ltrgn's Drone](https://sketchfab.com/3d-models/drone-688425e1cddb4a288a12b00246a76d43)
@@ -213,6 +236,12 @@ across height changes, and lands near players and cover. Shots cut between scene
 so these sheets cannot establish a single continuous jump trajectory. A continuous
 clip is required before measuring launch speed, recovery time, or contact order.
 
+A closer inspection sampled 00:48–01:00 and 01:20–01:32 at four frames per second.
+The continuous 00:55–00:57.6 rooftop approach shows leg spread and overhead motion.
+Its twenty-frame contact sheet samples eight frames per second. Neither takeoff
+nor landing is fully visible, so this excerpt cannot establish jump distance or
+full airborne duration. The clip and contact-sheet hashes are in the media inventory.
+
 A 24-frame documentary sheet for 02:30–02:45 shows a four-lobed aerial silhouette,
 bright thruster or attack effects, downward pursuit near a wall, impact, and debris.
 Use those visible events to define comparison shots. Do not infer hearing, online
@@ -222,8 +251,21 @@ learning, or a particular controller from them.
 content hashes, durations, and source revisions independently of local downloads.
 Raw gameplay videos remain local reference material.
 
-Two more Creative Commons candidates are
-[NateGazzard's four-rotor drone](https://poly.pizza/m/DNbUoMtG3H) and
-[Silly Fear's drone](https://poly.pizza/m/3Ae_y67lzvd). Their source pages list
-Attribution licenses, but direct downloads and geometry inspection are unresolved.
-The first model's source description explicitly identifies four rotors.
+[NateGazzard's four-rotor drone](https://poly.pizza/m/DNbUoMtG3H) is now the
+viewer model. Its [asset record](../assets/robots/README.md) retains the license,
+geometry inspection, and actuator alignment. [Silly Fear's drone](https://poly.pizza/m/3Ae_y67lzvd)
+remains an uninspected alternative.
+
+## Animated target asset
+
+[Quaternius's Adventurer](https://poly.pizza/m/5EGWBMpuXq) is a CC0 character from
+the [Ultimate Modular Men pack](https://quaternius.com/packs/ultimatemodularcharacters.html).
+The pack's Google Drive individual-file download returned a quota-exceeded HTML
+page. The creator's Poly Pizza listing supplied a valid 1,944,116-byte GLB instead.
+It contains five meshes, five skins, and 24 named animation clips, including walk,
+run, hit reactions, and death. The media inventory records its hash and all clip names.
+
+The [inspection screenshot](progress/adventurer-target-inspection.png) and
+[walking clip](progress/adventurer-target-inspection.mp4) show the actual downloaded
+model in a browser asset viewer. Bevy animation playback, root motion, collision,
+target behavior, and perception integration remain unverified.
