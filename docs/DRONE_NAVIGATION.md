@@ -81,7 +81,8 @@ There is no reward derived from hidden target position.
 
 Imitation used seed 7, a 64-unit recurrent actor with zero carried state,
 32 actor inputs, 32 critic inputs, and two 64-unit critic layers.
-It trained 500 updates, with four 512-sample cloning batches per update.
+It trained 500 updates, reusing one sampled 512-example batch for four gradient
+steps per update.
 Teacher-labelled learner rollouts expanded a replay buffer capped at 30,000 samples.
 Checkpoint 150 maximized minimum visibility among evaluated checkpoints that
 survived all 15 selection cases. Later checkpoints regressed.

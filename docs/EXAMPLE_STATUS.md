@@ -7,6 +7,29 @@ Updated: 2026-10-09. Goal status: active.
 Read [the roadmap](EXAMPLE_ROADMAP.md), [quality audit](QUALITY_AUDIT.md),
 [reference research](EXAMPLE_RESEARCH.md), and [drone contract](ROBOT_ENVIRONMENT.md).
 
+The [permanent-cover experiments](DRONE_SEARCH.md) distinguish search from
+waiting for a target to reappear. Cover PPO 260 never saw the robot after it
+stopped inside the pipe. A teacher using filtered sight and known arena waypoints
+passed ten trials. Distilled candidates learned individual cover routes, but no
+candidate passed both. Do not install them in gameplay.
+
+Only `bevy-gym-navigation-memory-ppo-20261009` remains active. Inspect that exact
+user service before restarting anything. Its log is
+`/home/sagan/.cache/bevy-gym-quality-validation/navigation-memory-ppo.log`.
+
+It has a finite 300-update limit. The [research archive](progress/drone-hide-candidate.json)
+contains the current snapshot, exact sources, failed runs, models, and restore paths.
+Its `active_run.snapshot_max_update` marks the cutoff. Later on-disk results remain
+to be inspected.
+
+The live test is `tests/drone_navigator_memory_probe.rs`;
+keep it until the process finishes. Other temporary tests were archived and removed.
+
+Next, inspect recurrent results and test supervised learning across observation
+sequences. Preserve the motor pilot's zero-memory contract. Qualify both cover
+routes, moving-target profiles, fresh seeds, and browser execution before gameplay
+integration. The full roadmap remains active.
+
 The [navigation research](DRONE_NAVIGATION.md) is archived. Imitation 150 and
 open PPO 140 each passed 192 native open-route cases. Open PPO crashed in all ten
 house/pipe cases. Cover PPO 260 survived all 25 selection cases and ten repeated
@@ -17,13 +40,13 @@ unqualified, and no new navigator has browser verification.
 The [research record](progress/drone-navigation-candidate.json) preserves exact
 sources, restore paths, model hashes, raw results, logs, and failed checkpoints.
 The three selected models and native path plots are committed beside it.
-All navigation training and audit services finished. The temporary research tests
+The earlier open-route and temporary-cover services finished. The earlier navigation tests
 were archived and removed from `tests/`. Prototype warnings are recorded;
 they are not clean production gates. Production Rust and the playable scene did
 not change in this checkpoint.
 
-Next, test deliberate search with navigator memory, hearing, vertical clearance,
-and targets that remain hidden. Follow the acceptance checks in the research guide.
+The permanent-cover follow-up above now tests targets that remain hidden.
+Hearing and vertical-clearance observations remain to be added.
 Do not repeat the unchanged moving-goal or open-route experiments just to resume.
 
 The [waypoint flight guide](DRONE_TRACKING.md) now runs in the rendered browser
