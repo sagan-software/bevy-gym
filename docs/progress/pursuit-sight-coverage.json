@@ -1,0 +1,75 @@
+{
+  "baseline_commit": "73e11942c0c5f6216ee065e552d12d1aa597c0c0",
+  "method": "LLVM show of only the two test binaries and runnable guide executed for this checkpoint; canonical source paths combine guide and integration-test instantiations.",
+  "tests": {
+    "native_including_shared_arena": 9,
+    "wasm": 7,
+    "guide_executed": true
+  },
+  "files": [
+    {
+      "path": "examples/robots/pursuit/sight.rs",
+      "sha256": "49bf516169209b1814723e08ab791f0adefd0ae0364ece0442ba4fda198996cc",
+      "instrumented_lines": 48,
+      "unhit_lines": [],
+      "branches": {
+        "45:16": [
+          true,
+          true
+        ],
+        "56:27": [
+          true,
+          true
+        ],
+        "73:8": [
+          true,
+          true
+        ],
+        "74:12": [
+          true,
+          true
+        ],
+        "75:12": [
+          true,
+          true
+        ],
+        "76:12": [
+          true,
+          true
+        ],
+        "90:13": [
+          true,
+          true
+        ],
+        "91:20": [
+          true,
+          true
+        ],
+        "92:20": [
+          true,
+          true
+        ],
+        "93:20": [
+          true,
+          true
+        ]
+      }
+    },
+    {
+      "path": "examples/robots/pursuit_sight.rs",
+      "sha256": "c98613cf30c7f48fb8c35c450e6b7fe87d5bf28201f0c5c53bb03e9d35054d0f",
+      "instrumented_lines": 17,
+      "unhit_lines": [],
+      "branches": {}
+    }
+  ],
+  "gaps": [
+    "The sensor is not connected to the rendered game or a pursuit actor yet. No new visual behavior is claimed."
+  ],
+  "sources": {
+    "tests/pursuit_sight.rs": "bcfb693ddfab3ad52d6d31da7bcec980b26d92038a88ee80e267fb14f6aca14c",
+    "Cargo.toml": "7aa7aec99e7dcf8ceeff92cad2dcaff40729bcd2b81a741e3c26fdfbf5a88afc",
+    "flake.nix": "7c371fb7ba2a9d57bdfc60d58157245ba9a59c40bee389c44544eb6482cf2827",
+    ".github/workflows/ci.yml": "a30aeb65de3f3d2697dcc84296837884f06d7401b42daeeac8c64c98c4f0bbfd"
+  }
+}

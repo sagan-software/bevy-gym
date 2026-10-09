@@ -335,7 +335,7 @@
               )
             }"
             cargo test --locked --no-default-features --features robots,browser \
-              --target wasm32-unknown-unknown --test pursuit_arena --test pursuit_combat --test pursuit_shots --test drone_hover --test drone_obstacles --test drone_damage --test drone_damage_baseline --test drone_recovery --test drone_parity "$@"
+              --target wasm32-unknown-unknown --test pursuit_arena --test pursuit_combat --test pursuit_shots --test pursuit_sight --test drone_hover --test drone_obstacles --test drone_damage --test drone_damage_baseline --test drone_recovery --test drone_parity "$@"
             cargo test --locked --no-default-features --features robots,browser,browser-training \
               --target wasm32-unknown-unknown --test drone_learning --test drone_damage_training "$@"
           '';

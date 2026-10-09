@@ -7,7 +7,30 @@ Updated: 2026-10-09. Goal status: active.
 Read [the roadmap](EXAMPLE_ROADMAP.md), [quality audit](QUALITY_AUDIT.md),
 [reference research](EXAMPLE_RESEARCH.md), and [drone contract](ROBOT_ENVIRONMENT.md).
 
-The current checkpoint connects the playable arena to live flight. The bundled
+The current checkpoint adds a tested geometric sight model and the
+`pursuit-sight` guide. The sensor checks exposed head, chest, and hip points
+through the arena geometry. Its 90-degree cone reaches 20 metres; last-seen
+memory expires at three seconds. Hidden movement cannot update the remembered
+position. A one-millimetre ray extension closes wall-face rounding gaps.
+
+Seven sensor tests pass in Chrome/WASM; nine native cases include the shared
+arena tests. The guide runs and prints visible, remembered, and unknown states.
+Root tests, strict Clippy, the expanded native CI command, and changed-line
+personal Rust gates pass. [Coverage](progress/pursuit-sight-coverage.json) records
+all instrumented sensor and guide lines hit, with both outcomes of every
+instrumented sensor branch. The full personal Rust backlog remains.
+
+Nix lint still reports pre-existing unfiltered-source warnings at
+`flake.nix:119` and `flake.nix:199`; this checkpoint changes the browser test list.
+Logs use the `pursuit-sight-` validation-cache prefix.
+
+This checkpoint does not change the rendered game. Next, connect sight to the
+playable arena with an explicit camera orientation and visible detection feedback.
+Keep privileged character coordinates outside the future pursuit actor's input.
+Then add sound events, telegraphed return fire, and pursuit training. The sensor
+contract and remaining integration work are in [the game plan](DRONE_PURSUIT_GAME.md).
+
+The live-flight checkpoint `73e1194` connects the playable arena to live flight. The bundled
 healthy hover policy drives `DroneHover` with arena obstacles. Rotor hits disable
 motor forces; collision or flight-region termination emits one body destruction
 event. Debris inherits flight velocity. Body damage stops further flight actions.
@@ -31,10 +54,8 @@ Logs use the `pursuit-flight-` validation-cache prefix. No recording is active.
 Native window execution and mobile touch input remain unverified. The controller
 is healthy hover only; pursuit and learned damage recovery are unfinished.
 
-Next, add occlusion-aware sight and finite remembered sightings before pursuit
-training. Keep hidden character positions out of actor input. Then add sound events
-and telegraphed return fire. Preserve the existing player controls, damage, reset,
-and qualified hover behavior while adding the game observations and rewards.
+Preserve the existing player controls, damage, reset, and qualified hover behavior
+while connecting the sight model and adding game observations and rewards.
 
 ## Earlier checkpoints
 

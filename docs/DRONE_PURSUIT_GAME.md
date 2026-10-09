@@ -153,7 +153,8 @@ The pipe runs along Z=-2..4 metres, centred at X=5 and Y=1.7 metres.
 The same static geometry answers nearest-obstruction queries for the camera.
 Invalid query coordinates fail closed at zero distance; zero-length segments
 have no obstruction. This is the geometry basis for later sight and shot queries.
-No perception model or hidden-target observation has been added yet.
+The geometric sight model below now queries this layout. It is not yet connected
+to the rendered game or a pursuit actor.
 
 Tests cover all sixteen button combinations, fixed movement, walls, door and pipe
 traversal, window and roof obstruction, gravity, reset, camera obstruction, walking
@@ -347,3 +348,50 @@ loss of control, and crash debris in the optimized browser build. Desktop and
 390-pixel views were inspected. Narrow reset restores the drone and pistol.
 [The visual record](progress/pursuit-flight.json) records the runtime, hashes,
 recording excerpt, and verification limits.
+
+## Sight and finite memory
+
+Run the short sensor guide:
+
+```sh
+nix develop --command cargo run --features robots --example pursuit-sight
+```
+
+The guide sees a robot through the house window, loses it behind the wall, and
+forgets its last position. `Sight` returns one of three `Contact` variants:
+`Unknown`, `Visible(point)`, or `Remembered { point, age }`. A remembered point
+is an earlier measurement, not the robot's current position. Hidden movement
+cannot update that point or supply target velocity. Reset calls `forget`.
+
+The camera uses a 90-degree full cone and an inclusive 20-metre range. Its direction
+is a `Dir3`. Observer and character centres must be finite and within ±1,000 metres
+on every axis. Invalid centres produce no sighting and age existing memory.
+
+The sensor tests head, chest, and hip proxies in that order, at vertical offsets
+of +0.6, +0.2, and −0.3 metres from the character centre. It returns the first
+exposed point. These samples approximate body visibility; they are not rendered
+pixels or a full silhouette. A coincident sample has no viewing direction.
+
+Occlusion uses the arena's existing solid-ray query and immutable geometry.
+[Rapier 0.36 documents bounded rays and solid origins](https://rapier.rs/docs/user_guides/rust/scene_queries/).
+Each sight ray extends one millimetre beyond its sample to close floating-point
+gaps at wall faces. That margin can hide a sample less than one millimetre in
+front of a wall. It does not change the range or cone test on the sampled point.
+Windows, the doorway, and pipe openings permit clear rays; solid surfaces block them.
+
+Each successful sample replaces the measured point and resets its age to zero.
+Each unsuccessful sample adds elapsed simulation time with saturating arithmetic.
+At an age of three seconds or more, the observation becomes `Unknown` and retains
+no position. Reacquisition starts a fresh sighting. Range, cone, body proxies,
+occlusion margin, and expiry are local game choices, not claims about ARC Raiders.
+
+Seven sensor cases pass natively and in Chrome/WASM. Native execution also runs
+two shared arena cases. Tests cover range and cone boundaries, exposed body points,
+wall-face rounding, invalid centres, hidden movement, exact expiry, saturation,
+reacquisition, and reset. [Coverage](progress/pursuit-sight-coverage.json) records
+all 48 instrumented sensor lines, both outcomes of all ten instrumented sensor
+branches, and all 17 instrumented guide lines.
+
+The model and guide are implemented. The rendered game still needs a camera
+orientation, sensor sampling, visible detection feedback, and sensor-only actor
+inputs before pursuit training. Hearing and return fire remain pending.
