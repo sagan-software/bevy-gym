@@ -38,13 +38,26 @@ mod weapons;
 use arena::{Arena, Movement};
 use bevy::{asset::AssetMetaCheck, prelude::*};
 
+#[cfg(test)]
+#[path = "pursuit/flight_tests.rs"]
+mod flight_tests;
+
+#[path = "learning/encoding.rs"]
+mod encoding;
+#[path = "pursuit/flight.rs"]
+mod flight;
+#[path = "learning/model.rs"]
+mod model;
+
 /// One character's simulation and measured motion for visual animation.
-#[derive(Resource, Default)]
+#[derive(Resource)]
 struct Game {
     /// Shared movement and collision model.
     arena: Arena,
     /// Pickup, target damage, and firing feedback.
     combat: firing::Combat,
+    /// Private flight physics and the bundled healthy hover controller.
+    flight: flight::Flight,
     /// Distance walked in metres since reset, used as animation phase.
     distance: f32,
     /// Last horizontal displacement, in metres per action.
@@ -55,11 +68,35 @@ struct Game {
     aim: Option<Dir3>,
 }
 
+impl Default for Game {
+    fn default() -> Self {
+        let arena = Arena::default();
+        let flight = flight::Flight::new(&arena);
+        let mut combat = firing::Combat::default();
+        combat
+            .project_flight(flight.observation())
+            .expect("Initial flight pose is valid");
+        Self {
+            arena,
+            combat,
+            flight,
+            distance: 0.0,
+            motion: Vec3::ZERO,
+            heading: 0.0,
+            aim: None,
+        }
+    }
+}
+
 impl Game {
     /// Reset simulation and animation together.
     fn reset(&mut self) {
         self.arena.reset();
         self.combat = firing::Combat::default();
+        self.flight.reset();
+        self.combat
+            .project_flight(self.flight.observation())
+            .expect("Reset flight pose is valid");
         self.distance = 0.0;
         self.motion = Vec3::ZERO;
         self.heading = 0.0;
@@ -86,6 +123,13 @@ impl Game {
     /// Animate measured displacement, so holding a blocked direction does not walk in place.
     fn step(&mut self, movement: Movement) {
         self.combat.advance(std::time::Duration::from_millis(20));
+        if let Some(step) = self.flight.advance(self.combat.target().health()) {
+            if let Err(error) = self.combat.project_flight(step.observation) {
+                self.flight.fail(format!("Invalid flight pose: {error:?}"));
+            } else if step.is_done() {
+                self.combat.crash();
+            }
+        }
         let previous = self.arena.position();
         self.arena.step(movement);
         self.motion = (self.arena.position() - previous) * Vec3::new(1.0, 0.0, 1.0);
@@ -200,6 +244,30 @@ mod tests {
         effects::install(&mut app);
         app.update();
         app
+    }
+
+    #[test]
+    fn flight_failure_is_visible_and_reset_restores_hover_playback() {
+        let mut app = app();
+        app.world_mut()
+            .resource_mut::<Game>()
+            .flight
+            .fail("Invalid checkpoint".to_owned());
+        app.update();
+        let world = app.world_mut();
+        let text = world
+            .query_filtered::<&Text, With<hud::Status>>()
+            .single(world)
+            .expect("Status");
+        assert!(text.0.contains("Flight stopped: Invalid checkpoint"));
+        app.world_mut().resource_mut::<Game>().reset();
+        app.update();
+        let world = app.world_mut();
+        let text = world
+            .query_filtered::<&Text, With<hud::Status>>()
+            .single(world)
+            .expect("Status");
+        assert_eq!(text.0, "Hover policy · E to collect pistol");
     }
 
     #[test]

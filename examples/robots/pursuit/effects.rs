@@ -80,10 +80,13 @@ fn observe(
                     remaining: Duration::from_secs(2),
                     elapsed: Duration::ZERO,
                 });
-                // The current target is stationary; future flight must supply its actual velocity.
+                // Fragments inherit the last authoritative world-space velocity in metres per second.
                 let pose = Isometry3d::new(position, target.rotation());
-                for (fragment, transform) in debris.burst(pose, Vec3::ZERO, collision_world(&game))
-                {
+                for (fragment, transform) in debris.burst(
+                    pose,
+                    game.flight.observation().linear_velocity(),
+                    collision_world(&game),
+                ) {
                     commands.spawn((
                         fragment,
                         Mesh3d(materials.fragment.clone()),

@@ -29,6 +29,44 @@ use shot::{
 };
 use std::time::Duration;
 
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn flight_pose_updates_preserve_damage_and_reject_invalid_state_atomically() {
+    let arena = Arena::default();
+    let mut pistol = Pistol::default();
+    pistol.pick_up(Pistol::LOCATION).expect("Pickup");
+    let mut target = Target::try_from((Vec3::new(0.0, 3.0, 0.0), Quat::IDENTITY)).expect("Target");
+    let aim = Aim::try_from((Vec3::new(0.0, 4.0, 0.0), Vec3::NEG_Y)).expect("Aim");
+    target.shoot(&arena, &mut pistol, aim).expect("Body hit");
+    let health = target.health().clone();
+    target
+        .move_to(Vec3::new(1.0, 3.0, 0.0), Quat::from_rotation_y(0.4))
+        .expect("Flight pose");
+    assert_eq!(target.health(), &health);
+    let position = target.position();
+    let rotation = target.rotation();
+    for (centre, orientation, error) in [
+        (
+            Vec3::splat(f32::NAN),
+            Quat::IDENTITY,
+            InvalidTarget::Position,
+        ),
+        (
+            Vec3::ZERO,
+            Quat::from_array([0.0; 4]),
+            InvalidTarget::Rotation,
+        ),
+    ] {
+        assert_eq!(target.move_to(centre, orientation), Err(error));
+        assert_eq!(target.position(), position);
+        assert_eq!(target.rotation(), rotation);
+        assert_eq!(target.health(), &health);
+    }
+    assert_eq!(target.crash(), Damage::Destroyed);
+    assert_eq!(target.crash(), Damage::Ignored);
+    assert!(!target.health().is_alive());
+}
+
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen_test::wasm_bindgen_test;
 #[cfg(target_arch = "wasm32")]

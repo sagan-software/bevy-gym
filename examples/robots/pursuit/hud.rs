@@ -42,7 +42,7 @@ pub(super) fn setup(mut commands: Commands<'_, '_>, assets: Res<'_, AssetServer>
         .with_children(|root| {
             root.spawn((
                 Status,
-                Text::new("Stationary drone · E to collect pistol"),
+                Text::new("Hover policy · E to collect pistol"),
                 TextFont {
                     font: font.clone(),
                     font_size: 16.0,
@@ -69,12 +69,13 @@ pub(super) fn setup(mut commands: Commands<'_, '_>, assets: Res<'_, AssetServer>
 pub(super) fn project(
     game: Res<'_, Game>,
     mut text: Query<'_, '_, &mut Text, With<Status>>,
-    mut previous: Local<'_, Option<(Feedback, u8, u8)>>,
+    mut previous: Local<'_, Option<(Feedback, u8, u8, bool)>>,
 ) {
     let state = (
         game.combat.feedback(),
         game.combat.rounds(),
         game.combat.target().health().body_hits_remaining(),
+        game.flight.error().is_some(),
     );
     if *previous == Some(state) {
         return;
@@ -84,7 +85,9 @@ pub(super) fn project(
     let rounds = state.1;
     let health = state.2;
     for mut text in &mut text {
-        text.0 = if game.combat.is_armed() {
+        text.0 = if let Some(error) = game.flight.error() {
+            format!("Flight stopped: {error} · R to reset")
+        } else if game.combat.is_armed() {
             format!("Ammo {rounds} · Drone {health}/6 · {message}")
         } else {
             message.to_owned()
@@ -95,7 +98,8 @@ pub(super) fn project(
 /// State-specific messages describe the action outcome without implying learned pursuit.
 const fn message(feedback: Feedback) -> &'static str {
     match feedback {
-        Feedback::Unarmed => "Stationary drone · E to collect pistol",
+        Feedback::Crashed => "Drone crashed · R to reset",
+        Feedback::Unarmed => "Hover policy · E to collect pistol",
         Feedback::Armed => "Point to aim · Click to fire",
         Feedback::Pickup(PickupError::TooFar) => "Move closer to the pistol",
         Feedback::Pickup(PickupError::AlreadyOwned) => "Pistol already collected",
@@ -133,7 +137,8 @@ mod tests {
     #[test]
     fn every_feedback_variant_has_an_exact_actionable_message() {
         let cases = [
-            (Feedback::Unarmed, "Stationary drone · E to collect pistol"),
+            (Feedback::Unarmed, "Hover policy · E to collect pistol"),
+            (Feedback::Crashed, "Drone crashed · R to reset"),
             (Feedback::Armed, "Point to aim · Click to fire"),
             (
                 Feedback::Pickup(PickupError::TooFar),

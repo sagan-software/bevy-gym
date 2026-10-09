@@ -1,0 +1,661 @@
+{
+  "baseline_commit": "1a976a1721d37122c0ba0fb0bbdd3c1e1073f78f",
+  "tests": {
+    "pursuit_viewer": 34,
+    "shots_native": 15
+  },
+  "method": "LLVM show of exactly the two native test binaries run in this checkpoint, with canonical source paths.",
+  "files": [
+    {
+      "path": "tests/pursuit_shots.rs",
+      "sha256": "42506a3fec65cc0802f1334df58d21144b0715ca702fee5e7efdd0817291828d",
+      "changed_instrumented_lines": [
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        65,
+        66,
+        67,
+        68
+      ],
+      "unhit_changed_lines": [],
+      "source_branches": {
+        "145:135": [
+          true,
+          false
+        ],
+        "149:127": [
+          true,
+          false
+        ],
+        "176:27": [
+          true,
+          true
+        ],
+        "182:77": [
+          true,
+          false
+        ],
+        "182:99": [
+          true,
+          false
+        ],
+        "223:16": [
+          true,
+          true
+        ],
+        "239:12": [
+          true,
+          true
+        ],
+        "240:63": [
+          true,
+          false
+        ],
+        "255:86": [
+          true,
+          false
+        ],
+        "290:109": [
+          true,
+          false
+        ]
+      }
+    },
+    {
+      "path": "examples/robots/pursuit.rs",
+      "sha256": "7aefaf8b0a84765a78d286c230ad4e192a121d4fa1597850a6d4dc8ca9ac8986",
+      "changed_instrumented_lines": [
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80,
+        81,
+        82,
+        83,
+        84,
+        85,
+        86,
+        87,
+        88,
+        96,
+        97,
+        98,
+        99,
+        126,
+        127,
+        128,
+        129,
+        130,
+        131,
+        132,
+        250,
+        251,
+        252,
+        253,
+        254,
+        255,
+        256,
+        257,
+        258,
+        259,
+        260,
+        261,
+        262,
+        263,
+        264,
+        265,
+        266,
+        267,
+        268,
+        269,
+        270,
+        271
+      ],
+      "unhit_changed_lines": [
+        128
+      ],
+      "source_branches": {
+        "126:16": [
+          true,
+          true
+        ],
+        "127:20": [
+          false,
+          true
+        ],
+        "129:23": [
+          true,
+          true
+        ],
+        "138:12": [
+          true,
+          true
+        ],
+        "199:12": [
+          true,
+          true
+        ],
+        "444:16": [
+          true,
+          true
+        ],
+        "518:20": [
+          true,
+          true
+        ],
+        "535:20": [
+          true,
+          true
+        ]
+      }
+    },
+    {
+      "path": "examples/robots/pursuit/aiming.rs",
+      "sha256": "4e1c2f4278101e96dbb4e35c38f9384e5a23dd6dfb80171fc66c2dd3c523523a",
+      "changed_instrumented_lines": [
+        117,
+        121
+      ],
+      "unhit_changed_lines": [],
+      "source_branches": {
+        "22:8": [
+          true,
+          true
+        ],
+        "22:39": [
+          true,
+          true
+        ],
+        "27:20": [
+          true,
+          true
+        ],
+        "30:12": [
+          true,
+          true
+        ],
+        "38:8": [
+          true,
+          true
+        ],
+        "39:16": [
+          true,
+          true
+        ],
+        "40:20": [
+          true,
+          true
+        ],
+        "44:17": [
+          true,
+          true
+        ],
+        "46:8": [
+          true,
+          true
+        ],
+        "48:15": [
+          true,
+          true
+        ],
+        "48:23": [
+          true,
+          true
+        ],
+        "49:16": [
+          true,
+          true
+        ]
+      }
+    },
+    {
+      "path": "examples/robots/pursuit/effects.rs",
+      "sha256": "52f99e1a87104c8addb4462b6d0b2277a0984ff154df2be0116f691c4919054b",
+      "changed_instrumented_lines": [
+        85,
+        86,
+        87,
+        88,
+        89
+      ],
+      "unhit_changed_lines": [],
+      "source_branches": {
+        "57:15": [
+          true,
+          true
+        ],
+        "129:12": [
+          true,
+          true
+        ],
+        "134:12": [
+          true,
+          true
+        ],
+        "154:12": [
+          true,
+          true
+        ],
+        "156:23": [
+          true,
+          false
+        ],
+        "185:12": [
+          true,
+          true
+        ],
+        "270:16": [
+          true,
+          true
+        ]
+      }
+    },
+    {
+      "path": "examples/robots/pursuit/firing.rs",
+      "sha256": "7b07071b4c34751b0a7d87ae6e04e4bad20ea7d14364611b5f365b33f740dd3c",
+      "changed_instrumented_lines": [
+        93,
+        94,
+        95,
+        96,
+        97,
+        98,
+        99,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107
+      ],
+      "unhit_changed_lines": [],
+      "source_branches": {
+        "103:12": [
+          true,
+          true
+        ],
+        "147:16": [
+          true,
+          true
+        ],
+        "149:16": [
+          true,
+          true
+        ],
+        "176:24": [
+          true,
+          true
+        ]
+      }
+    },
+    {
+      "path": "examples/robots/pursuit/flight.rs",
+      "sha256": "3757e635cd83ab0c05bd57b775b85e14d45025b2b00bd017dcdae441dae28b77",
+      "changed_instrumented_lines": [
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        50,
+        51,
+        52,
+        53,
+        54,
+        56,
+        59,
+        60,
+        61,
+        64,
+        65,
+        66,
+        69,
+        70,
+        71,
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80,
+        81,
+        82,
+        83,
+        84,
+        85,
+        87,
+        88,
+        89,
+        90,
+        91,
+        92,
+        95,
+        100,
+        101,
+        102,
+        105,
+        106,
+        107,
+        108,
+        109,
+        112,
+        113,
+        114,
+        115,
+        116,
+        117,
+        118,
+        119,
+        120,
+        121,
+        130,
+        131,
+        132,
+        133,
+        134,
+        135,
+        136,
+        137,
+        138,
+        139,
+        140,
+        141,
+        142,
+        144,
+        145,
+        146,
+        147,
+        149,
+        150,
+        151,
+        152,
+        153,
+        154,
+        155,
+        156,
+        157,
+        159,
+        162,
+        163,
+        164,
+        165,
+        166,
+        167,
+        168,
+        169,
+        170,
+        171,
+        172,
+        173
+      ],
+      "unhit_changed_lines": [],
+      "source_branches": {
+        "75:12": [
+          true,
+          true
+        ],
+        "80:16": [
+          true,
+          true
+        ],
+        "81:24": [
+          true,
+          true
+        ],
+        "165:15": [
+          true,
+          true
+        ]
+      }
+    },
+    {
+      "path": "examples/robots/pursuit/flight_tests.rs",
+      "sha256": "de7197a5b2b7b99dabb3e71199a0bd22355cb8b10a14c8ee7f2ab092535e409a",
+      "changed_instrumented_lines": [
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        21,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        58,
+        59,
+        60,
+        61,
+        62,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80,
+        83,
+        86,
+        87,
+        88,
+        89,
+        90,
+        91,
+        92,
+        93,
+        94,
+        96,
+        97,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106
+      ],
+      "unhit_changed_lines": [],
+      "source_branches": {
+        "37:11": [
+          true,
+          true
+        ],
+        "46:11": [
+          true,
+          true
+        ],
+        "60:12": [
+          true,
+          true
+        ],
+        "68:15": [
+          true,
+          true
+        ],
+        "69:12": [
+          true,
+          true
+        ]
+      }
+    },
+    {
+      "path": "examples/robots/pursuit/hud.rs",
+      "sha256": "a696aed9e067be4db49a714bf7bde9cfdc8cd2d54df77ae3c9bff8fb5846f3d4",
+      "changed_instrumented_lines": [
+        45,
+        72,
+        78,
+        88,
+        89,
+        90,
+        101,
+        102,
+        140,
+        141
+      ],
+      "unhit_changed_lines": [],
+      "source_branches": {
+        "80:8": [
+          true,
+          true
+        ],
+        "88:25": [
+          true,
+          true
+        ],
+        "90:19": [
+          true,
+          true
+        ]
+      }
+    },
+    {
+      "path": "examples/robots/pursuit/shot/target.rs",
+      "sha256": "bd1975d101cfb133591df1a266a5f9135c838afd4b134bd5362f0481ed19965e",
+      "changed_instrumented_lines": [
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        108,
+        109,
+        110
+      ],
+      "unhit_changed_lines": [],
+      "source_branches": {
+        "83:12": [
+          true,
+          true
+        ],
+        "87:12": [
+          true,
+          true
+        ],
+        "87:37": [
+          true,
+          true
+        ],
+        "154:16": [
+          true,
+          true
+        ],
+        "162:13": [
+          true,
+          true
+        ],
+        "180:12": [
+          true,
+          true
+        ],
+        "195:16": [
+          true,
+          true
+        ],
+        "202:20": [
+          true,
+          true
+        ],
+        "203:20": [
+          true,
+          true
+        ]
+      }
+    }
+  ],
+  "gaps": [
+    "examples/robots/pursuit.rs:128 stops flight after a rejected solver pose. Public DroneObservation construction is unavailable, and bounded tested dynamics did not emit an invalid pose. Target rejection and controller failure are tested independently.",
+    "examples/robots/pursuit/effects.rs:156 retains the defensive missing-fragment-body branch. Private fragment handles are created and discarded with their solver.",
+    "Native window startup and actual mobile touch input are not exercised by this coverage run. Browser rendering is verified separately."
+  ]
+}

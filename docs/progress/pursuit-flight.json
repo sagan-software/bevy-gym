@@ -1,0 +1,65 @@
+{
+  "baseline_commit": "1a976a1721d37122c0ba0fb0bbdd3c1e1073f78f",
+  "runtime": "build-ca0fba74ba40dec27f75c61d39510e6de974d9c7d9560ded88943e7d6136235e",
+  "recorded_utc": "2026-10-09T07:45:26.619224+00:00",
+  "viewport_css_pixels": {
+    "desktop": [
+      1280,
+      800
+    ],
+    "narrow": [
+      390,
+      844
+    ]
+  },
+  "observed": [
+    "Bundled healthy hover policy moves the rendered drone and its shot hitboxes",
+    "A destroyed rotor emits sparks and smoke, followed by a physical loss of control",
+    "Flight termination replaces the body with moving debris and reports Drone crashed",
+    "Reset restores drone and pistol in the narrow view",
+    "Narrow document width equals the 390-pixel viewport"
+  ],
+  "recording": {
+    "source_sha256": "6a62e7bff7930994ad35c4412cabcaf0171b3039e8e24b7affeb0c99f88eed08",
+    "excerpt_seconds": [
+      65,
+      83
+    ],
+    "crash_frame_source_seconds": 74.25,
+    "note": "Excerpt retains original timing. A screenshot-based orange-marker locator assisted aiming through normal pointer clicks."
+  },
+  "tests": {
+    "pursuit_viewer_native": 34,
+    "hover_viewer_native": 50,
+    "shots_native_including_arena": 15,
+    "shots_wasm": 13
+  },
+  "limitations": [
+    "No pursuit, perception, return fire, character collision, or humanoid policy yet",
+    "The bundled controller is qualified for healthy hover, not damage recovery",
+    "Rotor yaw is not constrained by the hover task",
+    "Debris uses colliding box proxies rather than fractured source meshes",
+    "Native window execution and mobile touch input remain unverified",
+    "Coverage retains invalid-solver-pose and defensive missing-fragment-body gaps",
+    "Full-project personal Rust lint backlog remains; changed-line gates pass"
+  ],
+  "sources": {
+    "examples/robots/pursuit.rs": "7aefaf8b0a84765a78d286c230ad4e192a121d4fa1597850a6d4dc8ca9ac8986",
+    "examples/robots/pursuit/aiming.rs": "4e1c2f4278101e96dbb4e35c38f9384e5a23dd6dfb80171fc66c2dd3c523523a",
+    "examples/robots/pursuit/effects.rs": "52f99e1a87104c8addb4462b6d0b2277a0984ff154df2be0116f691c4919054b",
+    "examples/robots/pursuit/firing.rs": "7b07071b4c34751b0a7d87ae6e04e4bad20ea7d14364611b5f365b33f740dd3c",
+    "examples/robots/pursuit/flight.rs": "3757e635cd83ab0c05bd57b775b85e14d45025b2b00bd017dcdae441dae28b77",
+    "examples/robots/pursuit/flight_tests.rs": "de7197a5b2b7b99dabb3e71199a0bd22355cb8b10a14c8ee7f2ab092535e409a",
+    "examples/robots/pursuit/hud.rs": "a696aed9e067be4db49a714bf7bde9cfdc8cd2d54df77ae3c9bff8fb5846f3d4",
+    "examples/robots/pursuit/shot/target.rs": "bd1975d101cfb133591df1a266a5f9135c838afd4b134bd5362f0481ed19965e",
+    "robot-web/pursuit/index.html": "205bccb17b4c6988eaad726c5cc71606bb464c8fea8921803bd4471e4a07a6d4",
+    "tests/pursuit_shots.rs": "42506a3fec65cc0802f1334df58d21144b0715ca702fee5e7efdd0817291828d"
+  },
+  "media": {
+    "pursuit-flight.mp4": "b5823b245f6c14e9af62b01fecf94b04d7ad181c1b26bee8259736b5abf8d23f",
+    "pursuit-flight-hover.png": "8bbcf3351442d01e5950fa4cbeeed5ff3c60a672b6182e2f4c3c1f265e2fdf80",
+    "pursuit-flight-rotor.png": "d9a2950ed405c10b7935b137b9bf9a06fb64364ce84b36bcded57cf538fc8ea5",
+    "pursuit-flight-crash.png": "c97c38a320ca80a16378ddd0f41e7245af69c46833eaa1b4c326595acf557d68",
+    "pursuit-flight-narrow.png": "d42b8613b49c3be49608a775548bebd20c7d185aae2f08816da7934933b6cb9d"
+  }
+}

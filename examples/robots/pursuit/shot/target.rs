@@ -96,6 +96,19 @@ impl TryFrom<(Vec3, Quat)> for Target {
 }
 
 impl Target {
+    /// Replace a validated pose while retaining body and rotor damage.
+    pub(crate) fn move_to(&mut self, position: Vec3, rotation: Quat) -> Result<(), InvalidTarget> {
+        let pose = Self::try_from((position, rotation))?;
+        self.position = pose.position;
+        self.rotation = pose.rotation;
+        Ok(())
+    }
+
+    /// Physical contact uses the same absorbing damage transition as body hits.
+    pub(crate) const fn crash(&mut self) -> Damage {
+        self.health.crash()
+    }
+
     /// Read the authoritative world-space body centre.
     pub(crate) const fn position(&self) -> Vec3 {
         self.position

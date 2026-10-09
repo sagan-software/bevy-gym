@@ -89,9 +89,9 @@ hover environment's mass, thrust, reward, or terminal rules for visual effects.
 Current status: checkpoint loading and destruction effects are implemented. Rotor
 failure emits a burst and smoke; task termination hides the body and spawns eight
 colliding debris proxies in the hover viewer. The arena now has a player-controlled
-robot, a lootable pistol, and a stationary drone target. Flight coupling, pursuit,
-and humanoid training remain pending. These effects do not demonstrate learned
-damage recovery.
+robot, a lootable pistol, and a flying drone driven by the bundled healthy hover
+policy. Rotor damage disables motor forces; flight termination triggers destruction.
+Pursuit, humanoid training, and learned damage recovery remain pending.
 
 ## Explore the arena
 
@@ -107,8 +107,8 @@ when a wall obstructs its view.
 
 Press `E` near the pistol to collect it. Point at
 the drone and click to fire; holding the button repeats at the weapon cooldown.
-`Space` and the Fire button use the last captured aim. The drone is a stationary
-firing target in this checkpoint.
+`Space` and the Fire button use the last captured aim. The drone uses its learned
+hover controller while the player moves and shoots.
 
 Run the short headless movement guide:
 
@@ -194,9 +194,9 @@ without spending a round. Each accepted shot spends one round and starts a
 There is no reload yet. Replacing each helper with `Default` restores its initial state.
 
 The guide traces aimed shots through the arena. The player-controlled scene uses
-the same health and pistol rules. Combat now drives destruction effects. Live motor
-failure and flight still need to connect to combat. The library's qualified hover
-environment is unchanged.
+the same health and pistol rules. Combat drives destruction effects and disables
+destroyed motors before the next flight action. The library's qualified default
+hover environment is unchanged.
 [Coverage evidence](progress/pursuit-combat-coverage.json) records the tested
 health and pistol branches; it does not claim a playable combat scene.
 
@@ -246,7 +246,7 @@ The visible scene now uses these shot helpers.
 
 ## Player combat checkpoint
 
-The licensed drone stays at (0, 2, 1) metres with its rotors spinning. Pickup hides
+In checkpoint `5164de6`, the licensed drone stayed at (0, 2, 1) metres. Pickup hides
 the ground pistol and shows it in the robot's right hand. Aim rotates the body and
 shoulder; movement remains independent.
 
@@ -288,9 +288,8 @@ These fragments are box proxies, not fractures of the licensed drone mesh.
 
 The fragments collide with the arena's floor, house, pipe, and cover. Their private
 Rapier world is built from the same immutable blocks used by the arena. They inherit
-zero body velocity from the current stationary target, then receive the existing
-visual burst velocities. Future flight integration must supply the moving body's
-actual linear velocity. Wreckage expires after five seconds.
+the moving body's last authoritative linear velocity, then receive the existing
+visual burst velocities. Wreckage expires after five seconds.
 
 Combat emits typed `Reset`, `Rotor(DroneMotor)`, and `Destroyed` events. The private
 queue retains at most one reset, four rotor events, and one body event. Presentation
@@ -302,12 +301,49 @@ time advances independently of the combat cooldown, with each frame capped at
 100 milliseconds. Debris uses fixed 16,667-microsecond steps. These effects do not
 change the qualified hover environment, rewards, motor forces, or observations.
 
-Twenty-six pursuit-viewer tests and all 50 hover-viewer tests pass. They cover
+Checkpoint `2f80f89` passed 26 pursuit-viewer tests and 50 hover-viewer tests. They cover
 one-shot events, same-frame reset and damage, effect expiry, stable material counts,
 and fragments bouncing off the house wall. [Coverage](progress/pursuit-destruction-coverage.json)
 records the native startup gap and the defensive missing-fragment-body branch.
 
-[The final combat-destruction recording](progress/pursuit-destruction.mp4) shows
+[The stationary combat-destruction recording](progress/pursuit-destruction.mp4) shows
 rotor smoke, a body explosion, moving debris, and reset in the optimized browser
 build. Desktop and narrow views pass. [The visual record](progress/pursuit-destruction.json)
 retains artifact hashes and distinguishes this stationary target from live flight.
+
+## Live flight and combat
+
+The private `Flight` controller builds `DroneHover` from the arena's immutable
+boxes, omitting the floor that the task already owns. It loads `recovery.mpk`
+with the existing twelve-feature architecture. Reset uses seed 42, retains loaded
+weights, clears recurrent memory, and repairs damage. Loading or inference failure
+stops flight and displays a diagnostic; reset retries a failed load.
+
+Every fixed action applies destroyed rotor states before requesting the next
+validated motor command. Failed motors contribute neither force nor reaction
+torque. Flight observations update shot geometry without repairing health.
+The target validates and normalizes each pose; quaternion components can differ
+from the solver by rounding. Position remains unchanged by this projection.
+
+A collision or flight-region exit destroys the body once and stops subsequent
+flight actions. Body damage also stops flight before another policy action.
+The character can still move after drone death. Debris inherits the last measured
+world velocity. Reset clears combat and presentation effects together with flight.
+
+Thirty-four pursuit-viewer tests and all 50 hover-viewer tests pass. Fifteen native
+shot tests include the two shared arena cases; thirteen shot cases pass in Chrome.
+The tests cover a minute of healthy hovering, physical failure after rotor hits,
+absorbing body death, deterministic reset, invalid pose rejection, and failed
+checkpoint or inference handling. This does not qualify pursuit or damage recovery.
+
+[Coverage](progress/pursuit-flight-coverage.json) records the tested branches and
+source hashes. The guard for a non-finite solver pose remains unhit; direct pose
+rejection and controller failure have separate tests. The existing defensive
+missing-fragment-body branch also remains unhit. Native window execution and
+mobile touch input remain unverified.
+
+[The live-flight recording](progress/pursuit-flight.mp4) shows rotor destruction,
+loss of control, and crash debris in the optimized browser build. Desktop and
+390-pixel views were inspected. Narrow reset restores the drone and pistol.
+[The visual record](progress/pursuit-flight.json) records the runtime, hashes,
+recording excerpt, and verification limits.

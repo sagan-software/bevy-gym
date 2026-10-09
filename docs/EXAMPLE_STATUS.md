@@ -7,7 +7,38 @@ Updated: 2026-10-09. Goal status: active.
 Read [the roadmap](EXAMPLE_ROADMAP.md), [quality audit](QUALITY_AUDIT.md),
 [reference research](EXAMPLE_RESEARCH.md), and [drone contract](ROBOT_ENVIRONMENT.md).
 
-The current flight-collision checkpoint adds `DroneObstacle` and
+The current checkpoint connects the playable arena to live flight. The bundled
+healthy hover policy drives `DroneHover` with arena obstacles. Rotor hits disable
+motor forces; collision or flight-region termination emits one body destruction
+event. Debris inherits flight velocity. Body damage stops further flight actions.
+Reset restores the scene and clears recurrent policy memory.
+
+All 34 pursuit-viewer tests, 50 hover-viewer tests, and 15 native shot tests pass.
+Thirteen shot cases pass in Chrome/WASM, alongside the existing browser suites.
+Root tests, strict native/WASM Clippy, and changed-line personal Rust gates pass.
+The full-project personal lint backlog remains. [Coverage](progress/pursuit-flight-coverage.json)
+records the unhit invalid-solver-pose guard and defensive missing-fragment-body branch.
+
+The optimized build passed under `bevy-gym-pursuit-flight-build-20261009`.
+Its runtime is `build-ca0fba74ba40dec27f75c61d39510e6de974d9c7d9560ded88943e7d6136235e`.
+The preview is `http://100.105.254.50:8781/robots/pursuit/?build=live-flight`, served
+by `bevy-gym-pursuit-server-20261009`. [The recording](progress/pursuit-flight.mp4)
+shows hovering, rotor damage, loss of control, and crash debris. Desktop and narrow
+views were inspected; narrow reset restores the drone and pistol without overflow.
+[The visual record](progress/pursuit-flight.json) retains source and media hashes.
+
+Logs use the `pursuit-flight-` validation-cache prefix. No recording is active.
+Native window execution and mobile touch input remain unverified. The controller
+is healthy hover only; pursuit and learned damage recovery are unfinished.
+
+Next, add occlusion-aware sight and finite remembered sightings before pursuit
+training. Keep hidden character positions out of actor input. Then add sound events
+and telegraphed return fire. Preserve the existing player controls, damage, reset,
+and qualified hover behavior while adding the game observations and rewards.
+
+## Earlier checkpoints
+
+The flight-collision checkpoint `1a976a1` adds `DroneObstacle` and
 `DroneHover::with_obstacles`. The arena can supply its immutable boxes without
 exposing the solver or duplicating motor dynamics. The new thirty-line
 `drone-obstacles` guide drops the drone onto a platform. Viewer integration is
@@ -35,8 +66,6 @@ flight action. Route a terminal collision through the existing one-time body
 death event, and pass impact velocity into debris. Reset must rebuild flight,
 clear policy memory, restore health, and remove presentation effects together.
 Then add occlusion-aware sensing, telegraphed return fire, and pursuit training.
-
-## Earlier checkpoints
 
 The destruction checkpoint `2f80f89` connects combat to rotor flashes, smoke, body explosions, and
 eight colliding debris proxies. It shares the hover viewer's renderer and uses the

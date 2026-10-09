@@ -114,10 +114,11 @@ mod tests {
         let mut window = Window::default();
         window.set_cursor_position(Some(Vec2::splat(400.0)));
         let window = app.world_mut().spawn(window).id();
+        let target = app.world().resource::<Game>().combat.target().position();
         app.world_mut().spawn((
             Camera3d::default(),
             camera(),
-            Transform::from_xyz(0.0, 3.0, 5.0).looking_at(Vec3::new(0.0, 2.0, 1.0), Vec3::Y),
+            Transform::from_xyz(0.0, 3.0, 5.0).looking_at(target, Vec3::Y),
         ));
         app.world_mut()
             .resource_mut::<ButtonInput<KeyCode>>()

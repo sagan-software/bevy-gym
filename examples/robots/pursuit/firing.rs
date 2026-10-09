@@ -36,6 +36,8 @@ pub(super) enum Effect {
 /// Last meaningful interaction result displayed by the viewer.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub(super) enum Feedback {
+    /// Flight contact or a flight-region exit ended the drone's episode.
+    Crashed,
     /// Initial state before the pistol is collected.
     Unarmed,
     /// Pickup succeeded and the magazine is full.
@@ -59,7 +61,7 @@ pub(super) struct Trace {
     remaining: Duration,
 }
 
-/// Stationary target practice, using the same actions intended for the pursuit game.
+/// Damageable target, pickup ownership, and feedback shared by player actions.
 pub(super) struct Combat {
     /// The sole pickup and its bounded magazine.
     pistol: Pistol,
@@ -87,6 +89,23 @@ impl Default for Combat {
 }
 
 impl Combat {
+    /// Update collision and aiming geometry without repairing existing damage.
+    pub(super) fn project_flight(
+        &mut self,
+        observation: bevy_gym::robots::DroneObservation,
+    ) -> Result<(), super::shot::target::InvalidTarget> {
+        self.target
+            .move_to(observation.position(), observation.orientation())
+    }
+
+    /// Emit one death event when physical flight termination destroys a living body.
+    pub(super) fn crash(&mut self) {
+        if self.target.crash() == Damage::Destroyed {
+            self.effects.push_back(Effect::Destroyed);
+            self.feedback = Feedback::Crashed;
+        }
+    }
+
     /// Consume one presentation event without allowing presentation to change health.
     pub(super) fn pop_effect(&mut self) -> Option<Effect> {
         self.effects.pop_front()
