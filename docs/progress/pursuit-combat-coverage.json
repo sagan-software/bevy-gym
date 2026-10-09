@@ -1,0 +1,181 @@
+{
+  "baseline_commit": "9e48258745c0570272b1930ab7e0d83017715e87",
+  "native_cases": 7,
+  "method": "LLVM instrumented external combat tests; explicit object export because build and target directories differ.",
+  "files": [
+    {
+      "path": "examples/robots/pursuit/combat/health.rs",
+      "sha256": "18d98e3cdd340a4852403bc8fd0f5e9612925c22b16513f332715107b387ab4d",
+      "line_hits": {
+        "41": 8,
+        "42": 8,
+        "43": 8,
+        "44": 8,
+        "45": 8,
+        "46": 8,
+        "51": 21,
+        "52": 21,
+        "53": 21,
+        "56": 13,
+        "57": 13,
+        "58": 13,
+        "61": 32,
+        "62": 32,
+        "63": 8,
+        "64": 8,
+        "65": 8,
+        "66": 8,
+        "68": 32,
+        "71": 8,
+        "72": 8,
+        "73": 2,
+        "75": 6,
+        "76": 6,
+        "77": 5,
+        "79": 1,
+        "81": 8,
+        "84": 18,
+        "85": 18,
+        "86": 1,
+        "87": 17,
+        "88": 17,
+        "89": 5,
+        "90": 4,
+        "91": 4,
+        "92": 4,
+        "94": 17,
+        "96": 9,
+        "97": 9,
+        "100": 4,
+        "101": 4,
+        "103": 4,
+        "105": 18,
+        "108": 3,
+        "109": 3,
+        "110": 1,
+        "112": 2,
+        "114": 3
+      },
+      "branches": [
+        {
+          "line": 72,
+          "column": 13,
+          "true": 6,
+          "false": 2
+        },
+        {
+          "line": 76,
+          "column": 12,
+          "true": 5,
+          "false": 1
+        },
+        {
+          "line": 85,
+          "column": 12,
+          "true": 1,
+          "false": 17
+        },
+        {
+          "line": 109,
+          "column": 12,
+          "true": 1,
+          "false": 2
+        }
+      ]
+    },
+    {
+      "path": "examples/robots/pursuit/combat/pistol.rs",
+      "sha256": "5b333b6506db0be75bc58a17576bd1f5db27993942437b1a0d7b4b4bde61c598",
+      "line_hits": {
+        "53": 3,
+        "54": 3,
+        "55": 3,
+        "58": 16,
+        "59": 16,
+        "60": 16,
+        "63": 10,
+        "64": 10,
+        "65": 10,
+        "66": 4,
+        "67": 6,
+        "68": 6,
+        "69": 2,
+        "70": 4,
+        "71": 4,
+        "72": 1,
+        "73": 3,
+        "74": 3,
+        "75": 3,
+        "76": 3,
+        "77": 3,
+        "78": 3,
+        "79": 10,
+        "82": 31,
+        "83": 31,
+        "84": 29,
+        "85": 2,
+        "86": 27,
+        "87": 27,
+        "88": 2,
+        "89": 25,
+        "90": 25,
+        "91": 25,
+        "92": 25,
+        "93": 31,
+        "96": 27,
+        "97": 27,
+        "98": 26,
+        "99": 26,
+        "100": 27
+      },
+      "branches": [
+        {
+          "line": 65,
+          "column": 12,
+          "true": 3,
+          "false": 7
+        },
+        {
+          "line": 65,
+          "column": 38,
+          "true": 1,
+          "false": 6
+        },
+        {
+          "line": 68,
+          "column": 12,
+          "true": 2,
+          "false": 4
+        },
+        {
+          "line": 71,
+          "column": 12,
+          "true": 1,
+          "false": 3
+        },
+        {
+          "line": 84,
+          "column": 12,
+          "true": 2,
+          "false": 27
+        },
+        {
+          "line": 87,
+          "column": 12,
+          "true": 2,
+          "false": 25
+        },
+        {
+          "line": 97,
+          "column": 16,
+          "true": 26,
+          "false": 1
+        }
+      ]
+    }
+  ],
+  "gaps": [
+    "Guide process entry and printing are not instrumented; the guide is run separately.",
+    "No visible combat integration, shot geometry, or drone flight coupling is included in this checkpoint."
+  ]
+}

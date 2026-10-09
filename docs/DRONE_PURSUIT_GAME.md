@@ -155,3 +155,39 @@ animation, held buttons, and a reset press released before the next frame.
 The [browser recording](progress/pursuit-arena.mp4) shows pipe traversal, reset,
 and house entry. [The evidence record](progress/pursuit-arena.json) identifies the
 verified bundle, source hashes, and remaining verification gaps.
+
+## Combat rules
+
+The private combat helpers now model damage and pistol ownership. They are not
+connected to the visible arena yet. Run their short headless guide:
+
+```sh
+nix develop --command cargo run --features robots --example pursuit-combat
+```
+
+A rotor advances from intact to damaged to destroyed. Its second hit returns
+`Damage::RotorDestroyed` with the existing `DroneMotor` identity. Further hits
+return `Damage::Ignored`. Rotor damage does not decrease body health.
+
+Six body
+hits or a fatal crash return `Damage::Destroyed` once. All later damage is ignored.
+These hit counts are local balance choices, not measurements of ARC Raiders.
+
+The pistol starts unowned at X=-1, Y=0.92, Z=8 metres. Pickup accepts a character
+centre within 1.5 metres, including equality. Non-finite coordinates or distance
+return `PickupError::InvalidPosition` before other checks. An owned pistol returns
+`AlreadyOwned`; an unowned pistol beyond the radius returns `TooFar`.
+
+Pickup grants twelve rounds. `fire` checks ownership, remaining ammunition, and
+cooldown in that order. Rejections return `Unarmed`, `Empty`, or `CoolingDown`
+without spending a round. Each accepted shot spends one round and starts a
+250-millisecond cooldown.
+
+`advance` consumes simulation time and saturates at zero.
+There is no reload yet. Replacing each helper with `Default` restores its initial state.
+
+The guide applies hits directly after accepted shots. Aiming, hitbox selection,
+wall obstruction, live motor failure, effects, and player controls still need to
+connect through the arena. The library's qualified hover environment is unchanged.
+[Coverage evidence](progress/pursuit-combat-coverage.json) records the tested
+health and pistol branches; it does not claim a playable combat scene.

@@ -252,10 +252,29 @@ hashes. Desktop, interior, and narrow screenshots are beside it. Native window
 execution and mobile touch input remain unverified. The headless guide ran for
 two simulated seconds, and `cargo test --features robots --doc` passed.
 
-Next, add typed body and rotor health, pistol pickup, ammunition, aiming, and shots.
-Then connect the drone, occlusion-aware sensing, telegraphed fire, pursuit training,
-and the humanoid policy. Keep the frozen recovery checkpoints and promotion gates.
-The full sequence is in [DRONE_PURSUIT_GAME.md](DRONE_PURSUIT_GAME.md).
+The playable arena checkpoint is published as `9e48258`.
+[CI](https://github.com/sagan-software/bevy-gym/actions/runs/37888862310) and
+[Pages](https://github.com/sagan-software/bevy-gym/actions/runs/37888862433) are running.
+
+The next combat checkpoint adds private body and rotor health, bounded pistol
+ammunition, proximity pickup, and a simulation-time cooldown. All seven cases pass
+natively and in Chrome/WASM. Strict Clippy, root tests, formatting, and Actionlint
+pass. Personal Rust
+discovery reports no diagnostics in the changed files; its full strict backlog remains.
+
+[Coverage](progress/pursuit-combat-coverage.json) hits all 88 measured helper lines
+and both outcomes of eleven instrumented conditions. The guide's process entry
+and printing are checked by running it, not by coverage instrumentation.
+The personal Nix check retains the same two unchanged source-filter findings
+described above. Validation logs use the `pursuit-combat-` prefix in
+`/home/sagan/.cache/bevy-gym-quality-validation`.
+
+The combat helpers are not connected to the visible arena. Next, implement aiming,
+rotor/body hitboxes, wall-blocked shots, and visible pistol pickup. Then connect
+drone motor failure and destruction effects, occlusion-aware sensing, telegraphed
+fire, pursuit training, and the humanoid policy. Keep the frozen recovery
+checkpoints and promotion gates. The full sequence is in
+[DRONE_PURSUIT_GAME.md](DRONE_PURSUIT_GAME.md).
 
 Preserve the healthy checkpoint and its qualification. The damage contract records
 the current model's static thrust limit; do not assume damage recovery follows
