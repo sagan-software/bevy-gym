@@ -57,11 +57,15 @@ exports the instrumented scene, navigation test, and guide objects directly with
 All navigation build, native, browser, personal-lint, coverage, and trial jobs have finished.
 The temporary research probe has been archived and removed. No training run is active.
 
-The latest previously pushed checkpoint is `5f82446`; its GitHub CI passed.
+The playable navigation checkpoint `1a15744` is pushed to GitHub `main`.
+[CI](https://github.com/sagan-software/bevy-gym/actions/runs/37961802709) and
+[browser deployment](https://github.com/sagan-software/bevy-gym/actions/runs/37961802713)
+were in progress at handoff. Inspect those runs before claiming remote validation.
+
 The guide passed two episodes with 2,843/3,000 visible samples each.
 Documentation tests passed seven cases with one existing ignored case.
-Commit and push this integration checkpoint after Markdown validation.
-Afterward, continue the active roadmap with learned search and cover behavior qualification.
+Markdown validation passed. Continue the active roadmap with learned search and
+cover behavior qualification.
 Do not repeat the completed trial sweep unless controller behavior changes.
 
 ### Research preceding integration
