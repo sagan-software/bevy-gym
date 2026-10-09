@@ -75,14 +75,26 @@ All research services in this section have stopped. Temporary tests are archived
 and removed. Production Rust and the playable scene remain unchanged.
 Do not repeat the completed two-route distillation recipe unchanged.
 
-Next, implement a perception-driven navigation baseline over the qualified motor
-pilot. Its input boundary must exclude target routes and hidden coordinates.
-Plan around static collision geometry and evaluate arbitrary visible movement,
-last-seen investigation, house windows, and pipe entrances together. Label the
-baseline's programmed navigation and learned motor control separately.
-This supports gameplay and better training demonstrations; it does not replace the
-remaining learned-search, damaged-flight, browser, or adversarial-training goals.
-The full roadmap remains active.
+The [navigation baseline](DRONE_NAVIGATION_BASELINE.md) now plans from filtered
+sight and static geometry over the unchanged learned motor pilot. It receives no
+target route or hidden coordinates. Six measured variants led to 265/265 surviving
+trials; every hidden-target trial ended with ten uninterrupted seconds of sight.
+The weakest moving-target sight fraction was 65.6%. All 53 pipe cases still fail
+the earlier 90% held-visibility threshold, with sampled gaps up to 5.8 seconds.
+
+The [research record](progress/drone-planner-baseline.json) and compressed raw
+trials preserve sources, failures, logs, and restore instructions. All planner
+services have stopped. The temporary runner is archived and removed.
+No production Rust or browser controller changed. CI for `79abc4c` passed both
+`strict` and `contracts` jobs.
+
+Next, turn the observation-only planner into documented example code and focused
+regression tests. Correct the eye-origin mismatch, define remembered-contact
+initialization, and add a blocked-door/window-only case. Preserve the motor pilot's
+zero-memory contract. Run coverage, strict native/personal/WASM checks, then
+integrate the programmed search baseline into the playable scene with browser
+screenshots and recordings. It must remain labeled separately from learned flight.
+The full roadmap, including learned search and adversarial training, remains active.
 
 The [navigation research](DRONE_NAVIGATION.md) is archived. Imitation 150 and
 open PPO 140 each passed 192 native open-route cases. Open PPO crashed in all ten
