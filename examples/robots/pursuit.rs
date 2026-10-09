@@ -66,15 +66,16 @@ mod perception_tests;
 #[path = "pursuit/hearing_tests.rs"]
 mod hearing_tests;
 
-#[path = "learning/encoding.rs"]
-mod encoding;
 #[path = "pursuit/flight.rs"]
 mod flight;
-#[path = "learning/model.rs"]
-mod model;
+#[path = "flight_control/mod.rs"]
+mod flight_control;
+#[path = "pursuit/navigation/mod.rs"]
+mod navigation;
 
-/// Camera centre in body-local metres; its forward direction is local negative Z.
-const DRONE_EYE: Vec3 = Vec3::new(0.0, 0.0, -0.22);
+#[path = "pursuit/camera.rs"]
+mod camera;
+use camera::EYE_OFFSET as DRONE_EYE;
 
 /// One character's simulation and measured motion for visual animation.
 #[derive(Resource)]
@@ -83,7 +84,7 @@ struct Game {
     arena: Arena,
     /// Pickup, target damage, and firing feedback.
     combat: firing::Combat,
-    /// Private flight physics and the bundled healthy hover controller.
+    /// Private flight physics, programmed search, and learned motor control.
     flight: flight::Flight,
     /// Current sighting or bounded last-seen memory, without hidden target state.
     sight: sight::Sight,
@@ -240,7 +241,10 @@ impl Game {
     fn step(&mut self, movement: Movement) {
         self.combat.advance(std::time::Duration::from_millis(20));
         self.hearing.advance(std::time::Duration::from_millis(20));
-        if let Some(step) = self.flight.advance(self.combat.target().health()) {
+        if let Some(step) = self
+            .flight
+            .advance(self.combat.target().health(), self.sight.contact())
+        {
             if let Err(error) = self.combat.project_flight(step.observation) {
                 self.flight.fail(format!("Invalid flight pose: {error:?}"));
             } else if step.is_done() {
@@ -296,7 +300,7 @@ impl Game {
     }
 }
 
-/// Launch the player-controlled arena; drone pursuit is a later checkpoint.
+/// Launch the player-controlled arena with programmed search and learned flight.
 fn main() {
     App::new()
         .add_plugins(
@@ -409,7 +413,7 @@ mod tests {
     }
 
     #[test]
-    fn flight_failure_is_visible_and_reset_restores_hover_playback() {
+    fn flight_failure_is_visible_and_reset_restores_pursuit() {
         let mut app = app();
         app.world_mut()
             .resource_mut::<Game>()
@@ -429,7 +433,7 @@ mod tests {
             .query_filtered::<&Text, With<hud::Status>>()
             .single(world)
             .expect("Status");
-        assert_eq!(text.0, "Hover policy · E to collect pistol");
+        assert_eq!(text.0, "Programmed search · learned flight");
     }
 
     #[test]
@@ -527,6 +531,60 @@ mod tests {
             .obstruction(target, eye)
             .is_none());
     }
+    #[test]
+    fn open_arena_keeps_the_original_camera_offset() {
+        let mut app = app();
+        app.update();
+        let world = app.world_mut();
+        let target = world.resource::<Game>().arena.position() + Vec3::Y * 0.4;
+        let eye = world
+            .query_filtered::<&Transform, With<Camera3d>>()
+            .single(world)
+            .expect("One camera")
+            .translation;
+        assert!((eye - target).abs_diff_eq(Vec3::new(0.0, 3.3, 6.0), 1e-5));
+    }
+
+    #[test]
+    fn pipe_camera_keeps_the_upper_subject_view_clear_of_the_ceiling() {
+        let mut app = app();
+        for _ in 0..62 {
+            app.world_mut()
+                .resource_mut::<Game>()
+                .arena
+                .step(Movement::Right);
+        }
+        for _ in 0..100 {
+            app.world_mut()
+                .resource_mut::<Game>()
+                .arena
+                .step(Movement::Forward);
+            app.update();
+            let world = app.world_mut();
+            let position = world.resource::<Game>().arena.position();
+            if position.z >= 4.0 {
+                continue;
+            }
+            let mut cameras = world.query_filtered::<(&Transform, &Projection), With<Camera3d>>();
+            let (eye, projection) = cameras.single(world).expect("One camera");
+            let Projection::Perspective(projection) = projection else {
+                panic!("Perspective camera");
+            };
+            let upper =
+                eye.rotation * Vec3::new(0.0, (projection.fov * 0.5).tan() * 0.5, -1.0).normalize();
+            let from = eye.translation;
+            let end = from + upper * from.distance(position);
+            assert!(
+                world
+                    .resource::<Game>()
+                    .arena
+                    .obstruction(from, end)
+                    .is_none(),
+                "Pipe camera upper subject view is obstructed at {position:?}: {from:?} -> {end:?}"
+            );
+        }
+    }
+
     #[test]
     fn pickup_shooting_feedback_and_reset_share_the_game_state() {
         let mut game = Game::default();

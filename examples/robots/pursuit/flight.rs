@@ -1,30 +1,42 @@
-//! Reuse qualified motor dynamics with arena geometry and the healthy hover policy.
+//! Follow sight-driven goals with learned motor control and arena collisions.
 
 use super::{
     arena::{layout::Surface, Arena},
     combat::health::{DroneHealth, RotorHealth},
-    encoding, model,
+    flight_control::{FlightGoal, FlightPilot},
+    navigation::{Navigator, INTERVAL},
+    sight::Contact,
 };
 use bevy_gym::{
-    robots::{DroneAction, DroneHover, DroneMotor, DroneObservation, DroneObstacle},
-    training::{RecurrentMemory, RecurrentPpoPolicy},
+    robots::{DroneHover, DroneMotor, DroneObservation, DroneObstacle},
     Env, Step,
 };
+use std::time::Duration;
 
-/// Flight owns its solver and either a loaded controller or a diagnostic failure.
+/// Flight owns its solver, programmed navigation, and either a loaded pilot or failure.
 pub(super) struct Flight {
-    /// Existing hover task with immutable arena collisions.
+    /// Existing flight task with immutable arena collisions.
     environment: DroneHover,
     /// Failure stops inference and physics until reset retries the bundled checkpoint.
-    pilot: Result<Pilot, String>,
+    pilot: Result<FlightPilot, String>,
+    /// Static geometry and observation history contain no hidden character state.
+    navigation: Navigator,
+    /// A goal remains fixed across its five motor actions.
+    command: Command,
 }
 
-/// Frozen weights and the recurrent memory of this episode.
-struct Pilot {
-    /// Bundled twelve-feature healthy hover policy.
-    policy: RecurrentPpoPolicy,
-    /// Updated only after the policy emits a valid motor command.
-    memory: RecurrentMemory,
+/// Navigation runs at ten hertz while the motor pilot runs at fifty hertz.
+#[derive(Clone, Copy)]
+enum Command {
+    /// The next motor action first consumes a filtered sighting.
+    Due,
+    /// Later motor actions retain the same goal until its interval ends.
+    Holding {
+        /// Validated position and heading for the motor pilot.
+        goal: FlightGoal,
+        /// Positive time remaining before another navigation decision.
+        remaining: Duration,
+    },
 }
 
 impl Flight {
@@ -42,16 +54,19 @@ impl Flight {
         environment.reset(Some(42));
         Self {
             environment,
-            pilot: Pilot::bundled(),
+            pilot: FlightPilot::bundled().map_err(|error| error.to_string()),
+            navigation: Navigator::default(),
+            command: Command::Due,
         }
     }
 
-    /// Reset deterministic physics and episode memory while retaining valid weights.
+    /// Reset physics and observation history while retaining valid weights and static geometry.
     pub(super) fn reset(&mut self) {
         self.environment.reset(Some(42));
-        match &mut self.pilot {
-            Ok(pilot) => pilot.memory = pilot.policy.initial_memory(),
-            Err(_) => self.pilot = Pilot::bundled(),
+        self.navigation.reset();
+        self.command = Command::Due;
+        if self.pilot.is_err() {
+            self.pilot = FlightPilot::bundled().map_err(|error| error.to_string());
         }
     }
 
@@ -70,12 +85,15 @@ impl Flight {
         self.environment.observation()
     }
 
-    /// Apply rotor health before requesting the next twenty-millisecond flight action.
-    pub(super) fn advance(&mut self, health: &DroneHealth) -> Option<Step<DroneObservation>> {
-        if !health.is_alive() {
+    /// Apply rotor health before navigation, inference, and twenty milliseconds of physics.
+    pub(super) fn advance(
+        &mut self,
+        health: &DroneHealth,
+        contact: Contact,
+    ) -> Option<Step<DroneObservation>> {
+        if !health.is_alive() || self.pilot.is_err() {
             return None;
         }
-        let pilot = self.pilot.as_mut().ok()?;
         for motor in DroneMotor::ALL {
             if health.rotor(motor) == RotorHealth::Destroyed {
                 if let Err(error) = self.environment.fail_motor(motor) {
@@ -84,78 +102,75 @@ impl Flight {
                 }
             }
         }
-        let command = pilot.command(self.environment.observation());
-        match command {
+        let goal = self.goal(contact);
+        match self
+            .pilot
+            .as_ref()
+            .ok()?
+            .action(self.environment.observation(), goal)
+        {
             Ok(action) => Some(self.environment.step(action)),
             Err(error) => {
-                self.fail(error);
+                self.fail(error.to_string());
                 None
             }
         }
     }
-}
 
-impl Pilot {
-    /// Decode the same weights and architecture used by the hover viewer.
-    fn bundled() -> Result<Self, String> {
-        Self::load(include_bytes!("../../../assets/robots/recovery.mpk").to_vec())
-    }
-
-    /// Keep checkpoint decoding fallible so corrupted assets cannot start physics.
-    fn load(bytes: Vec<u8>) -> Result<Self, String> {
-        let policy = model::load_policy(bytes).map_err(|error| error.to_string())?;
-        let memory = policy.initial_memory();
-        Ok(Self { policy, memory })
-    }
-
-    /// Validate output before committing its next recurrent state.
-    fn command(&mut self, observation: DroneObservation) -> Result<DroneAction, String> {
-        let prediction = self
-            .policy
-            .mean_action(&encoding::encode(observation), &self.memory)
-            .map_err(|error| error.to_string())?;
-        let action =
-            encoding::decode_action(&prediction.action).map_err(|error| error.to_string())?;
-        self.memory = prediction.next_memory;
-        Ok(action)
+    /// Consume contact only when a new navigation interval begins.
+    fn goal(&mut self, contact: Contact) -> FlightGoal {
+        let (goal, remaining) = match self.command {
+            Command::Due => (
+                self.navigation
+                    .goal(self.environment.observation(), contact),
+                INTERVAL,
+            ),
+            Command::Holding { goal, remaining } => (goal, remaining),
+        };
+        let remaining = remaining.saturating_sub(Duration::from_millis(20));
+        self.command = if remaining.is_zero() {
+            Command::Due
+        } else {
+            Command::Holding { goal, remaining }
+        };
+        goal
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use bevy_gym::training::{RecurrentPpoAgent, SeedConfig};
+    use bevy::math::Vec3;
+    use bevy_gym::robots::DroneAction;
 
     #[test]
-    fn failed_loading_and_inference_freeze_physics_and_reset_retries() {
+    fn controller_failure_freezes_physics_and_reset_retries() {
         let mut flight = Flight::new(&Arena::default());
         let initial = flight.observation();
-        flight.pilot = Pilot::load(Vec::new());
-        assert!(flight.error().is_some());
-        assert!(flight.advance(&DroneHealth::default()).is_none());
+        flight.fail("test controller failure".to_owned());
+        assert_eq!(flight.error(), Some("test controller failure"));
+        assert!(flight
+            .advance(&DroneHealth::default(), Contact::Unknown)
+            .is_none());
         assert_eq!(flight.observation(), initial);
         flight.reset();
         assert!(flight.error().is_none());
-        for (inputs, outputs) in [(11, 4), (12, 3)] {
-            let agent = RecurrentPpoAgent::new(
-                inputs,
-                inputs,
-                1,
-                &vec![0.0; outputs],
-                &vec![1.0; outputs],
-                model::learning_config(),
-                SeedConfig::from_root(7),
-            )
-            .expect("Valid incompatible policy");
-            let policy = agent.policy();
-            let memory = policy.initial_memory();
-            flight.pilot = Ok(Pilot { policy, memory });
-            assert!(flight.advance(&DroneHealth::default()).is_none());
-            assert!(flight.error().is_some());
-            assert_eq!(flight.observation(), initial);
-            flight.reset();
-            assert!(flight.error().is_none());
+        assert!(flight
+            .advance(&DroneHealth::default(), Contact::Unknown)
+            .is_some());
+    }
+
+    #[test]
+    fn navigation_holds_each_goal_for_exactly_five_motor_actions() {
+        let mut flight = Flight::new(&Arena::default());
+        let first = flight.goal(Contact::Unknown);
+        let visible = Contact::Visible(Vec3::new(-5.0, 1.5, -3.0));
+        for _ in 0..4 {
+            assert_eq!(flight.goal(visible), first);
         }
+        assert_ne!(flight.goal(visible), first);
+        flight.reset();
+        assert_eq!(flight.goal(Contact::Unknown), first);
     }
 
     #[test]
@@ -167,7 +182,7 @@ mod tests {
         let mut health = DroneHealth::default();
         health.hit_rotor(DroneMotor::FrontLeft);
         health.hit_rotor(DroneMotor::FrontLeft);
-        assert!(flight.advance(&health).is_none());
+        assert!(flight.advance(&health, Contact::Unknown).is_none());
         assert!(flight.error().is_some());
         assert_eq!(flight.observation(), terminal);
     }

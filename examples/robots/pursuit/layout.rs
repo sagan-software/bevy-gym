@@ -41,7 +41,7 @@ impl Block {
 }
 
 /// Build the 26-metre arena, windowed house, open pipe, and scattered cover.
-pub(super) fn blocks() -> Vec<Block> {
+pub(crate) fn blocks() -> Vec<Block> {
     let mut blocks = vec![Block::new(
         Vec3::new(0.0, -0.1, 0.0),
         Vec3::new(13.0, 0.1, 13.0),

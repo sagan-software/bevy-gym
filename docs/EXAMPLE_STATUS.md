@@ -4,6 +4,70 @@ Updated: 2026-10-09. Goal status: active.
 
 ## Resume here
 
+### Playable navigation checkpoint
+
+The playable pursuit scene now combines programmed search with learned motor control.
+The `pursuit-search` guide demonstrates filtered sight and the motor loop without rendering.
+Search receives current or remembered sightings, never the hidden character position.
+It uses the authored static map to find viewpoints and routes around cover.
+Learned search, hearing-directed navigation, damage adaptation, and adversarial humanoid training remain unfinished.
+
+The final 265 native trials all survived. Minimum lateral visibility was 2,092/3,000 samples.
+Every house and pipe trial ended with ten uninterrupted seconds of sight.
+All 53 pipe cases still miss the earlier 90% held-visibility threshold.
+The [final record](progress/drone-navigation-final.json) preserves tested sources and logs.
+Its trial archive is byte-identical to the earlier integration archive, verified by SHA-256.
+
+The scene now accepts brief sightings that occur between navigation decisions.
+Repeated remembered contacts cannot extend the investigation deadline.
+After expiry, the sensor must clear or provide a visible contact before another investigation starts.
+A closed-door fixture verifies planned clear segments through a window view.
+That fixture does not establish physical window-flight performance.
+
+A failing regression reproduced the pipe camera obstruction. The camera now lowers under ceilings.
+The [desktop capture](progress/drone-search-pipe-fixed-desktop.png),
+[narrow capture](progress/drone-search-pipe-fixed-narrow.png), and
+[recording](progress/drone-search-pipe-fixed.mp4) confirm the corrected view.
+The desktop capture shows the drone outside the pipe after disabling the robot.
+The original obstruction capture remains archived for comparison.
+
+The local browser runs build
+`ee5f5b24329264c454889da7f67c742db61a2fc7075f8899cbbae8e4f31136ba`
+at `http://100.105.254.50:8781/robots/pursuit/?build=navigation-final`.
+T3 preview inspection covered 390-by-844 and 1280-by-800 CSS-pixel views.
+The tab is `tab_1`, at the desktop viewport, with recording stopped.
+The latest open call confirmed a visible preview. The site server remains active.
+
+Final native validation passed formatting, root tests, 74 scene tests, 20 navigation tests,
+and strict all-target/all-feature Clippy. The exact WASM Clippy command also passed.
+The standard browser suite passed, including 18 applicable navigation tests.
+Two imported arena tests run only natively. Personal strict and discovery checks
+reported no changed-line findings.
+
+Nix lint still reports the two existing
+`statix/unfiltered_source_root` findings at `flake.nix:119` and `flake.nix:200`.
+Those lines are unchanged by this checkpoint.
+
+Coverage executed every line in the new navigation modules and runnable guide.
+[The coverage record](progress/drone-navigation-coverage.json) identifies four untested
+branch outcomes, flight-error paths, and a test-only panic arm. Full branch coverage is not claimed.
+The default cargo-llvm-cov report excludes examples. The recorded analysis instead
+exports the instrumented scene, navigation test, and guide objects directly with LLVM.
+
+All navigation build, native, browser, personal-lint, coverage, and trial jobs have finished.
+The temporary research probe has been archived and removed. No training run is active.
+
+The latest previously pushed checkpoint is `5f82446`; its GitHub CI passed.
+The guide passed two episodes with 2,843/3,000 visible samples each.
+Documentation tests passed seven cases with one existing ignored case.
+Commit and push this integration checkpoint after Markdown validation.
+Afterward, continue the active roadmap with learned search and cover behavior qualification.
+Do not repeat the completed trial sweep unless controller behavior changes.
+
+### Research preceding integration
+
+The following records describe research before the playable navigation checkpoint.
+
 Read [the roadmap](EXAMPLE_ROADMAP.md), [quality audit](QUALITY_AUDIT.md),
 [reference research](EXAMPLE_RESEARCH.md), and [drone contract](ROBOT_ENVIRONMENT.md).
 

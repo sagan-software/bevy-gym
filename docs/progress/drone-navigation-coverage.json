@@ -1,0 +1,114 @@
+{
+  "method": "LLVM source-region start counts on added lines from git diff --unified=0; union of resolved path aliases and all instrumented objects. This is execution evidence, not assertion correctness.",
+  "files": [
+    {
+      "path": "examples/robots/pursuit.rs",
+      "changed_instrumented_lines": 39,
+      "covered": 38,
+      "zero_hit_lines": [
+        "571"
+      ]
+    },
+    {
+      "path": "examples/robots/pursuit/flight.rs",
+      "changed_instrumented_lines": 46,
+      "covered": 45,
+      "zero_hit_lines": [
+        "114"
+      ]
+    },
+    {
+      "path": "examples/robots/pursuit/flight_tests.rs",
+      "changed_instrumented_lines": 6,
+      "covered": 6,
+      "zero_hit_lines": []
+    },
+    {
+      "path": "examples/robots/pursuit/hud.rs",
+      "changed_instrumented_lines": 3,
+      "covered": 3,
+      "zero_hit_lines": []
+    },
+    {
+      "path": "examples/robots/pursuit/layout.rs",
+      "changed_instrumented_lines": 1,
+      "covered": 1,
+      "zero_hit_lines": []
+    },
+    {
+      "path": "examples/robots/pursuit/navigation/map.rs",
+      "changed_instrumented_lines": 225,
+      "covered": 225,
+      "zero_hit_lines": []
+    },
+    {
+      "path": "examples/robots/pursuit/navigation/memory.rs",
+      "changed_instrumented_lines": 130,
+      "covered": 130,
+      "zero_hit_lines": []
+    },
+    {
+      "path": "examples/robots/pursuit/navigation/mod.rs",
+      "changed_instrumented_lines": 122,
+      "covered": 122,
+      "zero_hit_lines": []
+    },
+    {
+      "path": "examples/robots/pursuit/perception_tests.rs",
+      "changed_instrumented_lines": 4,
+      "covered": 4,
+      "zero_hit_lines": []
+    },
+    {
+      "path": "examples/robots/pursuit/return_fire.rs",
+      "changed_instrumented_lines": 2,
+      "covered": 2,
+      "zero_hit_lines": []
+    },
+    {
+      "path": "examples/robots/pursuit/return_fire_tests.rs",
+      "changed_instrumented_lines": 2,
+      "covered": 2,
+      "zero_hit_lines": []
+    },
+    {
+      "path": "examples/robots/pursuit/scene.rs",
+      "changed_instrumented_lines": 6,
+      "covered": 6,
+      "zero_hit_lines": []
+    },
+    {
+      "path": "examples/robots/pursuit_search.rs",
+      "changed_instrumented_lines": 41,
+      "covered": 41,
+      "zero_hit_lines": []
+    },
+    {
+      "path": "tests/pursuit_navigation.rs",
+      "changed_instrumented_lines": 60,
+      "covered": 60,
+      "zero_hit_lines": []
+    }
+  ],
+  "navigation_line_coverage": "All executable lines in map.rs, memory.rs, and mod.rs were executed.",
+  "branch_gaps": [
+    {
+      "path": "examples/robots/pursuit/navigation/map.rs",
+      "lines": [
+        146,
+        316
+      ],
+      "reason": "Current static-layout scenarios did not exercise a blocked sweep between free neighbouring cells or a blocked shortcut within 2.5 metres."
+    },
+    {
+      "path": "examples/robots/pursuit/navigation/mod.rs",
+      "lines": [
+        106,
+        107
+      ],
+      "reason": "Trial camera positions never coincided exactly with a target sample and remained within 20 metres of all samples."
+    }
+  ],
+  "failure_path_gaps": "Flight fail_motor and pilot.action error arms are not reached by the valid bundled pilot and authored physics state. Existing FlightPilot tests reject malformed checkpoints; Flight tests independently verify freeze and reset behavior. No runtime error injection was added.",
+  "test_failure_arm_gap": "examples/robots/pursuit.rs:571 is the test panic for an unexpected non-perspective camera. The configured scene always supplies a perspective camera."
+}

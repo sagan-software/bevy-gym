@@ -319,8 +319,8 @@ mod tests {
         let mut app = app();
         {
             let mut game = app.world_mut().resource_mut::<Game>();
-            for _ in 0..200 {
-                game.step(super::super::Movement::Forward);
+            for _ in 0..500 {
+                game.step(super::super::Movement::Idle);
                 if matches!(game.gun.phase(), Phase::Charging { .. }) {
                     break;
                 }

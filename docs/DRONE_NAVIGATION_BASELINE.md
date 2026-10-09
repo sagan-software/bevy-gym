@@ -2,8 +2,8 @@
 
 This research baseline combines programmed navigation with the existing learned
 motor pilot. It receives its own flight observation and filtered sight. It cannot
-read the target's scripted route or hidden position. Production Rust and browser
-gameplay have not changed.
+read the target's scripted route or hidden position. The initial research results
+below predate integration into the playable scene.
 
 The [earlier learned navigator](DRONE_SEARCH.md) could imitate cover approaches but
 failed moving-target pursuit. This baseline provides a separate control reference
@@ -38,7 +38,7 @@ limits the estimate to four metres per second, and uses a half-second lead while
 tracking. It prefers a six-metre viewing distance. Investigation retains the last
 observed point and velocity for at most ten seconds.
 
-Search samples potential target positions on a one-metre grid at Y = 1 metre.
+The research prototype samples potential target positions on a one-metre grid at Y = 1 metre.
 It records when a sample was within the body-centred viewing cone and had a clear
 static ray. Recently checked samples are skipped for ten seconds. A clear ray to
 a sample does not prove an entire cell is empty. The production sensor uses an
@@ -46,7 +46,7 @@ offset eye; aligning this heuristic with that origin remains an integration chec
 
 The query graph and search samples come from geometry, with no named house or
 pipe destination. The planner chooses reachable viewing cells and uses clear
-shortcuts up to 2.5 metres long. Its current implementation allocates graph-search
+shortcuts up to 2.5 metres long. The research prototype allocates graph-search
 scratch storage each decision. No browser-performance or allocation claim is made.
 
 ## Measured failures and changes
@@ -99,20 +99,37 @@ logs, variant summaries, and restore instructions. The
 outputs, including failed variants. Each decompressed entry contains its original
 path, SHA-256, and exact UTF-8 text. No research process remains active.
 
-## Implementation gate
+## Playable integration
 
-Before browser integration, convert the prototype into documented example code
-with focused behavioral tests. Align search rays with the production eye origin
-and define how an initial remembered contact seeds investigation. Keep navigation
-inputs restricted to filtered observations and static geometry.
+The playable scene now uses this programmed controller over the same frozen motor
+pilot. The [pursuit-search guide](../examples/robots/pursuit_search.rs) demonstrates
+the loop without rendering. Navigation consumes one filtered observation every
+100 milliseconds; the motor pilot performs five 20-millisecond actions per goal.
+Reset clears search history and retains the map and valid model weights.
 
-Test empty sight, finite-memory expiry, blocked starts, failed routes, escape
-clearance, scan initialization, heading-reference limits, reset, and both moving
-and hidden targets. Add a blocked-door fixture to require a window viewpoint.
-Measure changed-branch coverage and run the required native, personal-lint, and
-WASM gates. Prototype compiler warnings are not clean production validation.
+The implementation uses the same body-local camera offset as the visible lens and
+sight sensor. An initial remembered contact seeds investigation with its existing
+age deducted. Repeated remembered contacts cannot refresh that deadline. After expiry,
+stale remembered contacts remain ignored. A visible contact restarts investigation.
+After the sensor clears to unknown, a new brief remembered contact can also restart it.
 
-Then connect the controller to the playable arena and inspect desktop and narrow
-browser views with recordings. Label programmed navigation and learned flight
-separately. Keep learned-search, hearing, damaged-flight, and adversarial-training
-work in the active roadmap. [Execution status](EXAMPLE_STATUS.md) records the next step.
+Graph search reuses buffers bounded by the fixed grid. A geometry test closes the
+house door and checks that the planned route reaches a clear window view. Other
+checks cover malformed sightings, memory expiry, reset, heading-reference limits,
+blocked starts, clearance-margin escape, and unreachable destinations.
+
+All 265 integrated native trials survived. The weakest lateral visibility increased
+to 2,092 of 3,000 physics samples, or 69.7%. Every house and pipe trial ended with
+ten uninterrupted seconds of sight. The earlier 90% held-visibility gate still
+fails all 53 pipe cases. [The integration record](progress/drone-navigation-integration.json)
+retains exact probe sources and compressed raw measurements.
+
+Chrome/WASM passes 18 applicable navigation tests, including a minute-long physical
+pursuit episode. Desktop and narrow browser recordings show the playable integration.
+The first narrow review exposed a pipe-camera obstruction. A geometry regression
+reproduces it, and the revised camera lowers its view under a ceiling. Desktop and
+narrow captures confirm that the pipe interior and robot remain visible.
+[Execution status](EXAMPLE_STATUS.md) tracks visual confirmation and remaining gates.
+
+This is programmed search with learned flight. Learned search, hearing-directed
+navigation, damage adaptation, and adversarial training remain in the active roadmap.

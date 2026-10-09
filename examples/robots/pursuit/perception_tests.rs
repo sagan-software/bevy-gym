@@ -44,18 +44,12 @@ fn body_death_clears_sight_before_the_next_physics_action() {
 }
 
 #[test]
-fn body_camera_observes_the_actual_character_during_hover() {
+fn body_camera_observes_actual_character_movement_during_pursuit() {
     let mut game = Game::default();
     assert_eq!(game.sight.contact(), sight::Contact::Unknown);
-    for step in 0..300 {
-        let movement = if step < 150 {
-            Movement::Forward
-        } else if step < 200 {
-            Movement::Right
-        } else {
-            Movement::Backward
-        };
-        game.step(movement);
+    game.gun.disable();
+    for _ in 0..500 {
+        game.step(Movement::Idle);
         if let sight::Contact::Visible(point) = game.sight.contact() {
             assert_eq!(point.x, game.arena.position().x);
             assert_eq!(point.z, game.arena.position().z);

@@ -4,19 +4,27 @@ use super::*;
 use bevy_gym::robots::{DroneMotor, DroneMotorState};
 
 #[test]
-fn healthy_hover_remains_available_for_a_minute_of_simulation() {
+fn sight_driven_navigation_finds_the_robot_and_survives_a_minute() {
     let mut game = Game::default();
+    // Keep the target alive to measure tracking throughout the full flight.
+    game.gun.disable();
+    let mut visible = 0;
     for _ in 0..3000 {
         game.step(Movement::Idle);
         assert!(game.flight.error().is_none());
         assert!(game.combat.target().health().is_alive());
+        visible += usize::from(matches!(game.sight.contact(), sight::Contact::Visible(_)));
     }
+    assert!(
+        visible >= 1800,
+        "At least 60% visible samples, received {visible}"
+    );
     assert!(
         game.flight
             .observation()
             .position()
             .distance(Vec3::new(0.0, 2.0, 0.0))
-            < 0.5
+            > 1.0
     );
 }
 

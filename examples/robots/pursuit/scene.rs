@@ -65,7 +65,17 @@ pub(super) fn project(
         transform.rotation = Quat::from_rotation_y(game.facing());
     }
     let target = position + Vec3::Y * 0.4;
-    let desired = target + Vec3::new(0.0, 3.3, 6.0);
+    // Lower the view under a ceiling so the pipe lip cannot obscure the upper frame.
+    let offset = if game
+        .arena
+        .obstruction(target, target + Vec3::Y * 3.3)
+        .is_some()
+    {
+        Vec3::new(0.0, 0.6, 3.0)
+    } else {
+        Vec3::new(0.0, 3.3, 6.0)
+    };
+    let desired = target + offset;
     for mut transform in &mut camera {
         *transform = Transform::from_translation(
             game.arena

@@ -147,11 +147,21 @@ training, checkpoint export, and playback. See the
 
 The [waypoint guide](docs/DRONE_TRACKING.md) uses a bundled imitation-trained pilot
 to fly eight metres east and face east. Its heading and waypoint tests pass
-natively and in Chrome/WASM. The playable arena still uses the hover controller.
+natively and in Chrome/WASM. The [playable arena](docs/DRONE_PURSUIT_GAME.md)
+combines programmed search with that learned motor pilot. Run its headless
+[sensing and navigation guide](examples/robots/pursuit_search.rs):
+
+```sh
+nix develop --command cargo run --no-default-features --features robots --example pursuit-search
+```
+
+The navigator receives filtered sightings and static geometry. Learned search and
+adversarial humanoid training remain unfinished.
 
 The [actuator-failure guide](docs/DRONE_DAMAGE.md) disables a named motor during
 flight. It demonstrates the resulting crash under constant commands. Learned
-damaged-flight recovery and detached parts remain unfinished.
+damaged-flight recovery remains unfinished. The playable arena renders rotor bursts,
+smoke, and colliding debris when the drone is destroyed.
 
 ## Train in your browser
 

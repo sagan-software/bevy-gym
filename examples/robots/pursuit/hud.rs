@@ -70,7 +70,7 @@ pub(super) fn setup(mut commands: Commands<'_, '_>, assets: Res<'_, AssetServer>
             ));
             root.spawn((
                 Status,
-                Text::new("Hover policy · E to collect pistol"),
+                Text::new("Programmed search · learned flight"),
                 TextFont {
                     font: font.clone(),
                     font_size: 16.0,
@@ -127,7 +127,7 @@ pub(super) fn project(
 const fn message(feedback: Feedback) -> &'static str {
     match feedback {
         Feedback::Crashed => "Drone crashed · R to reset",
-        Feedback::Unarmed => "Hover policy · E to collect pistol",
+        Feedback::Unarmed => "Programmed search · learned flight",
         Feedback::Armed => "Point to aim · Click to fire",
         Feedback::Pickup(PickupError::TooFar) => "Move closer to the pistol",
         Feedback::Pickup(PickupError::AlreadyOwned) => "Pistol already collected",
@@ -165,7 +165,7 @@ mod tests {
     #[test]
     fn every_feedback_variant_has_an_exact_actionable_message() {
         let cases = [
-            (Feedback::Unarmed, "Hover policy · E to collect pistol"),
+            (Feedback::Unarmed, "Programmed search · learned flight"),
             (Feedback::Crashed, "Drone crashed · R to reset"),
             (Feedback::Armed, "Point to aim · Click to fire"),
             (

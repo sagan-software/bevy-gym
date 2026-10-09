@@ -37,8 +37,9 @@ jobs:
       - run: nix develop --command python3 tests/test_drone_audio.py
       - run: nix develop --command cargo fmt --all -- --check
       - run: nix develop --command cargo test
-      - run: nix develop --command cargo test --no-default-features --features robots --lib --test pursuit_arena --test pursuit_combat --test pursuit_shots --test pursuit_sight --test pursuit_hearing --test pursuit_return_fire --test drone_hover --test drone_damage --test drone_recovery --test drone_tracking --test drone_parity --test drone_learning
+      - run: nix develop --command cargo test --no-default-features --features robots --lib --test pursuit_arena --test pursuit_combat --test pursuit_shots --test pursuit_sight --test pursuit_hearing --test pursuit_return_fire --test pursuit_navigation --test drone_hover --test drone_damage --test drone_recovery --test drone_tracking --test drone_parity --test drone_learning
       - run: nix develop --command cargo test --features robots --example drone-flight --example drone-pursuit
+      - run: nix develop --command cargo run --no-default-features --features robots --example pursuit-search
       - run: nix develop --command cargo check --no-default-features --features robots,browser --target wasm32-unknown-unknown
       - run: nix run .#drone-browser-check
       - run: nix develop --command cargo test -p bevy-gym-web --locked

@@ -89,9 +89,10 @@ hover environment's mass, thrust, reward, or terminal rules for visual effects.
 Current status: checkpoint loading and destruction effects are implemented. Rotor
 failure emits a burst and smoke; task termination hides the body and spawns eight
 colliding debris proxies in the hover viewer. The arena now has a player-controlled
-robot, a lootable pistol, and a flying drone driven by the bundled healthy hover
-policy. Rotor damage disables motor forces; flight termination triggers destruction.
-Pursuit, humanoid training, and learned damage recovery remain pending.
+robot, a lootable pistol, and a flying drone that combines programmed search with
+learned motor control. Rotor damage disables motor forces; flight termination
+triggers destruction. Learned search, humanoid training, and learned damage recovery
+remain pending.
 
 ## Explore the arena
 
@@ -103,12 +104,24 @@ nix develop --command cargo run --features robots --example drone-pursuit
 
 Hold `W`, `A`, `S`, and `D` to move. Press `R` to reset. The on-screen movement
 buttons also accept held input. The camera follows the character and moves closer
-when a wall obstructs its view.
+when a wall obstructs its view. Under a ceiling, it uses a lower view.
 
 Press `E` near the pistol to collect it. Point at
 the drone and click to fire; holding the button repeats at the weapon cooldown.
-`Space` and the Fire button use the last captured aim. The drone uses its learned
-hover controller while the player moves and shoots.
+`Space` and the Fire button use the last captured aim. Programmed navigation follows
+filtered sightings and investigates last-seen areas. The learned motor pilot moves
+the drone toward those viewing positions. Current sight is required for gunfire.
+
+Run the sensing and navigation guide without a renderer:
+
+```sh
+nix develop --command cargo run --no-default-features --features robots --example pursuit-search
+```
+
+The guide keeps the target still and repeats the same episode after reset. It shows
+where the sensor reads world state and where navigation receives only filtered
+contact. [Navigation evidence](DRONE_NAVIGATION_BASELINE.md) records the measured
+moving-target and cover trials, including the remaining pipe visibility gap.
 
 Run the short headless movement guide:
 
@@ -154,7 +167,8 @@ The same static geometry answers nearest-obstruction queries for the camera.
 Invalid query coordinates fail closed at zero distance; zero-length segments
 have no obstruction. This is the geometry basis for later sight and shot queries.
 The geometric sight model below queries this layout from the rendered drone's
-body-mounted camera. A pursuit actor remains unfinished.
+body-mounted camera. Programmed navigation uses those filtered observations; a
+learned pursuit actor remains unfinished.
 
 Tests cover all sixteen button combinations, fixed movement, walls, door and pipe
 traversal, window and roof obstruction, gravity, reset, camera obstruction, walking

@@ -89,8 +89,8 @@ fn reset_discards_unrendered_shot_sounds() {
 #[test]
 fn current_sight_drives_warning_and_real_projectile_damage() {
     let mut game = Game::default();
-    for _ in 0..200 {
-        game.step(Movement::Forward);
+    for _ in 0..500 {
+        game.step(Movement::Idle);
         if matches!(game.gun.phase(), enemy::gun::Phase::Charging { .. }) {
             break;
         }
