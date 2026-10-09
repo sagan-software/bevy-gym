@@ -27,6 +27,8 @@ pub(super) enum Action {
 pub(super) enum Effect {
     /// Remove all transients before rendering the new episode.
     Reset,
+    /// The first hit starts smoke at this live rotor.
+    RotorDamaged(DroneMotor),
     /// A named rotor reached its destroyed state.
     Rotor(DroneMotor),
     /// The body reached its absorbing dead state.
@@ -71,7 +73,7 @@ pub(super) struct Combat {
     feedback: Feedback,
     /// Bounded visual trace; absent once its lifetime expires.
     trace: Option<Trace>,
-    /// At most one reset, four rotor failures, and one body death per episode.
+    /// At most one reset, four first hits, four rotor failures, and one body death.
     effects: VecDeque<Effect>,
 }
 
@@ -173,7 +175,12 @@ impl Combat {
         match self.target.shoot(arena, &mut self.pistol, aim) {
             Ok(shot) => {
                 // Authoritative transitions emit once, even if several actions precede a frame.
-                if let Shot::Hit { damage, .. } = shot {
+                if let Shot::Hit { damage, part, .. } = shot {
+                    if damage == Damage::Hit {
+                        if let super::shot::target::Part::Rotor(motor) = part {
+                            self.effects.push_back(Effect::RotorDamaged(motor));
+                        }
+                    }
                     match damage {
                         Damage::RotorDestroyed(motor) => {
                             self.effects.push_back(Effect::Rotor(motor));
@@ -267,6 +274,7 @@ mod tests {
         let aim = Dir3::new(combat.target().rotor_centre(motor) - Combat::origin(arena.position()))
             .expect("Rotor direction");
         combat.act(&arena, Action::Fire(aim));
+        assert_eq!(combat.pop_effect(), Some(Effect::RotorDamaged(motor)));
         assert_eq!(combat.pop_effect(), None);
         combat.advance(Duration::from_secs(1));
         combat.act(&arena, Action::Fire(aim));
@@ -291,6 +299,7 @@ mod tests {
             combat.advance(Duration::from_secs(1));
         }
         assert_eq!(combat.pop_effect(), Some(Effect::Reset));
+        assert_eq!(combat.pop_effect(), Some(Effect::RotorDamaged(motor)));
         assert_eq!(combat.pop_effect(), Some(Effect::Rotor(motor)));
         assert_eq!(combat.pop_effect(), None);
     }

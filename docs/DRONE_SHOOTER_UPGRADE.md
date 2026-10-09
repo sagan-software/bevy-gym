@@ -87,8 +87,14 @@ The checkpoint passes 97 scene tests and 20 navigation tests. Its selected camer
 locomotion, and weapon files have full native line and branch coverage, including
 their test code. This is not a whole-change coverage percentage. Remaining coverage
 boundaries are listed in [the record](progress/shooter-camera-coverage.json).
-Physical impacts, player projectiles, rotor smoke, ragdolls, two-versus-two agents,
-state lights, and raytraced audio remain separate unfinished checkpoints.
+
+Physical impulses and first-hit rotor smoke now pass native and browser tests.
+The [hit recording](progress/shooter-rotor-hit.mp4) shows the body twisting and
+smoke following the damaged rotor. The second hit retains the destruction burst.
+Player projectiles, ragdolls, two-versus-two agents, state lights, and raytraced audio
+remain separate unfinished checkpoints. Player shots still use hitscan.
+The [impact coverage record](progress/shooter-impact-coverage.json) lists test scope
+and the remaining uncovered paths.
 
 The optimized runtime is `a7e93bc80af7fdb86834af24d4a26ff28d853d172259d4841af8cc6262ce862b`.
 Its [final recording](progress/shooter-camera-final.mp4) and

@@ -85,6 +85,14 @@ impl Flight {
         self.environment.observation()
     }
 
+    /// Forward a hit to the same solver used by the learned motor policy.
+    pub(super) fn impact(
+        &mut self,
+        impulse: bevy_gym::robots::DroneImpulse,
+    ) -> Result<(), bevy_gym::robots::DroneImpulseRejected> {
+        self.environment.apply_impulse(impulse)
+    }
+
     /// Apply rotor health before navigation, inference, and twenty milliseconds of physics.
     pub(super) fn advance(
         &mut self,

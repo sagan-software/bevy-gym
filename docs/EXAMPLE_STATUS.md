@@ -12,12 +12,25 @@ a centre reticle, collision clearance, and an equipped starting pistol.
 Weapon projection reads the current animated hand after animation evaluation.
 Direction changes remain abrupt; the forward clip is still adapted for side travel.
 
-The camera work is in `bevy-gym-quality` on `quality-roadmap-20261008`.
-A separate `bevy-gym-impacts` worktree on `shooter-impacts-20261009` contains the next
-public impulse API, player-hit connection, and first-hit rotor smoke. Preserve both.
-Its 88 scene tests and five public impulse tests pass; browser validation and the
-full final gates remain pending. That work is not merged into the camera checkpoint.
-The original `bevy-gym` checkout remains deliberately dirty.
+The camera checkpoint `09f7372` is pushed to GitHub main.
+The authoritative worktree is `bevy-gym-quality` on `quality-roadmap-20261008`.
+The impact checkpoint adds validated physical impulses and persistent first-hit rotor
+smoke. Native root tests, 99 scene tests, five public impulse tests, 20 navigation
+tests, strict native/WASM Clippy, four asset tests, and the browser suite pass.
+
+The browser suite includes all five impulse tests. Personal lint reports no candidate
+Rust diagnostics; unrelated raw repository diagnostics remain. Nix lint reports
+pre-existing unfiltered source roots at flake.nix:119 and :200.
+
+The [hit recording](progress/shooter-rotor-hit.mp4) and
+[contact sheet](progress/shooter-rotor-hit.jpg) show a first rotor hit, rotation,
+and attached smoke. They use final Rust source before WASM optimization.
+[Coverage](progress/shooter-impact-coverage.json) records the exact remaining gaps.
+The impulse value has 37/37 covered lines and 8/8 branches, including test code.
+
+Player shots still use hitscan; swept projectiles remain the next checkpoint.
+The separate `bevy-gym-impacts` worktree is now an outdated scratch copy. Do not copy
+its files over this worktree. The original `bevy-gym` checkout remains deliberately dirty.
 
 Native root tests, 97 scene tests, 20 navigation tests, strict native/WASM Clippy,
 asset contracts, and the standard browser suite pass. Personal lint's changed-line
@@ -34,13 +47,13 @@ the embedded browser refuses pointer lock. Normal captured-mouse operation remai
 unverified in that browser. Desktop and narrow layouts were inspected; this remains
 a keyboard-and-mouse shooter, without a complete touch aiming interface.
 
-Next: finish and qualify the impulse API, connect swept player projectiles and
-rotor-specific smoke, improve directional animation, resolve bevy-ragdoll's Bevy
+Next: connect swept player projectiles and muzzle feedback, improve directional animation, resolve bevy-ragdoll's Bevy
 0.19 boundary, then add two drones/two droids and state-aware lights/audio.
 Do not report the complete shooter or the broader examples roadmap as finished.
 
-The optimized local build is `a7e93bc80af7fdb86834af24d4a26ff28d853d172259d4841af8cc6262ce862b`
-at `http://100.105.254.50:8781/robots/pursuit/?build=a7e93bc8`.
+The optimized impact build is `9a1e3e72b9565671c529a38e1cad7deaf965d1c79572f05516d12450e6515343`
+at `http://100.105.254.50:8781/robots/pursuit/?build=9a1e3e72`.
+The following camera evidence predates the impact checkpoint.
 The [final recording](progress/shooter-camera-final.mp4),
 [contact sheet](progress/shooter-camera-final.jpg), and
 [desktop capture](progress/shooter-camera-desktop.png) use that build.

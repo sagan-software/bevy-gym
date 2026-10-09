@@ -580,3 +580,8 @@ unreachable = { level = "warn", priority = 2 }
 unused_result_ok = { level = "warn", priority = 2 }
 unwrap_in_result = { level = "warn", priority = 2 }
 unwrap_used = { level = "warn", priority = 2 }
+
+[[example]]
+name = "drone-impact"
+path = "examples/robots/impact.rs"
+required-features = ["robots"]

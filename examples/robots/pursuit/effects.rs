@@ -11,27 +11,67 @@ use bevy_gym::robots::DroneMotor;
 use rapier3d::prelude::{ColliderBuilder, PhysicsWorld, RigidBodyBuilder, Vector};
 use std::time::Duration;
 
-/// A finite smoke emitter; reset removes it together with particles and debris.
+/// Rotor smoke or a timed destruction plume; reset removes every emitter.
 #[derive(Component)]
 struct Plume {
     /// Motor attachment or fixed body impact.
     source: Source,
-    /// Time before emission stops.
-    remaining: Duration,
     /// Accumulated time toward the next puff.
     elapsed: Duration,
 }
 
+impl Plume {
+    /// Every new emitter starts with an empty puff clock.
+    const fn new(source: Source) -> Self {
+        Self {
+            source,
+            elapsed: Duration::ZERO,
+        }
+    }
+}
+
 /// A rotor follows the target; a body impact retains the destruction position.
-#[expect(
-    variant_size_differences,
-    reason = "Both variants fit inline without allocating a plume payload."
-)]
 enum Source {
+    /// Follow one damaged rotor until destruction or reset.
+    DamagedRotor(DroneMotor),
     /// Follow one named rotor, including after its mesh disappears.
-    Rotor(DroneMotor),
+    Rotor {
+        /// Destroyed actuator whose moving attachment emits smoke.
+        motor: DroneMotor,
+        /// Time before the destruction plume expires.
+        remaining: Duration,
+    },
     /// Remain at the last body position.
-    Impact(Vec3),
+    Impact {
+        /// Fixed destruction position in world metres.
+        position: Vec3,
+        /// Time before the body plume expires.
+        remaining: Duration,
+    },
+}
+
+impl Source {
+    /// Damaged rotors follow health; destruction plumes have finite lifetimes.
+    fn advance(&mut self, game: &Game, delta: Duration) -> Option<Vec3> {
+        let (position, remaining) = match self {
+            Self::DamagedRotor(motor) => {
+                let target = game.combat.target();
+                return (target.health().is_alive()
+                    && target.health().rotor(*motor)
+                        == super::combat::health::RotorHealth::Damaged)
+                    .then(|| target.rotor_centre(*motor));
+            }
+            Self::Rotor { motor, remaining } => {
+                (game.combat.target().rotor_centre(*motor), remaining)
+            }
+            Self::Impact {
+                position,
+                remaining,
+            } => (*position, remaining),
+        };
+        *remaining = remaining.saturating_sub(delta);
+        (!remaining.is_zero()).then_some(position)
+    }
 }
 
 /// Install shared assets and bounded transients after target transforms update.
@@ -62,24 +102,25 @@ fn observe(
                 }
                 *debris = Debris::default();
             }
+            Effect::RotorDamaged(motor) => {
+                commands.spawn(Plume::new(Source::DamagedRotor(motor)));
+            }
             Effect::Rotor(motor) => {
                 let position = game.combat.target().rotor_centre(motor);
                 materials.burst(&mut commands, position, 0.18);
-                commands.spawn(Plume {
-                    source: Source::Rotor(motor),
+                commands.spawn(Plume::new(Source::Rotor {
+                    motor,
                     remaining: Duration::from_secs(4),
-                    elapsed: Duration::ZERO,
-                });
+                }));
             }
             Effect::Destroyed => {
                 let target = game.combat.target();
                 let position = target.position();
                 materials.burst(&mut commands, position, 0.6);
-                commands.spawn(Plume {
-                    source: Source::Impact(position),
+                commands.spawn(Plume::new(Source::Impact {
+                    position,
                     remaining: Duration::from_secs(2),
-                    elapsed: Duration::ZERO,
-                });
+                }));
                 // Fragments inherit the last authoritative world-space velocity in metres per second.
                 let pose = Isometry3d::new(position, target.rotation());
                 for (fragment, transform) in debris.burst(
@@ -115,7 +156,7 @@ fn collision_world(game: &Game) -> PhysicsWorld {
     world
 }
 
-/// Emit at most one puff per frame and twelve per second for each finite source.
+/// Emit at most one puff per frame and twelve per second for each source.
 fn smoke(
     mut commands: Commands<'_, '_>,
     time: Res<'_, Time>,
@@ -125,18 +166,13 @@ fn smoke(
 ) {
     let delta = time.delta().min(Duration::from_millis(100));
     for (entity, mut plume) in &mut plumes {
-        plume.remaining = plume.remaining.saturating_sub(delta);
-        if plume.remaining.is_zero() {
+        let Some(position) = plume.source.advance(&game, delta) else {
             commands.entity(entity).despawn();
             continue;
-        }
+        };
         plume.elapsed += delta;
         if plume.elapsed >= Duration::from_millis(84) {
             plume.elapsed = Duration::ZERO;
-            let position = match plume.source {
-                Source::Rotor(motor) => game.combat.target().rotor_centre(motor),
-                Source::Impact(position) => position,
-            };
             materials.puff(&mut commands, position);
         }
     }
@@ -211,16 +247,17 @@ mod tests {
         let rotor = Part::Rotor(DroneMotor::RearRight);
         hit(&mut app.world_mut().resource_mut::<Game>(), rotor, 1);
         app.update();
-        assert_eq!(count::<Particle>(&mut app), 0);
+        assert_eq!(count::<Plume>(&mut app), 1);
+        assert_eq!(count::<Particle>(&mut app), 1);
         hit(&mut app.world_mut().resource_mut::<Game>(), rotor, 1);
         app.update();
-        assert_eq!(count::<Particle>(&mut app), 14);
+        assert_eq!(count::<Particle>(&mut app), 15);
         assert_eq!(count::<Plume>(&mut app), 1);
         app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
             Duration::from_millis(10),
         ));
         app.update();
-        assert_eq!(count::<Particle>(&mut app), 14);
+        assert_eq!(count::<Particle>(&mut app), 15);
         app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
             Duration::from_millis(100),
         ));
@@ -241,6 +278,42 @@ mod tests {
             app.world().resource::<Assets<StandardMaterial>>().len(),
             material_count
         );
+    }
+
+    #[test]
+    fn first_hit_smokes_only_its_rotor_until_reset() {
+        let mut app = app();
+        let motor = DroneMotor::RearRight;
+        hit(
+            &mut app.world_mut().resource_mut::<Game>(),
+            Part::Rotor(motor),
+            1,
+        );
+        app.update();
+        let position = app
+            .world()
+            .resource::<Game>()
+            .combat
+            .target()
+            .rotor_centre(motor);
+        let world = app.world_mut();
+        let smoke = world
+            .query_filtered::<&Transform, With<Particle>>()
+            .single(world)
+            .expect("One puff");
+        assert!(smoke.translation.distance(position) < 0.1);
+        for _ in 0..60 {
+            app.update();
+        }
+        assert_eq!(count::<Plume>(&mut app), 1);
+        assert!(count::<Particle>(&mut app) > 0);
+        hit(&mut app.world_mut().resource_mut::<Game>(), Part::Body, 6);
+        app.update();
+        assert_eq!(count::<Plume>(&mut app), 1);
+        app.world_mut().resource_mut::<Game>().reset();
+        app.update();
+        assert_eq!(count::<Plume>(&mut app), 0);
+        assert_eq!(count::<Particle>(&mut app), 0);
     }
 
     #[test]

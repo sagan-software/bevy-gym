@@ -232,6 +232,7 @@ impl Game {
         }
         let previous_rounds = self.combat.rounds();
         self.combat.act(&self.arena, action);
+        self.hit_reaction(action, previous_rounds);
         if !self.combat.target().health().is_alive() {
             self.gun.disable();
             self.sight.forget();
@@ -244,6 +245,28 @@ impl Game {
             );
         }
         self.finish_run();
+    }
+
+    /// Apply momentum only for a newly accepted hit, never retained HUD feedback.
+    fn hit_reaction(&mut self, action: firing::Action, previous_rounds: u8) {
+        if self.combat.rounds() >= previous_rounds {
+            return;
+        }
+        let firing::Action::Fire(direction) = action else {
+            return;
+        };
+        let firing::Feedback::Fired(shot::target::Shot::Hit { point, .. }) = self.combat.feedback()
+        else {
+            return;
+        };
+        let target = self.combat.target();
+        let local = target.rotation().inverse() * (point - target.position());
+        // A 0.4 N·s hit changes this one-kilogram body's velocity by 0.4 m/s.
+        let impulse = bevy_gym::robots::DroneImpulse::try_from((local, *direction * 0.4))
+            .expect("Owned hitboxes fit the bounded drone body");
+        if let Err(error) = self.flight.impact(impulse) {
+            self.flight.fail(error.to_string());
+        }
     }
 
     /// Preserve the first terminal result, preferring a disabled player on simultaneous damage.
@@ -493,6 +516,27 @@ mod tests {
         return_fire::install(&mut app);
         app.update();
         app
+    }
+
+    #[test]
+    fn a_player_hit_pushes_the_drone_once_and_reset_clears_the_impulse() {
+        let mut game = Game::default();
+        game.act(firing::Action::PickUp);
+        let before = game.flight.observation();
+        let point = game
+            .combat
+            .target()
+            .rotor_centre(bevy_gym::robots::DroneMotor::RearRight);
+        let direction = Dir3::new(point - firing::Combat::origin(game.arena.position()))
+            .expect("Visible rotor");
+        game.act(firing::Action::Fire(direction));
+        let hit = game.flight.observation();
+        assert!((hit.linear_velocity() - before.linear_velocity()).length() > 0.1);
+        assert!((hit.angular_velocity() - before.angular_velocity()).length() > 0.1);
+        game.act(firing::Action::Fire(direction));
+        assert_eq!(game.flight.observation(), hit);
+        game.reset();
+        assert_eq!(game.flight.observation(), before);
     }
 
     #[test]

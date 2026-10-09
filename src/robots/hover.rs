@@ -9,7 +9,8 @@ use rapier3d::prelude::{
 };
 
 use super::{
-    DroneAction, DroneEpisodeEnded, DroneMotor, DroneMotorState, DroneObservation, DroneObstacle,
+    DroneAction, DroneEpisodeEnded, DroneImpulse, DroneImpulseRejected, DroneMotor,
+    DroneMotorState, DroneObservation, DroneObstacle,
 };
 use crate::training::SplitMix64;
 use crate::{Env, EpisodeStatus, Reset, Step};
@@ -94,6 +95,27 @@ const MOTORS: [(Vector, f32); 4] = [
 ];
 
 impl DroneHover {
+    /// Apply a validated physical hit without advancing the episode clock.
+    ///
+    /// # Errors
+    /// Returns `DroneImpulseRejected` after termination without changing state.
+    ///
+    /// # Panics
+    /// Panics if the private body is missing. Public operations preserve that body.
+    pub fn apply_impulse(&mut self, impulse: DroneImpulse) -> Result<(), DroneImpulseRejected> {
+        // Terminal observations remain immutable until reset.
+        if self.episode == Flight::Ended {
+            return Err(DroneImpulseRejected);
+        }
+        let body = self
+            .world
+            .bodies
+            .get_mut(self.body)
+            .expect("private body exists");
+        impulse.apply(body);
+        Ok(())
+    }
+
     /// Add immutable collision boxes while retaining the default hover task.
     ///
     /// The floor remains present. Reset preserves all supplied boxes. Any active
