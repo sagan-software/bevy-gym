@@ -1,0 +1,30 @@
+[package]
+name = "bevy-gym-pursuit-viewer"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lints]
+workspace = true
+
+[features]
+default = ["native"]
+native = ["bevy-gym/render"]
+browser = ["bevy-gym/browser", "dep:wasm-bindgen"]
+
+[dependencies]
+bevy = { version = "0.18", default-features = false }
+bevy-gym = { path = "../..", default-features = false, features = ["robots", "render-core"] }
+bevy_panorbit_camera = { version = "=0.34.0", default-features = false }
+bevy_ragdoll = { path = "../../vendor/bevy-ragdoll", default-features = false, features = ["3d"] }
+bevy_ragdoll_rapier3d = { path = "../../vendor/bevy-ragdoll-rapier3d" }
+bevy_rapier3d = { version = "=0.34.0", default-features = false, features = ["dim3", "enhanced-determinism"] }
+rapier3d = { version = "0.36.0", features = ["enhanced-determinism"] }
+wasm-bindgen = { version = "=0.2.121", optional = true }
+
+[target.'cfg(target_arch = "wasm32")'.dev-dependencies]
+wasm-bindgen-test = "=0.3.71"
+
+[[example]]
+name = "drone-pursuit"
+path = "../../examples/robots/pursuit.rs"

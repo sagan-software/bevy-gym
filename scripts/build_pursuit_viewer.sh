@@ -21,8 +21,8 @@ case "$#:${1:-}" in
     ;;
 esac
 pursuit_target="$(cargo metadata --locked --no-deps --format-version 1 | python3 -c 'import json, sys; print(json.load(sys.stdin)["target_directory"])')"
-cargo build --locked --no-default-features --target wasm32-unknown-unknown --example drone-pursuit \
-  --features robots,browser,render-core,bevy/webgl2 "${pursuit_flags[@]}"
+cargo build -p bevy-gym-pursuit-viewer --locked --no-default-features --target wasm32-unknown-unknown --example drone-pursuit \
+  --features browser,bevy/webgl2 "${pursuit_flags[@]}"
 mkdir -p -- "$pursuit_dist/assets/fonts" "$pursuit_dist/assets/robots" "$pursuit_dist/LICENSES"
 wasm-bindgen --target web --out-name drone-pursuit --out-dir "$pursuit_dist" \
   "$pursuit_target/wasm32-unknown-unknown/$pursuit_profile/examples/drone-pursuit.wasm"
@@ -37,6 +37,11 @@ cp -- assets/fonts/MonaSans-VariableFont.ttf assets/fonts/OFL.txt "$pursuit_dist
 cp -- assets/robots/drone.glb assets/robots/drone-charge.wav assets/robots/drone-shot.wav assets/robots/README.md "$pursuit_dist/assets/robots/"
 cp -R -- assets/robots/survival "$pursuit_dist/assets/robots/"
 cp -- LICENSES/DRONE-CC-BY-3.0.txt "$pursuit_dist/LICENSES/"
+for ragdoll_crate in bevy-ragdoll bevy-ragdoll-rapier3d; do
+  for license in MIT APACHE; do
+    cp -- "vendor/$ragdoll_crate/LICENSE-$license" "$pursuit_dist/LICENSES/$ragdoll_crate-$license.txt"
+  done
+done
 # Keep the entry module and WASM bindings together across cached deployments.
 runtime_files=(drone-pursuit.js drone-pursuit_bg.wasm start.js audio.js camera.js styles.css)
 runtime_hash="$(cd -- "$pursuit_dist" && sha256sum "${runtime_files[@]}" | sha256sum | cut -d ' ' -f 1)"

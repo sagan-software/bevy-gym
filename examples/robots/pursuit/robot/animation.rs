@@ -18,22 +18,20 @@ pub(crate) struct Rig {
     aim_down: AnimationNodeIndex,
     /// Authored recoil played when ammunition decreases.
     shoot: AnimationNodeIndex,
-    /// Full-body final death pose.
-    death: AnimationNodeIndex,
     /// Previous displayed magazine count detects newly accepted shots.
     rounds: u8,
     /// Smoothed running blend weight, bounded to zero through one.
     running: f32,
-    /// Previous life state prevents replaying death every frame.
+    /// Previous life state stops animation once when physics takes ownership.
     life: Life,
 }
 
-/// Living animation loops and the absorbing death pose are mutually exclusive.
+/// Animation owns living bones; ragdoll physics owns dead bones.
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum Life {
     /// Locomotion and weapon overlays may play.
     Alive,
-    /// Only the authored death clip may play.
+    /// Physics owns the skeleton; animation tracks remain stopped.
     Dead,
 }
 
@@ -60,7 +58,6 @@ impl Rig {
             shoot: clip("Pistol_Shoot", 2),
             aim_up: clip("Pistol_Aim_Up", 2),
             aim_down: clip("Pistol_Aim_Down", 2),
-            death: clip("Death01", 0),
             rounds: 0,
             running: 0.0,
             life: Life::Alive,
@@ -68,7 +65,7 @@ impl Rig {
         (graph, rig)
     }
 
-    /// Death owns the whole skeleton; reset restores the living animation loops.
+    /// Death releases the skeleton to physics; reset restores living animation loops.
     pub(super) fn advance(
         &mut self,
         game: &Game,
@@ -83,9 +80,6 @@ impl Rig {
         };
         if life != self.life {
             player.stop_all();
-            if life == Life::Dead {
-                player.play(self.death);
-            }
             self.life = life;
             self.running = 0.0;
         }
@@ -278,7 +272,7 @@ mod tests {
     }
 
     #[test]
-    fn death_plays_once_and_reset_restores_living_loops() {
+    fn death_stops_animation_and_reset_restores_living_loops() {
         let (mut graph, mut rig) = Rig::new(&model());
         let mut player = AnimationPlayer::default();
         let mut game = Game::default();
@@ -290,14 +284,12 @@ mod tests {
         }
         assert!(!game.robot_health.is_alive());
         rig.advance(&game, 0.02, &mut player, &mut graph);
-        assert!(player.is_playing_animation(rig.death));
+        assert!(player.playing_animations().next().is_none());
         assert!(!player.is_playing_animation(rig.idle));
-        player.animation_mut(rig.death).expect("Death").seek_to(0.2);
         rig.advance(&game, 0.02, &mut player, &mut graph);
-        assert_eq!(player.animation(rig.death).expect("Death").seek_time(), 0.2);
+        assert!(player.playing_animations().next().is_none());
         game.reset();
         rig.advance(&game, 0.02, &mut player, &mut graph);
-        assert!(!player.is_playing_animation(rig.death));
         assert!(player.is_playing_animation(rig.idle));
     }
 }

@@ -9,8 +9,9 @@ keywords = ["bevy", "gym", "ecs", "simulation", "rl"]
 categories = ["game-engines", "science"]
 
 [workspace]
-members = ["web", "gymnasium-web", "robot-web"]
+members = ["web", "gymnasium-web", "robot-web", "robot-web/pursuit"]
 default-members = ["."]
+exclude = ["vendor/bevy-ragdoll", "vendor/bevy-ragdoll-rapier3d"]
 resolver = "2"
 
 [lints]
@@ -31,7 +32,6 @@ ecosystem-inference = ["dep:avian2d"]
 fast-compile = ["bevy/dynamic_linking"]
 # Portable rendering for native and browser examples.
 render-core = [
-  "dep:bevy_panorbit_camera",
   "bevy/2d_bevy_render",
   "bevy/3d_bevy_render",
   "bevy/default_app",
@@ -66,11 +66,6 @@ mujoco = ["dep:mujoco-rs"]
 default-features = false
 features = ["bevy_log"]
 version = "0.18"
-
-[dependencies.bevy_panorbit_camera]
-version = "=0.34.0"
-default-features = false
-optional = true
 
 [dependencies.burn]
 default-features = false
@@ -158,11 +153,6 @@ version = "1"
 name = "remember-cue"
 path = "examples/robots/remember.rs"
 required-features = ["browser-training"]
-
-[[example]]
-name = "drone-pursuit"
-path = "examples/robots/pursuit.rs"
-required-features = ["robots", "render-core"]
 
 [[example]]
 name = "pursuit-combat"

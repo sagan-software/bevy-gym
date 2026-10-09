@@ -1,0 +1,26 @@
+{
+  "runtime": "6bb43be4aa4b3c01f3ad18e1680cf19975c5adb00274318d860f96366cf32d57",
+  "upstream_ragdoll_revision": "05ca5a920c88cec9cfaa661c483aa4e26924e08f",
+  "viewer_tests": 115,
+  "flight_viewer_tests": 61,
+  "browser": "T3 collaborative preview, 1280x800 CSS pixels",
+  "inputs": "Synthetic keyboard and pointer events through the canvas. Settled death, reset, A/D movement, second death, second reset, W movement.",
+  "result": "Continued simulation and movement after both resets; no console errors since recording began at 2026-10-09T22:02:38.059Z.",
+  "recording": "shooter-ragdoll-final.mp4",
+  "contact_sheet": "shooter-ragdoll-final.jpg",
+  "coverage": "shooter-ragdoll-coverage.json",
+  "limits": [
+    "390x844 inspection retains the existing Fire/instruction overlap and incomplete touch aiming. Desktop keyboard/mouse is the qualified path.",
+    "Native extended tests pass before and after the sleep fix; the browser console and recording provide the discriminating failure and success evidence.",
+    "Native startup and browser pointer-lock imports remain outside native coverage.",
+    "Two-versus-two agents, authored strafing, state lights, and raytraced audio remain unfinished."
+  ],
+  "source_sha256": {
+    "examples/robots/pursuit.rs": "35571ea0d917b9a39204dbe66567fef1f82438169110632ea18ca68a8d86dc21",
+    "examples/robots/pursuit/ragdoll.rs": "2a128dbe8325797c102b3eb5b91b9f84cde13e7efa9e2fcf40d4fda202f8866e",
+    "examples/robots/pursuit/view.rs": "778a0a1e55836e3d738b42f86dd8b3db5215a2a46fb872238838103fa9ec4d84",
+    "examples/robots/pursuit/robot.rs": "7ce804730a2eefa76fe26dbb3ea90f4fe3cca0ddbd2701e67b82f7163ebd9992",
+    "examples/robots/pursuit/robot/animation.rs": "248ad54886bd02edfa1934e462bc64168c3ab164c6998e694315ed614a39fbf3",
+    "robot-web/pursuit/Cargo.toml": "1c1ea66929b8ae8771ae3d1ff17885f9662d2e853cbcf21209a72f23ca56caa5"
+  }
+}

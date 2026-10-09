@@ -1,0 +1,21 @@
+[package]
+name = "bevy_ragdoll_rapier3d"
+version = "0.1.0-dev"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/sagan-software/bevy-ragdoll"
+publish = false
+[workspace]
+[features]
+default = []
+parallel = ["bevy_rapier3d/parallel"]
+enhanced-determinism = ["bevy_rapier3d/enhanced-determinism"]
+debug-render = ["bevy_rapier3d/debug-render-3d"]
+[dependencies]
+bevy = { version = "=0.18.1", default-features = false, features = ["std"] }
+bevy_ragdoll = { path = "../bevy-ragdoll", default-features = false, features = ["3d"] }
+bevy_rapier3d = { version = "=0.34.0", default-features = false, features = ["dim3"] }
+num-traits = "0.2.19"
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(dylint_lib, values("sagan_lints"))'] }

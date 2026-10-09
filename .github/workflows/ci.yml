@@ -39,7 +39,8 @@ jobs:
       - run: nix develop --command cargo fmt --all -- --check
       - run: nix develop --command cargo test
       - run: nix develop --command cargo test --no-default-features --features robots --lib --test pursuit_arena --test pursuit_combat --test pursuit_shots --test pursuit_sight --test pursuit_hearing --test pursuit_return_fire --test pursuit_navigation --test drone_hover --test drone_damage --test drone_recovery --test drone_tracking --test drone_parity --test drone_learning
-      - run: nix develop --command cargo test --features robots --example drone-flight --example drone-pursuit
+      - run: nix develop --command cargo test --features robots --example drone-flight
+      - run: nix develop --command cargo test -p bevy-gym-pursuit-viewer --example drone-pursuit
       - run: nix develop --command cargo run --no-default-features --features robots --example pursuit-search
       - run: nix develop --command cargo check --no-default-features --features robots,browser --target wasm32-unknown-unknown
       - run: nix run .#drone-browser-check
@@ -63,3 +64,5 @@ jobs:
       - run: nix develop --command cargo clippy -p bevy-gym-browser --target wasm32-unknown-unknown -- -D warnings
       - run: nix develop --command cargo clippy -p bevy-gym-drone-worker --all-targets --all-features -- -D warnings
       - run: nix develop --command cargo clippy -p bevy-gym-drone-worker --target wasm32-unknown-unknown --all-features -- -D warnings
+      - run: nix develop --command cargo clippy -p bevy-gym-pursuit-viewer --all-targets --all-features -- -D warnings
+      - run: nix develop --command cargo clippy -p bevy-gym-pursuit-viewer --example drone-pursuit --no-default-features --features browser,bevy/webgl2 --target wasm32-unknown-unknown -- -D warnings

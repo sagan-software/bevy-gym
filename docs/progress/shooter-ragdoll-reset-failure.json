@@ -1,0 +1,7 @@
+{
+  "runtime": "9f69d970fa3fc197b581d48883bf3f365cd48b05af52deb807b337a232c04709",
+  "status": "failed",
+  "browser_error": "panicked at rapier3d-0.32.0/src/dynamics/island_manager/sleep.rs:124:13: is sleeping: RigidBodyHandle(Index { index: 35, generation: 0 }) note niter: 1, isl size: 16",
+  "timestamp": "2026-10-09T21:48:53.665Z",
+  "scope": "The body falls and reset initially restores animation, then the physics loop panics. The static later frames are a crash, not a successful playback."
+}

@@ -4,6 +4,46 @@ Updated: 2026-10-09. Goal status: active.
 
 ## Resume here
 
+### Ragdoll checkpoint, 2026-10-09
+
+The current source adds physical mannequin death through the unpublished
+`bevy-gym-pursuit-viewer` package. The viewer owns its camera and vendored ragdoll
+dependencies; the published library has no normal path-only ragdoll dependencies.
+The death camera lowers and widens its view. Reset restores animation and body count.
+
+The initial browser build exposed a delayed Rapier sleeping-island panic after
+settling and reset. The viewer now disables the adapter's optional forced-sleep timer
+while retaining Rapier's automatic sleep. Extended native tests pass at 50 Hz and
+60 Hz before and after that change; they do not reproduce the browser failure.
+The browser recording and console provide the discriminating failure/success evidence.
+
+Qualified runtime: `6bb43be4aa4b3c01f3ad18e1680cf19975c5adb00274318d860f96366cf32d57`.
+URL: `http://100.105.254.50:8781/robots/pursuit/?build=6bb43be4`.
+The optimized [recording](progress/shooter-ragdoll-final.mp4),
+[contact sheet](progress/shooter-ragdoll-final.jpg), and
+[evidence record](progress/shooter-ragdoll.json) show settled death, two resets,
+and continued movement without console errors. The inspected 390x844 layout retains
+the existing Fire/instruction overlap and incomplete touch aiming. Desktop controls
+are qualified; mobile play remains unfinished.
+
+Root tests, 115 viewer tests, 61 flight-viewer tests, strict native/WASM Clippy,
+four asset tests, shell lint, and personal lint pass. Both raw personal-lint passes
+contain no viewer diagnostics. The [coverage record](progress/shooter-ragdoll-coverage.json)
+identifies native startup and test-assertion gaps. The ragdoll and animation files
+have full measured line and branch coverage, including their tests.
+
+Run `cargo test -p bevy-gym-pursuit-viewer --example drone-pursuit` through Nix.
+Validation logs are under `/home/sagan/.cache/bevy-gym-quality-validation/`:
+`ragdoll-sleep-gates.log`, `ragdoll-sleep-personal.log`, `ragdoll-sleep-coverage.log`,
+`ragdoll-sleep-release.log`, and `ragdoll-sleep-browser.log`.
+[Vendor provenance](../vendor/README.md) records the revision and compatibility edit.
+The separate package-list failure is documented in [QUALITY_AUDIT.md](QUALITY_AUDIT.md).
+
+Next: finish final Markdown/guide/doctest checks, commit, and push this checkpoint.
+Then add two drones and two droids with team-aware targeting. Authored strafing,
+state lights, raytraced audio, mobile controls, and the broader examples roadmap
+remain unfinished. Do not mark the overall goal complete.
+
 ### Weapon grip checkpoint, 2026-10-09
 
 Projectile checkpoint `7cabda0` is confirmed on GitHub main. The current checkpoint

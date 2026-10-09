@@ -222,7 +222,7 @@ mod tests {
             (
                 include_bytes!(concat!(
                     env!("CARGO_MANIFEST_DIR"),
-                    "/assets/robots/drone-charge.wav"
+                    "/../../assets/robots/drone-charge.wav"
                 ))
                 .as_slice(),
                 17_640,
@@ -231,7 +231,7 @@ mod tests {
             (
                 include_bytes!(concat!(
                     env!("CARGO_MANIFEST_DIR"),
-                    "/assets/robots/drone-shot.wav"
+                    "/../../assets/robots/drone-shot.wav"
                 ))
                 .as_slice(),
                 2_646,

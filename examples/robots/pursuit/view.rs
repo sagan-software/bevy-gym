@@ -231,15 +231,23 @@ pub(super) fn follow(
     mut cameras: Query<'_, '_, (&mut PanOrbitCamera, &mut Projection)>,
 ) {
     for (mut camera, mut projection) in &mut cameras {
-        camera.target_focus =
-            game.arena.position() + Vec3::Y * 0.45 + view.rotation() * Vec3::X * 0.65;
+        // Death lowers the focus toward the floor and releases the close aimed view.
+        let (radius, fov) = if game.robot_health.is_alive() {
+            camera.target_focus =
+                game.arena.position() + Vec3::Y * 0.45 + view.rotation() * Vec3::X * 0.65;
+            (view.radius(), view.fov())
+        } else {
+            let fallen = game.arena.position() - Vec3::Y * 0.45;
+            let blend = 1.0 - (-8.0 * time.delta_secs()).exp();
+            camera.target_focus = camera.target_focus.lerp(fallen, blend);
+            (4.5, 60.0_f32.to_radians())
+        };
         camera.target_yaw = view.yaw;
         camera.target_pitch = -view.pitch;
-        camera.target_radius = view.radius();
+        camera.target_radius = radius;
         camera.force_update = true;
         if let Projection::Perspective(lens) = &mut *projection {
-            lens.fov =
-                (view.fov() - lens.fov).mul_add((time.delta_secs() * 16.0).min(1.0), lens.fov);
+            lens.fov = (fov - lens.fov).mul_add((time.delta_secs() * 16.0).min(1.0), lens.fov);
         }
     }
 }
@@ -267,6 +275,54 @@ pub(super) fn collision(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn death_frames_the_fallen_body_and_reset_restores_the_shoulder() {
+        let mut app = App::new();
+        app.init_resource::<Game>()
+            .init_resource::<View>()
+            .init_resource::<Time>()
+            .add_systems(Update, follow);
+        let eye = app
+            .world_mut()
+            .spawn((camera(), Projection::default()))
+            .id();
+        app.world_mut()
+            .resource_mut::<Time>()
+            .advance_by(std::time::Duration::from_secs_f32(0.02));
+        app.update();
+        let standing = app
+            .world()
+            .get::<PanOrbitCamera>(eye)
+            .expect("Camera")
+            .target_focus;
+        {
+            let mut game = app.world_mut().resource_mut::<Game>();
+            for _ in 0..1000 {
+                game.step(super::super::arena::Movement::Idle);
+                if !game.robot_health.is_alive() {
+                    break;
+                }
+            }
+            assert!(!game.robot_health.is_alive());
+        }
+        app.world_mut().resource_mut::<View>().mode = AimMode::Sight;
+        for _ in 0..100 {
+            app.update();
+        }
+        let orbit = app.world().get::<PanOrbitCamera>(eye).expect("Camera");
+        assert!(orbit.target_focus.y < standing.y - 0.8);
+        assert_eq!(orbit.target_radius, 4.5);
+        assert!(
+            matches!(app.world().get::<Projection>(eye), Some(Projection::Perspective(lens))
+            if (lens.fov - 60.0_f32.to_radians()).abs() < 0.00001)
+        );
+        app.world_mut().resource_mut::<Game>().reset();
+        app.update();
+        let orbit = app.world().get::<PanOrbitCamera>(eye).expect("Camera");
+        assert_eq!(orbit.target_focus, standing);
+        assert_eq!(orbit.target_radius, 1.5);
+    }
 
     #[test]
     fn recoil_lifts_aim_and_preserves_the_pitch_limit() {

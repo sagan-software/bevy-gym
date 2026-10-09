@@ -45,6 +45,10 @@ pub(super) fn spawn(commands: &mut Commands<'_, '_>, assets: &AssetServer) {
         .with_children(|root| {
             root.spawn((
                 SceneRoot(assets.load(GltfAssetLabel::Scene(0).from_asset(path))),
+                bevy_ragdoll::Ragdoll::default(),
+                bevy_ragdoll::runtime::components::RagdollMode::Kinematic,
+                bevy_ragdoll::runtime::components::RagdollDrive::new(0.0, 0.0),
+                bevy_ragdoll::runtime::components::RagdollBlend::new(0.0),
                 Transform::from_xyz(0.0, -0.9, 0.0)
                     .with_rotation(Quat::from_rotation_y(std::f32::consts::PI)),
             ));
@@ -182,17 +186,22 @@ pub(super) fn loading_notice(
 }
 
 #[cfg(test)]
-mod tests {
+pub(super) mod tests {
     use super::*;
     use bevy::ecs::system::{RunSystemOnce, SystemState};
 
     /// Load actual glTF scenes and animate their skeletons without creating a GPU device.
     fn model_app() -> App {
+        model_app_with(|_| {})
+    }
+
+    /// Install optional scene plugins before the asset-loading test app starts.
+    pub(crate) fn model_app_with(configure: impl FnOnce(&mut App)) -> App {
         let mut app = App::new();
         app.add_plugins((
             MinimalPlugins,
             AssetPlugin {
-                file_path: concat!(env!("CARGO_MANIFEST_DIR"), "/assets").to_owned(),
+                file_path: concat!(env!("CARGO_MANIFEST_DIR"), "/../../assets").to_owned(),
                 meta_check: bevy::asset::AssetMetaCheck::Never,
                 ..default()
             },
@@ -224,13 +233,14 @@ mod tests {
         )
         .add_systems(FixedUpdate, crate::advance.run_if(ready))
         .add_systems(Update, (load, animate, loading_notice).chain());
+        configure(&mut app);
         app.finish();
         app.cleanup();
         app
     }
 
     /// Bound asynchronous file loading while keeping the simulation clock deterministic.
-    fn until(app: &mut App, mut done: impl FnMut(&mut World) -> bool) {
+    pub(crate) fn until(app: &mut App, mut done: impl FnMut(&mut World) -> bool) {
         let deadline = std::time::Instant::now() + std::time::Duration::from_secs(5);
         loop {
             app.update();

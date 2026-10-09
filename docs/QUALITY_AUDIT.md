@@ -53,6 +53,19 @@ MuJoCo runtime. These facts do not establish faithful browser MuJoCo support.
 Existing six-frame reference sheets cover all 23 Gymnasium tasks. They establish
 reference availability, not visual equivalence or trained-policy performance.
 
+## Local package gate, 2026-10-09
+
+`cargo package --list --allow-dirty -p bevy-gym` fails with
+`No such file or directory (os error 2)` in the quality worktree. A file-system
+trace ends while Cargo opens the missing nested reference path
+`ref/godot-rl-agents-examples/godot_rl_agents_plugin`. The trace is retained in
+`ragdoll-package-files.trace` under the validation cache. Packaging remains unverified.
+
+The shooter viewer now owns its unpublished vendored ragdoll dependencies in a
+separate `publish = false` workspace package. The library manifest has no normal
+path-only ragdoll dependencies. Cargo requires published normal path dependencies
+to have registry versions; see the [Cargo publication rules](https://doc.rust-lang.org/cargo/reference/specifying-dependencies.html#local-paths-in-published-crates).
+
 ## Reset defects fixed
 
 Automatic reset previously matched the public `EpisodeEndEvent` by pool-local
@@ -104,6 +117,7 @@ errors and two warnings in unchanged code. The
 Most findings concern function length; others concern complexity, wildcard enum
 matches, midpoint expressions, and a stale lint expectation. Fix these in scoped
 follow-up changes with behavioral tests. Do not hide them with broader allowances.
+
 This audit changed the workspace lint level only for unused dependencies. The
 training guide also retains the scoped synchronous-file exception described above.
 
@@ -119,6 +133,7 @@ robot WASM compile checks pass. The drone suite covers eight external contracts
 and five internal invariants. The recovery policy now passes separate native and
 browser qualification. [The learning guide](DRONE_LEARNING.md) records the limits
 of those results; damage recovery, perception, and pursuit remain unqualified.
+
 [Coverage evidence](progress/drone-foundation-coverage.json) records source hashes,
 command scope, full-file coverage, and uncovered changed lines. All 339 instrumented
 added source lines were hit, including internal test code. No added instrumented

@@ -34,7 +34,7 @@ Camera state is presentation state. It cannot move the physics capsule through c
 Aiming chooses a world point; projectiles originate at the weapon and collide along each step.
 An impact applies damage and impulse once. A destroyed rotor cannot receive another hit.
 
-Smoke follows its owning rotor. Reset removes projectiles, smoke, impulses, and ragdolls.
+Smoke follows its owning rotor. Reset removes projectiles, smoke, and impulses, and restores ragdolls to animation.
 Actor identity and team determine ownership; rendering must not assume one global hand.
 A droid is animated while alive and physically simulated after death.
 
@@ -170,3 +170,46 @@ The optimized [recording](progress/shooter-grip-final.mp4) and
 The desktop path is qualified for keyboard and mouse. The narrow layout still has
 an existing Fire/instruction overlap and lacks complete touch aiming; include those
 in the gameplay UI work rather than reporting mobile acceptance.
+
+## Physical mannequin death
+
+The unpublished `bevy-gym-pursuit-viewer` workspace package owns the rendering,
+camera, and ragdoll dependencies. Run it with:
+
+```sh
+nix develop --command cargo run -p bevy-gym-pursuit-viewer --example drone-pursuit
+```
+
+The published `bevy-gym` library has no ragdoll dependency. The viewer uses the
+[vendored compatibility source](../vendor/README.md) at a fixed upstream revision.
+Bevy 0.18.1 and bevy_rapier3d 0.34.0 drive the mannequin's separate physics world.
+The arena's oriented boxes provide its static collision geometry.
+
+Living bones follow animation and the existing hand constraints. Death stops those
+tracks and switches the bodies to dynamic physics. The pistol follows the physical
+hand after ragdoll writeback. Reset restores kinematic animation without adding bodies.
+The dead camera lowers its focus by 0.9 metres, centres on the character, and uses
+a 4.5-metre boom with a 60-degree field of view. Reset restores the shoulder view.
+
+The real-model integration test checks falling, floor contact, stopped animation,
+reset, and stable body count. A separate camera regression checks the lowered view,
+release from ADS, and restoration after reset. The 115-test viewer suite, root tests, strict native/WASM Clippy, asset checks,
+and personal lint pass before the longer browser run.
+The personal lint's raw strict and discovery reports contain no viewer diagnostics.
+
+The [prototype recording](progress/shooter-ragdoll-prototype.mp4) and
+[contact sheet](progress/shooter-ragdoll-prototype.jpg) show the fall and floor rest.
+They precede the death-camera correction. The corrected camera was inspected, but
+a longer optimized run then panicked in Rapier after settling and reset. The
+[failure record](progress/shooter-ragdoll-reset-failure.json) and
+[recording](progress/shooter-ragdoll-reset-failure.mp4) preserve that failure.
+
+The viewer now disables the adapter's optional forced-sleep timer and retains
+Rapier's automatic sleep. Extended native fall/reset tests pass at 50 Hz and 60 Hz;
+they do not reproduce the browser panic. The rebuilt browser completed settled death, two resets, and continued movement
+without console errors. The optimized [recording](progress/shooter-ragdoll-final.mp4),
+[contact sheet](progress/shooter-ragdoll-final.jpg), and
+[evidence record](progress/shooter-ragdoll.json) identify runtime `6bb43be4`.
+The [coverage record](progress/shooter-ragdoll-coverage.json) separates measured
+native paths from browser evidence and unmeasured boundaries. Narrow-layout HUD
+spacing and touch aiming remain unfinished.

@@ -7,7 +7,7 @@ Gymnasium ports. Keep the small flight guides available alongside this game.
 
 Build a gray blockout arena with colored landmarks, a house with windows,
 a traversable pipe, corners, and cover. An animated humanoid robot can hide,
-find and loot a pistol, aim, and shoot. Support both a trained humanoid policy
+aim, and shoot with an equipped pistol. Support both a trained humanoid policy
 and a player controlling the same character through the same actions.
 
 The drone must find, follow, lose, search for, and reacquire that character.
@@ -24,7 +24,7 @@ loses force and reaction torque.
 A fatal crash or destroyed body bursts into
 simulated debris. Reset removes debris and effects and restores the full scene.
 
-The humanoid must learn or let a player choose to seek cover, loot, aim, and fire.
+The humanoid must learn or let a player choose to seek cover, aim, and fire.
 The drone must learn flight, pursuit, search, and damage adaptation. Scripted
 controllers may establish baselines, but must be labeled as baselines.
 
@@ -99,16 +99,22 @@ remain pending.
 Run the player-controlled scene:
 
 ```sh
-nix develop --command cargo run --features robots --example drone-pursuit
+nix develop --command cargo run -p bevy-gym-pursuit-viewer --example drone-pursuit
 ```
 
 Hold `W`, `A`, `S`, and `D` to move. Press `R` to reset. The on-screen movement
 buttons also accept held input. The camera follows the character and moves closer
 when a wall obstructs its view. Under a ceiling, it uses a lower view.
 
-Press `E` near the pistol to collect it. Point at
-the drone and click to fire; holding the button repeats at the weapon cooldown.
-`Space` and the Fire button use the last captured aim. Programmed navigation follows
+The shooter starts with twelve pistol rounds. Click the scene to capture the mouse;
+move the mouse to orbit. Hold right mouse for ADS. The embedded preview supports
+right-button drag when pointer capture is unavailable. Press Escape to release capture.
+
+Aim the centre reticle at the drone and click to fire; holding the button repeats
+at the weapon cooldown.
+`Space` and the Fire button use the last captured aim.
+
+Programmed navigation follows
 filtered sightings and investigates last-seen areas. The learned motor pilot moves
 the drone toward those viewing positions. Current sight is required for gunfire.
 
@@ -180,8 +186,8 @@ verified bundle, source hashes, and remaining verification gaps.
 
 ## Combat rules
 
-The private combat helpers now model damage and pistol ownership. They are not
-connected to the visible arena yet. Run their short headless guide:
+The private combat helpers model damage and pistol ownership in the visible arena.
+The separate headless guide demonstrates proximity-checked pickup before firing:
 
 ```sh
 nix develop --command cargo run --features robots --example pursuit-combat

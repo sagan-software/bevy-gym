@@ -1,6 +1,6 @@
 //! Explore a collision-aware arena as an articulated robot.
 //!
-//! Run `cargo run --features robots --example drone-pursuit`.
+//! Run `cargo run -p bevy-gym-pursuit-viewer --example drone-pursuit`.
 //! `pursuit-walk` shows the same movement loop without rendering.
 
 #[path = "pursuit/arena.rs"]
@@ -80,6 +80,8 @@ mod survival;
 mod camera;
 #[path = "pursuit/gun_feedback.rs"]
 mod gun_feedback;
+#[path = "pursuit/ragdoll.rs"]
+mod ragdoll;
 #[path = "pursuit/view.rs"]
 mod view;
 #[path = "pursuit/weapon_pose.rs"]
@@ -413,12 +415,13 @@ fn main() {
         )
         .add_systems(
             PostUpdate,
-            (robot::pose, robot::grip_pose, weapons::project)
+            (robot::pose, robot::grip_pose)
                 .chain()
                 .after(bevy::app::AnimationSystems)
                 .before(TransformSystems::Propagate),
         )
         .add_plugins((
+            ragdoll::install,
             view::install,
             effects::install,
             gun_feedback::install,
@@ -445,7 +448,7 @@ fn viewer_plugins() -> bevy::app::PluginGroupBuilder {
             file_path: if cfg!(target_arch = "wasm32") {
                 "assets"
             } else {
-                concat!(env!("CARGO_MANIFEST_DIR"), "/assets")
+                concat!(env!("CARGO_MANIFEST_DIR"), "/../../assets")
             }
             .to_owned(),
             meta_check: AssetMetaCheck::Never,

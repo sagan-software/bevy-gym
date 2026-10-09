@@ -1,0 +1,22 @@
+[package]
+name = "bevy_ragdoll"
+version = "0.1.0-dev"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/sagan-software/bevy-ragdoll"
+publish = false
+[workspace]
+[features]
+default = ["3d"]
+3d = []
+2d = []
+debug = ["bevy/bevy_pbr"]
+serialize = ["dep:ron", "dep:serde", "bevy/serialize"]
+[dependencies]
+bevy = { version = "=0.18.1", default-features = false, features = ["std", "bevy_asset", "bevy_animation", "bevy_log"] }
+ron = { version = "0.12", optional = true }
+serde = { version = "1", features = ["derive"], optional = true }
+thiserror = "2"
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(dylint_lib, values("sagan_lints"))'] }
