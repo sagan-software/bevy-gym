@@ -213,10 +213,49 @@ The server unit is `bevy-gym-destruction-server-20261009`; no recording is activ
 The release unit `bevy-gym-destruction-soft-smoke-build-20261009` exited successfully.
 Validation logs use the `drone-effects-` prefix in the existing cache directory.
 
-Next, implement the blockout arena and player-controlled humanoid robot from
-[DRONE_PURSUIT_GAME.md](DRONE_PURSUIT_GAME.md). Pistol looting, rotor weak points,
-telegraphed drone fire, cover, windows, pipes, and adversarial training remain
-planned. The plan and reference contact-sheet evidence are saved.
+The destruction checkpoint is published as `13c76d1`.
+[CI](https://github.com/sagan-software/bevy-gym/actions/runs/37885879298) passed.
+[Pages](https://github.com/sagan-software/bevy-gym/actions/runs/37885879336) is running.
+
+The new `drone-pursuit` example provides an original articulated robot, a windowed
+house, an open pipe, and cover. Player buttons and keyboard input produce the same
+closed movement action. The 23-line `pursuit-walk` guide shows the headless loop.
+No drone opponent, weapons, learned pursuit, or humanoid policy is connected yet.
+
+Nine native arena tests and five viewer tests pass. Seven external arena cases
+also pass in Chrome/WASM; the two internal tests are native-only. Root tests,
+strict native/WASM Clippy, format checking, Nix formatting, and Actionlint pass.
+Personal shell validation passes. Personal Rust discovery reports no diagnostics
+in the changed arena files; the full-project strict backlog remains. The optimized
+browser build and final desktop, interior, and narrow visual checks pass.
+
+[Coverage](progress/pursuit-arena-coverage.json) hits every measured simulation and
+presentation line and branch outside native window startup. The guide's process
+entry and browser initialization error message remain uninstrumented. The first
+browser check found a missed between-frame reset tap; its regression failed before
+the input fix and now passes. Narrow layout and pipe traversal were inspected.
+
+The personal Nix runner reports two `unfiltered_source_root` findings at lines
+119 and 199 of `flake.nix`. Both unchanged roots already sit inside
+`lib.fileset.toSource` with explicit file sets. These findings conflict with the
+inspected source; no source filtering was removed or weakened.
+
+The final optimized arena build passed under
+`bevy-gym-pursuit-arena-contrast-build-20261009.service`. Its runtime is
+`build-f5cf0f9b16eccbfcf358ea885afd30f45b774d275e3b1d151529e8e19c77fcce`.
+The preview server is `bevy-gym-pursuit-server-20261009`, serving port 8781 from
+`runs/quality-research/site-pursuit`. No recording is active.
+
+[The recording](progress/pursuit-arena.mp4) shows pipe traversal, reset, and house
+entry. [The evidence record](progress/pursuit-arena.json) retains source and media
+hashes. Desktop, interior, and narrow screenshots are beside it. Native window
+execution and mobile touch input remain unverified. The headless guide ran for
+two simulated seconds, and `cargo test --features robots --doc` passed.
+
+Next, add typed body and rotor health, pistol pickup, ammunition, aiming, and shots.
+Then connect the drone, occlusion-aware sensing, telegraphed fire, pursuit training,
+and the humanoid policy. Keep the frozen recovery checkpoints and promotion gates.
+The full sequence is in [DRONE_PURSUIT_GAME.md](DRONE_PURSUIT_GAME.md).
 
 Preserve the healthy checkpoint and its qualification. The damage contract records
 the current model's static thrust limit; do not assume damage recovery follows

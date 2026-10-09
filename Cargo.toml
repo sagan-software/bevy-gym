@@ -147,6 +147,16 @@ features = ["fs", "io-util", "process", "rt"]
 version = "1"
 
 [[example]]
+name = "drone-pursuit"
+path = "examples/robots/pursuit.rs"
+required-features = ["robots", "render-core"]
+
+[[example]]
+name = "pursuit-walk"
+path = "examples/robots/pursuit_walk.rs"
+required-features = ["robots"]
+
+[[example]]
 name = "drone-flight"
 path = "examples/robots/flight.rs"
 required-features = ["robots", "render-core"]

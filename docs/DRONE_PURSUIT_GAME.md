@@ -88,5 +88,70 @@ hover environment's mass, thrust, reward, or terminal rules for visual effects.
 
 Current status: checkpoint loading and destruction effects are implemented. Rotor
 failure emits a burst and smoke; task termination hides the body and spawns eight
-colliding debris proxies. The arena, humanoid gameplay, weapons, and pursuit remain
-pending. These effects do not demonstrate learned damage recovery.
+colliding debris proxies. The arena now has a player-controlled robot. Weapons, drone pursuit, and
+humanoid training remain pending. These effects do not demonstrate learned damage recovery.
+
+## Explore the arena
+
+Run the player-controlled scene:
+
+```sh
+nix develop --command cargo run --features robots --example drone-pursuit
+```
+
+Hold `W`, `A`, `S`, and `D` to move. Press `R` to reset. The on-screen movement
+buttons also accept held input. The camera follows the character and moves closer
+when a wall obstructs its view. This checkpoint has no drone opponent or weapons.
+
+Run the short headless movement guide:
+
+```sh
+nix develop --command cargo run --features robots --example pursuit-walk
+```
+
+Build and serve the browser scene:
+
+```sh
+nix develop --command scripts/build_pursuit_viewer.sh
+python3 -m http.server 8000 --directory robot-web/pursuit-dist
+```
+
+Open `http://localhost:8000`. Published builds also link this scene from the
+examples gallery. Use `--release` to produce `robot-web/pursuit-dist-release`.
+
+## Arena movement contract
+
+The example's private `Arena` helper owns a 26-metre blockout and capsule movement.
+One closed `Movement` action advances 20 milliseconds. Walking speed is limited
+to 4 metres per second; diagonal input does not increase that limit. Opposite
+buttons cancel. The actor receives no raw solver handle.
+
+The capsule is 1.8 metres tall and 0.3 metres in radius. Gravity is 9.81 metres
+per second squared. It can step over obstacles up to 0.25 metres high, including
+the pipe lip. The one-metre window sill blocks walking. Reset restores the capsule
+centre, falling velocity, facing direction, and walking phase.
+
+Rapier 0.36 supplies the
+[kinematic character controller](https://rapier.rs/docs/user_guides/rust/character_controller_setup/).
+The controller resolves translation against static colliders. It does not train
+humanoid balance or physical leg motion. The robot's original geometric model
+uses articulated shoulder and hip animation driven by measured displacement.
+
+One list of 31 oriented boxes supplies both meshes and colliders. It includes
+the floor, perimeter, windowed house, roof, four cover blocks, and twelve pipe
+segments. House bounds are X=-8..-2 and Z=-6..0 metres. Its front window spans
+X=-6..-4 and Y=1..2.5 metres; its east door spans Z=-4..-2 and Y=0..2.4 metres.
+The pipe runs along Z=-2..4 metres, centred at X=5 and Y=1.7 metres.
+
+The same static geometry answers nearest-obstruction queries for the camera.
+Invalid query coordinates fail closed at zero distance; zero-length segments
+have no obstruction. This is the geometry basis for later sight and shot queries.
+No perception model or hidden-target observation has been added yet.
+
+Tests cover all sixteen button combinations, fixed movement, walls, door and pipe
+traversal, window and roof obstruction, gravity, reset, camera obstruction, walking
+animation, held buttons, and a reset press released before the next frame.
+
+The [browser recording](progress/pursuit-arena.mp4) shows pipe traversal, reset,
+and house entry. [The evidence record](progress/pursuit-arena.json) identifies the
+verified bundle, source hashes, and remaining verification gaps.

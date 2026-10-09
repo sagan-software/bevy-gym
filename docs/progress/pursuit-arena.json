@@ -1,0 +1,53 @@
+{
+  "baseline_commit": "13c76d143a9905468907b63248b4aa5d5d5570df",
+  "runtime": "build-f5cf0f9b16eccbfcf358ea885afd30f45b774d275e3b1d151529e8e19c77fcce",
+  "recorded_utc": "2026-10-09T05:28:07Z",
+  "viewport_css_pixels": {
+    "desktop": [
+      1280,
+      800
+    ],
+    "narrow": [
+      390,
+      844
+    ]
+  },
+  "observed": [
+    "Keyboard movement through the open pipe",
+    "Reset returns the robot to spawn",
+    "Robot enters the house through its doorway",
+    "Camera stays inside the house instead of crossing the rear wall",
+    "Labels remain readable against shaded walls",
+    "Narrow layout retains movement buttons and footer links"
+  ],
+  "tests": {
+    "native_arena": 9,
+    "native_viewer": 5,
+    "browser_external_arena": 7
+  },
+  "limitations": [
+    "Player movement prototype; no drone opponent or weapons yet",
+    "Procedural robot animation; no learned humanoid locomotion",
+    "Native window and mobile touch input not verified",
+    "Browser initialization error branch not forced",
+    "Full personal Rust backlog remains; changed arena files have no discovery diagnostics",
+    "Personal Nix reports two pre-existing source-root false positives; Nix formatting passes"
+  ],
+  "sources": {
+    "examples/robots/pursuit/robot.rs": "91a1d60a6407698e447944d590c4663e6095ca88b02dd26b2036953911404022",
+    "examples/robots/pursuit/controls.rs": "56b21c6bdfbab6397cb243414dd204c94da730054b08a51817bc3d7c0c9a58f5",
+    "examples/robots/pursuit/arena.rs": "e218843d4badb55e7b2c09ca622ffae3f82aa28a1f9dc25ae68eb70f418a516f",
+    "examples/robots/pursuit/scene.rs": "8755f4704d0a8c060ea6821277a7889053f0e6b44738d98c7f8529c9d49c50f1",
+    "examples/robots/pursuit/movement.rs": "2a6098028491547b092c4fd60b6db138189c421552c062d54a1e9e0389721ae0",
+    "examples/robots/pursuit/layout.rs": "7c9b865050f6052fb8900c1cc5abc6d5da1813faaf3b84ae4c5b5cc1412e0d78",
+    "examples/robots/pursuit.rs": "691b92054ed10d092ed05a777011021cf635709622c6a4da953a017c90d111c7",
+    "examples/robots/pursuit_walk.rs": "746674204c34a822f00ffdd83151d17d93232decba11d998d3d02c9ed707a6ea",
+    "tests/pursuit_arena.rs": "048ed88f9c63b609f8bc3bfd8763e345e43da2d995692e3c5b2f5bee6042e1f9"
+  },
+  "media": {
+    "pursuit-arena.png": "d95dcc198b516fe63c458cc1f61a27f3331d75819d928b9a360b6c858c9430be",
+    "pursuit-arena-interior.png": "1b833fb7dd890c90238c9b055f94d81cc8a3056627daef6c0552f66499121080",
+    "pursuit-arena-narrow.png": "4e3113e82e23dd8de20247f24f141c975f0e1dc8ed5ce1b685c2fc2ecad22208",
+    "pursuit-arena.mp4": "721316713124f94b1b2a43b39da1c9f24b1e2f43933e16110d817eb438c92e1c"
+  }
+}

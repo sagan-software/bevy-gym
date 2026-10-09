@@ -21,3 +21,7 @@ __pycache__/
 /robot-web/dist/
 
 /robot-web/dist-release/
+
+# Generated pursuit scene bundles.
+/robot-web/pursuit-dist/
+/robot-web/pursuit-dist-release/
