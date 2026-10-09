@@ -6,6 +6,9 @@ The target is a spectator-first competitive match with three drones and three dr
 All living agents must choose their actions through reinforcement-trained policies.
 The broader [examples roadmap](EXAMPLE_ROADMAP.md) remains required.
 
+The [skill curriculum](ROBOT_SKILL_CURRICULUM.md) defines the separate scenes,
+prerequisite training, and combined walkthrough required by the latest request.
+
 ## Audit of the current pursuit example
 
 Audited source checkpoint: `9c67238bab9f0c2d555074268a80899c18c14329`.

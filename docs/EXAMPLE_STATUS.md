@@ -4,6 +4,24 @@ Updated: 2026-10-09. Goal status: active.
 
 ## Resume here
 
+### RL-only skill curriculum, 2026-10-09
+
+The canonical `ai/AGENTS.md` now prohibits programmed example-agent decisions,
+imitation-only substitutes, and silent controller fallbacks. Root discovery files
+point to that source. Follow [the skill curriculum](ROBOT_SKILL_CURRICULUM.md) for
+separate drone/droid lessons, prerequisite transfer, independent promotion, the
+curriculum walkthrough, and the final trainable 3v3 scene.
+
+The goal service rejected a new goal because the earlier broad goal is unfinished.
+Do not mark that earlier work complete. The new objective is recorded in the curriculum.
+
+The existing RL damage trainer is running seed 11 with a 600-update limit per lesson.
+Unit: `bevy-gym-rl-curriculum-seed11-20261009.service`.
+Log: `/home/sagan/.cache/bevy-gym-quality-validation/rl-curriculum-seed11.log`.
+Artifacts: `runs/rl-curriculum/seed11-20261009`.
+This is a fresh test of the existing recipe, not completed new-skill implementation.
+The previous seed-7 damage run failed; do not replace that record with an inferred pass.
+
 ### Policy-only 3v3 priority, 2026-10-09
 
 The latest request replaces the planned two-versus-two player game with a
