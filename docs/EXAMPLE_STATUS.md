@@ -10,8 +10,8 @@ Read [the roadmap](EXAMPLE_ROADMAP.md), [quality audit](QUALITY_AUDIT.md),
 The [permanent-cover experiments](DRONE_SEARCH.md) distinguish search from
 waiting for a target to reappear. Cover PPO 260 never saw the robot after it
 stopped inside the pipe. A teacher using filtered sight and known arena waypoints
-passed ten trials. Distilled candidates learned individual cover routes, but no
-candidate passed both. Do not install them in gameplay.
+passed ten trials. Later distilled candidates learned both cover approaches, but
+none passed all cover and moving-target checks. Do not install them in gameplay.
 
 The recurrent run completed all 300 updates. No evaluated checkpoint saw the
 robot during a held pipe sample. The [research archive](progress/drone-hide-candidate.json)
@@ -39,16 +39,11 @@ traces, logs, and selected weights are in the [sequence archive](progress/drone-
 The [path comparison](progress/drone-sequence-paths.png) shows actual solver paths.
 No new navigator is qualified for gameplay.
 
-The complete-episode comparison is running as
-`bevy-gym-navigation-sequence-full-20261009.service`, invocation
-`509bd23b459c455c8942c5a0fda1e97a`, with a finite limit of 300 updates.
-Poll that existing unit. Do not restart it because an observation times out.
-Its log is `navigation-sequence-full.log` under the shared validation cache.
-
-Outputs are under `runs/quality-research/navigation-sequence-full/`.
-Its exact source is archived as `runs/quality-research/drone-sequence-full-source.rs`.
-The temporary test runner was removed after archiving; the active executable
-continues independently. No production source changed in this research checkpoint.
+The complete-episode comparison finished all 300 updates without a qualified
+checkpoint. Its full history and terminal log are in the
+[sequence archive](progress/drone-sequence-candidate.json). Update 180 survived
+all ten cases but never saw the held pipe target; update 220 learned the pipe
+view while crashing in every house case. Do not restart this unchanged recipe.
 
 The [heading diagnostic](DRONE_SEARCH.md#heading-target-diagnostic) measured a
 scalar yaw-label discontinuity in all ten teacher trials. A five-component
@@ -63,11 +58,31 @@ never reaches the teacher's 0.25-metre waypoint radius; its nearest sample is
 0.389 metres away. Check safe arrival regions before repeating distillation.
 Neither new candidate is qualified for gameplay.
 
-Next, inspect the existing complete-episode training unit and archive its terminal
-results. Then calibrate teacher waypoint transitions against physical clearance.
-If a candidate passes both permanent-cover routes, qualify earlier moving-target
-profiles, fresh seeds, and browser execution before gameplay integration.
-Preserve the motor pilot's zero-memory contract. The full roadmap remains active.
+The [arrival-region teacher](DRONE_SEARCH.md#intermediate-arrival-regions)
+passed 74 native trials across both routes and 37 reset seeds. Every trial
+survived 60 seconds and kept sight during the final ten seconds.
+This verifies the sampled teacher routes, not learned navigation or every region point.
+
+The arrival-region learner completed 600 updates. Candidate 560 passed 32/32
+stationary, 30/32 house, and 32/32 pipe trials on fresh seeds. Lateral and
+approaching targets each passed 0/32; three lateral trials crashed.
+The [archive](progress/drone-arrival-region-candidate.json) preserves the exact
+sources, complete histories, fresh-seed gates/results, and selected diagnostic model.
+The [path comparison](progress/drone-region-qualification.png) shows the same first
+fresh seed for all five routes. No candidate is qualified for gameplay.
+
+All research services in this section have stopped. Temporary tests are archived
+and removed. Production Rust and the playable scene remain unchanged.
+Do not repeat the completed two-route distillation recipe unchanged.
+
+Next, implement a perception-driven navigation baseline over the qualified motor
+pilot. Its input boundary must exclude target routes and hidden coordinates.
+Plan around static collision geometry and evaluate arbitrary visible movement,
+last-seen investigation, house windows, and pipe entrances together. Label the
+baseline's programmed navigation and learned motor control separately.
+This supports gameplay and better training demonstrations; it does not replace the
+remaining learned-search, damaged-flight, browser, or adversarial-training goals.
+The full roadmap remains active.
 
 The [navigation research](DRONE_NAVIGATION.md) is archived. Imitation 150 and
 open PPO 140 each passed 192 native open-route cases. Open PPO crashed in all ten

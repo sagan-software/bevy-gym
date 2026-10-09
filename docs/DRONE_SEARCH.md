@@ -1,6 +1,6 @@
 # Hidden-target search experiments
 
-No trained navigator yet passes both permanent-cover cases.
+No trained navigator yet passes all cover and moving-target checks.
 The [earlier navigation trials](DRONE_NAVIGATION.md) let targets leave cover.
 These trials keep the robot inside the house or pipe for the rest of a
 60-second episode. That change separates search from waiting for the robot
@@ -159,7 +159,11 @@ A finite follow-up trains complete episodes so later losses can reach the earlie
 route-choice observations. It retains the same model initialization and settings,
 but removing random chunk-start draws also changes later episode selections.
 This comparison can test the combined recipe; it cannot isolate chunk length alone.
-The follow-up remains active in the status document until its terminal result is recorded.
+
+The follow-up completed 300 updates without a qualified checkpoint.
+Update 180 survived all ten cases but never saw the held pipe target. Update 220
+saw the held pipe target in at least 502 samples, but crashed in every house case.
+The sequence archive now includes the full history, exact source, and terminal log.
 
 ## Heading-target diagnostic
 
@@ -194,3 +198,59 @@ The house trace never enters the teacher's 0.25-metre arrival radius around
 6.1 seconds. Teacher arrival checks use these same decision boundaries.
 This motivates checking safe arrival regions before another distillation run.
 It does not establish the cause of every failure.
+
+## Intermediate arrival regions
+
+The next teacher variant replaces two 0.25-metre point-arrival tests with closed
+regions. The house corner uses X [-1.5, -0.5], Y [1.5, 2.5], Z [1, 2] metres.
+The pipe crossing uses X [4.5, 5.5], Y [1.5, 2.5], Z [7, 9] metres.
+The destination positions, headings, pipe approach predicate, and motor pilot
+remain unchanged. The current action retains the old goal; the next action uses
+the advanced state, as in the earlier teacher.
+
+The [arrival-region archive](progress/drone-arrival-region-candidate.json) records
+74 successful teacher trials: both routes for the five selection seeds and
+32 additional seeds `u64::MAX - 4001` through `u64::MAX - 4032`.
+Every trial survived 60 seconds and retained sight for its final 100 samples.
+House trials saw the held robot in all 506 samples. Pipe trials saw it in at
+least 502 of 522 held samples. These trials sample reset variation in the fixed
+arena; they do not prove clearance from every point in either arrival region.
+
+![Teacher paths with arrival regions](progress/drone-arrival-regions.png)
+
+The figure shows programmed navigation over the existing learned motor pilot.
+It is a native solver measurement, not a learned-search or browser qualification.
+The learner uses the same initialization, action shape, seed, chunk/replay recipe,
+and 600-update budget as the previous vector-heading run. Only the teacher's two
+arrival predicates change. Changed trajectories naturally change later training data.
+
+The run completed 600 updates. Update 560 survived all ten selection cases,
+with at least 459 of 506 visible house-hold samples and 482 of 522 pipe-hold
+samples. Later updates regressed; update 600 crashed in all ten cases.
+
+The selected candidate then ran 160 fresh-seed trials: five routes for seeds
+`u64::MAX - 5001` through `u64::MAX - 5032`. Every trial lasts up to 60 seconds.
+The research gate requires survival. Cover routes also require at least 90%
+held visibility and 90 visible samples in the final 100-sample window.
+Open routes require first sight by action 500 and at least 60% overall visibility.
+These thresholds were fixed before this fresh-seed run; they are provisional
+research checks, not the complete gameplay acceptance contract.
+
+Stationary targets passed 32/32, house targets 30/32, and pipe targets 32/32.
+Lateral and approaching targets each passed 0/32. Three lateral trials crashed;
+the other 157 trials survived. The candidate remains rejected for gameplay.
+Its model, complete result rows, and five predetermined fresh-seed traces are archived.
+
+![Fresh-seed navigator paths](progress/drone-region-qualification.png)
+
+The teacher selects a house or pipe course from early sightings and then follows
+fixed waypoints. It never returns to unrestricted pursuit. This source constraint
+limits the demonstrations even though the learner can imitate both cover routes.
+Do not repeat this two-route distillation recipe as a route to general player pursuit.
+
+Next, build a perception-driven navigation baseline that accepts current sight,
+bounded last-seen information, its own flight state, and static collision geometry.
+It must not receive a target route or hidden target coordinates. Preserve learned
+motor control, add collision-aware route planning, and test moving targets alongside
+both permanent-cover cases. Keep programmed navigation and learned navigation
+explicitly labeled. Learned-search and adversarial-training work remains required.
