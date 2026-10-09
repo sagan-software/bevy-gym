@@ -1,5 +1,10 @@
 # Drone shooter upgrade
 
+The 2026-10-09 [Drones vs. Droids request](DRONES_VS_DROIDS.md) supersedes
+the player-first two-versus-two target below with policy-only 3v3 spectator matches
+and separately trained physical locomotion. The following records the earlier plan
+and its delivered visual checkpoints.
+
 The pursuit example is the current priority. The user rejected its fixed camera,
 weapon jitter, forward-only strafing, and weak hit feedback. Preserve the neutral
 mannequin and dark joints. Build a hiding-and-shooting game with two drones and

@@ -4,6 +4,23 @@ Updated: 2026-10-09. Goal status: active.
 
 ## Resume here
 
+### Policy-only 3v3 priority, 2026-10-09
+
+The latest request replaces the planned two-versus-two player game with a
+spectator-first three-versus-three match. Follow [Drones vs. Droids](DRONES_VS_DROIDS.md).
+All navigation, aim, firing requests, alert choices, and living locomotion must come
+from reinforcement-trained policies. Keep physics and weapon limits as environment rules.
+
+The audit confirms the current demonstration does not meet this requirement:
+its flight network is imitation-trained, its navigation and firing are programmed,
+and its living droid uses capsule movement and animation clips. No 3v3 training
+or learned articulated droid locomotion has been completed. Do not label the existing
+runtime as policy-only or treat its visual qualification as RL evidence.
+
+Next: implement the six-agent shared-world action boundary and batched two-team
+collector, with separate physical locomotion training before integrated qualification.
+The new plan records research references, invariants, tests, and publish checkpoints.
+
 ### Ragdoll checkpoint, 2026-10-09
 
 The current source adds physical mannequin death through the unpublished
@@ -39,8 +56,9 @@ Validation logs are under `/home/sagan/.cache/bevy-gym-quality-validation/`:
 [Vendor provenance](../vendor/README.md) records the revision and compatibility edit.
 The separate package-list failure is documented in [QUALITY_AUDIT.md](QUALITY_AUDIT.md).
 
-Next: finish final Markdown/guide/doctest checks, commit, and push this checkpoint.
-Then add two drones and two droids with team-aware targeting. Authored strafing,
+Checkpoint `9c67238` passed the final local checks and is pushed to GitHub main.
+CI and browser preview were still running or pending at the last check.
+The policy-only 3v3 plan above supersedes the two-versus-two milestone. Authored strafing,
 state lights, raytraced audio, mobile controls, and the broader examples roadmap
 remain unfinished. Do not mark the overall goal complete.
 

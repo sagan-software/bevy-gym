@@ -40,6 +40,10 @@ force. A passing local gate does not establish CI or deployment success.
 
 ### P1: ARC Raiders-inspired robots
 
+The current priority within P1 is [Drones vs. Droids](DRONES_VS_DROIDS.md):
+policy-only 3v3 spectator matches, batched competitive training, and separate
+physical droid locomotion training. This supersedes earlier player-first 2v2 plans.
+
 Research precedes robot implementation. Inspect official gameplay and development
 footage of Wasps, Hornets, the jumping quadruped, and other robots. Download videos
 with `yt-dlp`; preserve source URLs, timestamps, hashes, captions, and contact
