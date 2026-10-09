@@ -149,6 +149,11 @@ features = ["fs", "io-util", "process", "rt"]
 version = "1"
 
 [[example]]
+name = "remember-cue"
+path = "examples/robots/remember.rs"
+required-features = ["browser-training"]
+
+[[example]]
 name = "drone-pursuit"
 path = "examples/robots/pursuit.rs"
 required-features = ["robots", "render-core"]

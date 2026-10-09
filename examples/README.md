@@ -1,5 +1,11 @@
 # Examples
 
+## Remember an earlier observation
+
+The [remembered-cue guide](../docs/RECURRENT_IMITATION.md) teaches a recurrent actor
+to retain a direction after that direction disappears from its observations.
+The example contains only the demonstration, training loop, and inference calls.
+
 ## Ecosystem curriculum
 
 The [ecosystem suite](ecosystem/README.md) is an incremental recurrent PPO

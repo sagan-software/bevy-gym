@@ -1,0 +1,161 @@
+{
+  "base_commit": "22ca172a54aef5bb84527cb5732dae959f6ca506",
+  "change": "RecurrentPpoAgent::behavior_clone_sequence preserves temporal order and backpropagates through one demonstration. Existing public signatures, types, errors, and checkpoint formats remain unchanged.",
+  "red": {
+    "command": "cargo test --no-default-features --test recurrent_behavior_sequence",
+    "exit_code": 101,
+    "diagnostic": "E0599: no method named behavior_clone_sequence found for struct RecurrentPpoAgent"
+  },
+  "sources": {
+    "Cargo.toml": "c706c543790eded442d70e44e666199a707ed7d469c6225e50fe40788a30718e",
+    "src/training/recurrent_ppo/mod.rs": "728b140bb764e2e57c79519de11c33a547465daf2f9f8f0507fb187a85d34cf2",
+    "examples/robots/remember.rs": "eedd39703b00670b1acfbfed79f20803b5ab225b639cdd06b8444db0eb60e0a3",
+    "tests/recurrent_behavior_sequence.rs": "55c91f3de6f5e75546c91815692a954aab2422b85567fe074bd4c3f1712892d9",
+    "Cargo.lock": "48cc02ef81613eaa27616481273ff01f05ae5983b1a88a0585e23c70544f8fde",
+    "flake.nix": "c6262bb8e990f4314415426cb28b4100b1d375d500e117dd61cfea9d7938e915"
+  },
+  "tests": {
+    "native_integration": 6,
+    "chrome_wasm_integration": 6,
+    "private_encoder": 1,
+    "delayed_cue": {
+      "model_seed": 73,
+      "updates": 500,
+      "cues": [
+        -1,
+        1
+      ],
+      "blank_observations_per_episode": 3,
+      "required_action_projection": "> 0.6 for every blank frame"
+    },
+    "validation": {
+      "observation_and_action_widths": {
+        "valid": 1,
+        "invalid": [
+          0,
+          2
+        ]
+      },
+      "cell_and_hidden_widths": {
+        "valid": 8,
+        "invalid": [
+          0,
+          9
+        ]
+      },
+      "nonfinite_each_vector": [
+        "NaN",
+        "+infinity",
+        "-infinity"
+      ],
+      "action_endpoints": [
+        -1,
+        1
+      ],
+      "invalid_actions": [
+        -1.0001,
+        1.0001
+      ],
+      "asymmetric_action_intervals": [
+        [
+          -2,
+          4
+        ],
+        [
+          10,
+          14
+        ]
+      ],
+      "ordering": "All sample validation precedes initial-memory validation. Empty samples and invalid action bounds win over malformed memory.",
+      "mutation": "Rejected calls preserve serialized network bytes and the next valid optimizer update.",
+      "sentinel": "InvalidSequence(\"at least one behavior sample is required\")"
+    },
+    "all_feature_documentation": {
+      "passed": 7,
+      "ignored": 1
+    }
+  },
+  "gates": {
+    "native_script": "#!/usr/bin/env bash\nset -euo pipefail\ncargo fmt --all -- --check\ncargo test --no-default-features --test recurrent_behavior_sequence\ncargo test\ncargo clippy --all-targets --all-features -- -D warnings\ncargo clippy --target wasm32-unknown-unknown --no-default-features --features browser,browser-training --test recurrent_behavior_sequence --example remember-cue -- -D warnings\n",
+    "native_passed": true,
+    "personal_script": "#!/usr/bin/env bash\nset -u\nlint_runner=/home/sagan/Code/gitlab.com/liamcurry/lints/scripts/nix-safe\n\"$lint_runner\" run lint -- --rust --repo \"$PWD\" --package bevy-gym --all-targets --all-features --no-deps --extra-rustc-arg=-Aunused_crate_dependencies --changed-range 22ca172 --log-dir /home/sagan/.cache/bevy-gym-quality-validation/logs/sequence-personal-strict\nstrict_status=$?\nprintf 'Strict personal gate exit: %s\\n' \"$strict_status\"\n\"$lint_runner\" run lint -- --rust --repo \"$PWD\" --package bevy-gym --all-targets --all-features --no-deps --no-deny-warnings --extra-rustc-arg=-Aunused_crate_dependencies --changed-range 22ca172 --log-dir /home/sagan/.cache/bevy-gym-quality-validation/logs/sequence-personal-discovery\n",
+    "personal_changed_lines_passed": true,
+    "browser_command": "env -u LD_LIBRARY_PATH -u CFLAGS nix run .#drone-browser-check",
+    "browser_passed": true,
+    "coverage_script": "#!/usr/bin/env bash\nset -euo pipefail\ncargo llvm-cov --branch --no-default-features --features browser-training --lib --test recurrent_behavior_sequence --no-report\ncargo llvm-cov run --branch --no-default-features --features browser-training --example remember-cue --no-report\ncargo llvm-cov report --json --output-path /home/sagan/.cache/bevy-gym-quality-validation/sequence-coverage.json\ncargo llvm-cov report --text --output-path /home/sagan/.cache/bevy-gym-quality-validation/sequence-coverage-lines.txt\n",
+    "coverage_environment": "RUSTC_BOOTSTRAP=1, CARGO_TARGET_DIR=coverage-target, CARGO_BUILD_BUILD_DIR=coverage-build under the validation cache, debug=0, jobs=4, inside nix develop",
+    "coverage_passed": true,
+    "guide_and_docs_script": "#!/usr/bin/env bash\nset -euo pipefail\ncargo run --no-default-features --features browser-training --example remember-cue\ncargo test --doc --all-features\n",
+    "guide_and_docs_passed": true,
+    "browser_includes_sequence_tests_by_default": true,
+    "nix_lint": {
+      "command": "/home/sagan/Code/gitlab.com/liamcurry/lints/scripts/nix-safe run nix -- /home/sagan/Code/github.com/sagan-software/bevy-gym-quality/flake.nix",
+      "exit_code": 1,
+      "unchanged_findings": [
+        {
+          "rule": "statix/unfiltered_source_root",
+          "line": 119
+        },
+        {
+          "rule": "statix/unfiltered_source_root",
+          "line": 200
+        }
+      ],
+      "candidate_findings": []
+    }
+  },
+  "logs": {
+    "sequence-native-ready.log": {
+      "sha256": "a9d55759f096f12fc748d1247d9cba0df62c3d56e32af7a865afc07b69ad5aa7",
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/sequence-native-ready.log"
+    },
+    "sequence-personal-ready.log": {
+      "sha256": "7f4cbdfe049fb0d0a5f5ab3dabc4009d322e4594e6609d314df5af3bccdec8f5",
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/sequence-personal-ready.log"
+    },
+    "sequence-browser-ready.log": {
+      "sha256": "37a70de5004535f716b97a920d3f6b9eca82a32008302e1b7119cf6d86391ed5",
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/sequence-browser-ready.log"
+    },
+    "sequence-coverage-ready.log": {
+      "sha256": "4dd3b09b09a136829240e8293d94e10a9303526af998042fc4804fcad3f060c5",
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/sequence-coverage-ready.log"
+    },
+    "sequence-docs.log": {
+      "sha256": "c50f71e36f0e13ea48bbe409efa93173dd1c6de02ce503977df66fe08d8f977d",
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/sequence-docs.log"
+    },
+    "sequence-browser-ci.log": {
+      "sha256": "e4f4aa601f9698ea2f18d29f3734ee85ce17d1b1afb2db046d0e9c8be3d825d0",
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/sequence-browser-ci.log"
+    },
+    "sequence-docs-ship.log": {
+      "sha256": "adfebf71e0173b83845fe6239881533e60a7d9bc3e3f97c9ed86ebba6d84357f",
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/sequence-docs-ship.log"
+    }
+  },
+  "tooling_retries": [
+    "Initial coverage failed because branch instrumentation requires nightly options; scoped RUSTC_BOOTSTRAP=1 was added to coverage only.",
+    "The coverage CLI rejects --no-report with --no-clean; the successful collection uses --no-report for both tests and the guide.",
+    "Strict checks required a method reference in the borrowed-row encoder and checked indexing in WASM tests. Both exact strict gates were rerun after fixes."
+  ],
+  "limits": [
+    "Personal lint findings outside changed lines remain; underlying strict Clippy can exit 101 on that backlog while the changed-line gate reports no findings.",
+    "Headless Chrome proves training API behavior, not new rendered gameplay. No browser UI changed.",
+    "This delayed-cue test does not qualify drone navigation or hidden-target search.",
+    "The existing ignored plugin documentation example remains ignored.",
+    "The full Nix lint gate still reports the two unchanged unfiltered-source findings at flake.nix:119 and :200. The browser-test addition has no new Nix diagnostic."
+  ],
+  "guide_output": {
+    "negative_cue_action": -0.79999983,
+    "positive_cue_action": 0.7999999
+  },
+  "backend_contract": {
+    "crate": "burn-nn",
+    "version": "0.21.0",
+    "source": "src/modules/rnn/lstm.rs",
+    "input_shape": "[batch, sequence, feature] with batch_first=true",
+    "initial_state_shape": "[batch, hidden]",
+    "evidence": "Inspected the locally installed pinned crate source after docs.rs was unavailable."
+  }
+}

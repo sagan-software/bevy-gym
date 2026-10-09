@@ -13,22 +13,30 @@ stopped inside the pipe. A teacher using filtered sight and known arena waypoint
 passed ten trials. Distilled candidates learned individual cover routes, but no
 candidate passed both. Do not install them in gameplay.
 
-Only `bevy-gym-navigation-memory-ppo-20261009` remains active. Inspect that exact
-user service before restarting anything. Its log is
-`/home/sagan/.cache/bevy-gym-quality-validation/navigation-memory-ppo.log`.
+The recurrent run completed all 300 updates. No evaluated checkpoint saw the
+robot during a held pipe sample. The [research archive](progress/drone-hide-candidate.json)
+now contains its complete history and log. All research sources are archived;
+no training process remains active.
 
-It has a finite 300-update limit. The [research archive](progress/drone-hide-candidate.json)
-contains the current snapshot, exact sources, failed runs, models, and restore paths.
-Its `active_run.snapshot_max_update` marks the cutoff. Later on-disk results remain
-to be inspected.
+[Sequence imitation](RECURRENT_IMITATION.md) now trains through observation
+history using the existing sample and memory types. Its 45-line guide learns
+opposite actions from identical blank observations after different cues.
+Six integration tests pass natively and in Chrome/WASM.
 
-The live test is `tests/drone_navigator_memory_probe.rs`;
-keep it until the process finishes. Other temporary tests were archived and removed.
+Root tests, formatting,
+strict native/WASM Clippy, and changed-line personal strict/discovery checks pass.
+All added instrumented library and guide lines and both guide conditional outcomes execute in
+[coverage](progress/recurrent-sequence-coverage.json). The personal-lint backlog
+outside changed lines remains. The standard browser check now includes the six
+sequence tests. Nix lint still reports the two unchanged unfiltered-source findings
+at `flake.nix:119` and `flake.nix:200`. The [validation record](progress/recurrent-sequence-validation.json)
+records commands, hashes, tooling retries, and boundaries.
 
-Next, inspect recurrent results and test supervised learning across observation
-sequences. Preserve the motor pilot's zero-memory contract. Qualify both cover
-routes, moving-target profiles, fresh seeds, and browser execution before gameplay
-integration. The full roadmap remains active.
+Next, train on the teacher's ordered observation/action demonstrations using
+sequence cloning. Keep actor memory within episodes and reset it between episodes.
+Preserve the motor pilot's zero-memory contract. Qualify both permanent-cover
+routes, earlier moving-target profiles, fresh seeds, and browser execution before
+gameplay integration. The full roadmap remains active.
 
 The [navigation research](DRONE_NAVIGATION.md) is archived. Imitation 150 and
 open PPO 140 each passed 192 native open-route cases. Open PPO crashed in all ten

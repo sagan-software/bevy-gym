@@ -558,7 +558,7 @@ pub struct RecurrentPpoSequence {
 /// One expert observation and bounded environment action for actor pretraining.
 #[derive(Debug, Clone, PartialEq)]
 pub struct RecurrentBehaviorSample {
-    /// Encoded local observation at an episode boundary.
+    /// Encoded local observation; sequence cloning preserves its temporal position.
     pub observation: Vec<f32>,
 
     /// Expert action inside the configured environment bounds.
@@ -1446,6 +1446,61 @@ impl RecurrentPpoAgent {
         Ok(loss_value)
     }
 
+    /// Fit one contiguous demonstration, propagating gradients through its history.
+    ///
+    /// Samples must stay within one episode. Initial memory is detached from any
+    /// earlier computation; subsequent states remain connected within this call.
+    /// The returned loss is mean squared error over time and normalized action
+    /// dimensions. This updates only the actor and borrows the initial memory.
+    /// Activation storage grows with the number of samples.
+    ///
+    /// # Errors
+    ///
+    /// Returns the existing sample validation errors before validating memory.
+    /// Invalid input cannot change the actor or its optimizer.
+    pub fn behavior_clone_sequence(
+        &mut self,
+        samples: &[RecurrentBehaviorSample],
+        initial_memory: &RecurrentMemory,
+    ) -> Result<f64, RecurrentPpoError> {
+        self.validate_behavior_samples(samples)?;
+        validate_memory(initial_memory, self.config.actor_hidden_size)?;
+        // Burn 0.21.0 Lstm uses [batch, time, feature] with batch_first enabled.
+        // Preserve one temporal lane so later losses reach earlier observations.
+        let observations = samples
+            .iter()
+            .map(|sample| sample.observation.as_slice())
+            .collect::<Vec<_>>();
+        let targets = samples
+            .iter()
+            .map(|sample| normalize_action(&sample.action, &self.action_low, &self.action_high))
+            .collect::<Vec<_>>();
+        let observations =
+            encode_matrix::<TrainingBackend>(&observations, self.observation_dim, &self.device)
+                .reshape([1, samples.len(), self.observation_dim]);
+        let targets =
+            encode_matrix::<TrainingBackend>(&targets, self.action_low.len(), &self.device);
+        let state = memory_to_state(initial_memory, &self.device, self.config.actor_hidden_size);
+        let (mean, _, _) = self.actor.forward(
+            observations,
+            Some(state),
+            self.action_low.len(),
+            self.config.log_std_min,
+            self.config.log_std_max,
+        );
+        // Normalize action units exactly as the independent-sample cloning methods do.
+        let residual = mean.tanh() - targets;
+        let loss = residual.clone().mul(residual).mean();
+        let loss_value = loss.clone().into_scalar().elem::<f64>();
+        let gradients = GradientsParams::from_grads(loss.backward(), &self.actor);
+        self.actor = self.actor_optimizer.step(
+            self.config.actor_learning_rate,
+            self.actor.clone(),
+            gradients,
+        );
+        Ok(loss_value)
+    }
+
     /// Fit bounded actor targets at explicit recurrent states.
     ///
     /// Each sample is one step, so callers can regularize recurrent behavior
@@ -2061,8 +2116,12 @@ fn tensor_vec<B: Backend, const D: usize>(
 
 /// Flatten a validated row-major matrix into a backend tensor.
 #[cfg(any(not(target_arch = "wasm32"), feature = "browser-training"))]
-fn encode_matrix<B: Backend>(rows: &[Vec<f32>], width: usize, device: &B::Device) -> Tensor<B, 2> {
-    let values: Vec<_> = rows.iter().flatten().copied().collect();
+fn encode_matrix<B: Backend>(
+    rows: &[impl AsRef<[f32]>],
+    width: usize,
+    device: &B::Device,
+) -> Tensor<B, 2> {
+    let values: Vec<_> = rows.iter().flat_map(AsRef::as_ref).copied().collect();
     Tensor::<B, 1>::from_floats(values.as_slice(), device).reshape([rows.len(), width])
 }
 
@@ -2218,6 +2277,25 @@ fn validate_finite(values: &[f32], field: &'static str) -> Result<(), RecurrentP
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// Borrowed rows preserve row order without cloning their owned vectors.
+    #[test]
+    fn matrix_encoding_accepts_borrowed_and_owned_rows() {
+        let owned = [vec![1.0, 2.0], vec![-3.0, 4.0]];
+        let borrowed = owned.each_ref().map(Vec::as_slice);
+        let device = inference_device();
+        let owned_tensor = encode_matrix::<InferenceBackend>(&owned, 2, &device);
+        let borrowed_tensor = encode_matrix::<InferenceBackend>(&borrowed, 2, &device);
+        assert_eq!(borrowed_tensor.dims(), [2, 2]);
+        assert_eq!(
+            tensor_vec(owned_tensor).expect("owned rows"),
+            [1.0, 2.0, -3.0, 4.0]
+        );
+        assert_eq!(
+            tensor_vec(borrowed_tensor).expect("borrowed rows"),
+            [1.0, 2.0, -3.0, 4.0]
+        );
+    }
 
     /// Equal model seeds and observations must reproduce recurrent inference.
     #[test]

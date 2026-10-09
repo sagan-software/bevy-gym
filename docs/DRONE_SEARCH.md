@@ -80,13 +80,13 @@ at least 499 of 522 held pipe samples visible; every held house sample was hidde
 No evaluated checkpoint passed both courses. Later checkpoints also regressed
 or crashed. None is eligible for gameplay installation.
 
-## Recurrent experiment in progress
+## Recurrent experiment result
 
-The user service `bevy-gym-navigation-memory-ppo-20261009` runs a finite
-300-update PPO experiment. Inspect its live state before restarting it.
-Its log is `/home/sagan/.cache/bevy-gym-quality-validation/navigation-memory-ppo.log`.
-Checkpoints go to `runs/quality-research/navigation-memory-ppo/`.
-The record's `active_run.snapshot_max_update` identifies the archived cutoff.
+The user service `bevy-gym-navigation-memory-ppo-20261009` completed all
+300 updates. No evaluated checkpoint saw the robot during a held pipe sample.
+The final checkpoint crashed in all five house trials and survived all five pipe
+trials without finding the robot. No checkpoint qualifies for gameplay.
+The archive now includes the complete history and log.
 
 This run starts from cover PPO 260 with a fresh critic and optimizers, using seed 29.
 It carries actor memory between decisions and resets memory at episode boundaries.
@@ -99,7 +99,7 @@ Actor and critic receive the same 32 filtered inputs. The critic remains a
 feed-forward model. PPO settings match the earlier experiment except for
 32 sequences per minibatch, temporal chunks, and the 60-second permanent-cover
 profile. Rollout memory persists across parameter updates without a burn-in pass.
-The archive contains partial results; they do not prove terminal success or failure.
+These results reject this training run; they do not rule out recurrent navigation.
 
 ## Next work and verification limits
 
@@ -109,8 +109,8 @@ for identical current observations after different histories. A memoryless actor
 cannot represent that distinction. This is a structural limitation; the observed
 regressions do not establish it as their only cause.
 
-Finish inspecting the live recurrent run. Then test supervised training across
-observation sequences so the actor can learn which past observations matter.
+Use [sequence cloning](RECURRENT_IMITATION.md) to test supervised training across
+observation histories, so the actor can learn which past observations matter.
 Keep source history, adverse cases, and selection results. Do not repeat the
 unchanged physical-access calibration to resume.
 
@@ -123,5 +123,4 @@ The current research has no new browser evidence or fresh-seed search qualificat
 The prototype tests emit unused-item and unreachable-public-item warnings.
 They are archived research sources, not finished tutorial examples, and no clean
 strict Rust gate is claimed. Documentation lint, archive hashes, and local links
-are the gates for this documentation checkpoint. The live training test remains
-untracked until its process finishes; its exact source is already archived.
+are the gates for this documentation checkpoint. All temporary training tests are archived. No training service remains active.
