@@ -1,7 +1,11 @@
 //! Exercise JSON requests at the same boundary used by the browser worker.
 
+#[path = "../src/curriculum.rs"]
+mod curriculum;
 #[path = "../../examples/robots/learning/mod.rs"]
 mod learning;
+#[path = "../../examples/robots/curriculum/lesson.rs"]
+mod lesson;
 #[path = "../src/protocol.rs"]
 mod protocol;
 #[path = "../src/session.rs"]
@@ -18,7 +22,12 @@ fn requests_train_one_batch_and_export_reloadable_weights() {
         "not_started"
     );
     let started = respond(&mut session, r#"{"command":"start","seed":7}"#);
-    assert_eq!(started["event"], "started");
+    assert_eq!(
+        started,
+        serde_json::json!({"event":"started", "seed":7,
+        "updates":0,"transitions":0,"update_limit":260,
+        "actor_learning_rate":0.0003,"critic_learning_rate":0.001})
+    );
     let initial = respond(&mut session, r#"{"command":"export"}"#);
     let progress = respond(&mut session, r#"{"command":"advance"}"#);
     assert_eq!(progress["event"], "progress");
@@ -104,6 +113,34 @@ fn malformed_requests_preserve_an_existing_run() {
 }
 
 #[test]
+fn malformed_curriculum_requests_preserve_an_existing_run() {
+    let mut session = Session::default();
+    respond(&mut session, r#"{"command":"start","seed":7}"#);
+    let before = respond(&mut session, r#"{"command":"export"}"#);
+    for request in [
+        r#"{"command":"start_curriculum"}"#,
+        r#"{"command":"start_curriculum","seed":null}"#,
+        r#"{"command":"start_curriculum","seed":-1}"#,
+        r#"{"command":"start_curriculum","seed":4294967296}"#,
+        r#"{"command":"start_curriculum","seed":1.5}"#,
+        r#"{"command":"start_curriculum","seed":"7"}"#,
+        r#"{"command":"start_curriculum","seed":7,"extra":0}"#,
+        r#"{"command":"start_curriculum","seed":7,"seed":8}"#,
+    ] {
+        assert_eq!(
+            respond(&mut session, request)["code"],
+            "invalid_request",
+            "{request}"
+        );
+        assert_eq!(respond(&mut session, r#"{"command":"export"}"#), before);
+    }
+    assert_eq!(
+        respond(&mut session, r#"{"command":"advance"}"#)["updates"],
+        1
+    );
+}
+
+#[test]
 fn message_size_checks_utf8_bytes_at_the_inclusive_boundary() {
     let mut session = Session::default();
     let mut request = String::from(r#"{"command":"export"}"#);
@@ -154,4 +191,26 @@ fn seed_boundaries_restart_the_count_and_evaluation_preserves_idle_state() {
             1
         );
     }
+}
+
+#[test]
+fn curriculum_starts_calm_and_preserves_the_direct_recovery_recipe() {
+    let mut session = Session::default();
+    let started = respond(&mut session, r#"{"command":"start_curriculum","seed":7}"#);
+    assert_eq!(started["event"], "started");
+    assert_eq!(started["update_limit"], 1200);
+    assert_eq!(started["curriculum"]["lesson"], "hover");
+    assert_eq!(started["curriculum"]["lesson_updates"], 0);
+    let progress = respond(&mut session, r#"{"command":"advance"}"#);
+    assert_eq!(progress["updates"], 1);
+    assert_eq!(progress["curriculum"]["lesson_updates"], 1);
+    assert_eq!(progress["curriculum"]["lesson_limit"], 600);
+    assert!(progress["curriculum"]["evaluation"].is_null());
+    assert_eq!(progress["status"], "training");
+    let direct = respond(&mut session, r#"{"command":"start","seed":7}"#);
+    assert_eq!(direct["update_limit"], 260);
+    assert!(direct.get("curriculum").is_none());
+    assert!(respond(&mut session, r#"{"command":"advance"}"#)
+        .get("curriculum")
+        .is_none());
 }

@@ -22,11 +22,11 @@ a:hover { color: #fff; }
 .training { padding: 24px; overflow-y: auto; border-left: 1px solid #43494c; scrollbar-color: #687579 #171a1c; }
 .training h1 { margin: 0 0 20px; font-size: 21px; font-weight: 600; }
 .training label { display: block; margin-bottom: 6px; }
-.training input { width: 100%; margin-bottom: 14px; padding: 8px 10px; border: 1px solid #899599; border-radius: 3px; background: #22272a; color: inherit; font: inherit; caret-color: #efb36b; }
+.training input, .training select { width: 100%; margin-bottom: 14px; padding: 8px 10px; border: 1px solid #899599; border-radius: 3px; background: #22272a; color: inherit; font: inherit; caret-color: #efb36b; }
 .training button { min-height: 44px; padding: 9px 12px; border: 1px solid #687579; border-radius: 3px; background: #303a3e; color: inherit; font: inherit; cursor: pointer; }
 .training button:hover:enabled { background: #43565c; }
 .training button:disabled { opacity: 0.55; cursor: default; }
-.training input:disabled { opacity: 0.65; }
+.training input:disabled, .training select:disabled { opacity: 0.65; }
 #training-toggle { background: #39676c; border-color: #82a8ad; }
 .actions, .checkpoint-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .training p { margin: 12px 0; }

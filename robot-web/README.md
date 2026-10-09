@@ -41,7 +41,11 @@ illustrates the command; the environment models force rather than rotor RPM.
 The [recording](../docs/progress/drone-inference.mp4) compares learned recovery with
 constant half-thrust from the same disturbed start. The
 [inference guide](../docs/DRONE_INFERENCE.md) records controls and failure behavior.
-The training panel starts a separate worker from random weights. Pause training
+The training panel starts a separate worker from random weights. Choose direct
+recovery or curriculum training. Curriculum trains calm hover before disturbed
+recovery, preserves the optimizer, and advances only after passing each lesson.
+Its progress shows the current lesson's budget and independent evaluation.
+Pause training
 before watching or downloading a checkpoint. Watch checkpoint selects frozen
 weights and starts a disturbed episode; later optimizer updates do not change
 those weights. Resume training continues the run. Discard run permits a fresh

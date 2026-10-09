@@ -47,8 +47,10 @@ These control the comparison cases, not our game's mass or reward choices.
 ## Physical model
 
 The first lesson uses a rigid body and four ideal thrust actuators. It includes
-gravity, rotational inertia, contact impulses, and reaction torque. Rotor lag,
-aerodynamic drag, wind, and damage belong to later separately tested lessons.
+gravity, rotational inertia, contact impulses, and reaction torque. The
+[actuator-failure lesson](DRONE_DAMAGE.md) disables individual motors while
+retaining mass and collision geometry. Rotor lag, aerodynamic drag, wind, and
+detached-part dynamics remain unfinished.
 
 For rotor `i`, force is `u_i * F_max * R * Y`: `u_i` is a dimensionless command,
 `F_max` is maximum force in newtons, `R` rotates the body frame into the world,
@@ -56,6 +58,8 @@ and `Y` is the body-up unit vector. Apply that force at `p + R * r_i`, where
 `p` and `r_i` are position and motor offset in metres. Rapier computes the
 resulting moment in newton-metres. Add alternating yaw moments
 `sign_i * kappa * u_i * F_max * R * Y`, where `kappa` is in metres.
+When motor `i` has failed, both its force and reaction moment are zero regardless
+of its validated command. Reset restores all motors.
 
 Choose `F_max = m * g / 2` per rotor, with mass `m` in kilograms and gravity
 magnitude `g = 9.81 m/s²`. Four commands of 0.5 therefore balance an upright body.
@@ -82,8 +86,10 @@ on every reset. See [the recovery lesson](DRONE_RECOVERY.md) for its distributio
 seed contract, and baseline comparison. The default constructor remains calm.
 
 The [28-line hover guide](../examples/robots/hover.rs) holds four commands of 0.5
-for ten simulated seconds. It is a diagnostic baseline. No trained policy is
-qualified for this task yet.
+for ten simulated seconds. It is a diagnostic baseline. The
+[recovery policy](DRONE_LEARNING.md) and [browser curriculum](DRONE_BROWSER_TRAINING.md)
+have separate native and WASM qualification records. Their intact-flight results
+do not qualify recovery after motor failure.
 
 ## Acceptance checklist
 

@@ -3,7 +3,9 @@
 use bevy_gym::training::{RecurrentPpoAgent, RecurrentPpoUpdate};
 use serde::Serialize;
 
+use crate::curriculum::{Curriculum, ProgressStatus};
 use crate::learning::{new_agent, RecoveryBatch};
+use crate::lesson::Lesson;
 
 /// Fixed lesson budget: 133,120 transitions, without a claim of convergence.
 pub(crate) const UPDATE_LIMIT: u16 = 260;
@@ -28,6 +30,10 @@ pub(crate) struct Run {
     batch: RecoveryBatch,
     /// Successful updates, bounded by the fixed lesson budget.
     updates: CompletedUpdates,
+    /// Root seed used when resetting all lanes at a lesson boundary.
+    seed: u32,
+    /// Absent for the unchanged fixed-budget recovery run.
+    curriculum: Option<Curriculum>,
 }
 
 /// Only successful updates can increase this private bounded count.
@@ -74,13 +80,29 @@ impl Failure {
 impl Session {
     /// Replace the current run only after its model and rollout exist.
     pub(crate) fn start(&mut self, seed: u32) -> Result<(), Failure> {
+        self.start_run(seed, None)
+    }
+
+    /// Start calm hover with the same recipe and automatic lesson promotion.
+    pub(crate) fn start_curriculum(&mut self, seed: u32) -> Result<(), Failure> {
+        self.start_run(seed, Some(Curriculum::default()))
+    }
+
+    /// Initialize all owned state before replacing an existing run.
+    fn start_run(&mut self, seed: u32, curriculum: Option<Curriculum>) -> Result<(), Failure> {
         let agent = new_agent(u64::from(seed))
             .map_err(|error| Failure::new(FailureKind::Training, error))?;
-        let batch = RecoveryBatch::new(u64::from(seed), &agent.policy());
+        let batch = if curriculum.is_some() {
+            Lesson::Hover.batch(u64::from(seed), &agent.policy())
+        } else {
+            RecoveryBatch::new(u64::from(seed), &agent.policy())
+        };
         *self = Self::Ready(Box::new(Run {
             agent,
             batch,
             updates: CompletedUpdates::default(),
+            seed,
+            curriculum,
         }));
         Ok(())
     }
@@ -97,7 +119,7 @@ impl Session {
             Self::Failed(message) => return Err(Failure::new(FailureKind::Failed, message)),
             Self::Ready(run) => run,
         };
-        if run.updates.0 == UPDATE_LIMIT {
+        if run.status() != ProgressStatus::Training {
             return Err(Failure::new(
                 FailureKind::Complete,
                 "The training budget is complete.",
@@ -106,15 +128,29 @@ impl Session {
 
         // A failed collection or update may have mutated state. Discard that run.
         match run.update() {
-            Ok(metrics) => {
-                run.updates.0 += 1;
-                Ok((run.updates.0, metrics))
-            }
+            Ok(metrics) => Ok((run.updates.0, metrics)),
             Err(error) => {
                 let message = error.to_string();
                 *self = Self::Failed(message.clone());
                 Err(Failure::new(FailureKind::Training, message))
             }
+        }
+    }
+
+    /// Derive status and optional curriculum fields from the owned run.
+    pub(crate) fn progress(&self) -> Result<(ProgressStatus, Option<serde_json::Value>), Failure> {
+        match self {
+            Self::Ready(run) => Ok((
+                run.status(),
+                run.curriculum
+                    .as_ref()
+                    .map(|course| course.progress(run.updates.0)),
+            )),
+            Self::Idle => Err(Failure::new(
+                FailureKind::NotStarted,
+                "Start training first.",
+            )),
+            Self::Failed(message) => Err(Failure::new(FailureKind::Failed, message)),
         }
     }
 
@@ -136,10 +172,36 @@ impl Session {
 }
 
 impl Run {
+    /// Completion belongs to the selected mode, never to an unrelated fixed budget.
+    fn status(&self) -> ProgressStatus {
+        self.curriculum.as_ref().map_or_else(
+            || {
+                if self.updates.0 == UPDATE_LIMIT {
+                    ProgressStatus::Complete
+                } else {
+                    ProgressStatus::Training
+                }
+            },
+            Curriculum::status,
+        )
+    }
+
     /// Bound transient allocation to one 512-transition batch and optimizer update.
     fn update(&mut self) -> Result<RecurrentPpoUpdate, Box<dyn std::error::Error>> {
         let sequences = self.batch.collect(&self.agent.policy())?;
-        validate_metrics(self.agent.update(&sequences)?)
+        let metrics = validate_metrics(self.agent.update(&sequences)?)?;
+        self.updates.0 += 1;
+        if let Some(course) = &mut self.curriculum {
+            if let Some(lesson) = course.due(self.updates.0) {
+                // Match the native guide: reload frozen bytes before scoring independently.
+                let policy = crate::learning::load_policy(self.agent.policy().to_bytes()?)?;
+                let scores = lesson.evaluate(&policy)?;
+                if let Some(next) = course.finish(self.updates.0, scores) {
+                    self.batch = next.batch(u64::from(self.seed), &self.agent.policy());
+                }
+            }
+        }
+        Ok(metrics)
     }
 }
 
@@ -173,6 +235,92 @@ mod tests {
     use super::{validate_metrics, CompletedUpdates, Run, Session, UPDATE_LIMIT};
     use crate::learning::{learning_config, new_agent, RecoveryBatch};
     use crate::protocol::respond;
+
+    #[test]
+    fn progress_requires_a_valid_run() {
+        let idle = Session::default();
+        assert!(matches!(
+            idle.progress().expect_err("idle has no progress").kind,
+            super::FailureKind::NotStarted
+        ));
+        let failed = Session::Failed("failed update".into());
+        let error = failed.progress().expect_err("failed run has no progress");
+        assert!(matches!(error.kind, super::FailureKind::Failed));
+        assert_eq!(error.message, "failed update");
+    }
+
+    #[test]
+    fn promotion_retains_optimizer_and_resets_every_recovery_lane() {
+        let path = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("../docs/progress/drone-curriculum.mpk");
+        let agent = RecurrentPpoAgent::load(
+            path,
+            12,
+            12,
+            1,
+            &[0.0; 4],
+            &[1.0; 4],
+            learning_config(),
+            SeedConfig::from_root(7),
+        )
+        .expect("qualified weights");
+        let batch = crate::lesson::Lesson::Hover.batch(7, &agent.policy());
+        let mut session = Session::Ready(Box::new(Run {
+            agent,
+            batch,
+            updates: CompletedUpdates(19),
+            seed: 7,
+            curriculum: Some(crate::curriculum::Curriculum::default()),
+        }));
+        let (_, first) = session.advance().expect("promotion update");
+        let (_, course) = session.progress().expect("active progress");
+        let course = course.expect("curriculum progress");
+        assert_eq!(course["lesson"], "recovery");
+        assert_eq!(course["lesson_updates"], 0);
+        assert_eq!(course["evaluation"]["passed"], true);
+        let Session::Ready(run) = &mut session else {
+            panic!("active run");
+        };
+        let mut fresh = RecoveryBatch::new(7, &run.agent.policy());
+        assert_eq!(
+            run.batch
+                .collect(&run.agent.policy())
+                .expect("promoted lanes"),
+            fresh
+                .collect(&run.agent.policy())
+                .expect("fresh recovery lanes")
+        );
+        let (_, second) = session.advance().expect("recovery update");
+        assert!(second.optimizer_steps > first.optimizer_steps);
+    }
+
+    #[test]
+    fn exhausted_curriculum_keeps_exportable_weights_and_requires_restart() {
+        let agent = new_agent(7).expect("valid recipe");
+        let batch = crate::lesson::Lesson::Hover.batch(7, &agent.policy());
+        let mut session = Session::Ready(Box::new(Run {
+            agent,
+            batch,
+            updates: CompletedUpdates(599),
+            seed: 7,
+            curriculum: Some(crate::curriculum::Curriculum::default()),
+        }));
+        let result = respond(&mut session, r#"{"command":"advance"}"#);
+        assert_eq!(result["status"], "exhausted");
+        assert_eq!(result["curriculum"]["evaluation"]["passed"], false);
+        let before = session.export().expect("exhausted weights");
+        session.advance().expect_err("exhausted run cannot advance");
+        assert_eq!(session.export().expect("unchanged weights"), before);
+        session.start_curriculum(7).expect("explicit restart");
+        assert_eq!(
+            session
+                .progress()
+                .expect("active progress")
+                .1
+                .expect("fresh course")["lesson_updates"],
+            0
+        );
+    }
 
     #[test]
     fn numerical_failures_cannot_be_reported_as_successful_progress() {
@@ -230,6 +378,8 @@ mod tests {
             agent,
             batch,
             updates: CompletedUpdates(UPDATE_LIMIT - 1),
+            seed: 7,
+            curriculum: None,
         }));
         let result = respond(&mut session, r#"{"command":"advance"}"#);
         assert_eq!(result["status"], "complete");
@@ -269,6 +419,8 @@ mod tests {
             agent,
             batch,
             updates: CompletedUpdates::default(),
+            seed: 7,
+            curriculum: None,
         }));
         let first = respond(&mut session, r#"{"command":"advance"}"#);
         assert_eq!(first["code"], "training");

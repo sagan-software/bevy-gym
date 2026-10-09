@@ -123,7 +123,7 @@ test('checkpoint export and scoring preserve paused state and exact bytes',async
   await assert.rejects(s.training.checkpoint(),/Pause training/);
   s.training.pause();s.training.resume();worker.emit({event:'policy',bytes:[0,1,255]});await flush();
   assert.deepEqual(worker.sent.shift(),{command:'evaluate',bytes:[0,1,255]});worker.emit(evaluation());
-  const result=await pending;assert.deepEqual(result,{bytes:Uint8Array.of(0,1,255),seed:7,updates:1});
+  const result=await pending;assert.deepEqual(result,{bytes:Uint8Array.of(0,1,255),seed:7,updates:1,mode:'recovery'});
   assert.equal(s.training.state.phase,'paused');assert.equal(s.training.state.evaluation.updates,1);s.training.discard();
 });
 
@@ -186,4 +186,113 @@ test('discard after evaluation resolves prevents checkpoint delivery',async()=>{
   const s=setup();const worker=await paused(s);const pending=s.training.checkpoint();const rejected=assert.rejects(pending,{name:'AbortError'});
   worker.emit({event:'policy',bytes:[1]});await flush();worker.emit(evaluation());s.training.discard();await rejected;
   assert.equal(s.training.state.evaluation,null);assert.equal(s.training.state.phase,'idle');
+});
+
+test('curriculum start selects its command and pauses with lesson progress',async()=>{
+  const {training,workers}=setup();
+  const promise=training.start(7,'curriculum'); const worker=workers[0];
+  worker.emit({event:'ready',protocol:1}); await flush();
+  assert.deepEqual(worker.sent.shift(),{command:'start_curriculum',seed:7});
+  worker.emit({...started(7),update_limit:1200,curriculum:{lesson:'hover',lesson_updates:0,lesson_limit:600,evaluation:null}});
+  await promise; worker.sent.shift(); training.pause();
+  worker.emit({...progress(1),curriculum:{lesson:'hover',lesson_updates:1,lesson_limit:600,evaluation:null}});
+  await flush();
+  assert.equal(training.state.phase,'paused');
+  assert.equal(training.state.curriculum.lesson_updates,1);
+  training.discard();
+});
+
+async function curriculumRun() {
+  const value=setup(); const promise=value.training.start(7,'curriculum');
+  const worker=value.workers[0]; worker.emit({event:'ready',protocol:1}); await flush();
+  worker.sent.shift();
+  worker.emit({...started(7),update_limit:1200,curriculum:{lesson:'hover',lesson_updates:0,lesson_limit:600,evaluation:null}});
+  await promise; worker.sent.shift(); return {...value,worker};
+}
+
+function curriculumProgress(total,lesson,count,evaluation=null,status='training') {
+  return {...progress(total),status,curriculum:{lesson,lesson_updates:count,lesson_limit:600,evaluation}};
+}
+
+async function advanceCourse(run,total,lesson,count,evaluation=null,status='training') {
+  run.worker.emit(curriculumProgress(total,lesson,count,evaluation,status));
+  await flush(); run.worker.sent.shift();
+}
+
+test('curriculum promotion resets only lesson progress and completes after both passes',async()=>{
+  const run=await curriculumRun();
+  for(let i=1;i<20;i++) await advanceCourse(run,i,'hover',i);
+  const hover={lesson:'hover',passed:true,episodes:scores()};
+  await advanceCourse(run,20,'recovery',0,hover);
+  assert.equal(run.training.state.phase,'running');
+  for(let i=21;i<40;i++) await advanceCourse(run,i,'recovery',i-20,hover);
+  await advanceCourse(run,40,'recovery',20,{lesson:'recovery',passed:true,episodes:scores()},'complete');
+  assert.equal(run.training.state.phase,'complete');
+  assert.equal(run.training.state.updates,40);
+  assert.equal(run.worker.sent.length,0);
+  run.training.discard();
+});
+
+test('each curriculum budget can exhaust without falsely completing and permits checkpoint export',async()=>{
+  for(const lesson of ['hover','recovery']) {
+    const run=await curriculumRun(); let total=0;
+    let evaluation=null;
+    if(lesson==='recovery') {
+      for(let i=1;i<20;i++) await advanceCourse(run,++total,'hover',i);
+      evaluation={lesson:'hover',passed:true,episodes:scores()};
+      await advanceCourse(run,++total,'recovery',0,evaluation);
+    }
+    for(let count=1;count<=600;count++) {
+      if(count%20===0) evaluation={lesson,passed:false,episodes:scores().map(s=>({...s,reward:399}))};
+      await advanceCourse(run,++total,lesson,count,evaluation,count===600?'exhausted':'training');
+    }
+    assert.equal(run.training.state.phase,'exhausted');
+    const checkpoint=run.training.checkpoint();
+    assert.deepEqual(run.worker.sent.shift(),{command:'export'});
+    run.worker.emit({event:'policy',bytes:[1]}); await flush();
+    run.worker.sent.shift(); run.worker.emit({event:'evaluation',episodes:scores(),baseline:scores()});
+    assert.equal((await checkpoint).mode,'curriculum');
+    assert.equal(run.training.state.phase,'exhausted');
+    run.training.discard();
+  }
+});
+
+test('malformed curriculum state and impossible promotions stop the worker',async()=>{
+  const edits=[
+    p=>{p.curriculum=null;},p=>{p.curriculum.lesson_limit=601;},
+    p=>{p.curriculum.lesson='unknown';},p=>{p.curriculum.lesson_updates=-1;},
+    p=>{p.curriculum.lesson_updates=601;},p=>{p.curriculum.lesson_updates=0.5;},
+    p=>{p.curriculum.lesson='recovery';},p=>{p.status='complete';},
+    p=>{p.curriculum.evaluation={};}
+  ];
+  for(const edit of edits) {
+    const run=await curriculumRun();const p=curriculumProgress(1,'hover',1);edit(p);
+    run.worker.emit(p);await flush();assert.equal(run.training.state.phase,'failed');
+    assert.equal(run.worker.terminated,true);
+  }
+  for(const evaluation of [null,{lesson:'recovery',passed:true,episodes:scores()},
+    {lesson:'hover',passed:false,episodes:scores()}, {lesson:'hover',passed:true,episodes:[]}]) {
+    const run=await curriculumRun();
+    for(let i=1;i<20;i++) await advanceCourse(run,i,'hover',i);
+    await advanceCourse(run,20,'recovery',0,evaluation);
+    assert.equal(run.training.state.phase,'failed');
+  }
+  const {training,workers}=setup();
+  await assert.rejects(training.start(7,'unknown'),RangeError);
+  assert.equal(workers.length,0);
+});
+
+test('curriculum initialization rejects nonzero progress and each failed score gate stays in its lesson',async()=>{
+  const invalid=setup();const pending=invalid.training.start(7,'curriculum');
+  invalid.workers[0].emit({event:'ready',protocol:1});await flush();
+  invalid.workers[0].emit({...started(7),update_limit:1200,curriculum:{lesson:'hover',lesson_updates:1,lesson_limit:600,evaluation:null}});
+  await pending;assert.equal(invalid.training.state.phase,'failed');
+  for(const episodes of [scores().map(s=>({...s,survived:false})),scores().map(s=>({...s,final_distance:0.501}))]) {
+    const run=await curriculumRun();
+    for(let i=1;i<20;i++) await advanceCourse(run,i,'hover',i);
+    await advanceCourse(run,20,'hover',20,{lesson:'hover',passed:false,episodes});
+    assert.equal(run.training.state.phase,'running');
+    assert.equal(run.training.state.curriculum.lesson,'hover');
+    run.training.discard();
+  }
 });

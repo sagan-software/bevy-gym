@@ -1,0 +1,1767 @@
+{
+  "checkpointStatus": "Watching update 320 from seed 7.",
+  "last": {
+    "baseline": [
+      {
+        "final_distance": 6.703430652618408,
+        "reward": 39.76732603833079,
+        "seed": "0",
+        "steps": 85,
+        "survived": false
+      },
+      {
+        "final_distance": 8.140289306640625,
+        "reward": 67.04166154097766,
+        "seed": "1",
+        "steps": 130,
+        "survived": false
+      },
+      {
+        "final_distance": 11.053842544555664,
+        "reward": 85.61805526912212,
+        "seed": "2",
+        "steps": 176,
+        "survived": false
+      },
+      {
+        "final_distance": 9.496874809265137,
+        "reward": 44.842814203351736,
+        "seed": "42",
+        "steps": 274,
+        "survived": false
+      },
+      {
+        "final_distance": 4.324670314788818,
+        "reward": 46.12651114910841,
+        "seed": "18446744073709551615",
+        "steps": 79,
+        "survived": false
+      }
+    ],
+    "episodes": [
+      {
+        "final_distance": 0.2807428240776062,
+        "reward": 465.2521493434906,
+        "seed": "0",
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.28567612171173096,
+        "reward": 458.6870867013931,
+        "seed": "1",
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.31997838616371155,
+        "reward": 467.62073171138763,
+        "seed": "2",
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.3229046165943146,
+        "reward": 439.2295553088188,
+        "seed": "42",
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.3348578214645386,
+        "reward": 467.88012742996216,
+        "seed": "18446744073709551615",
+        "steps": 500,
+        "survived": true
+      }
+    ],
+    "event": "evaluation"
+  },
+  "messages": [
+    {
+      "event": "ready",
+      "protocol": 1
+    },
+    {
+      "actor_learning_rate": 0.0003,
+      "critic_learning_rate": 0.001,
+      "curriculum": {
+        "evaluation": null,
+        "lesson": "hover",
+        "lesson_limit": 600,
+        "lesson_updates": 0
+      },
+      "event": "started",
+      "seed": 7,
+      "transitions": 0,
+      "update_limit": 1200,
+      "updates": 0
+    },
+    {
+      "baseline": [
+        {
+          "final_distance": 6.703430652618408,
+          "reward": 39.76732603833079,
+          "seed": "0",
+          "steps": 85,
+          "survived": false
+        },
+        {
+          "final_distance": 8.140289306640625,
+          "reward": 67.04166154097766,
+          "seed": "1",
+          "steps": 130,
+          "survived": false
+        },
+        {
+          "final_distance": 11.053842544555664,
+          "reward": 85.61805526912212,
+          "seed": "2",
+          "steps": 176,
+          "survived": false
+        },
+        {
+          "final_distance": 9.496874809265137,
+          "reward": 44.842814203351736,
+          "seed": "42",
+          "steps": 274,
+          "survived": false
+        },
+        {
+          "final_distance": 4.324670314788818,
+          "reward": 46.12651114910841,
+          "seed": "18446744073709551615",
+          "steps": 79,
+          "survived": false
+        }
+      ],
+      "episodes": [
+        {
+          "final_distance": 2.693070411682129,
+          "reward": 22.647170932614245,
+          "seed": "0",
+          "steps": 46,
+          "survived": false
+        },
+        {
+          "final_distance": 2.8139874935150146,
+          "reward": 26.928102163015865,
+          "seed": "1",
+          "steps": 50,
+          "survived": false
+        },
+        {
+          "final_distance": 2.7658402919769287,
+          "reward": 26.387849062273744,
+          "seed": "2",
+          "steps": 50,
+          "survived": false
+        },
+        {
+          "final_distance": 2.574610471725464,
+          "reward": 23.29937139991671,
+          "seed": "42",
+          "steps": 47,
+          "survived": false
+        },
+        {
+          "final_distance": 2.5140838623046875,
+          "reward": 25.56516739539802,
+          "seed": "18446744073709551615",
+          "steps": 48,
+          "survived": false
+        }
+      ],
+      "event": "evaluation"
+    },
+    {
+      "baseline": [
+        {
+          "final_distance": 6.703430652618408,
+          "reward": 39.76732603833079,
+          "seed": "0",
+          "steps": 85,
+          "survived": false
+        },
+        {
+          "final_distance": 8.140289306640625,
+          "reward": 67.04166154097766,
+          "seed": "1",
+          "steps": 130,
+          "survived": false
+        },
+        {
+          "final_distance": 11.053842544555664,
+          "reward": 85.61805526912212,
+          "seed": "2",
+          "steps": 176,
+          "survived": false
+        },
+        {
+          "final_distance": 9.496874809265137,
+          "reward": 44.842814203351736,
+          "seed": "42",
+          "steps": 274,
+          "survived": false
+        },
+        {
+          "final_distance": 4.324670314788818,
+          "reward": 46.12651114910841,
+          "seed": "18446744073709551615",
+          "steps": 79,
+          "survived": false
+        }
+      ],
+      "episodes": [
+        {
+          "final_distance": 2.7730038166046143,
+          "reward": 23.238813751668204,
+          "seed": "0",
+          "steps": 47,
+          "survived": false
+        },
+        {
+          "final_distance": 2.921269655227661,
+          "reward": 28.002390180059592,
+          "seed": "1",
+          "steps": 51,
+          "survived": false
+        },
+        {
+          "final_distance": 2.850031614303589,
+          "reward": 27.202503935201094,
+          "seed": "2",
+          "steps": 51,
+          "survived": false
+        },
+        {
+          "final_distance": 2.7531402111053467,
+          "reward": 24.35217744857073,
+          "seed": "42",
+          "steps": 49,
+          "survived": false
+        },
+        {
+          "final_distance": 2.5897507667541504,
+          "reward": 26.39287275308743,
+          "seed": "18446744073709551615",
+          "steps": 49,
+          "survived": false
+        }
+      ],
+      "event": "evaluation"
+    },
+    {
+      "actor_learning_rate": 0.0003,
+      "actor_loss": -0.0064695795899183395,
+      "approximate_kl": 0.009187814713644845,
+      "critic_learning_rate": 0.001,
+      "critic_loss": 0.7040514762607302,
+      "curriculum": {
+        "evaluation": {
+          "episodes": [
+            {
+              "final_distance": 3.005598545074463,
+              "reward": 26.909075564704835,
+              "seed": "0",
+              "steps": 52,
+              "survived": false
+            },
+            {
+              "final_distance": 2.7015128135681152,
+              "reward": 29.627255679341033,
+              "seed": "1",
+              "steps": 52,
+              "survived": false
+            },
+            {
+              "final_distance": 2.8085196018218994,
+              "reward": 29.787043913034722,
+              "seed": "2",
+              "steps": 52,
+              "survived": false
+            },
+            {
+              "final_distance": 2.868940591812134,
+              "reward": 28.223063616082072,
+              "seed": "42",
+              "steps": 51,
+              "survived": false
+            },
+            {
+              "final_distance": 2.971792221069336,
+              "reward": 27.746992643224075,
+              "seed": "18446744073709551615",
+              "steps": 52,
+              "survived": false
+            }
+          ],
+          "lesson": "hover",
+          "passed": false
+        },
+        "lesson": "hover",
+        "lesson_limit": 600,
+        "lesson_updates": 20
+      },
+      "entropy": -2.306371840182692,
+      "event": "progress",
+      "optimizer_steps": 200,
+      "status": "training",
+      "transitions": 10240,
+      "updates": 20
+    },
+    {
+      "actor_learning_rate": 0.0003,
+      "actor_loss": -0.008039235595788341,
+      "approximate_kl": 0.002797410133052098,
+      "critic_learning_rate": 0.001,
+      "critic_loss": 12.759274924181682,
+      "curriculum": {
+        "evaluation": {
+          "episodes": [
+            {
+              "final_distance": 3.27518367767334,
+              "reward": 77.65138739347458,
+              "seed": "0",
+              "steps": 111,
+              "survived": false
+            },
+            {
+              "final_distance": 2.537553310394287,
+              "reward": 89.58545722067356,
+              "seed": "1",
+              "steps": 115,
+              "survived": false
+            },
+            {
+              "final_distance": 2.940894842147827,
+              "reward": 88.97533429041505,
+              "seed": "2",
+              "steps": 114,
+              "survived": false
+            },
+            {
+              "final_distance": 3.4542236328125,
+              "reward": 76.86087618023157,
+              "seed": "42",
+              "steps": 109,
+              "survived": false
+            },
+            {
+              "final_distance": 2.525617837905884,
+              "reward": 87.60611904412508,
+              "seed": "18446744073709551615",
+              "steps": 115,
+              "survived": false
+            }
+          ],
+          "lesson": "hover",
+          "passed": false
+        },
+        "lesson": "hover",
+        "lesson_limit": 600,
+        "lesson_updates": 40
+      },
+      "entropy": -2.277586513897404,
+      "event": "progress",
+      "optimizer_steps": 384,
+      "status": "training",
+      "transitions": 20480,
+      "updates": 40
+    },
+    {
+      "actor_learning_rate": 0.0003,
+      "actor_loss": -0.003915587367373519,
+      "approximate_kl": 0.010825018162023522,
+      "critic_learning_rate": 0.001,
+      "critic_loss": 16.641661158762872,
+      "curriculum": {
+        "evaluation": {
+          "episodes": [
+            {
+              "final_distance": 2.677213191986084,
+              "reward": 55.20761447399855,
+              "seed": "0",
+              "steps": 85,
+              "survived": false
+            },
+            {
+              "final_distance": 2.854997158050537,
+              "reward": 56.04622633010149,
+              "seed": "1",
+              "steps": 86,
+              "survived": false
+            },
+            {
+              "final_distance": 2.8506810665130615,
+              "reward": 57.47545853257179,
+              "seed": "2",
+              "steps": 87,
+              "survived": false
+            },
+            {
+              "final_distance": 2.6892385482788086,
+              "reward": 55.44976719468832,
+              "seed": "42",
+              "steps": 84,
+              "survived": false
+            },
+            {
+              "final_distance": 2.7776801586151123,
+              "reward": 57.24792029708624,
+              "seed": "18446744073709551615",
+              "steps": 87,
+              "survived": false
+            }
+          ],
+          "lesson": "hover",
+          "passed": false
+        },
+        "lesson": "hover",
+        "lesson_limit": 600,
+        "lesson_updates": 60
+      },
+      "entropy": -2.2955154213123024,
+      "event": "progress",
+      "optimizer_steps": 544,
+      "status": "training",
+      "transitions": 30720,
+      "updates": 60
+    },
+    {
+      "actor_learning_rate": 0.0003,
+      "actor_loss": -0.001995419950617361,
+      "approximate_kl": 0.002256524830961823,
+      "critic_learning_rate": 0.001,
+      "critic_loss": 12.052334557985887,
+      "curriculum": {
+        "evaluation": {
+          "episodes": [
+            {
+              "final_distance": 3.127967596054077,
+              "reward": 70.22789213806391,
+              "seed": "0",
+              "steps": 117,
+              "survived": false
+            },
+            {
+              "final_distance": 3.419806957244873,
+              "reward": 77.24719096720219,
+              "seed": "1",
+              "steps": 115,
+              "survived": false
+            },
+            {
+              "final_distance": 3.4169085025787354,
+              "reward": 78.12972944229841,
+              "seed": "2",
+              "steps": 119,
+              "survived": false
+            },
+            {
+              "final_distance": 2.935809850692749,
+              "reward": 72.78379306942225,
+              "seed": "42",
+              "steps": 114,
+              "survived": false
+            },
+            {
+              "final_distance": 3.568976402282715,
+              "reward": 72.0760360211134,
+              "seed": "18446744073709551615",
+              "steps": 119,
+              "survived": false
+            }
+          ],
+          "lesson": "hover",
+          "passed": false
+        },
+        "lesson": "hover",
+        "lesson_limit": 600,
+        "lesson_updates": 80
+      },
+      "entropy": -2.2986255629220977,
+      "event": "progress",
+      "optimizer_steps": 704,
+      "status": "training",
+      "transitions": 40960,
+      "updates": 80
+    },
+    {
+      "actor_learning_rate": 0.0003,
+      "actor_loss": -0.005357359059416922,
+      "approximate_kl": 0.0010026001576477722,
+      "critic_learning_rate": 0.001,
+      "critic_loss": 16.94902391033247,
+      "curriculum": {
+        "evaluation": {
+          "episodes": [
+            {
+              "final_distance": 4.305313587188721,
+              "reward": 81.12114258110523,
+              "seed": "0",
+              "steps": 141,
+              "survived": false
+            },
+            {
+              "final_distance": 5.5001397132873535,
+              "reward": 89.89206360653043,
+              "seed": "1",
+              "steps": 159,
+              "survived": false
+            },
+            {
+              "final_distance": 5.595920562744141,
+              "reward": 88.4194287378341,
+              "seed": "2",
+              "steps": 158,
+              "survived": false
+            },
+            {
+              "final_distance": 4.156571388244629,
+              "reward": 82.6189533509314,
+              "seed": "42",
+              "steps": 139,
+              "survived": false
+            },
+            {
+              "final_distance": 5.015712738037109,
+              "reward": 86.02058710157871,
+              "seed": "18446744073709551615",
+              "steps": 152,
+              "survived": false
+            }
+          ],
+          "lesson": "hover",
+          "passed": false
+        },
+        "lesson": "hover",
+        "lesson_limit": 600,
+        "lesson_updates": 100
+      },
+      "entropy": -2.3135193021735176,
+      "event": "progress",
+      "optimizer_steps": 864,
+      "status": "training",
+      "transitions": 51200,
+      "updates": 100
+    },
+    {
+      "actor_learning_rate": 0.0003,
+      "actor_loss": 0.0005884720018229928,
+      "approximate_kl": 0.0007972472604933032,
+      "critic_learning_rate": 0.001,
+      "critic_loss": 12.947466067736968,
+      "curriculum": {
+        "evaluation": {
+          "episodes": [
+            {
+              "final_distance": 1.867440104484558,
+              "reward": 87.74359838664532,
+              "seed": "0",
+              "steps": 127,
+              "survived": false
+            },
+            {
+              "final_distance": 2.4019935131073,
+              "reward": 99.80157020688057,
+              "seed": "1",
+              "steps": 151,
+              "survived": false
+            },
+            {
+              "final_distance": 2.177123546600342,
+              "reward": 101.85331653058529,
+              "seed": "2",
+              "steps": 144,
+              "survived": false
+            },
+            {
+              "final_distance": 1.888953685760498,
+              "reward": 88.39876790344715,
+              "seed": "42",
+              "steps": 127,
+              "survived": false
+            },
+            {
+              "final_distance": 1.9251818656921387,
+              "reward": 97.93607899546623,
+              "seed": "18446744073709551615",
+              "steps": 136,
+              "survived": false
+            }
+          ],
+          "lesson": "hover",
+          "passed": false
+        },
+        "lesson": "hover",
+        "lesson_limit": 600,
+        "lesson_updates": 120
+      },
+      "entropy": -2.305407500360161,
+      "event": "progress",
+      "optimizer_steps": 1024,
+      "status": "training",
+      "transitions": 61440,
+      "updates": 120
+    },
+    {
+      "actor_learning_rate": 0.0003,
+      "actor_loss": -0.0040179282950703055,
+      "approximate_kl": 0.008349425729861061,
+      "critic_learning_rate": 0.001,
+      "critic_loss": 14.65748584845278,
+      "curriculum": {
+        "evaluation": {
+          "episodes": [
+            {
+              "final_distance": 2.0758919715881348,
+              "reward": 103.70814682543278,
+              "seed": "0",
+              "steps": 163,
+              "survived": false
+            },
+            {
+              "final_distance": 11.236523628234863,
+              "reward": 108.03403498168336,
+              "seed": "1",
+              "steps": 213,
+              "survived": false
+            },
+            {
+              "final_distance": 12.078017234802246,
+              "reward": 122.15697965584695,
+              "seed": "2",
+              "steps": 248,
+              "survived": false
+            },
+            {
+              "final_distance": 3.147146224975586,
+              "reward": 109.66458843648434,
+              "seed": "42",
+              "steps": 181,
+              "survived": false
+            },
+            {
+              "final_distance": 2.3659980297088623,
+              "reward": 116.25393736362457,
+              "seed": "18446744073709551615",
+              "steps": 180,
+              "survived": false
+            }
+          ],
+          "lesson": "hover",
+          "passed": false
+        },
+        "lesson": "hover",
+        "lesson_limit": 600,
+        "lesson_updates": 140
+      },
+      "entropy": -2.3394162945915014,
+      "event": "progress",
+      "optimizer_steps": 1184,
+      "status": "training",
+      "transitions": 71680,
+      "updates": 140
+    },
+    {
+      "actor_learning_rate": 0.0003,
+      "actor_loss": -0.00639884795054968,
+      "approximate_kl": 0.0056448267155956985,
+      "critic_learning_rate": 0.001,
+      "critic_loss": 26.37371936427371,
+      "curriculum": {
+        "evaluation": {
+          "episodes": [
+            {
+              "final_distance": 2.765920877456665,
+              "reward": 85.25713980197906,
+              "seed": "0",
+              "steps": 155,
+              "survived": false
+            },
+            {
+              "final_distance": 2.2682504653930664,
+              "reward": 126.39650718867779,
+              "seed": "1",
+              "steps": 189,
+              "survived": false
+            },
+            {
+              "final_distance": 2.4637787342071533,
+              "reward": 109.39890180528164,
+              "seed": "2",
+              "steps": 174,
+              "survived": false
+            },
+            {
+              "final_distance": 2.577849864959717,
+              "reward": 93.91107703745365,
+              "seed": "42",
+              "steps": 162,
+              "survived": false
+            },
+            {
+              "final_distance": 2.7568986415863037,
+              "reward": 91.18308925628662,
+              "seed": "18446744073709551615",
+              "steps": 161,
+              "survived": false
+            }
+          ],
+          "lesson": "hover",
+          "passed": false
+        },
+        "lesson": "hover",
+        "lesson_limit": 600,
+        "lesson_updates": 160
+      },
+      "entropy": -2.338172447984107,
+      "event": "progress",
+      "optimizer_steps": 1340,
+      "status": "training",
+      "transitions": 81920,
+      "updates": 160
+    },
+    {
+      "actor_learning_rate": 0.0003,
+      "actor_loss": 0.0002613426186144352,
+      "approximate_kl": -0.00030677783070132136,
+      "critic_learning_rate": 0.001,
+      "critic_loss": 9.010567847639322,
+      "curriculum": {
+        "evaluation": {
+          "episodes": [
+            {
+              "final_distance": 3.944282293319702,
+              "reward": 81.81111915409565,
+              "seed": "0",
+              "steps": 219,
+              "survived": false
+            },
+            {
+              "final_distance": 6.1138014793396,
+              "reward": 106.58588052727282,
+              "seed": "1",
+              "steps": 267,
+              "survived": false
+            },
+            {
+              "final_distance": 4.885866641998291,
+              "reward": 101.20799767971039,
+              "seed": "2",
+              "steps": 259,
+              "survived": false
+            },
+            {
+              "final_distance": 3.896223783493042,
+              "reward": 90.82490788027644,
+              "seed": "42",
+              "steps": 228,
+              "survived": false
+            },
+            {
+              "final_distance": 4.345278739929199,
+              "reward": 84.45158793777227,
+              "seed": "18446744073709551615",
+              "steps": 228,
+              "survived": false
+            }
+          ],
+          "lesson": "hover",
+          "passed": false
+        },
+        "lesson": "hover",
+        "lesson_limit": 600,
+        "lesson_updates": 180
+      },
+      "entropy": -2.3455920815467834,
+      "event": "progress",
+      "optimizer_steps": 1496,
+      "status": "training",
+      "transitions": 92160,
+      "updates": 180
+    },
+    {
+      "actor_learning_rate": 0.0003,
+      "actor_loss": -0.005852648275322281,
+      "approximate_kl": 0.0027202357853895096,
+      "critic_learning_rate": 0.001,
+      "critic_loss": 4.182827624041238,
+      "curriculum": {
+        "evaluation": {
+          "episodes": [
+            {
+              "final_distance": 2.18755841255188,
+              "reward": 123.45900963246822,
+              "seed": "0",
+              "steps": 207,
+              "survived": false
+            },
+            {
+              "final_distance": 2.1717607975006104,
+              "reward": 252.51305304467678,
+              "seed": "1",
+              "steps": 327,
+              "survived": false
+            },
+            {
+              "final_distance": 1.833471655845642,
+              "reward": 212.67222011089325,
+              "seed": "2",
+              "steps": 283,
+              "survived": false
+            },
+            {
+              "final_distance": 2.0865297317504883,
+              "reward": 144.8376982063055,
+              "seed": "42",
+              "steps": 223,
+              "survived": false
+            },
+            {
+              "final_distance": 2.1887166500091553,
+              "reward": 141.37739673256874,
+              "seed": "18446744073709551615",
+              "steps": 226,
+              "survived": false
+            }
+          ],
+          "lesson": "hover",
+          "passed": false
+        },
+        "lesson": "hover",
+        "lesson_limit": 600,
+        "lesson_updates": 200
+      },
+      "entropy": -2.343056848505512,
+      "event": "progress",
+      "optimizer_steps": 1636,
+      "status": "training",
+      "transitions": 102400,
+      "updates": 200
+    },
+    {
+      "actor_learning_rate": 0.0003,
+      "actor_loss": -0.006424719875212759,
+      "approximate_kl": 0.00520571490392286,
+      "critic_learning_rate": 0.001,
+      "critic_loss": 7.637984828092158,
+      "curriculum": {
+        "evaluation": {
+          "episodes": [
+            {
+              "final_distance": 4.21295166015625,
+              "reward": 143.1112827155739,
+              "seed": "0",
+              "steps": 400,
+              "survived": false
+            },
+            {
+              "final_distance": 12.493287086486816,
+              "reward": 147.5738747868745,
+              "seed": "1",
+              "steps": 440,
+              "survived": false
+            },
+            {
+              "final_distance": 10.412049293518066,
+              "reward": 158.75203252234496,
+              "seed": "2",
+              "steps": 437,
+              "survived": false
+            },
+            {
+              "final_distance": 4.742173671722412,
+              "reward": 145.45813858043402,
+              "seed": "42",
+              "steps": 398,
+              "survived": false
+            },
+            {
+              "final_distance": 4.77282190322876,
+              "reward": 153.64033265784383,
+              "seed": "18446744073709551615",
+              "steps": 419,
+              "survived": false
+            }
+          ],
+          "lesson": "hover",
+          "passed": false
+        },
+        "lesson": "hover",
+        "lesson_limit": 600,
+        "lesson_updates": 220
+      },
+      "entropy": -2.3714983703102916,
+      "event": "progress",
+      "optimizer_steps": 1776,
+      "status": "training",
+      "transitions": 112640,
+      "updates": 220
+    },
+    {
+      "actor_learning_rate": 0.0003,
+      "actor_loss": -0.0013334665854927152,
+      "approximate_kl": -0.0006617811623072668,
+      "critic_learning_rate": 0.001,
+      "critic_loss": 39.59559256298235,
+      "curriculum": {
+        "evaluation": {
+          "episodes": [
+            {
+              "final_distance": 1.3393408060073853,
+              "reward": 253.38710609078407,
+              "seed": "0",
+              "steps": 500,
+              "survived": true
+            },
+            {
+              "final_distance": 1.8539268970489502,
+              "reward": 282.7750066071749,
+              "seed": "1",
+              "steps": 500,
+              "survived": true
+            },
+            {
+              "final_distance": 1.5613175630569458,
+              "reward": 295.4162814617157,
+              "seed": "2",
+              "steps": 500,
+              "survived": true
+            },
+            {
+              "final_distance": 1.0478460788726807,
+              "reward": 303.9345369338989,
+              "seed": "42",
+              "steps": 500,
+              "survived": true
+            },
+            {
+              "final_distance": 1.4652034044265747,
+              "reward": 259.988914757967,
+              "seed": "18446744073709551615",
+              "steps": 500,
+              "survived": true
+            }
+          ],
+          "lesson": "hover",
+          "passed": false
+        },
+        "lesson": "hover",
+        "lesson_limit": 600,
+        "lesson_updates": 240
+      },
+      "entropy": -2.3798573836684227,
+      "event": "progress",
+      "optimizer_steps": 1912,
+      "status": "training",
+      "transitions": 122880,
+      "updates": 240
+    },
+    {
+      "actor_learning_rate": 0.0003,
+      "actor_loss": -0.014081811532378197,
+      "approximate_kl": 0.010422411549370736,
+      "critic_learning_rate": 0.001,
+      "critic_loss": 4.074567332863808,
+      "curriculum": {
+        "evaluation": {
+          "episodes": [
+            {
+              "final_distance": 1.279540777206421,
+              "reward": 297.94005408883095,
+              "seed": "0",
+              "steps": 500,
+              "survived": true
+            },
+            {
+              "final_distance": 1.2500271797180176,
+              "reward": 261.8464187681675,
+              "seed": "1",
+              "steps": 500,
+              "survived": true
+            },
+            {
+              "final_distance": 1.239972710609436,
+              "reward": 277.44573366642,
+              "seed": "2",
+              "steps": 500,
+              "survived": true
+            },
+            {
+              "final_distance": 1.2665634155273438,
+              "reward": 286.6967227756977,
+              "seed": "42",
+              "steps": 500,
+              "survived": true
+            },
+            {
+              "final_distance": 1.2549289464950562,
+              "reward": 295.3379815816879,
+              "seed": "18446744073709551615",
+              "steps": 500,
+              "survived": true
+            }
+          ],
+          "lesson": "hover",
+          "passed": false
+        },
+        "lesson": "hover",
+        "lesson_limit": 600,
+        "lesson_updates": 260
+      },
+      "entropy": -2.381160020828247,
+      "event": "progress",
+      "optimizer_steps": 2036,
+      "status": "training",
+      "transitions": 133120,
+      "updates": 260
+    },
+    {
+      "actor_learning_rate": 0.0003,
+      "actor_loss": -0.0059421351324999705,
+      "approximate_kl": 0.009132505006391513,
+      "critic_learning_rate": 0.001,
+      "critic_loss": 2.0781369526521303,
+      "curriculum": {
+        "evaluation": {
+          "episodes": [
+            {
+              "final_distance": 0.5980514287948608,
+              "reward": 404.9883655309677,
+              "seed": "0",
+              "steps": 500,
+              "survived": true
+            },
+            {
+              "final_distance": 0.5400440096855164,
+              "reward": 442.0082103610039,
+              "seed": "1",
+              "steps": 500,
+              "survived": true
+            },
+            {
+              "final_distance": 0.560250461101532,
+              "reward": 433.97965455055237,
+              "seed": "2",
+              "steps": 500,
+              "survived": true
+            },
+            {
+              "final_distance": 0.5867524147033691,
+              "reward": 418.0156062245369,
+              "seed": "42",
+              "steps": 500,
+              "survived": true
+            },
+            {
+              "final_distance": 0.5839502215385437,
+              "reward": 414.49243599176407,
+              "seed": "18446744073709551615",
+              "steps": 500,
+              "survived": true
+            }
+          ],
+          "lesson": "hover",
+          "passed": false
+        },
+        "lesson": "hover",
+        "lesson_limit": 600,
+        "lesson_updates": 280
+      },
+      "entropy": -2.3671573742758483,
+      "event": "progress",
+      "optimizer_steps": 2160,
+      "status": "training",
+      "transitions": 143360,
+      "updates": 280
+    },
+    {
+      "actor_learning_rate": 0.0003,
+      "actor_loss": -0.005203400272876024,
+      "approximate_kl": 0.000392584886867553,
+      "critic_learning_rate": 0.001,
+      "critic_loss": 2.1589819132350385,
+      "curriculum": {
+        "evaluation": {
+          "episodes": [
+            {
+              "final_distance": 0.24970288574695587,
+              "reward": 456.35517966747284,
+              "seed": "0",
+              "steps": 500,
+              "survived": true
+            },
+            {
+              "final_distance": 0.3019337058067322,
+              "reward": 472.9947932958603,
+              "seed": "1",
+              "steps": 500,
+              "survived": true
+            },
+            {
+              "final_distance": 0.27620255947113037,
+              "reward": 475.12346160411835,
+              "seed": "2",
+              "steps": 500,
+              "survived": true
+            },
+            {
+              "final_distance": 0.2594248056411743,
+              "reward": 468.3705521225929,
+              "seed": "42",
+              "steps": 500,
+              "survived": true
+            },
+            {
+              "final_distance": 0.25457271933555603,
+              "reward": 460.53467881679535,
+              "seed": "18446744073709551615",
+              "steps": 500,
+              "survived": true
+            }
+          ],
+          "lesson": "hover",
+          "passed": true
+        },
+        "lesson": "recovery",
+        "lesson_limit": 600,
+        "lesson_updates": 0
+      },
+      "entropy": -2.391354560852051,
+      "event": "progress",
+      "optimizer_steps": 2280,
+      "status": "training",
+      "transitions": 153600,
+      "updates": 300
+    },
+    {
+      "actor_learning_rate": 0.0003,
+      "actor_loss": -0.010033469647169113,
+      "approximate_kl": 0.009736901614814997,
+      "critic_learning_rate": 0.001,
+      "critic_loss": 1.548290602862835,
+      "curriculum": {
+        "evaluation": {
+          "episodes": [
+            {
+              "final_distance": 0.2807428240776062,
+              "reward": 465.2521493434906,
+              "seed": "0",
+              "steps": 500,
+              "survived": true
+            },
+            {
+              "final_distance": 0.28567612171173096,
+              "reward": 458.6870867013931,
+              "seed": "1",
+              "steps": 500,
+              "survived": true
+            },
+            {
+              "final_distance": 0.31997838616371155,
+              "reward": 467.62073171138763,
+              "seed": "2",
+              "steps": 500,
+              "survived": true
+            },
+            {
+              "final_distance": 0.3229046165943146,
+              "reward": 439.2295553088188,
+              "seed": "42",
+              "steps": 500,
+              "survived": true
+            },
+            {
+              "final_distance": 0.3348578214645386,
+              "reward": 467.88012742996216,
+              "seed": "18446744073709551615",
+              "steps": 500,
+              "survived": true
+            }
+          ],
+          "lesson": "recovery",
+          "passed": true
+        },
+        "lesson": "recovery",
+        "lesson_limit": 600,
+        "lesson_updates": 20
+      },
+      "entropy": -2.3897600769996643,
+      "event": "progress",
+      "optimizer_steps": 2368,
+      "status": "complete",
+      "transitions": 163840,
+      "updates": 320
+    },
+    {
+      "baseline": [
+        {
+          "final_distance": 6.703430652618408,
+          "reward": 39.76732603833079,
+          "seed": "0",
+          "steps": 85,
+          "survived": false
+        },
+        {
+          "final_distance": 8.140289306640625,
+          "reward": 67.04166154097766,
+          "seed": "1",
+          "steps": 130,
+          "survived": false
+        },
+        {
+          "final_distance": 11.053842544555664,
+          "reward": 85.61805526912212,
+          "seed": "2",
+          "steps": 176,
+          "survived": false
+        },
+        {
+          "final_distance": 9.496874809265137,
+          "reward": 44.842814203351736,
+          "seed": "42",
+          "steps": 274,
+          "survived": false
+        },
+        {
+          "final_distance": 4.324670314788818,
+          "reward": 46.12651114910841,
+          "seed": "18446744073709551615",
+          "steps": 79,
+          "survived": false
+        }
+      ],
+      "episodes": [
+        {
+          "final_distance": 0.2807428240776062,
+          "reward": 465.2521493434906,
+          "seed": "0",
+          "steps": 500,
+          "survived": true
+        },
+        {
+          "final_distance": 0.28567612171173096,
+          "reward": 458.6870867013931,
+          "seed": "1",
+          "steps": 500,
+          "survived": true
+        },
+        {
+          "final_distance": 0.31997838616371155,
+          "reward": 467.62073171138763,
+          "seed": "2",
+          "steps": 500,
+          "survived": true
+        },
+        {
+          "final_distance": 0.3229046165943146,
+          "reward": 439.2295553088188,
+          "seed": "42",
+          "steps": 500,
+          "survived": true
+        },
+        {
+          "final_distance": 0.3348578214645386,
+          "reward": 467.88012742996216,
+          "seed": "18446744073709551615",
+          "steps": 500,
+          "survived": true
+        }
+      ],
+      "event": "evaluation"
+    }
+  ],
+  "startedAt": "2026-10-09T01:25:59.178Z",
+  "status": "Training complete. Test the checkpoint before using it.",
+  "date": "2026-10-08",
+  "training_seed": 7,
+  "hover_updates": 300,
+  "recovery_updates": 20,
+  "updates": 320,
+  "transitions": 163840,
+  "runtime": "build-460aff23e4292a9214631a7180419359b53bd03d4bc1ae1898455e45b38d883b",
+  "checkpoint_sha256": "47b6021f2becfc3fa6415a956ae959abd6b15e7f08d1d4e19b9ce6c92a461430",
+  "checkpoint_bytes": 46343,
+  "native_qualification": {
+    "baseline": [
+      {
+        "final_distance": 5.318605899810791,
+        "reward": 36.52009482495487,
+        "seed": 18446744073709551614,
+        "steps": 83,
+        "survived": false
+      },
+      {
+        "final_distance": 12.299566268920898,
+        "reward": 38.03894038219005,
+        "seed": 18446744073709551613,
+        "steps": 134,
+        "survived": false
+      },
+      {
+        "final_distance": 4.97501277923584,
+        "reward": 30.657243944704533,
+        "seed": 18446744073709551612,
+        "steps": 68,
+        "survived": false
+      },
+      {
+        "final_distance": 4.298341751098633,
+        "reward": 64.45854449272156,
+        "seed": 18446744073709551611,
+        "steps": 100,
+        "survived": false
+      },
+      {
+        "final_distance": 8.118802070617676,
+        "reward": 46.21538455225527,
+        "seed": 18446744073709551610,
+        "steps": 119,
+        "survived": false
+      },
+      {
+        "final_distance": 6.560845375061035,
+        "reward": 44.51394037716091,
+        "seed": 18446744073709551609,
+        "steps": 110,
+        "survived": false
+      },
+      {
+        "final_distance": 12.605446815490723,
+        "reward": 55.6765206954442,
+        "seed": 18446744073709551608,
+        "steps": 162,
+        "survived": false
+      },
+      {
+        "final_distance": 9.660634994506836,
+        "reward": 42.565846340730786,
+        "seed": 18446744073709551607,
+        "steps": 106,
+        "survived": false
+      },
+      {
+        "final_distance": 5.643832206726074,
+        "reward": 36.566482465714216,
+        "seed": 18446744073709551606,
+        "steps": 85,
+        "survived": false
+      },
+      {
+        "final_distance": 9.493358612060547,
+        "reward": 44.24217859655619,
+        "seed": 18446744073709551605,
+        "steps": 113,
+        "survived": false
+      },
+      {
+        "final_distance": 5.714730262756348,
+        "reward": 65.17272375710309,
+        "seed": 18446744073709551604,
+        "steps": 112,
+        "survived": false
+      },
+      {
+        "final_distance": 10.299129486083984,
+        "reward": 40.823047215119004,
+        "seed": 18446744073709551603,
+        "steps": 109,
+        "survived": false
+      },
+      {
+        "final_distance": 5.091660499572754,
+        "reward": 35.56675407290459,
+        "seed": 18446744073709551602,
+        "steps": 73,
+        "survived": false
+      },
+      {
+        "final_distance": 10.363314628601074,
+        "reward": 80.9942749789916,
+        "seed": 18446744073709551601,
+        "steps": 158,
+        "survived": false
+      },
+      {
+        "final_distance": 5.590290069580078,
+        "reward": 41.43863572180271,
+        "seed": 18446744073709551600,
+        "steps": 86,
+        "survived": false
+      },
+      {
+        "final_distance": 9.172889709472656,
+        "reward": 46.6295315977186,
+        "seed": 18446744073709551599,
+        "steps": 138,
+        "survived": false
+      },
+      {
+        "final_distance": 10.167458534240723,
+        "reward": 49.997354401275516,
+        "seed": 18446744073709551598,
+        "steps": 127,
+        "survived": false
+      },
+      {
+        "final_distance": 9.266576766967773,
+        "reward": 54.29360469337553,
+        "seed": 18446744073709551597,
+        "steps": 130,
+        "survived": false
+      },
+      {
+        "final_distance": 7.512791156768799,
+        "reward": 44.3140342598781,
+        "seed": 18446744073709551596,
+        "steps": 96,
+        "survived": false
+      },
+      {
+        "final_distance": 10.280525207519531,
+        "reward": 40.308346879668534,
+        "seed": 18446744073709551595,
+        "steps": 113,
+        "survived": false
+      },
+      {
+        "final_distance": 6.530902862548828,
+        "reward": 57.44178494811058,
+        "seed": 18446744073709551594,
+        "steps": 125,
+        "survived": false
+      },
+      {
+        "final_distance": 7.126069068908691,
+        "reward": 59.798052582889795,
+        "seed": 18446744073709551593,
+        "steps": 114,
+        "survived": false
+      },
+      {
+        "final_distance": 10.769185066223145,
+        "reward": 48.656833332031965,
+        "seed": 18446744073709551592,
+        "steps": 161,
+        "survived": false
+      },
+      {
+        "final_distance": 4.787629127502441,
+        "reward": 58.17479284852743,
+        "seed": 18446744073709551591,
+        "steps": 101,
+        "survived": false
+      },
+      {
+        "final_distance": 6.034978866577148,
+        "reward": 43.38746269792318,
+        "seed": 18446744073709551590,
+        "steps": 86,
+        "survived": false
+      },
+      {
+        "final_distance": 6.934301376342773,
+        "reward": 41.58653873205185,
+        "seed": 18446744073709551589,
+        "steps": 108,
+        "survived": false
+      },
+      {
+        "final_distance": 6.156650543212891,
+        "reward": 63.541186356917024,
+        "seed": 18446744073709551588,
+        "steps": 113,
+        "survived": false
+      },
+      {
+        "final_distance": 4.5344624519348145,
+        "reward": 34.468962989747524,
+        "seed": 18446744073709551587,
+        "steps": 72,
+        "survived": false
+      },
+      {
+        "final_distance": 4.932950496673584,
+        "reward": 36.64577963575721,
+        "seed": 18446744073709551586,
+        "steps": 78,
+        "survived": false
+      },
+      {
+        "final_distance": 6.478582382202148,
+        "reward": 55.655933890491724,
+        "seed": 18446744073709551585,
+        "steps": 123,
+        "survived": false
+      },
+      {
+        "final_distance": 6.678362846374512,
+        "reward": 51.25705736875534,
+        "seed": 18446744073709551584,
+        "steps": 117,
+        "survived": false
+      },
+      {
+        "final_distance": 5.185561180114746,
+        "reward": 34.26987587660551,
+        "seed": 18446744073709551583,
+        "steps": 73,
+        "survived": false
+      }
+    ],
+    "episodes": [
+      {
+        "final_distance": 0.32057613134384155,
+        "reward": 446.17771875858307,
+        "seed": 18446744073709551614,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.27955564856529236,
+        "reward": 443.2742014527321,
+        "seed": 18446744073709551613,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.29878613352775574,
+        "reward": 411.28588730096817,
+        "seed": 18446744073709551612,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.3257698118686676,
+        "reward": 463.3119366765022,
+        "seed": 18446744073709551611,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.291776567697525,
+        "reward": 419.3579720258713,
+        "seed": 18446744073709551610,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.2660600244998932,
+        "reward": 436.4796075820923,
+        "seed": 18446744073709551609,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.31889262795448303,
+        "reward": 477.5370606780052,
+        "seed": 18446744073709551608,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.34172993898391724,
+        "reward": 389.2901832461357,
+        "seed": 18446744073709551607,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.28318503499031067,
+        "reward": 401.7412419319153,
+        "seed": 18446744073709551606,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.38048356771469116,
+        "reward": 472.20220172405243,
+        "seed": 18446744073709551605,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.4012778401374817,
+        "reward": 370.01791828870773,
+        "seed": 18446744073709551604,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.4005112648010254,
+        "reward": 396.2324221134186,
+        "seed": 18446744073709551603,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.284766286611557,
+        "reward": 419.94768488407135,
+        "seed": 18446744073709551602,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.3709183633327484,
+        "reward": 464.0440785288811,
+        "seed": 18446744073709551601,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.327502578496933,
+        "reward": 454.68674701452255,
+        "seed": 18446744073709551600,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.34843209385871887,
+        "reward": 349.57386231422424,
+        "seed": 18446744073709551599,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.2567867636680603,
+        "reward": 455.6823946237564,
+        "seed": 18446744073709551598,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.4139370322227478,
+        "reward": 447.29386925697327,
+        "seed": 18446744073709551597,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.33196768164634705,
+        "reward": 426.5538391470909,
+        "seed": 18446744073709551596,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.3809363543987274,
+        "reward": 423.60206627845764,
+        "seed": 18446744073709551595,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.4785456359386444,
+        "reward": 376.17486757040024,
+        "seed": 18446744073709551594,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.26273515820503235,
+        "reward": 453.6535259485245,
+        "seed": 18446744073709551593,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.35547494888305664,
+        "reward": 365.53852766752243,
+        "seed": 18446744073709551592,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.30055394768714905,
+        "reward": 409.4700537323952,
+        "seed": 18446744073709551591,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.28425392508506775,
+        "reward": 465.6641597747803,
+        "seed": 18446744073709551590,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.2542257606983185,
+        "reward": 468.25890678167343,
+        "seed": 18446744073709551589,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.28288501501083374,
+        "reward": 425.25891399383545,
+        "seed": 18446744073709551588,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.5627880692481995,
+        "reward": 364.9192506670952,
+        "seed": 18446744073709551587,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.2899748384952545,
+        "reward": 418.5083312392235,
+        "seed": 18446744073709551586,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.4023627042770386,
+        "reward": 440.12003207206726,
+        "seed": 18446744073709551585,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.22122140228748322,
+        "reward": 457.7202953696251,
+        "seed": 18446744073709551584,
+        "steps": 500,
+        "survived": true
+      },
+      {
+        "final_distance": 0.24194398522377014,
+        "reward": 450.2150499224663,
+        "seed": 18446744073709551583,
+        "steps": 500,
+        "survived": true
+      }
+    ],
+    "mean_final_distance": 0.3300255355425179,
+    "mean_reward": 426.9935877677053,
+    "survived": 32
+  },
+  "wasm_qualification": {
+    "command": "nix run .#drone-browser-check",
+    "test": "browser_curriculum_checkpoint_recovers_on_held_out_seeds",
+    "passed": true,
+    "suite_tests": 15
+  },
+  "limitations": [
+    "This intact-flight curriculum does not test motor failure or pursuit.",
+    "The browser took 320 updates and the native curriculum took 300 with the same seed; bit-identical training trajectories are not claimed.",
+    "No efficiency advantage over the separate 260-update direct-recovery run is claimed."
+  ],
+  "completed_ui": {
+    "css_viewport": [
+      390,
+      780
+    ],
+    "body_width_css_pixels": 375,
+    "horizontal_overflow": false,
+    "download_clicked": true,
+    "export_unchanged_after_download": true,
+    "operating_system_download_receipt_verified": false,
+    "physical_touch_input_verified": false
+  }
+}

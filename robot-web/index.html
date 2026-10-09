@@ -17,6 +17,11 @@
       <section class="training" aria-labelledby="training-title">
         <h1 id="training-title">Train recovery</h1>
         <form id="training-form">
+          <label for="training-mode">Training task</label>
+          <select id="training-mode" name="mode">
+            <option value="recovery">Disturbed recovery</option>
+            <option value="curriculum">Curriculum: hover, then recovery</option>
+          </select>
           <label for="training-seed">Seed</label>
           <input id="training-seed" name="seed" type="number" required min="0" max="4294967295" step="1" value="7">
           <div class="actions">
@@ -27,6 +32,7 @@
         <p id="training-status" role="status">Training starts from random weights.</p>
         <label for="training-progress" id="training-count">0 / 260 updates</label>
         <progress id="training-progress" max="260" value="0"></progress>
+        <p id="lesson-score" hidden></p>
         <p id="training-steps">0 simulation steps</p>
         <dl class="rates">
           <dt>Policy learning rate</dt><dd id="policy-rate">Not started</dd>

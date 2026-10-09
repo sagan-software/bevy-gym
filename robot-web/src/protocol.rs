@@ -18,6 +18,11 @@ enum Command {
         /// Unsigned 32-bit root seed, exactly representable in JavaScript.
         seed: u32,
     },
+    /// Start the native two-lesson curriculum with a 600-update budget per lesson.
+    StartCurriculum {
+        /// Unsigned root seed with the same boundary as direct recovery.
+        seed: u32,
+    },
     /// Collect and optimize one batch; the host controls pacing.
     Advance {},
     /// Copy the current inference checkpoint without modifying the run.
@@ -59,22 +64,34 @@ fn execute(session: &mut Session, command: Command) -> Result<Value, Failure> {
                 "actor_learning_rate": config.actor_learning_rate,
                 "critic_learning_rate": config.critic_learning_rate}))
         }
+        Command::StartCurriculum { seed } => {
+            session.start_curriculum(seed)?;
+            let config = learning_config();
+            Ok(
+                json!({"event":"started", "seed":seed, "updates":0, "transitions":0,
+                "update_limit": 2 * crate::curriculum::LESSON_LIMIT,
+                "curriculum": session.progress()?.1,
+                "actor_learning_rate":config.actor_learning_rate,
+                "critic_learning_rate":config.critic_learning_rate}),
+            )
+        }
         Command::Advance {} => {
             let (updates, metrics) = session.advance()?;
-            let status = if updates == UPDATE_LIMIT {
-                "complete"
-            } else {
-                "training"
-            };
-            Ok(
-                json!({"event": "progress", "status": status, "updates": updates,
+            let (status, curriculum) = session.progress()?;
+            let mut result = json!({"event": "progress", "status": status, "updates": updates,
                 "transitions": u64::from(updates) * 512,
                 "optimizer_steps": metrics.optimizer_steps,
                 "actor_loss": metrics.actor_loss, "critic_loss": metrics.critic_loss,
                 "entropy": metrics.entropy, "approximate_kl": metrics.approximate_kl,
                 "actor_learning_rate": metrics.actor_learning_rate,
-                "critic_learning_rate": metrics.critic_learning_rate}),
-            )
+                "critic_learning_rate": metrics.critic_learning_rate});
+            if let Some(curriculum) = curriculum {
+                result
+                    .as_object_mut()
+                    .expect("progress is a JSON object")
+                    .insert("curriculum".into(), curriculum);
+            }
+            Ok(result)
         }
         Command::Export {} => Ok(json!({"event": "policy", "bytes": session.export()?})),
         Command::Evaluate { bytes } => {
@@ -92,14 +109,15 @@ fn score(bytes: Vec<u8>) -> Result<Value, Box<dyn std::error::Error>> {
     let [episodes, constant] = [episodes, constant].map(|scores| {
         scores
             .into_iter()
-            .map(|episode| {
-                json!({
-                    "seed": episode.seed.to_string(), "steps": episode.steps,
-                    "reward": episode.reward, "final_distance": episode.final_distance,
-                    "survived": episode.survived
-                })
-            })
+            .map(|episode| episode_json(&episode))
             .collect::<Vec<_>>()
     });
     Ok(json!({"event": "evaluation", "episodes": episodes, "baseline": constant}))
+}
+
+/// Preserve every seed bit at the JavaScript boundary.
+pub(crate) fn episode_json(episode: &crate::learning::evaluation::EpisodeScore) -> Value {
+    json!({"seed": episode.seed.to_string(), "steps": episode.steps,
+        "reward": episode.reward, "final_distance": episode.final_distance,
+        "survived": episode.survived})
 }

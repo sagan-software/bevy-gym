@@ -1,0 +1,142 @@
+{
+  "date": "2026-10-08",
+  "baseline_commit": "7b68da2f78ffe099a70d4f9ebe6c14f5de272f0e",
+  "native_tests": 25,
+  "controller_tests": 20,
+  "commands": [
+    "cargo llvm-cov --branch -p bevy-gym-drone-worker --test protocol --json",
+    "Explicit llvm-cov export of the instrumented protocol integration executable",
+    "node --test --experimental-test-coverage robot-web/tests/training.test.mjs"
+  ],
+  "files": [
+    {
+      "path": "robot-web/src/curriculum.rs",
+      "sha256": "4ec91f66194edd51e2a2a0fa2db3286aefc12ac33fcb783a3972286b3afa5bf5",
+      "summary": {
+        "branches": {
+          "count": 10,
+          "covered": 10,
+          "notcovered": 0,
+          "percent": 100
+        },
+        "functions": {
+          "count": 13,
+          "covered": 13,
+          "percent": 100
+        },
+        "instantiations": {
+          "count": 13,
+          "covered": 13,
+          "percent": 100
+        },
+        "lines": {
+          "count": 108,
+          "covered": 108,
+          "percent": 100
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 224,
+          "covered": 220,
+          "notcovered": 4,
+          "percent": 98.21428571428571
+        }
+      }
+    },
+    {
+      "path": "robot-web/src/protocol.rs",
+      "sha256": "9a53fc807d1048042fb0b99ab3496df2b288bad475417b9e200ef5a895d18406",
+      "summary": {
+        "branches": {
+          "count": 4,
+          "covered": 4,
+          "notcovered": 0,
+          "percent": 100
+        },
+        "functions": {
+          "count": 10,
+          "covered": 10,
+          "percent": 100
+        },
+        "instantiations": {
+          "count": 10,
+          "covered": 10,
+          "percent": 100
+        },
+        "lines": {
+          "count": 72,
+          "covered": 72,
+          "percent": 100
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 148,
+          "covered": 142,
+          "notcovered": 6,
+          "percent": 95.94594594594594
+        }
+      }
+    },
+    {
+      "path": "robot-web/src/session.rs",
+      "sha256": "a981b07d9094f56fd6e8164a03f11e96149fe63df7a2b064bd6421f020562bd3",
+      "summary": {
+        "branches": {
+          "count": 18,
+          "covered": 17,
+          "notcovered": 1,
+          "percent": 94.44444444444444
+        },
+        "functions": {
+          "count": 21,
+          "covered": 19,
+          "percent": 90.47619047619048
+        },
+        "instantiations": {
+          "count": 27,
+          "covered": 24,
+          "percent": 88.88888888888889
+        },
+        "lines": {
+          "count": 280,
+          "covered": 277,
+          "percent": 98.92857142857143
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 427,
+          "covered": 412,
+          "notcovered": 15,
+          "percent": 96.4871194379391
+        }
+      }
+    }
+  ],
+  "controller_coverage": {
+    "line_percent": 100,
+    "branch_percent": 99.43,
+    "function_percent": 96.55
+  },
+  "gaps": [
+    "File summaries include internal tests. The one unhit session branch is the test-only failed pattern-match assertion.",
+    "Session initialization and checkpoint serialization error closures remain unforced; the fixed valid recipe and in-memory recorder do not provide a supported way to trigger them.",
+    "The question-mark error paths for optimizer update and evaluation serialization/reload are not all forced; failed collection and invalid numerical metrics are exercised.",
+    "Worker WASM message adapter and DOM panel lack instrumented coverage. Actual browser behavior remains a separate gate.",
+    "The controller default Worker factory is exercised by browser execution rather than Node. Its defensive already-pending-request guard is unreachable through permitted public phases."
+  ]
+}

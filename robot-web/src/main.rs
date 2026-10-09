@@ -1,8 +1,13 @@
 //! Dedicated worker for the recovery lesson's existing CPU trainer.
 
 #[cfg(target_arch = "wasm32")]
+mod curriculum;
+#[cfg(target_arch = "wasm32")]
 #[path = "../../examples/robots/learning/mod.rs"]
 mod learning;
+#[cfg(target_arch = "wasm32")]
+#[path = "../../examples/robots/curriculum/lesson.rs"]
+mod lesson;
 #[cfg(target_arch = "wasm32")]
 mod protocol;
 #[cfg(target_arch = "wasm32")]

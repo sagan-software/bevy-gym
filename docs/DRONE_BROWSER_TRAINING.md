@@ -4,6 +4,82 @@ Status: browser training and checkpoint playback verified, 2026-10-08.
 A seed-7 browser run completed 260 updates and passed the frozen 32-episode
 qualification on both native and browser targets.
 
+## Browser curriculum
+
+The new training-task selector keeps direct recovery and adds the qualified native
+curriculum. `start_curriculum` accepts exactly `command` and the same required u32
+`seed`. Unknown fields, duplicate fields, null, fractional, negative, and oversized
+seeds are rejected before replacing an existing run. Existing direct-recovery
+requests and responses retain their previous shape.
+
+Curriculum stages are calm hover, disturbed recovery, complete, and exhausted.
+Each lesson has a 600-update budget. Every twentieth update scores a reloaded
+checkpoint on the five selection seeds. All five must survive, mean return must
+reach 400, and mean final distance must be at most 0.5 m. Passing at update 600
+advances or completes before exhaustion is considered. These are selection gates;
+they do not replace the 32-episode held-out qualification.
+
+Promotion retains the model and optimizer, then replaces all lanes and recurrent
+memory. Completed and exhausted runs retain exportable weights. An optimizer,
+checkpoint reload, or evaluation error discards the run. The host stops requesting
+updates at either terminal outcome. Pause waits for the current update and its
+scheduled evaluation. Discard terminates the worker.
+
+The curriculum `started` response has `update_limit: 1200` and a `curriculum` object.
+Its `progress` response also includes `curriculum`; `status` is `training`,
+`complete`, or `exhausted`. `updates` and `transitions` remain cumulative.
+The `curriculum` object has exactly these emitted members:
+
+- `lesson`: string `hover` or `recovery`, including the final lesson after stopping.
+- `lesson_updates`: integer from 0 through 600, reset to zero at promotion.
+- `lesson_limit`: integer 600.
+- `evaluation`: null before the first evaluation; otherwise an object with `lesson`,
+  boolean `passed`, and `episodes`. The five episode objects use the existing
+  score schema and selection-seed order. This lesson identifies what was evaluated,
+  even when the active lesson has just advanced.
+
+The existing `evaluate` command always scores disturbed recovery. Watching a calm
+hover checkpoint therefore tests whether it already handles disturbed starts.
+The browser controller validates lesson transitions and recomputes the selection
+gates from the reported scores before accepting progress.
+
+Twenty-five native protocol and invariant tests and twenty controller tests pass.
+Root tests, strict native/WASM Clippy, the optimized release build, and the final
+selected-worker personal-lint rechecks pass. Raw personal-lint diagnostics are clear.
+[Coverage](progress/drone-browser-curriculum-coverage.json)
+records complete measured curriculum/protocol lines and branches, plus exact
+session, controller, and browser adapter gaps.
+
+The real seed-7 browser run passed hover at update 300 and recovery after 20 more
+updates, totaling 163,840 training transitions. Its final checkpoint survived
+32/32 held-out episodes natively, with mean return 426.9936 and mean final distance
+0.3300 m. The permanent WASM test passes the same frozen qualification.
+All fifteen browser learning tests pass, including the earlier frozen models.
+
+[The run record](progress/drone-browser-curriculum.json) retains selection
+milestones, final qualification episodes, and the checkpoint hash.
+[The learning curve](progress/drone-browser-curriculum-learning.png) shows all
+three selection gates. The native curriculum took 300 updates; this browser run
+took 320. This does not establish identical training trajectories or an efficiency
+advantage over the separate 260-update direct-recovery run.
+
+[The flight recording](progress/drone-browser-curriculum-flight.mp4),
+[screenshot](progress/drone-browser-curriculum-flight.png), and
+[contact sheet](progress/drone-browser-curriculum-flight-contact.png) show the
+completed run's checkpoint playing through action 500 after Watch checkpoint.
+The panel identifies update 320 from seed 7; playback uses seed 42.
+This is intact-flight recovery. It does not demonstrate motor-failure adaptation.
+
+Pause, checkpoint playback, and resume were exercised during the same run.
+The update-8 checkpoint survived zero of five recovery episodes, with mean return
+25.0. [The earlier controls recording](progress/drone-browser-curriculum-controls.mp4)
+shows update-19 playback and resume; that checkpoint also failed its selection test.
+Desktop and 390×780 layouts were inspected; body width was 375 CSS pixels without
+horizontal overflow. The [completed narrow view](progress/drone-browser-curriculum-complete-narrow.png)
+also fits without horizontal overflow. Download checkpoint was clicked and its
+exported bytes matched the qualified model; the operating-system download receipt
+was not inspected. Native touch input was not tested.
+
 ## Contract and acceptance
 
 The worker reuses the native recovery recipe and its eight 64-action lanes.
@@ -82,7 +158,7 @@ Discard run terminates the worker and allows a fresh seed. It preserves the
 selected scene policy. Training never changes the scene policy automatically.
 
 The host states are idle, starting, running, pausing, paused, inspecting, complete,
-and failed. Only paused or complete runs with at least one update can export.
+exhausted, and failed. Paused, complete, or exhausted runs with at least one update can export.
 Loading, pausing, and evaluation disable conflicting actions. Failure allows retry.
 Worker identity guards every asynchronous continuation and pending response.
 

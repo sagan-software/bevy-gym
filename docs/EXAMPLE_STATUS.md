@@ -6,26 +6,53 @@ Updated: 2026-10-08. Goal status: active.
 
 Read [the roadmap](EXAMPLE_ROADMAP.md), [quality audit](QUALITY_AUDIT.md),
 [reference research](EXAMPLE_RESEARCH.md), and [drone contract](ROBOT_ENVIRONMENT.md).
-The native [curriculum](DRONE_CURRICULUM.md) is qualified. Seed 7 passed calm hover
-at update 280 and disturbed recovery after 20 more updates. Its saved checkpoint
-survived 32/32 held-out episodes natively and in the browser. Fourteen learning
-tests, eight curriculum tests, root tests, and strict native/WASM Clippy pass.
-The full personal-lint backlog remains; changed-line discovery is clear.
-Add browser curriculum controls next, then damaged-motor recovery and perception.
-The full native run is finished; do not restart it. Its model, scores, learning
-curve, and browser flight recording are retained under `docs/progress`.
-The browser training panel and explicit checkpoint playback are implemented.
-A full browser seed-7 run passed all 32 held-out recovery episodes on native and
-WASM targets. The original bundled model remains unchanged.
-The training-panel checkpoint `79356c4` is pushed and passes
-[CI](https://github.com/sagan-software/bevy-gym/actions/runs/37865485961).
-Its [Pages build](https://github.com/sagan-software/bevy-gym/actions/runs/37865485901)
-is in progress; the preceding worker checkpoint deployment passed.
-The earlier inference/cache Pages builds were superseded. Confirm deployment
-status before reporting the new panel as public. Local screenshots and recordings
-are linked in [the browser training guide](DRONE_BROWSER_TRAINING.md).
-Perception, damage adaptation, pursuit, and the jumping quadruped remain pending.
-Do not start later port families before the custom robot milestones.
+The [browser curriculum](DRONE_BROWSER_TRAINING.md) is qualified. Seed 7 passed
+calm hover at update 300 and disturbed recovery after 20 more updates. Its saved
+checkpoint survived 32/32 held-out episodes natively and passes the same frozen
+qualification in WASM. Mean return is 426.9936; mean final distance is 0.3300 m.
+The earlier native curriculum passed at 300 total updates. Both checkpoints and
+their separate evidence remain under `docs/progress`.
+
+Browser curriculum controls and worker transitions are ready to publish.
+The final 25 worker tests, 20 controller tests, fifteen browser learning tests,
+root tests, and strict native/WASM Clippy pass. The selected-worker personal
+checks pass with no raw diagnostics. Three large test functions missed by earlier
+changed-line filtering were split by behavior. Coverage and the optimized release
+build pass. The full root personal-lint backlog remains.
+
+The seed-7 browser run is complete. Do not retrain it to recover evidence.
+`docs/progress/drone-browser-curriculum.json` contains the run and qualification;
+`drone-browser-curriculum.mpk` contains its final 46,343-byte checkpoint.
+The T3 tab remains at `http://100.105.254.50:8777/robots/hover/` for inspection.
+Its server is `bevy-gym-curriculum-ui-server-20261009.service`, and its runtime is
+`build-460aff23e4292a9214631a7180419359b53bd03d4bc1ae1898455e45b38d883b`.
+The final gate units end with `final-gates2-20261009`, `final-wasm-20261009`,
+`final-personal2-20261009`, and `final-coverage-20261009`, prefixed by
+`bevy-gym-browser-curriculum-`.
+Logs are under `/home/sagan/.cache/bevy-gym-quality-validation/logs`.
+The final coverage, native/strict, and personal-lint units exited successfully.
+The guide/documentation command also finished: eight curriculum tests and six
+documentation tests passed; one existing plugin example remains ignored.
+
+The [motor-failure API and guide](DRONE_DAMAGE.md) are pushed as `c3ae4ad`.
+Native/WASM tests cover all sixteen actuator combinations, reset, and terminal
+rejection. Compile-fail tests protect identifiers and private health state.
+[CI](https://github.com/sagan-software/bevy-gym/actions/runs/37871626023) passed;
+[Pages](https://github.com/sagan-software/bevy-gym/actions/runs/37871625987) is running.
+The native curriculum's earlier pending Pages build was superseded.
+The damage model currently preserves mass and collision geometry.
+
+The inspected Leaper footage and licensed animated target candidate are published
+as `17c92c2`. [The research record](EXAMPLE_RESEARCH.md) links their visual evidence.
+The target's valid GLB is under `runs/quality-research/media/quaternius-adventurer.glb`;
+the earlier `.gltf` download is a quota-error HTML page and must not be used.
+
+Next, publish the browser curriculum checkpoint, then add visible actuator failure
+and train a separate damage-aware policy. Preserve the healthy model and its
+qualification. The damage contract records the current model's static thrust limit;
+do not assume recovery follows from the intact-flight force budget.
+Perception, damage adaptation, pursuit, detached parts, and the jumping quadruped
+remain pending. Do not start later port families before the custom robot milestones.
 
 Working checkout: `/home/sagan/Code/github.com/sagan-software/bevy-gym-quality`.
 Branch: `quality-roadmap-20261008`. Baseline: `232e801`.
@@ -403,10 +430,16 @@ Builds, targets, logs, and reference media live under
 `/home/sagan/.cache/bevy-gym-quality-validation/`. The `/dev/shm/bevy-gym-quality-*`
 paths are symlinks to those directories. Recreate them after a reboot. Builds use
 four jobs, or two for coverage/WASM, with development and test debug information off.
+For future personal-lint runs, use the separate `personal-target` and
+`personal-build` directories under that cache root. The personal runner uses a
+different Rust compiler; keep its Cargo artifacts separate from native validation.
+Interactive shells also supply `CFLAGS`, while the service environment leaves it
+unset. Blake3 records that variable in its build fingerprint. Use `env -u CFLAGS`
+inside the Nix shell for future native commands so both invocation paths agree.
 
 Detached units use `bevy-gym-*-20261008.service`. A passed unit has
 `SubState=exited` and `ExecMainStatus=0`; status zero while running is not a pass.
-Logs append across reruns, so read the final invocation.
+Use a separate log path for each invocation; a reused path can retain stale output.
 Both `bevy-gym-quality-ci-remainder-20261008` and `bevy-gym-drone-guides-20261008`
 passed. All viewer validation units passed. The release build and WASM execution
 also passed.

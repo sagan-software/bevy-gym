@@ -3,7 +3,7 @@ export class Training {
   #workerFactory;
   #onChange;
   #port = null;
-  #state = Object.freeze({phase: 'idle', seed: 7, updates: 0, metrics: null, recipe: null, evaluation: null, error: null});
+  #state = Object.freeze({phase: 'idle', seed: 7, mode: 'recovery', curriculum: null, updates: 0, metrics: null, recipe: null, evaluation: null, error: null});
 
   constructor(onChange, workerFactory = () => new Worker(new URL('./worker.js', import.meta.url), {type: 'module'})) {
     this.#onChange = onChange;
@@ -18,12 +18,13 @@ export class Training {
   }
 
   /** Validate before replacing state. Initialization and late replies belong to this worker only. */
-  async start(seed) {
+  async start(seed, mode = 'recovery') {
+    if (!['recovery', 'curriculum'].includes(mode)) throw new RangeError('Choose recovery or curriculum training.');
     if (!Number.isInteger(seed) || seed < 0 || seed > 0xffffffff) {
       throw new RangeError('Seed must be a whole number from 0 to 4294967295.');
     }
     if (!['idle', 'failed'].includes(this.#state.phase)) throw new Error('Discard the current run before starting another.');
-    this.#publish({phase: 'starting', seed, updates: 0, metrics: null, recipe: null, evaluation: null, error: null});
+    this.#publish({phase: 'starting', seed, mode, curriculum: null, updates: 0, metrics: null, recipe: null, evaluation: null, error: null});
     let port;
     try {
       const worker = this.#workerFactory();
@@ -34,13 +35,14 @@ export class Training {
       worker.onerror = event => this.#fail(port, new Error(event.message || 'Training worker could not start.'));
       worker.onmessageerror = () => this.#fail(port, new Error('Training worker message could not be read.'));
       await ready;
-      const result = await this.#request(port, {command: 'start', seed}, 'started');
-      if (result.seed !== seed || result.updates !== 0 || result.transitions !== 0 || result.update_limit !== 260
+      const result = await this.#request(port, {command: mode === 'curriculum' ? 'start_curriculum' : 'start', seed}, 'started');
+      if (result.seed !== seed || result.updates !== 0 || result.transitions !== 0 || result.update_limit !== (mode === 'curriculum' ? 1200 : 260)
           || result.actor_learning_rate !== 0.0003 || result.critic_learning_rate !== 0.001) {
         throw new Error('Training worker returned an incompatible recipe.');
       }
+      if (mode === 'curriculum') validateCurriculum(result.curriculum, null, 0, 'training');
       if (this.#port !== port) return;
-      this.#publish({phase: 'running', recipe: Object.freeze(result)});
+      this.#publish({phase: 'running', recipe: Object.freeze(result), curriculum: result.curriculum ?? null});
       void this.#run(port);
     } catch (error) {
       if (port === undefined) this.#publish({phase: 'failed', error: error.message});
@@ -61,13 +63,13 @@ export class Training {
   /** Cancel pending promises before releasing the old worker. Its callbacks become inert. */
   discard() {
     this.#close(new DOMException('The training run was discarded.', 'AbortError'));
-    this.#publish({phase: 'idle', updates: 0, metrics: null, recipe: null, evaluation: null, error: null});
+    this.#publish({phase: 'idle', curriculum: null, updates: 0, metrics: null, recipe: null, evaluation: null, error: null});
   }
 
   /** Freeze and score weights only when collection has stopped. */
   async checkpoint() {
     const phase = this.#state.phase;
-    if (!['paused', 'complete'].includes(phase) || this.#state.updates === 0) {
+    if (!['paused', 'complete', 'exhausted'].includes(phase) || this.#state.updates === 0) {
       throw new Error('Pause training before using a checkpoint.');
     }
     const port = this.#port;
@@ -84,7 +86,7 @@ export class Training {
       validateScores(evaluation.baseline);
       if (this.#port !== port) throw new DOMException('The training run was discarded.', 'AbortError');
       this.#publish({phase, evaluation: {...evaluation, updates}});
-      return {bytes: Uint8Array.from(policy.bytes), updates, seed: this.#state.seed};
+      return {bytes: Uint8Array.from(policy.bytes), updates, seed: this.#state.seed, mode: this.#state.mode};
     } catch (error) {
       this.#fail(port, error);
       throw error;
@@ -97,15 +99,16 @@ export class Training {
         const progress = await this.#request(port, {command: 'advance'}, 'progress');
         if (this.#port !== port) return;
         const updates = this.#state.updates + 1;
-        const status = updates === 260 ? 'complete' : 'training';
+        const status = this.#state.mode === 'curriculum' ? progress.status : updates === 260 ? 'complete' : 'training';
+        if (this.#state.mode === 'curriculum') validateCurriculum(progress.curriculum, this.#state.curriculum, updates, status);
         const values = ['actor_loss', 'critic_loss', 'entropy', 'approximate_kl', 'actor_learning_rate', 'critic_learning_rate'];
         if (progress.updates !== updates || progress.transitions !== updates * 512 || progress.status !== status
             || !Number.isSafeInteger(progress.optimizer_steps) || progress.optimizer_steps <= 0
             || !values.every(key => Number.isFinite(progress[key]))) {
           throw new Error('Training worker returned invalid progress.');
         }
-        const phase = status === 'complete' ? 'complete' : this.#state.phase === 'pausing' ? 'paused' : 'running';
-        this.#publish({phase, updates, metrics: Object.freeze(progress)});
+        const phase = ['complete', 'exhausted'].includes(status) ? status : this.#state.phase === 'pausing' ? 'paused' : 'running';
+        this.#publish({phase, updates, metrics: Object.freeze(progress), curriculum: progress.curriculum ?? null});
       }
     } catch (error) { this.#fail(port, error); }
   }
@@ -163,4 +166,33 @@ function validateScores(scores) {
     && typeof score.survived === 'boolean')) {
     throw new Error('Training worker returned invalid evaluation scores.');
   }
+}
+
+/** Verify every lesson transition against the native completion rule. */
+function validateCurriculum(course, previous, total, status) {
+  const fail = () => { throw new Error('Training worker returned invalid curriculum progress.'); };
+  if (!course || course.lesson_limit !== 600 || !['hover', 'recovery'].includes(course.lesson)
+      || !Number.isInteger(course.lesson_updates) || course.lesson_updates < 0 || course.lesson_updates > 600
+      || !Number.isInteger(total) || total < 0 || total > 1200) fail();
+  if (!previous) {
+    if (total !== 0 || course.lesson !== 'hover' || course.lesson_updates !== 0
+        || course.evaluation !== null || status !== 'training') fail();
+    return;
+  }
+  const count = previous.lesson_updates + 1;
+  let lesson = previous.lesson, nextCount = count, nextStatus = 'training';
+  if (count % 20 === 0) {
+    const evaluation = course.evaluation;
+    if (!evaluation || evaluation.lesson !== lesson) fail();
+    validateScores(evaluation.episodes);
+    const scores = evaluation.episodes;
+    const passed = scores.every(score => score.survived)
+      && scores.reduce((sum,score) => sum + score.reward,0) / 5 >= 400
+      && scores.reduce((sum,score) => sum + score.final_distance,0) / 5 <= 0.5;
+    if (evaluation.passed !== passed) fail();
+    if (passed && lesson === 'hover') { lesson = 'recovery'; nextCount = 0; }
+    else if (passed) nextStatus = 'complete';
+    else if (count === 600) nextStatus = 'exhausted';
+  } else if (JSON.stringify(course.evaluation) !== JSON.stringify(previous.evaluation)) fail();
+  if (course.lesson !== lesson || course.lesson_updates !== nextCount || status !== nextStatus) fail();
 }
