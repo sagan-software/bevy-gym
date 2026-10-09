@@ -1,0 +1,5284 @@
+{
+  "date": "2026-10-09",
+  "base_commit": "53dc4b6087328b4ab68bd3248cb02f5ff3790072",
+  "purpose": "Qualify translation and heading before sensor-only pursuit.",
+  "qualified_live_behavior_changed": false,
+  "checkpoint_sha256": "bb0bef6e7412fd79ea097fa95036d428d22962af3b259c52c82b38c894df9b76",
+  "waypoints": [
+    {
+      "controller": "direct target",
+      "source": {
+        "path": "runs/quality-research/waypoint-probe-direct.rs",
+        "sha256": "4e48ae808bcf191e988427707b24afbd17b003ae24c31ac81c84aff5abd024c2",
+        "source": "//! Temporary measurement of the frozen hover actor away from its training goal.\n#![cfg(feature = \"robots\")]\n#[path = \"../examples/robots/learning/encoding.rs\"]\nmod encoding;\n#[path = \"../examples/robots/learning/model.rs\"]\nmod model;\nuse bevy::math::Vec3;\nuse bevy_gym::{Env, robots::DroneHover};\n\n#[test]\nfn measure_waypoints() {\n    let policy = model::load_policy(include_bytes!(\"../assets/robots/recovery.mpk\").to_vec()).unwrap();\n    let mut rows = Vec::new();\n    for seed in [0, 1, 2, 42, u64::MAX] {\n        for radius in [0.0, 0.5, 1.0, 2.0, 4.0, 6.0, 8.0] {\n            for direction in [Vec3::X, Vec3::NEG_X, Vec3::Z, Vec3::NEG_Z] {\n                let target = Vec3::new(0.0, 2.0, 0.0) + direction * radius;\n                let mut env = DroneHover::disturbed();\n                let mut obs = env.reset(Some(seed)).observation;\n                let mut memory = policy.initial_memory();\n                let mut steps = 0;\n                let mut ended = false;\n                let mut min_distance = f32::MAX;\n                let mut settled = 0;\n                let mut peak_tilt = 0.0_f32;\n                for _ in 0..1000 {\n                    let mut features = encoding::encode(obs);\n                    features[..3].copy_from_slice(&(obs.orientation().inverse() * (target - obs.position()) / 2.0).to_array());\n                    let prediction = policy.mean_action(&features, &memory).unwrap();\n                    memory = prediction.next_memory;\n                    let step = env.step(encoding::decode_action(&prediction.action).unwrap());\n                    obs = step.observation;\n                    steps += 1;\n                    let distance = obs.position().distance(target);\n                    min_distance = min_distance.min(distance);\n                    if distance <= 0.5 && obs.linear_velocity().length() <= 0.5 { settled += 1; } else { settled = 0; }\n                    peak_tilt = peak_tilt.max((obs.orientation() * Vec3::Y).y.clamp(-1.0,1.0).acos());\n                    if step.is_done() { ended = true; break; }\n                }\n                rows.push(serde_json::json!({\"seed\":seed,\"target\":target.to_array(),\"steps\":steps,\"ended\":ended,\"final_distance\":obs.position().distance(target),\"minimum_distance\":min_distance,\"settled_actions\":settled,\"peak_tilt_rad\":peak_tilt}));\n            }\n        }\n    }\n    std::fs::write(\"runs/quality-research/waypoint-probe.json\", serde_json::to_vec_pretty(&rows).unwrap()).unwrap();\n}\n"
+      },
+      "episode_actions": 1000,
+      "action_seconds": 0.02,
+      "settled_definition": "Final 100 consecutive actions within 0.5 metres and speed at most 0.5 metres per second.",
+      "episodes": [
+        {
+          "ended": false,
+          "final_distance": 0.24600407481193542,
+          "minimum_distance": 0.07873815298080444,
+          "peak_tilt_rad": 0.26819151639938354,
+          "seed": 0,
+          "settled_actions": 960,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.24600407481193542,
+          "minimum_distance": 0.07873815298080444,
+          "peak_tilt_rad": 0.26819151639938354,
+          "seed": 0,
+          "settled_actions": 960,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.24600407481193542,
+          "minimum_distance": 0.07873815298080444,
+          "peak_tilt_rad": 0.26819151639938354,
+          "seed": 0,
+          "settled_actions": 960,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.24600407481193542,
+          "minimum_distance": 0.07873815298080444,
+          "peak_tilt_rad": 0.26819151639938354,
+          "seed": 0,
+          "settled_actions": 960,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.23765654861927032,
+          "minimum_distance": 0.23765654861927032,
+          "peak_tilt_rad": 0.2676711976528168,
+          "seed": 0,
+          "settled_actions": 906,
+          "steps": 1000,
+          "target": [
+            0.5,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.2543846070766449,
+          "minimum_distance": 0.136312797665596,
+          "peak_tilt_rad": 0.26947805285453796,
+          "seed": 0,
+          "settled_actions": 954,
+          "steps": 1000,
+          "target": [
+            -0.5,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.2576633393764496,
+          "minimum_distance": 0.23261195421218872,
+          "peak_tilt_rad": 0.274296373128891,
+          "seed": 0,
+          "settled_actions": 956,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.5
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.23579201102256775,
+          "minimum_distance": 0.025021549314260483,
+          "peak_tilt_rad": 0.26385316252708435,
+          "seed": 0,
+          "settled_actions": 899,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            -0.5
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.2288874238729477,
+          "minimum_distance": 0.2288874238729477,
+          "peak_tilt_rad": 0.2678379416465759,
+          "seed": 0,
+          "settled_actions": 801,
+          "steps": 1000,
+          "target": [
+            1.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.2633395195007324,
+          "minimum_distance": 0.2633395195007324,
+          "peak_tilt_rad": 0.2718915343284607,
+          "seed": 0,
+          "settled_actions": 928,
+          "steps": 1000,
+          "target": [
+            -1.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.2691482901573181,
+          "minimum_distance": 0.2691482901573181,
+          "peak_tilt_rad": 0.2836768627166748,
+          "seed": 0,
+          "settled_actions": 815,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            1.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.22891663014888763,
+          "minimum_distance": 0.05892177298665047,
+          "peak_tilt_rad": 0.26121270656585693,
+          "seed": 0,
+          "settled_actions": 892,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            -1.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.2147912085056305,
+          "minimum_distance": 0.20425520837306976,
+          "peak_tilt_rad": 0.38805198669433594,
+          "seed": 0,
+          "settled_actions": 727,
+          "steps": 1000,
+          "target": [
+            2.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.28495854139328003,
+          "minimum_distance": 0.28495854139328003,
+          "peak_tilt_rad": 0.28073254227638245,
+          "seed": 0,
+          "settled_actions": 682,
+          "steps": 1000,
+          "target": [
+            -2.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.28809913992881775,
+          "minimum_distance": 0.28809913992881775,
+          "peak_tilt_rad": 0.3211250603199005,
+          "seed": 0,
+          "settled_actions": 753,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            2.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.23322491347789764,
+          "minimum_distance": 0.22234532237052917,
+          "peak_tilt_rad": 0.4301705062389374,
+          "seed": 0,
+          "settled_actions": 853,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            -2.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 4.217197418212891,
+          "minimum_distance": 3.624329090118408,
+          "peak_tilt_rad": 1.0188713073730469,
+          "seed": 0,
+          "settled_actions": 0,
+          "steps": 86,
+          "target": [
+            4.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3965567648410797,
+          "minimum_distance": 0.2090640366077423,
+          "peak_tilt_rad": 0.7857584953308105,
+          "seed": 0,
+          "settled_actions": 681,
+          "steps": 1000,
+          "target": [
+            -4.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.31280016899108887,
+          "minimum_distance": 0.296539306640625,
+          "peak_tilt_rad": 0.49211642146110535,
+          "seed": 0,
+          "settled_actions": 709,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            4.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 2.677222490310669,
+          "minimum_distance": 1.1032495498657227,
+          "peak_tilt_rad": 1.0079954862594604,
+          "seed": 0,
+          "settled_actions": 0,
+          "steps": 142,
+          "target": [
+            0.0,
+            2.0,
+            -4.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 5.512310981750488,
+          "minimum_distance": 5.333479881286621,
+          "peak_tilt_rad": 1.641396164894104,
+          "seed": 0,
+          "settled_actions": 0,
+          "steps": 72,
+          "target": [
+            6.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 3.586179256439209,
+          "minimum_distance": 1.9494311809539795,
+          "peak_tilt_rad": 1.2683875560760498,
+          "seed": 0,
+          "settled_actions": 0,
+          "steps": 135,
+          "target": [
+            -6.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 2.1013505458831787,
+          "minimum_distance": 2.1013505458831787,
+          "peak_tilt_rad": 0.8165827989578247,
+          "seed": 0,
+          "settled_actions": 0,
+          "steps": 86,
+          "target": [
+            0.0,
+            2.0,
+            6.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 1.9403890371322632,
+          "minimum_distance": 1.6838717460632324,
+          "peak_tilt_rad": 1.05741548538208,
+          "seed": 0,
+          "settled_actions": 0,
+          "steps": 87,
+          "target": [
+            0.0,
+            2.0,
+            -6.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 7.042921543121338,
+          "minimum_distance": 6.9781646728515625,
+          "peak_tilt_rad": 1.6331619024276733,
+          "seed": 0,
+          "settled_actions": 0,
+          "steps": 73,
+          "target": [
+            8.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 2.14595103263855,
+          "minimum_distance": 1.836784839630127,
+          "peak_tilt_rad": 1.035907506942749,
+          "seed": 0,
+          "settled_actions": 0,
+          "steps": 95,
+          "target": [
+            -8.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 4.693544864654541,
+          "minimum_distance": 4.693544864654541,
+          "peak_tilt_rad": 1.2214174270629883,
+          "seed": 0,
+          "settled_actions": 0,
+          "steps": 58,
+          "target": [
+            0.0,
+            2.0,
+            8.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 4.584616184234619,
+          "minimum_distance": 4.584616184234619,
+          "peak_tilt_rad": 1.3551803827285767,
+          "seed": 0,
+          "settled_actions": 0,
+          "steps": 65,
+          "target": [
+            0.0,
+            2.0,
+            -8.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.25184571743011475,
+          "minimum_distance": 0.07148054242134094,
+          "peak_tilt_rad": 0.13929758965969086,
+          "seed": 1,
+          "settled_actions": 1000,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.25184571743011475,
+          "minimum_distance": 0.07148054242134094,
+          "peak_tilt_rad": 0.13929758965969086,
+          "seed": 1,
+          "settled_actions": 1000,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.25184571743011475,
+          "minimum_distance": 0.07148054242134094,
+          "peak_tilt_rad": 0.13929758965969086,
+          "seed": 1,
+          "settled_actions": 1000,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.25184571743011475,
+          "minimum_distance": 0.07148054242134094,
+          "peak_tilt_rad": 0.13929758965969086,
+          "seed": 1,
+          "settled_actions": 1000,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.2650265395641327,
+          "minimum_distance": 0.2650265395641327,
+          "peak_tilt_rad": 0.13925036787986755,
+          "seed": 1,
+          "settled_actions": 999,
+          "steps": 1000,
+          "target": [
+            0.5,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.23975078761577606,
+          "minimum_distance": 0.23975078761577606,
+          "peak_tilt_rad": 0.14275866746902466,
+          "seed": 1,
+          "settled_actions": 957,
+          "steps": 1000,
+          "target": [
+            -0.5,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.24545522034168243,
+          "minimum_distance": 0.13741226494312286,
+          "peak_tilt_rad": 0.1408006101846695,
+          "seed": 1,
+          "settled_actions": 915,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.5
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.25968486070632935,
+          "minimum_distance": 0.25968486070632935,
+          "peak_tilt_rad": 0.14154194295406342,
+          "seed": 1,
+          "settled_actions": 962,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            -0.5
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.27895277738571167,
+          "minimum_distance": 0.27895277738571167,
+          "peak_tilt_rad": 0.15235444903373718,
+          "seed": 1,
+          "settled_actions": 806,
+          "steps": 1000,
+          "target": [
+            1.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.22845859825611115,
+          "minimum_distance": 0.22845859825611115,
+          "peak_tilt_rad": 0.16497525572776794,
+          "seed": 1,
+          "settled_actions": 831,
+          "steps": 1000,
+          "target": [
+            -1.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.24296879768371582,
+          "minimum_distance": 0.15663133561611176,
+          "peak_tilt_rad": 0.2030450403690338,
+          "seed": 1,
+          "settled_actions": 901,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            1.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.26735079288482666,
+          "minimum_distance": 0.26735079288482666,
+          "peak_tilt_rad": 0.15851514041423798,
+          "seed": 1,
+          "settled_actions": 819,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            -1.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.30587324500083923,
+          "minimum_distance": 0.30587324500083923,
+          "peak_tilt_rad": 0.24207819998264313,
+          "seed": 1,
+          "settled_actions": 597,
+          "steps": 1000,
+          "target": [
+            2.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.20873324573040009,
+          "minimum_distance": 0.18991732597351074,
+          "peak_tilt_rad": 0.23303082585334778,
+          "seed": 1,
+          "settled_actions": 769,
+          "steps": 1000,
+          "target": [
+            -2.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.26132434606552124,
+          "minimum_distance": 0.26132434606552124,
+          "peak_tilt_rad": 0.49319377541542053,
+          "seed": 1,
+          "settled_actions": 743,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            2.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.27916139364242554,
+          "minimum_distance": 0.27916139364242554,
+          "peak_tilt_rad": 0.2388576716184616,
+          "seed": 1,
+          "settled_actions": 764,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            -2.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 1.0372822284698486,
+          "minimum_distance": 0.8272361755371094,
+          "peak_tilt_rad": 0.7777279019355774,
+          "seed": 1,
+          "settled_actions": 0,
+          "steps": 1000,
+          "target": [
+            4.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 4.3268609046936035,
+          "minimum_distance": 3.7192904949188232,
+          "peak_tilt_rad": 1.0193713903427124,
+          "seed": 1,
+          "settled_actions": 0,
+          "steps": 81,
+          "target": [
+            -4.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 4.027754783630371,
+          "minimum_distance": 1.7779946327209473,
+          "peak_tilt_rad": 1.1497995853424072,
+          "seed": 1,
+          "settled_actions": 0,
+          "steps": 111,
+          "target": [
+            0.0,
+            2.0,
+            4.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.31096524000167847,
+          "minimum_distance": 0.3002871572971344,
+          "peak_tilt_rad": 0.5084490776062012,
+          "seed": 1,
+          "settled_actions": 685,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            -4.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 2.4723541736602783,
+          "minimum_distance": 2.4723541736602783,
+          "peak_tilt_rad": 1.383523941040039,
+          "seed": 1,
+          "settled_actions": 0,
+          "steps": 136,
+          "target": [
+            6.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 6.0504021644592285,
+          "minimum_distance": 5.6613593101501465,
+          "peak_tilt_rad": 1.0727161169052124,
+          "seed": 1,
+          "settled_actions": 0,
+          "steps": 77,
+          "target": [
+            -6.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 2.7499561309814453,
+          "minimum_distance": 2.7499561309814453,
+          "peak_tilt_rad": 1.201998233795166,
+          "seed": 1,
+          "settled_actions": 0,
+          "steps": 67,
+          "target": [
+            0.0,
+            2.0,
+            6.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 2.5171377658843994,
+          "minimum_distance": 2.5171377658843994,
+          "peak_tilt_rad": 0.8629966974258423,
+          "seed": 1,
+          "settled_actions": 0,
+          "steps": 71,
+          "target": [
+            0.0,
+            2.0,
+            -6.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 3.524941921234131,
+          "minimum_distance": 3.5241429805755615,
+          "peak_tilt_rad": 1.4750685691833496,
+          "seed": 1,
+          "settled_actions": 0,
+          "steps": 100,
+          "target": [
+            8.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 8.229775428771973,
+          "minimum_distance": 7.781276226043701,
+          "peak_tilt_rad": 0.8086209297180176,
+          "seed": 1,
+          "settled_actions": 0,
+          "steps": 80,
+          "target": [
+            -8.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 5.349114418029785,
+          "minimum_distance": 5.349114418029785,
+          "peak_tilt_rad": 1.6272693872451782,
+          "seed": 1,
+          "settled_actions": 0,
+          "steps": 55,
+          "target": [
+            0.0,
+            2.0,
+            8.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 4.768126964569092,
+          "minimum_distance": 4.768126964569092,
+          "peak_tilt_rad": 1.2102999687194824,
+          "seed": 1,
+          "settled_actions": 0,
+          "steps": 60,
+          "target": [
+            0.0,
+            2.0,
+            -8.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.22300590574741364,
+          "minimum_distance": 0.07574134320020676,
+          "peak_tilt_rad": 0.12441469728946686,
+          "seed": 2,
+          "settled_actions": 1000,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.22300590574741364,
+          "minimum_distance": 0.07574134320020676,
+          "peak_tilt_rad": 0.12441469728946686,
+          "seed": 2,
+          "settled_actions": 1000,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.22300590574741364,
+          "minimum_distance": 0.07574134320020676,
+          "peak_tilt_rad": 0.12441469728946686,
+          "seed": 2,
+          "settled_actions": 1000,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.22300590574741364,
+          "minimum_distance": 0.07574134320020676,
+          "peak_tilt_rad": 0.12441469728946686,
+          "seed": 2,
+          "settled_actions": 1000,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.21343567967414856,
+          "minimum_distance": 0.14318807423114777,
+          "peak_tilt_rad": 0.12434455007314682,
+          "seed": 2,
+          "settled_actions": 934,
+          "steps": 1000,
+          "target": [
+            0.5,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.23458872735500336,
+          "minimum_distance": 0.23458872735500336,
+          "peak_tilt_rad": 0.13784076273441315,
+          "seed": 2,
+          "settled_actions": 967,
+          "steps": 1000,
+          "target": [
+            -0.5,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.21834005415439606,
+          "minimum_distance": 0.21834005415439606,
+          "peak_tilt_rad": 0.1256573498249054,
+          "seed": 2,
+          "settled_actions": 926,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.5
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.22767704725265503,
+          "minimum_distance": 0.19259442389011383,
+          "peak_tilt_rad": 0.12442430108785629,
+          "seed": 2,
+          "settled_actions": 962,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            -0.5
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.20686808228492737,
+          "minimum_distance": 0.05194461718201637,
+          "peak_tilt_rad": 0.1264699101448059,
+          "seed": 2,
+          "settled_actions": 903,
+          "steps": 1000,
+          "target": [
+            1.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.24687835574150085,
+          "minimum_distance": 0.24687835574150085,
+          "peak_tilt_rad": 0.16885772347450256,
+          "seed": 2,
+          "settled_actions": 800,
+          "steps": 1000,
+          "target": [
+            -1.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.21346400678157806,
+          "minimum_distance": 0.2120659500360489,
+          "peak_tilt_rad": 0.16978372633457184,
+          "seed": 2,
+          "settled_actions": 810,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            1.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.23249869048595428,
+          "minimum_distance": 0.23249869048595428,
+          "peak_tilt_rad": 0.12443919479846954,
+          "seed": 2,
+          "settled_actions": 877,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            -1.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.20834685862064362,
+          "minimum_distance": 0.17837725579738617,
+          "peak_tilt_rad": 0.3821713626384735,
+          "seed": 2,
+          "settled_actions": 863,
+          "steps": 1000,
+          "target": [
+            2.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.26904016733169556,
+          "minimum_distance": 0.26904016733169556,
+          "peak_tilt_rad": 0.2386903315782547,
+          "seed": 2,
+          "settled_actions": 718,
+          "steps": 1000,
+          "target": [
+            -2.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.2049291729927063,
+          "minimum_distance": 0.18233804404735565,
+          "peak_tilt_rad": 0.30463066697120667,
+          "seed": 2,
+          "settled_actions": 769,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            2.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.24677503108978271,
+          "minimum_distance": 0.24677503108978271,
+          "peak_tilt_rad": 0.26916131377220154,
+          "seed": 2,
+          "settled_actions": 650,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            -2.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 3.0446066856384277,
+          "minimum_distance": 0.5752638578414917,
+          "peak_tilt_rad": 1.0860469341278076,
+          "seed": 2,
+          "settled_actions": 0,
+          "steps": 120,
+          "target": [
+            4.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.2962954342365265,
+          "minimum_distance": 0.2962954342365265,
+          "peak_tilt_rad": 0.39664125442504883,
+          "seed": 2,
+          "settled_actions": 701,
+          "steps": 1000,
+          "target": [
+            -4.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 3.894866704940796,
+          "minimum_distance": 3.404623031616211,
+          "peak_tilt_rad": 0.8309175372123718,
+          "seed": 2,
+          "settled_actions": 0,
+          "steps": 88,
+          "target": [
+            0.0,
+            2.0,
+            4.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 2.1083009243011475,
+          "minimum_distance": 0.5219789743423462,
+          "peak_tilt_rad": 1.0655977725982666,
+          "seed": 2,
+          "settled_actions": 0,
+          "steps": 186,
+          "target": [
+            0.0,
+            2.0,
+            -4.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 1.8850520849227905,
+          "minimum_distance": 1.8711622953414917,
+          "peak_tilt_rad": 0.9672252535820007,
+          "seed": 2,
+          "settled_actions": 0,
+          "steps": 83,
+          "target": [
+            6.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 1.9632081985473633,
+          "minimum_distance": 1.865523099899292,
+          "peak_tilt_rad": 0.6081076264381409,
+          "seed": 2,
+          "settled_actions": 0,
+          "steps": 125,
+          "target": [
+            -6.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 4.981344699859619,
+          "minimum_distance": 4.902666091918945,
+          "peak_tilt_rad": 1.9734326601028442,
+          "seed": 2,
+          "settled_actions": 0,
+          "steps": 69,
+          "target": [
+            0.0,
+            2.0,
+            6.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 3.3187334537506104,
+          "minimum_distance": 2.7234745025634766,
+          "peak_tilt_rad": 1.823370337486267,
+          "seed": 2,
+          "settled_actions": 0,
+          "steps": 119,
+          "target": [
+            0.0,
+            2.0,
+            -6.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 6.215868949890137,
+          "minimum_distance": 6.215868949890137,
+          "peak_tilt_rad": 1.4819190502166748,
+          "seed": 2,
+          "settled_actions": 0,
+          "steps": 56,
+          "target": [
+            8.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 3.859814167022705,
+          "minimum_distance": 3.859814167022705,
+          "peak_tilt_rad": 0.9647443890571594,
+          "seed": 2,
+          "settled_actions": 0,
+          "steps": 71,
+          "target": [
+            -8.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 6.417354583740234,
+          "minimum_distance": 6.416417121887207,
+          "peak_tilt_rad": 1.9877508878707886,
+          "seed": 2,
+          "settled_actions": 0,
+          "steps": 68,
+          "target": [
+            0.0,
+            2.0,
+            8.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 3.8668692111968994,
+          "minimum_distance": 3.629824638366699,
+          "peak_tilt_rad": 1.4000394344329834,
+          "seed": 2,
+          "settled_actions": 0,
+          "steps": 90,
+          "target": [
+            0.0,
+            2.0,
+            -8.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.21570666134357452,
+          "minimum_distance": 0.0458369180560112,
+          "peak_tilt_rad": 0.30610528588294983,
+          "seed": 42,
+          "settled_actions": 902,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.21570666134357452,
+          "minimum_distance": 0.0458369180560112,
+          "peak_tilt_rad": 0.30610528588294983,
+          "seed": 42,
+          "settled_actions": 902,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.21570666134357452,
+          "minimum_distance": 0.0458369180560112,
+          "peak_tilt_rad": 0.30610528588294983,
+          "seed": 42,
+          "settled_actions": 902,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.21570666134357452,
+          "minimum_distance": 0.0458369180560112,
+          "peak_tilt_rad": 0.30610528588294983,
+          "seed": 42,
+          "settled_actions": 902,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.22716885805130005,
+          "minimum_distance": 0.22716885805130005,
+          "peak_tilt_rad": 0.3061608672142029,
+          "seed": 42,
+          "settled_actions": 902,
+          "steps": 1000,
+          "target": [
+            0.5,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.20713739097118378,
+          "minimum_distance": 0.04505899176001549,
+          "peak_tilt_rad": 0.306048721075058,
+          "seed": 42,
+          "settled_actions": 901,
+          "steps": 1000,
+          "target": [
+            -0.5,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.21970783174037933,
+          "minimum_distance": 0.16722577810287476,
+          "peak_tilt_rad": 0.3060024380683899,
+          "seed": 42,
+          "settled_actions": 895,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.5
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.21298301219940186,
+          "minimum_distance": 0.10751017183065414,
+          "peak_tilt_rad": 0.30621325969696045,
+          "seed": 42,
+          "settled_actions": 962,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            -0.5
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.2408819943666458,
+          "minimum_distance": 0.2408819943666458,
+          "peak_tilt_rad": 0.3062136769294739,
+          "seed": 42,
+          "settled_actions": 857,
+          "steps": 1000,
+          "target": [
+            1.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.20146718621253967,
+          "minimum_distance": 0.026206955313682556,
+          "peak_tilt_rad": 0.3059897720813751,
+          "seed": 42,
+          "settled_actions": 899,
+          "steps": 1000,
+          "target": [
+            -1.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.2269040048122406,
+          "minimum_distance": 0.2269040048122406,
+          "peak_tilt_rad": 0.337631493806839,
+          "seed": 42,
+          "settled_actions": 853,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            1.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.21087585389614105,
+          "minimum_distance": 0.21087585389614105,
+          "peak_tilt_rad": 0.3063255548477173,
+          "seed": 42,
+          "settled_actions": 947,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            -1.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.27084681391716003,
+          "minimum_distance": 0.27084681391716003,
+          "peak_tilt_rad": 0.30631035566329956,
+          "seed": 42,
+          "settled_actions": 723,
+          "steps": 1000,
+          "target": [
+            2.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.19629856944084167,
+          "minimum_distance": 0.1393508017063141,
+          "peak_tilt_rad": 0.33986353874206543,
+          "seed": 42,
+          "settled_actions": 892,
+          "steps": 1000,
+          "target": [
+            -2.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.26958832144737244,
+          "minimum_distance": 0.26958832144737244,
+          "peak_tilt_rad": 0.5278687477111816,
+          "seed": 42,
+          "settled_actions": 675,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            2.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.20842550694942474,
+          "minimum_distance": 0.19846269488334656,
+          "peak_tilt_rad": 0.3197220265865326,
+          "seed": 42,
+          "settled_actions": 809,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            -2.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.31471991539001465,
+          "minimum_distance": 0.2993411421775818,
+          "peak_tilt_rad": 0.47569993138313293,
+          "seed": 42,
+          "settled_actions": 694,
+          "steps": 1000,
+          "target": [
+            4.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 3.557211399078369,
+          "minimum_distance": 3.5226330757141113,
+          "peak_tilt_rad": 0.8940754532814026,
+          "seed": 42,
+          "settled_actions": 0,
+          "steps": 88,
+          "target": [
+            -4.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 3.8461010456085205,
+          "minimum_distance": 2.9522438049316406,
+          "peak_tilt_rad": 1.5061118602752686,
+          "seed": 42,
+          "settled_actions": 0,
+          "steps": 109,
+          "target": [
+            0.0,
+            2.0,
+            4.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 2.9083690643310547,
+          "minimum_distance": 2.512248992919922,
+          "peak_tilt_rad": 0.598266065120697,
+          "seed": 42,
+          "settled_actions": 0,
+          "steps": 96,
+          "target": [
+            0.0,
+            2.0,
+            -4.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.5502101182937622,
+          "minimum_distance": 0.3059155344963074,
+          "peak_tilt_rad": 0.6381937861442566,
+          "seed": 42,
+          "settled_actions": 0,
+          "steps": 1000,
+          "target": [
+            6.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 6.0706467628479,
+          "minimum_distance": 6.044970989227295,
+          "peak_tilt_rad": 1.780670404434204,
+          "seed": 42,
+          "settled_actions": 0,
+          "steps": 53,
+          "target": [
+            -6.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 4.757587432861328,
+          "minimum_distance": 4.731434345245361,
+          "peak_tilt_rad": 1.392391324043274,
+          "seed": 42,
+          "settled_actions": 0,
+          "steps": 75,
+          "target": [
+            0.0,
+            2.0,
+            6.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 3.9057979583740234,
+          "minimum_distance": 3.870836019515991,
+          "peak_tilt_rad": 1.5533913373947144,
+          "seed": 42,
+          "settled_actions": 0,
+          "steps": 62,
+          "target": [
+            0.0,
+            2.0,
+            -6.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 3.8539392948150635,
+          "minimum_distance": 3.8539392948150635,
+          "peak_tilt_rad": 0.846581757068634,
+          "seed": 42,
+          "settled_actions": 0,
+          "steps": 98,
+          "target": [
+            8.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 8.118409156799316,
+          "minimum_distance": 8.057964324951172,
+          "peak_tilt_rad": 2.573662519454956,
+          "seed": 42,
+          "settled_actions": 0,
+          "steps": 49,
+          "target": [
+            -8.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 6.926089286804199,
+          "minimum_distance": 6.926089286804199,
+          "peak_tilt_rad": 2.053152322769165,
+          "seed": 42,
+          "settled_actions": 0,
+          "steps": 68,
+          "target": [
+            0.0,
+            2.0,
+            8.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 5.330371379852295,
+          "minimum_distance": 5.330371379852295,
+          "peak_tilt_rad": 1.2068816423416138,
+          "seed": 42,
+          "settled_actions": 0,
+          "steps": 57,
+          "target": [
+            0.0,
+            2.0,
+            -8.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.19395801424980164,
+          "minimum_distance": 0.16039380431175232,
+          "peak_tilt_rad": 0.21293286979198456,
+          "seed": 18446744073709551615,
+          "settled_actions": 998,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.19395801424980164,
+          "minimum_distance": 0.16039380431175232,
+          "peak_tilt_rad": 0.21293286979198456,
+          "seed": 18446744073709551615,
+          "settled_actions": 998,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.19395801424980164,
+          "minimum_distance": 0.16039380431175232,
+          "peak_tilt_rad": 0.21293286979198456,
+          "seed": 18446744073709551615,
+          "settled_actions": 998,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.19395801424980164,
+          "minimum_distance": 0.16039380431175232,
+          "peak_tilt_rad": 0.21293286979198456,
+          "seed": 18446744073709551615,
+          "settled_actions": 998,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.1993681639432907,
+          "minimum_distance": 0.1993681639432907,
+          "peak_tilt_rad": 0.2106369286775589,
+          "seed": 18446744073709551615,
+          "settled_actions": 998,
+          "steps": 1000,
+          "target": [
+            0.5,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.18974560499191284,
+          "minimum_distance": 0.18340928852558136,
+          "peak_tilt_rad": 0.2173265665769577,
+          "seed": 18446744073709551615,
+          "settled_actions": 944,
+          "steps": 1000,
+          "target": [
+            -0.5,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.19276852905750275,
+          "minimum_distance": 0.15580764412879944,
+          "peak_tilt_rad": 0.21171776950359344,
+          "seed": 18446744073709551615,
+          "settled_actions": 938,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.5
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.19538307189941406,
+          "minimum_distance": 0.19538307189941406,
+          "peak_tilt_rad": 0.2154652327299118,
+          "seed": 18446744073709551615,
+          "settled_actions": 854,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            -0.5
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.20608612895011902,
+          "minimum_distance": 0.20608612895011902,
+          "peak_tilt_rad": 0.2092064768075943,
+          "seed": 18446744073709551615,
+          "settled_actions": 812,
+          "steps": 1000,
+          "target": [
+            1.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.18650467693805695,
+          "minimum_distance": 0.14880038797855377,
+          "peak_tilt_rad": 0.22513708472251892,
+          "seed": 18446744073709551615,
+          "settled_actions": 845,
+          "steps": 1000,
+          "target": [
+            -1.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.1923728734254837,
+          "minimum_distance": 0.1923728734254837,
+          "peak_tilt_rad": 0.21093007922172546,
+          "seed": 18446744073709551615,
+          "settled_actions": 894,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            1.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.19678963720798492,
+          "minimum_distance": 0.19678963720798492,
+          "peak_tilt_rad": 0.22217723727226257,
+          "seed": 18446744073709551615,
+          "settled_actions": 806,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            -1.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.2233746200799942,
+          "minimum_distance": 0.2233746200799942,
+          "peak_tilt_rad": 0.20773163437843323,
+          "seed": 18446744073709551615,
+          "settled_actions": 676,
+          "steps": 1000,
+          "target": [
+            2.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.1826573759317398,
+          "minimum_distance": 0.13008272647857666,
+          "peak_tilt_rad": 0.25383177399635315,
+          "seed": 18446744073709551615,
+          "settled_actions": 794,
+          "steps": 1000,
+          "target": [
+            -2.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.19920527935028076,
+          "minimum_distance": 0.1914847046136856,
+          "peak_tilt_rad": 0.38640427589416504,
+          "seed": 18446744073709551615,
+          "settled_actions": 650,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            2.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.20012615621089935,
+          "minimum_distance": 0.19178441166877747,
+          "peak_tilt_rad": 0.288008451461792,
+          "seed": 18446744073709551615,
+          "settled_actions": 761,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            -2.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.2851748764514923,
+          "minimum_distance": 0.2851748764514923,
+          "peak_tilt_rad": 0.36605706810951233,
+          "seed": 18446744073709551615,
+          "settled_actions": 635,
+          "steps": 1000,
+          "target": [
+            4.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 3.8814775943756104,
+          "minimum_distance": 3.7707459926605225,
+          "peak_tilt_rad": 0.567928671836853,
+          "seed": 18446744073709551615,
+          "settled_actions": 0,
+          "steps": 96,
+          "target": [
+            -4.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 2.851839542388916,
+          "minimum_distance": 2.4177544116973877,
+          "peak_tilt_rad": 1.0718212127685547,
+          "seed": 18446744073709551615,
+          "settled_actions": 0,
+          "steps": 134,
+          "target": [
+            0.0,
+            2.0,
+            4.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 2.4877169132232666,
+          "minimum_distance": 2.201901435852051,
+          "peak_tilt_rad": 0.5483872294425964,
+          "seed": 18446744073709551615,
+          "settled_actions": 0,
+          "steps": 92,
+          "target": [
+            0.0,
+            2.0,
+            -4.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3613465428352356,
+          "minimum_distance": 0.36099115014076233,
+          "peak_tilt_rad": 0.6193872690200806,
+          "seed": 18446744073709551615,
+          "settled_actions": 617,
+          "steps": 1000,
+          "target": [
+            6.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 6.3700642585754395,
+          "minimum_distance": 5.965471267700195,
+          "peak_tilt_rad": 0.7774993777275085,
+          "seed": 18446744073709551615,
+          "settled_actions": 0,
+          "steps": 75,
+          "target": [
+            -6.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 4.0339741706848145,
+          "minimum_distance": 3.7182557582855225,
+          "peak_tilt_rad": 1.1311900615692139,
+          "seed": 18446744073709551615,
+          "settled_actions": 0,
+          "steps": 72,
+          "target": [
+            0.0,
+            2.0,
+            6.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 4.11825704574585,
+          "minimum_distance": 4.11825704574585,
+          "peak_tilt_rad": 0.8874972462654114,
+          "seed": 18446744073709551615,
+          "settled_actions": 0,
+          "steps": 64,
+          "target": [
+            0.0,
+            2.0,
+            -6.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 2.633094549179077,
+          "minimum_distance": 2.633094549179077,
+          "peak_tilt_rad": 0.8457342386245728,
+          "seed": 18446744073709551615,
+          "settled_actions": 0,
+          "steps": 124,
+          "target": [
+            8.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 8.654425621032715,
+          "minimum_distance": 8.024678230285645,
+          "peak_tilt_rad": 1.0540953874588013,
+          "seed": 18446744073709551615,
+          "settled_actions": 0,
+          "steps": 67,
+          "target": [
+            -8.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 5.5000104904174805,
+          "minimum_distance": 5.5000104904174805,
+          "peak_tilt_rad": 1.731372356414795,
+          "seed": 18446744073709551615,
+          "settled_actions": 0,
+          "steps": 57,
+          "target": [
+            0.0,
+            2.0,
+            8.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 5.806230545043945,
+          "minimum_distance": 5.806230545043945,
+          "peak_tilt_rad": 1.2780983448028564,
+          "seed": 18446744073709551615,
+          "settled_actions": 0,
+          "steps": 54,
+          "target": [
+            0.0,
+            2.0,
+            -8.0
+          ]
+        }
+      ]
+    },
+    {
+      "controller": "one metre displacement cap plus deterministic yaw servo",
+      "source": {
+        "path": "runs/quality-research/waypoint-probe-bounded-yaw.rs",
+        "sha256": "1a2dac58067dd7bba9b0e46222f74beb26a6468e6e01050f9f0e383cedadd726",
+        "source": "//! Temporary measurement of the frozen hover actor away from its training goal.\n#![cfg(feature = \"robots\")]\n#[path = \"../examples/robots/learning/encoding.rs\"]\nmod encoding;\n#[path = \"../examples/robots/learning/model.rs\"]\nmod model;\nuse bevy::math::Vec3;\nuse bevy_gym::{Env, robots::DroneHover};\n\n#[test]\nfn measure_waypoints() {\n    let policy = model::load_policy(include_bytes!(\"../assets/robots/recovery.mpk\").to_vec()).unwrap();\n    let mut rows = Vec::new();\n    for seed in [0, 1, 2, 42, u64::MAX] {\n        for radius in [0.0, 2.0, 4.0, 6.0, 8.0] {\n            for direction in [Vec3::X, Vec3::NEG_X, Vec3::Z, Vec3::NEG_Z] {\n                let target = Vec3::new(0.0, 2.0, 0.0) + direction * radius;\n                let mut env = DroneHover::disturbed();\n                let mut obs = env.reset(Some(seed)).observation;\n                let mut memory = policy.initial_memory();\n                let mut steps = 0;\n                let mut ended = false;\n                let mut min_distance = f32::MAX;\n                let mut settled = 0;\n                let mut peak_tilt = 0.0_f32;\n                for _ in 0..1000 {\n                    let mut features = encoding::encode(obs);\n                    features[..3].copy_from_slice(&(obs.orientation().inverse() * (target - obs.position()).clamp_length_max(1.0) / 2.0).to_array());\n                    let prediction = policy.mean_action(&features, &memory).unwrap();\n                    memory = prediction.next_memory;\n                    let desired = direction;\n                    let forward = obs.orientation() * Vec3::NEG_Z;\n                    let yaw_error = forward.cross(desired).y.atan2(forward.dot(desired));\n                    let yaw_rate = obs.angular_velocity().y;\n                    let trim = (0.1 * yaw_error - 0.05 * yaw_rate).clamp(-0.15, 0.15);\n                    let mut motors = prediction.action;\n                    for (motor, sign) in motors.iter_mut().zip([1.0, -1.0, 1.0, -1.0]) { *motor = (*motor + trim * sign).clamp(0.0, 1.0); }\n                    let step = env.step(encoding::decode_action(&motors).unwrap());\n                    obs = step.observation;\n                    steps += 1;\n                    let distance = obs.position().distance(target);\n                    min_distance = min_distance.min(distance);\n                    if distance <= 0.5 && obs.linear_velocity().length() <= 0.5 { settled += 1; } else { settled = 0; }\n                    peak_tilt = peak_tilt.max((obs.orientation() * Vec3::Y).y.clamp(-1.0,1.0).acos());\n                    if step.is_done() { ended = true; break; }\n                }\n                rows.push(serde_json::json!({\"seed\":seed,\"target\":target.to_array(),\"steps\":steps,\"ended\":ended,\"final_distance\":obs.position().distance(target),\"minimum_distance\":min_distance,\"settled_actions\":settled,\"peak_tilt_rad\":peak_tilt,\"heading_cosine\":(obs.orientation()*Vec3::NEG_Z).dot(direction)}));\n            }\n        }\n    }\n    std::fs::write(\"runs/quality-research/waypoint-probe-bounded-yaw.json\", serde_json::to_vec_pretty(&rows).unwrap()).unwrap();\n}\n"
+      },
+      "episode_actions": 1000,
+      "action_seconds": 0.02,
+      "settled_definition": "Final 100 consecutive actions within 0.5 metres and speed at most 0.5 metres per second.",
+      "episodes": [
+        {
+          "ended": false,
+          "final_distance": 0.3009573519229889,
+          "heading_cosine": 0.9999967217445374,
+          "minimum_distance": 0.08483681827783585,
+          "peak_tilt_rad": 0.26806485652923584,
+          "seed": 0,
+          "settled_actions": 959,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3118093013763428,
+          "heading_cosine": 0.999148964881897,
+          "minimum_distance": 0.0769110918045044,
+          "peak_tilt_rad": 0.2683039605617523,
+          "seed": 0,
+          "settled_actions": 916,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.30341455340385437,
+          "heading_cosine": 0.9997968077659607,
+          "minimum_distance": 0.07700648158788681,
+          "peak_tilt_rad": 0.26817217469215393,
+          "seed": 0,
+          "settled_actions": 960,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3237897455692291,
+          "heading_cosine": 0.9999763369560242,
+          "minimum_distance": 0.10116169601678848,
+          "peak_tilt_rad": 0.2683188021183014,
+          "seed": 0,
+          "settled_actions": 345,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3016085922718048,
+          "heading_cosine": 0.9999986290931702,
+          "minimum_distance": 0.26893946528434753,
+          "peak_tilt_rad": 0.26694437861442566,
+          "seed": 0,
+          "settled_actions": 715,
+          "steps": 1000,
+          "target": [
+            2.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3107970356941223,
+          "heading_cosine": 0.9989897012710571,
+          "minimum_distance": 0.2936606705188751,
+          "peak_tilt_rad": 0.27005529403686523,
+          "seed": 0,
+          "settled_actions": 698,
+          "steps": 1000,
+          "target": [
+            -2.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3027742803096771,
+          "heading_cosine": 0.9998387098312378,
+          "minimum_distance": 0.3027742803096771,
+          "peak_tilt_rad": 0.2793612480163574,
+          "seed": 0,
+          "settled_actions": 623,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            2.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3246349096298218,
+          "heading_cosine": 0.9999972581863403,
+          "minimum_distance": 0.30297210812568665,
+          "peak_tilt_rad": 0.26037102937698364,
+          "seed": 0,
+          "settled_actions": 497,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            -2.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.2878521680831909,
+          "heading_cosine": 0.9995337128639221,
+          "minimum_distance": 0.27289915084838867,
+          "peak_tilt_rad": 0.26644226908683777,
+          "seed": 0,
+          "settled_actions": 325,
+          "steps": 1000,
+          "target": [
+            4.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.31165811419487,
+          "heading_cosine": 0.9984486699104309,
+          "minimum_distance": 0.306022584438324,
+          "peak_tilt_rad": 0.26971349120140076,
+          "seed": 0,
+          "settled_actions": 512,
+          "steps": 1000,
+          "target": [
+            -4.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.32336804270744324,
+          "heading_cosine": 0.9991137981414795,
+          "minimum_distance": 0.32336804270744324,
+          "peak_tilt_rad": 0.2793908417224884,
+          "seed": 0,
+          "settled_actions": 178,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            4.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3256862461566925,
+          "heading_cosine": 0.9999392032623291,
+          "minimum_distance": 0.28262367844581604,
+          "peak_tilt_rad": 0.26032009720802307,
+          "seed": 0,
+          "settled_actions": 461,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            -4.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3071546256542206,
+          "heading_cosine": 0.9996101260185242,
+          "minimum_distance": 0.3071546256542206,
+          "peak_tilt_rad": 0.2662830948829651,
+          "seed": 0,
+          "settled_actions": 175,
+          "steps": 1000,
+          "target": [
+            6.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.33289316296577454,
+          "heading_cosine": 0.9931463003158569,
+          "minimum_distance": 0.33289316296577454,
+          "peak_tilt_rad": 0.2695922255516052,
+          "seed": 0,
+          "settled_actions": 127,
+          "steps": 1000,
+          "target": [
+            -6.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 2.2605884075164795,
+          "heading_cosine": 0.9996832013130188,
+          "minimum_distance": 2.2605884075164795,
+          "peak_tilt_rad": 0.2793988585472107,
+          "seed": 0,
+          "settled_actions": 0,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            6.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3843635022640228,
+          "heading_cosine": 0.998480498790741,
+          "minimum_distance": 0.3843635022640228,
+          "peak_tilt_rad": 0.2603068947792053,
+          "seed": 0,
+          "settled_actions": 76,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            -6.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 1.5685714483261108,
+          "heading_cosine": 0.9984277486801147,
+          "minimum_distance": 1.5685714483261108,
+          "peak_tilt_rad": 0.26620471477508545,
+          "seed": 0,
+          "settled_actions": 0,
+          "steps": 1000,
+          "target": [
+            8.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 2.1808016300201416,
+          "heading_cosine": 0.9995949268341064,
+          "minimum_distance": 2.1808016300201416,
+          "peak_tilt_rad": 0.2695299983024597,
+          "seed": 0,
+          "settled_actions": 0,
+          "steps": 1000,
+          "target": [
+            -8.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 4.803660869598389,
+          "heading_cosine": 0.999658465385437,
+          "minimum_distance": 4.803660869598389,
+          "peak_tilt_rad": 0.2794014513492584,
+          "seed": 0,
+          "settled_actions": 0,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            8.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.8075093626976013,
+          "heading_cosine": 0.9996215105056763,
+          "minimum_distance": 0.8075093626976013,
+          "peak_tilt_rad": 0.2603003978729248,
+          "seed": 0,
+          "settled_actions": 0,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            -8.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3105056881904602,
+          "heading_cosine": 0.9993634819984436,
+          "minimum_distance": 0.07208266854286194,
+          "peak_tilt_rad": 0.13929887115955353,
+          "seed": 1,
+          "settled_actions": 1000,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.30003246665000916,
+          "heading_cosine": 0.9999950528144836,
+          "minimum_distance": 0.07086161524057388,
+          "peak_tilt_rad": 0.13929758965969086,
+          "seed": 1,
+          "settled_actions": 714,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.32156679034233093,
+          "heading_cosine": 0.9997605681419373,
+          "minimum_distance": 0.07233228534460068,
+          "peak_tilt_rad": 0.13929887115955353,
+          "seed": 1,
+          "settled_actions": 465,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.30295780301094055,
+          "heading_cosine": 0.9998838901519775,
+          "minimum_distance": 0.07126498222351074,
+          "peak_tilt_rad": 0.13929758965969086,
+          "seed": 1,
+          "settled_actions": 1000,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.309517502784729,
+          "heading_cosine": 0.9989446401596069,
+          "minimum_distance": 0.28894442319869995,
+          "peak_tilt_rad": 0.1524769365787506,
+          "seed": 1,
+          "settled_actions": 667,
+          "steps": 1000,
+          "target": [
+            2.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.30207598209381104,
+          "heading_cosine": 0.9999853372573853,
+          "minimum_distance": 0.2691376805305481,
+          "peak_tilt_rad": 0.15878979861736298,
+          "seed": 1,
+          "settled_actions": 707,
+          "steps": 1000,
+          "target": [
+            -2.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3226909935474396,
+          "heading_cosine": 0.9998937845230103,
+          "minimum_distance": 0.3033863604068756,
+          "peak_tilt_rad": 0.21032026410102844,
+          "seed": 1,
+          "settled_actions": 516,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            2.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.30203789472579956,
+          "heading_cosine": 0.9999563694000244,
+          "minimum_distance": 0.3019889295101166,
+          "peak_tilt_rad": 0.14957739412784576,
+          "seed": 1,
+          "settled_actions": 589,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            -2.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.31001296639442444,
+          "heading_cosine": 0.998985230922699,
+          "minimum_distance": 0.31001296639442444,
+          "peak_tilt_rad": 0.15238900482654572,
+          "seed": 1,
+          "settled_actions": 388,
+          "steps": 1000,
+          "target": [
+            4.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.2856667935848236,
+          "heading_cosine": 0.9997131824493408,
+          "minimum_distance": 0.2694608271121979,
+          "peak_tilt_rad": 0.15738439559936523,
+          "seed": 1,
+          "settled_actions": 324,
+          "steps": 1000,
+          "target": [
+            -4.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.32434454560279846,
+          "heading_cosine": 0.999979555606842,
+          "minimum_distance": 0.24978436529636383,
+          "peak_tilt_rad": 0.21049262583255768,
+          "seed": 1,
+          "settled_actions": 485,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            4.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3209632337093353,
+          "heading_cosine": 0.9995440244674683,
+          "minimum_distance": 0.3209632337093353,
+          "peak_tilt_rad": 0.14887338876724243,
+          "seed": 1,
+          "settled_actions": 194,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            -4.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.4211561381816864,
+          "heading_cosine": 0.9979668855667114,
+          "minimum_distance": 0.4211561381816864,
+          "peak_tilt_rad": 0.15240511298179626,
+          "seed": 1,
+          "settled_actions": 42,
+          "steps": 1000,
+          "target": [
+            6.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.29137715697288513,
+          "heading_cosine": 0.9994996786117554,
+          "minimum_distance": 0.29137715697288513,
+          "peak_tilt_rad": 0.15689992904663086,
+          "seed": 1,
+          "settled_actions": 195,
+          "steps": 1000,
+          "target": [
+            -6.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3630017936229706,
+          "heading_cosine": 0.9978417158126831,
+          "minimum_distance": 0.3630017936229706,
+          "peak_tilt_rad": 0.21053598821163177,
+          "seed": 1,
+          "settled_actions": 103,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            6.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 2.117164373397827,
+          "heading_cosine": 0.9993782043457031,
+          "minimum_distance": 2.117164373397827,
+          "peak_tilt_rad": 0.14862242341041565,
+          "seed": 1,
+          "settled_actions": 0,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            -6.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 3.0438027381896973,
+          "heading_cosine": 0.9997842311859131,
+          "minimum_distance": 3.0438027381896973,
+          "peak_tilt_rad": 0.15243297815322876,
+          "seed": 1,
+          "settled_actions": 0,
+          "steps": 1000,
+          "target": [
+            8.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 1.3365623950958252,
+          "heading_cosine": 0.9988629817962646,
+          "minimum_distance": 1.3365623950958252,
+          "peak_tilt_rad": 0.1566544622182846,
+          "seed": 1,
+          "settled_actions": 0,
+          "steps": 1000,
+          "target": [
+            -8.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.7449360489845276,
+          "heading_cosine": 0.9995770454406738,
+          "minimum_distance": 0.7449360489845276,
+          "peak_tilt_rad": 0.21055452525615692,
+          "seed": 1,
+          "settled_actions": 0,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            8.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 4.668467044830322,
+          "heading_cosine": 0.9993783235549927,
+          "minimum_distance": 4.668467044830322,
+          "peak_tilt_rad": 0.1484939604997635,
+          "seed": 1,
+          "settled_actions": 0,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            -8.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3142155110836029,
+          "heading_cosine": 0.9962923526763916,
+          "minimum_distance": 0.07574134320020676,
+          "peak_tilt_rad": 0.12441277503967285,
+          "seed": 2,
+          "settled_actions": 701,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3043696880340576,
+          "heading_cosine": 0.9995373487472534,
+          "minimum_distance": 0.07574134320020676,
+          "peak_tilt_rad": 0.12441469728946686,
+          "seed": 2,
+          "settled_actions": 1000,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3001255989074707,
+          "heading_cosine": 0.9999874830245972,
+          "minimum_distance": 0.07574134320020676,
+          "peak_tilt_rad": 0.12441277503967285,
+          "seed": 2,
+          "settled_actions": 1000,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3133048117160797,
+          "heading_cosine": 0.9986172318458557,
+          "minimum_distance": 0.07574134320020676,
+          "peak_tilt_rad": 0.12441469728946686,
+          "seed": 2,
+          "settled_actions": 1000,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3120388686656952,
+          "heading_cosine": 0.9948548078536987,
+          "minimum_distance": 0.2803620994091034,
+          "peak_tilt_rad": 0.12649542093276978,
+          "seed": 2,
+          "settled_actions": 666,
+          "steps": 1000,
+          "target": [
+            2.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3039228916168213,
+          "heading_cosine": 0.9995248913764954,
+          "minimum_distance": 0.3039228916168213,
+          "peak_tilt_rad": 0.1646268367767334,
+          "seed": 2,
+          "settled_actions": 596,
+          "steps": 1000,
+          "target": [
+            -2.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.30074307322502136,
+          "heading_cosine": 0.999974250793457,
+          "minimum_distance": 0.2836621403694153,
+          "peak_tilt_rad": 0.16184376180171967,
+          "seed": 2,
+          "settled_actions": 718,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            2.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.31294265389442444,
+          "heading_cosine": 0.9983232021331787,
+          "minimum_distance": 0.2924365997314453,
+          "peak_tilt_rad": 0.12443391233682632,
+          "seed": 2,
+          "settled_actions": 688,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            -2.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.28622856736183167,
+          "heading_cosine": 0.9958398938179016,
+          "minimum_distance": 0.27577275037765503,
+          "peak_tilt_rad": 0.1278175711631775,
+          "seed": 2,
+          "settled_actions": 325,
+          "steps": 1000,
+          "target": [
+            4.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.33509182929992676,
+          "heading_cosine": 0.9983774423599243,
+          "minimum_distance": 0.33509182929992676,
+          "peak_tilt_rad": 0.16425871849060059,
+          "seed": 2,
+          "settled_actions": 143,
+          "steps": 1000,
+          "target": [
+            -4.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.29040804505348206,
+          "heading_cosine": 0.9995930194854736,
+          "minimum_distance": 0.27771294116973877,
+          "peak_tilt_rad": 0.16025546193122864,
+          "seed": 2,
+          "settled_actions": 326,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            4.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3142578899860382,
+          "heading_cosine": 0.9976553916931152,
+          "minimum_distance": 0.28301864862442017,
+          "peak_tilt_rad": 0.12443199008703232,
+          "seed": 2,
+          "settled_actions": 527,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            -4.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.2544517517089844,
+          "heading_cosine": 0.9896924495697021,
+          "minimum_distance": 0.23130138218402863,
+          "peak_tilt_rad": 0.12822981178760529,
+          "seed": 2,
+          "settled_actions": 248,
+          "steps": 1000,
+          "target": [
+            6.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 2.4885756969451904,
+          "heading_cosine": 0.999971866607666,
+          "minimum_distance": 2.4885756969451904,
+          "peak_tilt_rad": 0.16413000226020813,
+          "seed": 2,
+          "settled_actions": 0,
+          "steps": 1000,
+          "target": [
+            -6.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.35247620940208435,
+          "heading_cosine": 0.9995754957199097,
+          "minimum_distance": 0.35247620940208435,
+          "peak_tilt_rad": 0.1597076803445816,
+          "seed": 2,
+          "settled_actions": 121,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            6.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3232845664024353,
+          "heading_cosine": 0.9910159111022949,
+          "minimum_distance": 0.3232845664024353,
+          "peak_tilt_rad": 0.12443199008703232,
+          "seed": 2,
+          "settled_actions": 144,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            -6.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.7525005340576172,
+          "heading_cosine": 0.9951687455177307,
+          "minimum_distance": 0.7525005340576172,
+          "peak_tilt_rad": 0.12842820584774017,
+          "seed": 2,
+          "settled_actions": 0,
+          "steps": 1000,
+          "target": [
+            8.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 4.982882022857666,
+          "heading_cosine": 0.9999555349349976,
+          "minimum_distance": 4.982882022857666,
+          "peak_tilt_rad": 0.1640646904706955,
+          "seed": 2,
+          "settled_actions": 0,
+          "steps": 1000,
+          "target": [
+            -8.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 2.0481252670288086,
+          "heading_cosine": 0.9987044930458069,
+          "minimum_distance": 2.0481252670288086,
+          "peak_tilt_rad": 0.159431591629982,
+          "seed": 2,
+          "settled_actions": 0,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            8.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 1.5047798156738281,
+          "heading_cosine": 0.9988662004470825,
+          "minimum_distance": 1.5047798156738281,
+          "peak_tilt_rad": 0.12443199008703232,
+          "seed": 2,
+          "settled_actions": 0,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            -8.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.306781530380249,
+          "heading_cosine": 0.9993430376052856,
+          "minimum_distance": 0.04740467295050621,
+          "peak_tilt_rad": 0.3061058819293976,
+          "seed": 42,
+          "settled_actions": 902,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3020265996456146,
+          "heading_cosine": 0.999187171459198,
+          "minimum_distance": 0.033848363906145096,
+          "peak_tilt_rad": 0.30610528588294983,
+          "seed": 42,
+          "settled_actions": 535,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3162370026111603,
+          "heading_cosine": 0.9985407590866089,
+          "minimum_distance": 0.07654697448015213,
+          "peak_tilt_rad": 0.30610528588294983,
+          "seed": 42,
+          "settled_actions": 907,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.30072134733200073,
+          "heading_cosine": 0.9999058246612549,
+          "minimum_distance": 0.03782776743173599,
+          "peak_tilt_rad": 0.3061058819293976,
+          "seed": 42,
+          "settled_actions": 902,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.30577710270881653,
+          "heading_cosine": 0.9993026256561279,
+          "minimum_distance": 0.30557888746261597,
+          "peak_tilt_rad": 0.3062399625778198,
+          "seed": 42,
+          "settled_actions": 644,
+          "steps": 1000,
+          "target": [
+            2.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.30230656266212463,
+          "heading_cosine": 0.9984703660011292,
+          "minimum_distance": 0.3017306923866272,
+          "peak_tilt_rad": 0.30602023005485535,
+          "seed": 42,
+          "settled_actions": 540,
+          "steps": 1000,
+          "target": [
+            -2.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.31654641032218933,
+          "heading_cosine": 0.998237133026123,
+          "minimum_distance": 0.2747766673564911,
+          "peak_tilt_rad": 0.3059399127960205,
+          "seed": 42,
+          "settled_actions": 591,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            2.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.30132392048835754,
+          "heading_cosine": 0.9999359846115112,
+          "minimum_distance": 0.25234735012054443,
+          "peak_tilt_rad": 0.30635759234428406,
+          "seed": 42,
+          "settled_actions": 808,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            -2.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3141569197177887,
+          "heading_cosine": 0.9968516826629639,
+          "minimum_distance": 0.3141569197177887,
+          "peak_tilt_rad": 0.3062492609024048,
+          "seed": 42,
+          "settled_actions": 198,
+          "steps": 1000,
+          "target": [
+            4.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.2712157070636749,
+          "heading_cosine": 0.9991222023963928,
+          "minimum_distance": 0.24859969317913055,
+          "peak_tilt_rad": 0.3060287535190582,
+          "seed": 42,
+          "settled_actions": 288,
+          "steps": 1000,
+          "target": [
+            -4.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.316130131483078,
+          "heading_cosine": 0.9982409477233887,
+          "minimum_distance": 0.3072606325149536,
+          "peak_tilt_rad": 0.30594661831855774,
+          "seed": 42,
+          "settled_actions": 462,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            4.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.29589512944221497,
+          "heading_cosine": 0.9999973177909851,
+          "minimum_distance": 0.29371845722198486,
+          "peak_tilt_rad": 0.3063652813434601,
+          "seed": 42,
+          "settled_actions": 444,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            -4.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 2.0847954750061035,
+          "heading_cosine": 0.9999516010284424,
+          "minimum_distance": 2.0847954750061035,
+          "peak_tilt_rad": 0.3062524199485779,
+          "seed": 42,
+          "settled_actions": 0,
+          "steps": 1000,
+          "target": [
+            6.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.2804613709449768,
+          "heading_cosine": 0.9936842322349548,
+          "minimum_distance": 0.2804613709449768,
+          "peak_tilt_rad": 0.30603131651878357,
+          "seed": 42,
+          "settled_actions": 182,
+          "steps": 1000,
+          "target": [
+            -6.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.36125391721725464,
+          "heading_cosine": 0.9902596473693848,
+          "minimum_distance": 0.36125391721725464,
+          "peak_tilt_rad": 0.3059486150741577,
+          "seed": 42,
+          "settled_actions": 86,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            6.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.31388959288597107,
+          "heading_cosine": 0.9992307424545288,
+          "minimum_distance": 0.31388959288597107,
+          "peak_tilt_rad": 0.30636727809906006,
+          "seed": 42,
+          "settled_actions": 184,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            -6.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 4.609861850738525,
+          "heading_cosine": 0.9999820590019226,
+          "minimum_distance": 4.609861850738525,
+          "peak_tilt_rad": 0.30625420808792114,
+          "seed": 42,
+          "settled_actions": 0,
+          "steps": 1000,
+          "target": [
+            8.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 1.2900047302246094,
+          "heading_cosine": 0.9993793368339539,
+          "minimum_distance": 1.2900047302246094,
+          "peak_tilt_rad": 0.30603209137916565,
+          "seed": 42,
+          "settled_actions": 0,
+          "steps": 1000,
+          "target": [
+            -8.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 1.4952558279037476,
+          "heading_cosine": 0.9986492395401001,
+          "minimum_distance": 1.4952558279037476,
+          "peak_tilt_rad": 0.3059498071670532,
+          "seed": 42,
+          "settled_actions": 0,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            8.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 1.875737190246582,
+          "heading_cosine": 0.9993135929107666,
+          "minimum_distance": 1.875737190246582,
+          "peak_tilt_rad": 0.3063688576221466,
+          "seed": 42,
+          "settled_actions": 0,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            -8.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.30869024991989136,
+          "heading_cosine": 0.9987301230430603,
+          "minimum_distance": 0.16168160736560822,
+          "peak_tilt_rad": 0.2128327190876007,
+          "seed": 18446744073709551615,
+          "settled_actions": 998,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.29884836077690125,
+          "heading_cosine": 0.9995456337928772,
+          "minimum_distance": 0.15764440596103668,
+          "peak_tilt_rad": 0.213169664144516,
+          "seed": 18446744073709551615,
+          "settled_actions": 530,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3191951513290405,
+          "heading_cosine": 0.9983716011047363,
+          "minimum_distance": 0.16286922991275787,
+          "peak_tilt_rad": 0.21275454759597778,
+          "seed": 18446744073709551615,
+          "settled_actions": 488,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.30170273780822754,
+          "heading_cosine": 0.9995574951171875,
+          "minimum_distance": 0.15911641716957092,
+          "peak_tilt_rad": 0.21301746368408203,
+          "seed": 18446744073709551615,
+          "settled_actions": 998,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.30754590034484863,
+          "heading_cosine": 0.9980564117431641,
+          "minimum_distance": 0.2923940420150757,
+          "peak_tilt_rad": 0.208815798163414,
+          "seed": 18446744073709551615,
+          "settled_actions": 679,
+          "steps": 1000,
+          "target": [
+            2.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3005239963531494,
+          "heading_cosine": 0.9990212917327881,
+          "minimum_distance": 0.29991137981414795,
+          "peak_tilt_rad": 0.22305922210216522,
+          "seed": 18446744073709551615,
+          "settled_actions": 568,
+          "steps": 1000,
+          "target": [
+            -2.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3201959431171417,
+          "heading_cosine": 0.9984863996505737,
+          "minimum_distance": 0.302229106426239,
+          "peak_tilt_rad": 0.21066230535507202,
+          "seed": 18446744073709551615,
+          "settled_actions": 579,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            2.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.30069440603256226,
+          "heading_cosine": 0.9997240900993347,
+          "minimum_distance": 0.300625205039978,
+          "peak_tilt_rad": 0.22241650521755219,
+          "seed": 18446744073709551615,
+          "settled_actions": 690,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            -2.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3061005175113678,
+          "heading_cosine": 0.9971832633018494,
+          "minimum_distance": 0.3061005175113678,
+          "peak_tilt_rad": 0.2087899148464203,
+          "seed": 18446744073709551615,
+          "settled_actions": 297,
+          "steps": 1000,
+          "target": [
+            4.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.2774713933467865,
+          "heading_cosine": 0.9996640682220459,
+          "minimum_distance": 0.26114681363105774,
+          "peak_tilt_rad": 0.22325611114501953,
+          "seed": 18446744073709551615,
+          "settled_actions": 296,
+          "steps": 1000,
+          "target": [
+            -4.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.32066336274147034,
+          "heading_cosine": 0.9985185861587524,
+          "minimum_distance": 0.3027708828449249,
+          "peak_tilt_rad": 0.21052628755569458,
+          "seed": 18446744073709551615,
+          "settled_actions": 465,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            4.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.2997424304485321,
+          "heading_cosine": 0.9999435544013977,
+          "minimum_distance": 0.2963699996471405,
+          "peak_tilt_rad": 0.2208419144153595,
+          "seed": 18446744073709551615,
+          "settled_actions": 324,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            -4.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.6987032294273376,
+          "heading_cosine": 0.9980413913726807,
+          "minimum_distance": 0.6987032294273376,
+          "peak_tilt_rad": 0.2087818682193756,
+          "seed": 18446744073709551615,
+          "settled_actions": 0,
+          "steps": 1000,
+          "target": [
+            6.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.2848075330257416,
+          "heading_cosine": 0.9956457614898682,
+          "minimum_distance": 0.2848075330257416,
+          "peak_tilt_rad": 0.22332097589969635,
+          "seed": 18446744073709551615,
+          "settled_actions": 179,
+          "steps": 1000,
+          "target": [
+            -6.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3674803674221039,
+          "heading_cosine": 0.991365373134613,
+          "minimum_distance": 0.3674803674221039,
+          "peak_tilt_rad": 0.21047893166542053,
+          "seed": 18446744073709551615,
+          "settled_actions": 77,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            6.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.9489662647247314,
+          "heading_cosine": 0.9999070763587952,
+          "minimum_distance": 0.9489662647247314,
+          "peak_tilt_rad": 0.2203717678785324,
+          "seed": 18446744073709551615,
+          "settled_actions": 0,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            -6.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 3.584632635116577,
+          "heading_cosine": 0.999107837677002,
+          "minimum_distance": 3.584632635116577,
+          "peak_tilt_rad": 0.20877841114997864,
+          "seed": 18446744073709551615,
+          "settled_actions": 0,
+          "steps": 1000,
+          "target": [
+            8.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 1.3223339319229126,
+          "heading_cosine": 0.9998211860656738,
+          "minimum_distance": 1.3223339319229126,
+          "peak_tilt_rad": 0.22335433959960938,
+          "seed": 18446744073709551615,
+          "settled_actions": 0,
+          "steps": 1000,
+          "target": [
+            -8.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.9111882448196411,
+          "heading_cosine": 0.9979361891746521,
+          "minimum_distance": 0.9111882448196411,
+          "peak_tilt_rad": 0.21045497059822083,
+          "seed": 18446744073709551615,
+          "settled_actions": 0,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            8.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 3.7105937004089355,
+          "heading_cosine": 0.9999028444290161,
+          "minimum_distance": 3.7105937004089355,
+          "peak_tilt_rad": 0.2201584428548813,
+          "seed": 18446744073709551615,
+          "settled_actions": 0,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            -8.0
+          ]
+        }
+      ]
+    },
+    {
+      "controller": "two metre displacement cap plus deterministic yaw servo",
+      "source": {
+        "path": "runs/quality-research/waypoint-probe-bounded2-yaw.rs",
+        "sha256": "8b0f18206750f7ff2dfcc7d5c3dc4d9c259cb05e6c6bb4b14a41d0bfdc681b26",
+        "source": "//! Temporary measurement of the frozen hover actor away from its training goal.\n#![cfg(feature = \"robots\")]\n#[path = \"../examples/robots/learning/encoding.rs\"]\nmod encoding;\n#[path = \"../examples/robots/learning/model.rs\"]\nmod model;\nuse bevy::math::Vec3;\nuse bevy_gym::{Env, robots::DroneHover};\n\n#[test]\nfn measure_waypoints() {\n    let policy = model::load_policy(include_bytes!(\"../assets/robots/recovery.mpk\").to_vec()).unwrap();\n    let mut rows = Vec::new();\n    for seed in [0, 1, 2, 42, u64::MAX] {\n        for radius in [0.0, 2.0, 4.0, 6.0, 8.0] {\n            for direction in [Vec3::X, Vec3::NEG_X, Vec3::Z, Vec3::NEG_Z] {\n                let target = Vec3::new(0.0, 2.0, 0.0) + direction * radius;\n                let mut env = DroneHover::disturbed();\n                let mut obs = env.reset(Some(seed)).observation;\n                let mut memory = policy.initial_memory();\n                let mut steps = 0;\n                let mut ended = false;\n                let mut min_distance = f32::MAX;\n                let mut settled = 0;\n                let mut peak_tilt = 0.0_f32;\n                for _ in 0..1000 {\n                    let mut features = encoding::encode(obs);\n                    features[..3].copy_from_slice(&(obs.orientation().inverse() * (target - obs.position()).clamp_length_max(2.0) / 2.0).to_array());\n                    let prediction = policy.mean_action(&features, &memory).unwrap();\n                    memory = prediction.next_memory;\n                    let desired = direction;\n                    let forward = obs.orientation() * Vec3::NEG_Z;\n                    let yaw_error = forward.cross(desired).y.atan2(forward.dot(desired));\n                    let yaw_rate = obs.angular_velocity().y;\n                    let trim = (0.1 * yaw_error - 0.05 * yaw_rate).clamp(-0.15, 0.15);\n                    let mut motors = prediction.action;\n                    for (motor, sign) in motors.iter_mut().zip([1.0, -1.0, 1.0, -1.0]) { *motor = (*motor + trim * sign).clamp(0.0, 1.0); }\n                    let step = env.step(encoding::decode_action(&motors).unwrap());\n                    obs = step.observation;\n                    steps += 1;\n                    let distance = obs.position().distance(target);\n                    min_distance = min_distance.min(distance);\n                    if distance <= 0.5 && obs.linear_velocity().length() <= 0.5 { settled += 1; } else { settled = 0; }\n                    peak_tilt = peak_tilt.max((obs.orientation() * Vec3::Y).y.clamp(-1.0,1.0).acos());\n                    if step.is_done() { ended = true; break; }\n                }\n                rows.push(serde_json::json!({\"seed\":seed,\"target\":target.to_array(),\"steps\":steps,\"ended\":ended,\"final_distance\":obs.position().distance(target),\"minimum_distance\":min_distance,\"settled_actions\":settled,\"peak_tilt_rad\":peak_tilt,\"heading_cosine\":(obs.orientation()*Vec3::NEG_Z).dot(direction)}));\n            }\n        }\n    }\n    std::fs::write(\"runs/quality-research/waypoint-probe-bounded2-yaw.json\", serde_json::to_vec_pretty(&rows).unwrap()).unwrap();\n}\n"
+      },
+      "episode_actions": 1000,
+      "action_seconds": 0.02,
+      "settled_definition": "Final 100 consecutive actions within 0.5 metres and speed at most 0.5 metres per second.",
+      "episodes": [
+        {
+          "ended": false,
+          "final_distance": 0.3009573519229889,
+          "heading_cosine": 0.9999967217445374,
+          "minimum_distance": 0.08483681827783585,
+          "peak_tilt_rad": 0.26806485652923584,
+          "seed": 0,
+          "settled_actions": 959,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3118093013763428,
+          "heading_cosine": 0.999148964881897,
+          "minimum_distance": 0.0769110918045044,
+          "peak_tilt_rad": 0.2683039605617523,
+          "seed": 0,
+          "settled_actions": 916,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.30341455340385437,
+          "heading_cosine": 0.9997968077659607,
+          "minimum_distance": 0.07700648158788681,
+          "peak_tilt_rad": 0.26817217469215393,
+          "seed": 0,
+          "settled_actions": 960,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3237897455692291,
+          "heading_cosine": 0.9999763369560242,
+          "minimum_distance": 0.10116169601678848,
+          "peak_tilt_rad": 0.2683188021183014,
+          "seed": 0,
+          "settled_actions": 345,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3075447678565979,
+          "heading_cosine": 0.9999971389770508,
+          "minimum_distance": 0.10372697561979294,
+          "peak_tilt_rad": 0.2815561592578888,
+          "seed": 0,
+          "settled_actions": 711,
+          "steps": 1000,
+          "target": [
+            2.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3108561933040619,
+          "heading_cosine": 0.9992181658744812,
+          "minimum_distance": 0.2997871935367584,
+          "peak_tilt_rad": 0.2789168953895569,
+          "seed": 0,
+          "settled_actions": 856,
+          "steps": 1000,
+          "target": [
+            -2.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3028273284435272,
+          "heading_cosine": 0.9999307990074158,
+          "minimum_distance": 0.30278894305229187,
+          "peak_tilt_rad": 0.31104108691215515,
+          "seed": 0,
+          "settled_actions": 727,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            2.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3239845931529999,
+          "heading_cosine": 0.9999802708625793,
+          "minimum_distance": 0.3030673861503601,
+          "peak_tilt_rad": 0.3374277651309967,
+          "seed": 0,
+          "settled_actions": 337,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            -2.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3063734769821167,
+          "heading_cosine": 0.9998024106025696,
+          "minimum_distance": 0.10287385433912277,
+          "peak_tilt_rad": 0.2810075581073761,
+          "seed": 0,
+          "settled_actions": 649,
+          "steps": 1000,
+          "target": [
+            4.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3100883364677429,
+          "heading_cosine": 0.9988976716995239,
+          "minimum_distance": 0.2868034541606903,
+          "peak_tilt_rad": 0.27780410647392273,
+          "seed": 0,
+          "settled_actions": 596,
+          "steps": 1000,
+          "target": [
+            -4.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.30220648646354675,
+          "heading_cosine": 0.9999064803123474,
+          "minimum_distance": 0.30220648646354675,
+          "peak_tilt_rad": 0.3117377460002899,
+          "seed": 0,
+          "settled_actions": 517,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            4.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3254685401916504,
+          "heading_cosine": 0.9999964833259583,
+          "minimum_distance": 0.2973310351371765,
+          "peak_tilt_rad": 0.3493524193763733,
+          "seed": 0,
+          "settled_actions": 520,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            -4.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 2.4840381145477295,
+          "heading_cosine": 0.6223439574241638,
+          "minimum_distance": 2.4840381145477295,
+          "peak_tilt_rad": 0.28136369585990906,
+          "seed": 0,
+          "settled_actions": 0,
+          "steps": 187,
+          "target": [
+            6.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3137860596179962,
+          "heading_cosine": 0.9960587024688721,
+          "minimum_distance": 0.23592045903205872,
+          "peak_tilt_rad": 0.2774154543876648,
+          "seed": 0,
+          "settled_actions": 519,
+          "steps": 1000,
+          "target": [
+            -6.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3047325611114502,
+          "heading_cosine": 0.9998698234558105,
+          "minimum_distance": 0.3047325611114502,
+          "peak_tilt_rad": 0.3119759261608124,
+          "seed": 0,
+          "settled_actions": 367,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            6.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3362552225589752,
+          "heading_cosine": 0.9999407529830933,
+          "minimum_distance": 0.11604909598827362,
+          "peak_tilt_rad": 0.3479267656803131,
+          "seed": 0,
+          "settled_actions": 486,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            -6.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 4.430766582489014,
+          "heading_cosine": 0.7659097909927368,
+          "minimum_distance": 4.430766582489014,
+          "peak_tilt_rad": 0.2815304398536682,
+          "seed": 0,
+          "settled_actions": 0,
+          "steps": 170,
+          "target": [
+            8.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 2.1122827529907227,
+          "heading_cosine": 0.9953101873397827,
+          "minimum_distance": 2.1122827529907227,
+          "peak_tilt_rad": 0.2772541344165802,
+          "seed": 0,
+          "settled_actions": 0,
+          "steps": 322,
+          "target": [
+            -8.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3206217885017395,
+          "heading_cosine": 0.9990147352218628,
+          "minimum_distance": 0.3206217885017395,
+          "peak_tilt_rad": 0.31209707260131836,
+          "seed": 0,
+          "settled_actions": 205,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            8.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 3.3041391372680664,
+          "heading_cosine": 0.9701545238494873,
+          "minimum_distance": 3.3041391372680664,
+          "peak_tilt_rad": 0.3472086191177368,
+          "seed": 0,
+          "settled_actions": 0,
+          "steps": 345,
+          "target": [
+            0.0,
+            2.0,
+            -8.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3105056881904602,
+          "heading_cosine": 0.9993634819984436,
+          "minimum_distance": 0.07208266854286194,
+          "peak_tilt_rad": 0.13929887115955353,
+          "seed": 1,
+          "settled_actions": 1000,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.30003246665000916,
+          "heading_cosine": 0.9999950528144836,
+          "minimum_distance": 0.07086161524057388,
+          "peak_tilt_rad": 0.13929758965969086,
+          "seed": 1,
+          "settled_actions": 714,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.32156679034233093,
+          "heading_cosine": 0.9997605681419373,
+          "minimum_distance": 0.07233228534460068,
+          "peak_tilt_rad": 0.13929887115955353,
+          "seed": 1,
+          "settled_actions": 465,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.30295780301094055,
+          "heading_cosine": 0.9998838901519775,
+          "minimum_distance": 0.07126498222351074,
+          "peak_tilt_rad": 0.13929758965969086,
+          "seed": 1,
+          "settled_actions": 1000,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.30966296792030334,
+          "heading_cosine": 0.9994519352912903,
+          "minimum_distance": 0.29459285736083984,
+          "peak_tilt_rad": 0.23164953291416168,
+          "seed": 1,
+          "settled_actions": 718,
+          "steps": 1000,
+          "target": [
+            2.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3083457946777344,
+          "heading_cosine": 0.9999818205833435,
+          "minimum_distance": 0.11493422836065292,
+          "peak_tilt_rad": 0.23140381276607513,
+          "seed": 1,
+          "settled_actions": 748,
+          "steps": 1000,
+          "target": [
+            -2.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.32212668657302856,
+          "heading_cosine": 0.9999608397483826,
+          "minimum_distance": 0.16287991404533386,
+          "peak_tilt_rad": 0.42563396692276,
+          "seed": 1,
+          "settled_actions": 339,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            2.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3021276295185089,
+          "heading_cosine": 0.9999909400939941,
+          "minimum_distance": 0.3018265962600708,
+          "peak_tilt_rad": 0.2233077883720398,
+          "seed": 1,
+          "settled_actions": 726,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            -2.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.30876624584198,
+          "heading_cosine": 0.9985743165016174,
+          "minimum_distance": 0.2860156297683716,
+          "peak_tilt_rad": 0.24358484148979187,
+          "seed": 1,
+          "settled_actions": 576,
+          "steps": 1000,
+          "target": [
+            4.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.30634644627571106,
+          "heading_cosine": 0.9998471736907959,
+          "minimum_distance": 0.14016132056713104,
+          "peak_tilt_rad": 0.22763009369373322,
+          "seed": 1,
+          "settled_actions": 675,
+          "steps": 1000,
+          "target": [
+            -4.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.32248738408088684,
+          "heading_cosine": 0.9999465942382812,
+          "minimum_distance": 0.3016197085380554,
+          "peak_tilt_rad": 0.39953064918518066,
+          "seed": 1,
+          "settled_actions": 531,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            4.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3010127544403076,
+          "heading_cosine": 0.999993622303009,
+          "minimum_distance": 0.30092713236808777,
+          "peak_tilt_rad": 0.22021083533763885,
+          "seed": 1,
+          "settled_actions": 499,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            -4.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3131449818611145,
+          "heading_cosine": 0.99613356590271,
+          "minimum_distance": 0.2276322990655899,
+          "peak_tilt_rad": 0.24365897476673126,
+          "seed": 1,
+          "settled_actions": 512,
+          "steps": 1000,
+          "target": [
+            6.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.2948143780231476,
+          "heading_cosine": 0.9998225569725037,
+          "minimum_distance": 0.2909262478351593,
+          "peak_tilt_rad": 0.22630675137043,
+          "seed": 1,
+          "settled_actions": 522,
+          "steps": 1000,
+          "target": [
+            -6.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3308628499507904,
+          "heading_cosine": 0.9998311996459961,
+          "minimum_distance": 0.15576450526714325,
+          "peak_tilt_rad": 0.373855859041214,
+          "seed": 1,
+          "settled_actions": 491,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            6.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.30263659358024597,
+          "heading_cosine": 0.9994099140167236,
+          "minimum_distance": 0.3023500442504883,
+          "peak_tilt_rad": 0.219116672873497,
+          "seed": 1,
+          "settled_actions": 387,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            -6.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 2.8746109008789062,
+          "heading_cosine": 0.9908115267753601,
+          "minimum_distance": 2.8746109008789062,
+          "peak_tilt_rad": 0.2437056601047516,
+          "seed": 1,
+          "settled_actions": 0,
+          "steps": 306,
+          "target": [
+            8.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 4.662975788116455,
+          "heading_cosine": 0.6155194044113159,
+          "minimum_distance": 4.662975788116455,
+          "peak_tilt_rad": 0.22571973502635956,
+          "seed": 1,
+          "settled_actions": 0,
+          "steps": 185,
+          "target": [
+            -8.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 3.651923656463623,
+          "heading_cosine": 0.5791707634925842,
+          "minimum_distance": 3.651923656463623,
+          "peak_tilt_rad": 0.3707487881183624,
+          "seed": 1,
+          "settled_actions": 0,
+          "steps": 302,
+          "target": [
+            0.0,
+            2.0,
+            8.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3126850128173828,
+          "heading_cosine": 0.9999961256980896,
+          "minimum_distance": 0.3126850128173828,
+          "peak_tilt_rad": 0.21855631470680237,
+          "seed": 1,
+          "settled_actions": 262,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            -8.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3142155110836029,
+          "heading_cosine": 0.9962923526763916,
+          "minimum_distance": 0.07574134320020676,
+          "peak_tilt_rad": 0.12441277503967285,
+          "seed": 2,
+          "settled_actions": 701,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3043696880340576,
+          "heading_cosine": 0.9995373487472534,
+          "minimum_distance": 0.07574134320020676,
+          "peak_tilt_rad": 0.12441469728946686,
+          "seed": 2,
+          "settled_actions": 1000,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3001255989074707,
+          "heading_cosine": 0.9999874830245972,
+          "minimum_distance": 0.07574134320020676,
+          "peak_tilt_rad": 0.12441277503967285,
+          "seed": 2,
+          "settled_actions": 1000,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3133048117160797,
+          "heading_cosine": 0.9986172318458557,
+          "minimum_distance": 0.07574134320020676,
+          "peak_tilt_rad": 0.12441469728946686,
+          "seed": 2,
+          "settled_actions": 1000,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.31134822964668274,
+          "heading_cosine": 0.9948962330818176,
+          "minimum_distance": 0.30292636156082153,
+          "peak_tilt_rad": 0.35033339262008667,
+          "seed": 2,
+          "settled_actions": 527,
+          "steps": 1000,
+          "target": [
+            2.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3036026358604431,
+          "heading_cosine": 0.9996984601020813,
+          "minimum_distance": 0.3036026358604431,
+          "peak_tilt_rad": 0.23476314544677734,
+          "seed": 2,
+          "settled_actions": 695,
+          "steps": 1000,
+          "target": [
+            -2.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3048373758792877,
+          "heading_cosine": 0.9999992251396179,
+          "minimum_distance": 0.14045244455337524,
+          "peak_tilt_rad": 0.30036497116088867,
+          "seed": 2,
+          "settled_actions": 727,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            2.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3132331371307373,
+          "heading_cosine": 0.9985015988349915,
+          "minimum_distance": 0.3021341860294342,
+          "peak_tilt_rad": 0.1584656685590744,
+          "seed": 2,
+          "settled_actions": 851,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            -2.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.33508145809173584,
+          "heading_cosine": 0.9866547584533691,
+          "minimum_distance": 0.3011102080345154,
+          "peak_tilt_rad": 0.4998907446861267,
+          "seed": 2,
+          "settled_actions": 326,
+          "steps": 1000,
+          "target": [
+            4.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.30354028940200806,
+          "heading_cosine": 0.9996114373207092,
+          "minimum_distance": 0.30354028940200806,
+          "peak_tilt_rad": 0.23341020941734314,
+          "seed": 2,
+          "settled_actions": 517,
+          "steps": 1000,
+          "target": [
+            -4.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.30502304434776306,
+          "heading_cosine": 0.9996016621589661,
+          "minimum_distance": 0.10568542033433914,
+          "peak_tilt_rad": 0.2982480823993683,
+          "seed": 2,
+          "settled_actions": 613,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            4.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.31326186656951904,
+          "heading_cosine": 0.9979249835014343,
+          "minimum_distance": 0.274896502494812,
+          "peak_tilt_rad": 0.168950617313385,
+          "seed": 2,
+          "settled_actions": 577,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            -4.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 2.0117030143737793,
+          "heading_cosine": 0.8335549831390381,
+          "minimum_distance": 0.47718870639801025,
+          "peak_tilt_rad": 1.0537582635879517,
+          "seed": 2,
+          "settled_actions": 0,
+          "steps": 392,
+          "target": [
+            6.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3070048391819,
+          "heading_cosine": 0.9999482035636902,
+          "minimum_distance": 0.3070048391819,
+          "peak_tilt_rad": 0.23294873535633087,
+          "seed": 2,
+          "settled_actions": 327,
+          "steps": 1000,
+          "target": [
+            -6.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 2.1529884338378906,
+          "heading_cosine": 0.6549026966094971,
+          "minimum_distance": 2.1529884338378906,
+          "peak_tilt_rad": 0.2973221242427826,
+          "seed": 2,
+          "settled_actions": 0,
+          "steps": 196,
+          "target": [
+            0.0,
+            2.0,
+            6.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.32097452878952026,
+          "heading_cosine": 0.9950060844421387,
+          "minimum_distance": 0.1850479543209076,
+          "peak_tilt_rad": 0.20014595985412598,
+          "seed": 2,
+          "settled_actions": 498,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            -6.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.2914201617240906,
+          "heading_cosine": 0.9810906648635864,
+          "minimum_distance": 0.20605558156967163,
+          "peak_tilt_rad": 0.6519208550453186,
+          "seed": 2,
+          "settled_actions": 282,
+          "steps": 1000,
+          "target": [
+            8.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3263572156429291,
+          "heading_cosine": 0.9965015053749084,
+          "minimum_distance": 0.3263572156429291,
+          "peak_tilt_rad": 0.2327144294977188,
+          "seed": 2,
+          "settled_actions": 162,
+          "steps": 1000,
+          "target": [
+            -8.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 4.1134233474731445,
+          "heading_cosine": 0.8225027322769165,
+          "minimum_distance": 4.1134233474731445,
+          "peak_tilt_rad": 0.29685017466545105,
+          "seed": 2,
+          "settled_actions": 0,
+          "steps": 172,
+          "target": [
+            0.0,
+            2.0,
+            8.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 2.2970545291900635,
+          "heading_cosine": 0.9943626523017883,
+          "minimum_distance": 2.2970545291900635,
+          "peak_tilt_rad": 0.1712687462568283,
+          "seed": 2,
+          "settled_actions": 0,
+          "steps": 318,
+          "target": [
+            0.0,
+            2.0,
+            -8.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.306781530380249,
+          "heading_cosine": 0.9993430376052856,
+          "minimum_distance": 0.04740467295050621,
+          "peak_tilt_rad": 0.3061058819293976,
+          "seed": 42,
+          "settled_actions": 902,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3020265996456146,
+          "heading_cosine": 0.999187171459198,
+          "minimum_distance": 0.033848363906145096,
+          "peak_tilt_rad": 0.30610528588294983,
+          "seed": 42,
+          "settled_actions": 535,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3162370026111603,
+          "heading_cosine": 0.9985407590866089,
+          "minimum_distance": 0.07654697448015213,
+          "peak_tilt_rad": 0.30610528588294983,
+          "seed": 42,
+          "settled_actions": 907,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.30072134733200073,
+          "heading_cosine": 0.9999058246612549,
+          "minimum_distance": 0.03782776743173599,
+          "peak_tilt_rad": 0.3061058819293976,
+          "seed": 42,
+          "settled_actions": 902,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3051425516605377,
+          "heading_cosine": 0.9996090531349182,
+          "minimum_distance": 0.30172598361968994,
+          "peak_tilt_rad": 0.3063107430934906,
+          "seed": 42,
+          "settled_actions": 729,
+          "steps": 1000,
+          "target": [
+            2.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.30214911699295044,
+          "heading_cosine": 0.9984035491943359,
+          "minimum_distance": 0.3013974130153656,
+          "peak_tilt_rad": 0.37011638283729553,
+          "seed": 42,
+          "settled_actions": 506,
+          "steps": 1000,
+          "target": [
+            -2.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.31663891673088074,
+          "heading_cosine": 0.9989266395568848,
+          "minimum_distance": 0.28229886293411255,
+          "peak_tilt_rad": 0.40059730410575867,
+          "seed": 42,
+          "settled_actions": 581,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            2.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.30158731341362,
+          "heading_cosine": 0.9999754428863525,
+          "minimum_distance": 0.24018672108650208,
+          "peak_tilt_rad": 0.31991732120513916,
+          "seed": 42,
+          "settled_actions": 807,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            -2.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.30449551343917847,
+          "heading_cosine": 0.9992932677268982,
+          "minimum_distance": 0.30351367592811584,
+          "peak_tilt_rad": 0.30633544921875,
+          "seed": 42,
+          "settled_actions": 637,
+          "steps": 1000,
+          "target": [
+            4.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3023717403411865,
+          "heading_cosine": 0.9973959922790527,
+          "minimum_distance": 0.3011683225631714,
+          "peak_tilt_rad": 0.3309224545955658,
+          "seed": 42,
+          "settled_actions": 488,
+          "steps": 1000,
+          "target": [
+            -4.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3180064857006073,
+          "heading_cosine": 0.9978024959564209,
+          "minimum_distance": 0.2480984330177307,
+          "peak_tilt_rad": 0.4003502428531647,
+          "seed": 42,
+          "settled_actions": 558,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            4.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.30286139249801636,
+          "heading_cosine": 0.9998465180397034,
+          "minimum_distance": 0.13555927574634552,
+          "peak_tilt_rad": 0.3282090127468109,
+          "seed": 42,
+          "settled_actions": 655,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            -4.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.30645784735679626,
+          "heading_cosine": 0.9994032382965088,
+          "minimum_distance": 0.30645784735679626,
+          "peak_tilt_rad": 0.30634137988090515,
+          "seed": 42,
+          "settled_actions": 396,
+          "steps": 1000,
+          "target": [
+            6.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.2908678650856018,
+          "heading_cosine": 0.9975643754005432,
+          "minimum_distance": 0.2842288017272949,
+          "peak_tilt_rad": 0.40929874777793884,
+          "seed": 42,
+          "settled_actions": 340,
+          "steps": 1000,
+          "target": [
+            -6.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3295864462852478,
+          "heading_cosine": 0.9965984225273132,
+          "minimum_distance": 0.11555159837007523,
+          "peak_tilt_rad": 0.4002508223056793,
+          "seed": 42,
+          "settled_actions": 480,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            6.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3013967275619507,
+          "heading_cosine": 0.9996694326400757,
+          "minimum_distance": 0.19946753978729248,
+          "peak_tilt_rad": 0.3287913501262665,
+          "seed": 42,
+          "settled_actions": 667,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            -6.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3061077296733856,
+          "heading_cosine": 0.9968621134757996,
+          "minimum_distance": 0.3061077296733856,
+          "peak_tilt_rad": 0.30634453892707825,
+          "seed": 42,
+          "settled_actions": 229,
+          "steps": 1000,
+          "target": [
+            8.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.2713799774646759,
+          "heading_cosine": 0.9986047148704529,
+          "minimum_distance": 0.2528846561908722,
+          "peak_tilt_rad": 0.3330646753311157,
+          "seed": 42,
+          "settled_actions": 280,
+          "steps": 1000,
+          "target": [
+            -8.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 3.673839807510376,
+          "heading_cosine": 0.8386819958686829,
+          "minimum_distance": 3.673839807510376,
+          "peak_tilt_rad": 0.40019774436950684,
+          "seed": 42,
+          "settled_actions": 0,
+          "steps": 291,
+          "target": [
+            0.0,
+            2.0,
+            8.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 3.5971121788024902,
+          "heading_cosine": 0.9622805118560791,
+          "minimum_distance": 3.5971121788024902,
+          "peak_tilt_rad": 0.3290744125843048,
+          "seed": 42,
+          "settled_actions": 0,
+          "steps": 158,
+          "target": [
+            0.0,
+            2.0,
+            -8.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.30869024991989136,
+          "heading_cosine": 0.9987301230430603,
+          "minimum_distance": 0.16168160736560822,
+          "peak_tilt_rad": 0.2128327190876007,
+          "seed": 18446744073709551615,
+          "settled_actions": 998,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.29884836077690125,
+          "heading_cosine": 0.9995456337928772,
+          "minimum_distance": 0.15764440596103668,
+          "peak_tilt_rad": 0.213169664144516,
+          "seed": 18446744073709551615,
+          "settled_actions": 530,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3191951513290405,
+          "heading_cosine": 0.9983716011047363,
+          "minimum_distance": 0.16286922991275787,
+          "peak_tilt_rad": 0.21275454759597778,
+          "seed": 18446744073709551615,
+          "settled_actions": 488,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.30170273780822754,
+          "heading_cosine": 0.9995574951171875,
+          "minimum_distance": 0.15911641716957092,
+          "peak_tilt_rad": 0.21301746368408203,
+          "seed": 18446744073709551615,
+          "settled_actions": 998,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3074018657207489,
+          "heading_cosine": 0.9986899495124817,
+          "minimum_distance": 0.29254448413848877,
+          "peak_tilt_rad": 0.20770764350891113,
+          "seed": 18446744073709551615,
+          "settled_actions": 716,
+          "steps": 1000,
+          "target": [
+            2.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3059481680393219,
+          "heading_cosine": 0.9988536238670349,
+          "minimum_distance": 0.19798938930034637,
+          "peak_tilt_rad": 0.25070178508758545,
+          "seed": 18446744073709551615,
+          "settled_actions": 754,
+          "steps": 1000,
+          "target": [
+            -2.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.32087501883506775,
+          "heading_cosine": 0.9988395571708679,
+          "minimum_distance": 0.3047211170196533,
+          "peak_tilt_rad": 0.326088011264801,
+          "seed": 18446744073709551615,
+          "settled_actions": 475,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            2.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3011641502380371,
+          "heading_cosine": 0.9998496770858765,
+          "minimum_distance": 0.2927314341068268,
+          "peak_tilt_rad": 0.2913687229156494,
+          "seed": 18446744073709551615,
+          "settled_actions": 736,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            -2.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3064107894897461,
+          "heading_cosine": 0.997151255607605,
+          "minimum_distance": 0.2884261906147003,
+          "peak_tilt_rad": 0.20744214951992035,
+          "seed": 18446744073709551615,
+          "settled_actions": 584,
+          "steps": 1000,
+          "target": [
+            4.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3035004436969757,
+          "heading_cosine": 0.9982852935791016,
+          "minimum_distance": 0.22437110543251038,
+          "peak_tilt_rad": 0.2521505653858185,
+          "seed": 18446744073709551615,
+          "settled_actions": 582,
+          "steps": 1000,
+          "target": [
+            -4.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.32299157977104187,
+          "heading_cosine": 0.9985264539718628,
+          "minimum_distance": 0.26745331287384033,
+          "peak_tilt_rad": 0.2729393541812897,
+          "seed": 18446744073709551615,
+          "settled_actions": 562,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            4.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3005356788635254,
+          "heading_cosine": 0.9997633099555969,
+          "minimum_distance": 0.2859610915184021,
+          "peak_tilt_rad": 0.2922610640525818,
+          "seed": 18446744073709551615,
+          "settled_actions": 695,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            -4.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.30844563245773315,
+          "heading_cosine": 0.9947103261947632,
+          "minimum_distance": 0.24344024062156677,
+          "peak_tilt_rad": 0.20741957426071167,
+          "seed": 18446744073709551615,
+          "settled_actions": 534,
+          "steps": 1000,
+          "target": [
+            6.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.29111945629119873,
+          "heading_cosine": 0.9986407160758972,
+          "minimum_distance": 0.2871049642562866,
+          "peak_tilt_rad": 0.25464320182800293,
+          "seed": 18446744073709551615,
+          "settled_actions": 400,
+          "steps": 1000,
+          "target": [
+            -6.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.3339024484157562,
+          "heading_cosine": 0.9982361197471619,
+          "minimum_distance": 0.11498716473579407,
+          "peak_tilt_rad": 0.2617916166782379,
+          "seed": 18446744073709551615,
+          "settled_actions": 492,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            6.0
+          ]
+        },
+        {
+          "ended": false,
+          "final_distance": 0.2979627847671509,
+          "heading_cosine": 0.9998149871826172,
+          "minimum_distance": 0.2977989912033081,
+          "peak_tilt_rad": 0.2899809181690216,
+          "seed": 18446744073709551615,
+          "settled_actions": 453,
+          "steps": 1000,
+          "target": [
+            0.0,
+            2.0,
+            -6.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 3.8477940559387207,
+          "heading_cosine": 0.9706863760948181,
+          "minimum_distance": 3.8477940559387207,
+          "peak_tilt_rad": 0.20740827918052673,
+          "seed": 18446744073709551615,
+          "settled_actions": 0,
+          "steps": 265,
+          "target": [
+            8.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 5.454050540924072,
+          "heading_cosine": 0.871551513671875,
+          "minimum_distance": 5.454050540924072,
+          "peak_tilt_rad": 0.25296491384506226,
+          "seed": 18446744073709551615,
+          "settled_actions": 0,
+          "steps": 176,
+          "target": [
+            -8.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 4.02678918838501,
+          "heading_cosine": 0.7788581848144531,
+          "minimum_distance": 4.02678918838501,
+          "peak_tilt_rad": 0.2610767185688019,
+          "seed": 18446744073709551615,
+          "settled_actions": 0,
+          "steps": 300,
+          "target": [
+            0.0,
+            2.0,
+            8.0
+          ]
+        },
+        {
+          "ended": true,
+          "final_distance": 4.850009441375732,
+          "heading_cosine": 0.9902685284614563,
+          "minimum_distance": 4.850009441375732,
+          "peak_tilt_rad": 0.28883135318756104,
+          "seed": 18446744073709551615,
+          "settled_actions": 0,
+          "steps": 167,
+          "target": [
+            0.0,
+            2.0,
+            -8.0
+          ]
+        }
+      ]
+    }
+  ],
+  "heading_transfer": {
+    "status": "rejected_at_last_evaluated_checkpoint",
+    "last_evaluated_update": 60,
+    "transitions_at_that_checkpoint": 30720,
+    "planned_maximum_updates": 600,
+    "completed_full_budget": false,
+    "stop_reason": "At update 60 one of five selection flights crashed and every flight ended more than 1.6 metres from the hover target. No case met heading qualification.",
+    "source": {
+      "path": "runs/quality-research/heading-probe-source.rs",
+      "sha256": "c868ac173e50ae1928987fbc5b368b94c06b94b6646d59425760cdab1567f123",
+      "source": "//! Measure whether actor transfer can learn a heading without losing flight.\n#![cfg(feature = \"robots\")]\n#[path = \"../examples/robots/learning/mod.rs\"]\nmod learning;\nuse bevy::math::Vec3;\nuse bevy_gym::{Env, Reset, Step, robots::{DroneHover, DroneObservation, DroneAction}, training::{RecurrentPpoAgent, RecurrentPpoPolicy, SeedConfig}};\nuse std::num::NonZeroU16;\n\nstruct Heading { drone: DroneHover }\nimpl Heading { fn new() -> Self { Self { drone: DroneHover::disturbed() } } }\nimpl Env for Heading {\n type Observation = DroneObservation;\n type Action = DroneAction;\n type Info = ();\n fn reset(&mut self, seed: Option<u64>) -> Reset<DroneObservation> { self.drone.reset(seed) }\n fn step(&mut self, action: DroneAction) -> Step<DroneObservation> {\n  let mut result = self.drone.step(action);\n  let forward = result.observation.orientation() * Vec3::NEG_Z;\n  result.reward *= f64::from(0.25 + 0.75 * (-forward.z + 1.0) / 2.0);\n  result\n }\n}\nfn features(obs: DroneObservation) -> [f32; 13] {\n let mut input = [0.0; 13];\n input[..12].copy_from_slice(&learning::encode(obs));\n let forward = obs.orientation() * Vec3::NEG_Z;\n input[12] = forward.cross(Vec3::NEG_Z).y.atan2(forward.dot(Vec3::NEG_Z)) / std::f32::consts::PI;\n input\n}\nfn evaluate(policy: &RecurrentPpoPolicy) -> serde_json::Value {\n let rows: Vec<_> = [0,1,2,42,u64::MAX].into_iter().map(|seed| {\n  let mut env = Heading::new();\n  let mut obs = env.reset(Some(seed)).observation;\n  let mut memory = policy.initial_memory();\n  let mut steps = 0;\n  let mut reward = 0.0;\n  let mut settled = 0;\n  for _ in 0..500 {\n   let prediction = policy.mean_action(&features(obs), &memory).unwrap();\n   memory = prediction.next_memory;\n   let result = env.step(learning::decode_action(&prediction.action).unwrap());\n   obs = result.observation;\n   reward += result.reward;\n   steps += 1;\n   if features(obs)[12].abs() < 0.083333336 && obs.position().distance(Vec3::new(0.0,2.0,0.0)) < 0.5 {settled+=1;}else{settled=0;}\n   if result.is_done() { break; }\n  }\n  serde_json::json!({\"seed\":seed,\"steps\":steps,\"reward\":reward,\"settled\":settled,\"distance\":obs.position().distance(Vec3::new(0.0,2.0,0.0)),\"yaw_error\":features(obs)[12]})\n }).collect();\n serde_json::json!(rows)\n}\n#[test]\n#[ignore]\nfn train_heading() {\n let mut config = learning::learning_config();\n config.actor_learning_rate = 0.0001;\n let mut agent = RecurrentPpoAgent::load_actor_with_inserted_input_feature_and_fresh_critic(\"assets/robots/recovery.mpk\",12,12,13,1,&[0.0;4],&[1.0;4],config,SeedConfig::from_root(7)).unwrap();\n let policy=agent.policy();\n let old = learning::load_policy(include_bytes!(\"../assets/robots/recovery.mpk\").to_vec()).unwrap();\n let obs=DroneHover::disturbed().reset(Some(42)).observation;\n let before=old.mean_action(&learning::encode(obs),&old.initial_memory()).unwrap();\n let after=policy.mean_action(&features(obs),&policy.initial_memory()).unwrap();\n assert_eq!(before,after);\n let mut batch=learning::RecoveryBatch::with_task(7,&policy,Heading::new,features,NonZeroU16::new(500).unwrap());\n std::fs::create_dir_all(\"runs/quality-research/heading-probe\").unwrap();\n println!(\"initial {}\",evaluate(&policy));\n for update in 1..=600 {\n  let sequences=batch.collect(&agent.policy()).unwrap();\n  agent.update(&sequences).unwrap();\n  if update % 20 == 0 || update == 1 {\n   let policy=agent.policy();\n   let evaluation=evaluate(&policy);\n   println!(\"{update}: {evaluation}\");\n   std::fs::write(format!(\"runs/quality-research/heading-probe/{update}.json\"),evaluation.to_string()).unwrap();\n   std::fs::write(format!(\"runs/quality-research/heading-probe/{update}.mpk\"),policy.to_bytes().unwrap()).unwrap();\n  }\n }\n}\n"
+    },
+    "selection": [
+      {
+        "update": 1,
+        "episodes": [
+          {
+            "distance": 0.3125159740447998,
+            "reward": 188.42937108369355,
+            "seed": 0,
+            "settled": 0,
+            "steps": 500,
+            "yaw_error": -0.4711918532848358
+          },
+          {
+            "distance": 0.32076001167297363,
+            "reward": 374.21576106871044,
+            "seed": 1,
+            "settled": 0,
+            "steps": 500,
+            "yaw_error": 0.5287253856658936
+          },
+          {
+            "distance": 0.2860962450504303,
+            "reward": 406.9844378711347,
+            "seed": 2,
+            "settled": 0,
+            "steps": 500,
+            "yaw_error": 0.2122240513563156
+          },
+          {
+            "distance": 0.28774434328079224,
+            "reward": 202.8802242754312,
+            "seed": 42,
+            "settled": 0,
+            "steps": 500,
+            "yaw_error": -0.8311008214950562
+          },
+          {
+            "distance": 0.23794229328632355,
+            "reward": 229.83184487140522,
+            "seed": 18446744073709551615,
+            "settled": 0,
+            "steps": 500,
+            "yaw_error": -0.6062031984329224
+          }
+        ]
+      },
+      {
+        "update": 20,
+        "episodes": [
+          {
+            "distance": 0.3785092234611511,
+            "reward": 176.7238599129691,
+            "seed": 0,
+            "settled": 0,
+            "steps": 500,
+            "yaw_error": -0.5185413360595703
+          },
+          {
+            "distance": 0.4046189785003662,
+            "reward": 365.3681707192316,
+            "seed": 1,
+            "settled": 0,
+            "steps": 500,
+            "yaw_error": 0.4712725281715393
+          },
+          {
+            "distance": 0.32244205474853516,
+            "reward": 398.4597158834513,
+            "seed": 2,
+            "settled": 0,
+            "steps": 500,
+            "yaw_error": 0.17058123648166656
+          },
+          {
+            "distance": 0.3187064826488495,
+            "reward": 198.33027170380262,
+            "seed": 42,
+            "settled": 0,
+            "steps": 500,
+            "yaw_error": -0.8785627484321594
+          },
+          {
+            "distance": 0.2479880452156067,
+            "reward": 228.7545468998045,
+            "seed": 18446744073709551615,
+            "settled": 0,
+            "steps": 500,
+            "yaw_error": -0.6367021799087524
+          }
+        ]
+      },
+      {
+        "update": 40,
+        "episodes": [
+          {
+            "distance": 0.8707980513572693,
+            "reward": 125.8178026483998,
+            "seed": 0,
+            "settled": 0,
+            "steps": 500,
+            "yaw_error": -0.4759381115436554
+          },
+          {
+            "distance": 0.8943923711776733,
+            "reward": 262.80177439278424,
+            "seed": 1,
+            "settled": 0,
+            "steps": 500,
+            "yaw_error": 0.48111891746520996
+          },
+          {
+            "distance": 0.8073945641517639,
+            "reward": 277.3033357213844,
+            "seed": 2,
+            "settled": 0,
+            "steps": 500,
+            "yaw_error": 0.22048455476760864
+          },
+          {
+            "distance": 0.7926144599914551,
+            "reward": 158.55206793143418,
+            "seed": 42,
+            "settled": 0,
+            "steps": 500,
+            "yaw_error": -0.839881956577301
+          },
+          {
+            "distance": 0.6561112403869629,
+            "reward": 185.8727146091276,
+            "seed": 18446744073709551615,
+            "settled": 0,
+            "steps": 500,
+            "yaw_error": -0.548419713973999
+          }
+        ]
+      },
+      {
+        "update": 60,
+        "episodes": [
+          {
+            "distance": 2.2510032653808594,
+            "reward": 51.64306212696467,
+            "seed": 0,
+            "settled": 0,
+            "steps": 500,
+            "yaw_error": -0.29549843072891235
+          },
+          {
+            "distance": 3.1908793449401855,
+            "reward": 97.58421155179421,
+            "seed": 1,
+            "settled": 0,
+            "steps": 410,
+            "yaw_error": 0.5881232023239136
+          },
+          {
+            "distance": 2.1191883087158203,
+            "reward": 111.05451138502384,
+            "seed": 2,
+            "settled": 0,
+            "steps": 500,
+            "yaw_error": 0.39257314801216125
+          },
+          {
+            "distance": 2.0679945945739746,
+            "reward": 87.40775247690806,
+            "seed": 42,
+            "settled": 0,
+            "steps": 500,
+            "yaw_error": -0.7300607562065125
+          },
+          {
+            "distance": 1.699597954750061,
+            "reward": 104.62313026575252,
+            "seed": 18446744073709551615,
+            "settled": 0,
+            "steps": 500,
+            "yaw_error": -0.3407905399799347
+          }
+        ]
+      }
+    ],
+    "frozen_acceptance": {
+      "path": "runs/quality-research/heading-invariants.md",
+      "sha256": "fd4a5d0e05f97132c4e7a0924d88492ddac9b2020b98b163a7a0119c6a9b56c1",
+      "source": "# Heading experiment acceptance\n\n- Preserve DroneHover mass, motor forces, disturbed resets, contact termination,\n  and the qualified twelve-feature checkpoint.\n- HeadingTask changes reward only. Heading is fixed world negative Z.\n- Actor input is twelve body-frame flight quantities plus signed yaw error/pi.\n  No target character state, sight, hearing, or arena data enters this lesson.\n- Transfer inserts one zero-weight feature. Existing mean actions and memory\n  must match the original actor before training. Critic and optimizer start fresh.\n- This private lesson introduces no public library API or live game behavior.\n- Actor learning rate is 0.0001; other healthy recipe settings are retained.\n- Reward multiplies healthy reward by 0.25 + 0.75*(1 - forward.z)/2.\n  Forward is a unit direction. This factor ranges from 0.25 to 1.\n- Training uses eight independent lanes, 64 actions each, and 500-action episodes.\n  Existing training seed exclusion and GAE rules apply unchanged.\n- Selection requires all five existing selection seeds to survive 500 actions,\n  earn reward >=400, end within 0.5 metres, and spend the final 100 actions\n  within 0.5 metres and 15 degrees of world north. No threshold may loosen after\n  seeing results. Qualification also needs frozen, separate high-bit seeds.\n- Commands: focused tests, cargo fmt --all -- --check, cargo test,\n  cargo clippy --all-targets --all-features -- -D warnings, changed-line personal\n  lint, explicit branch/line coverage, runnable guide and documentation tests.\n- Existing game continues using qualified healthy hover. Do not promote a\n  checkpoint solely because a training command completed.\n"
+    },
+    "log": "/home/sagan/.cache/bevy-gym-quality-validation/heading-probe-service.log",
+    "service": "bevy-gym-heading-probe-20261009.service",
+    "service_status": "stopped by experiment operator after failed selection; exit status is not a completed training result"
+  },
+  "residual_heading": {
+    "status": "running_unqualified",
+    "service": "bevy-gym-heading-residual-probe-20261009.service",
+    "log": "/home/sagan/.cache/bevy-gym-quality-validation/heading-residual-probe.log",
+    "artifacts": "runs/quality-research/heading-residual-probe",
+    "source": {
+      "path": "runs/quality-research/heading-residual-probe-source.rs",
+      "sha256": "999e84550dbd42672b1e8e51d37d49619d90eb040a5a4d7e58d2b46f79223bec",
+      "source": "//! Measure whether actor transfer can learn a heading without losing flight.\n#![cfg(feature = \"robots\")]\n#[path = \"../examples/robots/learning/mod.rs\"]\nmod learning;\nuse bevy::math::Vec3;\nuse bevy_gym::{Env, Reset, Step, robots::{DroneHover, DroneObservation, DroneAction}, training::{RecurrentPpoAgent, RecurrentPpoPolicy, SeedConfig}};\nuse std::num::NonZeroU16;\n#[path = \"../runs/quality-research/residual-rollout.rs\"]\nmod collection;\nuse learning::{GAE_LAMBDA,GAMMA};\nfn decode_action(values: &[f32]) -> Result<f32, Box<dyn std::error::Error>> {\n    if values.len() != 1 || !values[0].is_finite() || !(-0.15..=0.15).contains(&values[0]) { return Err(\"invalid yaw trim\".into()); }\n    Ok(values[0])\n}\nstruct TurnTask { heading: Heading, policy: RecurrentPpoPolicy, memory: bevy_gym::training::RecurrentMemory }\nimpl TurnTask {\n fn new() -> Self {\n  let policy=learning::load_policy(include_bytes!(\"../assets/robots/recovery.mpk\").to_vec()).unwrap();\n  let memory=policy.initial_memory();\n  Self { heading:Heading::new(),policy,memory }\n }\n}\nimpl Env for TurnTask {\n type Observation=DroneObservation;\n type Action=f32;\n type Info=();\n fn reset(&mut self, seed: Option<u64>) -> Reset<DroneObservation> {\n  self.memory=self.policy.initial_memory(); self.heading.reset(seed)\n }\n fn step(&mut self, trim:f32) -> Step<DroneObservation> {\n  let prediction=self.policy.mean_action(&learning::encode(self.heading.drone.observation()),&self.memory).unwrap();\n  self.memory=prediction.next_memory;\n  let mut motors=prediction.action;\n  for (motor,sign) in motors.iter_mut().zip([1.0,-1.0,1.0,-1.0]) { *motor=(*motor+trim*sign).clamp(0.0,1.0); }\n  self.heading.step(learning::decode_action(&motors).unwrap())\n }\n}\n\nstruct Heading { drone: DroneHover }\nimpl Heading { fn new() -> Self { Self { drone: DroneHover::disturbed() } } }\nimpl Env for Heading {\n type Observation = DroneObservation;\n type Action = DroneAction;\n type Info = ();\n fn reset(&mut self, seed: Option<u64>) -> Reset<DroneObservation> { self.drone.reset(seed) }\n fn step(&mut self, action: DroneAction) -> Step<DroneObservation> {\n  let mut result = self.drone.step(action);\n  let forward = result.observation.orientation() * Vec3::NEG_Z;\n  result.reward *= f64::from(0.25 + 0.75 * (-forward.z + 1.0) / 2.0);\n  result\n }\n}\nfn features(obs: DroneObservation) -> [f32; 13] {\n let mut input = [0.0; 13];\n input[..12].copy_from_slice(&learning::encode(obs));\n let forward = obs.orientation() * Vec3::NEG_Z;\n input[12] = forward.cross(Vec3::NEG_Z).y.atan2(forward.dot(Vec3::NEG_Z)) / std::f32::consts::PI;\n input\n}\nfn evaluate(policy: &RecurrentPpoPolicy) -> serde_json::Value {\n let rows: Vec<_> = [0,1,2,42,u64::MAX].into_iter().map(|seed| {\n  let mut env = TurnTask::new();\n  let mut obs = env.reset(Some(seed)).observation;\n  let mut memory = policy.initial_memory();\n  let mut steps = 0;\n  let mut reward = 0.0;\n  let mut settled = 0;\n  for _ in 0..500 {\n   let prediction = policy.mean_action(&features(obs), &memory).unwrap();\n   memory = prediction.next_memory;\n   let result = env.step(decode_action(&prediction.action).unwrap());\n   obs = result.observation;\n   reward += result.reward;\n   steps += 1;\n   if features(obs)[12].abs() < 0.083333336 && obs.position().distance(Vec3::new(0.0,2.0,0.0)) < 0.5 {settled+=1;}else{settled=0;}\n   if result.is_done() { break; }\n  }\n  serde_json::json!({\"seed\":seed,\"steps\":steps,\"reward\":reward,\"settled\":settled,\"distance\":obs.position().distance(Vec3::new(0.0,2.0,0.0)),\"yaw_error\":features(obs)[12]})\n }).collect();\n serde_json::json!(rows)\n}\n#[test]\n#[ignore]\nfn train_heading() {\n let mut config = learning::learning_config();\n config.actor_hidden_size=16;\n config.critic_hidden_sizes=vec![32,32];\n config.initial_log_std=-1.0;\n let mut agent=RecurrentPpoAgent::new(13,13,1,&[-0.15],&[0.15],config,SeedConfig::from_root(7)).unwrap();\n let mut batch=collection::RecoveryBatch::with_task(7,&agent.policy(),TurnTask::new,features,NonZeroU16::new(500).unwrap());\n std::fs::create_dir_all(\"runs/quality-research/heading-residual-probe\").unwrap();\n println!(\"initial {}\",evaluate(&agent.policy()));\n for update in 1..=600 {\n  let sequences=batch.collect(&agent.policy()).unwrap();\n  agent.update(&sequences).unwrap();\n  if update % 20 == 0 || update == 1 {\n   let policy=agent.policy();\n   let evaluation=evaluate(&policy);\n   println!(\"{update}: {evaluation}\");\n   std::fs::write(format!(\"runs/quality-research/heading-residual-probe/{update}.json\"),evaluation.to_string()).unwrap();\n   std::fs::write(format!(\"runs/quality-research/heading-residual-probe/{update}.mpk\"),policy.to_bytes().unwrap()).unwrap();\n  }\n }\n}\n"
+    },
+    "collector_source": {
+      "path": "runs/quality-research/residual-rollout.rs",
+      "sha256": "56c1ff81769a6d5205bd54921ae3633c08adf35f90a184262fb9e2d4fcf54b1c",
+      "source": "//! Bounded on-policy collection with separate reset streams and recurrent memory.\n\nuse std::{error::Error, num::NonZeroU16};\n\nuse bevy_gym::robots::DroneObservation;\nuse super::TurnTask;\nuse bevy_gym::training::{\n    RecurrentMemory, RecurrentPpoPolicy, RecurrentPpoSequence, RecurrentSampler, SeedConfig,\n};\nuse bevy_gym::{Env, EpisodeStatus, TimeLimit};\n\nuse super::{decode_action, GAE_LAMBDA, GAMMA};\n\n/// Eight independent training lanes, each contributing 64 actions per update.\npub(crate) struct RecoveryBatch<E = TurnTask, const N: usize = 13>\nwhere\n    E: Env<Observation = DroneObservation, Action = f32>,\n{\n    /// Persistent environments and recurrent state, never shared with evaluation.\n    lanes: [Lane<E>; 8],\n    /// Root streams used to derive each lane's next episode seed.\n    seeds: SeedConfig,\n    /// Fixed-width task encoder shared by policy and value observations.\n    encode: fn(DroneObservation) -> [f32; N],\n}\n\n/// One continuing episode and its independent policy-sampling stream.\nstruct Lane<E: Env<Observation = DroneObservation, Action = f32>> {\n    /// Private environment behind the lesson's positive action limit.\n    environment: TimeLimit<E>,\n    /// Most recent observation, replaced atomically after each action or reset.\n    observation: DroneObservation,\n    /// Actor context retained across consecutive rollout batches.\n    memory: RecurrentMemory,\n    /// Independent Gaussian exploration stream.\n    sampler: RecurrentSampler,\n    /// Completed episodes in this lane.\n    episode: u64,\n}\n\n/// One transition before advantage construction consumes the owned tensors.\nstruct Transition<const N: usize = 13> {\n    /// Dimensionless body-frame policy input before the action.\n    observation: [f32; N],\n    /// Gaussian motor samples before tanh, consumed by the optimizer.\n    pre_tanh_action: Vec<f32>,\n    /// Behavior-policy log probability of those motor samples.\n    log_probability: f32,\n    /// Critic prediction before the transition.\n    value: f32,\n    /// Unscaled environment reward.\n    reward: f32,\n    /// Critic prediction at the final observation, before any reset.\n    next_value: f32,\n    /// Boundary state controlling bootstrapping and advantage propagation.\n    status: EpisodeStatus,\n}\n\nimpl<E, const N: usize> RecoveryBatch<E, N>\nwhere\n    E: Env<Observation = DroneObservation, Action = f32>,\n{\n    /// Reuse bounded collection for another typed drone task and observation width.\n    pub(crate) fn with_task(\n        seed: u64,\n        policy: &RecurrentPpoPolicy,\n        make_environment: fn() -> E,\n        encode: fn(DroneObservation) -> [f32; N],\n        limit: NonZeroU16,\n    ) -> Self {\n        let seeds = SeedConfig::from_root(seed);\n        let lanes = std::array::from_fn(|index| {\n            let mut environment = TimeLimit::new(make_environment(), usize::from(limit.get()))\n                .expect(\"positive task limit\");\n            let observation = environment\n                .reset(Some(training_seed(seeds, index, 0)))\n                .observation;\n            Lane {\n                environment,\n                observation,\n                memory: policy.initial_memory(),\n                sampler: RecurrentSampler::new(seeds.action.wrapping_add(index as u64)),\n                episode: 0,\n            }\n        });\n        Self {\n            lanes,\n            seeds,\n            encode,\n        }\n    }\n\n    /// Collect exactly 512 transitions, splitting sequences at episode boundaries.\n    pub(crate) fn collect(\n        &mut self,\n        policy: &RecurrentPpoPolicy,\n    ) -> Result<Vec<RecurrentPpoSequence>, Box<dyn Error>> {\n        let mut sequences = Vec::with_capacity(self.lanes.len());\n        for (index, lane) in self.lanes.iter_mut().enumerate() {\n            let mut initial_memory = lane.memory.clone();\n            let mut transitions = Vec::with_capacity(64);\n            for step in 0..64 {\n                let observation = (self.encode)(lane.observation);\n                let action = policy.sample_action(&observation, &lane.memory, &mut lane.sampler)?;\n                let value = policy.value(&observation, 0)?;\n                let result = lane.environment.step(decode_action(&action.action)?);\n                // Read the final state's value before a reset can replace that state.\n                let next_value = policy.value(&(self.encode)(result.observation), 0)?;\n                lane.memory = action.next_memory;\n                lane.observation = result.observation;\n                transitions.push(Transition {\n                    observation,\n                    pre_tanh_action: action.pre_tanh_action,\n                    log_probability: action.log_probability,\n                    value,\n                    reward: result.reward as f32,\n                    next_value,\n                    status: result.status,\n                });\n\n                if result.status.is_done() || step == 63 {\n                    sequences.push(finish(std::mem::take(&mut transitions), initial_memory));\n                    if result.status.is_done() {\n                        lane.episode = lane.episode.wrapping_add(1);\n                        lane.observation = lane\n                            .environment\n                            .reset(Some(training_seed(self.seeds, index, lane.episode)))\n                            .observation;\n                        lane.memory = policy.initial_memory();\n                    }\n                    initial_memory = lane.memory.clone();\n                }\n            }\n        }\n        Ok(sequences)\n    }\n}\n\n/// Keep training below the high-bit evaluation partition and exclude small demo seeds.\nconst fn training_seed(seeds: SeedConfig, lane: usize, episode: u64) -> u64 {\n    (seeds.environment_episode(lane, episode) & (u64::MAX >> 1)) | (1 << 10)\n}\n\n/// Construct one contiguous sequence; no transition after reset enters this buffer.\nfn finish<const N: usize>(\n    transitions: Vec<Transition<N>>,\n    initial_memory: RecurrentMemory,\n) -> RecurrentPpoSequence {\n    let mut advantages = vec![0.0; transitions.len()];\n    let mut next_advantage = 0.0;\n    for (transition, advantage) in transitions.iter().zip(&mut advantages).rev() {\n        let bootstrap = transition.status.bootstrap_mask() as f32;\n        let trace = f32::from(!transition.status.is_done());\n        let delta = (GAMMA * bootstrap)\n            .mul_add(transition.next_value, transition.reward - transition.value);\n        *advantage = (GAMMA * GAE_LAMBDA * trace).mul_add(next_advantage, delta);\n        next_advantage = *advantage;\n    }\n    let length = transitions.len();\n    let mut sequence = RecurrentPpoSequence {\n        observations: Vec::with_capacity(length),\n        global_states: Vec::with_capacity(length),\n        pre_tanh_actions: Vec::with_capacity(length),\n        old_log_probabilities: Vec::with_capacity(length),\n        advantages,\n        returns: Vec::with_capacity(length),\n        value_index: 0,\n        initial_memory,\n    };\n    for (transition, advantage) in transitions.into_iter().zip(&sequence.advantages) {\n        // The existing optimizer owns separate actor and critic input matrices.\n        sequence.observations.push(transition.observation.to_vec());\n        sequence.global_states.push(transition.observation.to_vec());\n        sequence.pre_tanh_actions.push(transition.pre_tanh_action);\n        sequence\n            .old_log_probabilities\n            .push(transition.log_probability);\n        sequence.returns.push(transition.value + advantage);\n    }\n    sequence\n}\n\n"
+    },
+    "boundary": "Frozen healthy flight policy plus learned scalar diagonal motor trim, bounded to [-0.15, 0.15]; clamp final motor fractions to [0, 1]. This does not guarantee stability.",
+    "actor_inputs": "Existing twelve flight features plus signed yaw error/pi; no character coordinates.",
+    "architecture": "LSTM hidden size 16, critic [32,32], scalar action; healthy recipe except initial log std -1.0.",
+    "maximum_updates": 600,
+    "reference": "https://arxiv.org/abs/1812.03201v2",
+    "last_evaluated_update": 20,
+    "selection_at_update_20": [
+      {
+        "distance": 0.5529857277870178,
+        "reward": 264.35044894897067,
+        "seed": 0,
+        "settled": 0,
+        "steps": 500,
+        "yaw_error": -0.5462318658828735
+      },
+      {
+        "distance": 0.4522780478000641,
+        "reward": 309.43109411909387,
+        "seed": 1,
+        "settled": 0,
+        "steps": 500,
+        "yaw_error": 0.1300063133239746
+      },
+      {
+        "distance": 0.6249614357948303,
+        "reward": 315.8643783585838,
+        "seed": 2,
+        "settled": 0,
+        "steps": 500,
+        "yaw_error": 0.1845058798789978
+      },
+      {
+        "distance": 0.5466421842575073,
+        "reward": 270.1152968191514,
+        "seed": 42,
+        "settled": 0,
+        "steps": 500,
+        "yaw_error": 0.743503987789154
+      },
+      {
+        "distance": 0.6579900979995728,
+        "reward": 281.9976892953805,
+        "seed": 18446744073709551615,
+        "settled": 0,
+        "steps": 500,
+        "yaw_error": -0.9532198309898376
+      }
+    ],
+    "settled_counter_comparison": "distance < 0.5f32 and abs(yaw_error / pi) < 0.083333336f32; reset counter to zero after either fails"
+  },
+  "validation": {
+    "native": "All archived probes compiled and ran; direct and bounded waypoint probes completed. Actor insertion preserved action and recurrent output exactly for the checked seed. A separate temporary regression checked all five selection seeds and unchanged physics and termination; all seven tests including shared units passed.",
+    "strict_lint": "Not run against the archived experiment prototypes; their compiler output includes unused imports and a dead shared helper. They are not production examples.",
+    "coverage": "Not measured for archived prototypes.",
+    "browser": "Navigation candidates have not been run in the browser.",
+    "red_log": "/home/sagan/.cache/bevy-gym-quality-validation/drone-heading-red.log",
+    "green_log": "/home/sagan/.cache/bevy-gym-quality-validation/drone-heading-green.log"
+  }
+}

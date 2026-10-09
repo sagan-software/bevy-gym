@@ -7,6 +7,52 @@ Updated: 2026-10-09. Goal status: active.
 Read [the roadmap](EXAMPLE_ROADMAP.md), [quality audit](QUALITY_AUDIT.md),
 [reference research](EXAMPLE_RESEARCH.md), and [drone contract](ROBOT_ENVIRONMENT.md).
 
+The active work is learned heading and pursuit. [Navigation probe evidence](progress/drone-navigation-probes.json)
+retains the experiment sources and measured episodes. Direct commands at 0.5,
+1, and 2 metres each settled in all 20 cases: five reset seeds and four cardinal
+directions. At 4 metres, only seven survived and six settled. These are empty-world
+measurements, not evidence of obstacle avoidance or pursuit.
+
+A one-metre displacement cap plus a deterministic yaw servo kept all tested
+flights alive out to eight metres, but none settled at eight metres within
+20 seconds. That servo is a baseline, not learned turning. A two-metre cap caused
+failures at six and eight metres. Do not expose arbitrary distant goals to the
+qualified hover actor.
+
+Direct actor transfer preserved every checked mean action before training.
+After 60 PPO updates, one selection flight terminated at action 410 and all five
+ended more than 1.6 metres from the hover target. No case qualified. The experiment
+was stopped before its 600-update budget; its stopped service status does not
+mean training completed. The qualified game checkpoint remains unchanged.
+
+A residual-heading experiment is running under
+`bevy-gym-heading-residual-probe-20261009.service`. It freezes the healthy flight
+policy and learns one bounded diagonal motor correction. It has not qualified.
+
+Check that service before starting another run. Its log is
+`/home/sagan/.cache/bevy-gym-quality-validation/heading-residual-probe.log`;
+checkpoints and scores are under `runs/quality-research/heading-residual-probe`.
+The evidence JSON embeds both the experiment and collector sources. They were
+compiled as a temporary native test; the temporary test files have been removed.
+
+No experimental controller has been added to the public API or browser example.
+At residual update 20, all five flights survived but none qualified. Archived
+prototypes have compiler warnings and have not passed strict lint, coverage, or
+browser gates. Treat them as experiment records, not tutorial examples.
+
+Next, assess the saved residual checkpoints against the frozen five-seed criteria.
+A candidate needs 500 actions, return at least 400, final distance at most
+0.5 metres, and 100 final consecutive actions within 0.5 metres and 15 degrees
+of north. Then qualify frozen weights on separate high-bit seeds and in the browser.
+Keep failed models out of the game. Learn waypoint tracking and sensor-only search
+only after heading and flight remain qualified together.
+
+The published combat checkpoint is `53dc4b6`. Its
+[CI passed](https://github.com/sagan-software/bevy-gym/actions/runs/37917936689).
+Its [Pages run](https://github.com/sagan-software/bevy-gym/actions/runs/37917936588)
+is queued behind the preceding hearing deployment. This status was checked on
+2026-10-09; local browser evidence and remote deployment remain separate gates.
+
 The current checkpoint adds telegraphed drone return fire. A full 800 ms warning
 precedes three moving rounds, spaced 120 ms apart. Solid cover intercepts shots;
 window and pipe openings permit them. Three impacts disable the robot. Reset
@@ -48,8 +94,8 @@ Logs use the `pursuit-return-fire-` validation-cache prefix. The `ui-gates`,
 earlier, fixed `if-let` warning; the final release and strict gates pass.
 
 The worktree is `bevy-gym-quality`; preserve the original dirty checkout.
-No recording is active. This checkpoint's remote CI and Pages results must be
-checked after push; local browser evidence does not establish remote deployment.
+No recording is active. The published combat CI passed; its Pages deployment
+remains queued. Recheck the active experiment and remote deployment when resuming.
 
 The preceding hearing checkpoint is `5c91099`; its CI passed at
 [run 37909451819](https://github.com/sagan-software/bevy-gym/actions/runs/37909451819).

@@ -572,3 +572,29 @@ constructor during module evaluation. A regression reproduces that ordering;
 another checks the reload instruction after a bindings import fails.
 The real browser test suspends the output context, resumes it through a key press,
 measures nonzero weapon output, and measures silence after reset.
+
+## Navigation experiments before pursuit
+
+The [probe record](progress/drone-navigation-probes.json) stores source and measured
+results for target displacement, heading transfer, and a pending residual controller.
+The live game still uses its qualified hover actor.
+
+The hover actor can reach nearby displaced targets, but larger jumps frequently
+terminate flight. Limiting requested displacement improves survival and slows
+travel. This measures an empty world; it does not qualify arena navigation.
+
+Adding one zero-weight heading input preserves initial actor outputs. Subsequent
+PPO updates in the first transfer experiment degraded hover and failed the fixed
+heading criteria. That candidate was rejected at its last evaluated update, 60.
+
+The next experiment freezes flight weights and learns a scalar correction to
+alternating motor pairs. Final motor fractions remain in [0, 1]. Bounded correction
+does not guarantee stable flight, so it retains the same evaluation requirements.
+
+The architecture uses the decomposition described in
+[Residual Reinforcement Learning for Robot Control, version 2](https://arxiv.org/abs/1812.03201v2).
+That paper concerns robot assembly. It does not establish drone stability or
+Embark's implementation. Our frozen base is itself a learned hover controller.
+
+No character position enters either heading experiment. Heading qualification
+alone will not prove pursuit, obstacle avoidance, or reacquisition.
