@@ -15,8 +15,8 @@ mod damage_encoding;
 mod debris;
 #[path = "flight/effects.rs"]
 mod effects;
-#[path = "learning/encoding.rs"]
-mod encoding;
+#[path = "flight_control/mod.rs"]
+mod flight_control;
 #[path = "learning/model.rs"]
 mod model;
 #[cfg(not(target_arch = "wasm32"))]
@@ -36,6 +36,7 @@ mod drone_model;
 
 use bevy::{asset::AssetMetaCheck, prelude::*};
 
+use flight_control::encoding;
 use session::Session;
 
 /// Browser entry point for selecting validated checkpoint weights.
@@ -62,7 +63,7 @@ fn run(session: Session) {
         DefaultPlugins
             .set(WindowPlugin {
                 primary_window: Some(Window {
-                    title: "Drone hover | Bevy Gym".to_owned(),
+                    title: "Drone flight | Bevy Gym".to_owned(),
                     canvas: Some("#drone-canvas".to_owned()),
                     fit_canvas_to_parent: true,
                     ..default()
@@ -86,6 +87,7 @@ fn run(session: Session) {
             controls::interact,
             scene::project,
             scene::project_damage,
+            scene::project_target,
             controls::refresh,
         )
             .chain(),

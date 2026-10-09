@@ -1,9 +1,10 @@
 //! Deterministic playback and controller selection for the rendered hover lesson.
 
-use bevy::prelude::Resource;
+use bevy::prelude::{Dir2, Resource, Vec3};
 use bevy_gym::robots::{DroneAction, DroneHover, DroneMotor, DroneObservation};
 use bevy_gym::{Env, EpisodeStatus, Step, TimeLimit};
 
+use super::flight_control::{FlightGoal, FlightPilot};
 use super::pilot::{CheckpointKind, RecoveryPilot};
 
 /// Whether fixed updates may request another action; completion comes from `Step`.
@@ -56,6 +57,13 @@ enum Controller {
     Manual(MotorPreset),
     /// A learned policy with its own episode memory.
     Learned(Box<RecoveryPilot>),
+    /// An imitation-trained pilot and its validated destination.
+    Tracking {
+        /// Frozen weights with zero recurrent memory per action.
+        pilot: Box<FlightPilot>,
+        /// Authoritative goal used by both inference and the destination marker.
+        goal: FlightGoal,
+    },
     /// Loading or inference failed; no further commands may reach physics.
     Failed(String),
 }
@@ -141,21 +149,24 @@ impl Session {
     pub(super) const fn preset(&self) -> Option<MotorPreset> {
         match self.controller {
             Controller::Manual(preset) => Some(preset),
-            Controller::Learned(_) | Controller::Failed(_) => None,
+            Controller::Learned(_) | Controller::Tracking { .. } | Controller::Failed(_) => None,
         }
     }
 
     /// Identify learned inference without exposing policy weights or memory.
     #[cfg(test)]
     pub(super) const fn is_learned(&self) -> bool {
-        matches!(self.controller, Controller::Learned(_))
+        matches!(
+            self.controller,
+            Controller::Learned(_) | Controller::Tracking { .. }
+        )
     }
 
     /// Highlight the bundled policy only while those exact source weights are selected.
     pub(super) fn is_bundled(&self) -> bool {
         match &self.controller {
             Controller::Learned(pilot) => pilot.is_bundled(),
-            Controller::Manual(_) | Controller::Failed(_) => false,
+            Controller::Manual(_) | Controller::Tracking { .. } | Controller::Failed(_) => false,
         }
     }
 
@@ -163,7 +174,7 @@ impl Session {
     pub(super) fn error(&self) -> Option<&str> {
         match &self.controller {
             Controller::Failed(error) => Some(error),
-            Controller::Manual(_) | Controller::Learned(_) => None,
+            Controller::Manual(_) | Controller::Learned(_) | Controller::Tracking { .. } => None,
         }
     }
 
@@ -186,6 +197,7 @@ impl Session {
     pub(super) fn policy_label(&self) -> Option<&'static str> {
         match &self.controller {
             Controller::Learned(pilot) => Some(pilot.label()),
+            Controller::Tracking { .. } => Some("Waypoint pilot"),
             Controller::Manual(_) | Controller::Failed(_) => None,
         }
     }
@@ -214,6 +226,39 @@ impl Session {
                 self.reset();
             }
             Err(error) => self.fail(error.to_string()),
+        }
+    }
+
+    /// Start the qualified eight-metre eastward flight from the disturbed seed-42 pose.
+    pub(super) fn select_tracking(&mut self) {
+        self.install_tracking(FlightPilot::bundled());
+    }
+
+    /// Commit a decoded pilot or freeze playback without advancing the current episode.
+    fn install_tracking(
+        &mut self,
+        pilot: Result<FlightPilot, bevy_gym::training::RecurrentPpoError>,
+    ) {
+        match pilot {
+            Ok(pilot) => {
+                let goal = FlightGoal::try_from((Vec3::new(8.0, 2.0, 0.0), Dir2::X))
+                    .expect("The authored goal lies inside the flight box");
+                self.controller = Controller::Tracking {
+                    pilot: Box::new(pilot),
+                    goal,
+                };
+                self.start_profile = StartProfile::Disturbed;
+                self.reset();
+            }
+            Err(error) => self.fail(error.to_string()),
+        }
+    }
+
+    /// Read the selected destination without allowing presentation to alter it.
+    pub(super) const fn target(&self) -> Option<Vec3> {
+        match &self.controller {
+            Controller::Tracking { goal, .. } => Some(goal.position()),
+            Controller::Manual(_) | Controller::Learned(_) | Controller::Failed(_) => None,
         }
     }
 
@@ -271,9 +316,13 @@ impl Session {
         let revision = EpisodeRevision(self.revision.0.wrapping_add(1));
         *self = Self::starting(self.start_profile);
         self.revision = revision;
-        if let Controller::Learned(mut pilot) = controller {
-            pilot.reset();
-            self.controller = Controller::Learned(pilot);
+        match controller {
+            Controller::Learned(mut pilot) => {
+                pilot.reset();
+                self.controller = Controller::Learned(pilot);
+            }
+            tracking @ Controller::Tracking { .. } => self.controller = tracking,
+            Controller::Manual(_) | Controller::Failed(_) => {}
         }
     }
 
@@ -293,6 +342,9 @@ impl Session {
         let command = match &mut self.controller {
             Controller::Manual(preset) => Ok(preset.action()),
             Controller::Learned(pilot) => pilot.command(self.last.observation),
+            Controller::Tracking { pilot, goal } => pilot
+                .action(self.last.observation, *goal)
+                .map_err(Into::into),
             Controller::Failed(_) => return,
         };
         // Inference and validation complete before either physics or its counter changes.
@@ -571,5 +623,106 @@ mod tests {
             MotorPreset::Tilt.action().fractions(),
             [0.55, 0.45, 0.45, 0.55]
         );
+    }
+}
+
+#[cfg(test)]
+mod tracking_tests {
+    use super::*;
+
+    #[test]
+    fn waypoint_loading_failure_preserves_physics_and_reset_restores_manual_control() {
+        let mut session = Session::default();
+        session.select_tracking();
+        session.toggle_playback();
+        session.advance();
+        let previous = session.observation();
+        let steps = session.steps();
+        let error = bevy_gym::training::RecurrentPpoError::InvalidConfig {
+            field: "checkpoint",
+            reason: "parameter shape differs from the declared architecture",
+        };
+        let diagnostic = error.to_string();
+        session.install_tracking(Err(error));
+        assert_eq!(session.error(), Some(diagnostic.as_str()));
+        assert_eq!(session.playback(), Playback::Paused);
+        assert_eq!(session.target(), None);
+        assert_eq!(session.policy_label(), None);
+        session.advance();
+        session.single_step();
+        assert_eq!(session.steps(), steps);
+        assert_eq!(session.observation(), previous);
+        session.reset();
+        assert!(session.error().is_none());
+        assert_eq!(session.preset(), Some(MotorPreset::Hover));
+        assert_eq!(session.target(), None);
+    }
+
+    #[test]
+    fn waypoint_reset_repairs_damage_and_start_changes_retain_the_goal() {
+        use bevy_gym::robots::DroneMotorState;
+
+        let mut session = Session::default();
+        session.select_tracking();
+        assert!(session.is_learned());
+        let goal = session.target();
+        session.fail_motor(DroneMotor::FrontLeft);
+        assert_eq!(
+            session.observation().motor_state(DroneMotor::FrontLeft),
+            DroneMotorState::Failed
+        );
+        session.single_step();
+        session.reset();
+        assert_eq!(session.target(), goal);
+        assert_eq!(
+            session.observation().motor_state(DroneMotor::FrontLeft),
+            DroneMotorState::Working
+        );
+        session.select_start(StartProfile::Calm);
+        assert_eq!(session.target(), goal);
+        for _ in 0..500 {
+            session.single_step();
+        }
+        assert_eq!(session.status(), EpisodeStatus::Truncated);
+        assert!(session.observation().position().distance(goal.unwrap()) < 0.01);
+        session.select_learned();
+        assert_eq!(session.target(), None);
+    }
+
+    #[test]
+    fn waypoint_selection_resets_pauses_and_reaches_the_visible_goal() {
+        let mut session = Session::default();
+        session.single_step();
+        session.select_tracking();
+        assert_eq!(session.steps(), 0);
+        assert_eq!(session.playback(), Playback::Paused);
+        assert_eq!(session.start_profile(), StartProfile::Disturbed);
+        assert_eq!(session.target(), Some(Vec3::new(8.0, 2.0, 0.0)));
+        assert_eq!(session.policy_label(), Some("Waypoint pilot"));
+        assert_eq!(session.preset(), None);
+        assert!(!session.is_bundled());
+        assert!(session.error().is_none());
+        let initial = session.observation();
+        session.toggle_playback();
+        for _ in 0..500 {
+            session.advance();
+        }
+        assert_eq!(session.status(), EpisodeStatus::Truncated);
+        let final_observation = session.observation();
+        assert!(
+            final_observation
+                .position()
+                .distance(session.target().unwrap())
+                < 0.01
+        );
+        let forward = final_observation.orientation() * Vec3::NEG_Z;
+        assert!(forward.dot(Vec3::X) > 0.99);
+        session.advance();
+        assert_eq!(session.observation(), final_observation);
+        session.reset();
+        assert_eq!(session.observation(), initial);
+        assert_eq!(session.target(), Some(Vec3::new(8.0, 2.0, 0.0)));
+        session.select(MotorPreset::Hover);
+        assert_eq!(session.target(), None);
     }
 }

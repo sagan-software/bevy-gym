@@ -20,6 +20,8 @@ pub(super) enum Control {
     Reset,
     /// Reset the episode with the bundled recovery policy.
     Learned,
+    /// Reset to the imitation-trained eight-metre eastward flight.
+    Tracking,
     /// Select one of the four bounded motor commands.
     Preset(MotorPreset),
     /// Replace the episode with the selected initial conditions.
@@ -57,7 +59,7 @@ fn header(root: &mut ChildSpawnerCommands<'_>, font: &Handle<Font>) {
     root.spawn((panel(), BackgroundColor(Color::srgb(0.09, 0.10, 0.11))))
         .with_children(|header| {
             header.spawn((
-                Text::new("Drone hover"),
+                Text::new("Drone flight"),
                 TextFont {
                     font: font.clone(),
                     font_size: 25.0,
@@ -102,6 +104,7 @@ fn footer(root: &mut ChildSpawnerCommands<'_>, font: &Handle<Font>) {
             });
             footer.spawn(row()).with_children(|row| {
                 button(row, "Bundled policy [P]", Control::Learned, font);
+                button(row, "Fly east [T]", Control::Tracking, font);
                 for (label, preset) in [
                     ("Power off [1]", MotorPreset::PowerOff),
                     ("Hover [2]", MotorPreset::Hover),
@@ -164,11 +167,11 @@ fn button(
             },
             BackgroundColor(Color::srgb(0.22, 0.24, 0.25)),
         ))
-        // Complete click events retain rapid presses between rendered frames.
+        // Press uses the current hit target even before the first hovered frame.
         .observe(
-            move |mut click: On<'_, '_, Pointer<Click>>, mut session: ResMut<'_, Session>| {
-                click.propagate(false);
-                if click.button == PointerButton::Primary {
+            move |mut press: On<'_, '_, Pointer<Press>>, mut session: ResMut<'_, Session>| {
+                press.propagate(false);
+                if press.button == PointerButton::Primary {
                     apply(control, &mut session);
                 }
             },
@@ -198,6 +201,7 @@ pub(super) fn interact(keys: Res<'_, ButtonInput<KeyCode>>, mut session: ResMut<
         (KeyCode::KeyN, Control::Step),
         (KeyCode::KeyR, Control::Reset),
         (KeyCode::KeyP, Control::Learned),
+        (KeyCode::KeyT, Control::Tracking),
         (KeyCode::KeyC, Control::Start(StartProfile::Calm)),
         (KeyCode::KeyD, Control::Start(StartProfile::Disturbed)),
         (KeyCode::Digit1, Control::Preset(MotorPreset::PowerOff)),
@@ -222,6 +226,7 @@ fn apply(control: Control, session: &mut Session) {
         Control::Step => session.single_step(),
         Control::Reset => session.reset(),
         Control::Learned => session.select_learned(),
+        Control::Tracking => session.select_tracking(),
         Control::Preset(preset) => session.select(preset),
         Control::Start(profile) => session.select_start(profile),
     }
@@ -237,7 +242,11 @@ fn enabled(control: Control, session: &Session) -> bool {
                     == DroneMotorState::Working
         }
         Control::Step => session.can_step() && session.playback() == Playback::Paused,
-        Control::Reset | Control::Learned | Control::Preset(_) | Control::Start(_) => true,
+        Control::Reset
+        | Control::Learned
+        | Control::Tracking
+        | Control::Preset(_)
+        | Control::Start(_) => true,
     }
 }
 
@@ -246,6 +255,7 @@ fn selected(control: Control, session: &Session) -> bool {
     match control {
         Control::Preset(preset) => Some(preset) == session.preset(),
         Control::Learned => session.is_bundled(),
+        Control::Tracking => session.target().is_some(),
         Control::Start(profile) => profile == session.start_profile(),
         Control::Playback | Control::Step | Control::Reset | Control::FailMotor => false,
     }
@@ -321,7 +331,11 @@ fn status_label(session: &Session) -> String {
         DroneMotorState::Working => "",
         DroneMotorState::Failed => "\nFront-left motor failed",
     };
-    format!("{state} | {command} | Step {steps}/500\n{start} | Height {height:.2} m | Vertical speed {velocity:.2} m/s{damage}")
+    let target = session.target().map_or_else(String::new, |position| {
+        let distance = session.observation().position().distance(position);
+        format!("\n8 m east | Distance to goal {distance:.2} m")
+    });
+    format!("{state} | {command} | Step {steps}/500\n{start} | Height {height:.2} m | Vertical speed {velocity:.2} m/s{target}{damage}")
 }
 
 #[cfg(test)]
@@ -530,7 +544,63 @@ mod tests {
     }
 
     #[test]
-    fn consecutive_clicks_on_button_labels_are_applied_before_the_next_frame() {
+    fn rapid_pointer_press_activates_a_newly_hovered_button_once() {
+        use bevy::picking::{
+            backend::PointerHits,
+            pointer::{PointerAction, PointerInput},
+            InteractionPlugin, PickingPlugin,
+        };
+
+        let mut app = App::new();
+        app.add_plugins((MinimalPlugins, PickingPlugin, InteractionPlugin))
+            .init_resource::<Session>();
+        app.world_mut().register_component::<Window>();
+        app.world_mut().spawn(PointerId::Mouse);
+        let root = app.world_mut().spawn_empty().id();
+        app.world_mut()
+            .commands()
+            .entity(root)
+            .with_children(|parent| {
+                button(parent, "Step", Control::Step, &default());
+            });
+        app.update();
+        let target = app
+            .world_mut()
+            .query_filtered::<Entity, With<Control>>()
+            .single(app.world())
+            .unwrap();
+        let location = Location {
+            target: NormalizedRenderTarget::None {
+                width: 100,
+                height: 100,
+            },
+            position: Vec2::new(50.0, 50.0),
+        };
+        // Movement, press, and release arrive before the first hovered frame.
+        app.world_mut().write_message(PointerHits::new(
+            PointerId::Mouse,
+            vec![(target, HitData::new(Entity::PLACEHOLDER, 0.0, None, None))],
+            1.0,
+        ));
+        for action in [
+            PointerAction::Move { delta: Vec2::ONE },
+            PointerAction::Press(PointerButton::Primary),
+            PointerAction::Release(PointerButton::Primary),
+        ] {
+            app.world_mut().write_message(PointerInput::new(
+                PointerId::Mouse,
+                location.clone(),
+                action,
+            ));
+        }
+        app.update();
+        assert_eq!(app.world().resource::<Session>().steps(), 1);
+        app.update();
+        assert_eq!(app.world().resource::<Session>().steps(), 1);
+    }
+
+    #[test]
+    fn consecutive_presses_on_button_labels_are_applied_before_the_next_frame() {
         let mut world = World::new();
         world.init_resource::<Session>();
         // Pointer traversal queries this component even for an offscreen target.
@@ -554,7 +624,7 @@ mod tests {
             let pickable = world.get::<Pickable>(*label).unwrap();
             assert!(!pickable.is_hoverable && !pickable.should_block_lower);
         }
-        let click = |entity, button| {
+        let press = |entity, button| {
             Pointer::new(
                 PointerId::Mouse,
                 Location {
@@ -564,10 +634,9 @@ mod tests {
                     },
                     position: Vec2::ZERO,
                 },
-                Click {
+                Press {
                     button,
                     hit: HitData::new(Entity::PLACEHOLDER, 0.0, None, None),
-                    duration: std::time::Duration::from_millis(1),
                 },
                 entity,
             )
@@ -578,22 +647,22 @@ mod tests {
             world.get::<Control>(parent).unwrap(),
             Control::Preset(MotorPreset::Climb)
         ));
-        world.trigger(click(parent, PointerButton::Primary));
+        world.trigger(press(parent, PointerButton::Primary));
         assert_eq!(
             world.resource::<Session>().preset(),
             Some(MotorPreset::Climb)
         );
         world.resource_mut::<Session>().reset();
-        // Both complete clicks arrive between application updates, on child text.
-        world.trigger(click(labels[0], PointerButton::Primary));
-        world.trigger(click(labels[1], PointerButton::Primary));
+        // Both presses arrive between application updates, on child text.
+        world.trigger(press(labels[0], PointerButton::Primary));
+        world.trigger(press(labels[1], PointerButton::Primary));
         assert_eq!(
             world.resource::<Session>().preset(),
             Some(MotorPreset::Climb)
         );
         assert_eq!(world.resource::<Session>().steps(), 1);
         for button in [PointerButton::Secondary, PointerButton::Middle] {
-            world.trigger(click(labels[1], button));
+            world.trigger(press(labels[1], button));
         }
         assert_eq!(world.resource::<Session>().steps(), 1);
     }
@@ -688,5 +757,32 @@ mod tests {
             app.world().resource::<Session>().playback(),
             Playback::Running
         );
+    }
+}
+
+#[cfg(test)]
+mod tracking_tests {
+    use super::*;
+
+    #[test]
+    fn tracking_shortcut_selects_a_paused_goal_and_updates_the_highlight() {
+        let mut app = App::new();
+        app.init_resource::<Session>()
+            .init_resource::<ButtonInput<KeyCode>>()
+            .add_systems(Update, interact);
+        assert!(!selected(
+            Control::Tracking,
+            app.world().resource::<Session>()
+        ));
+        app.world_mut()
+            .resource_mut::<ButtonInput<KeyCode>>()
+            .press(KeyCode::KeyT);
+        app.update();
+        let session = app.world().resource::<Session>();
+        assert_eq!(session.playback(), Playback::Paused);
+        assert_eq!(session.steps(), 0);
+        assert!(selected(Control::Tracking, session));
+        assert!(enabled(Control::Tracking, session));
+        assert!(status_label(session).contains("8 m east | Distance to goal"));
     }
 }

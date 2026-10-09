@@ -45,7 +45,7 @@ impl Error for InvalidFlightGoal {}
 
 impl FlightGoal {
     /// Requested world position in metres.
-    pub(super) const fn position(self) -> Vec3 {
+    pub(crate) const fn position(self) -> Vec3 {
         self.position
     }
 

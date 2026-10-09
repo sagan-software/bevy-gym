@@ -1,4 +1,4 @@
-# Drone hover viewer
+# Drone flight viewer
 
 Run the native example from the repository root:
 
@@ -21,35 +21,45 @@ gallery; that sibling route is absent from the standalone local server.
 The scene starts paused. Run and Pause toggle continuous stepping. Step advances
 one 20 ms action while paused. Calm start and Disturbed start select the initial
 conditions and begin a paused episode. Bundled policy loads the bundled recovery
-model and begins a paused episode. Reset retains the start choice and restores
-seed 42. It preserves learned weights and clears recurrent memory. Manual reset
+model and begins a paused episode.
+
+Fly east loads the waypoint pilot and starts a paused eight-metre flight toward
+the ring. Its [guide](../docs/DRONE_TRACKING.md)
+describes the controller and qualification limits.
+
+Reset retains the start choice and restores seed 42. It preserves learned weights and clears recurrent memory. Manual reset
 restores the hover command.
+
 The four presets apply power-off, balanced hover, climb, or asymmetric thrust.
 Fail front left disables that actuator until Reset. A red ring and state label
 identify it; the rotor stops even while paused. The body retains its mass and
 collision shape. The bundled policy was trained with all four motors working.
-Keyboard shortcuts appear on the buttons. Ground contact, leaving the flight
-region, or 500 actions ends the episode; Reset starts another.
+
+Controls activate on primary pointer press. Keyboard shortcuts appear on the
+buttons. Ground contact, leaving the flight region, or 500 actions ends the episode; Reset starts another.
 
 The viewer compares learned and manual control of the
 [drone environment](../docs/ROBOT_ENVIRONMENT.md).
 The 28-line [headless guide](../examples/robots/hover.rs) introduces its API.
 The 25-line [recovery guide](../examples/robots/recovery.rs) uses
 `DroneHover::disturbed()` to add initial tilt and velocity.
+
 The [visual guide](../examples/robots/flight.rs) connects the environment to Bevy.
-Its private modules contain the session, policy, scene, and controls. Rendering reads the
-physics observation and never writes the authoritative pose. Rotor animation
+Its private modules contain the session, policy, scene, and controls.
+
+Rendering reads the physics observation and never writes the authoritative pose. Rotor animation
 illustrates the command; the environment models force rather than rotor RPM.
 
 The [recording](../docs/progress/drone-inference.mp4) compares learned recovery with
 constant half-thrust from the same disturbed start. The
 [inference guide](../docs/DRONE_INFERENCE.md) records controls and failure behavior.
+
 The training panel starts a separate worker from random weights. Choose direct
 recovery or curriculum training. Curriculum trains calm hover before disturbed
 recovery, preserves the optimizer, and advances only after passing each lesson.
 Its progress shows the current lesson's budget and independent evaluation.
-Pause training
-before watching or downloading a checkpoint. Watch checkpoint selects frozen
+
+Pause training before watching or downloading a checkpoint. Watch checkpoint selects frozen
 weights and starts a disturbed episode; later optimizer updates do not change
 those weights. Resume training continues the run. Discard run permits a fresh
 seed and preserves the current scene policy.

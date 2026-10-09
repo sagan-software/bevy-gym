@@ -1,0 +1,152 @@
+{
+  "date": "2026-10-09",
+  "baseline_commit": "d21667cf626d8ddcc6331c2da30f74397c931e2b",
+  "runtime_directory": "build-9fd8a7ef083ec05f6393020943b490b6c13a8383d9869c53ae9d02c6c3b79a21",
+  "browser": "T3 Code 0.0.45 / Electron 44.3.0 / Chromium 152.0.7977.78 on Linux; desktop user agent",
+  "desktop_viewport": [
+    1280,
+    800
+  ],
+  "narrow_viewport": [
+    390,
+    844
+  ],
+  "narrow_canvas_css_pixels": [
+    375.4285888671875,
+    760.0000610351562
+  ],
+  "narrow_document_scroll_width": 375,
+  "artifacts": {
+    "drone-tracking-desktop.png": {
+      "bytes": 606271,
+      "sha256": "0211cc6f47d279542ec75b70f9f0b496a53c5127647a6758fcd71450046cc643"
+    },
+    "drone-tracking-arrived.png": {
+      "bytes": 667044,
+      "sha256": "3159150a1066a7113435f176d07b6a6f94188d7c316707a335c351787955dc72"
+    },
+    "drone-tracking-narrow.png": {
+      "bytes": 313245,
+      "sha256": "418921a79e460edf188244a7dd8e355bf5377b6f7914d2e09be4167dccf17412"
+    },
+    "drone-tracking-narrow-arrived.png": {
+      "bytes": 336188,
+      "sha256": "6631cef6dada3ca45e0ebf112a06732211131a57c17a86265deff30509d18410"
+    },
+    "drone-tracking-flight.mp4": {
+      "bytes": 2034769,
+      "sha256": "0c76dad20062688dffe748b865427402fe5813d9e1b8b132e765b880f0b44860",
+      "duration_seconds": 23.186867
+    },
+    "drone-tracking-damage.mp4": {
+      "bytes": 1078192,
+      "sha256": "8bea257eff2b3ed95a6df37b651cdbf6bfd6ac7c1f8a22ba579c9fbc7f2c475b",
+      "duration_seconds": 9.4867
+    },
+    "drone-tracking-narrow.mp4": {
+      "bytes": 844461,
+      "sha256": "9c2312e5467eb6f9a4d44f899ed50a310ef7070b760608fe85eb85bc61ec7e9d",
+      "duration_seconds": 11.317967
+    }
+  },
+  "runtime_files": {
+    "checkpoint-file-panel.mjs": {
+      "bytes": 1189,
+      "sha256": "3ef8257059dce5cdcbb15b5e53b5e509545872807d3b833f3dd10900e87b3607"
+    },
+    "checkpoint-file.mjs": {
+      "bytes": 1535,
+      "sha256": "191c1370ec1400a6f23c241517e8b89d8a712e6e8123ff4bba7453eccacd7a48"
+    },
+    "drone-flight.js": {
+      "bytes": 109377,
+      "sha256": "4794398eaf06db1a860c493080c102d7e1b48860b43de6b3535559492c8fba83"
+    },
+    "drone-flight_bg.wasm": {
+      "bytes": 37316167,
+      "sha256": "2bdd4b7ffc80352c5cd5c9995265e03988cac35cd9bc09d4db736b3d63e0f6e3"
+    },
+    "drone-worker.js": {
+      "bytes": 12375,
+      "sha256": "6fe4a99a50aeec32e70f22f6a4964d9efeee43259e9b725b92a765b32744e4eb"
+    },
+    "drone-worker_bg.wasm": {
+      "bytes": 4248719,
+      "sha256": "212198bfc8276baa33bcbb50019cbd62751fcfe93c1c7d782e7c9a279c6fe554"
+    },
+    "start.js": {
+      "bytes": 572,
+      "sha256": "dda08b724d5c3c6b7d9d4a9e9e6cabdfc6967aac39ca9a13c7c705a08b3137f7"
+    },
+    "styles.css": {
+      "bytes": 2949,
+      "sha256": "5f0c793ac18f5432884cb9465e9d43ad4d74615ab29a03328f86e30f40fdcfe4"
+    },
+    "training-panel.mjs": {
+      "bytes": 6292,
+      "sha256": "5c196292bb48488f4242d20b7050173b9da3cf84cc6c81257ea4486afc824274"
+    },
+    "training.mjs": {
+      "bytes": 10063,
+      "sha256": "caf8da01c7d36d07d309dcb5f2aeb5c04ed28c0ed395e50fa8fb78d58060aded"
+    },
+    "worker.js": {
+      "bytes": 136,
+      "sha256": "811a9a17343143542e8e613c249687cc6157feb2dc0fa4939eb90a84d174dea5"
+    }
+  },
+  "source_files": {
+    "examples/robots/flight.rs": {
+      "bytes": 3455,
+      "sha256": "f9fa478fba38b3e18f3eb3be84d8c30c1c1678c3bdcc168ff4a4fbad90eb89bc"
+    },
+    "examples/robots/flight/controls.rs": {
+      "bytes": 30209,
+      "sha256": "dedc1bd41c92dccb3e789d07c435d499b68c50f36d712323d0c8c43c3f15d2c6"
+    },
+    "examples/robots/flight/scene.rs": {
+      "bytes": 17284,
+      "sha256": "6ec1c6809b46fce9d9650b2859b2124edf662e00584ebbe2752215e6e71db700"
+    },
+    "examples/robots/flight/session.rs": {
+      "bytes": 27630,
+      "sha256": "3c9627adba90f10a19384897985be17028ed200c40344523addb06579a86a5fe"
+    },
+    "examples/robots/flight_control/mod.rs": {
+      "bytes": 224,
+      "sha256": "f1c8efa57e83ae87936b468bd04cb166b73967907abfc0aac1f891e761289a4b"
+    },
+    "examples/robots/flight_control/goal.rs": {
+      "bytes": 2414,
+      "sha256": "baa1acff2e6ede53c9a576bf7fa8299a83fce9d8cd1d9130a1a052651c42a191"
+    },
+    "assets/robots/tracking.mpk": {
+      "bytes": 104463,
+      "sha256": "4e9f539f54b261bdaf67ab3636700a76b8c7fbe28d31d6579202b500c1d577e1"
+    },
+    "robot-web/index.html": {
+      "bytes": 4220,
+      "sha256": "c150e0be0042836dc06ecd24eaea13a53e5dd093b15ad5036bbc6a83ca697124"
+    }
+  },
+  "observations": [
+    "One pointer click on Fly east resets to paused Waypoint pilot, disturbed seed 42, step 0 and visible destination.",
+    "One pointer click on Run completes desktop waypoint flight at step 500, Time limit, height 2.00 m and distance 0.01 m in the displayed HUD.",
+    "At narrow width, pointer Reset restores step 0 and retains the waypoint pilot. Pointer Run completes step 500 with the same final HUD values while recording.",
+    "The initial drone and destination, and the arrived drone, remain above the controls at both inspected viewport sizes. No horizontal document overflow.",
+    "Pointer Fail front left during waypoint flight produces smoke and a crash with debris. This recorded episode ends at step 204, displayed height 0.29 m and distance 1.89 m.",
+    "Pointer Reset after the damaged episode restores the intact drone and waypoint pilot at step 0."
+  ],
+  "regressions": {
+    "rapid_pointer_press": "Before the fix, a new hover plus press and release in one frame left steps at 0 instead of 1. Press now uses the current hover target. The test exercises PickingPlugin and InteractionPlugin, then asserts exactly one step after two updates.",
+    "pointer_reference": "https://docs.rs/bevy_picking/0.18.1/bevy_picking/events/fn.pointer_events.html"
+  },
+  "limits": [
+    "Narrow viewport checks use desktop pointer input, not physical mobile touch.",
+    "Native window interaction is not verified.",
+    "Videos have no audio track. No audio behavior changed.",
+    "The recording keeps the collaborative preview rendering continuously. An earlier unrecorded hidden-preview wait advanced only 13 actions; it was not counted as a completed mobile flight.",
+    "This is imitation-trained low-level flight. Recovery training remains separate. Moving targets, obstacle avoidance, failed-motor recovery, learned pursuit and search remain unqualified.",
+    "The playable combat scene still uses its existing hover policy. This checkpoint changes the separate flight viewer."
+  ]
+}

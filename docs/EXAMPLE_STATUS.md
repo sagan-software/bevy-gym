@@ -7,50 +7,58 @@ Updated: 2026-10-09. Goal status: active.
 Read [the roadmap](EXAMPLE_ROADMAP.md), [quality audit](QUALITY_AUDIT.md),
 [reference research](EXAMPLE_RESEARCH.md), and [drone contract](ROBOT_ENVIRONMENT.md).
 
-The [waypoint flight guide](DRONE_TRACKING.md) and private inference helper are
-implemented. Run `drone-track` to fly eight metres east and face east from a
-disturbed start. `FlightGoal` validates position and uses `Dir2` for heading;
-`FlightPilot` loads the bundled imitation weights and returns typed motor actions.
-No library API changed.
+The [waypoint flight guide](DRONE_TRACKING.md) now runs in the rendered browser
+viewer. Select Fly east, then Run. The same frozen imitation pilot flies eight
+metres east and faces east. The destination marker derives from the typed goal;
+the camera frames the route and closes in as the drone arrives. Reset retains
+the pilot, repairs damage, and restores seed 42. No library API changed.
 
-All nine new tests pass natively and in Chrome/WASM. They include 128 held-out
-heading cases and 80 bounded waypoint cases. The helper preserves zero recurrent
-memory on every action and clamps displacement to three metres before body-frame
-encoding. The runtime model exactly matches the frozen research candidate:
+The [flight recording](progress/drone-tracking-flight.mp4),
+[damage recording](progress/drone-tracking-damage.mp4), and
+[narrow recording](progress/drone-tracking-narrow.mp4) show the release build.
+Desktop and narrow flights reach step 500 with displayed distance 0.01 m.
+Pointer controls work in both layouts. A rapid move-and-click regression exposed
+Bevy's previous-frame click target; the controls now activate on primary press.
+The [visual record](progress/drone-tracking-viewer.json) stores source/runtime
+hashes, screenshots, observations, and verification limits. Actual mobile touch
+and native window interaction remain unverified.
+
+All 61 viewer tests, nine waypoint tests, root tests, the exact native robot CI
+command, strict native/WASM Clippy, and full browser robot checks pass.
+Changed-line personal Rust strict/discovery checks pass without candidate-local
+diagnostics. The full personal-lint backlog remains. Nix was unchanged; its
+existing unfiltered source-root warnings remain.
+
+The [coverage record](progress/drone-tracking-viewer-coverage.json) covers every added
+instrumented line except native window startup at `flight.rs:66` and system
+registration at `flight.rs:90`. Both outcomes of new production branches execute.
+Validation logs use `tracking-viewer-pointer-` in the shared validation cache.
+
+Next, train navigation from filtered sight, finite memory, hearing bearings, and
+obstacle observations. Start with moving visible targets and qualify collision
+avoidance before adding hidden-target search through house windows and the pipe.
+Do not expose hidden character coordinates to the policy. Moving goals, arena
+obstacles, failed motors, learned pursuit, and search remain unqualified.
+The playable combat scene still uses the old hover pilot. The flight viewer's
+training panel still trains recovery only.
+
+Do not retrain or requalify the unchanged waypoint model just to resume.
+Preserve its zero recurrent memory and three-metre displacement limit.
+The bundled weights retain SHA-256
 `4e9f539f54b261bdaf67ab3636700a76b8c7fbe28d31d6579202b500c1d577e1`.
+The nine tests include the 128 held-out heading cases and 80 bounded waypoint
+cases. The [research record](progress/drone-heading-candidate.json) embeds the
+training sources, restore paths, failures, and selection results.
 
-Native formatting, root tests, the robot CI test command, strict all-target/
-all-feature Clippy, and the full browser robot checks pass. Changed-line personal
-Rust checks pass; the full personal-lint backlog remains. Nix lint still reports
-the existing unfiltered source roots at `flake.nix:119` and `flake.nix:200`. The
-[coverage record](progress/drone-tracking-coverage.json) includes the executed guide,
-every added instrumented line, and both outcomes of new production conditions.
-The first regression failed because the helper module did not exist.
-Validation logs use the `flight-helper-final-` prefix in the shared validation cache.
+All heading experiment services are stopped. No recording is active.
+The prior helper checkpoint `d21667c` has
+[passing CI](https://github.com/sagan-software/bevy-gym/actions/runs/37926307672).
+Its [Browser preview run](https://github.com/sagan-software/bevy-gym/actions/runs/37926307530)
+was still building when this checkpoint was prepared. Check subsequent CI and
+Pages runs separately; local browser verification does not prove deployment.
+Preserve the original dirty checkout and work only in `bevy-gym-quality`.
 
-Next, use `examples/robots/flight_control/mod.rs` in rendered browser flight and
-record the new controller. Do not retrain or requalify the unchanged model
-to resume. Preserve its zero-memory and displacement contracts. Then train
-navigation from filtered sight, finite memory, hearing bearings, and obstacle
-observations. Moving goals, arena obstacles, failed motors, learned pursuit, and
-search remain unqualified. The current playable scene still uses the old hover
-pilot; this checkpoint does not change its visuals or behavior.
-
-All heading experiment services are stopped. The
-[research record](progress/drone-heading-candidate.json) embeds the temporary
-training/evaluation sources and restore paths. Those prototypes remain historical
-records; the committed helper and regression tests now cover inference.
-The [measurements figure](progress/drone-heading-measurements.png) shows native
-telemetry, not browser footage. No recording is active.
-
-The published combat checkpoint is `53dc4b6`; its
-[CI passed](https://github.com/sagan-software/bevy-gym/actions/runs/37917936689).
-The research checkpoint `6ecbfe1` also has
-[passing CI](https://github.com/sagan-software/bevy-gym/actions/runs/37924203032).
-Check subsequent CI and Pages runs separately. Preserve the original dirty
-checkout and work only in `bevy-gym-quality`.
-
-## Current browser build
+## Earlier playable combat checkpoint
 
 The playable combat checkpoint adds telegraphed drone return fire. A full 800 ms warning
 precedes three moving rounds, spaced 120 ms apart. Solid cover intercepts shots;

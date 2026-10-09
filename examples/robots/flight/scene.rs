@@ -19,6 +19,10 @@ pub(super) struct DroneBody;
 #[derive(Component)]
 pub(super) struct FailedMotorMarker;
 
+/// Read-only destination marker and ground ruler for waypoint flight.
+#[derive(Component)]
+pub(super) struct FlightTarget;
+
 /// Retained model handle, including its observable loading or failure state.
 #[derive(Resource)]
 pub(super) struct DroneModel(pub(super) Handle<Scene>);
@@ -43,6 +47,7 @@ pub(super) fn setup(
             failure_marker(parent, &mut meshes, &mut materials);
         });
     floor(&mut commands, &mut meshes, &mut materials);
+    tracking_marker(&mut commands, &mut meshes, &mut materials);
     commands.spawn((
         DirectionalLight {
             illuminance: 12_000.0,
@@ -60,6 +65,56 @@ pub(super) fn setup(
         Camera3d::default(),
         Transform::from_xyz(3.3, 3.1, 4.7).looking_at(Vec3::new(0.0, 1.6, 0.0), Vec3::Y),
     ));
+}
+
+/// Mark the destination and metre spacing without adding collision geometry.
+fn tracking_marker(
+    commands: &mut Commands<'_, '_>,
+    meshes: &mut Assets<Mesh>,
+    materials: &mut Assets<StandardMaterial>,
+) {
+    let paint = materials.add(StandardMaterial {
+        base_color: Color::srgb(0.05, 0.34, 0.37),
+        unlit: true,
+        ..default()
+    });
+    commands
+        .spawn((FlightTarget, Transform::default(), Visibility::Hidden))
+        .with_children(|target| {
+            // The ring marks the two-metre flight goal; the stem locates it above ground.
+            target.spawn((
+                Mesh3d(meshes.add(Torus::new(0.35, 0.38))),
+                MeshMaterial3d(paint.clone()),
+                Transform::default(),
+            ));
+            target.spawn((
+                Mesh3d(meshes.add(Cuboid::new(0.025, 2.0, 0.025))),
+                MeshMaterial3d(paint.clone()),
+                Transform::from_xyz(0.0, -1.0, 0.0),
+            ));
+            // Nine ground ticks measure the fixed eight-metre route from its origin.
+            for metre in 0..=8 {
+                target.spawn((
+                    Mesh3d(meshes.add(Cuboid::new(0.025, 0.005, 1.2))),
+                    MeshMaterial3d(paint.clone()),
+                    Transform::from_xyz(metre as f32 - 8.0, -1.994, 0.0),
+                ));
+            }
+        });
+}
+
+/// Derive destination position and visibility from the selected controller.
+pub(super) fn project_target(
+    session: Res<'_, Session>,
+    mut target: Single<'_, '_, (&mut Transform, &mut Visibility), With<FlightTarget>>,
+) {
+    let (transform, visibility) = &mut *target;
+    if let Some(position) = session.target() {
+        transform.translation = position;
+        **visibility = Visibility::Inherited;
+    } else {
+        **visibility = Visibility::Hidden;
+    }
 }
 
 /// Attach a hidden visual marker above the front-left rotor in body coordinates.
@@ -123,7 +178,7 @@ pub(super) fn project(
     drone.rotation = observation.orientation();
     // Follow translation without inheriting body tilt, so climb and falls stay visible.
     let position = observation.position();
-    **camera = Transform::from_translation(position + CAMERA_OFFSET).looking_at(position, Vec3::Y);
+    **camera = camera_pose(position, session.target());
     let phase = session.steps() as f32 * 0.02 * 200.0;
     let fractions = session.last_action().fractions();
     for (name, mut transform) in &mut rotors {
@@ -143,6 +198,18 @@ pub(super) fn project(
             *transform = spin_about(pivot, -phase * fraction * sign);
         }
     }
+}
+
+/// Frame the route during waypoint flight, then converge on the usual inspection view.
+fn camera_pose(position: Vec3, target: Option<Vec3>) -> Transform {
+    // Divide route length by two metres to obtain a dimensionless zoom multiplier.
+    let (focus, scale, look_down) = target.map_or((position, 1.0, 0.0), |goal| {
+        let scale = 1.0 + position.distance(goal) / 2.0;
+        // Lower the look point by 0.55 metres per scale unit to clear the lower controls.
+        (position.lerp(goal, 0.5), scale, 0.55 * scale)
+    });
+    Transform::from_translation(focus + CAMERA_OFFSET * scale)
+        .looking_at(focus - Vec3::Y * look_down, Vec3::Y)
 }
 
 /// Derive marker visibility from actuator health without changing physics.
@@ -299,5 +366,77 @@ mod tests {
             );
         }
         assert!(rotor("Body").is_none());
+    }
+}
+
+#[cfg(test)]
+mod tracking_tests {
+    use super::*;
+    use crate::session::MotorPreset;
+
+    #[test]
+    fn tracking_camera_keeps_both_route_ends_above_controls_at_mobile_width() {
+        let target = Vec3::new(8.0, 2.0, 0.0);
+        for position in [Vec3::new(0.0, 2.0, 0.0), target] {
+            let camera = camera_pose(position, Some(target));
+            let inverse = camera.compute_affine().inverse();
+            let half_fov = PerspectiveProjection::default().fov / 2.0;
+            // The 390-pixel browser leaves a 375 by 760 CSS-pixel canvas after scrolling space.
+            let aspect = 375.0 / 760.0;
+            for point in [position, target] {
+                let local = inverse.transform_point3(point);
+                let half_height = -local.z * half_fov.tan();
+                let horizontal = local.x / (half_height * aspect);
+                let vertical = local.y / half_height;
+                assert!(horizontal.abs() < 0.95);
+                assert!((0.05..0.55).contains(&vertical));
+            }
+        }
+        let arrived = camera_pose(target, Some(target));
+        assert!(arrived
+            .translation
+            .abs_diff_eq(target + CAMERA_OFFSET, 0.000_001));
+    }
+
+    #[test]
+    fn waypoint_marker_follows_controller_selection_without_changing_physics() {
+        let mut app = App::new();
+        app.add_plugins((MinimalPlugins, AssetPlugin::default()))
+            .init_asset::<Mesh>()
+            .init_asset::<StandardMaterial>()
+            .init_asset::<Scene>()
+            .init_resource::<Session>()
+            .add_systems(Startup, setup)
+            .add_systems(Update, project_target);
+        app.update();
+        let world = app.world_mut();
+        let marker = world
+            .query_filtered::<Entity, With<FlightTarget>>()
+            .single(world)
+            .unwrap();
+        assert_eq!(
+            *world.get::<Visibility>(marker).unwrap(),
+            Visibility::Hidden
+        );
+        world.resource_mut::<Session>().select_tracking();
+        let initial = world.resource::<Session>().observation();
+        app.update();
+        let world = app.world_mut();
+        assert_eq!(
+            world.get::<Transform>(marker).unwrap().translation,
+            Vec3::new(8.0, 2.0, 0.0)
+        );
+        assert_eq!(
+            *world.get::<Visibility>(marker).unwrap(),
+            Visibility::Inherited
+        );
+        assert_eq!(world.resource::<Session>().observation(), initial);
+        assert_eq!(world.get::<Children>(marker).unwrap().len(), 11);
+        world.resource_mut::<Session>().select(MotorPreset::Hover);
+        app.update();
+        assert_eq!(
+            *app.world().get::<Visibility>(marker).unwrap(),
+            Visibility::Hidden
+        );
     }
 }

@@ -577,8 +577,8 @@ measures nonzero weapon output, and measures silence after reset.
 
 The [candidate record](progress/drone-heading-candidate.json) stores frozen
 weights, exact experiment sources, case results, and earlier failed approaches.
-The live game still uses its qualified hover actor. Browser integration of the
-new candidate remains pending.
+The live game still uses its qualified hover actor. The separate flight viewer
+now exposes the waypoint pilot through Fly east.
 
 The candidate passed 128 native heading cases across four directions and
 32 fresh high-bit reset seeds. Every case survived ten seconds, returned at
@@ -630,7 +630,7 @@ bundled inference. Its nine tests pass natively and in Chrome/WASM, including
 all 128 heading cases and 80 bounded waypoint cases. Every action uses zero
 recurrent memory and a three-metre displacement limit.
 
-Next, connect this controller to rendered browser flight and record its behavior.
+The waypoint flight is now available in the rendered browser viewer.
 Pursuit, search, moving targets, arena obstacles, and failed motors still require
 training and evaluation. No hidden character coordinates entered these heading
 or waypoint lessons. The playable combat scene still uses the old hover pilot.

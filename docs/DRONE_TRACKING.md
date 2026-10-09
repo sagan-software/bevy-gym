@@ -18,6 +18,34 @@ The private example helper validates finite positions inside X/Z (-10, 10) and
 Y (0, 10) metres. These are open bounds. A valid goal does not guarantee safe
 flight, collision avoidance, or recovery after damage.
 
+## Browser flight
+
+Open the drone viewer using the [browser build guide](../robot-web/README.md).
+Select Fly east, then Run. The drone flies toward the ring, two metres above
+the ground. Ground ticks mark each metre. The camera frames both route ends
+and moves closer as the drone arrives. The HUD reports distance to the goal.
+
+The keyboard shortcuts are T for Fly east, Space for Run/Pause, N for Step,
+and R for Reset. Reset retains the waypoint pilot, repairs motors, and restores
+seed 42. Calm start and Disturbed start retain the goal. Bundled policy returns
+to recovery inference. The training panel still trains recovery only.
+
+Fail front left disables one motor and triggers the existing destruction effects.
+This pilot was trained with all four motors working. A crash after damage is an
+expected demonstration of that limit, not evidence of damage recovery.
+
+The [flight recording](progress/drone-tracking-flight.mp4) shows the desktop run.
+The [damage recording](progress/drone-tracking-damage.mp4) shows smoke and debris
+after a failed motor. The [visual record](progress/drone-tracking-viewer.json)
+includes narrow-layout playback, screenshots, and source/runtime hashes.
+Both inspected healthy browser flights ended at 500 actions with displayed
+distance 0.01 metres. Physical mobile touch remains unverified.
+
+The controls activate on primary pointer press. Bevy 0.18.1 sends `Click` to the
+[previous frame's hovered target](https://docs.rs/bevy_picking/0.18.1/bevy_picking/events/fn.pointer_events.html).
+A rapid move, press, and release previously missed the new button. A regression
+now passes those inputs through Bevy's picking pipeline and asserts one action.
+
 ## Controller contract
 
 `FlightPilot::bundled()` loads the frozen imitation-trained controller.
@@ -86,5 +114,4 @@ have direct tests.
 
 The playable arena still uses its previous hover controller. Moving goals,
 arena obstacles, failed motors, and navigation from filtered senses remain
-unqualified. The next checkpoint must show this controller in a rendered browser
-scene before claiming a gameplay improvement.
+unqualified. The waypoint viewer is a separate flight lesson.

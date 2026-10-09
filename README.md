@@ -114,7 +114,7 @@ Add `ResetRequested` to any environment entity to trigger a reset on the next fi
 commands.entity(env_entity).insert(ResetRequested { seed: Some(42) });
 ```
 
-## Drone hover
+## Drone flight
 
 Run the first robot lesson from this checkout:
 
@@ -130,7 +130,9 @@ window. Open the visual lesson with:
 nix develop --command cargo run --features robots --example drone-flight
 ```
 
-Select Disturbed start, Learned policy, and Run to watch recovery. Manual controls
+Select Disturbed start, Bundled policy, and Run to watch recovery.
+Select Fly east and Run to watch
+the [waypoint pilot](docs/DRONE_TRACKING.md) fly eight metres. Manual controls
 provide hover, climb, power-off, and tilt for comparison. The
 [recovery guide](examples/robots/recovery.rs) adds initial tilt and
 velocity through `DroneHover::disturbed()`. The
