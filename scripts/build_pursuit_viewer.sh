@@ -35,6 +35,7 @@ fi
 cp -- robot-web/pursuit/index.html robot-web/pursuit/styles.css robot-web/pursuit/start.js robot-web/pursuit/audio.js "$pursuit_dist/"
 cp -- assets/fonts/MonaSans-VariableFont.ttf assets/fonts/OFL.txt "$pursuit_dist/assets/fonts/"
 cp -- assets/robots/drone.glb assets/robots/drone-charge.wav assets/robots/drone-shot.wav assets/robots/README.md "$pursuit_dist/assets/robots/"
+cp -R -- assets/robots/survival "$pursuit_dist/assets/robots/"
 cp -- LICENSES/DRONE-CC-BY-3.0.txt "$pursuit_dist/LICENSES/"
 # Keep the entry module and WASM bindings together across cached deployments.
 runtime_files=(drone-pursuit.js drone-pursuit_bg.wasm start.js audio.js styles.css)

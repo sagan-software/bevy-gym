@@ -1,0 +1,138 @@
+{
+  "files": [
+    {
+      "path": "LICENSE-ANIMATIONS.txt",
+      "source": "https://quaternius.itch.io/universal-animation-library",
+      "license": "CC0-1.0",
+      "author": "Quaternius",
+      "sha256": "6d01f55c6e4c49a2c9963e147e561945ae2c83958c8ca667d90a6bffdbfac061",
+      "modifications": "None; original file bytes."
+    },
+    {
+      "path": "LICENSE-ESSENTIALS.txt",
+      "source": "https://opengameart.org/content/sci-fi-essentials-kit",
+      "license": "CC0-1.0",
+      "author": "Quaternius",
+      "sha256": "2687fba65dca7bbd2f9ab2fb7a8c51dd0c7c8e9acd7579415612bec43f68b3f5",
+      "modifications": "None; original file bytes."
+    },
+    {
+      "path": "mannequin.glb",
+      "source": "https://quaternius.itch.io/universal-animation-library",
+      "license": "CC0-1.0",
+      "author": "Quaternius",
+      "sha256": "a0b15a89d3b21bf20ac48f8ac32fa16f20a9f32b170dfacd01a5375d7190d97f",
+      "modifications": {
+        "operation": "Replace material PBR factors; retain binary buffer, skeleton, mesh, and animation bytes unchanged.",
+        "palette_linear_rgba_metallic_roughness": {
+          "M_Main": [
+            [
+              0.55,
+              0.6,
+              0.58,
+              1.0
+            ],
+            0.25,
+            0.48
+          ],
+          "M_Joints": [
+            [
+              0.028,
+              0.045,
+              0.05,
+              1.0
+            ],
+            0.1,
+            0.75
+          ]
+        }
+      },
+      "original_sha256": "69591853d817488edaa8fd9bf8fc1d821eaeaf789f8627b3cd23b41c4ed67997"
+    },
+    {
+      "path": "pistol/Gun_Pistol.bin",
+      "source": "https://opengameart.org/content/sci-fi-essentials-kit",
+      "license": "CC0-1.0",
+      "author": "Quaternius",
+      "sha256": "82119e00ec3ddc39747e2b53934ebbcb97100b8904f85c3005b22c56c756fc15",
+      "modifications": "None; original file bytes."
+    },
+    {
+      "path": "pistol/Gun_Pistol.gltf",
+      "source": "https://opengameart.org/content/sci-fi-essentials-kit",
+      "license": "CC0-1.0",
+      "author": "Quaternius",
+      "sha256": "db0a2b4afda0abf2b68c857736f51555e21d6c883f4520b92f659ecb0c737b1e",
+      "modifications": "None; original file bytes."
+    },
+    {
+      "path": "pistol/T_Guns_Batch1_BaseColor.png",
+      "source": "https://opengameart.org/content/sci-fi-essentials-kit",
+      "license": "CC0-1.0",
+      "author": "Quaternius",
+      "sha256": "bb995634e417a243c104f54f43fdd71b166a36a30a38b7de00144400fd92f17d",
+      "modifications": "None; original file bytes."
+    },
+    {
+      "path": "pistol/T_Guns_Batch1_Normal.png",
+      "source": "https://opengameart.org/content/sci-fi-essentials-kit",
+      "license": "CC0-1.0",
+      "author": "Quaternius",
+      "sha256": "40c00467ff3f1d881097cf373ccaaf9b805a163af562e6ff44d1c117cbe45e63",
+      "modifications": "None; original file bytes."
+    },
+    {
+      "path": "pistol/T_Guns_Batch1_ORM.png",
+      "source": "https://opengameart.org/content/sci-fi-essentials-kit",
+      "license": "CC0-1.0",
+      "author": "Quaternius",
+      "sha256": "f9df518727f27048cfaa4a4ed6d13e5fdd482ae51e1963fc7a97fe70c9f98022",
+      "modifications": "None; original file bytes."
+    },
+    {
+      "path": "cover/Prop_Crate_Large.gltf",
+      "source": "https://opengameart.org/content/sci-fi-essentials-kit",
+      "license": "CC0-1.0",
+      "author": "Quaternius",
+      "sha256": "2b54a8fd4da534507ff3bd976f97abfe2b8ee2106dd934a73890248e33f8014a",
+      "modifications": "None; original file bytes."
+    },
+    {
+      "path": "cover/Prop_Crate_Large.bin",
+      "source": "https://opengameart.org/content/sci-fi-essentials-kit",
+      "license": "CC0-1.0",
+      "author": "Quaternius",
+      "sha256": "5f79642b6a60ed000a86477444c0c7a26197fd0df32b24d2bc9985092945d268",
+      "modifications": "None; original file bytes."
+    },
+    {
+      "path": "cover/T_Props_Crates_Normal.png",
+      "source": "https://opengameart.org/content/sci-fi-essentials-kit",
+      "license": "CC0-1.0",
+      "author": "Quaternius",
+      "sha256": "9fe8aa4951198c0dd3e06a41cd7aca1e50e308c2629f620f4d5be53dfc835b21",
+      "modifications": "None; original file bytes."
+    },
+    {
+      "path": "cover/T_Props_Crates_BaseColor.png",
+      "source": "https://opengameart.org/content/sci-fi-essentials-kit",
+      "license": "CC0-1.0",
+      "author": "Quaternius",
+      "sha256": "79d604644b8ef63731735cfb29a4a9ded81598d20ecffe75e2af3fd9e18d255c",
+      "modifications": "None; original file bytes."
+    },
+    {
+      "path": "cover/T_Props_Crates_ORM.png",
+      "source": "https://opengameart.org/content/sci-fi-essentials-kit",
+      "license": "CC0-1.0",
+      "author": "Quaternius",
+      "sha256": "a36b59d07082dde265f13689f0acaacfa0cfb22b4769a2dad1bad282a39bf795",
+      "modifications": "None; original file bytes."
+    }
+  ],
+  "archives": {
+    "animation-standard.zip": "cc73fc4e495b82958207316596317a3f40b9fa38065bde1027937452da537724",
+    "essentials-models.zip": "f5cb9382a029730f9fa8f93e7fdb103c1aaaec094a22b1397833ce0e48bd1016",
+    "essentials-textures.zip": "d80b61c7be7200c68e584f25292df6d0620516d5eb4d2043aec2cc54decb1e55"
+  }
+}

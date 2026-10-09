@@ -1,4 +1,4 @@
-//! Original pistol geometry and the licensed drone target, driven only by combat state.
+//! Licensed pistol and drone models, driven only by combat state.
 
 use super::{
     combat::{health::RotorHealth, pistol::Pistol},
@@ -17,48 +17,30 @@ pub(super) enum Visual {
     Held,
 }
 
-/// Load the existing licensed drone and create matching ground and held pistol meshes.
-pub(super) fn setup(
-    mut commands: Commands<'_, '_>,
-    assets: Res<'_, AssetServer>,
-    mut meshes: ResMut<'_, Assets<Mesh>>,
-    mut materials: ResMut<'_, Assets<StandardMaterial>>,
-) {
+/// Load licensed scenes once and share their assets between ground and held pistols.
+pub(super) fn setup(mut commands: Commands<'_, '_>, assets: Res<'_, AssetServer>) {
     let model = assets.load(GltfAssetLabel::Scene(0).from_asset("robots/drone.glb"));
     commands
         .spawn((Visual::Drone, Transform::default(), Visibility::default()))
         .with_children(|root| {
             root.spawn((SceneRoot(model), drone_model::model_alignment()));
         });
-    let metal = materials.add(Color::srgb(0.13, 0.17, 0.19));
-    let grip = materials.add(Color::srgb(0.89, 0.57, 0.13));
-    let barrel = meshes.add(Cuboid::new(0.07, 0.09, 0.25));
-    let handle = meshes.add(Cuboid::new(0.065, 0.15, 0.08));
-    for held in [false, true] {
-        let mut entity = commands.spawn((Transform::default(), Visibility::default()));
-        if held {
-            entity.insert(Visual::Held);
-        } else {
-            entity.insert(Visual::Pickup);
-        }
-        entity.with_children(|root| {
-            root.spawn((
-                Mesh3d(barrel.clone()),
-                MeshMaterial3d(metal.clone()),
-                Transform::from_xyz(0.0, 0.0, -0.08),
-            ));
-            root.spawn((
-                Mesh3d(handle.clone()),
-                MeshMaterial3d(grip.clone()),
-                Transform::from_xyz(0.0, -0.09, 0.0),
-            ));
-        });
+    let pistol =
+        assets.load(GltfAssetLabel::Scene(0).from_asset("robots/survival/pistol/Gun_Pistol.gltf"));
+    for kind in [Visual::Pickup, Visual::Held] {
+        commands.spawn((
+            kind,
+            SceneRoot(pistol.clone()),
+            Transform::default(),
+            Visibility::default(),
+        ));
     }
 }
 
 /// Project ownership and authoritative target health into model visibility and poses.
 pub(super) fn project(
     game: Res<'_, Game>,
+    hand: Query<'_, '_, &GlobalTransform, With<super::robot::Hand>>,
     mut roots: Query<'_, '_, (&Visual, &mut Transform, &mut Visibility), Without<Name>>,
 ) {
     let target = game.combat.target();
@@ -70,11 +52,13 @@ pub(super) fn project(
                 target.health().is_alive()
             }
             Visual::Pickup => {
-                transform.translation = Pistol::LOCATION - Vec3::Y * 0.65;
+                // The source mesh is 6.84 cm thick. Lay it flat just above the floor.
+                *transform = Transform::from_xyz(Pistol::LOCATION.x, 0.035, Pistol::LOCATION.z)
+                    .with_rotation(Quat::from_rotation_x(std::f32::consts::FRAC_PI_2));
                 !game.combat.is_armed()
             }
             Visual::Held => {
-                *transform = held_pose(&game);
+                *transform = held_pose(&game, hand.single().ok());
                 game.combat.is_armed()
             }
         };
@@ -124,13 +108,17 @@ pub(super) fn traces(game: Res<'_, Game>, mut gizmos: Gizmos<'_, '_>) {
     }
 }
 
-/// Derive the pistol pose from the same shoulder hinge used by the robot animation.
-fn held_pose(game: &Game) -> Transform {
+/// Place the grip at the animated hand; the native barrel points along negative X.
+fn held_pose(game: &Game, hand: Option<&GlobalTransform>) -> Transform {
     let facing = Quat::from_rotation_y(game.facing());
-    let pitch = game.pitch();
-    let shoulder = Quat::from_rotation_x(std::f32::consts::FRAC_PI_2 + pitch);
-    let hand = Vec3::new(0.31, 0.46, 0.0) + shoulder * Vec3::new(0.0, -0.50, 0.0);
-    let barrel = Quat::from_rotation_x(pitch);
-    Transform::from_translation(game.arena.position() + facing * (hand + barrel * Vec3::Y * 0.09))
-        .with_rotation(facing * barrel)
+    let direction = game.aim.map_or(facing * Vec3::NEG_Z, |aim| *aim);
+    let pitch = direction.y.clamp(-1.0, 1.0).asin();
+    let position = hand.map_or_else(
+        || game.arena.position() + facing * Vec3::new(0.25, 0.4, -0.4),
+        GlobalTransform::translation,
+    );
+    // Apply yaw and elevation separately so diagonal aim cannot roll the grip sideways.
+    Transform::from_translation(position).with_rotation(
+        facing * Quat::from_rotation_x(pitch) * Quat::from_rotation_y(-std::f32::consts::FRAC_PI_2),
+    )
 }

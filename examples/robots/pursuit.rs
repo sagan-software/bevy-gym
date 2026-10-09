@@ -73,6 +73,9 @@ mod flight_control;
 #[path = "pursuit/navigation/mod.rs"]
 mod navigation;
 
+#[path = "pursuit/survival.rs"]
+mod survival;
+
 #[path = "pursuit/camera.rs"]
 mod camera;
 use camera::EYE_OFFSET as DRONE_EYE;
@@ -80,6 +83,8 @@ use camera::EYE_OFFSET as DRONE_EYE;
 /// One character's simulation and measured motion for visual animation.
 #[derive(Resource)]
 struct Game {
+    /// Fixed-step survival time and the first terminal outcome.
+    run: survival::Run,
     /// Shared movement and collision model.
     arena: Arena,
     /// Pickup, target damage, and firing feedback.
@@ -119,6 +124,7 @@ impl Default for Game {
             .project_flight(flight.observation())
             .expect("Initial flight pose is valid");
         Self {
+            run: survival::Run::default(),
             arena,
             combat,
             flight,
@@ -140,6 +146,7 @@ impl Default for Game {
 impl Game {
     /// Reset simulation and animation together.
     fn reset(&mut self) {
+        self.run = survival::Run::default();
         self.arena.reset();
         self.combat = firing::Combat::default();
         self.flight.reset();
@@ -212,11 +219,6 @@ impl Game {
             .map_or(self.heading, |aim| (-aim.x).atan2(-aim.z))
     }
 
-    /// Elevate the held pistol and shoulder along the current aim.
-    fn pitch(&self) -> f32 {
-        self.aim.map_or(0.0, |aim| aim.y.clamp(-1.0, 1.0).asin())
-    }
-
     /// Interactions use the current arena position rather than a caller-supplied origin.
     fn act(&mut self, action: firing::Action) {
         if !self.robot_health.is_alive() {
@@ -235,10 +237,28 @@ impl Game {
                 hearing::Noise::Gunshot,
             );
         }
+        self.finish_run();
+    }
+
+    /// Preserve the first terminal result, preferring a disabled player on simultaneous damage.
+    fn finish_run(&mut self) {
+        let outcome = if !self.robot_health.is_alive() {
+            Some(survival::Outcome::RobotDisabled)
+        } else if self.flight.error().is_some() {
+            Some(survival::Outcome::FlightStopped)
+        } else if !self.combat.target().health().is_alive() {
+            Some(survival::Outcome::DroneDisabled)
+        } else {
+            None
+        };
+        if let Some(outcome) = outcome {
+            self.run.finish(outcome);
+        }
     }
 
     /// Animate measured displacement, so holding a blocked direction does not walk in place.
     fn step(&mut self, movement: Movement) {
+        self.run.tick();
         self.combat.advance(std::time::Duration::from_millis(20));
         self.hearing.advance(std::time::Duration::from_millis(20));
         if let Some(step) = self
@@ -284,6 +304,12 @@ impl Game {
         } else {
             self.gun.disable();
         }
+        self.finish_run();
+        self.footsteps(distance);
+    }
+
+    /// Emit sound only after grounded travel crosses a stride boundary.
+    fn footsteps(&mut self, distance: f32) {
         // Only measured grounded travel crosses a walking stride. A blocked input is silent.
         if self.arena.is_grounded() {
             self.footstep_distance += distance;
@@ -303,37 +329,22 @@ impl Game {
 /// Launch the player-controlled arena with programmed search and learned flight.
 fn main() {
     App::new()
-        .add_plugins(
-            DefaultPlugins
-                .set(WindowPlugin {
-                    primary_window: Some(Window {
-                        title: "Pursuit arena | Bevy Gym".to_owned(),
-                        canvas: Some("#pursuit-canvas".to_owned()),
-                        fit_canvas_to_parent: true,
-                        ..default()
-                    }),
-                    ..default()
-                })
-                .set(AssetPlugin {
-                    file_path: if cfg!(target_arch = "wasm32") {
-                        "assets"
-                    } else {
-                        concat!(env!("CARGO_MANIFEST_DIR"), "/assets")
-                    }
-                    .to_owned(),
-                    meta_check: AssetMetaCheck::Never,
-                    ..default()
-                }),
-        )
+        .add_plugins(viewer_plugins())
         .init_resource::<Game>()
         .init_resource::<controls::Input>()
         .insert_resource(Time::<Fixed>::from_seconds(0.02))
         .add_systems(
             Startup,
-            (scene::setup, controls::setup, weapons::setup, hud::setup),
+            (
+                scene::setup,
+                controls::setup,
+                weapons::setup,
+                hud::setup,
+                survival::setup,
+            ),
         )
         .add_systems(PreUpdate, controls::read.after(bevy::input::InputSystems))
-        .add_systems(FixedUpdate, advance)
+        .add_systems(FixedUpdate, advance.run_if(robot::ready))
         .add_systems(
             Update,
             (
@@ -342,8 +353,11 @@ fn main() {
                 weapons::project,
                 weapons::rotors,
                 weapons::traces,
+                robot::load,
                 robot::animate,
+                robot::loading_notice,
                 hud::project,
+                survival::project,
             )
                 .chain(),
         )
@@ -354,6 +368,30 @@ fn main() {
             audio::install,
         ))
         .run();
+}
+
+/// Configure the window and bundled assets for native and browser execution.
+fn viewer_plugins() -> bevy::app::PluginGroupBuilder {
+    DefaultPlugins
+        .set(WindowPlugin {
+            primary_window: Some(Window {
+                title: "Drone survival | Bevy Gym".to_owned(),
+                canvas: Some("#pursuit-canvas".to_owned()),
+                fit_canvas_to_parent: true,
+                ..default()
+            }),
+            ..default()
+        })
+        .set(AssetPlugin {
+            file_path: if cfg!(target_arch = "wasm32") {
+                "assets"
+            } else {
+                concat!(env!("CARGO_MANIFEST_DIR"), "/assets")
+            }
+            .to_owned(),
+            meta_check: AssetMetaCheck::Never,
+            ..default()
+        })
 }
 
 /// Player buttons and future policy output enter the same fixed action boundary.
@@ -378,13 +416,21 @@ mod tests {
             .init_asset::<Font>()
             .init_asset::<Scene>()
             .init_asset::<Image>()
+            .init_asset::<Gltf>()
+            .init_asset::<AnimationGraph>()
             .init_resource::<Game>()
             .init_resource::<controls::Input>()
             .init_resource::<ButtonInput<KeyCode>>()
             .init_resource::<ButtonInput<MouseButton>>()
             .add_systems(
                 Startup,
-                (scene::setup, controls::setup, weapons::setup, hud::setup),
+                (
+                    scene::setup,
+                    controls::setup,
+                    weapons::setup,
+                    hud::setup,
+                    survival::setup,
+                ),
             )
             .add_systems(
                 Update,
@@ -396,8 +442,11 @@ mod tests {
                     weapons::project,
                     weapons::rotors,
                     weapons::traces,
+                    robot::load,
                     robot::animate,
+                    robot::loading_notice,
                     hud::project,
+                    survival::project,
                 )
                     .chain(),
             );
@@ -437,6 +486,45 @@ mod tests {
     }
 
     #[test]
+    fn survival_time_stops_on_robot_death_and_reset_starts_a_new_run() {
+        let mut game = Game::default();
+        for _ in 0..1000 {
+            game.step(Movement::Idle);
+            if !game.robot_health.is_alive() {
+                break;
+            }
+        }
+        assert!(!game.robot_health.is_alive());
+        let elapsed = game.run.elapsed();
+        assert!(elapsed > std::time::Duration::ZERO);
+        for _ in 0..50 {
+            game.step(Movement::Right);
+        }
+        assert_eq!(game.run.elapsed(), elapsed);
+        game.reset();
+        assert_eq!(game.run.elapsed(), std::time::Duration::ZERO);
+        game.step(Movement::Idle);
+        assert_eq!(game.run.elapsed(), std::time::Duration::from_millis(20));
+    }
+
+    #[test]
+    fn character_uses_a_licensed_scene_beneath_the_physics_root() {
+        let mut app = app();
+        let world = app.world_mut();
+        let character = world
+            .query_filtered::<Entity, With<scene::Character>>()
+            .single(world)
+            .expect("One physics projection root");
+        let mut scenes = world.query::<(&SceneRoot, &ChildOf)>();
+        assert!(scenes.iter(world).any(|(scene, parent)| {
+            parent.parent() == character
+                && scene.0.path().is_some_and(|path| {
+                    path.path().to_str() == Some("robots/survival/mannequin.glb")
+                })
+        }));
+    }
+
+    #[test]
     fn player_motion_drives_pose_animation_and_reset() {
         let mut app = app();
         app.world_mut()
@@ -453,19 +541,11 @@ mod tests {
             roots.single(world).expect("one character").translation,
             position
         );
-        let mut joints = world.query_filtered::<&Transform, With<robot::Joint>>();
-        assert!(joints
-            .iter(world)
-            .all(|joint| joint.rotation != Quat::IDENTITY));
         app.world_mut()
             .resource_mut::<ButtonInput<KeyCode>>()
             .reset_all();
         app.update();
-        let world = app.world_mut();
-        let mut joints = world.query_filtered::<&Transform, With<robot::Joint>>();
-        assert!(joints
-            .iter(world)
-            .all(|joint| joint.rotation == Quat::IDENTITY));
+        assert!(app.world().resource::<Game>().motion.length() < 0.001);
         app.world_mut()
             .resource_mut::<ButtonInput<KeyCode>>()
             .press(KeyCode::KeyR);
@@ -761,35 +841,50 @@ mod tests {
         }
     }
     #[test]
+    fn pickup_pistol_lies_on_the_floor() {
+        let mut app = app();
+        let world = app.world_mut();
+        let gun = *world
+            .query::<(&weapons::Visual, &Transform)>()
+            .iter(world)
+            .find_map(|(kind, pose)| (*kind == weapons::Visual::Pickup).then_some(pose))
+            .expect("Pickup pistol");
+        for edge in [-0.0342, 0.0342] {
+            let height = gun.transform_point(Vec3::new(0.0, 0.0, edge)).y;
+            assert!((0.0..0.071).contains(&height));
+        }
+        assert!((gun.rotation * Vec3::Z).dot(Vec3::NEG_Y) > 0.999);
+    }
+
+    #[test]
     fn aiming_keeps_the_pistol_grip_at_the_right_hand() {
         let mut app = app();
+        app.world_mut().spawn((
+            robot::Hand,
+            GlobalTransform::from_translation(Vec3::new(2.0, 1.2, 3.0)),
+        ));
         app.world_mut()
             .resource_mut::<Game>()
             .act(firing::Action::PickUp);
-        for aim in [Dir3::NEG_Z, Dir3::Y] {
+        for aim in [
+            Dir3::NEG_Z,
+            Dir3::Y,
+            Dir3::new(Vec3::new(-1.0, 1.0, -1.0)).expect("Diagonal aim"),
+        ] {
             app.world_mut().resource_mut::<controls::Input>().aim = Some(aim);
             app.update();
             let world = app.world_mut();
-            let character = *world
-                .query_filtered::<&Transform, With<scene::Character>>()
-                .single(world)
-                .expect("Character");
-            let shoulder = *world
-                .query::<(&robot::Joint, &Transform)>()
-                .iter(world)
-                .find_map(|(joint, pose)| {
-                    matches!(joint, robot::Joint::RightShoulder).then_some(pose)
-                })
-                .expect("Right shoulder");
             let gun = *world
                 .query::<(&weapons::Visual, &Transform)>()
                 .iter(world)
                 .find_map(|(kind, pose)| (*kind == weapons::Visual::Held).then_some(pose))
                 .expect("Held pistol");
-            let hand =
-                character.transform_point(shoulder.transform_point(Vec3::new(0.0, -0.5, 0.0)));
-            let grip = gun.transform_point(Vec3::new(0.0, -0.09, 0.0));
-            assert!(hand.distance(grip) < 1.0e-5);
+            assert!(gun.translation.distance(Vec3::new(2.0, 1.2, 3.0)) < 1.0e-5);
+            assert!((gun.rotation * Vec3::NEG_X).distance(*aim) < 1.0e-5);
+            if aim.y.abs() < 0.99 {
+                let upright = (Vec3::Y - *aim * aim.y).normalize();
+                assert!((gun.rotation * Vec3::Y).distance(upright) < 1.0e-5);
+            }
         }
     }
     #[test]

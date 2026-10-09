@@ -4,6 +4,40 @@ Updated: 2026-10-09. Goal status: active.
 
 ## Resume here
 
+### Survival model checkpoint
+
+Work continues in `/home/sagan/Code/github.com/sagan-software/bevy-gym-quality`.
+The user selected the mannequin with neutral armor and dark joints.
+The [survival upgrade plan](DRONE_SURVIVAL_UPGRADE.md) records the asset sources and remaining work.
+Licensed CC0 models replace the primitive character, pistol, and cover blocks.
+The scene now has authored animation, asset-loading protection, and a survival clock.
+
+Native validation passes 86 scene tests, 20 navigation tests, root tests, formatting,
+strict Clippy, WASM Clippy, and four asset contracts. The standard browser suite passes.
+Personal lint reports no diagnostics on changed lines; unrelated repository diagnostics remain.
+The optimized scene was inspected at 1280-by-800 and 390-by-844 CSS pixels.
+The [desktop capture](progress/drone-survival-mannequin-desktop.png),
+[narrow capture](progress/drone-survival-mannequin-narrow.png), and
+[same-source preview recording](progress/drone-survival-mannequin-preview.mp4) show the models.
+The recording predates WASM optimization; the two final captures use the optimized build.
+
+The [qualification record](progress/drone-survival-model.json) identifies sources and runtime hashes.
+The browser uses build `7c2d064f979174ef2b8dd10331ae51a86c7c60e69986764d519c1a7734ca92d0`.
+Its local URL is `http://100.105.254.50:8781/robots/pursuit/?build=survival-model-final`.
+T3 tab `tab_1` is at the desktop viewport, with recording stopped.
+The tool reports preview visibility as false; screenshots confirm browser rendering.
+
+Branch coverage is still compiling in `bevy-gym-survival-branch-coverage-20261009.service`.
+Read `survival-branch-coverage.log` under `/home/sagan/.cache/bevy-gym-quality-validation`.
+The earlier coverage unit was stopped because it lacked `RUSTC_BOOTSTRAP=1`.
+Its output is not coverage evidence. The corrected unit uses that setting.
+No coverage percentage is claimed for this checkpoint.
+
+Next, finish coverage and improve directional locomotion and hand attachment timing.
+The current game has one drone; defeating it ends the run. Buildings and the pipe remain blockout meshes.
+The navigator still uses programmed search over learned motor control.
+Preserve these changes and the original checkout's unrelated dirty files.
+
 ### Playable navigation checkpoint
 
 The playable pursuit scene now combines programmed search with learned motor control.

@@ -35,6 +35,7 @@ jobs:
       - run: python3 tests/fixtures/gymnasium/test_contracts.py
       - run: nix develop --command python3 tests/test_gymnasium_dependencies.py
       - run: nix develop --command python3 tests/test_drone_audio.py
+      - run: nix develop --command python3 tests/test_survival_assets.py
       - run: nix develop --command cargo fmt --all -- --check
       - run: nix develop --command cargo test
       - run: nix develop --command cargo test --no-default-features --features robots --lib --test pursuit_arena --test pursuit_combat --test pursuit_shots --test pursuit_sight --test pursuit_hearing --test pursuit_return_fire --test pursuit_navigation --test drone_hover --test drone_damage --test drone_recovery --test drone_tracking --test drone_parity --test drone_learning

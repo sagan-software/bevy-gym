@@ -1,119 +1,288 @@
-//! Original articulated robot geometry; walking follows measured ground displacement.
+//! Licensed skinned mannequin; animation projects movement and combat state.
+
+#[path = "robot/animation.rs"]
+mod animation;
 
 use super::{scene::Character, Game};
-use bevy::prelude::*;
+use bevy::{animation::AnimationTargetId, prelude::*};
 
-/// Hinge joints driven by the robot's walking phase.
-#[derive(Component, Clone, Copy)]
-pub(super) enum Joint {
-    /// Left shoulder swings opposite the left hip.
-    LeftShoulder,
-    /// Right shoulder swings opposite the right hip.
-    RightShoulder,
-    /// Left hip swings forward and backward.
-    LeftHip,
-    /// Right hip swings opposite the left hip.
-    RightHip,
-}
+/// Right-hand bone used to place the held pistol after the skeleton loads.
+#[derive(Component)]
+pub(super) struct Hand;
 
-/// Construct a robot with a dark chassis, orange panels, and a pale face plate.
-pub(super) fn spawn(
-    commands: &mut Commands<'_, '_>,
-    meshes: &mut Assets<Mesh>,
-    materials: &mut Assets<StandardMaterial>,
-) {
-    let chassis = materials.add(Color::srgb(0.10, 0.13, 0.15));
-    let panel = materials.add(Color::srgb(0.92, 0.49, 0.11));
-    let face = materials.add(Color::srgb(0.82, 0.87, 0.86));
-    let torso = meshes.add(Cuboid::new(0.46, 0.52, 0.30));
-    let head = meshes.add(Cuboid::new(0.28, 0.28, 0.26));
-    let visor = meshes.add(Cuboid::new(0.22, 0.065, 0.015));
-    let arm = meshes.add(Capsule3d::new(0.065, 0.40));
-    let leg = meshes.add(Capsule3d::new(0.085, 0.50));
-    let foot = meshes.add(Cuboid::new(0.17, 0.10, 0.30));
+/// Source model and named animation clips loaded together.
+#[derive(Resource)]
+pub(super) struct Model(Handle<Gltf>);
+
+/// Load the in-place mannequin beneath the authoritative capsule projection.
+pub(super) fn spawn(commands: &mut Commands<'_, '_>, assets: &AssetServer) {
+    let path = "robots/survival/mannequin.glb";
+    commands.insert_resource(Model(assets.load(path)));
+    commands.spawn((
+        LoadingNotice,
+        Text::new("Loading models…"),
+        TextFont {
+            font: assets.load("fonts/MonaSans-VariableFont.ttf"),
+            font_size: 18.0,
+            ..default()
+        },
+        Node {
+            position_type: PositionType::Absolute,
+            left: px(16),
+            top: px(104),
+            ..default()
+        },
+        BackgroundColor(Color::srgb(0.09, 0.11, 0.12)),
+    ));
     commands
         .spawn((Character, Transform::default(), Visibility::default()))
         .with_children(|root| {
             root.spawn((
-                Mesh3d(torso),
-                MeshMaterial3d(panel.clone()),
-                Transform::from_xyz(0.0, 0.26, 0.0),
+                SceneRoot(assets.load(GltfAssetLabel::Scene(0).from_asset(path))),
+                Transform::from_xyz(0.0, -0.9, 0.0)
+                    .with_rotation(Quat::from_rotation_y(std::f32::consts::PI)),
             ));
-            root.spawn((
-                Mesh3d(head),
-                MeshMaterial3d(face),
-                Transform::from_xyz(0.0, 0.68, 0.0),
-            ));
-            root.spawn((
-                Mesh3d(visor),
-                MeshMaterial3d(chassis.clone()),
-                Transform::from_xyz(0.0, 0.69, -0.137),
-            ));
-            limbs(root, &arm, &leg, &foot, &chassis, &panel);
         });
 }
 
-/// Stop the walking cycle when collision prevents horizontal movement.
-pub(super) fn animate(game: Res<'_, Game>, mut joints: Query<'_, '_, (&Joint, &mut Transform)>) {
-    let swing = if game.motion.length() > 0.001 {
-        (game.distance * 5.0).sin() * 0.45
-    } else {
-        0.0
+/// Build the graph only after the model's skeleton and named clips exist.
+pub(super) fn load(
+    mut commands: Commands<'_, '_>,
+    model: Res<'_, Model>,
+    models: Res<'_, Assets<Gltf>>,
+    mut graphs: ResMut<'_, Assets<AnimationGraph>>,
+    players: Query<'_, '_, Entity, (With<AnimationPlayer>, Without<animation::Rig>)>,
+    targets: Query<'_, '_, (Entity, &AnimationTargetId, &bevy::animation::AnimatedBy)>,
+    hierarchy: Query<'_, '_, (&Name, Option<&ChildOf>)>,
+) {
+    let Some(model) = models.get(&model.0) else {
+        return;
     };
-    for (joint, mut transform) in &mut joints {
-        let sign = match joint {
-            Joint::LeftShoulder | Joint::RightHip => -1.0,
-            Joint::RightShoulder | Joint::LeftHip => 1.0,
+    for player in &players {
+        let (mut graph, rig) = animation::Rig::new(model);
+        for (entity, target, owner) in &targets {
+            if owner.0 == player {
+                if hierarchy
+                    .get(entity)
+                    .is_ok_and(|(name, _)| name.as_str() == "hand_r")
+                {
+                    commands.entity(entity).insert(Hand);
+                }
+                graph.add_target_to_mask_group(*target, u32::from(!upper_body(entity, &hierarchy)));
+            }
+        }
+        commands
+            .entity(player)
+            .insert((AnimationGraphHandle(graphs.add(graph)), rig));
+    }
+}
+
+/// Classify the whole spine subtree, including fingers, without relying on bone ordering.
+fn upper_body(mut entity: Entity, hierarchy: &Query<'_, '_, (&Name, Option<&ChildOf>)>) -> bool {
+    while let Ok((name, parent)) = hierarchy.get(entity) {
+        if name.as_str() == "spine_01" {
+            return true;
+        }
+        let Some(parent) = parent else {
+            break;
         };
-        transform.rotation = if matches!(joint, Joint::RightShoulder) && game.combat.is_armed() {
-            Quat::from_rotation_x(std::f32::consts::FRAC_PI_2 + game.pitch())
+        entity = parent.parent();
+    }
+    false
+}
+
+/// Blend measured locomotion with an independent upper-body pistol pose.
+pub(super) fn animate(
+    game: Res<'_, Game>,
+    time: Res<'_, Time>,
+    mut graphs: ResMut<'_, Assets<AnimationGraph>>,
+    mut players: Query<
+        '_,
+        '_,
+        (
+            &mut AnimationPlayer,
+            &AnimationGraphHandle,
+            &mut animation::Rig,
+        ),
+    >,
+) {
+    for (mut player, graph, mut rig) in &mut players {
+        if let Some(graph) = graphs.get_mut(&graph.0) {
+            rig.advance(&game, time.delta_secs(), &mut player, graph);
+        }
+    }
+}
+
+/// Asset-loading feedback; it disappears once the animated character can be controlled.
+#[derive(Component)]
+pub(super) struct LoadingNotice;
+
+/// Do not consume survival time or accept combat actions before all visible scenes load.
+pub(super) fn ready(
+    assets: Res<'_, AssetServer>,
+    scenes: Query<'_, '_, &SceneRoot>,
+    players: Query<'_, '_, &animation::Rig>,
+) -> bool {
+    !players.is_empty()
+        && scenes
+            .iter()
+            .all(|scene| assets.is_loaded_with_dependencies(&scene.0))
+}
+
+/// Report missing model or texture files without leaving the player invisible and vulnerable.
+pub(super) fn loading_notice(
+    assets: Res<'_, AssetServer>,
+    scenes: Query<'_, '_, &SceneRoot>,
+    players: Query<'_, '_, &animation::Rig>,
+    mut notices: Query<'_, '_, (&mut Text, &mut Visibility), With<LoadingNotice>>,
+) {
+    let loaded = !players.is_empty()
+        && scenes
+            .iter()
+            .all(|scene| assets.is_loaded_with_dependencies(&scene.0));
+    let failed = scenes.iter().any(|scene| {
+        assets
+            .get_load_state(scene.0.id())
+            .is_some_and(|state| state.is_failed())
+            || assets
+                .get_recursive_dependency_load_state(scene.0.id())
+                .is_some_and(|state| state.is_failed())
+    });
+    for (mut text, mut visibility) in &mut notices {
+        *visibility = if loaded {
+            Visibility::Hidden
         } else {
-            Quat::from_rotation_x(swing * sign)
+            Visibility::Inherited
+        };
+        text.0 = if failed {
+            "Model loading failed. Reload to retry.".to_owned()
+        } else {
+            "Loading models…".to_owned()
         };
     }
 }
 
-/// Attach alternating shoulder and hip hinges to the robot body.
-fn limbs(
-    root: &mut ChildSpawnerCommands<'_>,
-    arm: &Handle<Mesh>,
-    leg: &Handle<Mesh>,
-    foot: &Handle<Mesh>,
-    chassis: &Handle<StandardMaterial>,
-    panel: &Handle<StandardMaterial>,
-) {
-    for (sign, shoulder, hip) in [
-        (-1.0, Joint::LeftShoulder, Joint::LeftHip),
-        (1.0, Joint::RightShoulder, Joint::RightHip),
-    ] {
-        root.spawn((
-            shoulder,
-            Transform::from_xyz(sign * 0.31, 0.46, 0.0),
-            Visibility::default(),
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use bevy::ecs::system::{RunSystemOnce, SystemState};
+
+    /// Load actual glTF scenes and animate their skeletons without creating a GPU device.
+    fn model_app() -> App {
+        let mut app = App::new();
+        app.add_plugins((
+            MinimalPlugins,
+            AssetPlugin {
+                file_path: concat!(env!("CARGO_MANIFEST_DIR"), "/assets").to_owned(),
+                meta_check: bevy::asset::AssetMetaCheck::Never,
+                ..default()
+            },
+            bevy::scene::ScenePlugin,
+            TransformPlugin,
+            AnimationPlugin,
+            bevy::gltf::GltfPlugin::default(),
         ))
-        .with_children(|joint| {
-            joint.spawn((
-                Mesh3d(arm.clone()),
-                MeshMaterial3d(chassis.clone()),
-                Transform::from_xyz(0.0, -0.24, 0.0),
-            ));
-        });
-        root.spawn((
-            hip,
-            Transform::from_xyz(sign * 0.14, -0.10, 0.0),
-            Visibility::default(),
+        .init_asset::<Mesh>()
+        .init_asset::<Image>()
+        .init_asset::<StandardMaterial>()
+        .register_type::<MeshMaterial3d<StandardMaterial>>()
+        .init_asset::<bevy::mesh::skinning::SkinnedMeshInverseBindposes>()
+        .init_asset::<Font>()
+        .init_resource::<Game>()
+        .init_resource::<crate::controls::Input>()
+        .insert_resource(Time::<Fixed>::from_seconds(0.02))
+        .insert_resource(bevy::image::CompressedImageFormatSupport(
+            bevy::image::CompressedImageFormats::NONE,
         ))
-        .with_children(|joint| {
-            joint.spawn((
-                Mesh3d(leg.clone()),
-                MeshMaterial3d(chassis.clone()),
-                Transform::from_xyz(0.0, -0.34, 0.0),
-            ));
-            joint.spawn((
-                Mesh3d(foot.clone()),
-                MeshMaterial3d(panel.clone()),
-                Transform::from_xyz(0.0, -0.74, -0.05),
-            ));
+        .insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+            std::time::Duration::from_millis(20),
+        ))
+        .add_systems(
+            Startup,
+            |mut commands: Commands<'_, '_>, assets: Res<'_, AssetServer>| {
+                spawn(&mut commands, &assets);
+            },
+        )
+        .add_systems(FixedUpdate, crate::advance.run_if(ready))
+        .add_systems(Update, (load, animate, loading_notice).chain());
+        app.finish();
+        app.cleanup();
+        app
+    }
+
+    /// Bound asynchronous file loading while keeping the simulation clock deterministic.
+    fn until(app: &mut App, mut done: impl FnMut(&mut World) -> bool) {
+        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(5);
+        loop {
+            app.update();
+            if done(app.world_mut()) {
+                return;
+            }
+            assert!(
+                std::time::Instant::now() < deadline,
+                "Asset loading deadline"
+            );
+            std::thread::sleep(std::time::Duration::from_millis(1));
+        }
+    }
+
+    #[test]
+    fn actual_model_loads_its_hand_and_missing_scene_stops_play() {
+        let mut app = model_app();
+        assert!(!app
+            .world_mut()
+            .run_system_once(ready)
+            .expect("Ready system"));
+        until(&mut app, |world| {
+            world.run_system_once(ready).expect("Ready system")
         });
+        app.update();
+        let world = app.world_mut();
+        assert!(world.resource::<Game>().run.elapsed() > std::time::Duration::ZERO);
+        assert_eq!(
+            world
+                .query_filtered::<Entity, With<Hand>>()
+                .iter(world)
+                .count(),
+            1
+        );
+        assert_eq!(world.query::<&animation::Rig>().iter(world).count(), 1);
+        let missing = world
+            .resource::<AssetServer>()
+            .load(GltfAssetLabel::Scene(0).from_asset("robots/survival/missing-model.glb"));
+        for mut scene in world.query::<&mut SceneRoot>().iter_mut(world) {
+            scene.0 = missing.clone();
+        }
+        let elapsed = world.resource::<Game>().run.elapsed();
+        until(&mut app, |world| {
+            world
+                .query_filtered::<&Text, With<LoadingNotice>>()
+                .iter(world)
+                .any(|text| text.0 == "Model loading failed. Reload to retry.")
+        });
+        assert!(!app
+            .world_mut()
+            .run_system_once(ready)
+            .expect("Ready system"));
+        assert_eq!(app.world().resource::<Game>().run.elapsed(), elapsed);
+    }
+
+    #[test]
+    fn upper_body_mask_includes_hand_descendants_but_excludes_legs() {
+        let mut world = World::new();
+        let pelvis = world.spawn(Name::new("pelvis")).id();
+        let spine = world.spawn((Name::new("spine_01"), ChildOf(pelvis))).id();
+        let hand = world.spawn((Name::new("hand_r"), ChildOf(spine))).id();
+        let finger = world.spawn((Name::new("index_01_r"), ChildOf(hand))).id();
+        let thigh = world.spawn((Name::new("thigh_r"), ChildOf(pelvis))).id();
+        let unnamed = world.spawn_empty().id();
+        let mut state = SystemState::<Query<'_, '_, (&Name, Option<&ChildOf>)>>::new(&mut world);
+        let hierarchy = state.get(&world);
+        for entity in [spine, hand, finger] {
+            assert!(upper_body(entity, &hierarchy));
+        }
+        for entity in [pelvis, thigh, unnamed] {
+            assert!(!upper_body(entity, &hierarchy));
+        }
     }
 }

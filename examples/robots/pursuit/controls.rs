@@ -42,7 +42,7 @@ pub(super) fn setup(mut commands: Commands<'_, '_>, assets: Res<'_, AssetServer>
             ..default()
         })
         .with_children(|root| {
-            label(root, "Pursuit arena", 26.0, &font);
+            label(root, "Drone survival", 26.0, &font);
             movement_buttons(root, &font);
         });
 }
