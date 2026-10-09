@@ -67,7 +67,7 @@ pub(crate) fn baseline(seeds: &[u64]) -> Result<Vec<EpisodeScore>, Box<dyn Error
 }
 
 /// Stop at the first completion result; reset observations never enter the score.
-fn evaluate_episode(
+pub(crate) fn evaluate_episode(
     seed: u64,
     environment: DroneHover,
     mut action: impl FnMut(DroneObservation) -> Result<DroneAction, Box<dyn Error>>,

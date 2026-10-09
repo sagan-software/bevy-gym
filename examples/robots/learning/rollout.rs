@@ -1,8 +1,8 @@
 //! Bounded on-policy collection with separate reset streams and recurrent memory.
 
-use std::error::Error;
+use std::{error::Error, num::NonZeroU16};
 
-use bevy_gym::robots::{DroneHover, DroneObservation};
+use bevy_gym::robots::{DroneAction, DroneHover, DroneObservation};
 use bevy_gym::training::{
     RecurrentMemory, RecurrentPpoPolicy, RecurrentPpoSequence, RecurrentSampler, SeedConfig,
 };
@@ -11,17 +11,22 @@ use bevy_gym::{Env, EpisodeStatus, TimeLimit};
 use super::{decode_action, encode, GAE_LAMBDA, GAMMA};
 
 /// Eight independent training lanes, each contributing 64 actions per update.
-pub(crate) struct RecoveryBatch {
+pub(crate) struct RecoveryBatch<E = DroneHover, const N: usize = 12>
+where
+    E: Env<Observation = DroneObservation, Action = DroneAction>,
+{
     /// Persistent environments and recurrent state, never shared with evaluation.
-    lanes: [Lane; 8],
+    lanes: [Lane<E>; 8],
     /// Root streams used to derive each lane's next episode seed.
     seeds: SeedConfig,
+    /// Fixed-width task encoder shared by policy and value observations.
+    encode: fn(DroneObservation) -> [f32; N],
 }
 
 /// One continuing episode and its independent policy-sampling stream.
-struct Lane {
-    /// Private solver behind the ten-second task limit.
-    environment: TimeLimit<DroneHover>,
+struct Lane<E: Env<Observation = DroneObservation, Action = DroneAction>> {
+    /// Private environment behind the lesson's positive action limit.
+    environment: TimeLimit<E>,
     /// Most recent observation, replaced atomically after each action or reset.
     observation: DroneObservation,
     /// Actor context retained across consecutive rollout batches.
@@ -33,9 +38,9 @@ struct Lane {
 }
 
 /// One transition before advantage construction consumes the owned tensors.
-struct Transition {
+struct Transition<const N: usize = 12> {
     /// Dimensionless body-frame policy input before the action.
-    observation: [f32; 12],
+    observation: [f32; N],
     /// Gaussian motor samples before tanh, consumed by the optimizer.
     pre_tanh_action: Vec<f32>,
     /// Behavior-policy log probability of those motor samples.
@@ -62,10 +67,32 @@ impl RecoveryBatch {
         policy: &RecurrentPpoPolicy,
         make_environment: fn() -> DroneHover,
     ) -> Self {
+        Self::with_task(
+            seed,
+            policy,
+            make_environment,
+            encode,
+            NonZeroU16::new(500).expect("positive task limit"),
+        )
+    }
+}
+
+impl<E, const N: usize> RecoveryBatch<E, N>
+where
+    E: Env<Observation = DroneObservation, Action = DroneAction>,
+{
+    /// Reuse bounded collection for another typed drone task and observation width.
+    pub(crate) fn with_task(
+        seed: u64,
+        policy: &RecurrentPpoPolicy,
+        make_environment: fn() -> E,
+        encode: fn(DroneObservation) -> [f32; N],
+        limit: NonZeroU16,
+    ) -> Self {
         let seeds = SeedConfig::from_root(seed);
         let lanes = std::array::from_fn(|index| {
-            let mut environment =
-                TimeLimit::new(make_environment(), 500).expect("positive task limit");
+            let mut environment = TimeLimit::new(make_environment(), usize::from(limit.get()))
+                .expect("positive task limit");
             let observation = environment
                 .reset(Some(training_seed(seeds, index, 0)))
                 .observation;
@@ -77,7 +104,11 @@ impl RecoveryBatch {
                 episode: 0,
             }
         });
-        Self { lanes, seeds }
+        Self {
+            lanes,
+            seeds,
+            encode,
+        }
     }
 
     /// Collect exactly 512 transitions, splitting sequences at episode boundaries.
@@ -90,12 +121,12 @@ impl RecoveryBatch {
             let mut initial_memory = lane.memory.clone();
             let mut transitions = Vec::with_capacity(64);
             for step in 0..64 {
-                let observation = encode(lane.observation);
+                let observation = (self.encode)(lane.observation);
                 let action = policy.sample_action(&observation, &lane.memory, &mut lane.sampler)?;
                 let value = policy.value(&observation, 0)?;
                 let result = lane.environment.step(decode_action(&action.action)?);
                 // Read the final state's value before a reset can replace that state.
-                let next_value = policy.value(&encode(result.observation), 0)?;
+                let next_value = policy.value(&(self.encode)(result.observation), 0)?;
                 lane.memory = action.next_memory;
                 lane.observation = result.observation;
                 transitions.push(Transition {
@@ -132,7 +163,10 @@ const fn training_seed(seeds: SeedConfig, lane: usize, episode: u64) -> u64 {
 }
 
 /// Construct one contiguous sequence; no transition after reset enters this buffer.
-fn finish(transitions: Vec<Transition>, initial_memory: RecurrentMemory) -> RecurrentPpoSequence {
+fn finish<const N: usize>(
+    transitions: Vec<Transition<N>>,
+    initial_memory: RecurrentMemory,
+) -> RecurrentPpoSequence {
     let mut advantages = vec![0.0; transitions.len()];
     let mut next_advantage = 0.0;
     for (transition, advantage) in transitions.iter().zip(&mut advantages).rev() {

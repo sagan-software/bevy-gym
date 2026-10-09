@@ -195,3 +195,53 @@ full-project strict backlog remains. [Coverage](progress/drone-damage-baseline-c
 hits all 63 measured assessment lines and both outcomes of its two instrumented
 conditions. The runnable guide's 24 measured source lines are also hit. The record
 explains unreachable error propagation and the four unhit test panic lines.
+
+## Damage-aware training contract
+
+```sh
+nix develop --command cargo run --no-default-features --features robots \
+  --example drone-train-damage -- --updates 600 --seed 7
+```
+
+The guide saves weights and selection scores every 20 updates under
+`runs/drone-damage-training`. Budget exhaustion returns an error and preserves
+the last evaluated checkpoint. A saved checkpoint does not establish qualification.
+
+The separate training recipe uses sixteen inputs: the existing twelve body-frame
+motion features, then working indicators for front left, front right, rear right,
+and rear left. Working is 1; failed is 0. The healthy twelve-input checkpoint
+format remains unchanged. The damage recipe rejects those healthy checkpoints.
+
+Lessons retain one actor, critic, and optimizer. The first lesson learns intact
+calm hover. The second starts with the front-left motor failed. The third chooses
+one motor and either 100 or 250 intact actions independently on each episode reset.
+Failure changes the returned observation after the last intact action. It never
+advances physics itself. Termination takes precedence over a pending failure.
+
+Eight lanes collect 64 actions each per optimizer update. Initial lessons limit
+an episode to 500 actions; the scheduled lesson permits 750. Scheduled evaluation
+always measures 500 actions after failure, regardless of its warm-up duration.
+Training seeds remain outside the existing five selection seeds and high-bit
+benchmark partition. Evaluation starts fresh environments and recurrent memory.
+
+Freeze these selection gates before training: every intact case must survive 500
+actions, earn at least 400 return, and finish within 0.5 metres of the target.
+Every damaged case must also survive 500 post-failure actions, earn at least 400
+post-failure return, and finish within 0.5 metres. Its minimum body-centre height
+must be at least 1 metre and peak tilt at most 45 degrees. Yaw rotation is allowed.
+The fixed-corner lesson tests all five selection seeds after two intact seconds.
+The scheduled lesson tests all five seeds, four motors, and both failure times.
+Incomplete or reordered matrices cannot pass. Later lessons must retain intact
+hover. No damaged-flight model has passed these gates yet.
+
+Sixteen damage-training tests pass natively and in the browser, including a real
+512-transition PPO update, scheduled failure boundaries, reset streams, checkpoint
+shape rejection, and promotion thresholds. Existing healthy checkpoint tests,
+viewer tests, root tests, and strict native/WASM Clippy also pass. Focused personal
+Rust and Nix checks report no changed-file findings. The full-project personal
+Rust backlog remains.
+
+[Coverage](progress/drone-damage-training-coverage.json) records the added helper
+code and the runnable guide. Successful CLI promotion and final completion remain
+unmeasured until a trained policy passes the gates. The active training run is
+recorded in [the status document](EXAMPLE_STATUS.md).

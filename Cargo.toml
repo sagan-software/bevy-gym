@@ -177,6 +177,11 @@ path = "examples/robots/curriculum.rs"
 required-features = ["robots"]
 
 [[example]]
+name = "drone-train-damage"
+path = "examples/robots/train_damage.rs"
+required-features = ["robots"]
+
+[[example]]
 name = "drone-train"
 path = "examples/robots/train.rs"
 required-features = ["robots"]

@@ -8,7 +8,7 @@ use bevy_gym::Env;
 use serde::Serialize;
 
 /// Fixed warm-up durations before one actuator fails.
-#[derive(Clone, Copy, Debug, Serialize)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "snake_case")]
 pub(crate) enum FailureTime {
     /// Apply 100 intact 20 ms actions before failure.

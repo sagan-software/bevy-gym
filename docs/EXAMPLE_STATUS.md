@@ -85,11 +85,12 @@ guide also ends 36 actions after failure.
 The preview is `http://100.105.254.50:8778/robots/hover/?build=final`, served by
 `bevy-gym-visible-damage-server-20261009` from `runs/quality-research/site-visible-damage`.
 Its runtime is `build-85b4ba1609c7a202f04f63a69e36ee1003b6aa94968938e312796b26f5f35bd6`.
-No validation or recording job remains active. The preview is 1280×800 CSS pixels.
+No recording is active. The preview is 1280×800 CSS pixels.
 Do not resize during recording.
 
 The scheduled-failure baseline is published as `307876c`.
-[CI](https://github.com/sagan-software/bevy-gym/actions/runs/37879345355) is running;
+The handoff commit `850ebf1` superseded the baseline CI run.
+[CI](https://github.com/sagan-software/bevy-gym/actions/runs/37879381806) passed;
 [Pages](https://github.com/sagan-software/bevy-gym/actions/runs/37879345358) is pending.
 The new
 `drone-damage-baseline` guide compares 32 seeds, four motors, and two failure times.
@@ -111,7 +112,31 @@ an incompatible `LD_LIBRARY_PATH`; the passing command removes that variable
 before `nix run .#drone-browser-check`. Do not wrap this runner in `nix develop`,
 which can restore the conflicting library path.
 
-Next, train a separate damage-aware policy. Preserve the healthy model and its
+The damage-aware training checkpoint is ready to publish.
+The guide is `drone-train-damage`; its separate policy has sixteen inputs.
+The shared rollout collector now supports typed drone tasks and fixed-width encoders.
+Existing healthy checkpoint qualification still passes. Sixteen damage-training tests
+pass natively and in the browser. Root tests, viewer/curriculum tests, strict
+native/WASM Clippy, and focused personal Rust/Nix checks pass. No changed-file
+personal diagnostics remain; the full-project strict backlog remains.
+Coverage hits the added helper code. Successful CLI promotion and final completion
+remain unmeasured; no damage-aware checkpoint has passed its gates yet.
+The final logs are `damage-training-gates2`, `damage-training-wasm2`,
+`damage-training-personal2`, and `damage-training-coverage-final`, with supplemental
+one/two-update and filesystem-failure CLI checks in the same validation directory.
+
+Seed 7 is training under `bevy-gym-damage-curriculum-20261009.service`.
+Its log is `/home/sagan/.cache/bevy-gym-quality-validation/damage-curriculum-seed7.log`;
+checkpoints are under `runs/drone-damage-curriculum-seed7`. The unit was confirmed
+running. Do not restart it because a tool observation times out. Query the unit and
+process first. It permits 600 updates per lesson and retains the optimizer across
+intact hover, front-left failure, and scheduled failures. The frozen promotion
+thresholds are in `DRONE_DAMAGE.md`. No damaged-flight checkpoint is qualified.
+
+Next, inspect the active training run and its saved selection reports.
+Add explicit sixteen-input checkpoint inference to the viewer before recording
+this policy. Keep the existing healthy viewer mode and checkpoint available.
+Preserve the healthy model and its
 qualification. The damage contract records the current model's static thrust limit;
 do not assume recovery follows from the intact-flight force budget.
 Perception, damage adaptation, pursuit, detached parts, and the jumping quadruped
