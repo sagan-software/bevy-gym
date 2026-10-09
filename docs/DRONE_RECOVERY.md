@@ -1,12 +1,13 @@
 # Drone recovery lesson
 
-Status: physics and manual browser comparison implemented, 2026-10-08.
+Status: native frozen-policy inference implemented, 2026-10-09.
+Separate browser lesson scenes and standalone checkpoint transfer remain pending.
 
 Use `DroneHover::disturbed()` for a hover task that needs feedback control.
 `DroneHover::default()` and its committed traces remain unchanged. The new constructor
 uses the same validated actions, observations, dynamics, reward, and termination rules.
 
-[Flightmare's pinned reset implementation](https://github.com/uzh-rpg/flightmare/blob/d4218aedac18cbe9364a0a0df10ab992c4b65e4f/flightlib/src/envs/quadrotor_env/quadrotor_env.cpp)
+[Flightmare's pinned reset implementation][flightmare-reset]
 randomizes position, linear velocity, and normalized orientation before a flight.
 This supports varying initial conditions during training. Our lesson uses the bounded
 distribution below; it does not reproduce Flightmare's reset distribution or reward.
@@ -51,21 +52,37 @@ actions and observations. Later curriculum stages need their own reviewed contra
 
 The [learning lesson](DRONE_LEARNING.md) now supplies a qualified checkpoint and
 held-out comparisons against constant half-thrust. Learned inference and training
-controls in the viewer remain pending.
+controls are available in the existing combined viewer.
 
 ## Run and inspect
 
-The [25-line recovery guide](../examples/robots/recovery.rs) demonstrates why the
-calm guide's constant command fails:
+The [recovery command](../examples/robots/recovery.rs) now loads the qualified
+RL curriculum checkpoint and runs a disturbed episode:
 
 ```sh
 nix develop --command cargo run --no-default-features --features robots --example drone-recovery
 ```
 
-Seed 42 terminates during action 274, after at most 5.48 simulated seconds.
-The last action stops at its first terminal 5 ms substep. Its initial linear
-velocity is approximately `(-0.282, 0.301, -0.160)` m/s. The five baseline seeds are
-0, 1, 2, 42, and `u64::MAX`. All terminate before 500 actions at constant half-thrust.
+Use `--checkpoint PATH --seed 42` to select compatible weights and a reset seed.
+Missing, corrupt, or incompatible weights fail before any environment action.
+The command reports checkpoint path, inference mode, and the complete episode score.
+It shares the [hover lesson's](DRONE_HOVER.md) observation/action contract, reward,
+episode horizon, recurrent memory handling, and checkpoint provenance.
+Only the reset distribution changes, as specified above.
+
+The [curriculum trainer](DRONE_CURRICULUM.md) transfers hover weights and optimizer
+state into recovery. The [direct trainer](DRONE_LEARNING.md) starts recovery from
+random weights. Both use the same `DroneHover::disturbed()` implementation.
+Promotion requires five selection survivors, mean return at least 400, and mean
+final distance at most 0.5 metres. The frozen checkpoint survived all 32 held-out
+recovery episodes. Navigation, combat, and damaged flight remain unqualified.
+
+The earlier constant-thrust guide terminated seed 42 during action 274, after at
+most 5.48 simulated seconds. Its initial linear velocity was approximately
+`(-0.282, 0.301, -0.160)` m/s. All five baseline seeds, 0, 1, 2, 42, and `u64::MAX`,
+terminated before 500 actions. Those results are historical physics evidence.
+
+### Historical viewer evidence
 
 Open the viewer, then select Calm start or Disturbed start:
 
@@ -84,3 +101,5 @@ their limits. Physics and session code have 100% measured native line and branch
 coverage. New UI construction lines lack native coverage hits; browser rendering
 and interaction supply separate behavioral evidence. Full-package personal lints
 retain 51 errors and two warnings in unchanged files.
+
+[flightmare-reset]: https://github.com/uzh-rpg/flightmare/blob/d4218aedac18cbe9364a0a0df10ab992c4b65e4f/flightlib/src/envs/quadrotor_env/quadrotor_env.cpp

@@ -1,6 +1,7 @@
 //! Shared mechanics behind the recovery training and inference lessons.
 
 mod encoding;
+mod episode;
 pub(crate) mod evaluation;
 mod model;
 mod rollout;

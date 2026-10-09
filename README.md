@@ -122,9 +122,9 @@ Run the first robot lesson from this checkout:
 nix develop --command cargo run --no-default-features --features robots --example drone-hover
 ```
 
-The [hover guide](examples/robots/hover.rs) applies four validated motor commands
-in a private Rapier world and prints the resulting position. It runs without a
-window. Open the visual lesson with:
+The [hover lesson](docs/DRONE_HOVER.md) loads the qualified RL curriculum checkpoint,
+infers four motor commands per step, and prints the episode score. It runs without
+a window. Missing or incompatible weights fail visibly. Open the existing viewer with:
 
 ```sh
 nix develop --command cargo run --features robots --example drone-flight

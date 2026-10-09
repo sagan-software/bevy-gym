@@ -3,8 +3,8 @@
 Status: implementation in progress; most lessons are not implemented or trained.
 Updated: 2026-10-09. The user superseded the earlier broad examples goal.
 This curriculum is the current execution objective. The earlier unfinished audit
-and reference ports remain deferred. The goal service exposes no clear/cancel
-operation and still stores the earlier blocked goal; no replacement service goal exists.
+and reference ports remain deferred. A new curriculum goal is active in the
+continuation thread. The earlier blocked goal was not marked complete.
 
 Deliver separate drone and droid skill examples, a curriculum walkthrough, and a
 final competitive three-versus-three environment. Every autonomous action must come

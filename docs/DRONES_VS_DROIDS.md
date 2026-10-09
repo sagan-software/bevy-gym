@@ -4,7 +4,7 @@ Updated: 2026-10-09. Status: audited and planned; implementation and training pe
 This request supersedes the two-versus-two player-first shooter milestone.
 The target is a spectator-first competitive match with three drones and three droids.
 All living agents must choose their actions through reinforcement-trained policies.
-The broader [examples roadmap](EXAMPLE_ROADMAP.md) remains required.
+The broader [examples roadmap](EXAMPLE_ROADMAP.md) is deferred.
 
 The [skill curriculum](ROBOT_SKILL_CURRICULUM.md) defines the separate scenes,
 prerequisite training, and combined walkthrough required by the latest request.
@@ -86,9 +86,10 @@ inference. The existing `RecurrentPpoPolicy` and `RecurrentPpoSequence` provide
 parts of this separation. They do not yet supply the six-agent environment or its
 rollout collector. The existing `EcosystemRuntime::step` also provides a local
 reference for rejecting missing, duplicate, and stale multi-agent actions; its 2D
-ecosystem is not the requested articulated 3D arena. The current actor is Gaussian; a joint continuous/categorical
-policy needs correct sampling, log probabilities, entropy, and checkpoint metadata
-for trigger and alert-state decisions before PPO training can be considered valid.
+ecosystem is not the requested articulated 3D arena. The current actor is Gaussian; a joint
+continuous/categorical policy needs correct sampling, log probabilities, entropy,
+and checkpoint metadata for trigger and alert-state decisions before PPO training
+can be considered valid.
 
 Freeze policy versions throughout each rollout. Update both team learners from the
 collected batch, then start a new rollout with the new versions. Retain previous
@@ -161,7 +162,7 @@ behaviour cloning alone does not satisfy the requested reinforcement learning ga
    camera, pause, and speed controls. Show teams, health, learned state, and checkpoint
    identity. Record complete matches, contact sheets, and console results.
 7. Re-audit all action sources, document remaining limits, and publish the qualified
-   checkpoints and example. Continue the broader robot and reference-example roadmap.
+   checkpoints and example. Keep the broader reference-example roadmap deferred.
 
 Each checkpoint requires a scoped commit and non-force push to main after its gates.
 Rust changes require focused failing tests first, exact repository/native/WASM lint

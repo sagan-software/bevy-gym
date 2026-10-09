@@ -206,17 +206,26 @@ fn qualify(policy: &bevy_gym::training::RecurrentPpoPolicy) {
 #[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
 #[cfg_attr(not(target_arch = "wasm32"), test)]
 fn curriculum_batches_use_the_selected_profile_without_changing_direct_recovery() {
-    let policy = new_agent(7).unwrap().policy();
+    let policy = new_agent(7).expect("initialize PPO").policy();
     let mut calm = RecoveryBatch::with_environment(7, &policy, DroneHover::default);
-    let calm_sequences = calm.collect(&policy).unwrap();
-    let first = &calm_sequences[0].observations[0];
-    assert_eq!(&first[3..6], &[0.0, 1.0, 0.0]);
-    assert_eq!(&first[6..12], &[0.0; 6]);
+    let calm_sequences = calm.collect(&policy).expect("collect calm episodes");
+    let first = calm_sequences
+        .first()
+        .expect("first lane")
+        .observations
+        .first()
+        .expect("first observation");
+    assert_eq!(first.get(3..6).expect("body up features"), &[0.0, 1.0, 0.0]);
+    assert_eq!(first.get(6..12).expect("velocity features"), &[0.0; 6]);
     let mut explicit = RecoveryBatch::with_environment(7, &policy, DroneHover::disturbed);
     let mut original = RecoveryBatch::new(7, &policy);
     assert_eq!(
-        explicit.collect(&policy).unwrap(),
-        original.collect(&policy).unwrap()
+        explicit
+            .collect(&policy)
+            .expect("collect explicit recovery episodes"),
+        original
+            .collect(&policy)
+            .expect("collect default recovery episodes")
     );
 }
 
@@ -224,12 +233,17 @@ fn curriculum_batches_use_the_selected_profile_without_changing_direct_recovery(
 #[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
 #[cfg_attr(not(target_arch = "wasm32"), test)]
 fn curriculum_evaluation_uses_separate_calm_and_disturbed_episodes() {
-    let policy = load_policy(include_bytes!("../assets/robots/recovery.mpk").to_vec()).unwrap();
-    let before = policy.to_bytes().unwrap();
-    let calm = learning::evaluation::evaluate_with(&policy, &[42], DroneHover::default).unwrap();
-    let disturbed =
-        learning::evaluation::evaluate_with(&policy, &[42], DroneHover::disturbed).unwrap();
-    assert_eq!(disturbed, evaluate(&policy, &[42]).unwrap());
+    let policy = load_policy(include_bytes!("../assets/robots/recovery.mpk").to_vec())
+        .expect("load qualified checkpoint");
+    let before = policy.to_bytes().expect("serialize frozen policy");
+    let calm = learning::evaluation::evaluate_with(&policy, &[42], DroneHover::default)
+        .expect("evaluate calm episodes");
+    let disturbed = learning::evaluation::evaluate_with(&policy, &[42], DroneHover::disturbed)
+        .expect("evaluate disturbed episodes");
+    assert_eq!(
+        disturbed,
+        evaluate(&policy, &[42]).expect("evaluate default recovery")
+    );
     assert_ne!(calm, disturbed);
-    assert_eq!(policy.to_bytes().unwrap(), before);
+    assert_eq!(policy.to_bytes().expect("serialize frozen policy"), before);
 }

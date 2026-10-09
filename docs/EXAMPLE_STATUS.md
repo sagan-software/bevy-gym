@@ -4,6 +4,40 @@ Updated: 2026-10-09. Current work: RL-only drone/droid curriculum.
 
 ## Resume here
 
+### Frozen-policy skill commands, 2026-10-09
+
+`drone-hover` and `drone-recovery` now infer every motor action from the qualified
+RL curriculum checkpoint. Both use the same episode implementation as curriculum
+evaluation. They retain recurrent memory within an episode and fail visibly for
+missing, unreadable, corrupt, or incompatible weights. The CLI regression first
+failed because the old constant-thrust commands ignored the checkpoint argument.
+
+The [hover guide](DRONE_HOVER.md), [recovery guide](DRONE_RECOVERY.md), and
+[validation record](progress/drone-skill-cli.json) describe the commands and limits.
+The default checkpoint remains `docs/progress/drone-curriculum.mpk`, SHA-256
+`8b94182a1368f5449a52db5c0859160fc5819d6772c0547f31d240df7a0a465a`.
+Its existing held-out RL qualification passes again; no replacement training was run.
+The seed-7 motor-failure failure remains preserved.
+
+Native tests, strict native and WASM Clippy, the complete browser suite, Python
+personal lint, and CLI failure/success checks pass. The worker's 25 protocol tests
+also pass. Personal Rust discovery reports no candidate diagnostics. Strict personal
+Clippy still reports the unchanged repository backlog. Coverage records all measured
+entry-point lines, all 13 runner lines, all 40 shared episode lines through integration tests,
+and both episode branch outcomes. The validation record identifies error-region gaps.
+Logs use `/home/sagan/.cache/bevy-gym-quality-validation/skill-cli-`.
+
+Seed 11 remains running under `bevy-gym-rl-curriculum-seed11-20261009.service`.
+At the recorded update 280, hover promotion still failed despite five survivors.
+Artifacts remain in `runs/rl-curriculum/seed11-20261009`; inspect the log for newer results.
+
+The T3 viewer opens, but it still exposes historical constant-thrust and imitation
+controls. That inspection is not new-scene qualification. Separate policy-only browser
+scenes, standalone hover selection, and checkpoint transfer remain unfinished.
+Next: add standalone lesson selection to the shared trainer, then isolate the two
+browser lesson entry points. The droid lessons and shared 3v3 arena remain unfinished.
+Remote CI for this checkpoint remains unverified.
+
 ### RL-only skill curriculum, 2026-10-09
 
 The canonical `ai/AGENTS.md` now prohibits programmed example-agent decisions,
@@ -16,8 +50,8 @@ The user superseded the earlier broad goal on 2026-10-09. Its unfinished audit a
 reference ports remain deferred history, not the current execution objective.
 Current objective: implement and qualify RL-only drone/droid skill scenes, curriculum
 training and progression, and spectator-first competitive 3v3 inference.
-The goal service still stores the earlier blocked goal and exposes no clear/cancel
-operation. A new service goal has not been created; do not claim otherwise.
+A new service goal is active in continuation thread
+`01a122d8-148d-79f2-b593-21d8472e877f`. The earlier unfinished goal was not marked complete.
 
 The existing RL damage trainer is running seed 11 with a 600-update limit per lesson.
 Unit: `bevy-gym-rl-curriculum-seed11-20261009.service`.
@@ -93,7 +127,8 @@ retracts before cover. Recoil derives from the pistol cooldown. Pelvis direction
 changes now settle with a 100 ms time constant.
 
 Native root tests, 113 scene tests, strict native/WASM Clippy, and asset checks pass.
-The standard browser suite passes for this production code. Personal lint reports no candidate diagnostics in either raw pass; unrelated
+The standard browser suite passes for this production code. Personal lint reports no candidate
+diagnostics in either raw pass; unrelated
 repository diagnostics remain. The [coverage record](progress/shooter-grip-coverage.json)
 lists exact gaps. The [strafe recording](progress/shooter-grip-strafe.mp4) and
 [close-up contact sheet](progress/shooter-grip-close.jpg) show the final source before
@@ -183,7 +218,8 @@ the embedded browser refuses pointer lock. Normal captured-mouse operation remai
 unverified in that browser. Desktop and narrow layouts were inspected; this remains
 a keyboard-and-mouse shooter, without a complete touch aiming interface.
 
-Next after the current projectile checkpoint: improve directional animation, resolve bevy-ragdoll's Bevy
+Next after the current projectile checkpoint: improve directional animation, resolve bevy-ragdoll's
+Bevy
 0.19 boundary, then add two drones/two droids and state-aware lights/audio.
 Do not report the complete shooter or the broader examples roadmap as finished.
 
@@ -213,7 +249,8 @@ The [desktop capture](progress/drone-survival-mannequin-desktop.png),
 [same-source preview recording](progress/drone-survival-mannequin-preview.mp4) show the models.
 The recording predates WASM optimization; the two final captures use the optimized build.
 
-The [qualification record](progress/drone-survival-model.json) identifies sources and runtime hashes.
+The [qualification record](progress/drone-survival-model.json) identifies sources and runtime
+hashes.
 The browser uses build `7c2d064f979174ef2b8dd10331ae51a86c7c60e69986764d519c1a7734ca92d0`.
 Its local URL is `http://100.105.254.50:8781/robots/pursuit/?build=survival-model-final`.
 T3 tab `tab_1` is at the desktop viewport, with recording stopped.
@@ -225,7 +262,8 @@ Branch coverage completed in `survival-branch-coverage.log` under
 See `progress/drone-survival-coverage.json` for exact file summaries and gaps.
 Directional locomotion and hand attachment work continues in the camera checkpoint above.
 
-The current game has one drone; defeating it ends the run. Buildings and the pipe remain blockout meshes.
+The current game has one drone; defeating it ends the run. Buildings and the pipe remain blockout
+meshes.
 The navigator still uses programmed search over learned motor control.
 Preserve these changes and the original checkout's unrelated dirty files.
 
@@ -235,7 +273,8 @@ The playable pursuit scene now combines programmed search with learned motor con
 The `pursuit-search` guide demonstrates filtered sight and the motor loop without rendering.
 Search receives current or remembered sightings, never the hidden character position.
 It uses the authored static map to find viewpoints and routes around cover.
-Learned search, hearing-directed navigation, damage adaptation, and adversarial humanoid training remain unfinished.
+Learned search, hearing-directed navigation, damage adaptation, and adversarial humanoid training
+remain unfinished.
 
 The final 265 native trials all survived. Minimum lateral visibility was 2,092/3,000 samples.
 Every house and pipe trial ended with ten uninterrupted seconds of sight.
@@ -245,7 +284,8 @@ Its trial archive is byte-identical to the earlier integration archive, verified
 
 The scene now accepts brief sightings that occur between navigation decisions.
 Repeated remembered contacts cannot extend the investigation deadline.
-After expiry, the sensor must clear or provide a visible contact before another investigation starts.
+After expiry, the sensor must clear or provide a visible contact before another investigation
+starts.
 A closed-door fixture verifies planned clear segments through a window view.
 That fixture does not establish physical window-flight performance.
 
@@ -322,13 +362,15 @@ All added instrumented library and guide lines and both guide conditional outcom
 [coverage](progress/recurrent-sequence-coverage.json). The personal-lint backlog
 outside changed lines remains. The standard browser check now includes the six
 sequence tests. Nix lint still reports the two unchanged unfiltered-source findings
-at `flake.nix:119` and `flake.nix:200`. The [validation record](progress/recurrent-sequence-validation.json)
+at `flake.nix:119` and `flake.nix:200`. The [validation
+record](progress/recurrent-sequence-validation.json)
 records commands, hashes, tooling retries, and boundaries.
 
 The first [ordered sequence run](DRONE_SEARCH.md#ordered-sequence-imitation)
 completed 300 updates. It learned each route at different checkpoints, but none
 passed both routes across all five selection seeds. Its exact sources, results,
-traces, logs, and selected weights are in the [sequence archive](progress/drone-sequence-candidate.json).
+traces, logs, and selected weights are in the [sequence
+archive](progress/drone-sequence-candidate.json).
 The [path comparison](progress/drone-sequence-paths.png) shows actual solver paths.
 No new navigator is qualified for gameplay.
 
@@ -651,7 +693,8 @@ The release unit `bevy-gym-pursuit-combat-layout-build-20261009` exited successf
 No recording is active. Validation logs use the `pursuit-visible-combat-` prefix.
 
 [The recording](progress/pursuit-visible-combat.mp4) shows pickup, body damage,
-rotor damage and removal, body destruction, and reset. [The visual record](progress/pursuit-visible-combat.json)
+rotor damage and removal, body destruction, and reset. [The visual
+record](progress/pursuit-visible-combat.json)
 retains source and artifact hashes. The controls no longer obscure the drone in
 narrow views. A failing regression also caught queued pickup being overwritten
 between simulation ticks; the queue now retains it. A separate regression protects
@@ -1060,7 +1103,8 @@ Passed after the source changes:
 - `nix develop --command cargo test --features robots --lib --test drone_hover`:
   87 library tests and eight external drone tests passed.
 - `nix develop --command cargo clippy --all-targets --all-features -- -D warnings`.
-- `nix develop --command cargo check --no-default-features --features robots,browser --target wasm32-unknown-unknown`.
+- `nix develop --command cargo check --no-default-features --features robots,browser --target
+wasm32-unknown-unknown`.
 - Focused branch coverage: 87 library tests, eight drone tests, and five reset tests.
   All new drone source lines and branches were hit. All 339 instrumented added
   source lines were hit, including internal test code. The changed reset and step

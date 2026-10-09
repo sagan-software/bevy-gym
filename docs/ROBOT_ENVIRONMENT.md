@@ -17,9 +17,9 @@ the environment owns a private Rapier world, so it needs no Bevy physics-plugin
 version coupling. [Native/WASM comparison](DRONE_PARITY.md) passed for ten
 recorded motor sequences using test-profile builds.
 
-[Flightmare's pinned dynamics](https://github.com/uzh-rpg/flightmare/blob/d4218aedac18cbe9364a0a0df10ab992c4b65e4f/flightlib/src/dynamics/quadrotor_dynamics.cpp)
+[Flightmare's pinned dynamics][flightmare-dynamics]
 uses body-frame motor positions, inertia, thrust mapping, and alternating reaction
-torques. [The pinned PyBullet drone implementation](https://github.com/learnsyslab/gym-pybullet-drones/blob/7ebad1ecabd28a7000add2d05f888aa2e837c2cc/gym_pybullet_drones/envs/BaseAviary.py)
+torques. [The pinned PyBullet drone implementation][pybullet-dynamics]
 applies each motor force in its link frame and sums alternating reaction torques.
 These control the comparison cases, not our game's mass or reward choices.
 
@@ -119,8 +119,8 @@ uniform offsets of ±0.2 metres on X/Z and ±0.1 metres on Y.
 on every reset. See [the recovery lesson](DRONE_RECOVERY.md) for its distribution,
 seed contract, and baseline comparison. The default constructor remains calm.
 
-The [28-line hover guide](../examples/robots/hover.rs) holds four commands of 0.5
-for ten simulated seconds. It is a diagnostic baseline. The
+The [hover lesson](DRONE_HOVER.md) runs frozen RL inference for at most ten
+simulated seconds. The earlier constant-thrust results remain historical evidence. The
 [recovery policy](DRONE_LEARNING.md) and [browser curriculum](DRONE_BROWSER_TRAINING.md)
 have separate native and WASM qualification records. Their intact-flight results
 do not qualify recovery after motor failure.
@@ -148,6 +148,11 @@ do not qualify recovery after motor failure.
 - [x] Required root Rust gates and changed-line personal lints pass.
 - [x] The core `robots` module has 100% measured line and branch coverage.
 - [ ] Viewer coverage is complete. Its session has full coverage; graphics startup
-      and asset-state branches remain unhit in [the viewer record](progress/drone-viewer-coverage.json).
+      and asset-state branches remain unhit in [the viewer
+record](progress/drone-viewer-coverage.json).
 - [ ] Full-package personal lints pass; baseline findings remain in the audit.
 - [x] Final prose-only documentation, the guide, and documentation tests pass.
+
+[flightmare-dynamics]: https://github.com/uzh-rpg/flightmare/blob/d4218aedac18cbe9364a0a0df10ab992c4b65e4f/flightlib/src/dynamics/quadrotor_dynamics.cpp
+
+[pybullet-dynamics]: https://github.com/learnsyslab/gym-pybullet-drones/blob/7ebad1ecabd28a7000add2d05f888aa2e837c2cc/gym_pybullet_drones/envs/BaseAviary.py
