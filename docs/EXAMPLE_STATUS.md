@@ -15,8 +15,8 @@ candidate passed both. Do not install them in gameplay.
 
 The recurrent run completed all 300 updates. No evaluated checkpoint saw the
 robot during a held pipe sample. The [research archive](progress/drone-hide-candidate.json)
-now contains its complete history and log. All research sources are archived;
-no training process remains active.
+now contains its complete history and log. That run
+has stopped. Its research sources are archived.
 
 [Sequence imitation](RECURRENT_IMITATION.md) now trains through observation
 history using the existing sample and memory types. Its 45-line guide learns
@@ -32,11 +32,28 @@ sequence tests. Nix lint still reports the two unchanged unfiltered-source findi
 at `flake.nix:119` and `flake.nix:200`. The [validation record](progress/recurrent-sequence-validation.json)
 records commands, hashes, tooling retries, and boundaries.
 
-Next, train on the teacher's ordered observation/action demonstrations using
-sequence cloning. Keep actor memory within episodes and reset it between episodes.
-Preserve the motor pilot's zero-memory contract. Qualify both permanent-cover
-routes, earlier moving-target profiles, fresh seeds, and browser execution before
-gameplay integration. The full roadmap remains active.
+The first [ordered sequence run](DRONE_SEARCH.md#ordered-sequence-imitation)
+completed 300 updates. It learned each route at different checkpoints, but none
+passed both routes across all five selection seeds. Its exact sources, results,
+traces, logs, and selected weights are in the [sequence archive](progress/drone-sequence-candidate.json).
+The [path comparison](progress/drone-sequence-paths.png) shows actual solver paths.
+No new navigator is qualified for gameplay.
+
+The complete-episode comparison is running as
+`bevy-gym-navigation-sequence-full-20261009.service`, invocation
+`509bd23b459c455c8942c5a0fda1e97a`, with a finite limit of 300 updates.
+Poll that existing unit. Do not restart it because an observation times out.
+Its log is `navigation-sequence-full.log` under the shared validation cache.
+
+Outputs are under `runs/quality-research/navigation-sequence-full/`.
+Its exact source is archived as `runs/quality-research/drone-sequence-full-source.rs`.
+The temporary test runner was removed after archiving; the active executable
+continues independently. No production source changed in this research checkpoint.
+
+Next, inspect the complete-episode results and archive the terminal log.
+If a candidate passes both permanent-cover routes, qualify earlier moving-target
+profiles, fresh seeds, and browser execution before gameplay integration.
+Preserve the motor pilot's zero-memory contract. The full roadmap remains active.
 
 The [navigation research](DRONE_NAVIGATION.md) is archived. Imitation 150 and
 open PPO 140 each passed 192 native open-route cases. Open PPO crashed in all ten

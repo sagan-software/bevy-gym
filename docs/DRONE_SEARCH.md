@@ -123,4 +123,40 @@ The current research has no new browser evidence or fresh-seed search qualificat
 The prototype tests emit unused-item and unreachable-public-item warnings.
 They are archived research sources, not finished tutorial examples, and no clean
 strict Rust gate is claimed. Documentation lint, archive hashes, and local links
-are the gates for this documentation checkpoint. All temporary training tests are archived. No training service remains active.
+are the gates for this documentation checkpoint. The earlier temporary training tests are archived. The earlier training services have stopped.
+
+## Ordered sequence imitation
+
+The [sequence archive](progress/drone-sequence-candidate.json) records a completed
+300-update run using `behavior_clone_sequence`. Actor memory persists within each
+episode. The motor pilot still resets its own memory each action.
+The actor starts from cover PPO 260, with seed 43 and learning rate 0.0005.
+
+Each update trains one contiguous chunk per route, up to 128 decisions.
+The current actor reconstructs initial memory from that episode's earlier observations.
+Gradients stop at the chunk boundary.
+
+Ten teacher episodes per route remain in replay. Every ten updates, a learner
+rollout per route adds teacher labels. Replay retains the latest four learner
+episodes per route. Sampling includes episode starts, early movement, arbitrary
+positions, and episode tails. The archive preserves the exact recipe and sources.
+
+No evaluated checkpoint passed both routes across all five selection seeds.
+Update 180 survived all five house cases and saw the hidden robot in at least
+435 of 506 samples, but crashed in all five pipe cases. Update 300 survived all
+five pipe cases, with 357–488 visible held samples out of 522. It survived four
+house cases; three house cases had no visible held samples.
+The two saved models are research artifacts and must not enter gameplay.
+
+![Sequence imitation paths at seed 42](progress/drone-sequence-paths.png)
+
+These paths are native solver measurements. They do not verify browser execution,
+fresh seeds, earlier moving-target profiles, damaged flight, or general search.
+The native research tests completed successfully but emitted prototype warnings.
+Their passing exit codes do not establish clean production lint gates.
+
+A finite follow-up trains complete episodes so later losses can reach the earlier
+route-choice observations. It retains the same model initialization and settings,
+but removing random chunk-start draws also changes later episode selections.
+This comparison can test the combined recipe; it cannot isolate chunk length alone.
+The follow-up remains active in the status document until its terminal result is recorded.
