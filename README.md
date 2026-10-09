@@ -135,12 +135,17 @@ provide hover, climb, power-off, and tilt for comparison. The
 [recovery guide](examples/robots/recovery.rs) adds initial tilt and
 velocity through `DroneHover::disturbed()`. The
 [browser build guide](robot-web/README.md) uses the same Bevy example in WebAssembly.
+
 The [learning guide](docs/DRONE_LEARNING.md) trains a recovery policy and records
 its native and browser qualification. The bundled policy survived all 32 native
 held-out episodes. The [inference guide](docs/DRONE_INFERENCE.md) includes a browser
 recording. The [browser training guide](docs/DRONE_BROWSER_TRAINING.md) covers
 training, checkpoint export, and playback. See the
 [physics contract](docs/ROBOT_ENVIRONMENT.md) and [execution status](docs/EXAMPLE_STATUS.md).
+
+The [waypoint guide](docs/DRONE_TRACKING.md) uses a bundled imitation-trained pilot
+to fly eight metres east and face east. Its heading and waypoint tests pass
+natively and in Chrome/WASM. The playable arena still uses the hover controller.
 
 The [actuator-failure guide](docs/DRONE_DAMAGE.md) disables a named motor during
 flight. It demonstrates the resulting crash under constant commands. Learned

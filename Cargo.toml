@@ -189,6 +189,11 @@ path = "examples/robots/obstacles.rs"
 required-features = ["robots"]
 
 [[example]]
+name = "drone-track"
+path = "examples/robots/track.rs"
+required-features = ["robots"]
+
+[[example]]
 name = "drone-hover"
 path = "examples/robots/hover.rs"
 required-features = ["robots"]

@@ -625,7 +625,12 @@ samples without smoothing. Its first two panels use one preselected unseen
 reset seed across four headings. The last panel shows four bounded eight-metre
 moves from seed zero. It does not show browser execution.
 
-Next, implement and verify a small inference guide, then connect the controller
-to browser flight. Pursuit, search, moving targets, arena obstacles, and failed
-motors still require training and evaluation. No hidden character coordinates
-entered these heading or waypoint lessons.
+The [waypoint guide](DRONE_TRACKING.md) now provides typed goal construction and
+bundled inference. Its nine tests pass natively and in Chrome/WASM, including
+all 128 heading cases and 80 bounded waypoint cases. Every action uses zero
+recurrent memory and a three-metre displacement limit.
+
+Next, connect this controller to rendered browser flight and record its behavior.
+Pursuit, search, moving targets, arena obstacles, and failed motors still require
+training and evaluation. No hidden character coordinates entered these heading
+or waypoint lessons. The playable combat scene still uses the old hover pilot.

@@ -7,63 +7,48 @@ Updated: 2026-10-09. Goal status: active.
 Read [the roadmap](EXAMPLE_ROADMAP.md), [quality audit](QUALITY_AUDIT.md),
 [reference research](EXAMPLE_RESEARCH.md), and [drone contract](ROBOT_ENVIRONMENT.md).
 
-A new flight candidate is native-qualified. Its frozen weights are
-[drone-heading-candidate.mpk](progress/drone-heading-candidate.mpk); the
-[record](progress/drone-heading-candidate.json) contains source, hashes, criteria,
-case results, and failed experiments. The playable browser still uses the old
-hover policy. No production Rust or browser runtime changed in this checkpoint.
+The [waypoint flight guide](DRONE_TRACKING.md) and private inference helper are
+implemented. Run `drone-track` to fly eight metres east and face east from a
+disturbed start. `FlightGoal` validates position and uses `Dir2` for heading;
+`FlightPilot` loads the bundled imitation weights and returns typed motor actions.
+No library API changed.
 
-The candidate passed both native qualification tests. All 128 fresh heading cases
-survived 500 actions, returned at least 400, ended within 0.5 metres, and held
-position and heading within the required band for the final 100 actions.
-They cover 32 previously unused high-bit seeds and four cardinal headings.
-The minimum return was 418.62; maximum final position error was 5.362 millimetres.
-
-All 80 waypoint cases survived and held the final position/heading band when
-requested displacement was capped at three metres. Targets were zero, two, four,
-and eight metres away, across four directions and five selection seeds.
-These are separate waypoint checks, not additional unseen seeds. No hover-return
-threshold applies to travel toward displaced targets. Without the displacement
-cap, nine of twenty eight-metre cases failed.
-
-Training used imitation learning, not PPO updates. An original deterministic
-controller supplied four-motor demonstrations. The final variant used a fresh
-64-unit actor, shuffled bounded replay, and new labels at learner-visited states.
-It uses thirteen inputs and ZERO recurrent memory on every action. Carrying
-returned memory would create a different, unqualified controller.
-
-The checkpoint is update 200, with SHA-256
+All nine new tests pass natively and in Chrome/WASM. They include 128 held-out
+heading cases and 80 bounded waypoint cases. The helper preserves zero recurrent
+memory on every action and clamps displacement to three metres before body-frame
+encoding. The runtime model exactly matches the frozen research candidate:
 `4e9f539f54b261bdaf67ab3636700a76b8c7fbe28d31d6579202b500c1d577e1`.
-The first twelve inputs retain the flight feature ordering and units; the final
-input is signed horizontal heading error divided by pi. The current hover loader
-expects twelve inputs and a 32-unit actor, so this candidate needs its own helper.
-The waypoint adapter
-clamps displacement before converting it to the body frame and dividing by two
-metres. This is low-level flight control; it has no character observations.
 
-Next, add the small typed inference helper and guide, qualify the frozen model
-in Chrome/WASM, and show the new controller in the browser. Preserve zero-memory
-inference and the three-metre displacement limit. Then train navigation from
-filtered sight, finite memory, hearing bearings, and obstacle observations.
-Do not describe imitation flight as learned pursuit or search.
+Native formatting, root tests, the robot CI test command, strict all-target/
+all-feature Clippy, and the full browser robot checks pass. Changed-line personal
+Rust checks pass; the full personal-lint backlog remains. Nix lint still reports
+the existing unfiltered source roots at `flake.nix:119` and `flake.nix:200`. The
+[coverage record](progress/drone-tracking-coverage.json) includes the executed guide,
+every added instrumented line, and both outcomes of new production conditions.
+The first regression failed because the helper module did not exist.
+Validation logs use the `flight-helper-final-` prefix in the shared validation cache.
 
-All heading experiment services are stopped; none needs resuming. Logs use the
-`heading-` and `tracking-teacher-` prefixes under the validation cache.
-`heading-markov-final-qualification.log` records both passing assertion-based tests.
-The record embeds the temporary test sources and their restore paths; the root
-test files were removed after archiving. They have not passed strict lint or
-coverage, so they are research records, not finished tutorial examples.
+Next, use `examples/robots/flight_control/mod.rs` in rendered browser flight and
+record the new controller. Do not retrain or requalify the unchanged model
+to resume. Preserve its zero-memory and displacement contracts. Then train
+navigation from filtered sight, finite memory, hearing bearings, and obstacle
+observations. Moving goals, arena obstacles, failed motors, learned pursuit, and
+search remain unqualified. The current playable scene still uses the old hover
+pilot; this checkpoint does not change its visuals or behavior.
 
-[The measurements figure](progress/drone-heading-measurements.png) shows one
-preselected unseen heading seed and four eight-metre routes from seed zero.
-It is native telemetry, not browser footage. The browser was inspected at
-1280 by 800; it remains the published combat build. No recording is active.
+All heading experiment services are stopped. The
+[research record](progress/drone-heading-candidate.json) embeds the temporary
+training/evaluation sources and restore paths. Those prototypes remain historical
+records; the committed helper and regression tests now cover inference.
+The [measurements figure](progress/drone-heading-measurements.png) shows native
+telemetry, not browser footage. No recording is active.
 
-The published combat checkpoint is `53dc4b6`. Its
+The published combat checkpoint is `53dc4b6`; its
 [CI passed](https://github.com/sagan-software/bevy-gym/actions/runs/37917936689).
-Check the latest Pages run separately; local browser evidence does not establish
-remote deployment. Preserve the original dirty checkout and work only in
-`bevy-gym-quality`.
+The research checkpoint `6ecbfe1` also has
+[passing CI](https://github.com/sagan-software/bevy-gym/actions/runs/37924203032).
+Check subsequent CI and Pages runs separately. Preserve the original dirty
+checkout and work only in `bevy-gym-quality`.
 
 ## Current browser build
 
