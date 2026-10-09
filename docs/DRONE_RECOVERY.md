@@ -70,9 +70,18 @@ It shares the [hover lesson's](DRONE_HOVER.md) observation/action contract, rewa
 episode horizon, recurrent memory handling, and checkpoint provenance.
 Only the reset distribution changes, as specified above.
 
-The [curriculum trainer](DRONE_CURRICULUM.md) transfers hover weights and optimizer
-state into recovery. The [direct trainer](DRONE_LEARNING.md) starts recovery from
-random weights. Both use the same `DroneHover::disturbed()` implementation.
+Run recovery independently through the shared curriculum trainer:
+
+```sh
+nix develop --command cargo run --no-default-features --features robots \
+  --example drone-curriculum -- --lesson recovery --seed 7 --updates 600 \
+  --output runs/drone-recovery/new-run
+```
+
+This mode starts from random weights. When `--lesson` is omitted, the
+[curriculum trainer](DRONE_CURRICULUM.md) transfers hover weights and optimizer
+state into recovery. The older [direct trainer](DRONE_LEARNING.md) also starts
+recovery from random weights. All paths use `DroneHover::disturbed()`.
 Promotion requires five selection survivors, mean return at least 400, and mean
 final distance at most 0.5 metres. The frozen checkpoint survived all 32 held-out
 recovery episodes. Navigation, combat, and damaged flight remain unqualified.

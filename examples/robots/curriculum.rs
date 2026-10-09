@@ -11,13 +11,16 @@ mod lesson;
 
 use std::{error::Error, num::NonZeroU32, path::PathBuf};
 
-use clap::Parser;
+use clap::{Parser, ValueEnum};
 use learning::{baseline, load_policy, new_agent, SELECTION_SEEDS};
 use lesson::Lesson;
 
 /// Bound the work and choose where to save each evaluated checkpoint.
 #[derive(Parser)]
 struct Options {
+    /// Train one lesson independently; omission runs hover followed by recovery.
+    #[arg(long, value_enum)]
+    lesson: Option<Lesson>,
     /// Maximum 512-transition updates per lesson; exhaustion does not pass a lesson.
     #[arg(long, default_value = "600")]
     updates: NonZeroU32,
@@ -29,12 +32,30 @@ struct Options {
     output: PathBuf,
 }
 
+// Keep CLI parsing outside the lesson module shared with the browser worker.
+impl ValueEnum for Lesson {
+    /// Offer the same closed lessons and order as curriculum execution.
+    fn value_variants<'a>() -> &'a [Self] {
+        &[Self::Hover, Self::Recovery]
+    }
+
+    /// Reuse the lesson's artifact name as its command-line spelling.
+    fn to_possible_value(&self) -> Option<clap::builder::PossibleValue> {
+        Some(clap::builder::PossibleValue::new(self.name()))
+    }
+}
+
 /// Retain the agent across lessons and replace only the episode collection state.
 fn main() -> Result<(), Box<dyn Error>> {
     let options = Options::parse();
     std::fs::create_dir_all(&options.output)?;
     let mut agent = new_agent(options.seed)?;
-    for lesson in [Lesson::Hover, Lesson::Recovery] {
+    // Borrow the selected lesson or the fixed curriculum without duplicating its runner.
+    let lessons = match &options.lesson {
+        Some(lesson) => std::slice::from_ref(lesson),
+        None => &[Lesson::Hover, Lesson::Recovery],
+    };
+    for &lesson in lessons {
         let name = lesson.name();
         let mut batch = lesson.batch(options.seed, &agent.policy());
         for update in 1..=options.updates.get() {

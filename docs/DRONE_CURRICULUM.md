@@ -9,7 +9,8 @@ unchanged until this curriculum has its own qualification evidence.
 
 ## Contract
 
-- Lessons are a closed sequence: calm hover, then disturbed recovery.
+- The default sequence is calm hover, then disturbed recovery.
+- `--lesson hover` and `--lesson recovery` each train only the selected lesson.
 - Each lesson uses eight independent lanes and 64 actions per lane per update.
 - Every twentieth update evaluates the five existing selection seeds independently.
 - Advance only when all five episodes survive, mean return reaches 400, and mean
@@ -29,7 +30,7 @@ only after the native training result passes final qualification.
 
 ## Research and damage limits
 
-[Unity's curriculum documentation](https://unity-technologies.github.io/ml-agents/Training-ML-Agents/#curriculum)
+[Unity's curriculum documentation][unity-curriculum]
 uses lesson completion criteria to advance environment difficulty. This lesson
 uses independent evaluation scores as its completion criterion; it does not copy
 Unity's configuration format or claim the same training algorithm.
@@ -52,8 +53,16 @@ model. Do not promise stationary four-axis hover after losing one rotor.
 The new example is `drone-curriculum`. Run it from the repository root:
 
 ```sh
-nix develop --command cargo run --no-default-features --features robots --example drone-curriculum -- --updates 600 --seed 7 --output runs/drone-curriculum/my-run
+nix develop --command cargo run --no-default-features --features robots \
+  --example drone-curriculum -- --updates 600 --seed 7 \
+  --output runs/drone-curriculum/my-run
 ```
+
+For standalone training, add `--lesson hover` or `--lesson recovery`. These are the
+only accepted names. Both use the same lesson factories, collector, evaluator, and
+promotion criteria as the default sequence. Standalone training starts from random
+weights; it does not load a prior checkpoint or bypass promotion. The default
+sequence retains its optimizer across the hover-to-recovery transition.
 
 Use a distinct output directory for each run. Checkpoints and scores include the
 lesson and update in their filenames. The final update also receives an evaluation
@@ -97,3 +106,5 @@ reached action 500. Browser curriculum training controls remain to be implemente
 The completed unit is `bevy-gym-curriculum-run-20261008.service`. Its log remains at
 `/home/sagan/.cache/bevy-gym-quality-validation/logs/curriculum-run.log`.
 Intermediate artifacts remain in `runs/drone-curriculum/seed7-initial`.
+
+[unity-curriculum]: https://unity-technologies.github.io/ml-agents/Training-ML-Agents/#curriculum

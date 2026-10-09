@@ -1,7 +1,7 @@
 # Drone hover lesson
 
-The native `drone-hover` command now runs frozen RL inference. Separate browser
-lesson scenes and standalone hover training remain unfinished.
+The native `drone-hover` command runs frozen RL inference. The shared trainer
+supports standalone hover training. Separate browser lesson scenes remain unfinished.
 
 ## Run
 
@@ -43,8 +43,16 @@ contact termination, and flight-region termination. The episode ends after at mo
 
 ## Training and qualification
 
-The existing combined trainer starts with hover and transfers its actor, critic,
-and optimizer into disturbed recovery:
+Train hover independently with the shared curriculum runner:
+
+```sh
+nix develop --command cargo run --no-default-features --features robots \
+  --example drone-curriculum -- --lesson hover --seed 7 --updates 600 \
+  --output runs/drone-hover/new-run
+```
+
+Omitting `--lesson` trains hover and then transfers its actor, critic, and optimizer
+into disturbed recovery:
 
 ```sh
 nix develop --command cargo run --no-default-features --features robots \
@@ -52,7 +60,7 @@ nix develop --command cargo run --no-default-features --features robots \
   --output runs/drone-curriculum/new-run
 ```
 
-Use a new output directory. Standalone hover selection in this trainer remains pending.
+Use a new output directory. Standalone training starts from random weights.
 Promotion requires all five selection episodes to survive, mean return of at least
 400, and mean final distance of at most 0.5 metres. Budget exhaustion fails the lesson.
 

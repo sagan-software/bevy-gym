@@ -1,0 +1,82 @@
+{
+  "date": "2026-10-09",
+  "base_commit": "e6baa3cc947075c6351b78d66d4f3fa7df7a67ba",
+  "source_sha256": {
+    "examples/robots/curriculum.rs": "063d379aa681b521012c6eaf9bab102811a80e8f044a8e674648b93318c916cc",
+    "tests/test_drone_curriculum_cli.py": "18e582fefe5e08e401444811ba96fa9d3b4a22854579fbe0b943b1eb3193c926"
+  },
+  "red": "Both standalone CLI cases exited 2 because --lesson was absent; expected exit 1 with selected lesson exhaustion and artifacts.",
+  "checks": [
+    "Standalone hover and recovery each save exactly their own update-1 model and failed five-seed evaluation, then exit 1.",
+    "Omitting --lesson still starts hover and cannot advance after its update budget fails.",
+    "travel, Hover, and the empty value exit 2 before creating the output directory.",
+    "Native root tests, learning tests, curriculum tests, strict all-target/all-feature Clippy, WASM library check, and personal changed-line Rust and Python lint pass."
+  ],
+  "coverage": {
+    "source": "examples/robots/curriculum.rs",
+    "new_measured_lines": {
+      "38": 5,
+      "39": 5,
+      "40": 5,
+      "43": 9,
+      "44": 9,
+      "45": 9,
+      "54": 3,
+      "55": 2,
+      "56": 1,
+      "58": 3
+    },
+    "new_measured_lines_covered": 10,
+    "new_measured_lines_total": 10,
+    "full_file_summary": {
+      "branches": {
+        "count": 8,
+        "covered": 4,
+        "notcovered": 4,
+        "percent": 50
+      },
+      "functions": {
+        "count": 3,
+        "covered": 3,
+        "percent": 100
+      },
+      "instantiations": {
+        "count": 6,
+        "covered": 3,
+        "percent": 50
+      },
+      "lines": {
+        "count": 46,
+        "covered": 38,
+        "percent": 82.6086956521739
+      },
+      "mcdc": {
+        "count": 0,
+        "covered": 0,
+        "notcovered": 0,
+        "percent": 0
+      },
+      "regions": {
+        "count": 101,
+        "covered": 79,
+        "notcovered": 22,
+        "percent": 78.21782178217822
+      }
+    },
+    "gaps": [
+      "Existing main-loop promotion and completion paths were not retrained for this checkpoint. Existing skip-evaluation and I/O error paths are not covered by the one-update CLI runs.",
+      "Clap-generated parser code has no source-line coverage mapping here. Argument rejection has separate CLI behavioral assertions."
+    ],
+    "profile_boundary": "Fresh profiles include the exact unit-test executable and successful argument parsing only. Argument-error process exits caused counter underflow in an earlier LLVM report, which is excluded.",
+    "logs": [
+      "skill-selection-lines.txt",
+      "skill-selection-measured.log",
+      "skill-selection-lines-argument-exit-anomaly.txt"
+    ]
+  },
+  "training_evidence": "These bounded CLI checks are test runs, not qualified policies or learning improvement. Existing qualified checkpoint evidence remains unchanged.",
+  "validation_notes": [
+    "An earlier coverage helper selected a training executable instead of its test executable. It was stopped before writing a checkpoint. The corrected helper uses the exact test executable and a timeout. The existing seed11 service was unaffected."
+  ],
+  "log_prefix": "/home/sagan/.cache/bevy-gym-quality-validation/skill-selection-"
+}

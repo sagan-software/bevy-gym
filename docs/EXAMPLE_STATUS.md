@@ -4,6 +4,35 @@ Updated: 2026-10-09. Current work: RL-only drone/droid curriculum.
 
 ## Resume here
 
+### Standalone training selection, 2026-10-09
+
+The shared `drone-curriculum` trainer now accepts `--lesson hover` and
+`--lesson recovery`. Omission retains the hover-to-recovery sequence and optimizer
+transfer. Standalone modes start from random weights and use the same collector,
+evaluator, and promotion criteria. An empty or invalid `--lesson` value fails before
+output creation. A failed update budget never starts another lesson.
+
+Three CLI tests cover both standalone lessons, default progression, and rejected
+values. Native tests, strict Clippy, WASM checks, and changed-line personal lint pass.
+[The evidence](progress/drone-skill-selection.json) records all ten added measured
+Rust lines hit, existing coverage gaps, and corrected coverage-tool failures.
+The [hover](DRONE_HOVER.md) and [recovery](DRONE_RECOVERY.md) guides have independent
+training and inference commands. No new policy qualification is claimed.
+Logs use `/home/sagan/.cache/bevy-gym-quality-validation/skill-selection-`.
+
+The preceding inference checkpoint `e6baa3cc947075c6351b78d66d4f3fa7df7a67ba` is on
+GitHub main. Its CI strict job passed; contracts and browser deployment were still
+running or pending at the last check. Local evidence and remote CI remain separate.
+
+Seed 11 passed hover at update 300 with five survivors, mean return 441.279, and
+mean final distance 0.303 metres. It is training fixed front-left failure; update
+200 still failed promotion. The original service, log, and checkpoint directory
+remain unchanged. Preserve both this run and the earlier seed-7 failure.
+
+Next: qualify calm-start replay of the saved curriculum policy, then implement
+separate policy-only browser lesson scenes. Standalone checkpoint transfer, later
+drone lessons, physical droid lessons, and the 3v3 arena remain unfinished.
+
 ### Frozen-policy skill commands, 2026-10-09
 
 `drone-hover` and `drone-recovery` now infer every motor action from the qualified
