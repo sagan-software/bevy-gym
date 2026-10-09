@@ -1,0 +1,60 @@
+{
+  "baseline_commit": "d096947b4e2023d019a3f395bb50c49404308541",
+  "runtime": "build-3f7307468de4f859554b14ab010d1cbda6c222bc74f21fac49774446be91e9f8",
+  "recorded_utc": "2026-10-09T08:55:35.928940+00:00",
+  "viewport_css_pixels": {
+    "desktop": [
+      1280,
+      800
+    ],
+    "narrow": [
+      390,
+      844
+    ]
+  },
+  "observed": [
+    "An accepted pistol round reports shot south while sight is none",
+    "Gunshot memory expires without a new event",
+    "Walking reports steps south, then silence expires that cue",
+    "The narrow view fits hearing, combat, and controls without clipping"
+  ],
+  "recording": {
+    "started_utc": "2026-10-09T08:53:11.511Z",
+    "duration_seconds": 8.681967,
+    "note": "Original browser recording copied without retiming. Standard keyboard and pointer events control the character; no simulation state is edited."
+  },
+  "validation": {
+    "pursuit_viewer_native": 45,
+    "hover_viewer_native": 50,
+    "hearing_native_including_arena": 8,
+    "hearing_wasm": 6,
+    "new_browser_console_errors": 0,
+    "new_failed_network_requests": 0
+  },
+  "limitations": [
+    "The healthy hover controller does not pursue sound or sight",
+    "Hearing uses authored event ranges and one obstruction ray, not acoustic propagation",
+    "Audible sound playback is not implemented",
+    "Native window execution and actual mobile touch input remain unverified",
+    "Existing WebGL feature warnings and the full-project personal Rust lint backlog remain"
+  ],
+  "sources": {
+    "examples/robots/pursuit.rs": "3aa3d362f4bf4d15a94cc2e31aede1927ab788c9c1447c1b2abe0cd775b15fb0",
+    "examples/robots/pursuit/arena.rs": "805f6f3a2085060066bf9c985413dff0ef8c2ba31ba3e307b2b927e1fc436565",
+    "examples/robots/pursuit/flight_tests.rs": "aa5948072711696843f98590d11788c12a7e69f913c8d8760f13808f8c3a0c59",
+    "examples/robots/pursuit/hearing.rs": "f2d1c36e284719b615ad015dea162d6e4c62d779bdcf39054b4ff1c949798651",
+    "examples/robots/pursuit/hearing_tests.rs": "fa7002deb36636ea206449936eb90ac40b205477a6288fd5e8f72bf35332a2b3",
+    "examples/robots/pursuit/perception.rs": "d6fbc3f853082cc7d1cf059d9afd88eebec73777213f91904fc29eac9662163c",
+    "examples/robots/pursuit_hearing.rs": "51935417ff37167086c02a41a4788d4bfedf707e97d3a5690e163e7521a73250",
+    "tests/pursuit_arena.rs": "ae3d6deb392b17583f3e91425a8175b4c7bbe65d14093925f0c6b0bd680945bb",
+    "tests/pursuit_hearing.rs": "04ebaf5a4e3fdc4462c23f2d3ffce4e65460041381c02c516c5359888108c37f"
+  },
+  "media": {
+    "docs/progress/pursuit-hearing-narrow.png": "bbf9f3d902f5a6bd62d870aa3a72992c7c750983df33938c26d7894d6e524cf6",
+    "docs/progress/pursuit-hearing-quiet.png": "40e4f055861b2ba7480d3c02e86157af537a1ac62eeaa803d27beb58a8108011",
+    "docs/progress/pursuit-hearing-shot-expired.png": "60081d05e2c8fa77e6815d1a02bb12391e2dbf757b04e64e2ac0c3dd0f0571b1",
+    "docs/progress/pursuit-hearing-shot.png": "8bced87602b4fef22914953b504b2d493d13545d731f75be7329fd165345e284",
+    "docs/progress/pursuit-hearing-steps.png": "1a47d5c703ef55dfe26f7fe8ad3497554378616c4d5bd36ff754cad302fb07b9",
+    "docs/progress/pursuit-hearing.mp4": "a017badae10700dcacb57908dc67d5dbf8361474f77cd7aef5ad3a4b4a2d8d22"
+  }
+}

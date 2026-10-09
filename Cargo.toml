@@ -157,6 +157,11 @@ path = "examples/robots/pursuit_combat.rs"
 required-features = ["robots"]
 
 [[example]]
+name = "pursuit-hearing"
+path = "examples/robots/pursuit_hearing.rs"
+required-features = ["robots"]
+
+[[example]]
 name = "pursuit-sight"
 path = "examples/robots/pursuit_sight.rs"
 required-features = ["robots"]

@@ -393,7 +393,7 @@ checkpoint `7f5fd6a`: all 48 instrumented sensor lines, both outcomes of all ten
 instrumented sensor branches, and all 17 instrumented guide lines.
 
 The model and guide are implemented. The rendered integration is described below.
-Sensor-only pursuit actor inputs, hearing, and return fire remain pending.
+Sensor-only pursuit actor inputs and return fire remain pending. Hearing is described below.
 
 ## Body-mounted sight in the arena
 
@@ -429,4 +429,62 @@ input; actual mobile touch input remains unverified. [The visual record](progres
 retains source and media hashes and distinguishes observed behavior from test evidence.
 
 The drone still hovers. It does not choose where to look, pursue the robot, or fire.
-Finite sound events and telegraphed return fire come next, before pursuit training.
+Hearing is connected below. Telegraphed return fire comes next, before pursuit training.
+
+## Finite hearing events
+
+The playable arena emits footsteps after each 0.8 metres of grounded travel and
+one gunshot per accepted pistol round. Idle, blocked, and airborne movement stays
+silent. Unarmed attempts, cooldown rejections, and an empty magazine cannot refresh
+hearing. Reset, body death, physical death, and controller failure clear both senses.
+
+The local hearing model retains only an event class, an eight-way world-relative
+bearing, and elapsed simulation time. North is negative Z; east is positive X.
+Coincident horizontal positions have an unresolved bearing. Cardinal sectors own
+their 22.5-degree boundary ties. No emitter or listener coordinate is retained.
+
+Footsteps reach eight metres and gunshots reach 24 metres, including the boundary.
+An obstruction halves range once; windows and pipe openings use the shared geometry.
+
+A new audible event replaces the previous cue. Invalid or inaudible events preserve
+its age. Cues expire at two seconds; age addition saturates. Query positions must
+be finite and within ±1,000 metres on every axis. These ranges and timing are game
+choices, not measurements of ARC Raiders. The model does not simulate diffraction,
+reflections, material acoustics, or masking.
+
+Epic's [AI Perception documentation](https://dev.epicgames.com/documentation/unreal-engine/ai-perception-in-unreal-engine?lang=en-US)
+and [Report Noise Event](https://dev.epicgames.com/documentation/unreal-engine/BlueprintAPI/AI/Perception/ReportNoiseEvent?lang=en-US)
+describe explicit hearing events, range, and finite stimulus age. They informed this
+design; they do not establish how Embark implements enemy hearing. Audible sound
+playback remains pending.
+
+Run the minimal guide:
+
+```bash
+nix develop --command cargo run --no-default-features --features robots --example pursuit-hearing
+```
+
+The guide contrasts an inaudible footstep with a gunshot through the same wall,
+reads the coarse direction, then expires it. The HUD shows cues such as
+`Drone sight: none · shot south`; sight and hearing expire independently.
+HUD text updates only when its displayed state changes.
+
+All 45 pursuit-viewer tests and 50 hover-viewer tests pass. Eight native hearing
+cases include two shared arena tests; six hearing cases pass in Chrome/WASM.
+Tests cover clear and obstructed range endpoints, every bearing, sector ties,
+invalid input, silence, replacement, expiry, reset, accepted and rejected shots,
+blocked movement, falling, landing, and offline UI. Root tests, strict native/WASM
+Clippy, and the changed-line personal Rust gates pass. The full personal Rust lint
+backlog remains; the Nix gate still reports existing source-root warnings at
+`flake.nix:119` and `flake.nix:199`.
+
+[Coverage](progress/pursuit-hearing-coverage.json) records hits on every changed
+instrumented line and both outcomes of every added production branch. The runnable
+guide is included. Native window startup and the existing invalid-solver-pose
+branch remain outside this coverage.
+
+[The browser recording](progress/pursuit-hearing.mp4) shows a gunshot cue, expiry,
+footsteps, and expiry after stopping. Desktop and 390-pixel views were inspected;
+hearing text and controls fit. Actual mobile touch input remains unverified.
+[The visual record](progress/pursuit-hearing.json) retains source and media hashes.
+The healthy hover policy receives no new inputs and does not pursue these cues.

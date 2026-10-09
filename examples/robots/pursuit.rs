@@ -30,6 +30,8 @@ mod drone_model;
 mod aiming;
 #[path = "pursuit/effects.rs"]
 mod effects;
+#[path = "pursuit/hearing.rs"]
+mod hearing;
 #[path = "pursuit/hud.rs"]
 mod hud;
 #[path = "pursuit/perception.rs"]
@@ -49,6 +51,10 @@ mod flight_tests;
 #[cfg(test)]
 #[path = "pursuit/perception_tests.rs"]
 mod perception_tests;
+
+#[cfg(test)]
+#[path = "pursuit/hearing_tests.rs"]
+mod hearing_tests;
 
 #[path = "learning/encoding.rs"]
 mod encoding;
@@ -71,8 +77,12 @@ struct Game {
     flight: flight::Flight,
     /// Current sighting or bounded last-seen memory, without hidden target state.
     sight: sight::Sight,
+    /// Last audible event; hidden source coordinates are never retained.
+    hearing: hearing::Hearing,
     /// Distance walked in metres since reset, used as animation phase.
     distance: f32,
+    /// Grounded travel since the last footstep, in metres below one 0.8 m stride.
+    footstep_distance: f32,
     /// Last horizontal displacement, in metres per action.
     motion: Vec3,
     /// Last nonzero movement heading in radians; retained while idle.
@@ -94,7 +104,9 @@ impl Default for Game {
             combat,
             flight,
             sight: sight::Sight::default(),
+            hearing: hearing::Hearing::default(),
             distance: 0.0,
+            footstep_distance: 0.0,
             motion: Vec3::ZERO,
             heading: 0.0,
             aim: None,
@@ -109,10 +121,12 @@ impl Game {
         self.combat = firing::Combat::default();
         self.flight.reset();
         self.sight.forget();
+        self.hearing.forget();
         self.combat
             .project_flight(self.flight.observation())
             .expect("Reset flight pose is valid");
         self.distance = 0.0;
+        self.footstep_distance = 0.0;
         self.motion = Vec3::ZERO;
         self.heading = 0.0;
         self.aim = None;
@@ -131,6 +145,7 @@ impl Game {
     fn sample_sight(&mut self) {
         if !self.combat.target().health().is_alive() || self.flight.error().is_some() {
             self.sight.forget();
+            self.hearing.forget();
             return;
         }
         let eye = self.eye();
@@ -141,6 +156,14 @@ impl Game {
             self.arena.position(),
             std::time::Duration::from_millis(20),
         );
+    }
+
+    /// Submit an actual event only while the listener can sense.
+    fn hear(&mut self, source: Vec3, noise: hearing::Noise) {
+        if self.combat.target().health().is_alive() && self.flight.error().is_none() {
+            self.hearing
+                .hear(&self.arena, self.combat.target().position(), source, noise);
+        }
     }
 
     /// Armed characters face their aim while retaining independent movement.
@@ -157,15 +180,24 @@ impl Game {
 
     /// Interactions use the current arena position rather than a caller-supplied origin.
     fn act(&mut self, action: firing::Action) {
+        let previous_rounds = self.combat.rounds();
         self.combat.act(&self.arena, action);
         if !self.combat.target().health().is_alive() {
             self.sight.forget();
+            self.hearing.forget();
+        } else if self.combat.rounds() < previous_rounds {
+            // Accepted shots spend ammunition; retained feedback cannot replay a noise.
+            self.hear(
+                firing::Combat::origin(self.arena.position()),
+                hearing::Noise::Gunshot,
+            );
         }
     }
 
     /// Animate measured displacement, so holding a blocked direction does not walk in place.
     fn step(&mut self, movement: Movement) {
         self.combat.advance(std::time::Duration::from_millis(20));
+        self.hearing.advance(std::time::Duration::from_millis(20));
         if let Some(step) = self.flight.advance(self.combat.target().health()) {
             if let Err(error) = self.combat.project_flight(step.observation) {
                 self.flight.fail(format!("Invalid flight pose: {error:?}"));
@@ -182,6 +214,19 @@ impl Game {
             self.heading = (-self.motion.x).atan2(-self.motion.z);
         }
         self.sample_sight();
+        // Only measured grounded travel crosses a walking stride. A blocked input is silent.
+        if self.arena.is_grounded() {
+            self.footstep_distance += distance;
+            // A 20 ms action moves at most 0.08 m, so it can cross only one stride.
+            if self.footstep_distance >= 0.8 {
+                self.footstep_distance -= 0.8;
+                // Emit above the sole so the floor endpoint is not an occluder.
+                self.hear(
+                    self.arena.position() - Vec3::Y * 0.7,
+                    hearing::Noise::Footstep,
+                );
+            }
+        }
     }
 }
 

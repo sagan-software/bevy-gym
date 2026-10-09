@@ -37,6 +37,8 @@ pub(super) struct Arena {
     position: Vec3,
     /// Falling velocity in metres per second.
     vertical_velocity: f32,
+    /// Support reported by the last character-controller action.
+    grounded: bool,
 }
 
 impl Default for Arena {
@@ -61,11 +63,21 @@ impl Default for Arena {
             shape: SharedShape::capsule_y(0.6, 0.3),
             position: SPAWN,
             vertical_velocity: 0.0,
+            grounded: false,
         }
     }
 }
 
 impl Arena {
+    /// Test fixture starting two metres above the normal spawn, with the same collision world.
+    #[cfg(test)]
+    pub(super) fn airborne() -> Self {
+        Self {
+            position: SPAWN + Vec3::Y * 2.0,
+            ..Self::default()
+        }
+    }
+
     /// Borrow authored boxes; rendering cannot change the collision layout.
     pub(super) fn blocks(&self) -> &[Block] {
         &self.blocks
@@ -96,7 +108,8 @@ impl Arena {
             |_| {},
         );
         self.position += Vec3::from_array(corrected.translation.to_array());
-        if corrected.grounded {
+        self.grounded = corrected.grounded;
+        if self.grounded {
             self.vertical_velocity = 0.0;
         }
     }
@@ -106,10 +119,16 @@ impl Arena {
         self.position
     }
 
+    /// Read support from the last action; construction and reset have not sampled it.
+    pub(super) const fn is_grounded(&self) -> bool {
+        self.grounded
+    }
+
     /// Restore the initial character state while retaining immutable obstacles.
     pub(super) const fn reset(&mut self) {
         self.position = SPAWN;
         self.vertical_velocity = 0.0;
+        self.grounded = false;
     }
 
     /// Return the first obstruction distance in metres; invalid coordinates return zero.
@@ -139,19 +158,18 @@ mod tests {
 
     #[test]
     fn airborne_character_falls_and_lands_without_floor_penetration() {
-        let mut arena = Arena {
-            position: SPAWN + Vec3::Y * 2.0,
-            ..Arena::default()
-        };
+        let mut arena = Arena::airborne();
         let initial = arena.position();
         arena.step(Movement::Idle);
         assert!(arena.position().y < initial.y);
         assert!(arena.vertical_velocity < 0.0);
+        assert!(!arena.is_grounded());
         for _ in 0..100 {
             arena.step(Movement::Idle);
         }
         assert!((0.90..0.92).contains(&arena.position().y));
         assert!(arena.vertical_velocity.abs() < f32::EPSILON);
+        assert!(arena.is_grounded());
     }
 
     #[test]

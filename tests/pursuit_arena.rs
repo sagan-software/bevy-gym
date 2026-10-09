@@ -19,16 +19,19 @@ wasm_bindgen_test_configure!(run_in_browser);
 fn movement_is_fixed_step_and_reset_restores_the_character() {
     let mut arena = Arena::default();
     let start = arena.position();
+    assert!(!arena.is_grounded());
     arena.step(Movement::Right);
     assert!((arena.position().x - start.x - 0.08).abs() < 1.0e-5);
     arena.reset();
     assert_eq!(arena.position(), start);
+    assert!(!arena.is_grounded());
     let mut fresh = Arena::default();
     for _ in 0..20 {
         arena.step(Movement::ForwardRight);
         fresh.step(Movement::ForwardRight);
         assert_eq!(arena.position(), fresh.position());
     }
+    assert!(arena.is_grounded());
 }
 
 #[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]

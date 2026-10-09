@@ -1,6 +1,10 @@
 //! Project filtered sight into a body-mounted lens and a named HUD state.
 
-use super::{sight::Contact, Game};
+use super::{
+    hearing::{Bearing, Noise},
+    sight::Contact,
+    Game,
+};
 use bevy::prelude::*;
 
 /// Keep private rendering types behind one viewer installation function.
@@ -123,7 +127,7 @@ fn project(
         With<Lens>,
     >,
     mut labels: Query<'_, '_, &mut Text, With<Status>>,
-    mut previous: Local<'_, Option<Detection>>,
+    mut previous: Local<'_, Option<(Detection, Option<(Noise, Bearing)>)>>,
 ) {
     let detection = Detection::read(&game);
     let eye = game.eye();
@@ -137,10 +141,25 @@ fn project(
             Visibility::Hidden
         };
     }
-    if *previous != Some(detection) {
-        *previous = Some(detection);
+    let heard = if detection == Detection::Offline {
+        None
+    } else {
+        game.hearing
+            .latest()
+            .map(|cue| (cue.noise(), cue.bearing()))
+    };
+    let state = (detection, heard);
+    if *previous != Some(state) {
+        *previous = Some(state);
         for mut text in &mut labels {
-            detection.label().clone_into(&mut text.0);
+            let sight = detection.label();
+            text.0 = if let Some((noise, bearing)) = heard {
+                let noise = noise.label();
+                let bearing = bearing.label();
+                format!("{sight} · {noise} {bearing}")
+            } else {
+                sight.to_owned()
+            };
         }
     }
 }
@@ -263,6 +282,77 @@ mod tests {
         assert_eq!(
             app.world().resource::<Assets<StandardMaterial>>().len(),
             materials
+        );
+    }
+
+    #[test]
+    fn sound_labels_expire_independently_of_sight_and_disappear_offline() {
+        let mut app = app();
+        {
+            let mut game = app.world_mut().resource_mut::<Game>();
+            let game = &mut *game;
+            game.hearing.hear(
+                &game.arena,
+                Vec3::new(0.0, 10.0, 0.0),
+                Vec3::new(0.0, 10.0, -3.0),
+                Noise::Footstep,
+            );
+        }
+        assert_projection(
+            &mut app,
+            Detection::None,
+            "Drone sight: none · steps north",
+            Visibility::Inherited,
+        );
+        {
+            let mut game = app.world_mut().resource_mut::<Game>();
+            let game = &mut *game;
+            game.sight.sample(
+                &game.arena,
+                Vec3::new(0.0, 10.0, 0.0),
+                Dir3::Z,
+                Vec3::new(0.0, 9.4, 5.0),
+                Duration::ZERO,
+            );
+            game.hearing.hear(
+                &game.arena,
+                Vec3::new(0.0, 10.0, 0.0),
+                Vec3::new(3.0, 10.0, 0.0),
+                Noise::Gunshot,
+            );
+        }
+        assert_projection(
+            &mut app,
+            Detection::Visible,
+            "Drone sight: visible · shot east",
+            Visibility::Inherited,
+        );
+        app.world_mut()
+            .resource_mut::<Game>()
+            .hearing
+            .advance(Duration::from_secs(2));
+        assert_projection(
+            &mut app,
+            Detection::Visible,
+            "Drone sight: visible",
+            Visibility::Inherited,
+        );
+        {
+            let mut game = app.world_mut().resource_mut::<Game>();
+            let game = &mut *game;
+            game.hearing.hear(
+                &game.arena,
+                Vec3::new(0.0, 10.0, 0.0),
+                Vec3::new(3.0, 10.0, 0.0),
+                Noise::Gunshot,
+            );
+            game.flight.fail("Controller failed".to_owned());
+        }
+        assert_projection(
+            &mut app,
+            Detection::Offline,
+            "Drone sight: offline",
+            Visibility::Inherited,
         );
     }
 }
