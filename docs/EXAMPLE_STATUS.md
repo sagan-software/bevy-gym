@@ -88,7 +88,10 @@ Its runtime is `build-85b4ba1609c7a202f04f63a69e36ee1003b6aa94968938e312796b26f5
 No validation or recording job remains active. The preview is 1280×800 CSS pixels.
 Do not resize during recording.
 
-The scheduled-failure baseline is ready to publish. The new
+The scheduled-failure baseline is published as `307876c`.
+[CI](https://github.com/sagan-software/bevy-gym/actions/runs/37879345355) is running;
+[Pages](https://github.com/sagan-software/bevy-gym/actions/runs/37879345358) is pending.
+The new
 `drone-damage-baseline` guide compares 32 seeds, four motors, and two failure times.
 Both controllers reached damage in all 256 cases and then crashed. Constant
 half-thrust lasted 36–37 actions; the intact policy lasted 34–38 actions.
