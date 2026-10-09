@@ -7,7 +7,42 @@ Updated: 2026-10-09. Goal status: active.
 Read [the roadmap](EXAMPLE_ROADMAP.md), [quality audit](QUALITY_AUDIT.md),
 [reference research](EXAMPLE_RESEARCH.md), and [drone contract](ROBOT_ENVIRONMENT.md).
 
-The current checkpoint connects visible pistol pickup, mouse aiming, ammunition,
+The current destruction checkpoint connects combat to rotor flashes, smoke, body explosions, and
+eight colliding debris proxies. It shares the hover viewer's renderer and uses the
+arena's immutable geometry for debris collisions. The target remains stationary;
+flight coupling, sensing, return fire, and learned pursuit are unfinished.
+
+All 26 pursuit-viewer tests, 50 hover-viewer tests, root tests, strict native/WASM
+Clippy, and Chrome/WASM checks pass. Personal Rust discovery found no diagnostics
+in the changed combat and destruction files; the full-project backlog remains.
+Coverage hits every changed measured line except native plugin installation.
+The defensive missing-body branches are recorded with their exact locations.
+
+The optimized build passed under
+`bevy-gym-pursuit-destruction-soft-flash-build-20261009`. Desktop and narrow browser
+checks pass, including aimed rotor shots at 390 pixels. The final preview is
+`http://100.105.254.50:8781/robots/pursuit/?build=soft-destruction`, served by
+`bevy-gym-pursuit-server-20261009`. Its runtime is
+`build-6f31f621d9cd24ccd25ceea0cbbd38a27056ded4c1f682bf35420b162d47fde2`.
+
+[The recording](progress/pursuit-destruction.mp4) shows rotor smoke, body destruction,
+colliding debris, and reset. [The visual record](progress/pursuit-destruction.json)
+retains hashes and verification limits. A browser check found a flat polygon flash;
+the shared renderer now uses a soft, camera-facing radial texture instead. Its
+regression failed before that change and passes afterward.
+
+Logs use the `pursuit-destruction-` prefix in the validation cache. No recording is
+active. Native window execution and mobile touch input remain unverified. The hover
+viewer was tested natively and compiled for WASM, but was not separately re-recorded.
+
+Next, connect the drone to live flight and arena collision geometry. Rotor damage
+must stop its motor forces, and fatal collisions must trigger the same destruction
+path. Keep the qualified hover profile unchanged. Then add occlusion-aware sensing,
+telegraphed return fire, and pursuit training.
+
+## Earlier checkpoints
+
+The combat checkpoint `5164de6` connects visible pistol pickup, mouse aiming, ammunition,
 body damage, and rotor weak points to the playable arena. The drone remains a
 stationary target. Nineteen viewer tests, 49 flight-viewer tests, seven combat
 cases, fourteen native shot cases, root tests, and strict native/WASM Clippy pass.
@@ -32,7 +67,7 @@ Personal shell checks pass. Personal Rust discovery has no diagnostics in the
 changed combat files; the full-project backlog remains. Native window and mobile
 touch input are unverified.
 
-Next, connect combat damage to flight failure, rotor smoke, and crash debris. Then
+Next, connect combat damage to flight failure. Then
 implement occlusion-aware sensing and telegraphed drone fire before pursuit training.
 The seed-7 damage curriculum remains a failed run; preserve its healthy checkpoint
 and frozen promotion gates. Do not restart it without the documented rehearsal change.
@@ -319,7 +354,7 @@ documentation tests run last.
 
 The aimed-shot checkpoint is published as `41ca7e5`; its CI passed. The visible
 combat checkpoint now connects these helpers to the arena. Next, connect drone
-motor failure and destruction effects, occlusion-aware sensing, telegraphed fire,
+motor failure, occlusion-aware sensing, telegraphed fire,
 pursuit training, and the humanoid policy. Keep the frozen recovery
 checkpoints and promotion gates. The full sequence is in
 [DRONE_PURSUIT_GAME.md](DRONE_PURSUIT_GAME.md).

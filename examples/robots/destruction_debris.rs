@@ -1,7 +1,6 @@
 //! A small independent collision world for visual wreckage.
 
 use bevy::prelude::*;
-use bevy_gym::robots::DroneObservation;
 use rapier3d::prelude::{ColliderBuilder, PhysicsWorld, RigidBodyBuilder, RigidBodyHandle, Vector};
 use std::time::Duration;
 
@@ -26,31 +25,31 @@ const STEP: Duration = Duration::from_micros(16_667);
 const LIFETIME: Duration = Duration::from_secs(5);
 
 impl Debris {
-    /// Create eight collision fragments with the drone's incoming velocity.
-    pub(super) fn burst(&mut self, observation: DroneObservation) -> Vec<(Fragment, Transform)> {
-        let mut world = PhysicsWorld::default();
+    /// Create eight collision fragments in a private world with incoming velocity in m/s.
+    pub(super) fn burst(
+        &mut self,
+        pose: Isometry3d,
+        velocity: Vec3,
+        mut world: PhysicsWorld,
+    ) -> Vec<(Fragment, Transform)> {
         world.integration_parameters.dt = STEP.as_secs_f32();
-        world.insert(
-            RigidBodyBuilder::fixed().translation(Vector::new(0.0, -0.1, 0.0)),
-            ColliderBuilder::cuboid(30.0, 0.1, 30.0),
-        );
         let mut fragments = Vec::with_capacity(8);
         for x in [-1.0, 1.0] {
             for y in [-1.0, 1.0] {
                 for z in [-1.0, 1.0] {
                     let offset = Vec3::new(x * 0.15, y * 0.06, z * 0.15);
-                    let mut position = observation.position() + observation.orientation() * offset;
+                    let mut position: Vec3 = pose.transform_point(offset).into();
                     position.y = position.y.max(0.15);
                     // Fragment velocities are m/s; spin is rad/s. The burst is visual energy.
-                    let velocity = observation.linear_velocity()
-                        + Vec3::new(x * 1.8, y.mul_add(0.5, 2.5), z * 1.8);
+                    let fragment_velocity =
+                        velocity + Vec3::new(x * 1.8, y.mul_add(0.5, 2.5), z * 1.8);
                     let (handle, _) = world.insert(
                         RigidBodyBuilder::dynamic()
                             .translation(Vector::from_array(position.to_array()))
                             .rotation(Vector::from_array(
-                                observation.orientation().to_scaled_axis().to_array(),
+                                pose.rotation.to_scaled_axis().to_array(),
                             ))
-                            .linvel(Vector::from_array(velocity.to_array()))
+                            .linvel(Vector::from_array(fragment_velocity.to_array()))
                             .angvel(Vector::new(z * 5.0, x * 7.0, y * 4.0))
                             .ccd_enabled(true),
                         ColliderBuilder::cuboid(0.11, 0.04, 0.11)
@@ -60,8 +59,7 @@ impl Debris {
                     );
                     fragments.push((
                         Fragment(handle),
-                        Transform::from_translation(position)
-                            .with_rotation(observation.orientation()),
+                        Transform::from_translation(position).with_rotation(pose.rotation),
                     ));
                 }
             }
@@ -114,7 +112,16 @@ mod tests {
         let observation = drone.reset(Some(42)).observation;
         let mut debris = Debris::default();
         assert!(!debris.tick(Duration::from_secs(1)));
-        let fragments = debris.burst(observation);
+        let mut world = PhysicsWorld::default();
+        world.insert(
+            RigidBodyBuilder::fixed().translation(Vector::new(0.0, -0.1, 0.0)),
+            ColliderBuilder::cuboid(30.0, 0.1, 30.0),
+        );
+        let fragments = debris.burst(
+            Isometry3d::new(observation.position(), observation.orientation()),
+            observation.linear_velocity(),
+            world,
+        );
         assert_eq!(fragments.len(), 8);
         assert!(!debris.tick(STEP));
         assert_ne!(debris.pose(&fragments[0].0).unwrap(), fragments[0].1);

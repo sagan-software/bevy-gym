@@ -194,8 +194,9 @@ without spending a round. Each accepted shot spends one round and starts a
 There is no reload yet. Replacing each helper with `Default` restores its initial state.
 
 The guide traces aimed shots through the arena. The player-controlled scene uses
-the same health and pistol rules. Live motor failure and destruction effects still
-need to connect to combat. The library's qualified hover environment is unchanged.
+the same health and pistol rules. Combat now drives destruction effects. Live motor
+failure and flight still need to connect to combat. The library's qualified hover
+environment is unchanged.
 [Coverage evidence](progress/pursuit-combat-coverage.json) records the tested
 health and pistol branches; it does not claim a playable combat scene.
 
@@ -264,9 +265,8 @@ it. Clicking movement controls does not shoot into the world. Cooling-down attem
 retain the preceding feedback; other rejected actions display their reason.
 
 Accepted shots show one 120-millisecond trace and impact pulse. New shots replace
-that bounded trace. This scene does not yet show explosions, smoke, or debris;
-those effects currently run in the separate hover viewer. The next checkpoint must
-connect combat damage, motor failure, flight, and the existing destruction effects.
+that bounded trace. Combat now shares the hover viewer's explosion, smoke, and
+debris renderer. Flight and motor failure still need to connect to combat.
 
 Nineteen viewer tests cover input, pickup, aim, hand alignment, feedback, visibility,
 and reset. The fourteen native shot tests include two arena tests; twelve external
@@ -277,3 +277,37 @@ records source hashes and the uninstrumented native startup lines.
 body and rotor hits, destruction, and reset. Desktop and 390-pixel layouts were
 inspected. [The evidence record](progress/pursuit-visible-combat.json) retains
 artifact hashes and the remaining verification gaps.
+
+## Combat destruction
+
+The second rotor hit emits one flash, twelve sparks, and four seconds of smoke.
+Flashes use a soft radial texture and face the camera; sparks remain small spheres.
+The smoke follows the named rotor after its mesh disappears. Body death emits a
+larger flash, twelve sparks, two seconds of smoke, and eight colliding fragments.
+These fragments are box proxies, not fractures of the licensed drone mesh.
+
+The fragments collide with the arena's floor, house, pipe, and cover. Their private
+Rapier world is built from the same immutable blocks used by the arena. They inherit
+zero body velocity from the current stationary target, then receive the existing
+visual burst velocities. Future flight integration must supply the moving body's
+actual linear velocity. Wreckage expires after five seconds.
+
+Combat emits typed `Reset`, `Rotor(DroneMotor)`, and `Destroyed` events. The private
+queue retains at most one reset, four rotor events, and one body event. Presentation
+consumes these events without changing health. Reset replaces pending events and
+clears active particles, smoke emitters, and debris before any new destruction.
+
+Particle assets are shared across both viewers and reused across resets. Presentation
+time advances independently of the combat cooldown, with each frame capped at
+100 milliseconds. Debris uses fixed 16,667-microsecond steps. These effects do not
+change the qualified hover environment, rewards, motor forces, or observations.
+
+Twenty-six pursuit-viewer tests and all 50 hover-viewer tests pass. They cover
+one-shot events, same-frame reset and damage, effect expiry, stable material counts,
+and fragments bouncing off the house wall. [Coverage](progress/pursuit-destruction-coverage.json)
+records the native startup gap and the defensive missing-fragment-body branch.
+
+[The final combat-destruction recording](progress/pursuit-destruction.mp4) shows
+rotor smoke, a body explosion, moving debris, and reset in the optimized browser
+build. Desktop and narrow views pass. [The visual record](progress/pursuit-destruction.json)
+retains artifact hashes and distinguishes this stationary target from live flight.

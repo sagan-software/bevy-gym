@@ -7,6 +7,10 @@
 mod arena;
 #[path = "pursuit/controls.rs"]
 mod controls;
+#[path = "destruction_debris.rs"]
+mod debris;
+#[path = "destruction_particles.rs"]
+mod particles;
 #[path = "pursuit/robot.rs"]
 mod robot;
 #[path = "pursuit/scene.rs"]
@@ -24,6 +28,8 @@ mod drone_model;
 
 #[path = "pursuit/aiming.rs"]
 mod aiming;
+#[path = "pursuit/effects.rs"]
+mod effects;
 #[path = "pursuit/hud.rs"]
 mod hud;
 #[path = "pursuit/weapons.rs"]
@@ -138,6 +144,7 @@ fn main() {
             )
                 .chain(),
         )
+        .add_plugins(effects::install)
         .run();
 }
 
@@ -162,6 +169,7 @@ mod tests {
             .init_asset::<StandardMaterial>()
             .init_asset::<Font>()
             .init_asset::<Scene>()
+            .init_asset::<Image>()
             .init_resource::<Game>()
             .init_resource::<controls::Input>()
             .init_resource::<ButtonInput<KeyCode>>()
@@ -189,6 +197,7 @@ mod tests {
         gizmos.insert(GizmoConfig::default(), DefaultGizmoConfigGroup);
         app.insert_resource(gizmos)
             .init_resource::<bevy::gizmos::gizmos::GizmoStorage<DefaultGizmoConfigGroup, ()>>();
+        effects::install(&mut app);
         app.update();
         app
     }

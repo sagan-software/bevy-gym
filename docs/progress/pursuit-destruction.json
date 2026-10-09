@@ -1,0 +1,51 @@
+{
+  "baseline_commit": "5164de63735c7a76bfff796f40fba837fbb6f46e",
+  "runtime": "build-6f31f621d9cd24ccd25ceea0cbbd38a27056ded4c1f682bf35420b162d47fde2",
+  "recorded_utc": "2026-10-09T07:01:29Z",
+  "viewport_css_pixels": {
+    "desktop": [
+      1280,
+      800
+    ],
+    "narrow": [
+      390,
+      844
+    ]
+  },
+  "observed": [
+    "Second rotor hit produces a flash and sparks, hides the rotor, and emits smoke",
+    "Body death replaces the target with a soft flash, sparks, smoke, and eight moving debris proxies",
+    "Reset removes active effects and restores the pickup and drone",
+    "Narrow layout supports aimed rotor shots without obscuring the target",
+    "A flat polygon flash found in the first visual check was replaced with a soft camera-facing radial texture"
+  ],
+  "tests": {
+    "pursuit_viewer_native": 26,
+    "hover_viewer_native": 50
+  },
+  "limitations": [
+    "The target remains stationary; combat is not yet coupled to live flight or motor forces",
+    "No drone return fire, perception, learned pursuit, or humanoid policy yet",
+    "Debris uses box proxies instead of fractured source-model meshes",
+    "Native window execution and mobile touch input remain unverified",
+    "The hover viewer passes native tests and WASM Clippy; it was not separately re-recorded in this checkpoint",
+    "Full-project personal Rust backlog remains; changed destruction files have no discovery diagnostics",
+    "Coverage records native startup and defensive missing-body gaps"
+  ],
+  "sources": {
+    "examples/robots/destruction_debris.rs": "da2f6de7130993b4e7f004ac20eacae9a374d04896c89cfbd5b1d8ca2e62730b",
+    "examples/robots/destruction_particles.rs": "c128e36195e1735eef6bf7d2d8333d654b8f9a09f12c4367ed30aa6949f30e6d",
+    "examples/robots/flight.rs": "9b728ecc592431dd07b18666611cae8fedb522c9f4e3e84f713ce66c8e8f35ee",
+    "examples/robots/flight/effects.rs": "ff250bcd16c220f1b2b8e221515db122ba40835bc6cd37e9d483f16589f3491c",
+    "examples/robots/pursuit.rs": "fc0204c7422321a046614366c38cb6b025a5274b402b394bd74b13fd4c3c0333",
+    "examples/robots/pursuit/effects.rs": "bf04c39b57a5e9c2230b7720b754de0bd1c8156f31cbb83f79ce7726adc78fd6",
+    "examples/robots/pursuit/firing.rs": "41593b9f459e4fb82f1ec551a9a4d3b937fb4d8a477e852d4af2e12d6cc044d1"
+  },
+  "media": {
+    "pursuit-destruction-smoke.png": "a4e33f78017f4d5700761f65ea315878d7a295af9bc0ba3c53a4bfafa7163ce8",
+    "pursuit-destruction-flash.png": "ad692068deee76798e9e8478abb35d3292685d3fa73fd3e8ab81a7ee6eb3eb93",
+    "pursuit-destruction-debris.png": "50a4408d331ab869e19eb63cf8c1d732dacdfe92747f23ba47f54e8c309c1f98",
+    "pursuit-destruction-narrow.png": "a082ddb11e47144b0d2866e67d46e0ed736e5be5cea6cfed5403cfa36fe30428",
+    "pursuit-destruction.mp4": "db6cae856ff344639e61d0c51c63448479e5742871d0cc294439f2ad9cc6af52"
+  }
+}

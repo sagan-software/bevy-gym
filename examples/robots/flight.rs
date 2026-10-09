@@ -11,6 +11,8 @@ mod checkpoint;
 mod controls;
 #[path = "damage/training/encoding.rs"]
 mod damage_encoding;
+#[path = "destruction_debris.rs"]
+mod debris;
 #[path = "flight/effects.rs"]
 mod effects;
 #[path = "learning/encoding.rs"]
@@ -20,6 +22,8 @@ mod model;
 #[cfg(not(target_arch = "wasm32"))]
 #[path = "flight/options.rs"]
 mod options;
+#[path = "destruction_particles.rs"]
+mod particles;
 #[path = "flight/pilot.rs"]
 mod pilot;
 #[path = "flight/scene.rs"]

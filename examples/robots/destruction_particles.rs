@@ -44,7 +44,9 @@ pub(super) struct Materials {
     billboard: Handle<Mesh>,
     /// Fragment box dimensions match the debris colliders.
     pub(super) fragment: Handle<Mesh>,
-    /// Hot emission for sparks and the initial flash.
+    /// Soft camera-facing flash material, separate from the small spark spheres.
+    flash: Handle<StandardMaterial>,
+    /// Hot emission for spark spheres.
     fire: Handle<StandardMaterial>,
     /// Four fixed smoke opacity levels avoid allocating materials each frame.
     smoke: [Handle<StandardMaterial>; 4],
@@ -59,7 +61,7 @@ pub(super) fn setup(
     mut materials: ResMut<'_, Assets<StandardMaterial>>,
     mut images: ResMut<'_, Assets<Image>>,
 ) {
-    let opacity = images.add(smoke_texture());
+    let opacity = images.add(radial_texture());
     let smoke = [0.35, 0.22, 0.12, 0.04].map(|alpha| {
         materials.add(StandardMaterial {
             base_color: Color::srgba(0.12, 0.14, 0.15, alpha),
@@ -74,6 +76,14 @@ pub(super) fn setup(
         sphere: meshes.add(Sphere::new(1.0).mesh().uv(8, 6)),
         billboard: meshes.add(Rectangle::new(2.0, 2.0)),
         fragment: meshes.add(Cuboid::new(0.22, 0.08, 0.22)),
+        flash: materials.add(StandardMaterial {
+            base_color: Color::srgba(1.0, 0.92, 0.7, 0.95),
+            base_color_texture: Some(opacity),
+            alpha_mode: AlphaMode::Blend,
+            cull_mode: None,
+            unlit: true,
+            ..default()
+        }),
         fire: materials.add(StandardMaterial {
             base_color: Color::srgb(1.0, 0.62, 0.12),
             emissive: LinearRgba::new(5.0, 1.6, 0.1, 1.0),
@@ -138,7 +148,8 @@ impl Materials {
     ) {
         let material = match kind {
             Kind::Smoke => self.smoke[0].clone(),
-            Kind::Flash | Kind::Spark => self.fire.clone(),
+            Kind::Flash => self.flash.clone(),
+            Kind::Spark => self.fire.clone(),
         };
         commands.spawn((
             Particle {
@@ -149,8 +160,8 @@ impl Materials {
                 radius: size,
             },
             Mesh3d(match kind {
-                Kind::Smoke => self.billboard.clone(),
-                Kind::Flash | Kind::Spark => self.sphere.clone(),
+                Kind::Smoke | Kind::Flash => self.billboard.clone(),
+                Kind::Spark => self.sphere.clone(),
             }),
             NotShadowCaster,
             MeshMaterial3d(material),
@@ -186,15 +197,18 @@ pub(super) fn animate(
         }
         let age = particle.age.as_secs_f32();
         let fraction = age / particle.lifetime.as_secs_f32();
+        // Soft quads face the camera; spark spheres need no orientation update.
+        if matches!(particle.kind, Kind::Smoke | Kind::Flash) {
+            if let Some(position) = camera_position {
+                transform.look_at(position, Vec3::Y);
+            }
+        }
         match particle.kind {
             Kind::Spark => {
                 particle.velocity.y = 9.81_f32.mul_add(-delta.as_secs_f32(), particle.velocity.y);
             }
             Kind::Smoke => {
                 transform.scale = Vec3::splat(age.mul_add(0.13, 0.07));
-                if let Some(position) = camera_position {
-                    transform.look_at(position, Vec3::Y);
-                }
                 let [dense, medium, thin, faint] = &materials.smoke;
                 material.0 = if fraction < 0.25 {
                     dense
@@ -217,7 +231,7 @@ pub(super) fn animate(
 }
 
 /// Generate one 33-pixel radial alpha mask; the square's edges are fully transparent.
-fn smoke_texture() -> Image {
+fn radial_texture() -> Image {
     let mut pixels = Vec::with_capacity(33 * 33 * 4);
     for y in -16_i32..=16 {
         for x in -16_i32..=16 {
@@ -249,7 +263,7 @@ mod tests {
 
     #[test]
     fn smoke_mask_has_an_opaque_centre_and_transparent_edges() {
-        let image = smoke_texture();
+        let image = radial_texture();
         let bytes = image.data.unwrap();
         assert_eq!(bytes.len(), 33 * 33 * 4);
         assert_eq!(
@@ -263,5 +277,50 @@ mod tests {
         }
         let intermediate = bytes[(16 * 33 + 24) * 4 + 3];
         assert!(intermediate > 0 && intermediate < 255);
+    }
+    #[test]
+    fn flash_uses_a_soft_billboard_and_faces_the_camera() {
+        let mut app = App::new();
+        app.add_plugins((MinimalPlugins, AssetPlugin::default()))
+            .init_asset::<Mesh>()
+            .init_asset::<Image>()
+            .init_asset::<StandardMaterial>()
+            .insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+                Duration::from_millis(10),
+            ))
+            .add_systems(Startup, setup)
+            .add_systems(Update, animate);
+        let eye = Vec3::new(3.0, 3.0, 3.0);
+        app.world_mut()
+            .spawn((Camera3d::default(), Transform::from_translation(eye)));
+        app.update();
+        app.world_mut()
+            .resource_scope(|world, materials: Mut<'_, Materials>| {
+                materials.burst(&mut world.commands(), Vec3::ZERO, 0.6);
+            });
+        app.world_mut().flush();
+        app.update();
+        let world = app.world_mut();
+        let billboard = world.resource::<Materials>().billboard.clone();
+        let (mesh, material, pose) = world
+            .query::<(
+                &Particle,
+                &Mesh3d,
+                &MeshMaterial3d<StandardMaterial>,
+                &Transform,
+            )>()
+            .iter(world)
+            .find_map(|(particle, mesh, material, pose)| {
+                matches!(particle.kind, Kind::Flash).then_some((mesh, material, pose))
+            })
+            .expect("Live flash");
+        assert_eq!(mesh.0, billboard);
+        let material = world
+            .resource::<Assets<StandardMaterial>>()
+            .get(&material.0)
+            .expect("Flash material");
+        assert!(material.base_color_texture.is_some());
+        assert_eq!(material.alpha_mode, AlphaMode::Blend);
+        assert!(pose.forward().dot(eye.normalize()) > 0.999);
     }
 }

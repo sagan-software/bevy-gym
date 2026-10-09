@@ -1,0 +1,597 @@
+{
+  "baseline_commit": "5164de63735c7a76bfff796f40fba837fbb6f46e",
+  "tests": {
+    "viewer": 26,
+    "flight_viewer": 50
+  },
+  "method": "LLVM show of the instrumented drone-pursuit and drone-flight example tests, using canonical source paths.",
+  "files": [
+    {
+      "path": "examples/robots/pursuit/firing.rs",
+      "sha256": "41593b9f459e4fb82f1ec551a9a4d3b937fb4d8a477e852d4af2e12d6cc044d1",
+      "changed_instrumented_lines": [
+        84,
+        91,
+        92,
+        93,
+        157,
+        158,
+        159,
+        160,
+        161,
+        162,
+        163,
+        165,
+        241,
+        242,
+        243,
+        244,
+        245,
+        246,
+        247,
+        248,
+        249,
+        250,
+        251,
+        252,
+        253,
+        254,
+        255,
+        256,
+        257,
+        258,
+        259,
+        260,
+        261,
+        262,
+        263,
+        264,
+        265,
+        266,
+        267,
+        268,
+        269,
+        270,
+        271,
+        272,
+        273,
+        274,
+        275,
+        276,
+        277
+      ],
+      "unhit_changed_lines": [],
+      "source_branches": {
+        "128:16": [
+          true,
+          true
+        ],
+        "130:16": [
+          true,
+          true
+        ],
+        "157:24": [
+          true,
+          true
+        ]
+      }
+    },
+    {
+      "path": "examples/robots/destruction_debris.rs",
+      "sha256": "da2f6de7130993b4e7f004ac20eacae9a374d04896c89cfbd5b1d8ca2e62730b",
+      "changed_instrumented_lines": [
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        41,
+        44,
+        45,
+        50,
+        52,
+        62,
+        115,
+        116,
+        117,
+        118,
+        120,
+        121,
+        122,
+        123
+      ],
+      "unhit_changed_lines": [],
+      "source_branches": {
+        "77:13": [
+          true,
+          true
+        ],
+        "82:12": [
+          true,
+          true
+        ],
+        "87:15": [
+          true,
+          true
+        ]
+      }
+    },
+    {
+      "path": "examples/robots/destruction_particles.rs",
+      "sha256": "c128e36195e1735eef6bf7d2d8333d654b8f9a09f12c4367ed30aa6949f30e6d",
+      "changed_instrumented_lines": [
+        64,
+        79,
+        80,
+        81,
+        82,
+        83,
+        84,
+        85,
+        86,
+        151,
+        152,
+        163,
+        164,
+        201,
+        202,
+        203,
+        204,
+        205,
+        234,
+        266,
+        282,
+        283,
+        284,
+        285,
+        286,
+        287,
+        288,
+        289,
+        290,
+        291,
+        292,
+        293,
+        294,
+        295,
+        296,
+        297,
+        298,
+        299,
+        300,
+        301,
+        302,
+        303,
+        304,
+        305,
+        306,
+        307,
+        308,
+        309,
+        310,
+        311,
+        312,
+        313,
+        314,
+        315,
+        316,
+        317,
+        318,
+        319,
+        320,
+        321,
+        322,
+        323,
+        324,
+        325
+      ],
+      "unhit_changed_lines": [],
+      "source_branches": {
+        "194:12": [
+          true,
+          true
+        ],
+        "202:20": [
+          true,
+          true
+        ],
+        "213:33": [
+          true,
+          true
+        ],
+        "215:27": [
+          true,
+          true
+        ],
+        "217:27": [
+          true,
+          true
+        ],
+        "279:17": [
+          true,
+          false
+        ],
+        "279:37": [
+          true,
+          false
+        ]
+      }
+    },
+    {
+      "path": "examples/robots/flight.rs",
+      "sha256": "9b728ecc592431dd07b18666611cae8fedb522c9f4e3e84f713ce66c8e8f35ee",
+      "changed_instrumented_lines": [],
+      "unhit_changed_lines": [],
+      "source_branches": {}
+    },
+    {
+      "path": "examples/robots/flight/effects.rs",
+      "sha256": "ff250bcd16c220f1b2b8e221515db122ba40835bc6cd37e9d483f16589f3491c",
+      "changed_instrumented_lines": [
+        144,
+        145,
+        146,
+        147,
+        148,
+        149,
+        170,
+        172,
+        173,
+        174,
+        175,
+        177,
+        178
+      ],
+      "unhit_changed_lines": [],
+      "source_branches": {
+        "49:12": [
+          true,
+          true
+        ],
+        "59:16": [
+          true,
+          true
+        ],
+        "59:26": [
+          true,
+          true
+        ],
+        "65:12": [
+          true,
+          true
+        ],
+        "65:29": [
+          true,
+          true
+        ],
+        "161:26": [
+          true,
+          true
+        ],
+        "183:16": [
+          true,
+          true
+        ],
+        "215:12": [
+          true,
+          true
+        ],
+        "220:12": [
+          true,
+          true
+        ],
+        "240:12": [
+          true,
+          true
+        ],
+        "242:23": [
+          true,
+          false
+        ]
+      }
+    },
+    {
+      "path": "examples/robots/pursuit.rs",
+      "sha256": "fc0204c7422321a046614366c38cb6b025a5274b402b394bd74b13fd4c3c0333",
+      "changed_instrumented_lines": [
+        147,
+        172,
+        200
+      ],
+      "unhit_changed_lines": [
+        147
+      ],
+      "source_branches": {
+        "94:12": [
+          true,
+          true
+        ],
+        "155:12": [
+          true,
+          true
+        ],
+        "376:16": [
+          true,
+          true
+        ],
+        "450:20": [
+          true,
+          true
+        ],
+        "467:20": [
+          true,
+          true
+        ]
+      }
+    },
+    {
+      "path": "examples/robots/pursuit/effects.rs",
+      "sha256": "bf04c39b57a5e9c2230b7720b754de0bd1c8156f31cbb83f79ce7726adc78fd6",
+      "changed_instrumented_lines": [
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        47,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        60,
+        61,
+        62,
+        63,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80,
+        81,
+        82,
+        84,
+        85,
+        86,
+        87,
+        88,
+        89,
+        90,
+        91,
+        92,
+        93,
+        97,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111,
+        112,
+        113,
+        116,
+        117,
+        118,
+        119,
+        120,
+        121,
+        122,
+        123,
+        124,
+        125,
+        126,
+        127,
+        128,
+        129,
+        130,
+        131,
+        132,
+        133,
+        134,
+        135,
+        137,
+        138,
+        140,
+        143,
+        144,
+        145,
+        146,
+        147,
+        148,
+        149,
+        150,
+        151,
+        152,
+        153,
+        154,
+        155,
+        157,
+        165,
+        166,
+        167,
+        168,
+        169,
+        170,
+        171,
+        172,
+        173,
+        174,
+        175,
+        176,
+        177,
+        178,
+        181,
+        182,
+        183,
+        184,
+        185,
+        186,
+        187,
+        188,
+        190,
+        191,
+        192,
+        193,
+        194,
+        195,
+        196,
+        199,
+        200,
+        201,
+        202,
+        205,
+        206,
+        207,
+        208,
+        209,
+        210,
+        211,
+        212,
+        213,
+        214,
+        215,
+        216,
+        217,
+        218,
+        219,
+        220,
+        221,
+        222,
+        223,
+        224,
+        225,
+        226,
+        227,
+        228,
+        229,
+        230,
+        231,
+        232,
+        233,
+        234,
+        235,
+        236,
+        237,
+        238,
+        241,
+        244,
+        245,
+        246,
+        247,
+        248,
+        249,
+        250,
+        251,
+        252,
+        253,
+        254,
+        255,
+        256,
+        257,
+        258,
+        259,
+        260,
+        261,
+        262,
+        266,
+        267,
+        268,
+        269,
+        270,
+        271,
+        272,
+        273,
+        275,
+        276,
+        277,
+        279,
+        282,
+        283,
+        284,
+        285,
+        286,
+        287,
+        288,
+        289,
+        290,
+        292,
+        293,
+        294,
+        296,
+        297,
+        298,
+        299,
+        300,
+        302,
+        303,
+        304,
+        305,
+        306,
+        307,
+        308,
+        309
+      ],
+      "unhit_changed_lines": [],
+      "source_branches": {
+        "57:15": [
+          true,
+          true
+        ],
+        "126:12": [
+          true,
+          true
+        ],
+        "131:12": [
+          true,
+          true
+        ],
+        "151:12": [
+          true,
+          true
+        ],
+        "153:23": [
+          true,
+          false
+        ],
+        "182:12": [
+          true,
+          true
+        ],
+        "267:16": [
+          true,
+          true
+        ]
+      }
+    }
+  ],
+  "gaps": [
+    "examples/robots/pursuit.rs:147 installs the plugin in native window startup; headless tests install the same systems directly and the browser exercises startup.",
+    "examples/robots/pursuit/effects.rs:153 has an unexercised missing-body branch. Fragment handles are private, created with their solver, and removed with that solver on reset or expiry.",
+    "examples/robots/flight/effects.rs:242 retains the same pre-existing defensive missing-body branch.",
+    "Native window execution and mobile touch input remain unverified; GPU output is checked separately in the browser."
+  ]
+}

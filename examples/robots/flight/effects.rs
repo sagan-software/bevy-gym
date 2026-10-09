@@ -1,9 +1,6 @@
 //! Bounded destruction feedback, isolated from the training environment.
 
-#[path = "effects/debris.rs"]
-mod debris;
-#[path = "effects/particles.rs"]
-mod particles;
+use super::{debris, particles};
 
 use super::session::{EpisodeRevision, Session};
 use bevy::prelude::*;
@@ -144,7 +141,12 @@ fn observe(
                     remaining: Duration::from_secs(2),
                     elapsed: Duration::ZERO,
                 });
-                for (fragment, transform) in debris.burst(session.observation()) {
+                let observation = session.observation();
+                for (fragment, transform) in debris.burst(
+                    Isometry3d::new(observation.position(), observation.orientation()),
+                    observation.linear_velocity(),
+                    crash_world(),
+                ) {
                     commands.spawn((
                         fragment,
                         Mesh3d(materials.fragment.clone()),
@@ -162,6 +164,17 @@ fn observe(
             Visibility::Visible
         };
     }
+}
+
+/// Preserve the hover viewer's existing isolated floor for visual wreckage.
+fn crash_world() -> rapier3d::prelude::PhysicsWorld {
+    use rapier3d::prelude::{ColliderBuilder, PhysicsWorld, RigidBodyBuilder, Vector};
+    let mut world = PhysicsWorld::default();
+    world.insert(
+        RigidBodyBuilder::fixed().translation(Vector::new(0.0, -0.1, 0.0)),
+        ColliderBuilder::cuboid(30.0, 0.1, 30.0),
+    );
+    world
 }
 
 /// Remove the failed rotor mesh while retaining its smoke source and physical failure.

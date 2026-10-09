@@ -1,5 +1,6 @@
 //! Player and future policy actions share pickup, firing, and feedback state.
 
+use super::combat::health::Damage;
 use super::{
     arena::Arena,
     combat::pistol::{FireError, PickupError, Pistol},
@@ -9,7 +10,8 @@ use super::{
     },
 };
 use bevy::math::{Dir3, Quat, Vec3};
-use std::time::Duration;
+use bevy_gym::robots::DroneMotor;
+use std::{collections::VecDeque, time::Duration};
 
 /// One interaction at the fixed action boundary; callers cannot choose a shot origin.
 #[derive(Debug, Clone, Copy)]
@@ -18,6 +20,17 @@ pub(super) enum Action {
     PickUp,
     /// Fire along a validated direction from the character's chest.
     Fire(Dir3),
+}
+
+/// One-shot presentation events; health remains the authoritative source.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(super) enum Effect {
+    /// Remove all transients before rendering the new episode.
+    Reset,
+    /// A named rotor reached its destroyed state.
+    Rotor(DroneMotor),
+    /// The body reached its absorbing dead state.
+    Destroyed,
 }
 
 /// Last meaningful interaction result displayed by the viewer.
@@ -56,6 +69,8 @@ pub(super) struct Combat {
     feedback: Feedback,
     /// Bounded visual trace; absent once its lifetime expires.
     trace: Option<Trace>,
+    /// At most one reset, four rotor failures, and one body death per episode.
+    effects: VecDeque<Effect>,
 }
 
 impl Default for Combat {
@@ -66,11 +81,17 @@ impl Default for Combat {
                 .expect("Authored finite target pose"),
             feedback: Feedback::Unarmed,
             trace: None,
+            effects: VecDeque::from([Effect::Reset]),
         }
     }
 }
 
 impl Combat {
+    /// Consume one presentation event without allowing presentation to change health.
+    pub(super) fn pop_effect(&mut self) -> Option<Effect> {
+        self.effects.pop_front()
+    }
+
     /// A chest-origin ray cannot start beyond a wall penetrated by the displayed barrel.
     pub(super) fn origin(character: Vec3) -> Vec3 {
         character + Vec3::Y * 0.4
@@ -132,6 +153,16 @@ impl Combat {
             .expect("Arena position and typed direction are valid");
         match self.target.shoot(arena, &mut self.pistol, aim) {
             Ok(shot) => {
+                // Authoritative transitions emit once, even if several actions precede a frame.
+                if let Shot::Hit { damage, .. } = shot {
+                    match damage {
+                        Damage::RotorDestroyed(motor) => {
+                            self.effects.push_back(Effect::Rotor(motor));
+                        }
+                        Damage::Destroyed => self.effects.push_back(Effect::Destroyed),
+                        Damage::Hit | Damage::Ignored => {}
+                    }
+                }
                 let to = match shot {
                     Shot::Miss { point } | Shot::Wall { point } | Shot::Hit { point, .. } => point,
                 };
@@ -205,5 +236,43 @@ mod tests {
         assert_eq!(combat.feedback(), Feedback::Rejected(FireError::Empty));
         assert_eq!(combat.rounds(), 0);
         assert!(combat.trace().is_none());
+    }
+    #[test]
+    fn destruction_events_are_ordered_once_and_reset_replaces_pending_events() {
+        let arena = Arena::default();
+        let mut combat = Combat::default();
+        assert_eq!(combat.pop_effect(), Some(Effect::Reset));
+        assert_eq!(combat.pop_effect(), None);
+        combat.act(&arena, Action::PickUp);
+        let motor = DroneMotor::RearRight;
+        let aim = Dir3::new(combat.target().rotor_centre(motor) - Combat::origin(arena.position()))
+            .expect("Rotor direction");
+        combat.act(&arena, Action::Fire(aim));
+        assert_eq!(combat.pop_effect(), None);
+        combat.advance(Duration::from_secs(1));
+        combat.act(&arena, Action::Fire(aim));
+        assert_eq!(combat.pop_effect(), Some(Effect::Rotor(motor)));
+        assert_eq!(combat.pop_effect(), None);
+        let aim = Dir3::new(combat.target().position() - Combat::origin(arena.position()))
+            .expect("Body direction");
+        for _ in 0..6 {
+            combat.advance(Duration::from_secs(1));
+            combat.act(&arena, Action::Fire(aim));
+        }
+        assert_eq!(combat.pop_effect(), Some(Effect::Destroyed));
+        combat.advance(Duration::from_secs(1));
+        combat.act(&arena, Action::Fire(aim));
+        assert_eq!(combat.pop_effect(), None);
+        combat = Combat::default();
+        combat.act(&arena, Action::PickUp);
+        let aim = Dir3::new(combat.target().rotor_centre(motor) - Combat::origin(arena.position()))
+            .expect("Rotor direction");
+        for _ in 0..2 {
+            combat.act(&arena, Action::Fire(aim));
+            combat.advance(Duration::from_secs(1));
+        }
+        assert_eq!(combat.pop_effect(), Some(Effect::Reset));
+        assert_eq!(combat.pop_effect(), Some(Effect::Rotor(motor)));
+        assert_eq!(combat.pop_effect(), None);
     }
 }
