@@ -7,6 +7,25 @@ Updated: 2026-10-09. Goal status: active.
 Read [the roadmap](EXAMPLE_ROADMAP.md), [quality audit](QUALITY_AUDIT.md),
 [reference research](EXAMPLE_RESEARCH.md), and [drone contract](ROBOT_ENVIRONMENT.md).
 
+The [navigation research](DRONE_NAVIGATION.md) is archived. Imitation 150 and
+open PPO 140 each passed 192 native open-route cases. Open PPO crashed in all ten
+house/pipe cases. Cover PPO 260 survived all 25 selection cases and ten repeated
+cover audits, but its weakest house case had sight for only 40.5% of the episode.
+Do not install these models in gameplay. Deliberate hidden-target search remains
+unqualified, and no new navigator has browser verification.
+
+The [research record](progress/drone-navigation-candidate.json) preserves exact
+sources, restore paths, model hashes, raw results, logs, and failed checkpoints.
+The three selected models and native path plots are committed beside it.
+All navigation training and audit services finished. The temporary research tests
+were archived and removed from `tests/`. Prototype warnings are recorded;
+they are not clean production gates. Production Rust and the playable scene did
+not change in this checkpoint.
+
+Next, test deliberate search with navigator memory, hearing, vertical clearance,
+and targets that remain hidden. Follow the acceptance checks in the research guide.
+Do not repeat the unchanged moving-goal or open-route experiments just to resume.
+
 The [waypoint flight guide](DRONE_TRACKING.md) now runs in the rendered browser
 viewer. Select Fly east, then Run. The same frozen imitation pilot flies eight
 metres east and faces east. The destination marker derives from the typed goal;
@@ -34,12 +53,9 @@ instrumented line except native window startup at `flight.rs:66` and system
 registration at `flight.rs:90`. Both outcomes of new production branches execute.
 Validation logs use `tracking-viewer-pointer-` in the shared validation cache.
 
-Next, train navigation from filtered sight, finite memory, hearing bearings, and
-obstacle observations. Start with moving visible targets and qualify collision
-avoidance before adding hidden-target search through house windows and the pipe.
-Do not expose hidden character coordinates to the policy. Moving goals, arena
-obstacles, failed motors, learned pursuit, and search remain unqualified.
-The playable combat scene still uses the old hover pilot. The flight viewer's
+Moving-goal and open-route navigation now have native research evidence above.
+Failed-motor pursuit, learned hidden-target search, and browser navigation remain
+unqualified. The playable combat scene still uses the old hover pilot. The flight viewer's
 training panel still trains recovery only.
 
 Do not retrain or requalify the unchanged waypoint model just to resume.
@@ -51,10 +67,10 @@ cases. The [research record](progress/drone-heading-candidate.json) embeds the
 training sources, restore paths, failures, and selection results.
 
 All heading experiment services are stopped. No recording is active.
-The prior helper checkpoint `d21667c` has
-[passing CI](https://github.com/sagan-software/bevy-gym/actions/runs/37926307672).
-Its [Browser preview run](https://github.com/sagan-software/bevy-gym/actions/runs/37926307530)
-was still building when this checkpoint was prepared. Check subsequent CI and
+The prior waypoint viewer checkpoint `2b9fe8a` has
+[passing CI](https://github.com/sagan-software/bevy-gym/actions/runs/37932039075).
+Its [Browser preview run](https://github.com/sagan-software/bevy-gym/actions/runs/37932038999)
+was pending when this research checkpoint was prepared. Check subsequent CI and
 Pages runs separately; local browser verification does not prove deployment.
 Preserve the original dirty checkout and work only in `bevy-gym-quality`.
 
