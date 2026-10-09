@@ -65,7 +65,11 @@ pub(super) fn animate(game: Res<'_, Game>, mut joints: Query<'_, '_, (&Joint, &m
             Joint::LeftShoulder | Joint::RightHip => -1.0,
             Joint::RightShoulder | Joint::LeftHip => 1.0,
         };
-        transform.rotation = Quat::from_rotation_x(swing * sign);
+        transform.rotation = if matches!(joint, Joint::RightShoulder) && game.combat.is_armed() {
+            Quat::from_rotation_x(std::f32::consts::FRAC_PI_2 + game.pitch())
+        } else {
+            Quat::from_rotation_x(swing * sign)
+        };
     }
 }
 

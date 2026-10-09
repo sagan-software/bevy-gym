@@ -1,11 +1,41 @@
 # Examples execution status
 
-Updated: 2026-10-08. Goal status: active.
+Updated: 2026-10-09. Goal status: active.
 
 ## Resume here
 
 Read [the roadmap](EXAMPLE_ROADMAP.md), [quality audit](QUALITY_AUDIT.md),
 [reference research](EXAMPLE_RESEARCH.md), and [drone contract](ROBOT_ENVIRONMENT.md).
+
+The current checkpoint connects visible pistol pickup, mouse aiming, ammunition,
+body damage, and rotor weak points to the playable arena. The drone remains a
+stationary target. Nineteen viewer tests, 49 flight-viewer tests, seven combat
+cases, fourteen native shot cases, root tests, and strict native/WASM Clippy pass.
+Chrome/WASM checks pass. Coverage hits all changed measured lines outside window
+startup, with both outcomes of the measured production conditions covered.
+
+The final optimized build and desktop/narrow browser review pass. The preview is
+`http://100.105.254.50:8781/robots/pursuit/?build=combat-final`, served by
+`bevy-gym-pursuit-server-20261009`. Its runtime is
+`build-2b671bb45b2f66711aef3277fc1fae71a5e604e8b620bb66b0d075a46e678b31`.
+The release unit `bevy-gym-pursuit-combat-layout-build-20261009` exited successfully.
+No recording is active. Validation logs use the `pursuit-visible-combat-` prefix.
+
+[The recording](progress/pursuit-visible-combat.mp4) shows pickup, body damage,
+rotor damage and removal, body destruction, and reset. [The visual record](progress/pursuit-visible-combat.json)
+retains source and artifact hashes. The controls no longer obscure the drone in
+narrow views. A failing regression also caught queued pickup being overwritten
+between simulation ticks; the queue now retains it. A separate regression protects
+pistol-to-hand alignment when aiming upward.
+
+Personal shell checks pass. Personal Rust discovery has no diagnostics in the
+changed combat files; the full-project backlog remains. Native window and mobile
+touch input are unverified.
+
+Next, connect combat damage to flight failure, rotor smoke, and crash debris. Then
+implement occlusion-aware sensing and telegraphed drone fire before pursuit training.
+The seed-7 damage curriculum remains a failed run; preserve its healthy checkpoint
+and frozen promotion gates. Do not restart it without the documented rehearsal change.
 
 The [browser curriculum](DRONE_BROWSER_TRAINING.md) is qualified. Seed 7 passed
 calm hover at update 300 and disturbed recovery after 20 more updates. Its saved
@@ -287,10 +317,10 @@ validation cache. Personal Rust discovery reports no diagnostics in the changed
 shot files or guide; the full-project strict backlog remains. The guide and
 documentation tests run last.
 
-These helpers are not connected to the visible arena. Next, add visible pistol
-pickup, aiming controls, and shot feedback using this tested model. Then connect
-drone motor failure and destruction effects, occlusion-aware sensing, telegraphed
-fire, pursuit training, and the humanoid policy. Keep the frozen recovery
+The aimed-shot checkpoint is published as `41ca7e5`; its CI passed. The visible
+combat checkpoint now connects these helpers to the arena. Next, connect drone
+motor failure and destruction effects, occlusion-aware sensing, telegraphed fire,
+pursuit training, and the humanoid policy. Keep the frozen recovery
 checkpoints and promotion gates. The full sequence is in
 [DRONE_PURSUIT_GAME.md](DRONE_PURSUIT_GAME.md).
 

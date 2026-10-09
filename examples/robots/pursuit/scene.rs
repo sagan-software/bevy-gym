@@ -58,7 +58,7 @@ pub(super) fn project(
     let position = game.arena.position();
     for mut transform in &mut character {
         transform.translation = position;
-        transform.rotation = Quat::from_rotation_y(game.heading);
+        transform.rotation = Quat::from_rotation_y(game.facing());
     }
     let target = position + Vec3::Y * 0.4;
     let desired = target + Vec3::new(0.0, 3.3, 6.0);

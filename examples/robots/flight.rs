@@ -27,6 +27,9 @@ mod scene;
 #[path = "flight/session.rs"]
 mod session;
 
+#[path = "drone_model.rs"]
+mod drone_model;
+
 use bevy::{asset::AssetMetaCheck, prelude::*};
 
 use session::Session;

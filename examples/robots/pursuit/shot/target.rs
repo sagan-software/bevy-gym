@@ -116,6 +116,17 @@ impl Target {
         self.position + self.rotation * offset(motor)
     }
 
+    /// Query the visible aim point without spending ammunition or changing health.
+    pub(crate) fn aim_point(&self, arena: &Arena, aim: Aim) -> Vec3 {
+        let target = self
+            .nearest(aim)
+            .map_or(Aim::RANGE, |(_, distance)| distance);
+        let wall = arena
+            .obstruction(aim.origin(), aim.point(Aim::RANGE))
+            .unwrap_or(Aim::RANGE);
+        aim.point(target.min(wall))
+    }
+
     /// Spend one round, query nearest geometry, and apply at most one health transition.
     pub(crate) fn shoot(
         &mut self,

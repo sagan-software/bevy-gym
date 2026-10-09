@@ -1,10 +1,14 @@
 //! Model alignment, lights, and read-only projection of the physics observation.
 
-use std::f32::consts::{FRAC_PI_2, PI};
+use std::f32::consts::FRAC_PI_2;
 
 use bevy::prelude::*;
 use bevy_gym::robots::{DroneMotor, DroneMotorState};
 
+pub(super) use super::drone_model::rotor;
+#[cfg(test)]
+use super::drone_model::BODY_CENTRE;
+use super::drone_model::{model_alignment, spin_about};
 use super::session::Session;
 
 /// The transform whose position and orientation come directly from physics.
@@ -18,9 +22,6 @@ pub(super) struct FailedMotorMarker;
 /// Retained model handle, including its observable loading or failure state.
 #[derive(Resource)]
 pub(super) struct DroneModel(pub(super) Handle<Scene>);
-
-/// Source-model body centre in metres, before its +Z front is rotated to -Z.
-const BODY_CENTRE: Vec3 = Vec3::new(0.000_070_5, -0.055_414, -0.134_026_5);
 
 /// Fixed camera offset in metres, facing the front of the drone.
 const CAMERA_OFFSET: Vec3 = Vec3::new(2.2, 1.4, -3.2);
@@ -110,12 +111,6 @@ fn floor(
     }
 }
 
-/// Translate the model's body centre to zero, then turn its front toward -Z.
-fn model_alignment() -> Transform {
-    let rotation = Quat::from_rotation_y(PI);
-    Transform::from_translation(rotation * -BODY_CENTRE).with_rotation(rotation)
-}
-
 /// Update only display transforms; these values never flow back into the solver.
 pub(super) fn project(
     session: Res<'_, Session>,
@@ -159,24 +154,6 @@ pub(super) fn project_damage(
         DroneMotorState::Working => Visibility::Hidden,
         DroneMotorState::Failed => Visibility::Inherited,
     };
-}
-
-/// Source-space pivots and motor identities for the four named mesh nodes.
-pub(super) fn rotor(name: &str) -> Option<(Vec3, DroneMotor, f32)> {
-    let (x, z, motor, sign) = match name {
-        "Rotor_FL" => (0.250_664_5, 0.126_471, DroneMotor::FrontLeft, 1.0),
-        "Rotor_FR" => (-0.250_420_5, 0.126_471, DroneMotor::FrontRight, -1.0),
-        "Rotor_BR" => (-0.250_420_5, -0.394_633_5, DroneMotor::RearRight, 1.0),
-        "Rotor_BL" => (0.250_664_5, -0.394_633_5, DroneMotor::RearLeft, -1.0),
-        _ => return None,
-    };
-    Some((Vec3::new(x, 0.032_098_5, z), motor, sign))
-}
-
-/// Rotate vertices around their mesh centre without orbiting the whole rotor.
-fn spin_about(pivot: Vec3, angle: f32) -> Transform {
-    let rotation = Quat::from_rotation_y(angle);
-    Transform::from_translation(pivot - rotation * pivot).with_rotation(rotation)
 }
 
 #[cfg(test)]

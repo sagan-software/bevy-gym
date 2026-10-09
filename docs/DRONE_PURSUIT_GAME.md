@@ -88,8 +88,10 @@ hover environment's mass, thrust, reward, or terminal rules for visual effects.
 
 Current status: checkpoint loading and destruction effects are implemented. Rotor
 failure emits a burst and smoke; task termination hides the body and spawns eight
-colliding debris proxies. The arena now has a player-controlled robot. Weapons, drone pursuit, and
-humanoid training remain pending. These effects do not demonstrate learned damage recovery.
+colliding debris proxies in the hover viewer. The arena now has a player-controlled
+robot, a lootable pistol, and a stationary drone target. Flight coupling, pursuit,
+and humanoid training remain pending. These effects do not demonstrate learned
+damage recovery.
 
 ## Explore the arena
 
@@ -101,7 +103,12 @@ nix develop --command cargo run --features robots --example drone-pursuit
 
 Hold `W`, `A`, `S`, and `D` to move. Press `R` to reset. The on-screen movement
 buttons also accept held input. The camera follows the character and moves closer
-when a wall obstructs its view. This checkpoint has no drone opponent or weapons.
+when a wall obstructs its view.
+
+Press `E` near the pistol to collect it. Point at
+the drone and click to fire; holding the button repeats at the weapon cooldown.
+`Space` and the Fire button use the last captured aim. The drone is a stationary
+firing target in this checkpoint.
 
 Run the short headless movement guide:
 
@@ -186,9 +193,9 @@ without spending a round. Each accepted shot spends one round and starts a
 `advance` consumes simulation time and saturates at zero.
 There is no reload yet. Replacing each helper with `Default` restores its initial state.
 
-The guide now traces aimed shots through the arena. Live motor failure, effects,
-and player controls still need to connect to these rules. The library's qualified
-hover environment is unchanged.
+The guide traces aimed shots through the arena. The player-controlled scene uses
+the same health and pistol rules. Live motor failure and destruction effects still
+need to connect to combat. The library's qualified hover environment is unchanged.
 [Coverage evidence](progress/pursuit-combat-coverage.json) records the tested
 health and pistol branches; it does not claim a playable combat scene.
 
@@ -234,4 +241,39 @@ cases also pass in Chrome/WASM. They cover rotated weak points, nearer-part
 shielding, wall/window/pipe geometry, range, malformed inputs, extreme finite
 magnitudes, death, and rejected firing. [Coverage evidence](progress/pursuit-shots-coverage.json)
 records every measured shot-helper line and both outcomes of thirteen conditions.
-Visible aiming and combat integration remain pending.
+The visible scene now uses these shot helpers.
+
+## Player combat checkpoint
+
+The licensed drone stays at (0, 2, 1) metres with its rotors spinning. Pickup hides
+the ground pistol and shows it in the robot's right hand. Aim rotates the body and
+shoulder; movement remains independent.
+
+A damaged rotor keeps a visible orange
+marker. Its second hit hides that rotor. Six body hits hide the entire target.
+Reset restores the pistol, ammunition, target, and all rotor meshes.
+
+The camera ray chooses the nearest visible aim point. The actual shot starts
+0.4 metres above the character centre, inside its collision capsule. A displayed
+barrel penetrating a wall therefore cannot bypass shot occlusion. The camera
+cannot directly supply a shot origin. `Action::Fire` accepts only a `Dir3`.
+
+Pickup and fire enter one fixed simulation action queue. Pickup takes precedence
+over a simultaneous shot and survives render frames until the simulation consumes
+it. Clicking movement controls does not shoot into the world. Cooling-down attempts
+retain the preceding feedback; other rejected actions display their reason.
+
+Accepted shots show one 120-millisecond trace and impact pulse. New shots replace
+that bounded trace. This scene does not yet show explosions, smoke, or debris;
+those effects currently run in the separate hover viewer. The next checkpoint must
+connect combat damage, motor failure, flight, and the existing destruction effects.
+
+Nineteen viewer tests cover input, pickup, aim, hand alignment, feedback, visibility,
+and reset. The fourteen native shot tests include two arena tests; twelve external
+shot cases pass in Chrome/WASM. [Coverage](progress/pursuit-visible-combat-coverage.json)
+records source hashes and the uninstrumented native startup lines.
+
+[The browser recording](progress/pursuit-visible-combat.mp4) demonstrates pickup,
+body and rotor hits, destruction, and reset. Desktop and 390-pixel layouts were
+inspected. [The evidence record](progress/pursuit-visible-combat.json) retains
+artifact hashes and the remaining verification gaps.

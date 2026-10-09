@@ -72,11 +72,11 @@ impl DroneHealth {
         let Some(remaining) = self.body else {
             return Damage::Ignored;
         };
-        self.body = NonZeroU8::new(remaining.get() - 1);
-        if self.body.is_some() {
-            Damage::Hit
+        if remaining.get() == 1 {
+            self.crash()
         } else {
-            Damage::Destroyed
+            self.body = NonZeroU8::new(remaining.get() - 1);
+            Damage::Hit
         }
     }
 

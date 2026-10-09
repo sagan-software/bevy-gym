@@ -320,3 +320,20 @@ fn body_shields_a_rotor_behind_it() {
         RotorHealth::Intact
     );
 }
+
+/// The pointer queries visible geometry without consuming ammunition or changing health.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn visible_aim_points_respect_target_wall_and_range() {
+    let arena = Arena::default();
+    let target = Target::try_from((Vec3::new(0.0, 3.0, 0.0), Quat::IDENTITY)).unwrap();
+    let aim = Aim::try_from((Vec3::new(0.0, 3.0, 2.0), Vec3::NEG_Z)).unwrap();
+    assert!((target.aim_point(&arena, aim).z - 0.18).abs() < 1.0e-5);
+    let aim = Aim::try_from((Vec3::new(0.0, 4.0, 2.0), Vec3::Y)).unwrap();
+    assert_eq!(target.aim_point(&arena, aim), Vec3::new(0.0, 34.0, 2.0));
+    let hidden = Target::try_from((Vec3::new(-7.0, 1.8, -3.0), Quat::IDENTITY)).unwrap();
+    let aim = Aim::try_from((Vec3::new(-7.0, 1.8, 2.0), Vec3::NEG_Z)).unwrap();
+    assert!(hidden.aim_point(&arena, aim).z > 0.0);
+    assert_eq!(target.health().body_hits_remaining(), 6);
+    assert_eq!(hidden.health().body_hits_remaining(), 6);
+}

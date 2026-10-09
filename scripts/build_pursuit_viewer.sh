@@ -23,7 +23,7 @@ esac
 pursuit_target="$(cargo metadata --locked --no-deps --format-version 1 | python3 -c 'import json, sys; print(json.load(sys.stdin)["target_directory"])')"
 cargo build --locked --no-default-features --target wasm32-unknown-unknown --example drone-pursuit \
   --features robots,browser,render-core,bevy/webgl2 "${pursuit_flags[@]}"
-mkdir -p -- "$pursuit_dist/assets/fonts"
+mkdir -p -- "$pursuit_dist/assets/fonts" "$pursuit_dist/assets/robots" "$pursuit_dist/LICENSES"
 wasm-bindgen --target web --out-name drone-pursuit --out-dir "$pursuit_dist" \
   "$pursuit_target/wasm32-unknown-unknown/$pursuit_profile/examples/drone-pursuit.wasm"
 if [[ "$pursuit_profile" == "release" ]]; then
@@ -34,6 +34,8 @@ if [[ "$pursuit_profile" == "release" ]]; then
 fi
 cp -- robot-web/pursuit/index.html robot-web/pursuit/styles.css robot-web/pursuit/start.js "$pursuit_dist/"
 cp -- assets/fonts/MonaSans-VariableFont.ttf assets/fonts/OFL.txt "$pursuit_dist/assets/fonts/"
+cp -- assets/robots/drone.glb assets/robots/README.md "$pursuit_dist/assets/robots/"
+cp -- LICENSES/DRONE-CC-BY-3.0.txt "$pursuit_dist/LICENSES/"
 # Keep the entry module and WASM bindings together across cached deployments.
 runtime_files=(drone-pursuit.js drone-pursuit_bg.wasm start.js styles.css)
 runtime_hash="$(cd -- "$pursuit_dist" && sha256sum "${runtime_files[@]}" | sha256sum | cut -d ' ' -f 1)"

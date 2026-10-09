@@ -8,6 +8,10 @@ use bevy::prelude::*;
 pub(super) struct Input {
     /// Direction after opposite buttons cancel.
     pub(super) movement: Movement,
+    /// One captured interaction, retained until a fixed update consumes it.
+    pub(super) action: Option<super::firing::Action>,
+    /// Last world aim, retained while the pointer is over a control.
+    pub(super) aim: Option<Dir3>,
 }
 
 /// Each on-screen button represents its displayed keyboard key.
@@ -72,6 +76,8 @@ pub(super) fn read(
     }
     if reset && !*reset_held {
         game.reset();
+        input.action = None;
+        input.aim = None;
     }
     *reset_held = reset;
     input.movement = if reset {
@@ -112,7 +118,12 @@ fn movement_buttons(root: &mut ChildSpawnerCommands<'_>, font: &Handle<Font>) {
 }
 
 /// A touch-sized held control uses the same action as its keyboard label.
-fn button(row: &mut ChildSpawnerCommands<'_>, label: &str, key: Control, font: &Handle<Font>) {
+pub(super) fn button(
+    row: &mut ChildSpawnerCommands<'_>,
+    label: &str,
+    key: impl Component,
+    font: &Handle<Font>,
+) {
     row.spawn((
         Button,
         key,

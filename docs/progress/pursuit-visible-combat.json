@@ -1,0 +1,60 @@
+{
+  "baseline_commit": "41ca7e5f44ec2e9a405b719222ded858b80545f3",
+  "runtime": "build-2b671bb45b2f66711aef3277fc1fae71a5e604e8b620bb66b0d075a46e678b31",
+  "recorded_utc": "2026-10-09T06:30:33Z",
+  "viewport_css_pixels": {
+    "desktop": [
+      1280,
+      800
+    ],
+    "narrow": [
+      390,
+      844
+    ]
+  },
+  "observed": [
+    "Pistol pickup hides the ground model and shows the held pistol",
+    "Body hits spend ammunition and reduce body health",
+    "First rotor hit adds an orange damage marker",
+    "Second rotor hit removes the rotor without reducing body health",
+    "Six body hits remove the target",
+    "Reset restores the pickup and target",
+    "Combat controls remain below the target in desktop and narrow layouts"
+  ],
+  "tests": {
+    "viewer_native": 19,
+    "flight_viewer_native": 49,
+    "combat_native_and_wasm": 7,
+    "shots_native": 14,
+    "shots_external_wasm": 12
+  },
+  "limitations": [
+    "Stationary firing target; no flight coupling, return fire, pursuit, or humanoid policy yet",
+    "Combat destruction currently hides meshes; explosions, smoke, and debris remain in the separate hover viewer",
+    "Native window and mobile touch input not verified",
+    "Full personal Rust backlog remains; changed combat files have no discovery diagnostics",
+    "The recording contains one shot missing the rotor and hitting static geometry"
+  ],
+  "sources": {
+    "examples/robots/drone_model.rs": "9340e0fdb49d38089c34075fe6c4d2f2b457337f12944573123d64f7ded87c50",
+    "examples/robots/flight.rs": "7597aab011cb6dc0511c91ebe39d9936754274ff5d55f3af2235fefa47a59ab4",
+    "examples/robots/flight/scene.rs": "79a52f330a65c76af1db14737099c5b0638af5026abe73c4a5253c8aa0c2bce1",
+    "examples/robots/pursuit.rs": "00fb6eaf1cd98f7a08aa1be60b00107b0851537f83dfef8acb541d571d921862",
+    "examples/robots/pursuit/aiming.rs": "8a2b6802bcb52b36b04bfc6a25c7fede1819efee491593c38486e99eebdd4ee3",
+    "examples/robots/pursuit/combat/health.rs": "33a2e257e18c75e1e3953820e66e9adddc5312b56bf98c46d8d18160c8e22a56",
+    "examples/robots/pursuit/controls.rs": "0ba69b9877439fc380c7fd06495e4e31b059fc9e86fcdcd53a155f11352c712e",
+    "examples/robots/pursuit/firing.rs": "9ea51804a8061ac03bf2455fce2209a3ed5c9bdf52e07a72aa3664af1aaf9c7e",
+    "examples/robots/pursuit/hud.rs": "960dac38dabbe0a1b39da53490c5f6efe894bc733985d04865833c4f524c1ab4",
+    "examples/robots/pursuit/robot.rs": "99c39a5a08e8619cfc124be8d9130dcb298625bb22b1e58f89da611046fd3a33",
+    "examples/robots/pursuit/scene.rs": "eebcb879401c1817f3744c8ca7e13b86f004405d7ed7e9f902c9b748ed882293",
+    "examples/robots/pursuit/shot/target.rs": "97abd9be9abd39b66eb12b07300d52df9cb52696265b6c09b0dbef582a259349",
+    "examples/robots/pursuit/weapons.rs": "cc2d42594fc62b4da683cdf716e0aeb56be4e178f7ada0f928b4ae22e3c4f48c",
+    "tests/pursuit_shots.rs": "a53e27616f401120a66579acaef887168edd57f8b66f3b00fbc8152c1c9c1d1e"
+  },
+  "media": {
+    "pursuit-visible-combat.png": "be6fc04738e01403fc9f5a0c6d0af21d3f3a3ead8fb23d27db4a7b90a0a7dca2",
+    "pursuit-visible-combat-destroyed.png": "8941e1f89e213c5bedf5b4450609338e81b3c86dcf7c19e6b3f97e299fe5fe28",
+    "pursuit-visible-combat-narrow.png": "e254cec87655bf9c5ce3f3e71a0b1d1c892c31f859e4a01a76b53e17325a73d9",
+    "pursuit-visible-combat.mp4": "5de225d05a278024e927c2fb9740fe9bb828b3213901c6cf26bd408eb480f6db"
+  }
+}
