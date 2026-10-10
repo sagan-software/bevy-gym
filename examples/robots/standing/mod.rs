@@ -15,6 +15,9 @@ pub(crate) mod session;
 mod trace;
 #[cfg(not(target_arch = "wasm32"))]
 mod training;
+/// Frozen six-agent inference over one shared physical world.
+#[path = "../world_scene/session.rs"]
+pub(crate) mod world_session;
 
 use crate::learning::RecoveryBatch;
 use bevy_gym::{robots::DroidStanding, training::RecurrentPpoPolicy};

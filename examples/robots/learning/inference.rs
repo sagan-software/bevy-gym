@@ -17,5 +17,5 @@ mod model;
 mod rollout;
 
 pub(crate) use encoding::{decode_action, encode};
-pub(crate) use model::{GAE_LAMBDA, GAMMA};
+pub(crate) use model::{load_policy, GAE_LAMBDA, GAMMA};
 pub(crate) use rollout::RecoveryBatch;

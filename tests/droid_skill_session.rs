@@ -21,6 +21,10 @@ mod standing;
 use bevy_gym::{robots::DroidStanding, Env, TimeLimit};
 use standing::session;
 
+/// All six frozen controllers must share the new physical decision boundary.
+#[path = "droid_skill_session/world.rs"]
+mod shared_world;
+
 /// Preserved PPO update 100; failed selection, never qualified standing evidence.
 const CHECKPOINT: &[u8] = include_bytes!("../docs/progress/droid-standing-trial.mpk");
 /// Exact byte identity and recorded PPO counters for this candidate.

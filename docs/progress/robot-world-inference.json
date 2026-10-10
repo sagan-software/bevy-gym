@@ -1,0 +1,321 @@
+{
+  "recorded_utc": "2026-10-10T19:22:17.164233+00:00",
+  "scope": "Frozen six-controller inference in the shared physics world; no competition qualification",
+  "base_revision": "c64afc3e9d9e5e44ad9e5985b34959487e57b889",
+  "source_sha256": {
+    "examples/robots/learning/inference.rs": "1c4d068ca76e652ec969a76ec4481e17c9fb70ba2363ea2003f5fcbd66038cc2",
+    "examples/robots/standing/mod.rs": "660c0798d927b7af287995eb8575737dfd081ef7d246b7ac8c6d5157dd7787f7",
+    "examples/robots/world_scene/controllers.rs": "b1f2f9d85179dec279f2c918bb0e4674b9fd4629109ea7191b81a437aafd221d",
+    "examples/robots/world_scene/controllers_tests.rs": "de9838d32e4c435787ef323d359bda713a662f9f1f07540f154db30b2b750cbc",
+    "examples/robots/world_scene/encoding.rs": "52aa5b40490418bee7500b5b7b7b21409a052dfd89ba825318f55df490f30164",
+    "examples/robots/world_scene/failure.rs": "2b483f4a12700973461d03e973aacb2982bf686626e3a5ef425d1cc8078f0186",
+    "examples/robots/world_scene/session.rs": "6b5e153935f4b3ea79dc7563bf130f3b6c1473d19e1fb626f99e5a196205173d",
+    "examples/robots/world_scene/session_tests.rs": "fe3d238bcd9d960d43152d42da71b1ee880813079c6454b75c0062bca8b6fc80",
+    "tests/droid_skill_session.rs": "66b22699938c08183a3713994888d8a1a26dbc62b94ff95d09f699815b758afc",
+    "tests/droid_skill_session/world.rs": "52c5d01a777593c478022a5ba54e23d816764f4cd7a26756d222dae2249cf07c",
+    "tests/droid_skill_session/world_parity.rs": "92de4c4e3cf7a7a2f9ef41d5656db534ac0bf17618bbe45a3007919af3282ae7"
+  },
+  "actor_contract": {
+    "decision_interval_ms": 20,
+    "solver_substeps": 4,
+    "horizon_ms": 20000,
+    "agents_per_team": 3,
+    "frozen_policies": 2,
+    "separate_memories": 6,
+    "drone_inputs": 12,
+    "drone_outputs": 4,
+    "droid_inputs": 204,
+    "droid_outputs": 26,
+    "all_actions_before_physics": true,
+    "memory_commit": "After successful common physical advancement",
+    "policy_inputs": "Own body and passive reset target; no other robot state, reward or critic state",
+    "failure": "Drop both policies; retain the original typed cause; no fallback; reset does not revive failure"
+  },
+  "checkpoints": {
+    "drone": {
+      "path": "docs/progress/drone-hover.mpk",
+      "sha256": "5aa47c6941b1aa243c4eafcb0fafaf8c6fa9ee816944dc5a5ca0d3f95712403b",
+      "training": "PPO seed 7, update 280, 143360 transitions",
+      "evidence": "docs/progress/drone-checkpoint-transfer.json",
+      "qualification": "Standalone calm hover only; not the shared task"
+    },
+    "droid": {
+      "path": "docs/progress/standing-seed17-update22940/checkpoint.mpk",
+      "record": {
+        "schema": "droid-standing-v1",
+        "algorithm": "PPO",
+        "seed": 17,
+        "update": 22940,
+        "transitions": 11745280,
+        "optimizer_steps": 172980,
+        "sha256": "9c9e4c5bc8f7734da9835161476997e6d39d2aba28b24439e932a1f9949a2fdb"
+      },
+      "evidence": "docs/progress/standing-seed17-update22940/summary.json",
+      "qualification": "Failed original standing selection and held-out evaluation"
+    }
+  },
+  "native_reference": {
+    "path": "docs/progress/robot-world-native-actions.json",
+    "sha256": "5433b818c6246088f63321fd6669180e4a5635bbd6010b4e61c6aa14c3e8377d",
+    "bytes": 1058319,
+    "frames": 128,
+    "elapsed_ms": 2560,
+    "recurrent_trajectories": 6,
+    "action_fraction_tolerance": 1e-05,
+    "capture": "ROBOT_WORLD_CAPTURE_NATIVE=1 cargo test --features robots --test droid_skill_session native_shared_clip_matches_recorded_inputs_and_actions -- --nocapture",
+    "scope": "Identical inputs and fresh distinct memories on native and WASM; not cross-platform physical-trajectory equivalence"
+  },
+  "focused_regression": {
+    "log": "/home/sagan/.cache/bevy-gym-quality-validation/world-session-parity-green.log",
+    "log_sha256": "1208d5396917c09d147a301731bb658f18043e749f1f52300dcd6a7b9a1ba6fe",
+    "suites": 1,
+    "passed": 37,
+    "ignored": 0
+  },
+  "native_default": {
+    "log": "/home/sagan/.cache/bevy-gym-quality-validation/world-session-default-final2.log",
+    "log_sha256": "67fa12176ad1c69a50a63b4b4b4e49245fc1aa71cc416ecc1acf23391eef0967",
+    "suites": 37,
+    "passed": 132,
+    "ignored": 1
+  },
+  "native_robots": {
+    "log": "/home/sagan/.cache/bevy-gym-quality-validation/world-session-robots-final2.log",
+    "log_sha256": "f1690b2a60df5b624e8c9e30428dfc927d3deff45dd31eb04d882d05f74f0964",
+    "suites": 37,
+    "passed": 468,
+    "ignored": 3
+  },
+  "wasm": {
+    "log": "/home/sagan/.cache/bevy-gym-quality-validation/world-session-browser-final.log",
+    "log_sha256": "c66b1374969261bfffa7b0dcfcbb8ea537576dae52e1ed7b34ae74e58c7fbd1d",
+    "suites": 26,
+    "passed": 267,
+    "ignored": 0
+  },
+  "gates": {
+    "format": "cargo fmt --all -- --check",
+    "native_default": "cargo test",
+    "native_robots": "cargo test --features robots",
+    "strict": "cargo clippy --all-targets --all-features -- -D warnings",
+    "wasm": "nix run .#drone-browser-check",
+    "personal": "Full personal Rust suite, --all-targets --all-features --changed-range HEAD, all new files included with intent-to-add; Clippy and Dylint children exit 0 and report no changed diagnostics",
+    "personal_toolchain": "1.98.0-nightly-2026-06-15 from the installed personal-lint checkout",
+    "coverage": "cargo llvm-cov --no-clean --branch --features robots --test droid_skill_session; fresh per-object llvm-profdata merge and llvm-cov export without diagnostics"
+  },
+  "coverage": {
+    "object": "/home/sagan/.cache/bevy-gym-quality-validation/coverage-target/debug/deps/droid_skill_session-4e14768964021903",
+    "export_diagnostics": "",
+    "files": [
+      {
+        "path": "examples/robots/world_scene/controllers.rs",
+        "summary": {
+          "branches": {
+            "count": 0,
+            "covered": 0,
+            "notcovered": 0,
+            "percent": 0
+          },
+          "functions": {
+            "count": 16,
+            "covered": 16,
+            "percent": 100
+          },
+          "instantiations": {
+            "count": 16,
+            "covered": 16,
+            "percent": 100
+          },
+          "lines": {
+            "count": 84,
+            "covered": 84,
+            "percent": 100
+          },
+          "mcdc": {
+            "count": 0,
+            "covered": 0,
+            "notcovered": 0,
+            "percent": 0
+          },
+          "regions": {
+            "count": 131,
+            "covered": 131,
+            "notcovered": 0,
+            "percent": 100
+          }
+        },
+        "unhit_regions": [],
+        "unhit_branch_outcomes": []
+      },
+      {
+        "path": "examples/robots/world_scene/encoding.rs",
+        "summary": {
+          "branches": {
+            "count": 0,
+            "covered": 0,
+            "notcovered": 0,
+            "percent": 0
+          },
+          "functions": {
+            "count": 7,
+            "covered": 7,
+            "percent": 100
+          },
+          "instantiations": {
+            "count": 10,
+            "covered": 10,
+            "percent": 100
+          },
+          "lines": {
+            "count": 73,
+            "covered": 73,
+            "percent": 100
+          },
+          "mcdc": {
+            "count": 0,
+            "covered": 0,
+            "notcovered": 0,
+            "percent": 0
+          },
+          "regions": {
+            "count": 161,
+            "covered": 161,
+            "notcovered": 0,
+            "percent": 100
+          }
+        },
+        "unhit_regions": [],
+        "unhit_branch_outcomes": []
+      },
+      {
+        "path": "examples/robots/world_scene/failure.rs",
+        "summary": {
+          "branches": {
+            "count": 0,
+            "covered": 0,
+            "notcovered": 0,
+            "percent": 0
+          },
+          "functions": {
+            "count": 2,
+            "covered": 2,
+            "percent": 100
+          },
+          "instantiations": {
+            "count": 2,
+            "covered": 2,
+            "percent": 100
+          },
+          "lines": {
+            "count": 18,
+            "covered": 18,
+            "percent": 100
+          },
+          "mcdc": {
+            "count": 0,
+            "covered": 0,
+            "notcovered": 0,
+            "percent": 0
+          },
+          "regions": {
+            "count": 34,
+            "covered": 34,
+            "notcovered": 0,
+            "percent": 100
+          }
+        },
+        "unhit_regions": [],
+        "unhit_branch_outcomes": []
+      },
+      {
+        "path": "examples/robots/world_scene/session.rs",
+        "summary": {
+          "branches": {
+            "count": 8,
+            "covered": 8,
+            "notcovered": 0,
+            "percent": 100
+          },
+          "functions": {
+            "count": 12,
+            "covered": 12,
+            "percent": 100
+          },
+          "instantiations": {
+            "count": 12,
+            "covered": 12,
+            "percent": 100
+          },
+          "lines": {
+            "count": 93,
+            "covered": 92,
+            "percent": 98.9247311827957
+          },
+          "mcdc": {
+            "count": 0,
+            "covered": 0,
+            "notcovered": 0,
+            "percent": 0
+          },
+          "regions": {
+            "count": 126,
+            "covered": 122,
+            "notcovered": 4,
+            "percent": 96.82539682539682
+          }
+        },
+        "unhit_regions": [
+          [
+            75,
+            62
+          ],
+          [
+            78,
+            40
+          ],
+          [
+            168,
+            17
+          ],
+          [
+            168,
+            27
+          ]
+        ],
+        "unhit_branch_outcomes": []
+      }
+    ]
+  },
+  "unhit_production_paths": [
+    {
+      "path": "examples/robots/world_scene/session.rs",
+      "line": 75,
+      "reason": "Known-valid exact embedded hover reference passes its loader; a different checkpoint fails identity first"
+    },
+    {
+      "path": "examples/robots/world_scene/session.rs",
+      "line": 78,
+      "reason": "Constant default world reset has finite initial bodies; no public mutation can corrupt construction"
+    },
+    {
+      "path": "examples/robots/world_scene/session.rs",
+      "line": 168,
+      "reason": "World reset reconstructs the same finite constant bodies; no supported failing reconstruction has been reproduced"
+    }
+  ],
+  "boundary_checks": [
+    "Each team slot can fail inference without committing any prior staged memory",
+    "Wrong action widths and out-of-bound fractions preserve decoder causes",
+    "Foreign snapshot causes a sticky world rejection without publishing requests",
+    "Changing one robot memory leaves every other inferred action and memory unchanged",
+    "Changing hidden robot physical state leaves focal actor inputs bit-identical",
+    "Complete 1000-frame clip matches six direct recurrent-policy replays",
+    "Completion prevents another step; reset matches a fresh session",
+    "Checkpoint identity, malformed metadata and malformed digest-bound model bytes reject playback"
+  ],
+  "unfinished": [
+    "Shared-world browser scene",
+    "Competitive rules and mixed tactical action distribution",
+    "Shared-task training, skill prerequisites and competition qualification"
+  ]
+}
