@@ -10,6 +10,7 @@ mod initial_checkpoint;
 mod learning;
 #[path = "curriculum/lesson.rs"]
 mod lesson;
+mod travel;
 
 use std::{error::Error, num::NonZeroU32, path::PathBuf};
 
@@ -23,10 +24,16 @@ use lesson::Lesson;
 struct Options {
     /// Train one lesson independently; omission runs hover followed by recovery.
     #[arg(long, value_enum)]
-    lesson: Option<Lesson>,
+    lesson: Option<SelectedLesson>,
     /// Initialize standalone recovery from a recorded, qualified RL hover checkpoint.
     #[arg(long, value_enum)]
     initialize_from: Option<InitialCheckpoint>,
+    /// Run frozen travel inference without collecting training samples or updating weights.
+    #[arg(long, requires = "lesson", conflicts_with_all = ["updates", "initialize_from"])]
+    evaluate_checkpoint: Option<PathBuf>,
+    /// Select the task distribution for frozen travel inference.
+    #[arg(long, value_enum, requires = "evaluate_checkpoint")]
+    travel_stage: Option<travel::stage::Stage>,
     /// Maximum 512-transition updates per lesson; exhaustion does not pass a lesson.
     #[arg(long, default_value = "600")]
     updates: NonZeroU32,
@@ -38,14 +45,42 @@ struct Options {
     output: PathBuf,
 }
 
-// Keep CLI parsing outside the lesson module shared with the browser worker.
-impl ValueEnum for Lesson {
-    /// Offer the same closed lessons and order as curriculum execution.
+/// Select either a twelve-input control lesson or the goal-conditioned travel curriculum.
+#[derive(Clone, Copy)]
+enum SelectedLesson {
+    /// Existing hover/recovery contract.
+    Control(Lesson),
+    /// Thirteen-input position and heading curriculum.
+    Travel,
+}
+
+impl ValueEnum for SelectedLesson {
+    /// Expose the closed lesson vocabulary without changing existing spellings.
     fn value_variants<'a>() -> &'a [Self] {
-        &[Self::Hover, Self::Recovery]
+        &[
+            Self::Control(Lesson::Hover),
+            Self::Control(Lesson::Recovery),
+            Self::Travel,
+        ]
     }
 
-    /// Reuse the lesson's artifact name as its command-line spelling.
+    /// Keep artifact and CLI lesson names consistent.
+    fn to_possible_value(&self) -> Option<clap::builder::PossibleValue> {
+        let name = match self {
+            Self::Control(lesson) => lesson.name(),
+            Self::Travel => "travel",
+        };
+        Some(clap::builder::PossibleValue::new(name))
+    }
+}
+
+impl ValueEnum for travel::stage::Stage {
+    /// Keep stage spellings identical to saved checkpoint prefixes.
+    fn value_variants<'a>() -> &'a [Self] {
+        &Self::ALL
+    }
+
+    /// Translate the closed stage into a CLI value.
     fn to_possible_value(&self) -> Option<clap::builder::PossibleValue> {
         Some(clap::builder::PossibleValue::new(self.name()))
     }
@@ -54,10 +89,36 @@ impl ValueEnum for Lesson {
 /// Retain the agent across lessons and replace only the episode collection state.
 fn main() -> Result<(), Box<dyn Error>> {
     let options = Options::parse();
+    // Reject incompatible inference modes before loading weights or creating output.
+    if options.evaluate_checkpoint.is_some()
+        && !matches!(options.lesson, Some(SelectedLesson::Travel))
+    {
+        return Err("--evaluate-checkpoint requires --lesson travel".into());
+    }
     // Reject unsupported transitions before loading weights or creating artifacts.
-    if options.initialize_from.is_some() && !matches!(options.lesson, Some(Lesson::Recovery)) {
+    if options.initialize_from.is_some()
+        && !matches!(
+            options.lesson,
+            Some(SelectedLesson::Control(Lesson::Recovery))
+        )
+    {
         return Err("qualified-hover initialization requires --lesson recovery".into());
     }
+    // Travel has its own actor input width and qualified prerequisite; dispatch before construction.
+    let lessons = match &options.lesson {
+        Some(SelectedLesson::Control(lesson)) => std::slice::from_ref(lesson),
+        Some(SelectedLesson::Travel) => {
+            if let Some(path) = &options.evaluate_checkpoint {
+                return travel::infer(
+                    options.travel_stage.unwrap_or(travel::stage::Stage::Near),
+                    options.seed,
+                    path,
+                );
+            }
+            return travel::train(options.seed, options.updates, &options.output);
+        }
+        None => &[Lesson::Hover, Lesson::Recovery],
+    };
     let mut agent = match options.initialize_from {
         Some(source) => source.load(options.seed)?,
         None => new_agent(options.seed)?,
@@ -68,11 +129,6 @@ fn main() -> Result<(), Box<dyn Error>> {
         std::fs::write(options.output.join("transfer.json"), record.to_string())?;
         println!("{record}");
     }
-    // Borrow the selected lesson or the fixed curriculum without duplicating its runner.
-    let lessons = match &options.lesson {
-        Some(lesson) => std::slice::from_ref(lesson),
-        None => &[Lesson::Hover, Lesson::Recovery],
-    };
     for &lesson in lessons {
         let name = lesson.name();
         let mut batch = lesson.batch(options.seed, &agent.policy());

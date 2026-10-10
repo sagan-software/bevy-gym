@@ -4,6 +4,47 @@ Updated: 2026-10-09. Current work: RL-only drone/droid curriculum.
 
 ## Resume here
 
+### Travel PPO training and frozen inference, 2026-10-09
+
+This checkpoint adds `drone-curriculum --lesson travel`. It transfers the
+qualified seed-11 recovery actor, appends a zero-weight heading input, and starts a
+fresh critic and optimizer. Position, heading, arrival deadline and final settling
+gates are fixed before training. The three stages sample progressively farther goals;
+the last stage halves the arrival deadline. All motor requests come from PPO policies.
+
+`bevy-gym-travel-seed11-20261009.service` is running with seed 11 and at most 600
+updates per stage. Artifacts are `runs/drone-travel/seed11-20261009`; `run.json` records
+source and binary hashes, and `source.patch` preserves the exact launch sources.
+The immutable launch binary is under
+`/home/sagan/.cache/bevy-gym-quality-validation/travel-policy-seed11-20261009/`.
+Its log is `/home/sagan/.cache/bevy-gym-quality-validation/travel-seed11.log`.
+Do not restart the job solely because a later source edit changes the working binary.
+
+Native learning tests pass (27, one ignored), as do 12 curriculum unit tests, nine
+CLI tests, root tests, strict native/WASM Clippy, WASM compilation, and the actual
+browser suite (25 learning tests). Frozen travel inference now runs through
+`--evaluate-checkpoint`; missing/incompatible weights and conflicting modes fail
+before output creation. The CLI regression proves no checkpoint mutation or output
+files during inference. Changed-line personal Rust and Python lint are clean.
+Strict personal Clippy still fails on the unchanged repository backlog.
+
+The [travel guide](DRONE_TRAVEL.md) records commands, all three stage distributions,
+the 13-input actor contract, rewards and selection gates. The
+[implementation evidence](progress/drone-travel-policy.json) records measured coverage
+and exact gaps. The training launch snapshot predates the later CLI inference and
+bounded source-file validation edits; its preserved binary continues unchanged.
+
+At update 380, selection failed: zero of five episodes survived, none arrived, and
+all final settling counts were zero. No travel checkpoint is qualified. Promotion
+criteria are unchanged. The next action is to inspect the completed trial, diagnose
+loss of stable flight, and qualify a frozen candidate on independent held-out goals.
+Travel scene/video evidence, combined progression through qualified travel, all
+later drone lessons, physical droid locomotion and 3v3 competition remain unfinished.
+
+The old damage service is no longer loaded. Its preserved log still ends with
+`Lesson front-left exhausted its update budget without passing.` The absent unit's
+default success fields are not evidence that the failed trial passed.
+
 ### Travel environment and typed collection, 2026-10-09
 
 The environment checkpoint `081bace99e04ee5c873b1534bcb4e4a1c2d1d485` is on GitHub main.
@@ -29,13 +70,11 @@ lint is clean. [Collector evidence](progress/drone-travel-collector.json) record
 existing critic-error propagation regions at rollout lines 130 and 133 remain unhit.
 Travel uses a body-only test encoder here; no trained travel controller is implied.
 
-Travel has no trained policy, training/inference command, scene, or video yet.
-Next: define the travel observation encoding, test qualified actor transfer with
-heading input, then implement sampled-goal training and independent
-position/heading/speed gates. Existing imitation-only tracking is
-not a source checkpoint. Do not weaken the gates if training fails.
+At this earlier checkpoint, travel had no trained policy, training/inference command,
+scene, or video. The newer section above supersedes its next action. Existing
+imitation-only tracking is not a source checkpoint. Do not weaken gates on failure.
 
-No training job for this task is active. Preserve both damage failures and the
+At that earlier checkpoint, no training job was active. Preserve both damage failures and the
 completed seed-11 recovery transfer. Logs use
 `/home/sagan/.cache/bevy-gym-quality-validation/travel-environment-` and
 `/home/sagan/.cache/bevy-gym-quality-validation/travel-collector-`.
@@ -76,7 +115,7 @@ branch outcomes; the evidence names error-propagation and existing loop gaps.
 Existing browser videos do not show these new weights.
 
 The original seed-11 damage run remains failed and preserved; it is a different run.
-No training service for this task is currently active. Logs use
+At that checkpoint, no training service was active. Logs use
 `/home/sagan/.cache/bevy-gym-quality-validation/skill-transfer-`.
 
 Next: implement drone travel through the shared RL environment and focused failing

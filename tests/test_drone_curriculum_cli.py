@@ -34,6 +34,83 @@ class DroneCurriculumCli(unittest.TestCase):
                 self.assertGreater(record["optimizer_steps"], 0)
                 self.assertEqual(len(record["episodes"]), 5)
 
+    def test_travel_starts_with_rl_transfer_and_preserves_failed_selection(self):
+        with tempfile.TemporaryDirectory() as directory:
+            result = subprocess.run(
+                [str(TARGET / "debug/examples/drone-curriculum"),
+                 "--lesson", "travel", "--updates", "1", "--seed", "11",
+                 "--output", directory],
+                cwd=ROOT, capture_output=True, text=True, check=False,
+            )
+            self.assertEqual(result.returncode, 1, result.stderr)
+            self.assertIn("Lesson travel-near exhausted", result.stderr)
+            record = json.loads((Path(directory) / "travel-near-1.json").read_text())
+            self.assertFalse(record["passed"])
+            self.assertEqual(record["update"], 1)
+            self.assertGreater(record["optimizer_steps"], 0)
+            self.assertEqual(len(record["episodes"]), 5)
+            transfer = json.loads((Path(directory) / "transfer.json").read_text())
+            self.assertEqual(transfer["source"], "qualified-recovery")
+            self.assertEqual(transfer["destination"], "travel-near")
+            self.assertEqual(transfer["optimizer"], "fresh")
+            self.assertEqual(transfer["actor_observations"], 13)
+            self.assertEqual(sorted(p.name for p in Path(directory).iterdir()),
+                             ["transfer.json", "travel-near-1.json", "travel-near-1.mpk"])
+            checkpoint = Path(directory) / "travel-near-1.mpk"
+            before = checkpoint.read_bytes()
+            inference = subprocess.run(
+                [str(TARGET / "debug/examples/drone-curriculum"),
+                 "--lesson", "travel", "--evaluate-checkpoint", str(checkpoint),
+                 "--travel-stage", "travel-near", "--seed", "42",
+                 "--output", str(Path(directory) / "inference-must-not-write")],
+                cwd=ROOT, capture_output=True, text=True, check=False,
+            )
+            self.assertEqual(inference.returncode, 0, inference.stderr)
+            score = json.loads(inference.stdout)
+            self.assertEqual(score["mode"], "frozen-inference")
+            self.assertEqual(score["qualification"], "not established by this episode")
+            self.assertEqual(len(score["episodes"]), 1)
+            self.assertEqual(checkpoint.read_bytes(), before)
+            self.assertFalse((Path(directory) / "inference-must-not-write").exists())
+
+    def test_travel_inference_rejects_missing_and_incompatible_checkpoints(self):
+        for checkpoint in (ROOT / "absent-travel-checkpoint.mpk",
+                           ROOT / "docs/progress/drone-recovery-transfer.mpk"):
+            with self.subTest(checkpoint=checkpoint), tempfile.TemporaryDirectory() as directory:
+                output = Path(directory) / "must-not-exist"
+                result = subprocess.run(
+                    [str(TARGET / "debug/examples/drone-curriculum"),
+                     "--lesson", "travel", "--evaluate-checkpoint", str(checkpoint),
+                     "--output", str(output)],
+                    cwd=ROOT, capture_output=True, text=True, check=False,
+                )
+                self.assertEqual(result.returncode, 1, result.stderr)
+                self.assertTrue(result.stderr)
+                self.assertFalse(output.exists())
+
+    def test_travel_inference_rejects_conflicting_modes_before_output(self):
+        cases = [
+            (["--evaluate-checkpoint", "missing"], 2),
+            (["--lesson", "hover", "--evaluate-checkpoint", "missing"], 1),
+            (["--lesson", "travel", "--evaluate-checkpoint", "missing", "--updates", "1"], 2),
+            (["--lesson", "travel", "--travel-stage", "travel-far"], 2),
+            (["--lesson", "travel", "--evaluate-checkpoint", "missing", "--travel-stage", "unknown"], 2),
+            (["--lesson", "travel", "--evaluate-checkpoint", "missing",
+              "--initialize-from", "qualified-hover"], 2),
+            (["--lesson", "travel", "--initialize-from", "qualified-hover"], 1),
+        ]
+        for arguments, status in cases:
+            with self.subTest(arguments=arguments), tempfile.TemporaryDirectory() as directory:
+                output = Path(directory) / "must-not-exist"
+                result = subprocess.run(
+                    [str(TARGET / "debug/examples/drone-curriculum"), *arguments,
+                     "--output", str(output)],
+                    cwd=ROOT, capture_output=True, text=True, check=False,
+                )
+                self.assertEqual(result.returncode, status, result.stderr)
+                self.assertTrue(result.stderr)
+                self.assertFalse(output.exists())
+
     def test_default_curriculum_starts_with_hover(self):
         with tempfile.TemporaryDirectory() as directory:
             result = subprocess.run(
@@ -99,7 +176,7 @@ class DroneCurriculumCli(unittest.TestCase):
                 self.assertFalse(output.exists())
 
     def test_unknown_lesson_fails_before_creating_output(self):
-        for value, error in (("travel", "invalid value"),
+        for value, error in (("clearance", "invalid value"),
                              ("Hover", "invalid value"),
                              ("", "a value is required")):
             with self.subTest(value=value), tempfile.TemporaryDirectory() as directory:

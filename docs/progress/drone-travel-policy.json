@@ -1,0 +1,380 @@
+{
+  "date": "2026-10-09",
+  "base_commit": "21225b6c4d119a18e9602eb6ce1e841edb94dd2b",
+  "status": "Implementation checkpoint; no travel policy qualified",
+  "source_sha256": {
+    "examples/robots/curriculum.rs": "c89ec14043da678d2a9add53610be53189add443cba3f5521f8a8fcc5b9568a8",
+    "examples/robots/learning/encoding.rs": "587c484f2e61d7c5e3c193e8ee669bb724bdc2fc61813868034e08dc17a9c522",
+    "examples/robots/travel/encoding.rs": "2774a719376533ffa1a5f1fba3c6f2de05789a6a4c3a5fdbd30d6c6e4c8299fb",
+    "examples/robots/travel/environment.rs": "f889ad88bae58c90f515e6cce5a27ae2484df1d53004d73d0e85007f027127a2",
+    "examples/robots/travel/evaluation.rs": "0d691f3c393caaf4a5a49adfd2c7294c4504c445e041915745a460a509d0f36f",
+    "examples/robots/travel/mod.rs": "877ae6b8f43133022ac3b3299ae0fd2f100867650a9b47d93b342bce3940e4b9",
+    "examples/robots/travel/model.rs": "a49cb52c2524f50e8dfd595b6a02b7718ee778affd521ef0cb01026b9431a662",
+    "examples/robots/travel/stage.rs": "35a154daef39fbd2fcf777db57bdd27c1ce54d198583aa2205ef7ea820c8aa37",
+    "tests/drone_learning/travel.rs": "821652049ccf0e3537a50a696497d8f5b5f356cac958783fe430eb215d214fc2",
+    "tests/test_drone_curriculum_cli.py": "eeb730a91a586a7395be2c5c83adcafbe64dd1d14de53a899ae481be31f43a26"
+  },
+  "tdd": {
+    "red_logs": [
+      "/home/sagan/.cache/bevy-gym-quality-validation/travel-policy-red.log",
+      "/home/sagan/.cache/bevy-gym-quality-validation/travel-policy-transfer-red.log",
+      "/home/sagan/.cache/bevy-gym-quality-validation/travel-cli-red.log",
+      "/home/sagan/.cache/bevy-gym-quality-validation/travel-inference-red.log"
+    ],
+    "failures": [
+      "Missing travel observation module",
+      "Missing qualified actor transfer module",
+      "Unknown travel lesson",
+      "Unknown frozen inference flag"
+    ]
+  },
+  "validation": {
+    "native_learning": "27 passed, one ignored",
+    "curriculum_units": "12 passed",
+    "cli": "9 passed",
+    "root_cargo_test": "passed",
+    "format": "passed",
+    "strict_native_clippy": "passed",
+    "strict_wasm_learning_clippy": "passed",
+    "wasm_check": "passed",
+    "actual_browser_suite": "passed; 25 learning tests",
+    "personal_changed_line_clippy_and_dylint": "no diagnostics",
+    "strict_personal_clippy": "exit 101 on unchanged repository backlog; no changed-line diagnostics",
+    "personal_python": "passed",
+    "documentation": "root and robots doctests passed; final Markdown check recorded in travel-policy-docs-final.log",
+    "logs": "/home/sagan/.cache/bevy-gym-quality-validation/travel-policy-"
+  },
+  "coverage": {
+    "method": "Fresh instrumented native example-unit, learning-integration and CLI profiles; explicit llvm-cov export. Resolve imported source aliases to physical paths and union LCOV DA lines and JSON branch locations. Counts include unit-test code. No whole-package coverage claim.",
+    "commands": [
+      "cargo llvm-cov --branch --no-default-features --features robots --test drone_learning --example drone-curriculum --no-report",
+      "cargo llvm-cov run --branch --no-report --no-default-features --features robots --example drone-curriculum -- --lesson travel --seed 11 --updates 1 --output CACHE/travel-policy-coverage-output"
+    ],
+    "additional_runs": "Fresh unit binaries, six valid-parsing CLI cases, semantic invalid-mode case, two-update and 21-update training, frozen candidates 20/120 over five seeds, far/fast inference. Malformed Clap cases run uninstrumented because LLVM profile counters underflowed on those paths.",
+    "physical_source": {
+      "examples/robots/curriculum.rs": {
+        "lines": {
+          "covered": 79,
+          "count": 82
+        },
+        "branches": {
+          "covered": 17,
+          "count": 20
+        },
+        "unhit_lines": [
+          138,
+          152,
+          160
+        ],
+        "unhit_branches": [
+          {
+            "range": [
+              137,
+              16,
+              137,
+              32
+            ],
+            "true_hits": 4,
+            "false_hits": 0
+          },
+          {
+            "range": [
+              137,
+              36,
+              137,
+              67
+            ],
+            "true_hits": 0,
+            "false_hits": 4
+          },
+          {
+            "range": [
+              156,
+              16,
+              156,
+              47
+            ],
+            "true_hits": 3,
+            "false_hits": 0
+          }
+        ]
+      },
+      "examples/robots/learning/encoding.rs": {
+        "lines": {
+          "covered": 48,
+          "count": 48
+        },
+        "branches": {
+          "covered": 0,
+          "count": 0
+        },
+        "unhit_lines": [],
+        "unhit_branches": []
+      },
+      "examples/robots/travel/encoding.rs": {
+        "lines": {
+          "covered": 31,
+          "count": 31
+        },
+        "branches": {
+          "covered": 4,
+          "count": 4
+        },
+        "unhit_lines": [],
+        "unhit_branches": []
+      },
+      "examples/robots/travel/environment.rs": {
+        "lines": {
+          "covered": 46,
+          "count": 46
+        },
+        "branches": {
+          "covered": 2,
+          "count": 2
+        },
+        "unhit_lines": [],
+        "unhit_branches": []
+      },
+      "examples/robots/travel/evaluation.rs": {
+        "lines": {
+          "covered": 72,
+          "count": 72
+        },
+        "branches": {
+          "covered": 32,
+          "count": 32
+        },
+        "unhit_lines": [],
+        "unhit_branches": []
+      },
+      "examples/robots/travel/mod.rs": {
+        "lines": {
+          "covered": 51,
+          "count": 54
+        },
+        "branches": {
+          "covered": 7,
+          "count": 8
+        },
+        "unhit_lines": [
+          55,
+          58,
+          67
+        ],
+        "unhit_branches": [
+          {
+            "range": [
+              57,
+              16,
+              57,
+              22
+            ],
+            "true_hits": 0,
+            "false_hits": 4
+          }
+        ]
+      },
+      "examples/robots/travel/model.rs": {
+        "lines": {
+          "covered": 40,
+          "count": 40
+        },
+        "branches": {
+          "covered": 2,
+          "count": 2
+        },
+        "unhit_lines": [],
+        "unhit_branches": []
+      },
+      "examples/robots/travel/stage.rs": {
+        "lines": {
+          "covered": 22,
+          "count": 22
+        },
+        "branches": {
+          "covered": 0,
+          "count": 0
+        },
+        "unhit_lines": [],
+        "unhit_branches": []
+      }
+    },
+    "unhit_travel_regions": [
+      {
+        "file": "examples/robots/travel/evaluation.rs",
+        "range": [
+          69,
+          72,
+          69,
+          73
+        ]
+      },
+      {
+        "file": "examples/robots/travel/evaluation.rs",
+        "range": [
+          79,
+          68,
+          79,
+          69
+        ]
+      },
+      {
+        "file": "examples/robots/travel/model.rs",
+        "range": [
+          22,
+          33,
+          22,
+          34
+        ]
+      },
+      {
+        "file": "examples/robots/travel/mod.rs",
+        "range": [
+          74,
+          65,
+          74,
+          66
+        ]
+      },
+      {
+        "file": "examples/robots/travel/mod.rs",
+        "range": [
+          20,
+          43,
+          20,
+          44
+        ]
+      },
+      {
+        "file": "examples/robots/travel/mod.rs",
+        "range": [
+          21,
+          36,
+          21,
+          37
+        ]
+      },
+      {
+        "file": "examples/robots/travel/mod.rs",
+        "range": [
+          27,
+          71,
+          27,
+          72
+        ]
+      },
+      {
+        "file": "examples/robots/travel/mod.rs",
+        "range": [
+          40,
+          59,
+          40,
+          60
+        ]
+      },
+      {
+        "file": "examples/robots/travel/mod.rs",
+        "range": [
+          41,
+          51,
+          41,
+          52
+        ]
+      },
+      {
+        "file": "examples/robots/travel/mod.rs",
+        "range": [
+          45,
+          50,
+          45,
+          51
+        ]
+      },
+      {
+        "file": "examples/robots/travel/mod.rs",
+        "range": [
+          46,
+          80,
+          46,
+          81
+        ]
+      },
+      {
+        "file": "examples/robots/travel/mod.rs",
+        "range": [
+          47,
+          51,
+          47,
+          52
+        ]
+      },
+      {
+        "file": "examples/robots/travel/mod.rs",
+        "range": [
+          48,
+          82,
+          48,
+          83
+        ]
+      },
+      {
+        "file": "examples/robots/travel/mod.rs",
+        "range": [
+          55,
+          14,
+          55,
+          15
+        ]
+      },
+      {
+        "file": "examples/robots/travel/mod.rs",
+        "range": [
+          58,
+          17,
+          58,
+          22
+        ]
+      },
+      {
+        "file": "examples/robots/travel/mod.rs",
+        "range": [
+          67,
+          5,
+          67,
+          11
+        ]
+      }
+    ],
+    "gaps": [
+      "Travel promotion break and all-stage success remain unhit because no genuine trained candidate passes. Synthetic passing scores cover every evaluator gate but do not prove trained competence.",
+      "Travel source read failure after open; trainer initialization, directory/write, collector/update, serialization/reload/evaluation failures; inference episode failure after validated loading are not fault-injected.",
+      "The positive constant TimeLimit construction and valid four-output policy leave their error-propagation regions unhit.",
+      "Existing control curriculum continuation and completion remain outside this focused instrumented run; prior qualified control evidence is retained."
+    ]
+  },
+  "training": {
+    "unit": "bevy-gym-travel-seed11-20261009.service",
+    "state_at_inspection": "active",
+    "seed": 11,
+    "maximum_updates_per_stage": 600,
+    "last_inspected_update": 380,
+    "passed": false,
+    "survivors": 0,
+    "arrivals": 0,
+    "settled_episodes": 0,
+    "artifacts": "runs/drone-travel/seed11-20261009",
+    "launch_manifest": "runs/drone-travel/seed11-20261009/run.json",
+    "launch_patch": "runs/drone-travel/seed11-20261009/source.patch",
+    "launch_version_note": "Immutable copied binary predates inference CLI and bounded source-read edits; training semantics unchanged.",
+    "source_checkpoint": "docs/progress/drone-recovery-transfer.mpk",
+    "source_sha256": "7c2b9a6f2a0288faa27676d1514848710f4d5c24cd77505e75cf4990576a12b1",
+    "sample_count_at_update380": 194560
+  },
+  "unfinished": [
+    "Independent held-out travel qualification and qualified checkpoints",
+    "Standalone travel scene and recorded browser playback",
+    "Combined progression through qualified travel",
+    "Remaining drone lessons, physical droid lessons, multi-agent training and spectator 3v3 arena"
+  ],
+  "remote_ci": "Not verified for this unpublished checkpoint; local checks are separate"
+}

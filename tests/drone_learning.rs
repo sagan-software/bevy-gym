@@ -9,6 +9,8 @@ wasm_bindgen_test::wasm_bindgen_test_configure!(run_in_browser);
 
 #[path = "../examples/robots/learning/mod.rs"]
 mod learning;
+#[path = "drone_learning/travel.rs"]
+mod travel;
 
 use bevy_gym::robots::{DroneAction, DroneHover};
 use bevy_gym::Env;

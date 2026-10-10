@@ -37,9 +37,14 @@ impl Error for ActionDecodeError {
 /// Each quantity uses XYZ body coordinates. Divide displacement by 2 metres,
 /// velocity by 2 m/s, and angular velocity by 2 rad/s; world up has unit length.
 pub(crate) fn encode(observation: DroneObservation) -> [f32; 12] {
+    encode_target(observation, Vec3::new(0.0, 2.0, 0.0))
+}
+
+/// Encode the same body-frame quantities relative to a task-supplied position in metres.
+pub(crate) fn encode_target(observation: DroneObservation, target: Vec3) -> [f32; 12] {
     // Rotate world quantities into body coordinates before applying unit scales.
     let inverse = observation.orientation().inverse();
-    let displacement = inverse * (Vec3::new(0.0, 2.0, 0.0) - observation.position()) / 2.0;
+    let displacement = inverse * (target - observation.position()) / 2.0;
     let up = inverse * Vec3::Y;
     let velocity = inverse * observation.linear_velocity() / 2.0;
     let angular_velocity = inverse * observation.angular_velocity() / 2.0;

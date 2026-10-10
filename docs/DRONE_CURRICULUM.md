@@ -59,7 +59,7 @@ nix develop --command cargo run --no-default-features --features robots \
 ```
 
 For standalone training, add `--lesson hover` or `--lesson recovery`. These are the
-only accepted names. Both use the same lesson factories, collector, evaluator, and
+control lesson names. Both use the same lesson factories, collector, evaluator, and
 promotion criteria as the default sequence. Standalone training starts from random
 weights unless qualified initialization is selected below. The default
 sequence retains its optimizer across the hover-to-recovery transition.
@@ -150,3 +150,13 @@ remain the exact gaps listed in the evidence. Strict native/WASM gates and the
 browser suite pass. Changed-line personal lint is clean; strict personal lint
 still fails on the unchanged repository backlog. Existing scene recordings use
 the original curriculum checkpoint, not these new transferred weights.
+
+## Travel extension
+
+`--lesson travel` runs the separate near/far/fast PPO sequence described in the
+[travel guide](DRONE_TRAVEL.md). It transfers the qualified recovery actor into
+13-input observations with a zero-weight heading feature and a fresh critic and
+optimizer. Frozen inference uses `--evaluate-checkpoint` and the same environment.
+No travel candidate is qualified yet. The default hover/recovery sequence and its
+qualification evidence are unchanged; combined progression through qualified travel
+remains unfinished.

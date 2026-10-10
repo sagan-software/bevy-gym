@@ -1,8 +1,8 @@
 # Drone travel lesson
 
-Status: reusable environment implemented; RL training, qualification, and scene
-remain unfinished. Historical tracking weights are imitation-trained and do not
-qualify this lesson.
+Status: reusable environment, PPO training, and frozen inference implemented.
+Qualification and the standalone browser scene remain unfinished. Historical tracking
+weights are imitation-trained and do not qualify this lesson.
 
 ## Environment
 
@@ -28,7 +28,7 @@ are private and immutable.
 The observation contains a read-only `DroneObservation` and the destination.
 Position is measured in metres, linear velocity in m/s, and angular velocity in
 rad/s. Orientation is a unit quaternion from body coordinates to world coordinates.
-The later neural-network encoding must state its scaling and heading representation.
+The neural-network encoding below fixes scaling and heading representation.
 The environment does not expose a mutable physics world.
 
 Actions retain the hover contract: four finite motor fractions in `[0, 1]`, ordered
@@ -90,12 +90,105 @@ and qualification remain green. Collector coverage records 226/226 lines, includ
 tests, and 6/6 branch outcomes across both instantiations. Two existing critic-error
 propagation regions remain unhit; the evidence records their exact locations.
 
-The next implementation must sample progressively harder goals, transfer a qualified
-RL actor, and collect rollouts through this same environment. Position and heading
-must reach independent held-out gates. Approach speed and settling time need
-explicit stage criteria before training. Keep policy inference failure visible.
-Training and inference commands, qualified travel checkpoints, a standalone scene,
-and recorded browser playback remain pending. Existing hover and recovery browser
-recordings do not establish travel competence.
+## Training and frozen inference
+
+Run the three travel stages with a finite budget per stage:
+
+```sh
+nix develop --command cargo run --no-default-features --features robots \
+  --example drone-curriculum -- --lesson travel --seed 11 --updates 600 \
+  --output runs/drone-travel/seed11
+```
+
+The source is the qualified PPO recovery checkpoint
+`docs/progress/drone-recovery-transfer.mpk`, SHA-256
+`7c2b9a6f2a0288faa27676d1514848710f4d5c24cd77505e75cf4990576a12b1`.
+The trainer verifies its bytes against the embedded reference before transfer.
+It copies the recurrent actor and adds one zero-weight heading input. The critic,
+optimizers, and sampling streams start fresh. A `transfer.json` record precedes
+training. Tests prove unchanged actions and recurrent memory at transfer.
+
+Each update collects eight lanes of 64 actions through `TravelTask` and the shared
+`DroneTravel` implementation. Policy weights remain fixed during collection;
+PPO updates follow the 512 transitions. Each lane owns its recurrent memory.
+Stage changes reset lanes and memory while retaining the trained agent and optimizer.
+
+Evaluate a saved candidate without training:
+
+```sh
+nix develop --command cargo run --no-default-features --features robots \
+  --example drone-curriculum -- --lesson travel --seed 42 \
+  --evaluate-checkpoint runs/drone-travel/seed11/travel-near-20.mpk \
+  --travel-stage travel-near
+```
+
+The command requires an existing 13-input checkpoint and creates no output files.
+Missing, incompatible, or invalid inference fails visibly; there is no fallback.
+`--travel-stage` accepts `travel-near`, `travel-far`, or `travel-fast`, defaults to
+`travel-near`, and requires `--evaluate-checkpoint`. Evaluation requires
+`--lesson travel` and conflicts with `--updates` and `--initialize-from`.
+A single episode explicitly reports that it does not establish qualification.
+
+### Observation encoding
+
+The actor and critic each receive 13 dimensionless features. In order, these are
+body-frame destination displacement XYZ divided by 2 m, body-frame world-up XYZ,
+body-frame linear velocity XYZ divided by 2 m/s, body-frame angular velocity XYZ
+divided by 2 rad/s, and signed heading error divided by pi radians.
+Heading error is `atan2((forward × desired).y, forward · desired)`; positive values
+rotate around world +Y. The last feature lies in `[-1, 1]`. An exactly vertical
+forward vector has undefined horizontal heading and explicitly encodes positive zero.
+The up vector and recurrent memory still describe tilt. Outputs retain the four
+motor fractions and ordering specified above; no controller converts goals to actions.
+
+### Sampling and promotion
+
+`TravelTask` samples one immutable destination per episode. Explicit seeds restart
+both streams at episode zero; omitted seeds advance the wrapping episode index.
+`SeedConfig::environment_episode(0, episode)` controls the disturbed body reset.
+Stream 1 draws radius, azimuth, height, and heading in that order. Azimuth and heading
+use the sampler's float range from minus pi to pi. Position is
+`(radius × cos(azimuth), height, radius × sin(azimuth))`; heading is
+`(cos(heading), sin(heading))` in world X/Z.
+
+The fixed stage profiles are:
+
+- `travel-near`: radius 0.5–1 m, height 1.5–2.5 m, first arrival by action 500,
+  mean return at least 600.
+- `travel-far`: radius 2–4 m, height 1–4 m, first arrival by action 500,
+  mean return at least 500.
+- `travel-fast`: radius 4–6 m, height 1–5 m, first arrival by action 250,
+  mean return at least 500.
+
+Every episode lasts at most 1,000 actions, or 20 seconds. Arrival requires distance
+at most 0.5 m and absolute heading error at most pi/12 radians. Every evaluated
+episode must survive the full horizon and satisfy both bounds plus speed at most
+0.5 m/s for its final 100 consecutive actions. Arrival deadlines are inclusive:
+500 actions is 10 seconds; 250 is 5 seconds; 100 settling actions is 2 seconds.
+
+Every twentieth update and the final budgeted update save weights, reload frozen
+inference, and evaluate ordered seeds `0, 1, 2, 42, 18446744073709551615`.
+All episode gates and the mean-return gate must pass before the next stage.
+Exhaustion returns an error and preserves the failed candidate. These selection
+results do not replace independent held-out qualification, which remains pending.
+
+Each stage record contains `lesson`, `update`, `passed`, `optimizer_steps`, and
+ordered `episodes`. Episode fields are `seed`, `steps`, summed unscaled `reward`,
+`survived`, `first_arrival`, `settled_actions`, `final_distance` in metres,
+`final_heading_error` in radians, and `final_speed` in m/s. `first_arrival` is a
+one-based action index or JSON null when absent. Non-finite floating diagnostics
+serialize as JSON null. Inference adds `mode`, `checkpoint`, `stage`, and an honest
+`qualification` message; it does not update the checkpoint.
+
+[Training implementation evidence](progress/drone-travel-policy.json) records native,
+WASM, CLI, lint, and measured coverage results. No travel policy has qualified.
+The seed-11 trial and failed selection records remain under
+`runs/drone-travel/seed11-20261009`; its immutable binary and source manifest preserve
+the exact launch version. See [current status](EXAMPLE_STATUS.md) before restarting.
+
+Next: investigate the failed trial, qualify a frozen candidate on independent
+held-out goals, and add the separate scene with recorded browser playback. The
+default curriculum still runs hover and recovery only. Existing hover/recovery
+videos do not establish travel competence.
 
 [flightmare]: https://github.com/uzh-rpg/flightmare/blob/master/flightlib/src/envs/quadrotor_env/quadrotor_env.cpp
