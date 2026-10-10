@@ -49,12 +49,30 @@ observations, actions and promotion gates remain unchanged.
 The ten-update smoke run completed 5,120 RL transitions and failed selection.
 The first ten optimizer records in the larger trial match that smoke run exactly.
 This does not establish checkpoint-byte reproducibility or qualification. The older
-seed-19 recovery run remains preserved and runs independently until its budget ends.
+seed-19 recovery run exhausted its budget; its artifacts remain preserved.
 
 Before reporting progress, inspect
 `bevy-gym-travel-batched-seed23-20261010.service` and
 `runs/drone-travel/batched-seed23-20261010`. Held-out evaluation and independent
 run evidence remain required before promotion is reported.
+
+## Seed-23 endurance selection and independent evaluation
+
+The batched seed-23 run passed its five-root endurance selection at update 1,860,
+after 952,320 transitions. All five episodes survived, with at least 244 final
+settled actions. The mean return was 854.3. The trainer then continued into near travel.
+
+Independent evaluation through the same immutable executable failed endurance.
+All 32 held-out episodes survived, but maximum heading error reached 0.542 radians
+against pi/12 permitted. The shortest final settled streak was zero. The
+[selection record](progress/drone-travel-endurance-seed23.json) and
+[complete 128-episode suite](progress/drone-travel-endurance-seed23-held-out.json)
+preserve checkpoint identity and every case.
+
+Endurance remains unqualified. The existing trainer advances after selection alone,
+before held-out evaluation. This is a promotion-enforcement gap. Future transitions
+must require independent evaluation, and later candidates must replay earlier stages.
+The fixed gates remain unchanged.
 
 ## Run the travel scene
 

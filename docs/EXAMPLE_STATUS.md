@@ -4,6 +4,19 @@ Updated: 2026-10-10. Current work: RL-only drone/droid curriculum.
 
 ## Resume here
 
+### Endurance selection passes; independent evaluation fails, 2026-10-10
+
+Seed 23 passed its five-root endurance selection at update 1,860.
+Independent evaluation failed: all 32 episodes survived, but maximum heading error
+was 0.542 radians and the shortest final settled streak was zero. The
+[evidence record](progress/drone-travel-endurance-seed23.json) and
+[complete suite](progress/drone-travel-endurance-seed23-held-out.json) preserve the result.
+
+The existing trainer advanced to near travel on selection alone. That is a
+promotion-enforcement gap; endurance remains unqualified. Next: require independent
+evaluation before stage transitions and replay earlier stages before qualification.
+Standing remains unqualified, and browser 3v3 remains unfinished.
+
 ### Travel recovery budget exhausted, 2026-10-10
 
 The seed-19 recovery run completed 2,400 updates and 1,228,800 transitions.

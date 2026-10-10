@@ -1,0 +1,131 @@
+{
+  "schema": "drone-travel-endurance-independent-v1",
+  "recorded_utc": "2026-10-10T10:20:56.939466+00:00",
+  "source_revision": "e8b794137e2f90609a94d5a7092eebc393f2451b",
+  "binary_sha256": "20ad629b07ae606a353fd46fdfad7630590b830d932901613ebdb8de04c6f001",
+  "checkpoint": "runs/drone-travel/batched-seed23-20261010/travel-endurance-1860.mpk",
+  "checkpoint_sha256": "0d2d1dc51f527569ca07f70e04763f0dd6327037de32765708373ed25ae95e11",
+  "seed": 23,
+  "selection_update": 1860,
+  "endurance_transitions": 952320,
+  "optimizer_steps": 11184,
+  "selection": {
+    "episodes": [
+      {
+        "final_distance": 0.4129287302494049,
+        "final_heading_error": 0.04769962280988693,
+        "final_speed": 0.007733442820608616,
+        "first_arrival": 1,
+        "reward": 846.1339010596275,
+        "seed": 0,
+        "settled_actions": 585,
+        "steps": 1000,
+        "survived": true
+      },
+      {
+        "final_distance": 0.412477046251297,
+        "final_heading_error": 0.17015911638736725,
+        "final_speed": 0.007347604259848595,
+        "first_arrival": 1,
+        "reward": 846.1610907316208,
+        "seed": 1,
+        "settled_actions": 250,
+        "steps": 1000,
+        "survived": true
+      },
+      {
+        "final_distance": 0.4127825200557709,
+        "final_heading_error": 0.055249981582164764,
+        "final_speed": 0.007571323774755001,
+        "first_arrival": 1,
+        "reward": 858.6870933175087,
+        "seed": 2,
+        "settled_actions": 563,
+        "steps": 1000,
+        "survived": true
+      },
+      {
+        "final_distance": 0.4124312698841095,
+        "final_heading_error": 0.17210696637630463,
+        "final_speed": 0.007369610480964184,
+        "first_arrival": 1,
+        "reward": 848.8169644474983,
+        "seed": 42,
+        "settled_actions": 244,
+        "steps": 1000,
+        "survived": true
+      },
+      {
+        "final_distance": 0.4135397970676422,
+        "final_heading_error": 0.1923174411058426,
+        "final_speed": 0.0076814079657197,
+        "first_arrival": 1,
+        "reward": 871.5627961158752,
+        "seed": 18446744073709551615,
+        "settled_actions": 1000,
+        "steps": 1000,
+        "survived": true
+      }
+    ],
+    "lesson": "travel-endurance",
+    "optimizer_steps": 11184,
+    "passed": true,
+    "update": 1860
+  },
+  "independent_command": {
+    "command": [
+      "/home/sagan/.cache/bevy-gym-quality-validation/travel-batched-seed23-20261010/drone-curriculum",
+      "--lesson",
+      "travel",
+      "--evaluate-held-out",
+      "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/runs/drone-travel/batched-seed23-20261010/travel-endurance-1860.mpk"
+    ],
+    "exit_code": 1,
+    "elapsed_seconds": 4.5028764070011675,
+    "checkpoint_sha256": "0d2d1dc51f527569ca07f70e04763f0dd6327037de32765708373ed25ae95e11"
+  },
+  "held_out": [
+    {
+      "stage": "travel-endurance",
+      "evaluation": "failed",
+      "episodes": 32,
+      "survivors": 32,
+      "maximum_heading_error_rad": 0.5420523881912231,
+      "minimum_settled_actions": 0,
+      "maximum_final_distance_m": 0.41437989473342896,
+      "mean_return": 853.4927929230034
+    },
+    {
+      "stage": "travel-near",
+      "evaluation": "failed",
+      "episodes": 32,
+      "survivors": 32,
+      "maximum_heading_error_rad": 2.951075553894043,
+      "minimum_settled_actions": 0,
+      "maximum_final_distance_m": 0.4199737310409546,
+      "mean_return": 472.05883902748906
+    },
+    {
+      "stage": "travel-far",
+      "evaluation": "failed",
+      "episodes": 32,
+      "survivors": 26,
+      "maximum_heading_error_rad": 2.9129698276519775,
+      "minimum_settled_actions": 0,
+      "maximum_final_distance_m": 8.083636283874512,
+      "mean_return": 315.0281129268826
+    },
+    {
+      "stage": "travel-fast",
+      "evaluation": "failed",
+      "episodes": 32,
+      "survivors": 9,
+      "maximum_heading_error_rad": 2.9339277744293213,
+      "minimum_settled_actions": 0,
+      "maximum_final_distance_m": 7.661970615386963,
+      "mean_return": 116.99555824265778
+    }
+  ],
+  "qualification": "failed; five-root selection passes but held-out endurance fails",
+  "training_stage_transition": "The existing trainer continued into near travel after selection passed, before held-out endurance passed. This is a promotion-enforcement gap. No prerequisite qualification is established; independent evaluation must govern future stage transitions."
+}
