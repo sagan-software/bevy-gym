@@ -51,9 +51,9 @@ Keep a replay of earlier evaluation tasks to detect loss of previously learned s
    Evaluate every rotor separately. Allow yaw rotation where the actuator geometry
    prevents stationary heading; record uncontrollable cases without inventing stability.
 
-The [clearance guide](DRONE_CLEARANCE.md) now provides readonly body-frame range
-observations over the shared collision world. The clearance task, training,
-qualification and scene remain unfinished.
+The [clearance guide](DRONE_CLEARANCE.md) now provides a goal-conditioned environment
+with body-frame ranges over the shared collision world. Geometry curriculum, actor
+encoding, training, qualification and the scene remain unfinished.
 
 The existing sixteen-input damage trainer covers intact hover, a fixed complete
 front-left failure, and scheduled failures. Its seed-7 run failed the fixed failure

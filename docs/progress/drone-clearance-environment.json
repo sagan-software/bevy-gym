@@ -1,0 +1,405 @@
+{
+  "status": "Core clearance environment implemented; geometry curriculum, training, qualification and browser inference unfinished.",
+  "source_base": "b1735fb044438978b1d77e91eb4b3db6ebc30553",
+  "source_patch_sha256": "538e657fc65be9f939a2240a447ca0fa58a9eb0ec32eb6b2371ff916e17c258e",
+  "source_sha256": {
+    "Cargo.toml": "73bd586dc9eaaf739d6a41257156cbc81ab9f9d719f11b8cb8d9b103635599ae",
+    "src/robots/mod.rs": "ccf2e131e910a4445f642de089cc9c9b37160f804517960867a5577925d80d25",
+    "src/robots/travel.rs": "d94e7b9e777c91565ad6c95b9780da7356948fb43bdf06a75b98ef7ae7108a7b",
+    "src/robots/clearance/mod.rs": "4d28d34753a436ca8432ef639f41517881e203d7b181a9052093aa43dd8bc5c6",
+    "src/robots/clearance/environment.rs": "5e02bffcbaccaffa1c827b2a8ae054f115e3f499bf558d1eec5d50754b03546f",
+    "src/robots/clearance/observation.rs": "6c88306182825fd6974a2307d13c743d31013ba46735705c56409ea9c6547afe",
+    "examples/robots/clearance.rs": "a7858097910a2c993182bec7ff01fcaa7460adbf6f0e6ac2cd84be13f9ca1c45",
+    "tests/drone_obstacles.rs": "bef9a23edbd34effdace5a19c1e02efad2b578dfea994d760f85bd46a1ed7d90"
+  },
+  "staged_implementation_sequence": [
+    {
+      "checkpoint": "Runnable guide and public test",
+      "log": "/home/sagan/.cache/bevy-gym-quality-validation/clearance-env-red.log",
+      "result": "E0432: DroneClearance is missing."
+    },
+    {
+      "checkpoint": "Private module tree with skeletal files",
+      "log": "/home/sagan/.cache/bevy-gym-quality-validation/clearance-env-skeleton.log",
+      "result": "E0432 remains; no behavior added."
+    },
+    {
+      "checkpoint": "Public types, signatures and re-exports",
+      "log": "/home/sagan/.cache/bevy-gym-quality-validation/clearance-env-signatures.log",
+      "result": "Imports compile; skeletal constructor panics."
+    },
+    {
+      "checkpoint": "Behavior through public Env seam",
+      "log": "/home/sagan/.cache/bevy-gym-quality-validation/clearance-env-green.log",
+      "result": "Empty geometry reproduces travel exactly."
+    },
+    {
+      "checkpoint": "Additional public boundaries and private invariant",
+      "logs": [
+        "/home/sagan/.cache/bevy-gym-quality-validation/clearance-env-boundaries.log",
+        "/home/sagan/.cache/bevy-gym-quality-validation/clearance-env-private-invariant.log"
+      ],
+      "result": "Two public tests and one private invariant pass."
+    }
+  ],
+  "invariants": {
+    "legal_lifecycle": [
+      "Flying",
+      "Ended"
+    ],
+    "reset_profile": "Disturbed, retained from shared physics across resets.",
+    "validated_ingress": [
+      "DroneDestination",
+      "DroneObstacle",
+      "DroneAction"
+    ],
+    "derived_values": "Destination/body/ranges are read from one owned travel task. No separate cached task or sensor state.",
+    "failure_categories": "Existing typed ingress errors remain unchanged. Contact is termination; no actions are generated after it. Private solver invariant failures remain diagnostic panics.",
+    "capability_audit": {
+      "public_construction": "new accepts only validated destination and static boxes.",
+      "public_observation": "travel and ranges return immutable typed snapshots. Snapshot fields are private.",
+      "public_operations": [
+        "Env::reset",
+        "Env::step with validated four-motor action"
+      ],
+      "raw_resource_paths": "No public transport, world, body, into_inner, mutable accessor or unchecked snapshot constructor.",
+      "compile_fail_cases": [
+        "Accessing the owned travel task",
+        "Constructing a mixed snapshot through private fields"
+      ]
+    },
+    "complexity": "Six range rays over N colliders take O(N) time and O(1) auxiliary space. Immutable geometry takes O(N) retained space. No measured allocation claim."
+  },
+  "contract": {
+    "task": "Fixed validated world position in metres and normalized horizontal heading.",
+    "reset": "Same seed-zero construction and disturbed distributions as DroneTravel; geometry and destination retained.",
+    "reward": "Exactly DroneTravel upright * heading alignment / (1 + distance_squared / 1 square metre); terminated reward zero.",
+    "actions": "Only caller-supplied validated four-motor fractions; same 20 ms physical command interval.",
+    "sensors": "Existing six body-centred solid rays with optional inclusive-ten-metre hits; no swept-body-clearance claim.",
+    "snapshot": "Task, body and ranges from unchanged physical state; copies retain values after reset or actions.",
+    "geometry": "Static validated boxes may overlap body or goal. Feasible geometry is caller policy; no planner or route is supplied.",
+    "local_profile_sources": [
+      "src/robots/travel.rs",
+      "src/robots/hover.rs",
+      "docs/DRONE_CLEARANCE.md"
+    ]
+  },
+  "public_cases": {
+    "empty_geometry": "Seed-zero construction, resets 42/MAX and two unseeded resets, four isolated action fixtures at 100 actions each: travel observation, physical body, range snapshot, reward bits and status match existing control environments.",
+    "nonempty_geometry": "One-metre platform survives resets 42/MAX and two unseeded resets; fixed destination retained; Down range in 0.8..1.3 metres.",
+    "termination": "First contact above floor within 100 actions; zero reward; ten repeated terminal actions preserve body, task, ranges and status.",
+    "private_invariant": "Only a private test replaces the entire owning travel task; new reads use replacement goal and geometry, retained copy preserves original destination."
+  },
+  "native": [
+    {
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "log": "/home/sagan/.cache/bevy-gym-quality-validation/clearance-env-native-0.log"
+    },
+    {
+      "command": [
+        "cargo",
+        "test"
+      ],
+      "exit_code": 0,
+      "log": "/home/sagan/.cache/bevy-gym-quality-validation/clearance-env-native-1.log"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--no-default-features",
+        "--features",
+        "robots",
+        "--lib",
+        "--test",
+        "drone_obstacles",
+        "--test",
+        "drone_hover",
+        "--test",
+        "drone_travel"
+      ],
+      "exit_code": 0,
+      "log": "/home/sagan/.cache/bevy-gym-quality-validation/clearance-env-native-2.log"
+    },
+    {
+      "command": [
+        "cargo",
+        "clippy",
+        "--all-targets",
+        "--all-features",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "log": "/home/sagan/.cache/bevy-gym-quality-validation/clearance-env-native-3.log"
+    }
+  ],
+  "browser": {
+    "command": "nix run .#drone-browser-check",
+    "exit_code": 0,
+    "passed": 238,
+    "suites": 25,
+    "log": "/home/sagan/.cache/bevy-gym-quality-validation/clearance-env-browser.log",
+    "log_sha256": "b1510c5f27786817d7b38d6fd5397a2fabbac630f348ad4264749ccc59650d96",
+    "visual": "No UI changed. No trained clearance scene or policy-action parity evidence exists."
+  },
+  "personal_rust": {
+    "exit_code": 0,
+    "clippy_exit": 0,
+    "dylint_exit": 0,
+    "changed_line_diagnostics": 0,
+    "log": "/home/sagan/.cache/bevy-gym-quality-validation/clearance-env-personal-final.log",
+    "scope": "All targets/features, including newly staged source files, relative to HEAD. Existing diagnostic backlog permitted; changed-line warnings remain failures."
+  },
+  "coverage": {
+    "report": "/home/sagan/.cache/bevy-gym-quality-validation/clearance-env-coverage-complete.json",
+    "report_sha256": "686e12a1f964bf40c634553c1bcdc4525fc9e6773696269cd121f8a4fefa1cab",
+    "commands": [
+      "cargo llvm-cov --no-clean --branch --no-default-features --features robots --lib --test drone_obstacles --test drone_travel --json --output-path /home/sagan/.cache/bevy-gym-quality-validation/clearance-env-coverage.json --disable-default-ignore-filename-regex",
+      "cargo llvm-cov run --no-clean --branch --no-default-features --features robots --example drone-clearance --json --output-path /home/sagan/.cache/bevy-gym-quality-validation/clearance-env-coverage-complete.json --disable-default-ignore-filename-regex"
+    ],
+    "exit_codes": [
+      0,
+      0
+    ],
+    "file_summaries_including_private_test": {
+      "examples/robots/clearance.rs": {
+        "branches": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0.0
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0.0
+        },
+        "functions": {
+          "count": 1,
+          "covered": 1,
+          "percent": 100.0
+        },
+        "instantiations": {
+          "count": 1,
+          "covered": 1,
+          "percent": 100.0
+        },
+        "lines": {
+          "count": 18,
+          "covered": 18,
+          "percent": 100.0
+        },
+        "regions": {
+          "count": 30,
+          "covered": 30,
+          "notcovered": 0,
+          "percent": 100.0
+        }
+      },
+      "src/robots/clearance/environment.rs": {
+        "branches": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0.0
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0.0
+        },
+        "functions": {
+          "count": 5,
+          "covered": 5,
+          "percent": 100.0
+        },
+        "instantiations": {
+          "count": 11,
+          "covered": 9,
+          "percent": 81.81818181818183
+        },
+        "lines": {
+          "count": 48,
+          "covered": 48,
+          "percent": 100.0
+        },
+        "regions": {
+          "count": 80,
+          "covered": 80,
+          "notcovered": 0,
+          "percent": 100.0
+        }
+      },
+      "src/robots/clearance/observation.rs": {
+        "branches": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0.0
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0.0
+        },
+        "functions": {
+          "count": 2,
+          "covered": 2,
+          "percent": 100.0
+        },
+        "instantiations": {
+          "count": 4,
+          "covered": 4,
+          "percent": 100.0
+        },
+        "lines": {
+          "count": 6,
+          "covered": 6,
+          "percent": 100.0
+        },
+        "regions": {
+          "count": 6,
+          "covered": 6,
+          "notcovered": 0,
+          "percent": 100.0
+        }
+      }
+    },
+    "new_private_travel_helpers_all_regions_hit": true,
+    "gaps": [
+      "Two unused linked Env::reset and Env::step copies have zero hits; each method executes in public integration tests. Every new function definition and region is hit.",
+      "Facade exports, derives and declarations have no executable counts.",
+      "Existing private range-solver invariant panic remains unhit; public callers cannot inject malformed solver output."
+    ],
+    "production_branches_added": 0
+  },
+  "remaining": [
+    "Geometry curriculum for narrowed openings, wall braking and cover layouts",
+    "Actor encoding, compatible transfer and frozen qualification gates",
+    "Qualified travel parent and clearance RL training",
+    "Independent held-out clearance qualification",
+    "Frozen browser clearance inference and recordings",
+    "Standing qualification, later lessons and shared 3v3 inference"
+  ],
+  "documentation": {
+    "rumdl": {
+      "exit_code": 0,
+      "paths": [
+        "docs/DRONE_CLEARANCE.md",
+        "docs/ROBOT_SKILL_CURRICULUM.md",
+        "docs/EXAMPLE_STATUS.md"
+      ]
+    },
+    "personal_markdown": {
+      "exit_code": 1,
+      "new_diagnostics": 0,
+      "unchanged_paragraph_diagnostics": [
+        {
+          "path": "docs/EXAMPLE_STATUS.md",
+          "line": 493,
+          "unchanged_in_HEAD": true
+        },
+        {
+          "path": "docs/EXAMPLE_STATUS.md",
+          "line": 606,
+          "unchanged_in_HEAD": true
+        },
+        {
+          "path": "docs/EXAMPLE_STATUS.md",
+          "line": 628,
+          "unchanged_in_HEAD": true
+        },
+        {
+          "path": "docs/EXAMPLE_STATUS.md",
+          "line": 642,
+          "unchanged_in_HEAD": true
+        },
+        {
+          "path": "docs/EXAMPLE_STATUS.md",
+          "line": 669,
+          "unchanged_in_HEAD": true
+        },
+        {
+          "path": "docs/EXAMPLE_STATUS.md",
+          "line": 685,
+          "unchanged_in_HEAD": true
+        },
+        {
+          "path": "docs/EXAMPLE_STATUS.md",
+          "line": 695,
+          "unchanged_in_HEAD": true
+        },
+        {
+          "path": "docs/EXAMPLE_STATUS.md",
+          "line": 702,
+          "unchanged_in_HEAD": true
+        },
+        {
+          "path": "docs/EXAMPLE_STATUS.md",
+          "line": 764,
+          "unchanged_in_HEAD": true
+        },
+        {
+          "path": "docs/ROBOT_SKILL_CURRICULUM.md",
+          "line": 3,
+          "unchanged_in_HEAD": true
+        }
+      ]
+    },
+    "final_commands": [
+      {
+        "command": [
+          "cargo",
+          "run",
+          "--no-default-features",
+          "--features",
+          "robots",
+          "--example",
+          "drone-clearance"
+        ],
+        "exit_code": 0,
+        "log": "/home/sagan/.cache/bevy-gym-quality-validation/clearance-env-final-docs-0.log"
+      },
+      {
+        "command": [
+          "cargo",
+          "test",
+          "--no-default-features",
+          "--features",
+          "robots",
+          "--doc"
+        ],
+        "exit_code": 0,
+        "log": "/home/sagan/.cache/bevy-gym-quality-validation/clearance-env-final-docs-1.log"
+      },
+      {
+        "command": [
+          "cargo",
+          "fmt",
+          "--all",
+          "--",
+          "--check"
+        ],
+        "exit_code": 0,
+        "log": "/home/sagan/.cache/bevy-gym-quality-validation/clearance-env-final-docs-2.log"
+      }
+    ],
+    "doctests": {
+      "passed": 16,
+      "ignored": 1,
+      "new_private_boundary_cases_passed": 2
+    }
+  }
+}

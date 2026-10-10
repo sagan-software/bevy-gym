@@ -2,7 +2,9 @@
 
 use bevy::math::Vec3;
 
-use super::{DroneAction, DroneDestination, DroneHover, DroneTravelObservation};
+use super::{
+    DroneAction, DroneDestination, DroneHover, DroneObstacle, DroneRanges, DroneTravelObservation,
+};
 use crate::{Env, Reset, Step};
 
 /// Reach a fixed position and heading through four validated motor commands.
@@ -38,6 +40,22 @@ pub struct DroneTravel {
 }
 
 impl DroneTravel {
+    /// Compose clearance geometry without exposing mutable physics to public callers.
+    pub(super) fn with_obstacles(
+        destination: DroneDestination,
+        obstacles: impl IntoIterator<Item = DroneObstacle>,
+    ) -> Self {
+        Self {
+            body: DroneHover::disturbed_with_obstacles(obstacles),
+            destination,
+        }
+    }
+
+    /// Read local ranges from the same private body used for travel observations.
+    pub(super) fn ranges(&self) -> DroneRanges {
+        self.body.ranges()
+    }
+
     /// Start a disturbed episode at seed zero with the supplied destination.
     #[must_use]
     pub fn new(destination: DroneDestination) -> Self {

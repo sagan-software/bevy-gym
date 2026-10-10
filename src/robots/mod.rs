@@ -1,6 +1,7 @@
 //! Rigid-body drone lessons for native and browser simulations.
 
 mod action;
+mod clearance;
 mod destination;
 mod droid;
 mod episode_ended;
@@ -15,6 +16,7 @@ mod travel;
 mod travel_observation;
 
 pub use action::{DroneAction, InvalidDroneAction};
+pub use clearance::{DroneClearance, DroneClearanceObservation};
 pub use episode_ended::DroneEpisodeEnded;
 pub use hover::DroneHover;
 pub use impulse::{DroneImpulse, DroneImpulseRejected, InvalidDroneImpulse};

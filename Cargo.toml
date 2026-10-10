@@ -613,3 +613,8 @@ required-features = ["robots", "render-core"]
 name = "drone-ranges"
 path = "examples/robots/ranges.rs"
 required-features = ["robots"]
+
+[[example]]
+name = "drone-clearance"
+path = "examples/robots/clearance.rs"
+required-features = ["robots"]

@@ -4,6 +4,25 @@ Updated: 2026-10-10. Current work: RL-only drone/droid curriculum.
 
 ## Resume here
 
+### Clearance combines travel tasks and local collision ranges, 2026-10-10
+
+`DroneClearance` now pairs body, destination and six local ranges in one snapshot.
+It reuses disturbed travel physics and rewards and retains collision boxes on reset.
+Contact freezes the complete terminal snapshot. Its independently runnable example
+prints observations without issuing agent actions.
+
+The [guide](DRONE_CLEARANCE.md) and [record](progress/drone-clearance-environment.json)
+preserve construction, reset streams, contact cases, staged implementation and coverage.
+All 238 browser tests, default native tests and 131 focused robot tests pass.
+Formatting, strict Clippy and changed-line personal Rust lint pass.
+Every new function definition and region executes; two unused linked reset/step
+copies remain unhit. No clearance policy, learned avoidance or browser scene is claimed.
+
+Standing and both gated travel jobs continue with unchanged promotion gates.
+Next: define the actor encoding and gradual opening, braking and cover tasks, then
+freeze qualification cases before clearance training. Standing and full travel
+remain unqualified. Later skills, competitive training and shared browser 3v3 remain unfinished.
+
 ### Disturbed flight retains obstacle geometry, 2026-10-10
 
 `DroneHover::disturbed_with_obstacles` combines the existing recovery distribution

@@ -416,3 +416,100 @@ fn assert_platform_contact_is_absorbing(drone: &mut DroneHover) {
     assert_eq!(repeated.status, contact.status);
     assert_eq!(drone.ranges(), frozen_ranges);
 }
+
+/// Clearance adds sensor snapshots while retaining travel's physical and reward contract.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn clearance_empty_geometry_preserves_travel_and_reset_streams() {
+    use bevy::math::Vec2;
+    use bevy_gym::robots::{DroneClearance, DroneDestination, DroneTravel};
+    let destination = DroneDestination::try_from((Vec3::new(1.0, 2.0, -1.0), Vec2::NEG_Y))
+        .expect("valid task destination");
+    let mut clearance = DroneClearance::new(destination, []);
+    let mut travel = DroneTravel::new(destination);
+    let mut body = DroneHover::disturbed();
+    assert_eq!(clearance.observation().travel(), travel.observation());
+    assert_eq!(clearance.observation().ranges(), body.ranges());
+    for seed in [Some(42), Some(u64::MAX), None, None] {
+        let actual = clearance.reset(seed).observation;
+        assert_eq!(actual.travel(), travel.reset(seed).observation);
+        assert_eq!(actual.travel().body(), body.reset(seed).observation);
+        assert_eq!(actual.ranges(), body.ranges());
+        for fractions in [[0.5; 4], [0.6; 4], [0.55, 0.45, 0.45, 0.55], [0.0; 4]] {
+            let command = DroneAction::try_from(fractions).expect("isolated actuator fixture");
+            for _ in 0..100 {
+                let expected = travel.step(command);
+                let physical = body.step(command);
+                let actual = clearance.step(command);
+                assert_eq!(actual.observation.travel(), expected.observation);
+                assert_eq!(actual.observation.travel().body(), physical.observation);
+                assert_eq!(actual.observation.ranges(), body.ranges());
+                assert_eq!(actual.reward.to_bits(), expected.reward.to_bits());
+                assert_eq!(actual.status, expected.status);
+                assert_eq!(clearance.observation(), actual.observation);
+            }
+        }
+    }
+}
+
+/// Clearance observes retained collision geometry and freezes its terminal snapshot.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn clearance_obstacles_and_destination_survive_reset_and_contact() {
+    use bevy::math::Vec2;
+    use bevy_gym::robots::{DroneClearance, DroneDestination, DroneRangeDirection};
+    let destination =
+        DroneDestination::try_from((Vec3::new(1.0, 2.0, -1.0), Vec2::X)).expect("valid fixed task");
+    let platform = DroneObstacle::try_from((
+        Vec3::new(0.0, 0.9, 0.0),
+        Vec3::new(3.0, 0.1, 3.0),
+        Quat::IDENTITY,
+    ))
+    .expect("one-metre platform");
+    let mut environment = DroneClearance::new(destination, [platform]);
+    for seed in [Some(42), Some(u64::MAX), None, None] {
+        let start = environment.reset(seed).observation;
+        assert_eq!(start.travel().destination(), destination);
+        let down = start
+            .ranges()
+            .distance(DroneRangeDirection::Down)
+            .expect("platform");
+        assert!((0.8..1.3).contains(&down.metres()));
+        assert_clearance_contact_is_absorbing(&mut environment, start);
+        assert_eq!(
+            start.travel().destination(),
+            destination,
+            "retained snapshot"
+        );
+    }
+}
+
+/// Validate the first terminal contact and repeated reads through the public clearance seam.
+fn assert_clearance_contact_is_absorbing(
+    environment: &mut bevy_gym::robots::DroneClearance,
+    start: bevy_gym::robots::DroneClearanceObservation,
+) {
+    let off = DroneAction::try_from([0.0; 4]).expect("isolated actuator fixture");
+    let contact = (0..100)
+        .map(|_| environment.step(off))
+        .find(bevy_gym::Step::is_done)
+        .expect("platform contact within two seconds");
+    assert_eq!(contact.status, EpisodeStatus::Terminated);
+    assert_eq!(contact.reward.to_bits(), 0.0_f64.to_bits());
+    assert!(contact.observation.travel().body().position().y > 1.0);
+    assert_eq!(
+        contact.observation.travel().destination(),
+        start.travel().destination()
+    );
+    assert_ne!(
+        contact.observation, start,
+        "physical action advanced the body"
+    );
+    for _ in 0..10 {
+        let repeated = environment.step(off);
+        assert_eq!(repeated.observation, contact.observation);
+        assert_eq!(repeated.reward.to_bits(), contact.reward.to_bits());
+        assert_eq!(repeated.status, contact.status);
+        assert_eq!(environment.observation(), contact.observation);
+    }
+}
