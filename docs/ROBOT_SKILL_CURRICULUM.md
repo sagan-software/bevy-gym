@@ -51,6 +51,10 @@ Keep a replay of earlier evaluation tasks to detect loss of previously learned s
    Evaluate every rotor separately. Allow yaw rotation where the actuator geometry
    prevents stationary heading; record uncontrollable cases without inventing stability.
 
+The [clearance guide](DRONE_CLEARANCE.md) now provides readonly body-frame range
+observations over the shared collision world. The clearance task, training,
+qualification and scene remain unfinished.
+
 The existing sixteen-input damage trainer covers intact hover, a fixed complete
 front-left failure, and scheduled failures. Its seed-7 run failed the fixed failure
 lesson. That is not a qualified implementation of the graded-damage curriculum above.
@@ -74,10 +78,12 @@ lesson. That is not a qualified implementation of the graded-damage curriculum a
 
 Current death ragdolls are useful integration evidence but do not implement living
 joint control. Authored locomotion playback cannot satisfy any droid locomotion gate.
+
 No droid lesson above is qualified. The [standing guide](DROID_STANDING.md) now provides
 a thirteen-segment, twenty-six-actuator environment, PPO training and frozen evaluation.
 The retained seed-7 trial uses fixed gates; its first selection failed. Qualification
-and the physical mannequin scene remain unfinished.
+remains unfinished. The physical mannequin scene runs frozen inference with an
+unqualified candidate.
 
 ## Shared competition
 

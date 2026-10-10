@@ -608,3 +608,8 @@ required-features = ["robots"]
 name = "droid-standing-scene"
 path = "examples/robots/standing_viewer.rs"
 required-features = ["robots", "render-core"]
+
+[[example]]
+name = "drone-ranges"
+path = "examples/robots/ranges.rs"
+required-features = ["robots"]

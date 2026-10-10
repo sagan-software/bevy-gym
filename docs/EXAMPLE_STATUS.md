@@ -4,6 +4,25 @@ Updated: 2026-10-10. Current work: RL-only drone/droid curriculum.
 
 ## Resume here
 
+### Readonly range observations for clearance, 2026-10-10
+
+`DroneHover::ranges()` now measures six body-frame rays through current solid geometry.
+It excludes the drone collider and sensor volumes, includes the floor, and caps
+readings at ten metres. A miss differs from an inclusive-limit hit; solid origin
+overlap reports zero. Reads preserve physical steps, reset streams and terminal state.
+The [guide](DRONE_CLEARANCE.md) and [evidence](progress/drone-ranges.json) record the contract.
+
+All 234 browser tests, native default tests and 126 focused robot tests pass.
+Formatting, strict Clippy and changed-line personal Rust lint pass. Every instrumented
+line, function and branch in the range modules and runnable example executes.
+The private solver-invariant panic remains unhit; enum and constant data are uninstrumented.
+The public API keeps the solver and sensor arrays private.
+
+The previous milestone's [CI](https://github.com/sagan-software/bevy-gym/actions/runs/38051688098)
+passed. Its browser-preview deployment is still running at this record.
+Standing and gated travel training continue. Clearance training and its scene remain
+unfinished; travel qualification and the later curriculum still precede browser 3v3.
+
 ### Endurance passes held-out evaluation; standing browser refreshed, 2026-10-10
 
 Seed 29 passed endurance selection and separate-process validation at update 6,860,

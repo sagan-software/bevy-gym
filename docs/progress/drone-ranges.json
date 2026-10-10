@@ -1,0 +1,276 @@
+{
+  "recorded_utc": "2026-10-10T12:41:23.312064+00:00",
+  "source_base": "700e7efa7535254edc16036e6bef03ef88192dae",
+  "source_patch_sha256": "4e545a47c456017a964e719b051558b89e005b2d7353c31d7e7ca9fc7c645f7e",
+  "source_sha256": {
+    "Cargo.toml": "e9c1ba5bad198a3bb9f71d581b1da6a2ae1db154010e42fcb79b54abb545a228",
+    "examples/robots/ranges.rs": "4d9999a20ae851a84280f2731990e0aae57f6926a5e02f1a0d58c6510ee4068e",
+    "src/robots/hover.rs": "e91bf0079089c2d5540f175fd53374860999961624154fa42de118e6009160cb",
+    "src/robots/mod.rs": "2200b461ca1939d76fa0a77ec15b61bfffce0f9a5cea28336560445d323345e6",
+    "tests/drone_obstacles.rs": "3f71a9cf2ac39915dfc542595e69e49f5ddb181c7ea318525f23f3c45d37ec20",
+    "src/robots/ranges/direction.rs": "7e37a7df320e5b1c001b6c19063561cf3507f90ed8b23072907ba321ccdb0260",
+    "src/robots/ranges/distance.rs": "63a2ca8a872277a73f2204ff5e67e5a67db4a1f96ea5050b8b0a2ee0c48ab6be",
+    "src/robots/ranges/mod.rs": "0a9861367e85d6618b4f83c541213256fa48aa0846e4ddacbfc3e38f320dd4b0",
+    "src/robots/ranges/observation.rs": "3707052121356033175723cefa1a797de3f36f6adba6b041415a895ea8b09cb5"
+  },
+  "status": "Readonly sensor contract implemented. Clearance environment, RL training, frozen inference and qualification remain unfinished.",
+  "profile": {
+    "directions": [
+      "Forward (-Z)",
+      "Back (+Z)",
+      "Left (-X)",
+      "Right (+X)",
+      "Up (+Y)",
+      "Down (-Y)"
+    ],
+    "origin": "Physical body centre in metres. Directions rotate with body orientation and are normalized.",
+    "maximum_metres": 10,
+    "no_hit": "None",
+    "hit": "Some(DroneRangeDistance), including zero for solid overlap and ten metres for an inclusive-limit hit.",
+    "filters": "Exclude own collider and sensor volumes. Include the floor and other solid geometry.",
+    "numeric_input": "TryFrom<f32>; reject nonfinite before finite [0,10] checks. Preserve accepted bits including negative zero.",
+    "actions": "Sensor reads never issue commands, advance physics or consume RNG.",
+    "complexity": "O(N) time for six rays over N colliders; O(1) auxiliary space. No allocation measurement is claimed.",
+    "sources": [
+      "https://docs.rs/parry3d/0.31.1/parry3d/query/trait.RayCast.html#method.cast_ray",
+      "https://docs.rs/rapier3d/0.36.0/rapier3d/pipeline/struct.PhysicsWorld.html"
+    ]
+  },
+  "red": {
+    "command": "cargo test --no-default-features --features robots --test drone_obstacles ranges_read_current_geometry_without_advancing_physics",
+    "exit_code": 101,
+    "cause": "Missing DroneRangeDirection and DroneHover::ranges.",
+    "log_sha256": "1d66c84159160b75c45b23c76979a891cacb194cff5f3db8f3a39cbf6b7d6943"
+  },
+  "native_gates": [
+    {
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "log": "/home/sagan/.cache/bevy-gym-quality-validation/drone-ranges-native-final-0.log"
+    },
+    {
+      "command": [
+        "cargo",
+        "test"
+      ],
+      "exit_code": 0,
+      "log": "/home/sagan/.cache/bevy-gym-quality-validation/drone-ranges-native-final-1.log"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--no-default-features",
+        "--features",
+        "robots",
+        "--lib",
+        "--test",
+        "drone_obstacles",
+        "--test",
+        "drone_hover",
+        "--test",
+        "drone_travel"
+      ],
+      "exit_code": 0,
+      "log": "/home/sagan/.cache/bevy-gym-quality-validation/drone-ranges-native-final-2.log"
+    },
+    {
+      "command": [
+        "cargo",
+        "clippy",
+        "--all-targets",
+        "--all-features",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "log": "/home/sagan/.cache/bevy-gym-quality-validation/drone-ranges-native-final-3.log"
+    }
+  ],
+  "browser": {
+    "command": "nix run .#drone-browser-check",
+    "exit_code": 0,
+    "passed": 234,
+    "log_sha256": "3e2db16894f7349bc15274bd10e1eec0f3b6633ae99a9c15cc7f964074c807e6"
+  },
+  "personal_rust": {
+    "exit_code": 0,
+    "changed_line_diagnostics": 0,
+    "clippy_exit": 0,
+    "dylint_exit": 0,
+    "mode": "Existing diagnostic backlog permitted; changed-line diagnostics remain failures.",
+    "log": "/home/sagan/.cache/bevy-gym-quality-validation/drone-ranges-personal-final.log"
+  },
+  "coverage": {
+    "report": "/home/sagan/.cache/bevy-gym-quality-validation/drone-ranges-coverage-complete.json",
+    "report_sha256": "21ca343c36d1ff43a588a44d181e49612fa1c5ea8bafbd518a43a0f2c804fbcb",
+    "file_summaries_including_tests": {
+      "examples/robots/ranges.rs": {
+        "branches": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0.0
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0.0
+        },
+        "functions": {
+          "count": 1,
+          "covered": 1,
+          "percent": 100.0
+        },
+        "instantiations": {
+          "count": 1,
+          "covered": 1,
+          "percent": 100.0
+        },
+        "lines": {
+          "count": 8,
+          "covered": 8,
+          "percent": 100.0
+        },
+        "regions": {
+          "count": 12,
+          "covered": 12,
+          "notcovered": 0,
+          "percent": 100.0
+        }
+      },
+      "src/robots/ranges/direction.rs": {
+        "branches": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0.0
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0.0
+        },
+        "functions": {
+          "count": 1,
+          "covered": 1,
+          "percent": 100.0
+        },
+        "instantiations": {
+          "count": 2,
+          "covered": 2,
+          "percent": 100.0
+        },
+        "lines": {
+          "count": 9,
+          "covered": 9,
+          "percent": 100.0
+        },
+        "regions": {
+          "count": 9,
+          "covered": 9,
+          "notcovered": 0,
+          "percent": 100.0
+        }
+      },
+      "src/robots/ranges/distance.rs": {
+        "branches": {
+          "count": 4,
+          "covered": 4,
+          "notcovered": 0,
+          "percent": 100.0
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0.0
+        },
+        "functions": {
+          "count": 3,
+          "covered": 3,
+          "percent": 100.0
+        },
+        "instantiations": {
+          "count": 6,
+          "covered": 5,
+          "percent": 83.33333333333334
+        },
+        "lines": {
+          "count": 17,
+          "covered": 17,
+          "percent": 100.0
+        },
+        "regions": {
+          "count": 20,
+          "covered": 20,
+          "notcovered": 0,
+          "percent": 100.0
+        }
+      },
+      "src/robots/ranges/observation.rs": {
+        "branches": {
+          "count": 2,
+          "covered": 2,
+          "notcovered": 0,
+          "percent": 100.0
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0.0
+        },
+        "functions": {
+          "count": 7,
+          "covered": 7,
+          "percent": 100.0
+        },
+        "instantiations": {
+          "count": 13,
+          "covered": 13,
+          "percent": 100.0
+        },
+        "lines": {
+          "count": 69,
+          "covered": 69,
+          "percent": 100.0
+        },
+        "regions": {
+          "count": 120,
+          "covered": 120,
+          "notcovered": 0,
+          "percent": 100.0
+        }
+      }
+    },
+    "hover_ranges_calls": 1293,
+    "unhit_path": {
+      "source": "src/robots/ranges/observation.rs:70",
+      "path": "expect failure on malformed private solver output",
+      "reason": "No public construction or mutation path can inject an invalid solver hit. Public distance-validation failures are directly tested. This panic is not an instrumented source branch."
+    },
+    "unmeasured": "Enum declarations and associated constant data have no instrumented executable lines. Duplicate compiled instantiations are not all executed."
+  },
+  "verification": [
+    "Nearest solid wins over farther geometry.",
+    "Read before the first physical step includes the floor.",
+    "Own collider and sensor volumes do not appear as solids.",
+    "Body yaw rotates the physical sensor rays.",
+    "Solid overlap reports zero.",
+    "A hit at exactly ten metres differs from a ray beyond the limit.",
+    "NaN, both infinities, negative finite values and values above ten metres are rejected.",
+    "Positive and negative zero, minimum positive subnormal, 1.5 and ten metres are accepted.",
+    "Read operations preserve repeated snapshots, seeded/unseeded reset streams, physical steps and terminal observations."
+  ],
+  "gui": "No UI change in this milestone. Browser sensor tests execute through the shared environment; clearance scene is not implemented."
+}

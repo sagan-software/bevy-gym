@@ -10,6 +10,7 @@ mod motor;
 mod motor_state;
 mod observation;
 mod obstacle;
+mod ranges;
 mod travel;
 mod travel_observation;
 
@@ -30,3 +31,5 @@ pub use droid::{
     DroidAction, DroidActuator, DroidBody, DroidBodyState, DroidObservation, DroidStanding,
     InvalidDroidAction,
 };
+
+pub use ranges::{DroneRangeDirection, DroneRangeDistance, DroneRanges, InvalidDroneRangeDistance};

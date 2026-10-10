@@ -174,3 +174,146 @@ fn validation_errors_explain_the_field_without_an_error_source() {
         assert!(error.source().is_none());
     }
 }
+
+/// Range reads include the floor, exclude the drone and return the closest solid face.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn ranges_read_current_geometry_without_advancing_physics() {
+    use bevy_gym::robots::DroneRangeDirection;
+    let walls = [2.0, 4.0].map(|x| {
+        DroneObstacle::try_from((Vec3::new(x, 2.0, 0.0), Vec3::splat(0.5), Quat::IDENTITY))
+            .expect("fixed wall")
+    });
+    let drone = DroneHover::with_obstacles(walls);
+    let before = drone.observation();
+    let ranges = drone.ranges();
+    let right = ranges
+        .distance(DroneRangeDirection::Right)
+        .expect("near wall");
+    let down = ranges.distance(DroneRangeDirection::Down).expect("floor");
+    assert!((right.metres() - 1.5).abs() < 0.000_01);
+    assert!((down.metres() - 2.0).abs() < 0.000_01);
+    for direction in [
+        DroneRangeDirection::Forward,
+        DroneRangeDirection::Back,
+        DroneRangeDirection::Left,
+        DroneRangeDirection::Up,
+    ] {
+        assert!(
+            ranges.distance(direction).is_none(),
+            "unobstructed {direction:?}"
+        );
+    }
+    assert_eq!(drone.observation(), before, "readonly range query");
+    assert_eq!(drone.ranges(), ranges, "repeated reads are stable");
+}
+
+/// Distance construction rejects malformed values before the finite range bounds.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn range_distances_validate_each_numeric_boundary() {
+    use bevy_gym::robots::{DroneRangeDistance, InvalidDroneRangeDistance};
+    for value in [f32::NAN, f32::INFINITY, f32::NEG_INFINITY] {
+        assert_eq!(
+            DroneRangeDistance::try_from(value),
+            Err(InvalidDroneRangeDistance::NonFinite)
+        );
+    }
+    for value in [
+        -1.0,
+        -f32::from_bits(1),
+        f32::from_bits(10.0_f32.to_bits() + 1),
+        f32::MAX,
+    ] {
+        assert_eq!(
+            DroneRangeDistance::try_from(value),
+            Err(InvalidDroneRangeDistance::OutOfRange)
+        );
+    }
+    for value in [-0.0_f32, 0.0, f32::from_bits(1), 1.5, 10.0] {
+        let distance = DroneRangeDistance::try_from(value).expect("valid metres");
+        assert_eq!(distance.metres().to_bits(), value.to_bits());
+    }
+    assert_eq!(
+        DroneRangeDistance::MAX.metres().to_bits(),
+        10.0_f32.to_bits()
+    );
+    assert_eq!(
+        InvalidDroneRangeDistance::NonFinite.to_string(),
+        "Range distance must be finite."
+    );
+    assert_eq!(
+        InvalidDroneRangeDistance::OutOfRange.to_string(),
+        "Range distance must be in [0, 10] metres."
+    );
+    let error: &dyn std::error::Error = &InvalidDroneRangeDistance::OutOfRange;
+    assert!(error.source().is_none());
+}
+
+/// Solid origin overlap is zero; a ten-metre hit is distinct from a missed ray.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn ranges_preserve_overlap_and_inclusive_limit() {
+    use bevy_gym::robots::DroneRangeDirection;
+    let wall = |centre_x| {
+        DroneObstacle::try_from((
+            Vec3::new(centre_x, 2.0, 0.0),
+            Vec3::splat(0.5),
+            Quat::IDENTITY,
+        ))
+        .expect("valid fixed box")
+    };
+    let at_limit = DroneHover::with_obstacles([wall(10.5)]);
+    let distance = at_limit
+        .ranges()
+        .distance(DroneRangeDirection::Right)
+        .expect("inclusive hit");
+    assert_eq!(distance.metres().to_bits(), 10.0_f32.to_bits());
+    let beyond = DroneHover::with_obstacles([wall(f32::from_bits(10.5_f32.to_bits() + 1))]);
+    assert!(beyond
+        .ranges()
+        .distance(DroneRangeDirection::Right)
+        .is_none());
+    let inside = DroneHover::with_obstacles([wall(0.0)]);
+    for direction in DroneRangeDirection::ALL {
+        let distance = inside
+            .ranges()
+            .distance(direction)
+            .expect("solid origin overlap");
+        assert_eq!(distance.metres().to_bits(), 0.0_f32.to_bits());
+    }
+}
+
+/// Sensor reads preserve seeded and unseeded resets, physical steps and terminal snapshots.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn ranges_preserve_trajectories_and_reset_streams() {
+    let mut observed = DroneHover::default();
+    let mut control = DroneHover::default();
+    let off = DroneAction::try_from([0.0; 4]).expect("isolated test actuator fixture");
+    for seed in [Some(42), None, None] {
+        for _ in 0..10 {
+            let _snapshot = observed.ranges();
+        }
+        assert_eq!(
+            observed.reset(seed).observation,
+            control.reset(seed).observation
+        );
+        for _ in 0..100 {
+            let _snapshot = observed.ranges();
+            let before = observed.observation();
+            let _again = observed.ranges();
+            assert_eq!(observed.observation(), before);
+            let measured = observed.step(off);
+            let expected = control.step(off);
+            assert_eq!(measured.observation, expected.observation);
+            assert_eq!(measured.reward.to_bits(), expected.reward.to_bits());
+            assert_eq!(measured.status, expected.status);
+        }
+        let before = observed.observation();
+        let terminal = observed.ranges();
+        observed.step(off);
+        assert_eq!(observed.ranges(), terminal);
+        assert_eq!(observed.observation(), before);
+    }
+}

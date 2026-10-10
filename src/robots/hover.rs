@@ -95,6 +95,20 @@ const MOTORS: [(Vector, f32); 4] = [
 ];
 
 impl DroneHover {
+    /// Measure six readonly body-frame rays without stepping physics or consuming RNG.
+    ///
+    /// Readings start at the physical body centre, include the floor and other solids,
+    /// and exclude this drone's collider. Directions rotate with the body. Readings
+    /// remain available after termination and change only when physical state changes.
+    /// Scanning six rays over N colliders takes O(N) time and O(1) auxiliary space.
+    ///
+    /// # Panics
+    /// Panics if private physics violates its finite pose or bounded ray-hit invariants.
+    #[must_use]
+    pub fn ranges(&self) -> super::DroneRanges {
+        super::ranges::measure(&self.world, self.collider, self.observation())
+    }
+
     /// Apply a validated physical hit without advancing the episode clock.
     ///
     /// # Errors
