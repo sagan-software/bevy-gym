@@ -15,33 +15,24 @@ use std::time::Duration;
 /// One deterministic solver substep.
 pub(super) const PHYSICS_INTERVAL: Duration = Duration::from_millis(5);
 
-/// World and handles stay private to prevent direct movement of living agents.
-pub(super) struct Articulation {
-    /// Shared solver for all linked bodies and the floor.
-    pub world: PhysicsWorld,
-    /// Physical bodies in observation order.
-    pub bodies: [RigidBodyHandle; 13],
-    /// Segment colliders in observation order.
+/// Handles for one complete articulated body inside its owner's solver.
+pub(in crate::robots) struct DroidRig {
+    /// Physical bodies in observation order; never exposed outside robot mechanics.
+    bodies: [RigidBodyHandle; 13],
+    /// Matching segment colliders in observation order.
     colliders: [ColliderHandle; 13],
-    /// Floor contact identity, distinct from self-contact.
+    /// Shared floor identity, distinct from self-contact and other agents.
     floor: ColliderHandle,
 }
 
-impl Articulation {
-    /// Spawn the complete tree through one common rigid transform.
-    pub(super) fn new(rotation: Rotation, offset: Vector) -> Self {
-        let mut world = PhysicsWorld {
-            gravity: Vector::NEG_Y * 9.81,
-            integration_parameters: IntegrationParameters {
-                dt: PHYSICS_INTERVAL.as_secs_f32(),
-                ..Default::default()
-            },
-            ..Default::default()
-        };
-        let (_, floor) = world.insert(
-            RigidBodyBuilder::fixed().translation(Vector::new(0.0, -0.1, 0.0)),
-            ColliderBuilder::cuboid(10.0, 0.1, 10.0).friction(0.8),
-        );
+impl DroidRig {
+    /// Insert the unchanged body and passive joint model into one existing solver.
+    pub(in crate::robots) fn insert(
+        world: &mut PhysicsWorld,
+        floor: ColliderHandle,
+        rotation: Rotation,
+        offset: Vector,
+    ) -> Self {
         let segments = DroidBody::ALL.map(|body| {
             let profile = geometry::segment(body);
             let half = profile.half_extents;
@@ -58,9 +49,8 @@ impl Articulation {
         });
         let bodies = segments.map(|(body, _)| body);
         let colliders = segments.map(|(_, collider)| collider);
-        Self::insert_joints(&mut world, &bodies);
+        Self::insert_joints(world, &bodies);
         Self {
-            world,
             bodies,
             colliders,
             floor,
@@ -103,10 +93,10 @@ impl Articulation {
     }
 
     /// Apply policy-selected actuator torques, with no target posture or damping controller.
-    pub(super) fn apply(&mut self, action: DroidAction) {
+    pub(in crate::robots) fn apply(&self, world: &mut PhysicsWorld, action: DroidAction) {
         // Rapier accumulates persistent user torque; replace the prior substep's commands.
         for handle in self.bodies {
-            self.world
+            world
                 .bodies
                 .get_mut(handle)
                 .expect("private segment")
@@ -121,12 +111,7 @@ impl Articulation {
                 .bodies
                 .get(joint.child as usize)
                 .expect("closed child index");
-            let orientation = *self
-                .world
-                .bodies
-                .get(parent)
-                .expect("private parent")
-                .rotation();
+            let orientation = *world.bodies.get(parent).expect("private parent").rotation();
             for (direction, axis) in [Vector::X, Vector::Y, Vector::Z]
                 .into_iter()
                 .zip(joint.axes)
@@ -136,12 +121,12 @@ impl Articulation {
                     let torque = orientation
                         * direction
                         * (action.fraction(axis.actuator) * axis.torque_limit);
-                    self.world
+                    world
                         .bodies
                         .get_mut(child)
                         .expect("private child")
                         .add_torque(torque, true);
-                    self.world
+                    world
                         .bodies
                         .get_mut(parent)
                         .expect("private parent")
@@ -152,7 +137,7 @@ impl Articulation {
     }
 
     /// Copy the authoritative physics state without exposing mutable bodies.
-    pub(super) fn observation(&self) -> DroidObservation {
+    pub(in crate::robots) fn observation(&self, world: &PhysicsWorld) -> DroidObservation {
         DroidObservation {
             bodies: DroidBody::ALL.map(|identity| {
                 let handle = *self
@@ -163,9 +148,8 @@ impl Articulation {
                     .colliders
                     .get(identity as usize)
                     .expect("closed collider index");
-                let body = self.world.bodies.get(handle).expect("private segment");
-                let floor_contact = self
-                    .world
+                let body = world.bodies.get(handle).expect("private segment");
+                let floor_contact = world
                     .contact_pair(collider, self.floor)
                     .is_some_and(ContactPair::has_any_active_contact);
                 DroidBodyState {
@@ -180,6 +164,44 @@ impl Articulation {
     }
 }
 
+/// Standalone lesson owner; its rig uses the same component as the shared robot world.
+pub(super) struct Articulation {
+    /// The lesson's sole integration and collision owner.
+    pub world: PhysicsWorld,
+    /// Complete body handles, tied to the owned solver throughout the episode.
+    rig: DroidRig,
+}
+
+impl Articulation {
+    /// Rebuild the original standalone floor and body without changing insertion order.
+    pub(super) fn new(rotation: Rotation, offset: Vector) -> Self {
+        let mut world = PhysicsWorld {
+            gravity: Vector::NEG_Y * 9.81,
+            integration_parameters: IntegrationParameters {
+                dt: PHYSICS_INTERVAL.as_secs_f32(),
+                ..Default::default()
+            },
+            ..Default::default()
+        };
+        let (_, floor) = world.insert(
+            RigidBodyBuilder::fixed().translation(Vector::new(0.0, -0.1, 0.0)),
+            ColliderBuilder::cuboid(10.0, 0.1, 10.0).friction(0.8),
+        );
+        let rig = DroidRig::insert(&mut world, floor, rotation, offset);
+        Self { world, rig }
+    }
+
+    /// Forward only this body's validated actuator requests to its own solver.
+    pub(super) fn apply(&mut self, action: DroidAction) {
+        self.rig.apply(&mut self.world, action);
+    }
+
+    /// Read the unchanged physical observation profile.
+    pub(super) fn observation(&self) -> DroidObservation {
+        self.rig.observation(&self.world)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::super::DroidActuator;
@@ -191,7 +213,7 @@ mod tests {
         let rotation = Rotation::from_rotation_y(0.7) * Rotation::from_rotation_z(0.01);
         let articulation = Articulation::new(rotation, Vector::Y * 0.03);
         let mut mass = 0.0;
-        for handle in articulation.bodies {
+        for handle in articulation.rig.bodies {
             let body = articulation.world.bodies.get(handle).expect("segment");
             assert!(body.is_dynamic());
             assert!(body.mass() > 0.0);
@@ -248,6 +270,7 @@ mod tests {
             *fractions.get_mut(actuator as usize).expect("actuator") = 0.5;
             articulation.apply(DroidAction::try_from(fractions).expect("fixture"));
             let torques: Vec<_> = articulation
+                .rig
                 .bodies
                 .iter()
                 .map(|handle| {
@@ -270,7 +293,7 @@ mod tests {
             assert!(torques.iter().all(|torque| torque.length() <= 60.001));
         }
         articulation.apply(DroidAction::try_from([0.0; 26]).expect("fixture"));
-        for handle in articulation.bodies {
+        for handle in articulation.rig.bodies {
             assert_eq!(
                 articulation
                     .world
@@ -298,6 +321,7 @@ mod tests {
             (DroidBody::LeftThigh, Vector::Z * 100.0),
         ] {
             let handle = *articulation
+                .rig
                 .bodies
                 .get(identity as usize)
                 .expect("identity");

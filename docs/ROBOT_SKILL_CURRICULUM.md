@@ -2,6 +2,7 @@
 
 Status: implementation in progress; most lessons are not implemented or trained.
 Updated: 2026-10-09. The user superseded the earlier broad examples goal.
+
 This curriculum is the current execution objective. The earlier unfinished audit
 and reference ports remain deferred. A new curriculum goal is active in the
 continuation thread. The earlier blocked goal was not marked complete.
@@ -91,6 +92,10 @@ Start with one learned drone and one learned droid after their prerequisites pas
 Then train two-versus-two and three-versus-three matches with identical control rules.
 The final scene defaults to three-versus-three. Each size is a curriculum configuration
 of the same shared-world implementation, not independent duels combined visually.
+
+The [shared robot world](ROBOT_WORLD.md) now contains all six original physical
+bodies in one solver and validates complete actuator frames from one snapshot.
+Competitive rules, trained team controllers and match qualification remain unfinished.
 
 Collect all living agents' actions from one observation snapshot before stepping
 physics. Batch trajectories across arenas. Share weights within a team and retain

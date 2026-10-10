@@ -2,10 +2,11 @@
 
 use std::{fmt, time::Duration};
 
-use bevy::math::{Quat, Vec3};
+use super::drone::{DroneModel, GRAVITY};
+use bevy::math::Vec3;
 use rapier3d::prelude::{
-    ColliderBuilder, ColliderHandle, ContactPair, IntegrationParameters, PhysicsWorld,
-    RigidBodyBuilder, RigidBodyHandle, Rotation, Vector,
+    ColliderBuilder, ContactPair, IntegrationParameters, PhysicsWorld, RigidBodyBuilder, Rotation,
+    Vector,
 };
 
 use super::{
@@ -36,10 +37,8 @@ use crate::{Env, EpisodeStatus, Reset, Step};
 pub struct DroneHover {
     /// Solver state, isolated from callers and from every other environment.
     world: PhysicsWorld,
-    /// The sole dynamic body, retained until the entire world is replaced.
-    body: RigidBodyHandle,
-    /// Drone collision proxy, retained until the entire world is replaced.
-    collider: ColliderHandle,
+    /// Original collision and actuator model inside the owned solver.
+    model: DroneModel,
     /// Reset stream; physics stepping never consumes random values.
     random: SplitMix64,
     /// Whether actions can still advance this episode.
@@ -74,25 +73,8 @@ enum Flight {
 const POLICY_INTERVAL: Duration = Duration::from_millis(20);
 /// Solver interval; motor axes are recomputed before every substep.
 const PHYSICS_INTERVAL: Duration = Duration::from_millis(5);
-/// Body mass in kilograms, independent of the artist's material choices.
-const MASS_KG: f32 = 1.0;
-/// Gravitational acceleration magnitude in metres per second squared.
-const GRAVITY: f32 = 9.81;
-/// Each motor can produce half the body's weight in newtons.
-const MAX_THRUST: f32 = MASS_KG * GRAVITY / 2.0;
-/// Reaction moment divided by thrust, in metres.
-const REACTION_ARM: f32 = 0.016;
 /// Hover target position in metres.
 const TARGET: Vec3 = Vec3::new(0.0, 2.0, 0.0);
-/// Motor offsets in metres and alternating reaction signs, in action order.
-///
-/// These offsets follow the licensed model's rotor centres after its front faces -Z.
-const MOTORS: [(Vector, f32); 4] = [
-    (Vector::new(-0.2505, 0.0875, -0.2606), 1.0),
-    (Vector::new(0.2505, 0.0875, -0.2606), -1.0),
-    (Vector::new(0.2505, 0.0875, 0.2606), 1.0),
-    (Vector::new(-0.2505, 0.0875, 0.2606), -1.0),
-];
 
 impl DroneHover {
     /// Measure six readonly body-frame rays without stepping physics or consuming RNG.
@@ -106,7 +88,7 @@ impl DroneHover {
     /// Panics if private physics violates its finite pose or bounded ray-hit invariants.
     #[must_use]
     pub fn ranges(&self) -> super::DroneRanges {
-        super::ranges::measure(&self.world, self.collider, self.observation())
+        super::ranges::measure(&self.world, self.model.collider, self.observation())
     }
 
     /// Apply a validated physical hit without advancing the episode clock.
@@ -124,7 +106,7 @@ impl DroneHover {
         let body = self
             .world
             .bodies
-            .get_mut(self.body)
+            .get_mut(self.model.body)
             .expect("private body exists");
         impulse.apply(body);
         Ok(())
@@ -220,22 +202,14 @@ impl DroneHover {
             RigidBodyBuilder::fixed().translation(Vector::new(0.0, -0.1, 0.0)),
             ColliderBuilder::cuboid(30.0, 0.1, 30.0),
         );
-        // A box approximates the model body; its mass determines rotational inertia.
-        let (body, collider) = world.insert(
-            RigidBodyBuilder::dynamic()
-                .translation(Vector::from_array(position.to_array()))
-                .can_sleep(false)
-                .ccd_enabled(true),
-            ColliderBuilder::cuboid(0.287, 0.104, 0.297).mass(MASS_KG),
-        );
+        let model = DroneModel::insert(&mut world, position);
         // Existing floor and drone insertion order stays unchanged for default tasks.
         for obstacle in &obstacles {
             obstacle.insert(&mut world);
         }
         Self {
             world,
-            body,
-            collider,
+            model,
             random,
             episode: Flight::Flying,
             reset_profile: ResetProfile::Calm,
@@ -260,7 +234,7 @@ impl DroneHover {
         let body = self
             .world
             .bodies
-            .get_mut(self.body)
+            .get_mut(self.model.body)
             .expect("private body exists");
         body.set_rotation(rotation, true);
         body.set_linvel(linear_velocity, true);
@@ -278,49 +252,12 @@ impl DroneHover {
     /// that body throughout the environment's lifetime.
     #[must_use]
     pub fn observation(&self) -> DroneObservation {
-        let body = self
-            .world
-            .bodies
-            .get(self.body)
-            .expect("private body exists");
-        DroneObservation {
-            position: Vec3::from_array(body.translation().to_array()),
-            orientation: Quat::from_array(body.rotation().to_array()),
-            linear_velocity: Vec3::from_array(body.linvel().to_array()),
-            angular_velocity: Vec3::from_array(body.angvel().to_array()),
-            motor_states: self.motor_states,
-        }
+        self.model.observation(&self.world, self.motor_states)
     }
 
-    /// Replace persistent forces with this command in the body's current frame.
+    /// Replace persistent forces through the same model used by the shared world.
     fn apply_motors(&mut self, action: DroneAction) {
-        let body = self
-            .world
-            .bodies
-            .get_mut(self.body)
-            .expect("private body exists");
-        body.reset_forces(false);
-        body.reset_torques(false);
-        let rotation = *body.rotation();
-        let position = body.translation();
-        let up = rotation * Vector::Y;
-
-        // A force in newtons at a world-space point produces torque in newton-metres.
-        // Alternating reaction moments cancel when all motor commands are equal.
-        for (((offset, sign), fraction), state) in MOTORS
-            .into_iter()
-            .zip(action.fractions())
-            .zip(self.motor_states)
-        {
-            // A failed actuator contributes neither lift nor its reaction moment.
-            let fraction = match state {
-                DroneMotorState::Working => fraction,
-                DroneMotorState::Failed => 0.0,
-            };
-            let force = fraction * MAX_THRUST;
-            body.add_force_at_point(up * force, position + rotation * offset, true);
-            body.add_torque(up * (sign * REACTION_ARM * force), true);
-        }
+        self.model.apply(&mut self.world, action, self.motor_states);
     }
 
     /// End after contact or exit, including non-finite positions from solver failure.
@@ -333,7 +270,7 @@ impl DroneHover {
         !inside
             || self
                 .world
-                .contact_pairs_with(self.collider)
+                .contact_pairs_with(self.model.collider)
                 .any(ContactPair::has_any_active_contact)
     }
 }
@@ -431,7 +368,7 @@ mod tests {
             drone
                 .world
                 .bodies
-                .get_mut(drone.body)
+                .get_mut(drone.model.body)
                 .expect("body exists")
                 .set_translation(Vector::from_array(position.to_array()), true);
             assert!(!drone.flight_ended());
@@ -451,7 +388,7 @@ mod tests {
             drone
                 .world
                 .bodies
-                .get_mut(drone.body)
+                .get_mut(drone.model.body)
                 .expect("body exists")
                 .set_translation(Vector::from_array(position.to_array()), true);
             assert!(drone.flight_ended());
@@ -461,7 +398,11 @@ mod tests {
     #[test]
     fn thrust_axis_rotates_between_physics_substeps() {
         let mut drone = DroneHover::default();
-        let body = drone.world.bodies.get_mut(drone.body).expect("body exists");
+        let body = drone
+            .world
+            .bodies
+            .get_mut(drone.model.body)
+            .expect("body exists");
         body.set_rotation(Rotation::from_rotation_z(0.6), true);
         body.set_angvel(Vector::Z * 4.0, true);
         let hover = DroneAction::try_from([0.5; 4]).expect("valid action");
@@ -505,7 +446,7 @@ mod tests {
         tilted
             .world
             .bodies
-            .get_mut(tilted.body)
+            .get_mut(tilted.model.body)
             .expect("body exists")
             .set_rotation(Rotation::from_rotation_z(std::f32::consts::PI), true);
         assert!(tilted.step(hover).reward.abs() < 1e-6);
@@ -548,7 +489,7 @@ mod tests {
             drone
                 .world
                 .bodies
-                .get(drone.body)
+                .get(drone.model.body)
                 .expect("body")
                 .user_force()
                 .y
@@ -558,7 +499,7 @@ mod tests {
             drone
                 .world
                 .bodies
-                .get(drone.body)
+                .get(drone.model.body)
                 .expect("body")
                 .user_torque()
                 .length()
@@ -568,7 +509,7 @@ mod tests {
             drone.fail_motor(motor).expect("active flight");
         }
         drone.apply_motors(full);
-        let body = drone.world.bodies.get(drone.body).expect("body");
+        let body = drone.world.bodies.get(drone.model.body).expect("body");
         assert_eq!(body.user_force(), Vector::ZERO);
         assert_eq!(body.user_torque(), Vector::ZERO);
     }
@@ -581,7 +522,7 @@ mod tests {
             let body = drone
                 .world
                 .bodies
-                .get(drone.body)
+                .get(drone.model.body)
                 .expect("private body exists");
             assert!(body.user_force().length_squared() > 0.0);
             assert!(body.user_torque().length_squared() > 0.0);
@@ -589,7 +530,7 @@ mod tests {
             let body = drone
                 .world
                 .bodies
-                .get(drone.body)
+                .get(drone.model.body)
                 .expect("private body exists");
             assert_eq!(body.user_force(), Vector::ZERO);
             assert_eq!(body.user_torque(), Vector::ZERO);

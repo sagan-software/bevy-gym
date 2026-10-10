@@ -618,3 +618,8 @@ required-features = ["robots"]
 name = "drone-clearance"
 path = "examples/robots/clearance.rs"
 required-features = ["robots"]
+
+[[example]]
+name = "robot-world-contract"
+path = "examples/robots/world.rs"
+required-features = ["robots"]

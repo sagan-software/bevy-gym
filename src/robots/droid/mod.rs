@@ -15,3 +15,5 @@ pub use body::DroidBody;
 pub use body_state::DroidBodyState;
 pub use observation::DroidObservation;
 pub use standing::DroidStanding;
+
+pub(super) use physics::DroidRig;

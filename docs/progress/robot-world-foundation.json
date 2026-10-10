@@ -1,0 +1,623 @@
+{
+  "schema": "robot-world-foundation-evidence-v1",
+  "source_base": "e44a982f54f3d85416ccc1d707d6dbf15d4ec752",
+  "source_patch_sha256": "a49919707673450a5f7c9cc09c0ea45df972fccc91e7044cbac2592fddb88bae",
+  "source_sha256": {
+    "Cargo.toml": "56ed4d05701b458a9e142f95a3c771f0003fdfaf8ce4d2ad14d8d3be9cce5208",
+    "examples/robots/world.rs": "5df5f7a0503def2df0984e702057af31c23168f0def3ede25e2a116775b155e0",
+    "flake.nix": "73efcba53bbaf80d57d5bef74db78705790bb5df6e9d7bb61779765a7c3986f0",
+    "src/robots/droid/mod.rs": "e0b138edaca9d6a2bacb31651172d2292407f75976a3339bd5e555451c4b649e",
+    "src/robots/droid/physics.rs": "a4fee6ee9a548b8a210e21b0fca38c9e659beec2a8ea083fa335e5bda148c5ff",
+    "src/robots/drone.rs": "156609b169039cfa91d3c09f84bdcf13ddb403b163b99e0f7b8a9a68192f0630",
+    "src/robots/hover.rs": "f068fa0c2901b7c7d9cac1cbdda00efb1846d7b4e3d48ad1cfaeddad8e76fd92",
+    "src/robots/mod.rs": "fbf26b024fcc1696b6bc01ca80b75ca1b8a63fb96756fa2b445be8fd8eebc3ec",
+    "src/robots/world/actions.rs": "c337c1b032137a1fe616b5f169211707e499e3be97bac46f1d680bf7c8a76bd5",
+    "src/robots/world/error.rs": "fe146c859b4d865d68238486aa1685b0500976235da87883fcd7d9a7c977c356",
+    "src/robots/world/frame.rs": "8950d82e4ef421965cf2d45bda25027fd04a961a815335b8f0c16d69f583bd0c",
+    "src/robots/world/identity.rs": "459bdf6ae5dc5edb5dda2e4f3e0e09deadb826eb4f01a5116665a43300b55f6c",
+    "src/robots/world/mod.rs": "87ff730ae29a8ee563d0e4f56363fd997b7e16cfecd81a30a5837a7ad85941f6",
+    "src/robots/world/simulation.rs": "c3d4f4ac70c8d3a1f0401181b00318da3f150a3eaef999a9240fdc64d3bd61f3",
+    "src/robots/world/slot.rs": "5e54c22c340706d981b82a69b87a329d00e2c488678c40612149fe1ee513a04f",
+    "src/robots/world/snapshot.rs": "78d94ad3f6fa9b2df0bef246299495608c3ab39b440366603a79cb1ebaa90bee",
+    "src/robots/world/team.rs": "6863aea33ed6e8c4d480a89dd935b6c009d846e6972883646c5e50baa848d114",
+    "tests/robot_world.rs": "7a8a11905e41de94e8e10c90ef685204185b518ad6f0941cda3c31cf1dcb38e0"
+  },
+  "implementation": {
+    "solver": "rapier3d 0.36.0 with enhanced-determinism",
+    "dynamic_bodies": 42,
+    "fixed_bodies": 1,
+    "colliders": 43,
+    "passive_joints": 36,
+    "total_dynamic_mass_kg": 213,
+    "agents": {
+      "drones": 3,
+      "droids": 3
+    },
+    "policy_interval_ms": 20,
+    "physics_interval_ms": 5,
+    "substeps_per_interval": 4,
+    "controllers_added": 0,
+    "scope": "shared physical foundation; competitive environment and policy qualification unfinished"
+  },
+  "gates": [
+    {
+      "command": "cargo fmt --all -- --check",
+      "exit": 0,
+      "passed_tests": 0,
+      "ignored_tests": 0,
+      "log": "/home/sagan/.cache/bevy-gym-quality-validation/robot-world-final2-format.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "cargo test",
+      "exit": 0,
+      "passed_tests": 132,
+      "ignored_tests": 1,
+      "log": "/home/sagan/.cache/bevy-gym-quality-validation/robot-world-final2-default.log",
+      "log_sha256": "48cf260a81690312d15f1466f1e4aecbc6fed2724f28cf507df95fd2fff79a52"
+    },
+    {
+      "command": "cargo test --features robots",
+      "exit": 0,
+      "passed_tests": 451,
+      "ignored_tests": 3,
+      "log": "/home/sagan/.cache/bevy-gym-quality-validation/robot-world-final2-robots.log",
+      "log_sha256": "ec00b1020ff65e78727b5019144578d85d4412036981362f14a2ecadc7dcb5c1"
+    },
+    {
+      "command": "cargo clippy --all-targets --all-features -- -D warnings",
+      "exit": 0,
+      "passed_tests": 0,
+      "ignored_tests": 0,
+      "log": "/home/sagan/.cache/bevy-gym-quality-validation/robot-world-final2-clippy.log",
+      "log_sha256": "4ad5cff9aa5b4d961bc1912a51f21e306affcfa86712244ea6a94127121041c2"
+    },
+    {
+      "command": "cargo build --features robots --example droid-standing --example drone-curriculum --example robot-world-contract",
+      "exit": 0,
+      "passed_tests": 0,
+      "ignored_tests": 0,
+      "log": "/home/sagan/.cache/bevy-gym-quality-validation/robot-world-final2-build.log",
+      "log_sha256": "b6dc96ab4514d34277dad8dfd8ab85b0700aebd747acf51c2f5343eb39192d21"
+    },
+    {
+      "command": "nix run .#drone-browser-check",
+      "exit": 0,
+      "passed_tests": 251,
+      "ignored_tests": 0,
+      "log": "/home/sagan/.cache/bevy-gym-quality-validation/robot-world-final2-browser.log",
+      "log_sha256": "d55458f941470f5316409bbe457a8bb4ed29f165021a7f3bf7f0ce1fc5b06950"
+    }
+  ],
+  "personal_lints": {
+    "scope": "bevy-gym, all targets, all features, HEAD changed range",
+    "clippy_exit": 0,
+    "dylint_exit": 0,
+    "changed_line_diagnostics": 0,
+    "actual_pinned_compiler": "1.98.0-nightly-2026-06-15 from installed lints checkout",
+    "log": "/home/sagan/.cache/bevy-gym-quality-validation/robot-world-final2-personal.log",
+    "log_sha256": "6d64ef18e68e433a817a0559a7879a7fe7b41ddafbec4262049e04d024412785"
+  },
+  "nix_lints": {
+    "exit": 0,
+    "diagnostics": [],
+    "log": "/home/sagan/.cache/bevy-gym-quality-validation/robot-world-nix-lint.log"
+  },
+  "coverage": {
+    "command": "cargo llvm-cov --no-clean --branch --features robots --lib --test robot_world --test drone_impulse --test drone_hover --test drone_damage --json",
+    "summaries": [
+      {
+        "file": "src/robots/droid/physics.rs",
+        "summary": {
+          "branches": {
+            "count": 10,
+            "covered": 8,
+            "notcovered": 2,
+            "percent": 80
+          },
+          "functions": {
+            "count": 16,
+            "covered": 16,
+            "percent": 100
+          },
+          "instantiations": {
+            "count": 25,
+            "covered": 22,
+            "percent": 88
+          },
+          "lines": {
+            "count": 247,
+            "covered": 247,
+            "percent": 100
+          },
+          "mcdc": {
+            "count": 0,
+            "covered": 0,
+            "notcovered": 0,
+            "percent": 0
+          },
+          "regions": {
+            "count": 389,
+            "covered": 389,
+            "notcovered": 0,
+            "percent": 100
+          }
+        }
+      },
+      {
+        "file": "src/robots/drone.rs",
+        "summary": {
+          "branches": {
+            "count": 0,
+            "covered": 0,
+            "notcovered": 0,
+            "percent": 0
+          },
+          "functions": {
+            "count": 3,
+            "covered": 3,
+            "percent": 100
+          },
+          "instantiations": {
+            "count": 6,
+            "covered": 6,
+            "percent": 100
+          },
+          "lines": {
+            "count": 48,
+            "covered": 48,
+            "percent": 100
+          },
+          "mcdc": {
+            "count": 0,
+            "covered": 0,
+            "notcovered": 0,
+            "percent": 0
+          },
+          "regions": {
+            "count": 79,
+            "covered": 79,
+            "notcovered": 0,
+            "percent": 100
+          }
+        }
+      },
+      {
+        "file": "src/robots/hover.rs",
+        "summary": {
+          "branches": {
+            "count": 18,
+            "covered": 18,
+            "notcovered": 0,
+            "percent": 100
+          },
+          "functions": {
+            "count": 25,
+            "covered": 25,
+            "percent": 100
+          },
+          "instantiations": {
+            "count": 43,
+            "covered": 38,
+            "percent": 88.37209302325581
+          },
+          "lines": {
+            "count": 318,
+            "covered": 318,
+            "percent": 100
+          },
+          "mcdc": {
+            "count": 0,
+            "covered": 0,
+            "notcovered": 0,
+            "percent": 0
+          },
+          "regions": {
+            "count": 528,
+            "covered": 528,
+            "notcovered": 0,
+            "percent": 100
+          }
+        }
+      },
+      {
+        "file": "src/robots/world/actions.rs",
+        "summary": {
+          "branches": {
+            "count": 0,
+            "covered": 0,
+            "notcovered": 0,
+            "percent": 0
+          },
+          "functions": {
+            "count": 1,
+            "covered": 1,
+            "percent": 100
+          },
+          "instantiations": {
+            "count": 2,
+            "covered": 2,
+            "percent": 100
+          },
+          "lines": {
+            "count": 11,
+            "covered": 11,
+            "percent": 100
+          },
+          "mcdc": {
+            "count": 0,
+            "covered": 0,
+            "notcovered": 0,
+            "percent": 0
+          },
+          "regions": {
+            "count": 5,
+            "covered": 5,
+            "notcovered": 0,
+            "percent": 100
+          }
+        }
+      },
+      {
+        "file": "src/robots/world/error.rs",
+        "summary": {
+          "branches": {
+            "count": 0,
+            "covered": 0,
+            "notcovered": 0,
+            "percent": 0
+          },
+          "functions": {
+            "count": 3,
+            "covered": 3,
+            "percent": 100
+          },
+          "instantiations": {
+            "count": 6,
+            "covered": 3,
+            "percent": 50
+          },
+          "lines": {
+            "count": 15,
+            "covered": 15,
+            "percent": 100
+          },
+          "mcdc": {
+            "count": 0,
+            "covered": 0,
+            "notcovered": 0,
+            "percent": 0
+          },
+          "regions": {
+            "count": 27,
+            "covered": 27,
+            "notcovered": 0,
+            "percent": 100
+          }
+        }
+      },
+      {
+        "file": "src/robots/world/frame.rs",
+        "summary": {
+          "branches": {
+            "count": 2,
+            "covered": 2,
+            "notcovered": 0,
+            "percent": 100
+          },
+          "functions": {
+            "count": 5,
+            "covered": 5,
+            "percent": 100
+          },
+          "instantiations": {
+            "count": 9,
+            "covered": 9,
+            "percent": 100
+          },
+          "lines": {
+            "count": 32,
+            "covered": 32,
+            "percent": 100
+          },
+          "mcdc": {
+            "count": 0,
+            "covered": 0,
+            "notcovered": 0,
+            "percent": 0
+          },
+          "regions": {
+            "count": 42,
+            "covered": 42,
+            "notcovered": 0,
+            "percent": 100
+          }
+        }
+      },
+      {
+        "file": "src/robots/world/identity.rs",
+        "summary": {
+          "branches": {
+            "count": 0,
+            "covered": 0,
+            "notcovered": 0,
+            "percent": 0
+          },
+          "functions": {
+            "count": 2,
+            "covered": 2,
+            "percent": 100
+          },
+          "instantiations": {
+            "count": 4,
+            "covered": 2,
+            "percent": 50
+          },
+          "lines": {
+            "count": 9,
+            "covered": 9,
+            "percent": 100
+          },
+          "mcdc": {
+            "count": 0,
+            "covered": 0,
+            "notcovered": 0,
+            "percent": 0
+          },
+          "regions": {
+            "count": 11,
+            "covered": 11,
+            "notcovered": 0,
+            "percent": 100
+          }
+        }
+      },
+      {
+        "file": "src/robots/world/simulation.rs",
+        "summary": {
+          "branches": {
+            "count": 10,
+            "covered": 10,
+            "notcovered": 0,
+            "percent": 100
+          },
+          "functions": {
+            "count": 23,
+            "covered": 23,
+            "percent": 100
+          },
+          "instantiations": {
+            "count": 36,
+            "covered": 34,
+            "percent": 94.44444444444444
+          },
+          "lines": {
+            "count": 247,
+            "covered": 247,
+            "percent": 100
+          },
+          "mcdc": {
+            "count": 0,
+            "covered": 0,
+            "notcovered": 0,
+            "percent": 0
+          },
+          "regions": {
+            "count": 374,
+            "covered": 371,
+            "notcovered": 3,
+            "percent": 99.19786096256684
+          }
+        }
+      },
+      {
+        "file": "src/robots/world/slot.rs",
+        "summary": {
+          "branches": {
+            "count": 0,
+            "covered": 0,
+            "notcovered": 0,
+            "percent": 0
+          },
+          "functions": {
+            "count": 1,
+            "covered": 1,
+            "percent": 100
+          },
+          "instantiations": {
+            "count": 2,
+            "covered": 2,
+            "percent": 100
+          },
+          "lines": {
+            "count": 6,
+            "covered": 6,
+            "percent": 100
+          },
+          "mcdc": {
+            "count": 0,
+            "covered": 0,
+            "notcovered": 0,
+            "percent": 0
+          },
+          "regions": {
+            "count": 6,
+            "covered": 6,
+            "notcovered": 0,
+            "percent": 100
+          }
+        }
+      },
+      {
+        "file": "src/robots/world/snapshot.rs",
+        "summary": {
+          "branches": {
+            "count": 0,
+            "covered": 0,
+            "notcovered": 0,
+            "percent": 0
+          },
+          "functions": {
+            "count": 4,
+            "covered": 4,
+            "percent": 100
+          },
+          "instantiations": {
+            "count": 8,
+            "covered": 6,
+            "percent": 75
+          },
+          "lines": {
+            "count": 20,
+            "covered": 20,
+            "percent": 100
+          },
+          "mcdc": {
+            "count": 0,
+            "covered": 0,
+            "notcovered": 0,
+            "percent": 0
+          },
+          "regions": {
+            "count": 27,
+            "covered": 27,
+            "notcovered": 0,
+            "percent": 100
+          }
+        }
+      }
+    ],
+    "combined_export_diagnostic": "warning: 12 functions have mismatched data",
+    "authoritative_method": "Each current executable ran with its own fresh raw profile. Each profile was merged and exported against that executable alone, with no export diagnostics. Region and branch hits were summed by source coordinates across these five reports.",
+    "aggregate_gaps": {
+      "separate_export_diagnostics": [],
+      "combined_export_mismatched_paths": [],
+      "aggregate_zero_regions": [
+        {
+          "file": "src/robots/world/simulation.rs",
+          "range": [
+            178,
+            28,
+            178,
+            29
+          ]
+        },
+        {
+          "file": "src/robots/world/simulation.rs",
+          "range": [
+            198,
+            77,
+            198,
+            82
+          ]
+        }
+      ],
+      "aggregate_zero_branch_outcomes": [
+        {
+          "file": "src/robots/droid/physics.rs",
+          "range": [
+            256,
+            29,
+            256,
+            45
+          ],
+          "outcomes": [
+            26,
+            0
+          ]
+        },
+        {
+          "file": "src/robots/droid/physics.rs",
+          "range": [
+            256,
+            49,
+            256,
+            65
+          ],
+          "outcomes": [
+            26,
+            0
+          ]
+        }
+      ]
+    },
+    "gap_reasons": [
+      {
+        "file": "src/robots/world/simulation.rs",
+        "line": 178,
+        "gap": "Post-substep validation error propagation; no finite supported action fixture produced a solver failure."
+      },
+      {
+        "file": "src/robots/world/simulation.rs",
+        "line": 198,
+        "gap": "Stopped alternative in private validation; advance rejects a stopped world before calling validation."
+      },
+      {
+        "file": "src/robots/droid/physics.rs",
+        "line": 256,
+        "gap": "Two failure outcomes of an unchanged joint-limit assertion in a passing private test; no production branch gap."
+      }
+    ]
+  },
+  "frozen_body_regression": {
+    "binaries": {
+      "droid-standing": {
+        "source": "/home/sagan/.cache/bevy-gym-quality-validation/target/debug/examples/droid-standing",
+        "copied_binary": "/home/sagan/.cache/bevy-gym-quality-validation/robot-world-frozen-comparison/droid-standing",
+        "sha256": "83e0b2fed48bb3f808bbb857e8c42c421c05888a2c5464f3116c78aac561eaa6"
+      },
+      "drone-curriculum": {
+        "source": "/home/sagan/.cache/bevy-gym-quality-validation/target/debug/examples/drone-curriculum",
+        "copied_binary": "/home/sagan/.cache/bevy-gym-quality-validation/robot-world-frozen-comparison/drone-curriculum",
+        "sha256": "06aa8201436c2213eb4372f59d65ad650cbe3765af871ee94445ffb4cd1c4f96"
+      },
+      "baseline_standing": {
+        "path": "/home/sagan/.cache/bevy-gym-quality-validation/standing-posture-seed23-20261010/droid-standing",
+        "sha256": "702115bbf3fb11a1396f9091464cf1d7a22471ea942f8f4c8b794f0845cc253a"
+      }
+    },
+    "standing": {
+      "checkpoint_sha256": "9c9e4c5bc8f7734da9835161476997e6d39d2aba28b24439e932a1f9949a2fdb",
+      "traces": [
+        {
+          "seed": 0,
+          "identical_bytes": true,
+          "lines": 746,
+          "sha256": "3cd398de783c01d7e5d269c66bbf24b8b8fd759981ba2d4bbcee59c1a4f3e500",
+          "before": "/home/sagan/.cache/bevy-gym-quality-validation/robot-world-frozen-comparison/standing-before-seed0.jsonl",
+          "after": "/home/sagan/.cache/bevy-gym-quality-validation/robot-world-frozen-comparison/standing-after-seed0.jsonl"
+        },
+        {
+          "seed": 42,
+          "identical_bytes": true,
+          "lines": 1002,
+          "sha256": "7d8153d8de087874825e17d75171f3ed3cbd70cc3c861007aec9bc5db01b48a1",
+          "before": "/home/sagan/.cache/bevy-gym-quality-validation/robot-world-frozen-comparison/standing-before-seed42.jsonl",
+          "after": "/home/sagan/.cache/bevy-gym-quality-validation/robot-world-frozen-comparison/standing-after-seed42.jsonl"
+        }
+      ]
+    },
+    "drone": {
+      "command": [
+        "/home/sagan/.cache/bevy-gym-quality-validation/robot-world-frozen-comparison/drone-curriculum",
+        "--lesson",
+        "travel",
+        "--evaluate-promotion",
+        "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/runs/drone-travel/rehearsed-seed29-20261010/travel-near-24000.mpk",
+        "--travel-stage",
+        "travel-near"
+      ],
+      "checkpoint_sha256": "d1d09e57e77e8e162213bca8e60d62ebd2105a3be0690b5524e4e9c5525ef2ad",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "identical_bytes": true,
+      "identical_json": true,
+      "before": "/home/sagan/.cache/bevy-gym-quality-validation/travel-rehearsed-seed29-final-retention.json",
+      "after": "/home/sagan/.cache/bevy-gym-quality-validation/robot-world-frozen-comparison/drone-after-promotion.json",
+      "before_sha256": "4fdd0c456bc2734329c96cd34dc0a0fa70b0b0e323e7777897a6f880ee3ff677",
+      "after_sha256": "4fdd0c456bc2734329c96cd34dc0a0fa70b0b0e323e7777897a6f880ee3ff677"
+    },
+    "qualification": "These comparisons establish tested body trajectory preservation. They do not qualify standing, full drone travel or 3v3."
+  },
+  "ui_verification": "No frontend changed. Headless browser test execution does not establish visible 3v3 playback."
+}

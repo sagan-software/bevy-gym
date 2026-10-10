@@ -4,6 +4,7 @@ mod action;
 mod clearance;
 mod destination;
 mod droid;
+mod drone;
 mod episode_ended;
 mod hover;
 mod impulse;
@@ -14,6 +15,7 @@ mod obstacle;
 mod ranges;
 mod travel;
 mod travel_observation;
+mod world;
 
 pub use action::{DroneAction, InvalidDroneAction};
 pub use clearance::{DroneClearance, DroneClearanceObservation};
@@ -35,3 +37,8 @@ pub use droid::{
 };
 
 pub use ranges::{DroneRangeDirection, DroneRangeDistance, DroneRanges, InvalidDroneRangeDistance};
+
+pub use world::{
+    RobotActions, RobotFrame, RobotId, RobotSlot, RobotSnapshot, RobotTeam, RobotWorld,
+    RobotWorldError, RobotWorldFailure,
+};
