@@ -4,6 +4,47 @@ Updated: 2026-10-09. Current work: RL-only drone/droid curriculum.
 
 ## Resume here
 
+### Qualified standalone checkpoint transfer, 2026-10-09
+
+The browser scene checkpoint `14f20dd3e381b9120d5065bbf93d1a270fd46b6f` is pushed to
+GitHub main. This checkpoint adds
+`--lesson recovery --initialize-from qualified-hover` to `drone-curriculum`.
+Only the recorded PPO hover checkpoint is accepted. Loaded actor and critic records
+must match its embedded reference. Unsupported destinations fail before output
+creation. Actor and critic weights transfer; the optimizer and sampling streams
+start fresh. A `transfer.json` record precedes the first update. The original
+in-memory curriculum still retains its optimizer between lessons.
+
+The preserved hover source is now `docs/progress/drone-hover.mpk`, SHA-256
+`5aa47c6941b1aa243c4eafcb0fafaf8c6fa9ee816944dc5a5ca0d3f95712403b`.
+It passed 32/32 held-out calm episodes natively and in WASM. Native mean return was
+459.7338 and mean final distance was 0.11701 metres.
+
+A separate seed-11 trial passed recovery selection at update 20, using 88 optimizer
+steps and 10,240 new transitions. Its service
+`bevy-gym-recovery-transfer-seed11-20261009.service` exited successfully. Artifacts
+remain in `runs/drone-recovery/transfer-seed11-20261009`. The frozen result is copied
+to `docs/progress/drone-recovery-transfer.mpk`. Native held-out evaluation passed
+32/32 recovery episodes with mean return 441.3443 and mean distance 0.26578 metres.
+Hover replay also passed 32/32, with mean return 461.1305 and mean distance
+0.16483 metres. All three new qualification tests also pass in actual WASM execution.
+The [evidence](progress/drone-checkpoint-transfer.json) retains hashes and episodes.
+Native learning tests (19 passed, one ignored), curriculum unit tests (10), CLI
+tests (6), root tests, strict native/WASM Clippy, and the browser suite pass.
+Changed-line personal Rust and Python lint pass. Strict personal Rust lint remains
+blocked by the unchanged repository backlog. Transfer coverage is 71/71 lines
+including tests and 2/2 branch outcomes. Main coverage is 53/56 lines and 11/14
+branch outcomes; the evidence names error-propagation and existing loop gaps.
+Existing browser videos do not show these new weights.
+
+The original seed-11 damage run remains failed and preserved; it is a different run.
+No training service for this task is currently active. Logs use
+`/home/sagan/.cache/bevy-gym-quality-validation/skill-transfer-`.
+
+Next: implement drone travel through the shared RL environment and focused failing
+tests, then train and qualify its checkpoint. Physical
+droid lessons and the shared 3v3 arena remain unfinished.
+
 ### Standalone RL browser scenes, 2026-10-09
 
 `drone-hover-scene` and `drone-recovery-scene` now run separate frozen-policy scenes.

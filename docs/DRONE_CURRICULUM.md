@@ -61,7 +61,7 @@ nix develop --command cargo run --no-default-features --features robots \
 For standalone training, add `--lesson hover` or `--lesson recovery`. These are the
 only accepted names. Both use the same lesson factories, collector, evaluator, and
 promotion criteria as the default sequence. Standalone training starts from random
-weights; it does not load a prior checkpoint or bypass promotion. The default
+weights unless qualified initialization is selected below. The default
 sequence retains its optimizer across the hover-to-recovery transition.
 
 Use a distinct output directory for each run. Checkpoints and scores include the
@@ -108,3 +108,45 @@ The completed unit is `bevy-gym-curriculum-run-20261008.service`. Its log remain
 Intermediate artifacts remain in `runs/drone-curriculum/seed7-initial`.
 
 [unity-curriculum]: https://unity-technologies.github.io/ml-agents/Training-ML-Agents/#curriculum
+
+## Qualified standalone transfer
+
+Run recovery from the recorded PPO hover prerequisite:
+
+```sh
+nix develop --command cargo run --no-default-features --features robots \
+  --example drone-curriculum -- --lesson recovery --initialize-from qualified-hover \
+  --seed 11 --updates 600 --output runs/drone-recovery/qualified-transfer
+```
+
+`qualified-hover` is the only accepted source. It requires `--lesson recovery`.
+Unsupported combinations fail before output creation. Missing or changed source
+networks fail without a fallback. Loading compares the complete actor and critic
+with the embedded qualified reference. Transfer starts a fresh optimizer and
+sampling streams; the default two-lesson sequence retains its optimizer.
+
+Before the first update, `transfer.json` records one object with nine required,
+non-null members. `event` is the string `checkpoint-transfer`; `source` is
+`qualified-hover`; `source_checkpoint` is `docs/progress/drone-hover.mpk`.
+`qualified_record_sha256` is the lowercase SHA-256 of that committed reference
+record, not of an arbitrary alternate serialization. `source_training` is
+`PPO, seed 7, hover update 280`; `destination` is `recovery`; `optimizer` is `fresh`.
+`optimizer_steps` is the integer zero; `seed` is the supplied unsigned 64-bit integer.
+Member order is not promised. No optional members or null values are emitted.
+
+The [transfer evidence](progress/drone-checkpoint-transfer.json) records the source,
+selection evaluations, held-out episodes, hashes, validation, and coverage gaps.
+The source passed 32/32 held-out hover episodes natively and in WASM. Seed 11
+passed recovery selection after 20 updates and 10,240 new transitions. The saved
+`docs/progress/drone-recovery-transfer.mpk` passed 32/32 recovery episodes and
+32/32 hover replay episodes natively and in WASM. Native mean returns were
+441.3443 and 461.1305, respectively. These transitions exclude prerequisite training.
+This single trial does not establish a training efficiency advantage.
+
+The transfer module records 71/71 measured lines, including tests, and both branch
+outcomes. Main records 53/56 lines and 11/14 branch outcomes. Serialization,
+known-valid embedded decoding, CLI filesystem errors, and existing loop paths
+remain the exact gaps listed in the evidence. Strict native/WASM gates and the
+browser suite pass. Changed-line personal lint is clean; strict personal lint
+still fails on the unchanged repository backlog. Existing scene recordings use
+the original curriculum checkpoint, not these new transferred weights.

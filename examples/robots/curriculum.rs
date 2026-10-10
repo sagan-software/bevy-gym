@@ -5,6 +5,8 @@
     reason = "This synchronous tutorial writes checkpoints without an async runtime."
 )]
 
+#[path = "curriculum/initial_checkpoint.rs"]
+mod initial_checkpoint;
 mod learning;
 #[path = "curriculum/lesson.rs"]
 mod lesson;
@@ -12,6 +14,7 @@ mod lesson;
 use std::{error::Error, num::NonZeroU32, path::PathBuf};
 
 use clap::{Parser, ValueEnum};
+use initial_checkpoint::InitialCheckpoint;
 use learning::{baseline, load_policy, new_agent, SELECTION_SEEDS};
 use lesson::Lesson;
 
@@ -21,6 +24,9 @@ struct Options {
     /// Train one lesson independently; omission runs hover followed by recovery.
     #[arg(long, value_enum)]
     lesson: Option<Lesson>,
+    /// Initialize standalone recovery from a recorded, qualified RL hover checkpoint.
+    #[arg(long, value_enum)]
+    initialize_from: Option<InitialCheckpoint>,
     /// Maximum 512-transition updates per lesson; exhaustion does not pass a lesson.
     #[arg(long, default_value = "600")]
     updates: NonZeroU32,
@@ -48,8 +54,20 @@ impl ValueEnum for Lesson {
 /// Retain the agent across lessons and replace only the episode collection state.
 fn main() -> Result<(), Box<dyn Error>> {
     let options = Options::parse();
+    // Reject unsupported transitions before loading weights or creating artifacts.
+    if options.initialize_from.is_some() && !matches!(options.lesson, Some(Lesson::Recovery)) {
+        return Err("qualified-hover initialization requires --lesson recovery".into());
+    }
+    let mut agent = match options.initialize_from {
+        Some(source) => source.load(options.seed)?,
+        None => new_agent(options.seed)?,
+    };
     std::fs::create_dir_all(&options.output)?;
-    let mut agent = new_agent(options.seed)?;
+    if let Some(source) = options.initialize_from {
+        let record = source.record(options.seed);
+        std::fs::write(options.output.join("transfer.json"), record.to_string())?;
+        println!("{record}");
+    }
     // Borrow the selected lesson or the fixed curriculum without duplicating its runner.
     let lessons = match &options.lesson {
         Some(lesson) => std::slice::from_ref(lesson),

@@ -1,7 +1,7 @@
 # Drone recovery lesson
 
 Status: native and browser frozen-policy inference implemented, 2026-10-09.
-Standalone checkpoint transfer remains pending.
+Qualified standalone checkpoint transfer is implemented.
 
 Use `DroneHover::disturbed()` for a hover task that needs feedback control.
 `DroneHover::default()` and its committed traces remain unchanged. The new constructor
@@ -78,7 +78,12 @@ nix develop --command cargo run --no-default-features --features robots \
   --output runs/drone-recovery/new-run
 ```
 
-This mode starts from random weights. When `--lesson` is omitted, the
+This mode starts from random weights. Add `--initialize-from qualified-hover` to
+transfer the qualified hover actor and critic with a fresh optimizer. The
+[transfer evidence](progress/drone-checkpoint-transfer.json) records seed 11,
+20 recovery updates, and 32/32 held-out recovery and hover replay survivors in
+native and WASM tests. Use `--checkpoint docs/progress/drone-recovery-transfer.mpk`
+with the inference command to replay this result. When `--lesson` is omitted, the
 [curriculum trainer](DRONE_CURRICULUM.md) transfers hover weights and optimizer
 state into recovery. The older [direct trainer](DRONE_LEARNING.md) also starts
 recovery from random weights. All paths use `DroneHover::disturbed()`.

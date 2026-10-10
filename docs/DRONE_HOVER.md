@@ -92,3 +92,10 @@ coverage limits, and browser recordings.
 The separate [recovery command](DRONE_RECOVERY.md) uses the same checkpoint with
 disturbed starts. Historical constant-thrust evidence remains in the earlier
 records; neither native lesson command uses that controller now.
+
+The separately preserved prerequisite is `docs/progress/drone-hover.mpk`, trained
+with PPO through seed-7 hover update 280. It passed 32/32 held-out calm episodes
+natively and in WASM, with native mean return 459.7338 and final distance 0.11701
+metres. The [transfer guide](DRONE_CURRICULUM.md#qualified-standalone-transfer)
+uses it to initialize standalone recovery. The scene still embeds the original
+final curriculum checkpoint identified above.

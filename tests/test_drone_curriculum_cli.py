@@ -1,5 +1,6 @@
 """Run individual curriculum lessons through the native training command."""
 
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -44,6 +45,58 @@ class DroneCurriculumCli(unittest.TestCase):
             self.assertIn("Lesson hover exhausted", result.stderr)
             self.assertEqual(sorted(p.name for p in Path(directory).iterdir()),
                              ["hover-1.json", "hover-1.mpk"])
+
+    def test_standalone_recovery_can_transfer_the_qualified_hover_checkpoint(self):
+        with tempfile.TemporaryDirectory() as directory:
+            result = subprocess.run(
+                [str(TARGET / "debug/examples/drone-curriculum"),
+                 "--lesson", "recovery", "--initialize-from", "qualified-hover",
+                 "--updates", "1", "--output", directory],
+                cwd=ROOT, capture_output=True, text=True, check=False,
+            )
+            self.assertIn(result.returncode, (0, 1), result.stderr)
+            transfer = json.loads((Path(directory) / "transfer.json").read_text())
+            self.assertEqual(transfer["source"], "qualified-hover")
+            self.assertEqual(transfer["destination"], "recovery")
+            self.assertEqual(transfer["optimizer"], "fresh")
+            self.assertEqual(transfer["optimizer_steps"], 0)
+            reference = ROOT / "docs/progress/drone-hover.mpk"
+            self.assertEqual(transfer["qualified_record_sha256"],
+                             hashlib.sha256(reference.read_bytes()).hexdigest())
+            self.assertEqual(transfer["seed"], 7)
+            self.assertEqual(sorted(p.name for p in Path(directory).iterdir()),
+                             ["recovery-1.json", "recovery-1.mpk", "transfer.json"])
+            record = json.loads((Path(directory) / "recovery-1.json").read_text())
+            self.assertGreater(record["optimizer_steps"], 0)
+            self.assertEqual(result.returncode, 0 if record["passed"] else 1)
+            self.assertEqual(json.loads(result.stdout.splitlines()[0]), transfer)
+
+    def test_transfer_rejects_unsupported_destination_before_output_creation(self):
+        for lesson_args in ([], ["--lesson", "hover"]):
+            with self.subTest(args=lesson_args), tempfile.TemporaryDirectory() as directory:
+                output = Path(directory) / "output"
+                result = subprocess.run(
+                    [str(TARGET / "debug/examples/drone-curriculum"), *lesson_args,
+                     "--initialize-from", "qualified-hover", "--updates", "1",
+                     "--output", str(output)],
+                    cwd=ROOT, capture_output=True, text=True, check=False,
+                )
+                self.assertEqual(result.returncode, 1)
+                self.assertIn("qualified-hover initialization requires --lesson recovery", result.stderr)
+                self.assertFalse(output.exists())
+
+    def test_unknown_initialization_fails_before_creating_output(self):
+        for source in ("unknown", "QualifiedHover", ""):
+            with self.subTest(source=source), tempfile.TemporaryDirectory() as directory:
+                output = Path(directory) / "output"
+                result = subprocess.run(
+                    [str(TARGET / "debug/examples/drone-curriculum"),
+                     "--lesson", "recovery", "--initialize-from", source,
+                     "--updates", "1", "--output", str(output)],
+                    cwd=ROOT, capture_output=True, text=True, check=False,
+                )
+                self.assertEqual(result.returncode, 2)
+                self.assertFalse(output.exists())
 
     def test_unknown_lesson_fails_before_creating_output(self):
         for value, error in (("travel", "invalid value"),
