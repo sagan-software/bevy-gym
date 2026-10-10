@@ -1,5 +1,11 @@
 # Examples execution status
 
+A training-only droid posture reward is implemented and validated. Its 20-update
+smoke trial used 10,240 RL transitions and failed selection; it is unqualified.
+The [record](progress/droid-standing-posture-reward.json) retains the profile,
+source hashes, checkpoint, optimizer journal and coverage gaps.
+All 245 browser tests, 31 native learning tests and 14 CLI tests pass.
+
 The completed droid run’s strongest selection candidate, update 22,940, failed
 held-out qualification. Five of 32 episodes survived the horizon, with every final
 stable streak zero. The [record](progress/standing-seed17-update22940/summary.json)

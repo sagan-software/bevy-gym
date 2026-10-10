@@ -1,8 +1,12 @@
 //! Separate standing training and frozen evaluation commands.
 
-use super::{checkpoint, evaluation, trace, training};
+use super::{checkpoint, evaluation, reward::Recipe, trace, training};
 use clap::{Parser, Subcommand};
-use std::{error::Error, num::NonZeroU32, path::PathBuf};
+use std::{
+    error::Error,
+    num::NonZeroU32,
+    path::{Path, PathBuf},
+};
 
 /// Run physical standing training or frozen checkpoint evaluation.
 #[derive(Parser)]
@@ -26,6 +30,9 @@ enum Command {
     },
     /// Train with PPO; a failed budget returns an error and retains its candidate.
     Train {
+        /// Training-only reward; frozen evaluation always retains the original profile.
+        #[arg(long, value_enum, default_value_t = Recipe::Original)]
+        reward_profile: Recipe,
         /// Maximum 512-transition updates; exhaustion never grants qualification.
         #[arg(long, default_value = "600")]
         updates: NonZeroU32,
@@ -41,6 +48,9 @@ enum Command {
         /// Valid standing checkpoint and its required seven-member provenance sidecar.
         #[arg(long)]
         checkpoint: PathBuf,
+        /// Training-only reward; frozen evaluation always retains the original profile.
+        #[arg(long, value_enum, default_value_t = Recipe::Original)]
+        reward_profile: Recipe,
         /// Maximum new 512-transition batches; prior updates are recorded separately.
         #[arg(long, default_value = "600")]
         updates: NonZeroU32,
@@ -79,42 +89,78 @@ async fn execute(command: Command) -> Result<(), Box<dyn Error>> {
             trace::write(bytes, &metadata, seed, &mut std::io::stdout().lock())
         }
         Command::Train {
+            reward_profile,
             updates,
             seed,
             output,
-        } => Box::pin(training::train(seed, updates, &output)).await,
+        } => Box::pin(train_selected(seed, updates, &output, None, reward_profile)).await,
         Command::WarmStart {
+            reward_profile,
             checkpoint,
             updates,
             seed,
             output,
-        } => Box::pin(training::warm_start(seed, updates, &output, &checkpoint)).await,
-        Command::Evaluate { checkpoint, seed } => {
-            // Read each file once; identity validation precedes construction of any environment.
-            let bytes = tokio::fs::read(&checkpoint).await?;
-            let metadata = tokio::fs::read(checkpoint.with_extension("json")).await?;
-            let (policy, record) = checkpoint::from_bytes(bytes, &metadata)?;
-            let held_out = evaluation::held_out_seeds();
-            let seeds = seed
-                .as_ref()
-                .map_or(held_out.as_slice(), std::slice::from_ref);
-            let episodes = evaluation::evaluate(&policy, seeds)?;
-            let passed = evaluation::passes(&episodes, seeds);
-            let suite = if seed.is_some() {
-                "single-episode"
-            } else {
-                "held-out"
-            };
-            let report = serde_json::json!({"mode":"frozen-inference", "suite":suite,
-                "checkpoint":checkpoint, "provenance":record, "passed":passed,
-                "qualification":"requires independent run evidence; a single episode cannot qualify",
-                "episodes":episodes});
-            println!("{report}");
-            if passed {
-                Ok(())
-            } else {
-                Err("Standing evaluation failed; checkpoint is not qualified.".into())
-            }
+        } => {
+            Box::pin(train_selected(
+                seed,
+                updates,
+                &output,
+                Some(&checkpoint),
+                reward_profile,
+            ))
+            .await
         }
+        Command::Evaluate { checkpoint, seed } => evaluate_checkpoint(&checkpoint, seed).await,
+    }
+}
+
+/// Preserve existing default entry points and use shaping only when explicitly selected.
+async fn train_selected(
+    seed: u64,
+    updates: NonZeroU32,
+    output: &Path,
+    checkpoint: Option<&Path>,
+    recipe: Recipe,
+) -> Result<(), Box<dyn Error>> {
+    match (recipe, checkpoint) {
+        (Recipe::Original, None) => Box::pin(training::train(seed, updates, output)).await,
+        (Recipe::Original, Some(checkpoint)) => {
+            Box::pin(training::warm_start(seed, updates, output, checkpoint)).await
+        }
+        (Recipe::PostureV1, checkpoint) => {
+            Box::pin(training::train_profiled(
+                seed, updates, output, checkpoint, recipe,
+            ))
+            .await
+        }
+    }
+}
+
+/// Reload immutable weights before measuring either one episode or the original held-out suite.
+async fn evaluate_checkpoint(checkpoint: &Path, seed: Option<u64>) -> Result<(), Box<dyn Error>> {
+    // Identity validation precedes construction of any environment.
+    let bytes = tokio::fs::read(checkpoint).await?;
+    let metadata = tokio::fs::read(checkpoint.with_extension("json")).await?;
+    let (policy, record) = checkpoint::from_bytes(bytes, &metadata)?;
+    let held_out = evaluation::held_out_seeds();
+    let seeds = seed
+        .as_ref()
+        .map_or(held_out.as_slice(), std::slice::from_ref);
+    let episodes = evaluation::evaluate(&policy, seeds)?;
+    let passed = evaluation::passes(&episodes, seeds);
+    let suite = if seed.is_some() {
+        "single-episode"
+    } else {
+        "held-out"
+    };
+    let report = serde_json::json!({"mode":"frozen-inference", "suite":suite,
+        "checkpoint":checkpoint, "provenance":record, "passed":passed,
+        "qualification":"requires independent run evidence; a single episode cannot qualify",
+        "episodes":episodes});
+    println!("{report}");
+    if passed {
+        Ok(())
+    } else {
+        Err("Standing evaluation failed; checkpoint is not qualified.".into())
     }
 }

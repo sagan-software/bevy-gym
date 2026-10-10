@@ -44,6 +44,123 @@ class StandingCliTests(unittest.TestCase):
             timeout=60,
         )
 
+    def test_posture_profile_is_training_only_and_records_its_contract(
+        self,
+    ) -> None:
+        """Record shaping after real PPO; frozen inference stays original."""
+        for mode in ["train", "warm-start"]:
+            output = self.root / ("posture-" + mode)
+            arguments = [mode, "--reward-profile", "posture-v1"]
+            if mode == "warm-start":
+                arguments += ["--checkpoint", str(self.checkpoint)]
+            result = self.run_command(
+                *arguments, "--seed", "17", "--updates", "1",
+                "--output", str(output),
+            )
+            self.assertEqual(result.returncode, 1, result.stderr)
+            self.assertIn("exhausted its update budget", result.stderr)
+            self.assertEqual(
+                (output / "training-reward.json").read_text(),
+                '{"contact_both":1.0,"contact_none":0.25,"contact_one":0.5,'
+                '"evaluation":"original-standing-v1",'
+                '"posture_up_projection_scale":0.03407418727874756,'
+                '"schema":"droid-standing-posture-reward-v1","seed":17}',
+            )
+            journal = json.loads((output / "optimization.jsonl").read_text())
+            self.assertEqual(journal["valid_samples"], 512)
+            self.assertGreater(journal["optimizer_updates"], 0)
+            checkpoint = output / "standing-1.mpk"
+            before = checkpoint.read_bytes()
+            evaluated = self.run_command(
+                "evaluate", "--checkpoint", str(checkpoint), "--seed", "42"
+            )
+            self.assertEqual(evaluated.returncode, 1)
+            self.assertEqual(checkpoint.read_bytes(), before)
+            self.assertEqual(
+                json.loads(evaluated.stdout)["suite"], "single-episode"
+            )
+        self.assertFalse((self.output / "training-reward.json").exists())
+
+    def test_reward_profile_rejects_invalid_and_frozen_modes(self) -> None:
+        """Reject unknown profiles and training options on frozen commands."""
+        output = self.root / "rejected-profile"
+        for arguments in [
+            ("train", "--reward-profile", "unknown"),
+            ("train", "--reward-profile"),
+            ("train", "--reward-profile", "true"),
+            ("evaluate", "--checkpoint", str(self.checkpoint),
+             "--reward-profile", "posture-v1"),
+            ("trace", "--checkpoint", str(self.checkpoint),
+             "--reward-profile", "posture-v1"),
+        ]:
+            if arguments[0] == "train":
+                arguments += ("--output", str(output))
+            result = self.run_command(*arguments)
+            self.assertEqual(result.returncode, 2)
+            self.assertEqual(result.stdout, "")
+            self.assertFalse(output.exists())
+
+    def test_explicit_original_profile_preserves_default_training(
+        self,
+    ) -> None:
+        """Default and explicit original profiles have identical semantics."""
+        output = self.root / "explicit-original"
+        result = self.run_command(
+            "train", "--reward-profile", "original", "--updates", "1",
+            "--output", str(output),
+        )
+        self.assertEqual(result.returncode, self.training.returncode)
+        self.assertFalse((output / "training-reward.json").exists())
+        self.assertEqual(
+            (output / "optimization.jsonl").read_text(),
+            (self.output / "optimization.jsonl").read_text(),
+        )
+        self.assertEqual(
+            json.loads((output / "standing-1.evaluation.json").read_text())[
+                "episodes"
+            ],
+            json.loads(
+                (self.output / "standing-1.evaluation.json").read_text()
+            )["episodes"],
+        )
+
+    def test_failed_scheduled_selection_continues_to_the_final_update(
+        self,
+    ) -> None:
+        """A failed update-20 selection preserves cadence and continues."""
+        output = self.root / "scheduled-selection"
+        result = self.run_command(
+            "train", "--updates", "21", "--output", str(output)
+        )
+        self.assertEqual(result.returncode, 1)
+        rows = [json.loads(line) for line in
+                (output / "optimization.jsonl").read_text().splitlines()]
+        self.assertEqual([row["update"] for row in rows], list(range(1, 22)))
+        for update in [20, 21]:
+            selection = json.loads(
+                (output / f"standing-{update}.evaluation.json").read_text()
+            )
+            self.assertFalse(selection["passed"])
+            self.assertEqual(
+                selection["provenance"]["transitions"], update * 512
+            )
+        self.assertGreater(
+            rows[-1]["optimizer_steps"], rows[-2]["optimizer_steps"]
+        )
+
+    def test_relative_output_preserves_original_directory_handling(
+        self,
+    ) -> None:
+        """A bare relative output uses the current directory as its parent."""
+        result = subprocess.run(
+            [self.executable, "train", "--updates", "1",
+             "--output", "relative"],
+            cwd=self.root, capture_output=True, text=True,
+            check=False, timeout=60,
+        )
+        self.assertEqual(result.returncode, 1)
+        self.assertTrue((self.root / "relative" / "standing-1.mpk").is_file())
+
     def test_budget_exhaustion_preserves_candidate(self) -> None:
         """A failed trial preserves weights, provenance and evaluation."""
         self.assertEqual(self.training.returncode, 1)

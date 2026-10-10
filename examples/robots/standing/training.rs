@@ -1,11 +1,12 @@
 //! Bounded on-policy standing training with explicit budget failure.
 
 use super::{
-    batch,
+    batch_with_recipe,
     checkpoint::{from_bytes, Record},
     evaluation, model,
+    reward::{Recipe, POSTURE_SCALE},
 };
-use bevy_gym::training::RecurrentPpoUpdate;
+use bevy_gym::training::{RecurrentPpoAgent, RecurrentPpoUpdate};
 use serde::Serialize;
 use std::{
     error::Error,
@@ -48,7 +49,14 @@ pub(crate) async fn train(
     updates: NonZeroU32,
     output: &Path,
 ) -> Result<(), Box<dyn Error>> {
-    Box::pin(train_from(seed, updates, output, Start::Random)).await
+    Box::pin(train_from(
+        seed,
+        updates,
+        output,
+        Start::Random,
+        Recipe::Original,
+    ))
+    .await
 }
 
 /// Continue RL weights with fresh optimizer state and a separately recorded source identity.
@@ -63,8 +71,37 @@ pub(crate) async fn warm_start(
         updates,
         output,
         Start::Checkpoint(checkpoint),
+        Recipe::Original,
     ))
     .await
+}
+
+/// Train a selected reward profile from random or validated RL checkpoint parameters.
+pub(crate) async fn train_profiled(
+    seed: u64,
+    updates: NonZeroU32,
+    output: &Path,
+    checkpoint: Option<&Path>,
+    recipe: Recipe,
+) -> Result<(), Box<dyn Error>> {
+    let start = checkpoint.map_or(Start::Random, Start::Checkpoint);
+    Box::pin(train_from(seed, updates, output, start, recipe)).await
+}
+
+/// Validated import bytes and their source identity, retained before optimization.
+struct InitialCheckpoint {
+    /// Exact imported actor/critic container bytes.
+    bytes: Vec<u8>,
+    /// Existing source counters and weight digest.
+    record: Record,
+}
+
+/// Ready learner and optional source evidence; optimizer and collector state are fresh.
+struct Initialization {
+    /// Configured recurrent learner with fresh Adam state.
+    agent: RecurrentPpoAgent,
+    /// None for seeded random initialization; otherwise the validated import.
+    initial: Option<InitialCheckpoint>,
 }
 
 /// Validate the selected initialization before creating output or collecting any transitions.
@@ -73,47 +110,14 @@ async fn train_from(
     updates: NonZeroU32,
     output: &Path,
     start: Start<'_>,
+    recipe: Recipe,
 ) -> Result<(), Box<dyn Error>> {
-    let (mut agent, initial) = match start {
-        Start::Random => (model::new_agent(seed)?, None),
-        Start::Checkpoint(path) => {
-            let bytes = fs::read(path).await?;
-            let metadata = fs::read(path.with_extension("json")).await?;
-            let record = Record::for_bytes(&bytes, &metadata)?;
-            // One cold byte copy retains exact source evidence while Burn consumes its decoder input.
-            let agent = model::warm_start(seed, bytes.clone())?;
-            (agent, Some((bytes, record)))
-        }
-    };
-    // A new directory prevents accidental replacement of previous trials or evidence.
-    let parent = output
-        .parent()
-        .filter(|path| !path.as_os_str().is_empty())
-        .unwrap_or_else(|| Path::new("."));
-    fs::create_dir_all(parent).await?;
-    fs::create_dir(output).await?;
-    if let Some((bytes, record)) = initial {
-        // Preserve the source before optimization; counters in subsequent sidecars remain run-local.
-        fs::write(output.join("initial.mpk"), &bytes).await?;
-        fs::write(
-            output.join("initial.json"),
-            serde_json::to_vec_pretty(&record)?,
-        )
-        .await?;
-        let origin = WarmStartRecord {
-            schema: WarmStartSchema::V1,
-            seed,
-            source: &record,
-        };
-        fs::write(
-            output.join("warm-start.json"),
-            serde_json::to_vec_pretty(&origin)?,
-        )
-        .await?;
-    }
+    let Initialization { mut agent, initial } = initialize(seed, start).await?;
+    create_output(output, seed, initial).await?;
+    record_reward_profile(output, seed, recipe).await?;
     let mut progress = fs::File::create(output.join("optimization.jsonl")).await?;
     let mut row = Vec::with_capacity(512);
-    let mut rollout = batch(seed, &agent.policy());
+    let mut rollout = batch_with_recipe(seed, &agent.policy(), recipe);
     for update in 1..=updates.get() {
         // One immutable policy snapshot supplies all eight lanes before either optimizer changes.
         let sequences = rollout.collect(&agent.policy())?;
@@ -131,6 +135,76 @@ async fn train_from(
         }
     }
     Err("Standing exhausted its update budget without passing; checkpoint is not qualified.".into())
+}
+
+/// Validate the original checkpoint shape before a new output directory exists.
+async fn initialize(seed: u64, start: Start<'_>) -> Result<Initialization, Box<dyn Error>> {
+    match start {
+        Start::Random => Ok(Initialization {
+            agent: model::new_agent(seed)?,
+            initial: None,
+        }),
+        Start::Checkpoint(path) => {
+            let bytes = fs::read(path).await?;
+            let metadata = fs::read(path.with_extension("json")).await?;
+            let record = Record::for_bytes(&bytes, &metadata)?;
+            // One cold copy retains exact source evidence while Burn consumes its decoder input.
+            let agent = model::warm_start(seed, bytes.clone())?;
+            Ok(Initialization {
+                agent,
+                initial: Some(InitialCheckpoint { bytes, record }),
+            })
+        }
+    }
+}
+
+/// Reject existing trials and retain validated source evidence before collection.
+async fn create_output(
+    output: &Path,
+    seed: u64,
+    initial: Option<InitialCheckpoint>,
+) -> Result<(), Box<dyn Error>> {
+    let parent = output
+        .parent()
+        .filter(|path| !path.as_os_str().is_empty())
+        .unwrap_or_else(|| Path::new("."));
+    fs::create_dir_all(parent).await?;
+    fs::create_dir(output).await?;
+    if let Some(InitialCheckpoint { bytes, record }) = initial {
+        fs::write(output.join("initial.mpk"), &bytes).await?;
+        fs::write(
+            output.join("initial.json"),
+            serde_json::to_vec_pretty(&record)?,
+        )
+        .await?;
+        let origin = WarmStartRecord {
+            schema: WarmStartSchema::V1,
+            seed,
+            source: &record,
+        };
+        fs::write(
+            output.join("warm-start.json"),
+            serde_json::to_vec_pretty(&origin)?,
+        )
+        .await?;
+    }
+    Ok(())
+}
+
+/// Emit the complete local profile before collection; the original recipe adds no artifact.
+async fn record_reward_profile(
+    output: &Path,
+    seed: u64,
+    recipe: Recipe,
+) -> Result<(), Box<dyn Error>> {
+    if recipe == Recipe::Original {
+        return Ok(());
+    }
+    let record = serde_json::json!({"schema":recipe, "seed":seed,
+        "posture_up_projection_scale":POSTURE_SCALE, "contact_both":1.0,
+        "contact_one":0.5, "contact_none":0.25, "evaluation":"original-standing-v1"});
+    fs::write(output.join("training-reward.json"), record.to_string()).await?;
+    Ok(())
 }
 
 /// Preserve exact weights and provenance before reporting independent selection outcomes.
@@ -197,6 +271,36 @@ fn record_update(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// A blocked profile artifact propagates I/O failure before any collector is created.
+    #[test]
+    fn reward_profile_write_failure_is_not_a_fallback() {
+        let process = std::process::id();
+        let directory = std::env::temp_dir().join(format!("standing-profile-write-{process}"));
+        let runtime = tokio::runtime::Builder::new_current_thread()
+            .build()
+            .expect("runtime");
+        runtime.block_on(async {
+            fs::create_dir(&directory)
+                .await
+                .expect("new isolated directory");
+            let artifact = directory.join("training-reward.json");
+            fs::create_dir(&artifact).await.expect("blocked artifact");
+            record_reward_profile(&directory, 17, Recipe::Original)
+                .await
+                .expect("original emits no profile");
+            record_reward_profile(&directory, 17, Recipe::PostureV1)
+                .await
+                .expect_err("profile cannot replace a directory");
+            assert!(!directory.join("optimization.jsonl").exists());
+            fs::remove_dir(&artifact)
+                .await
+                .expect("remove test artifact");
+            fs::remove_dir(&directory)
+                .await
+                .expect("remove isolated test directory");
+        });
+    }
 
     /// Finite metrics with signed losses for journal tests.
     fn metrics() -> RecurrentPpoUpdate {

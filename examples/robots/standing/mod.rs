@@ -6,6 +6,7 @@ mod cli;
 pub(crate) mod encoding;
 pub(crate) mod evaluation;
 pub(crate) mod model;
+pub(crate) mod reward;
 /// Frozen execution shared by physical inspection and rendered playback.
 #[path = "../standing_scene/session.rs"]
 pub(crate) mod session;
@@ -25,6 +26,22 @@ pub(crate) fn batch(seed: u64, policy: &RecurrentPpoPolicy) -> RecoveryBatch<Dro
         seed,
         policy,
         DroidStanding::default,
+        encoding::encode,
+        |values| Ok(encoding::decode(values)?),
+        NonZeroU16::new(1_000).expect("positive standing horizon"),
+    )
+}
+
+/// Collect using a fixed reward profile while retaining the original action/observation contract.
+pub(crate) fn batch_with_recipe(
+    seed: u64,
+    policy: &RecurrentPpoPolicy,
+    recipe: reward::Recipe,
+) -> RecoveryBatch<reward::TrainingTask, 204> {
+    RecoveryBatch::with_actions(
+        seed,
+        policy,
+        recipe.factory(),
         encoding::encode,
         |values| Ok(encoding::decode(values)?),
         NonZeroU16::new(1_000).expect("positive standing horizon"),

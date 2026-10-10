@@ -289,3 +289,76 @@ fn checkpoint_rejects_corrupt_and_incompatible_networks_after_identity() {
         assert!(!error.to_string().contains("digest mismatch"));
     }
 }
+
+/// Training reward shaping cannot alter resets, torque application or terminal freezing.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn posture_reward_preserves_the_authoritative_physical_episode() {
+    use bevy_gym::robots::{DroidAction, DroidBody};
+    for seed in [0, 42, u64::MAX] {
+        let mut original = DroidStanding::default();
+        let mut shaped = standing::reward::TrainingTask::posture();
+        assert_eq!(original.reset(Some(seed)), shaped.reset(Some(seed)));
+        let mut changed_reward = false;
+        for _ in 0..1_000 {
+            let action = DroidAction::try_from([0.0; 26]).expect("isolated test fixture");
+            let expected = original.step(action);
+            let actual = shaped.step(action);
+            assert_eq!(expected.observation, actual.observation);
+            assert_eq!(expected.status, actual.status);
+            assert!((0.0..=expected.reward).contains(&actual.reward));
+            changed_reward |= actual.reward < expected.reward;
+            if actual.status.is_done() {
+                assert_eq!(shaped.step(action), actual);
+                assert_eq!(actual.reward.to_bits(), 0.0_f64.to_bits());
+                break;
+            }
+            let observation = actual.observation;
+            assert!(observation.body(DroidBody::Torso).position().is_finite());
+        }
+        assert!(changed_reward);
+        assert_eq!(original.reset(None), shaped.reset(None));
+    }
+}
+
+/// The original profile preserves exact collector samples and optimizer inputs.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn original_training_profile_preserves_all_rollout_values() {
+    use standing::reward::Recipe;
+    let policy = standing::model::new_agent(7).expect("fixture").policy();
+    let mut original = standing::batch(7, &policy);
+    let mut profiled = standing::batch_with_recipe(7, &policy, Recipe::Original);
+    for _ in 0..2 {
+        assert_eq!(
+            original.collect(&policy).expect("original rollout"),
+            profiled.collect(&policy).expect("profiled rollout")
+        );
+    }
+}
+
+/// A frozen RL actor supplies identical physical samples while shaping changes learning targets.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn posture_rollout_changes_reward_targets_without_selecting_actions() {
+    use standing::reward::Recipe;
+    let mut agent = standing::model::new_agent(7).expect("seeded actor");
+    let policy = agent.policy();
+    let mut original = standing::batch(7, &policy);
+    let mut shaped = standing::batch_with_recipe(7, &policy, Recipe::PostureV1);
+    let expected = original.collect(&policy).expect("original rollout");
+    let actual = shaped.collect(&policy).expect("posture rollout");
+    assert_eq!(expected.len(), actual.len());
+    let mut targets_changed = false;
+    for (original, shaped) in expected.iter().zip(&actual) {
+        assert_eq!(original.observations, shaped.observations);
+        assert_eq!(original.global_states, shaped.global_states);
+        assert_eq!(original.pre_tanh_actions, shaped.pre_tanh_actions);
+        assert_eq!(original.old_log_probabilities, shaped.old_log_probabilities);
+        targets_changed |= original.returns != shaped.returns;
+    }
+    assert!(targets_changed);
+    let metrics = agent.update(&actual).expect("real shaped PPO update");
+    assert_eq!(metrics.valid_samples, 512);
+    assert!(metrics.optimizer_updates > 0);
+}

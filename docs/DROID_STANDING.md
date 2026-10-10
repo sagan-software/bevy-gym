@@ -538,3 +538,52 @@ policy-selected torque and physical boundary for selection seeds 0 and 42.
 The current reward can exceed its threshold while posture fails. This does not
 establish a physics or optimizer defect. The next experiment will test a training-only
 reward profile emphasizing posture and foot support while preserving qualification gates.
+
+## Training-only posture reward
+
+The optional `--reward-profile posture-v1` applies posture and foot-support weights
+to the original training reward. `original` remains the default. Frozen `evaluate`
+and `trace` reject the training option and retain the original qualification gates.
+The actor keeps the same 204 features and 26 direct-torque fractions.
+
+```sh
+nix develop --command cargo run --no-default-features --features robots \
+  --example droid-standing -- warm-start \
+  --checkpoint docs/progress/standing-seed17-update22940/checkpoint.mpk \
+  --reward-profile posture-v1 --seed 23 --updates 24000 \
+  --output runs/droid-standing/posture-seed23
+```
+
+The imported actor and critic remain unqualified. Adam, counters, samplers and
+episode memory start fresh. This command does not resume optimizer state.
+
+Let `u` be the torso-up projection on world Y, clamped to [-1, 1]. The training
+reward is the original reward times `exp(-(1 - u) / s)` times the contact weight.
+The dimensionless scale `s` is exactly `0.03407418727874756`, derived from the
+original f32 upright threshold. The posture weight is 1 when upright and
+`exp(-1)` at that threshold. Inverted poses receive less weight than horizontal poses.
+
+The dimensionless contact weight is 1 for both feet, 0.5 for exactly one foot,
+and 0.25 for neither foot. Contacts come from the same post-action physics snapshot.
+Terminal episodes retain zero reward before weighting. Reset streams, physical rules,
+torques, observations and qualification gates remain unchanged.
+
+Before collecting transitions, this mode writes `training-reward.json`. It emits
+seven required members as compact UTF-8 JSON without a final newline. The schema
+string is `droid-standing-posture-reward-v1`; `seed` is an unsigned integer.
+`posture_up_projection_scale` is the number `0.03407418727874756`.
+`contact_both`, `contact_one` and `contact_none` are the numbers 1.0, 0.5 and 0.25.
+`evaluation` is the string `original-standing-v1`.
+
+No member is absent or null; the writer emits no extensions. There is no profile
+input parser. The CLI test asserts the complete emitted text and member order.
+The original mode emits no profile artifact. A failed profile write stops training
+before rollout collection. The unchanged checkpoint sidecar requires the run record
+and reward artifact to identify this training recipe.
+
+The [validation record](progress/droid-standing-posture-reward.json) retains
+source hashes, commands, coverage gaps and the 20-update seed-23 smoke trial.
+That trial used 10,240 transitions and failed each of the five selection episodes.
+It has no held-out evaluation or qualification claim. All 245 browser tests,
+31 native learning tests and 14 CLI tests pass. The reward wrapper has full
+measured production line, region, function and branch coverage.

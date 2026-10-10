@@ -1,0 +1,907 @@
+{
+  "recorded_utc": "2026-10-10T15:47:07.069064+00:00",
+  "source_base": "7a7aef7ef3c0c03db2d843649e1e347bff430086",
+  "source_sha256": {
+    "examples/robots/standing/reward.rs": "1ed32077f63ffd076c6e9f64144fa4518d474b96e1f83f5aaa38965499a0c4d5",
+    "examples/robots/standing/mod.rs": "09c097a15f832b0d40485ac601c6f0a5c7951feddc62ab614d105433f2b50acc",
+    "examples/robots/standing/training.rs": "653970c53cf9cb6bdd19573bb585ba8fbcd0eb757b7e26f0b216a24a65d2a179",
+    "examples/robots/standing/cli.rs": "d7cadde177396c684cf79ec0effcb89c383aeab66afe86d03eff46751a6e577a",
+    "tests/droid_learning.rs": "cd48c23b4518ea1d8d8b2bb92c9fdab3d348746890283145e5c3b095929a62bb",
+    "tests/test_droid_standing_cli.py": "00fb96f8525cfa5eed384633452ab04509a692cd3a71d9c3216440f32c573c1c"
+  },
+  "source_patch_sha256": "8052b0ef2667b928da8040b218be27a5a6f4cf6a559950d8b1074efadb08ff6b",
+  "profile": {
+    "contact_both": 1.0,
+    "contact_none": 0.25,
+    "contact_one": 0.5,
+    "evaluation": "original-standing-v1",
+    "posture_up_projection_scale": 0.03407418727874756,
+    "schema": "droid-standing-posture-reward-v1",
+    "seed": 23
+  },
+  "profile_semantics": {
+    "reward": "Original dimensionless per-action reward times exp(-(1-u)/s) times contact multiplier. u is clamped f32 torso-up projection on world Y, converted to f64; s = 1 - f64(original f32 threshold 0.9659258).",
+    "support": "Both feet 1; exactly one 0.5; neither 0.25. Terminal rewards remain original zero before projection.",
+    "ownership": "Original task owns the body, contacts, lifecycle and reset stream; every action is passed through unchanged. No controller, teacher or fallback is added.",
+    "actor": "Unchanged 204 own-body features and 26 bounded direct-torque fractions; profile, reward and critic information never enter actor observations.",
+    "wire": "Emitted-only seven-member compact UTF-8 JSON, no final newline. Exact canonical text asserted at the CLI seam. No input parser, omitted members, null values or extensions. Original mode emits no profile artifact.",
+    "evaluation": "Unchanged original single-agent physical standing environment, reward, selection roots, held-out roots and qualification gates.",
+    "complexity": "Constant time and auxiliary space over the fixed thirteen-body observation; no new per-step allocation."
+  },
+  "research": {
+    "retrieved_source": "https://github.com/leggedrobotics/legged_gym/blob/8fa29acc6fd1910c3d9659eef6310bdd301cde0a/legged_gym/envs/base/legged_robot.py",
+    "revision": "8fa29acc6fd1910c3d9659eef6310bdd301cde0a",
+    "source_sha256": "bdaf5fa2dc123a539811b536c4a6feb9dadfcaf9df377d25d8ddbf434f531ff9",
+    "inspected_function": "    def _reward_orientation(self):\n        # Penalize non flat base orientation\n        return torch.sum(torch.square(self.projected_gravity[:, :2]), dim=1)\n",
+    "interpretation": "The upstream method measures squared projected-gravity XY as a roll/pitch penalty. This is a reference, not a guarantee for this articulated body. A local profile must distinguish upright and inverted poses and define its units, reward scaling, contacts and original evaluation gates before implementation.",
+    "profile_status": "not implemented"
+  },
+  "test_first": {
+    "env_red": "E0433 cannot find reward in standing; test failed before the missing wrapper was added.",
+    "env_green": "Public Env seam preserved reset, step observations/status, terminal freezing and omitted-seed reset progression while rewards changed.",
+    "cli_red": "Exit 2, unexpected argument --reward-profile, before implementation.",
+    "cli_green": "Both random and checkpoint starts perform PPO updates and emit exact profile text; invalid, missing and frozen-mode arguments stop before output.",
+    "rollout": "Frozen RL actor produces identical observations, global states, sampled pre-tanh actions and log probabilities under both profiles. Learning targets differ; actual shaped PPO update consumes 512 samples.",
+    "private": "Known exp(-1) weight, all four contact combinations, horizontal/inverted distinction and blocked-artifact I/O failure tested."
+  },
+  "checks": {
+    "native_environment": [
+      "nix",
+      "develop",
+      "--command",
+      "env",
+      "-u",
+      "CFLAGS",
+      "CARGO_TARGET_DIR=/home/sagan/.cache/bevy-gym-quality-validation/target",
+      "CARGO_BUILD_BUILD_DIR=/home/sagan/.cache/bevy-gym-quality-validation/build",
+      "CARGO_PROFILE_DEV_DEBUG=0",
+      "CARGO_PROFILE_TEST_DEBUG=0",
+      "CARGO_BUILD_JOBS=2"
+    ],
+    "commands": [
+      [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      [
+        "cargo",
+        "test"
+      ],
+      [
+        "cargo",
+        "clippy",
+        "--all-targets",
+        "--all-features",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      [
+        "cargo",
+        "test",
+        "--no-default-features",
+        "--features",
+        "robots",
+        "--test",
+        "droid_learning"
+      ],
+      [
+        "cargo",
+        "build",
+        "--no-default-features",
+        "--features",
+        "robots",
+        "--example",
+        "droid-standing"
+      ],
+      [
+        "python3",
+        "-m",
+        "unittest",
+        "tests.test_droid_standing_cli"
+      ],
+      [
+        "nix",
+        "run",
+        ".#drone-browser-check"
+      ]
+    ],
+    "counts": {
+      "native": {
+        "passed": 132,
+        "ignored": 1,
+        "suites": 36
+      },
+      "learning": {
+        "passed": 31,
+        "ignored": 0,
+        "suites": 1
+      },
+      "coverage": {
+        "passed": 31,
+        "ignored": 0,
+        "suites": 1
+      },
+      "browser": {
+        "passed": 245,
+        "ignored": 0,
+        "suites": 25
+      }
+    },
+    "cli_tests": 14,
+    "rust_personal": "all targets/all features changed-range HEAD; both children exit 0 and no changed diagnostics. Separate full strict Clippy passes. Existing unfiltered personal backlog is not declared clean.",
+    "python_personal": "exit 0, no diagnostics",
+    "logs": {
+      "fmt": {
+        "path": "/home/sagan/.cache/bevy-gym-quality-validation/posture-fmt.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "native": {
+        "path": "/home/sagan/.cache/bevy-gym-quality-validation/posture-native.log",
+        "sha256": "37f0feab5f6ace20de6f561f31badb11029055d3dcbc4fb38f00269c55838e45"
+      },
+      "clippy": {
+        "path": "/home/sagan/.cache/bevy-gym-quality-validation/posture-clippy.log",
+        "sha256": "495ebfcd776c91df0cb4fe9097b689cc7ae8e6b4a2944b85cc045bc4b79c08fe"
+      },
+      "learning": {
+        "path": "/home/sagan/.cache/bevy-gym-quality-validation/posture-learning.log",
+        "sha256": "32a178d4dda2428b612982b3af7f883752d3a468ffcfbcbb97f0d4d48eb6d446"
+      },
+      "build": {
+        "path": "/home/sagan/.cache/bevy-gym-quality-validation/posture-build.log",
+        "sha256": "71df57650cfcda873b490710fdbdd433d724eeceb59f5123eea111f7f4b71a11"
+      },
+      "cli": {
+        "path": "/home/sagan/.cache/bevy-gym-quality-validation/posture-cli.log",
+        "sha256": "54a95e412ff5576595b90cb9e6286eb7f825fa35e8d3e5750ec6c8cc8017228c"
+      },
+      "browser": {
+        "path": "/home/sagan/.cache/bevy-gym-quality-validation/posture-browser.log",
+        "sha256": "4ce98c61ba1ab0f6c85af4a50664385df0044f33986089f7a97139b404517d2c"
+      },
+      "personal": {
+        "path": "/home/sagan/.cache/bevy-gym-quality-validation/posture-personal.log",
+        "sha256": "038a142cff2b1e515cc1c951c74e648b8a95d44e2f66853fec1de3335df5b853"
+      },
+      "python": {
+        "path": "/home/sagan/.cache/bevy-gym-quality-validation/posture-python.log",
+        "sha256": "0e8bbae39af51717e91a0834d03d0c2b8abeb055edb6fa6b22e7b6cbeac19cfc"
+      },
+      "coverage": {
+        "path": "/home/sagan/.cache/bevy-gym-quality-validation/posture-coverage.log",
+        "sha256": "f696b84c6ae4c814b5c16c3c7c8c6c806d096471983d4f9336ebc8ae7751f7f8"
+      },
+      "coverage-cli": {
+        "path": "/home/sagan/.cache/bevy-gym-quality-validation/posture-coverage-cli.log",
+        "sha256": "8e1bb5326b27f2550dee73fd6343e810dbd874c7d44892a128fb7a09ae3b8a07"
+      },
+      "coverage-report": {
+        "path": "/home/sagan/.cache/bevy-gym-quality-validation/posture-coverage-report.log",
+        "sha256": "d909d257f7333fcf4959ed7249f58c60d521a4230f947ef37b88a9e8860e188f"
+      },
+      "markdown": {
+        "path": "/home/sagan/.cache/bevy-gym-quality-validation/posture-markdown.log",
+        "sha256": "f481ba08aa787c32ea7024101ebf2d02acabf9de9dcd0767f46bee3ec0b754b7"
+      },
+      "personal-markdown": {
+        "path": "/home/sagan/.cache/bevy-gym-quality-validation/posture-personal-markdown.log",
+        "sha256": "3b203f85f78dd47ec2d8e1d0a6b5c26b5e560104c15bf90242e345b95ed9d620"
+      },
+      "help": {
+        "path": "/home/sagan/.cache/bevy-gym-quality-validation/posture-help.log",
+        "sha256": "6ecdc3ee442a60ea76d85b10af21e1a996b221e329f21d06bc8eae379d33c590"
+      },
+      "doc-tests": {
+        "path": "/home/sagan/.cache/bevy-gym-quality-validation/posture-doc-tests.log",
+        "sha256": "e993ed5ecd00e94d1f282d7281e9de5e0e13df7071ca82a05b04e923501ceeac"
+      },
+      "final-fmt": {
+        "path": "/home/sagan/.cache/bevy-gym-quality-validation/posture-final-fmt.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    "documentation": {
+      "rumdl": "exit 0; both changed guides clean",
+      "personal_markdown": "nine unchanged EXAMPLE_STATUS.md LIAMC005 paragraphs; each matches HEAD exactly, no changed diagnostics",
+      "examples": "droid-standing --help and warm-start --help exit 0",
+      "doc_tests": "16 pass, 1 existing ignored",
+      "final_format": "cargo fmt --all -- --check exits 0"
+    }
+  },
+  "coverage": {
+    "objects": [
+      "/nix/store/llz63b99xvpsk2bhrzbh7z1grxxfa4h9-rust-mixed/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+      "export",
+      "-instr-profile=/home/sagan/.cache/bevy-gym-quality-validation/coverage-target/bevy-gym-quality.profdata",
+      "-object",
+      "/home/sagan/.cache/bevy-gym-quality-validation/coverage-target/debug/deps/droid_learning-367f485180c001e7",
+      "-object",
+      "/home/sagan/.cache/bevy-gym-quality-validation/coverage-target/debug/examples/droid-standing"
+    ],
+    "raw_report_sha256": "0c4cd0bf27610a9089d213b1c111fabfd6688af327895a75e61985659b9a8e66",
+    "summaries": {
+      "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/examples/robots/standing/cli.rs": {
+        "branches": {
+          "count": 4,
+          "covered": 3,
+          "notcovered": 1,
+          "percent": 75
+        },
+        "functions": {
+          "count": 7,
+          "covered": 7,
+          "percent": 100
+        },
+        "instantiations": {
+          "count": 7,
+          "covered": 7,
+          "percent": 100
+        },
+        "lines": {
+          "count": 74,
+          "covered": 73,
+          "percent": 98.64864864864865
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 135,
+          "covered": 132,
+          "notcovered": 3,
+          "percent": 97.77777777777777
+        }
+      },
+      "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/examples/robots/standing/mod.rs": {
+        "branches": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "functions": {
+          "count": 5,
+          "covered": 3,
+          "percent": 60
+        },
+        "instantiations": {
+          "count": 5,
+          "covered": 3,
+          "percent": 60
+        },
+        "lines": {
+          "count": 25,
+          "covered": 16,
+          "percent": 64
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 30,
+          "covered": 16,
+          "notcovered": 14,
+          "percent": 53.333333333333336
+        }
+      },
+      "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/examples/robots/standing/reward.rs": {
+        "branches": {
+          "count": 4,
+          "covered": 4,
+          "notcovered": 0,
+          "percent": 100
+        },
+        "functions": {
+          "count": 6,
+          "covered": 6,
+          "percent": 100
+        },
+        "instantiations": {
+          "count": 6,
+          "covered": 6,
+          "percent": 100
+        },
+        "lines": {
+          "count": 44,
+          "covered": 44,
+          "percent": 100
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 55,
+          "covered": 55,
+          "notcovered": 0,
+          "percent": 100
+        }
+      },
+      "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/examples/robots/standing/training.rs": {
+        "branches": {
+          "count": 12,
+          "covered": 10,
+          "notcovered": 2,
+          "percent": 83.33333333333334
+        },
+        "functions": {
+          "count": 19,
+          "covered": 19,
+          "percent": 100
+        },
+        "instantiations": {
+          "count": 19,
+          "covered": 19,
+          "percent": 100
+        },
+        "lines": {
+          "count": 191,
+          "covered": 186,
+          "percent": 97.38219895287958
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 309,
+          "covered": 281,
+          "notcovered": 28,
+          "percent": 90.93851132686083
+        }
+      },
+      "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/tests/../examples/robots/standing/cli.rs": {
+        "branches": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "functions": {
+          "count": 7,
+          "covered": 0,
+          "percent": 0
+        },
+        "instantiations": {
+          "count": 7,
+          "covered": 0,
+          "percent": 0
+        },
+        "lines": {
+          "count": 74,
+          "covered": 0,
+          "percent": 0
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 135,
+          "covered": 0,
+          "notcovered": 135,
+          "percent": 0
+        }
+      },
+      "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/tests/../examples/robots/standing/mod.rs": {
+        "branches": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "functions": {
+          "count": 5,
+          "covered": 4,
+          "percent": 80
+        },
+        "instantiations": {
+          "count": 5,
+          "covered": 4,
+          "percent": 80
+        },
+        "lines": {
+          "count": 25,
+          "covered": 22,
+          "percent": 88
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 30,
+          "covered": 25,
+          "notcovered": 5,
+          "percent": 83.33333333333334
+        }
+      },
+      "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/tests/../examples/robots/standing/reward.rs": {
+        "branches": {
+          "count": 8,
+          "covered": 6,
+          "notcovered": 2,
+          "percent": 75
+        },
+        "functions": {
+          "count": 7,
+          "covered": 7,
+          "percent": 100
+        },
+        "instantiations": {
+          "count": 7,
+          "covered": 7,
+          "percent": 100
+        },
+        "lines": {
+          "count": 58,
+          "covered": 58,
+          "percent": 100
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 83,
+          "covered": 83,
+          "notcovered": 0,
+          "percent": 100
+        }
+      },
+      "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/tests/../examples/robots/standing/training.rs": {
+        "branches": {
+          "count": 4,
+          "covered": 4,
+          "notcovered": 0,
+          "percent": 100
+        },
+        "functions": {
+          "count": 27,
+          "covered": 11,
+          "percent": 40.74074074074074
+        },
+        "instantiations": {
+          "count": 28,
+          "covered": 12,
+          "percent": 42.857142857142854
+        },
+        "lines": {
+          "count": 284,
+          "covered": 135,
+          "percent": 47.53521126760563
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 447,
+          "covered": 190,
+          "notcovered": 257,
+          "percent": 42.505592841163306
+        }
+      }
+    },
+    "gaps": [
+      "CLI evaluate_checkpoint success return remains unhit; no qualified standing checkpoint exists. This preserves the previous success branch.",
+      "train_from successful-selection early return remains unhit; no qualified standing checkpoint exists. Existing selection semantics remain unchanged.",
+      "CLI record_update nonfinite path is covered through the unit copy, not the normal finite-metric CLI.",
+      "The unit-linked CLI entry points and CLI-linked original batch copies are unused; executable and integration paths cover their active counterparts.",
+      "Two uncovered branch outcomes belong to successful private-test assertions; all reward production branches and regions are covered."
+    ]
+  },
+  "smoke": {
+    "launch": {
+      "base_revision": "7a7aef7ef3c0c03db2d843649e1e347bff430086",
+      "source_sha256": {
+        "examples/robots/standing/reward.rs": "1ed32077f63ffd076c6e9f64144fa4518d474b96e1f83f5aaa38965499a0c4d5",
+        "examples/robots/standing/mod.rs": "09c097a15f832b0d40485ac601c6f0a5c7951feddc62ab614d105433f2b50acc",
+        "examples/robots/standing/training.rs": "653970c53cf9cb6bdd19573bb585ba8fbcd0eb757b7e26f0b216a24a65d2a179",
+        "examples/robots/standing/cli.rs": "d7cadde177396c684cf79ec0effcb89c383aeab66afe86d03eff46751a6e577a",
+        "tests/droid_learning.rs": "dd708aaf297720d081b4b96279256b6b9afd3a4fe81a32764499e0a8ad3625b8",
+        "tests/test_droid_standing_cli.py": "4957cf7775f709d0d5288f536b3f0b70a2281e50553f4cbbc4cbd6edf53c84c7"
+      },
+      "binary_sha256": "702115bbf3fb11a1396f9091464cf1d7a22471ea942f8f4c8b794f0845cc253a",
+      "binary": "/home/sagan/.cache/bevy-gym-quality-validation/standing-posture-smoke-20261010/droid-standing",
+      "seed": 23,
+      "updates": 20,
+      "transitions": 10240,
+      "checkpoint": "docs/progress/standing-seed17-update22940/checkpoint.mpk",
+      "parent_sha256": "9c9e4c5bc8f7734da9835161476997e6d39d2aba28b24439e932a1f9949a2fdb",
+      "qualification": "Diagnostic only; parent and candidate unqualified. Actor and critic imported, fresh Adam/counters/episode memory; not a resume.",
+      "command": [
+        "/home/sagan/.cache/bevy-gym-quality-validation/standing-posture-smoke-20261010/droid-standing",
+        "warm-start",
+        "--checkpoint",
+        "docs/progress/standing-seed17-update22940/checkpoint.mpk",
+        "--reward-profile",
+        "posture-v1",
+        "--seed",
+        "23",
+        "--updates",
+        "20",
+        "--output",
+        "runs/droid-standing/posture-smoke-seed23-20261010"
+      ],
+      "exit_status": 1
+    },
+    "binary_relevant_sources_match_final_code": true,
+    "initialization": "Imported seed-17 update 22940 actor and critic; fresh Adam, samplers, counters and episode memory. Parent is unqualified. This is not optimizer resume.",
+    "checkpoint_sha256": "a70cfc80537789400f65232947b93bf74efb81918189b448e755c92aabb4299c",
+    "provenance": {
+      "schema": "droid-standing-v1",
+      "algorithm": "PPO",
+      "seed": 23,
+      "update": 20,
+      "transitions": 10240,
+      "optimizer_steps": 120,
+      "sha256": "a70cfc80537789400f65232947b93bf74efb81918189b448e755c92aabb4299c"
+    },
+    "optimizer_records": [
+      {
+        "actor_learning_rate": 0.0003,
+        "actor_loss": -0.010303814196959138,
+        "approximate_kl": 0.10054046474397182,
+        "critic_learning_rate": 0.001,
+        "critic_loss": 84.26017391681671,
+        "entropy": -17.37019968032837,
+        "lesson": "droid-standing-v1",
+        "optimizer_steps": 4,
+        "optimizer_updates": 4,
+        "update": 1,
+        "valid_samples": 512
+      },
+      {
+        "actor_learning_rate": 0.0003,
+        "actor_loss": 0.04544586260453798,
+        "approximate_kl": 0.0993590128637154,
+        "critic_learning_rate": 0.001,
+        "critic_loss": 29.76312340190634,
+        "entropy": -17.368516765534878,
+        "lesson": "droid-standing-v1",
+        "optimizer_steps": 12,
+        "optimizer_updates": 8,
+        "update": 2,
+        "valid_samples": 512
+      },
+      {
+        "actor_learning_rate": 0.0003,
+        "actor_loss": 0.024847075808793306,
+        "approximate_kl": 0.033146006520837545,
+        "critic_learning_rate": 0.001,
+        "critic_loss": 32.04583561420441,
+        "entropy": -17.36665439605713,
+        "lesson": "droid-standing-v1",
+        "optimizer_steps": 16,
+        "optimizer_updates": 4,
+        "update": 3,
+        "valid_samples": 512
+      },
+      {
+        "actor_learning_rate": 0.0003,
+        "actor_loss": 0.015757828718051314,
+        "approximate_kl": 0.008009121287614107,
+        "critic_learning_rate": 0.001,
+        "critic_loss": 23.882532611489296,
+        "entropy": -17.36656665802002,
+        "lesson": "droid-standing-v1",
+        "optimizer_steps": 20,
+        "optimizer_updates": 4,
+        "update": 4,
+        "valid_samples": 512
+      },
+      {
+        "actor_learning_rate": 0.0003,
+        "actor_loss": 0.012674049939960241,
+        "approximate_kl": 0.009851571638137102,
+        "critic_learning_rate": 0.001,
+        "critic_loss": 47.203989908099174,
+        "entropy": -17.367231845855713,
+        "lesson": "droid-standing-v1",
+        "optimizer_steps": 24,
+        "optimizer_updates": 4,
+        "update": 5,
+        "valid_samples": 512
+      },
+      {
+        "actor_learning_rate": 0.0003,
+        "actor_loss": 0.002007688310186495,
+        "approximate_kl": 0.0596438117390794,
+        "critic_learning_rate": 0.001,
+        "critic_loss": 60.02030560403364,
+        "entropy": -17.36789631843567,
+        "lesson": "droid-standing-v1",
+        "optimizer_steps": 32,
+        "optimizer_updates": 8,
+        "update": 6,
+        "valid_samples": 512
+      },
+      {
+        "actor_learning_rate": 0.0003,
+        "actor_loss": -0.010555063163337763,
+        "approximate_kl": 0.025444726981731877,
+        "critic_learning_rate": 0.001,
+        "critic_loss": 27.623109984910116,
+        "entropy": -17.373115561902523,
+        "lesson": "droid-standing-v1",
+        "optimizer_steps": 40,
+        "optimizer_updates": 8,
+        "update": 7,
+        "valid_samples": 512
+      },
+      {
+        "actor_learning_rate": 0.0003,
+        "actor_loss": 0.006274448707699776,
+        "approximate_kl": 0.013204859104007483,
+        "critic_learning_rate": 0.001,
+        "critic_loss": 14.228777758777142,
+        "entropy": -17.37604522705078,
+        "lesson": "droid-standing-v1",
+        "optimizer_steps": 44,
+        "optimizer_updates": 4,
+        "update": 8,
+        "valid_samples": 512
+      },
+      {
+        "actor_learning_rate": 0.0003,
+        "actor_loss": 0.013191201258450747,
+        "approximate_kl": 0.0014086556620895863,
+        "critic_learning_rate": 0.001,
+        "critic_loss": 14.305887123569846,
+        "entropy": -17.37939453125,
+        "lesson": "droid-standing-v1",
+        "optimizer_steps": 48,
+        "optimizer_updates": 4,
+        "update": 9,
+        "valid_samples": 512
+      },
+      {
+        "actor_learning_rate": 0.0003,
+        "actor_loss": 0.00014435863704420626,
+        "approximate_kl": 0.022283701990090887,
+        "critic_learning_rate": 0.001,
+        "critic_loss": 12.662349773105234,
+        "entropy": -17.38379307091236,
+        "lesson": "droid-standing-v1",
+        "optimizer_steps": 56,
+        "optimizer_updates": 8,
+        "update": 10,
+        "valid_samples": 512
+      },
+      {
+        "actor_learning_rate": 0.0003,
+        "actor_loss": 0.016787460386694875,
+        "approximate_kl": 0.07597219743456586,
+        "critic_learning_rate": 0.001,
+        "critic_loss": 8.65861582780417,
+        "entropy": -17.38564964570105,
+        "lesson": "droid-standing-v1",
+        "optimizer_steps": 64,
+        "optimizer_updates": 8,
+        "update": 11,
+        "valid_samples": 512
+      },
+      {
+        "actor_learning_rate": 0.0003,
+        "actor_loss": 0.006602362263947725,
+        "approximate_kl": 0.005103022791445255,
+        "critic_learning_rate": 0.001,
+        "critic_loss": 6.1025053188204765,
+        "entropy": -17.387895584106445,
+        "lesson": "droid-standing-v1",
+        "optimizer_steps": 68,
+        "optimizer_updates": 4,
+        "update": 12,
+        "valid_samples": 512
+      },
+      {
+        "actor_learning_rate": 0.0003,
+        "actor_loss": 0.0013186822761781514,
+        "approximate_kl": 0.03143722395179749,
+        "critic_learning_rate": 0.001,
+        "critic_loss": 10.887012313411105,
+        "entropy": -17.39102441072464,
+        "lesson": "droid-standing-v1",
+        "optimizer_steps": 76,
+        "optimizer_updates": 8,
+        "update": 13,
+        "valid_samples": 512
+      },
+      {
+        "actor_learning_rate": 0.0003,
+        "actor_loss": -0.0031738891266286373,
+        "approximate_kl": 0.01958462542097572,
+        "critic_learning_rate": 0.001,
+        "critic_loss": 13.19190750605776,
+        "entropy": -17.393397331237793,
+        "lesson": "droid-standing-v1",
+        "optimizer_steps": 84,
+        "optimizer_updates": 8,
+        "update": 14,
+        "valid_samples": 512
+      },
+      {
+        "actor_learning_rate": 0.0003,
+        "actor_loss": -0.01751314723105679,
+        "approximate_kl": 0.01429038014828175,
+        "critic_learning_rate": 0.001,
+        "critic_loss": 11.81128307263134,
+        "entropy": -17.394099990837276,
+        "lesson": "droid-standing-v1",
+        "optimizer_steps": 92,
+        "optimizer_updates": 8,
+        "update": 15,
+        "valid_samples": 512
+      },
+      {
+        "actor_learning_rate": 0.0003,
+        "actor_loss": -0.013268357681226917,
+        "approximate_kl": 0.004028048848112954,
+        "critic_learning_rate": 0.001,
+        "critic_loss": 7.598153613740578,
+        "entropy": -17.39233022928238,
+        "lesson": "droid-standing-v1",
+        "optimizer_steps": 100,
+        "optimizer_updates": 8,
+        "update": 16,
+        "valid_samples": 512
+      },
+      {
+        "actor_learning_rate": 0.0003,
+        "actor_loss": -0.008474537375150248,
+        "approximate_kl": 0.009751077988766732,
+        "critic_learning_rate": 0.001,
+        "critic_loss": 3.73992481055393,
+        "entropy": -17.389535903930664,
+        "lesson": "droid-standing-v1",
+        "optimizer_steps": 108,
+        "optimizer_updates": 8,
+        "update": 17,
+        "valid_samples": 512
+      },
+      {
+        "actor_learning_rate": 0.0003,
+        "actor_loss": 0.006340756546705961,
+        "approximate_kl": 0.003814880270510912,
+        "critic_learning_rate": 0.001,
+        "critic_loss": 1.343980542384088,
+        "entropy": -17.387853145599365,
+        "lesson": "droid-standing-v1",
+        "optimizer_steps": 112,
+        "optimizer_updates": 4,
+        "update": 18,
+        "valid_samples": 512
+      },
+      {
+        "actor_learning_rate": 0.0003,
+        "actor_loss": 0.007552350172773004,
+        "approximate_kl": 0.006078165955841541,
+        "critic_learning_rate": 0.001,
+        "critic_loss": 1.3343532849103212,
+        "entropy": -17.38616704940796,
+        "lesson": "droid-standing-v1",
+        "optimizer_steps": 116,
+        "optimizer_updates": 4,
+        "update": 19,
+        "valid_samples": 512
+      },
+      {
+        "actor_learning_rate": 0.0003,
+        "actor_loss": 0.008967562578618526,
+        "approximate_kl": 0.006625756621360779,
+        "critic_learning_rate": 0.001,
+        "critic_loss": 1.1700222566723824,
+        "entropy": -17.384429931640625,
+        "lesson": "droid-standing-v1",
+        "optimizer_steps": 120,
+        "optimizer_updates": 4,
+        "update": 20,
+        "valid_samples": 512
+      }
+    ],
+    "selection": {
+      "episodes": [
+        {
+          "final_distance": 1.3166791200637817,
+          "final_height": 0.5414376854896545,
+          "final_speed": 3.120816230773926,
+          "final_upright": -0.5216054916381836,
+          "reward": 605.1018918398768,
+          "seed": 0,
+          "stable_actions": 0,
+          "steps": 783,
+          "supported": false,
+          "survived": false
+        },
+        {
+          "final_distance": 0.16834793984889984,
+          "final_height": 0.9570075273513794,
+          "final_speed": 0.06557302176952362,
+          "final_upright": 0.7239329218864441,
+          "reward": 817.6098820865154,
+          "seed": 1,
+          "stable_actions": 0,
+          "steps": 1000,
+          "supported": true,
+          "survived": true
+        },
+        {
+          "final_distance": 0.6554708480834961,
+          "final_height": 0.4990130066871643,
+          "final_speed": 2.5706064701080322,
+          "final_upright": -0.034958526492118835,
+          "reward": 723.3806902505457,
+          "seed": 2,
+          "stable_actions": 0,
+          "steps": 898,
+          "supported": false,
+          "survived": false
+        },
+        {
+          "final_distance": 1.033719778060913,
+          "final_height": 0.5058245658874512,
+          "final_speed": 2.720917224884033,
+          "final_upright": -0.5936096906661987,
+          "reward": 748.5242284778506,
+          "seed": 42,
+          "stable_actions": 0,
+          "steps": 960,
+          "supported": false,
+          "survived": false
+        },
+        {
+          "final_distance": 0.6305462121963501,
+          "final_height": 0.7848319411277771,
+          "final_speed": 1.877667784690857,
+          "final_upright": 0.2531093955039978,
+          "reward": 733.1356600597501,
+          "seed": 18446744073709551615,
+          "stable_actions": 0,
+          "steps": 917,
+          "supported": false,
+          "survived": false
+        }
+      ],
+      "mode": "selection",
+      "passed": false,
+      "provenance": {
+        "algorithm": "PPO",
+        "optimizer_steps": 120,
+        "schema": "droid-standing-v1",
+        "seed": 23,
+        "sha256": "a70cfc80537789400f65232947b93bf74efb81918189b448e755c92aabb4299c",
+        "transitions": 10240,
+        "update": 20
+      },
+      "qualification": "requires held-out evaluation and independent run evidence"
+    },
+    "exit_status": 1,
+    "error": "Error: \"Standing exhausted its update budget without passing; checkpoint is not qualified.\"",
+    "held_out": "Not evaluated; failed selection and diagnostic budget. No held-out result used to choose this candidate.",
+    "comparison": "No paired baseline or qualification benefit is claimed."
+  },
+  "qualification": "Unqualified; the experiment changes training reward only. Shared browser 3v3 remains unfinished."
+}
