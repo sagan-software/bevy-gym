@@ -3,14 +3,15 @@
 use bevy_gym::robots::DroneTravelObservation;
 use bevy_gym::training::RecurrentPpoPolicy;
 use bevy_gym::{Env, TimeLimit};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use std::{error::Error, num::NonZeroU16};
 
 use super::{encoding, environment::TravelTask, stage::Stage};
 use crate::learning::decode_action;
 
 /// One frozen evaluation episode; these records never become optimizer input.
-#[derive(Debug, Clone, PartialEq, Serialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub(crate) struct Score {
     /// Independent reset root.
     pub(crate) seed: u64,
@@ -21,6 +22,7 @@ pub(crate) struct Score {
     /// Whether the episode reached its time limit without termination.
     pub(crate) survived: bool,
     /// First action inside the joint position and heading band, or no arrival.
+    #[serde(deserialize_with = "required_arrival")]
     pub(crate) first_arrival: Option<NonZeroU16>,
     /// Consecutive final actions satisfying position, heading and speed gates.
     pub(crate) settled_actions: u16,
@@ -30,6 +32,14 @@ pub(crate) struct Score {
     pub(crate) final_heading_error: f32,
     /// Final world linear speed, in metres per second.
     pub(crate) final_speed: f32,
+}
+
+/// Require the nullable arrival member while retaining Serde's standard nonzero conversion.
+fn required_arrival<'de, D>(deserializer: D) -> Result<Option<NonZeroU16>, D::Error>
+where
+    D: serde::Deserializer<'de>,
+{
+    Option::<NonZeroU16>::deserialize(deserializer)
 }
 
 /// Require the exact ordered evaluation set and every episode's physical gates.

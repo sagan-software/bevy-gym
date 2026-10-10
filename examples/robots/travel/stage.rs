@@ -1,21 +1,36 @@
 //! Closed travel stages with fixed sampling bounds and promotion thresholds.
 
 /// Increase destination distance and tighten the arrival deadline without changing actuators.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub(crate) enum Stage {
     /// Retain the original position and initial heading over the longer travel horizon.
+    #[serde(rename = "travel-endurance")]
     Endurance,
     /// Learn position and heading changes near the original hover target.
+    #[serde(rename = "travel-near")]
     Near,
     /// Reach destinations several metres away.
+    #[serde(rename = "travel-far")]
     Far,
     /// Reach farther destinations under a shorter arrival deadline.
+    #[serde(rename = "travel-fast")]
     Fast,
 }
 
 impl Stage {
     /// Ordered lessons; one learner and optimizer continue across these stages.
     pub(crate) const ALL: [Self; 4] = [Self::Endurance, Self::Near, Self::Far, Self::Fast];
+
+    /// Replay every prerequisite and the proposed stage in curriculum order.
+    pub(crate) fn through(self) -> impl Iterator<Item = Self> {
+        let length = match self {
+            Self::Endurance => 1,
+            Self::Near => 2,
+            Self::Far => 3,
+            Self::Fast => 4,
+        };
+        Self::ALL.into_iter().take(length)
+    }
 
     /// Stable artifact spelling.
     pub(crate) const fn name(self) -> &'static str {

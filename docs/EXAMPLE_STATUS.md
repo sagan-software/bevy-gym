@@ -4,6 +4,23 @@ Updated: 2026-10-10. Current work: RL-only drone/droid curriculum.
 
 ## Resume here
 
+### Separate-process travel promotion gate, 2026-10-10
+
+The current trainer now validates every prerequisite on 32 separate validation
+roots before advancing. It verifies checkpoint identity, recomputes the gates and
+requires an agreeing child exit status. Failed gates continue the current stage;
+operational failures stop training. Final held-out evaluation remains separate.
+
+Native tests, CLI tests, browser tests and strict Clippy pass. Personal Rust lint
+reports no changed-line diagnostics; its strict child still fails on the existing
+backlog. Python lint retains 45 unchanged line-length diagnostics. The
+[promotion record](progress/drone-travel-promotion.json) identifies measured coverage
+and unhit process paths. The immutable 1,900-update seed-23 PPO probe is running.
+
+The older immutable trial still uses selection-only transitions. Standing and
+travel remain unqualified. Next: inspect the probe's independent reports and
+resolve the failed skill qualification before later skills and browser 3v3.
+
 ### Endurance selection passes; independent evaluation fails, 2026-10-10
 
 Seed 23 passed its five-root endurance selection at update 1,860.
@@ -12,9 +29,9 @@ was 0.542 radians and the shortest final settled streak was zero. The
 [evidence record](progress/drone-travel-endurance-seed23.json) and
 [complete suite](progress/drone-travel-endurance-seed23-held-out.json) preserve the result.
 
-The existing trainer advanced to near travel on selection alone. That is a
-promotion-enforcement gap; endurance remains unqualified. Next: require independent
-evaluation before stage transitions and replay earlier stages before qualification.
+The older immutable trainer advanced to near travel on selection alone. The current
+trainer requires independent promotion validation and replays earlier stages.
+Endurance remains unqualified.
 Standing remains unqualified, and browser 3v3 remains unfinished.
 
 ### Travel recovery budget exhausted, 2026-10-10

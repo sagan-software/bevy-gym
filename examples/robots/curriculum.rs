@@ -14,13 +14,14 @@ mod travel;
 
 use std::{error::Error, num::NonZeroU32, path::PathBuf};
 
-use clap::{Parser, ValueEnum};
+use clap::{ArgGroup, Parser, ValueEnum};
 use initial_checkpoint::InitialCheckpoint;
 use learning::{baseline, load_policy, new_agent, SELECTION_SEEDS};
 use lesson::Lesson;
 
 /// Bound the work and choose where to save each evaluated checkpoint.
 #[derive(Parser)]
+#[command(group(ArgGroup::new("travel_evaluation").args(["evaluate_checkpoint", "evaluate_promotion"])))]
 struct Options {
     /// Train one lesson independently; omission runs hover followed by recovery.
     #[arg(long, value_enum)]
@@ -34,8 +35,11 @@ struct Options {
     /// Evaluate every travel stage on the fixed held-out seed suite without training.
     #[arg(long, requires = "lesson", conflicts_with_all = ["updates", "initialize_from", "evaluate_checkpoint", "travel_stage", "seed"])]
     evaluate_held_out: Option<PathBuf>,
+    /// Validate a proposed stage and every prerequisite in a separate frozen process.
+    #[arg(long, requires_all = ["lesson", "travel_stage"], conflicts_with_all = ["updates", "initialize_from", "evaluate_held_out", "seed"])]
+    evaluate_promotion: Option<PathBuf>,
     /// Select the task distribution for frozen travel inference.
-    #[arg(long, value_enum, requires = "evaluate_checkpoint")]
+    #[arg(long, value_enum, requires = "travel_evaluation")]
     travel_stage: Option<travel::stage::Stage>,
     /// Maximum 512-transition updates per lesson; exhaustion does not pass a lesson.
     #[arg(long, default_value = "600")]
@@ -103,6 +107,11 @@ fn main() -> Result<(), Box<dyn Error>> {
     {
         return Err("--evaluate-held-out requires --lesson travel".into());
     }
+    if options.evaluate_promotion.is_some()
+        && !matches!(options.lesson, Some(SelectedLesson::Travel))
+    {
+        return Err("--evaluate-promotion requires --lesson travel".into());
+    }
     // Reject unsupported transitions before loading weights or creating artifacts.
     if options.initialize_from.is_some()
         && !matches!(
@@ -116,6 +125,12 @@ fn main() -> Result<(), Box<dyn Error>> {
     let lessons = match &options.lesson {
         Some(SelectedLesson::Control(lesson)) => std::slice::from_ref(lesson),
         Some(SelectedLesson::Travel) => {
+            if let Some(path) = &options.evaluate_promotion {
+                let stage = options
+                    .travel_stage
+                    .ok_or("promotion requires --travel-stage")?;
+                return travel::promotion::run(stage, path);
+            }
             if let Some(path) = &options.evaluate_held_out {
                 return travel::held_out::run(path);
             }

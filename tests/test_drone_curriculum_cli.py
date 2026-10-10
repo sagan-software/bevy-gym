@@ -121,6 +121,73 @@ class DroneCurriculumCli(unittest.TestCase):
             self.assertEqual(checkpoint.read_bytes(), before)
             self.assertFalse((output / "unused").exists())
 
+    def test_promotion_replays_prerequisites_on_validation_roots(self):
+        checkpoint = ROOT / "docs/progress/drone-travel-trial.mpk"
+        before = checkpoint.read_bytes()
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / "must-not-exist"
+            result = subprocess.run(
+                [str(TARGET / "debug/examples/drone-curriculum"),
+                 "--lesson", "travel",
+                 "--evaluate-promotion", str(checkpoint),
+                 "--travel-stage", "travel-near",
+                 "--output", str(output)],
+                cwd=ROOT, capture_output=True, text=True, check=False,
+            )
+            self.assertEqual(result.returncode, 1, result.stderr)
+            report = json.loads(result.stdout)
+            self.assertEqual(report["schema"], "travel-promotion-v1")
+            digest = hashlib.sha256(before).hexdigest()
+            self.assertEqual(report["checkpoint_sha256"], digest)
+            self.assertEqual([row["stage"] for row in report["stages"]],
+                             ["travel-endurance", "travel-near"])
+            for row in report["stages"]:
+                roots = [(1 << 64) - 1 - offset
+                         for offset in range(1024, 1056)]
+                self.assertEqual(
+                    [episode["seed"] for episode in row["episodes"]], roots)
+            self.assertIn("Promotion validation failed", result.stderr)
+            self.assertFalse(output.exists())
+        self.assertEqual(checkpoint.read_bytes(), before)
+
+    def test_promotion_rejects_invalid_modes_before_creating_output(self):
+        base = ["--lesson", "travel", "--evaluate-promotion", "missing",
+                "--travel-stage", "travel-endurance"]
+        cases = [
+            (["--evaluate-promotion", "missing",
+              "--travel-stage", "travel-endurance"], 2),
+            (["--lesson", "hover", "--evaluate-promotion", "missing",
+              "--travel-stage", "travel-endurance"], 1),
+            (["--lesson", "travel", "--evaluate-promotion", "missing"], 2),
+            (base, 1),
+            (["--lesson", "travel", "--evaluate-promotion",
+              str(ROOT / "docs/progress/drone-recovery-transfer.mpk"),
+              "--travel-stage", "travel-endurance"], 1),
+            (["--lesson", "travel", "--evaluate-promotion", "missing",
+              "--travel-stage", "unknown"], 2),
+        ]
+        for extra in (["--updates", "1"], ["--seed", "11"],
+                      ["--initialize-from", "qualified-hover"],
+                      ["--evaluate-checkpoint", "missing"],
+                      ["--evaluate-held-out", "missing"]):
+            cases.append(([*base, *extra], 2))
+        for arguments, status in cases:
+            with (
+                self.subTest(arguments=arguments),
+                tempfile.TemporaryDirectory() as directory,
+            ):
+                output = Path(directory) / "must-not-exist"
+                result = subprocess.run(
+                    [str(TARGET / "debug/examples/drone-curriculum"),
+                     *arguments,
+                     "--output", str(output)],
+                    cwd=ROOT, capture_output=True, text=True, check=False,
+                )
+                self.assertEqual(result.returncode, status, result.stderr)
+                self.assertFalse(result.stdout)
+                self.assertTrue(result.stderr)
+                self.assertFalse(output.exists())
+
     def test_travel_refuses_an_unwritable_progress_destination(self):
         with tempfile.TemporaryDirectory() as directory:
             destination = Path(directory) / "optimization.jsonl"

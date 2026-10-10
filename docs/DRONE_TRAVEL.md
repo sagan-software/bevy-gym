@@ -69,10 +69,64 @@ against pi/12 permitted. The shortest final settled streak was zero. The
 [complete 128-episode suite](progress/drone-travel-endurance-seed23-held-out.json)
 preserve checkpoint identity and every case.
 
-Endurance remains unqualified. The existing trainer advances after selection alone,
-before held-out evaluation. This is a promotion-enforcement gap. Future transitions
-must require independent evaluation, and later candidates must replay earlier stages.
-The fixed gates remain unchanged.
+Endurance remains unqualified. The immutable batched trial advances after selection
+alone. The current trainer requires separate-process validation before each transition.
+The older process retains its historical behavior; its transitions do not establish qualification.
+
+## Independent promotion validation
+
+After a five-root selection passes, the trainer launches the same executable in a
+separate process. The process loads the saved policy without a learner or exploration
+sampler. It evaluates endurance through the proposed stage, in curriculum order.
+The parent checks the checkpoint SHA-256, recomputes every physical gate and checks
+that the exit status agrees. It saves the child stdout as `<stage>-<update>.promotion.json`.
+
+Each stage uses 32 ordered validation roots, from `u64::MAX - 1024` through
+`u64::MAX - 1055`. Training excludes these high-half roots. They differ from the
+five selection roots and the final held-out roots `u64::MAX - 1` through
+`u64::MAX - 32`. Repeated validation can influence stage transitions, so final
+held-out evaluation remains a separate release requirement.
+
+If validation fails its gates with exit status 1, training continues in the same
+stage. If loading, process execution, report parsing, checkpoint identity or status
+agreement fails, training stops before any transition. Budget exhaustion cannot
+promote a stage. Successful transitions retain the existing learner and optimizers.
+
+To inspect a frozen checkpoint through near travel:
+
+```sh
+nix develop --command cargo run --no-default-features --features robots \
+  --example drone-curriculum -- --lesson travel \
+  --evaluate-promotion path/to/checkpoint.mpk --travel-stage travel-near
+```
+
+The command emits one compact JSON report and exits 0 only when every prerequisite
+passes. It requires an explicit lesson and stage. It creates no training output.
+
+The private `travel-promotion-v1` report has exactly three required members:
+`schema`, a string equal to `travel-promotion-v1`; `checkpoint_sha256`, a string
+matching the saved bytes' 64 lowercase hexadecimal SHA-256 digits; and `stages`,
+an array containing the exact curriculum prefix. Stage tags are `travel-endurance`,
+`travel-near`, `travel-far` and `travel-fast`. Each stage object requires `stage`
+and `episodes`; the episode array contains exactly the 32 ordered roots above.
+
+Each episode requires `seed` (`u64`), `steps` (`u16`), `reward` (`f64`),
+`survived` (boolean), `first_arrival` (null or a nonzero `u16`),
+`settled_actions` (`u16`), `final_distance` (`f32`, metres),
+`final_heading_error` (`f32`, radians) and `final_speed` (`f32`, metres per second).
+Missing or unknown object members fail parsing. Missing arrival differs from null;
+null parses but fails qualification. Physical measurements must be finite and
+nonnegative before the existing survival, arrival, settling and return gates apply.
+JSON decoding retains these numeric types; consumers must preserve full `u64` seed
+precision. Object member order is irrelevant; stage and episode array order is required.
+
+The [promotion evidence](progress/drone-travel-promotion.json) records tests,
+coverage gaps and the immutable bounded PPO probe. The probe uses seed 23 and
+1,900 updates per stage under
+`bevy-gym-travel-promotion-seed23-20261010.service`, with output in
+`runs/drone-travel/promotion-seed23-20261010`. Inspect its current state and reports
+before claiming that a real training transition exercised this gate. No travel
+checkpoint is qualified, and browser 3v3 remains unfinished.
 
 ## Run the travel scene
 

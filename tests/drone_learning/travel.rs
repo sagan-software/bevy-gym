@@ -132,6 +132,9 @@ mod progress;
 #[path = "../../examples/robots/travel/stage.rs"]
 mod stage;
 
+#[path = "../../examples/robots/travel/promotion/report.rs"]
+mod promotion_report;
+
 /// The exact inclusive selection boundaries apply to every named travel stage.
 #[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
 #[cfg_attr(not(target_arch = "wasm32"), test)]

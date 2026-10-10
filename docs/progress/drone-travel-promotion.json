@@ -1,0 +1,222 @@
+{
+  "recorded_utc": "2026-10-10T11:18:50.182947+00:00",
+  "source_base": "8116f57dde8edb82f1727dc70eaaefe456ddffa6",
+  "status": "gate implemented; real PPO subprocess exercise pending; no qualified travel checkpoint",
+  "native_gates": [
+    {
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "log": "/home/sagan/.cache/bevy-gym-quality-validation/travel-promotion-post-rename-native-0.log"
+    },
+    {
+      "command": [
+        "cargo",
+        "test"
+      ],
+      "exit_code": 0,
+      "log": "/home/sagan/.cache/bevy-gym-quality-validation/travel-promotion-post-rename-native-1.log"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--no-default-features",
+        "--features",
+        "robots",
+        "--example",
+        "drone-curriculum",
+        "--test",
+        "drone_learning"
+      ],
+      "exit_code": 0,
+      "log": "/home/sagan/.cache/bevy-gym-quality-validation/travel-promotion-post-rename-native-2.log"
+    },
+    {
+      "command": [
+        "cargo",
+        "build",
+        "--no-default-features",
+        "--features",
+        "robots",
+        "--example",
+        "drone-curriculum"
+      ],
+      "exit_code": 0,
+      "log": "/home/sagan/.cache/bevy-gym-quality-validation/travel-promotion-post-rename-native-3.log"
+    },
+    {
+      "command": [
+        "python3",
+        "tests/test_drone_curriculum_cli.py"
+      ],
+      "exit_code": 0,
+      "log": "/home/sagan/.cache/bevy-gym-quality-validation/travel-promotion-post-rename-native-4.log"
+    },
+    {
+      "command": [
+        "cargo",
+        "clippy",
+        "--all-targets",
+        "--all-features",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "log": "/home/sagan/.cache/bevy-gym-quality-validation/travel-promotion-post-rename-native-5.log"
+    }
+  ],
+  "browser_gate": {
+    "command": "nix run .#drone-browser-check",
+    "log": "/home/sagan/.cache/bevy-gym-quality-validation/travel-promotion-post-rename-browser.log",
+    "status": "passed",
+    "exit_code": 0,
+    "suites": 25,
+    "passed": 229,
+    "ignored": 0
+  },
+  "personal_lint": {
+    "changed_rust_diagnostics": 0,
+    "strict_clippy_child_exit": 101,
+    "strict_wrapper_exit": 0,
+    "python_unchanged_E501": 45,
+    "python_exit": 1
+  },
+  "coverage": {
+    "report": "/home/sagan/.cache/bevy-gym-quality-validation/travel-promotion-coverage-with-cli.json",
+    "scope": "native drone-curriculum and drone_learning tests plus complete instrumented CLI suite; default filename exclusions disabled",
+    "files": [
+      {
+        "path": "examples/robots/travel/promotion/mod.rs",
+        "summary_including_tests": {
+          "branches": {
+            "count": 4,
+            "covered": 3,
+            "notcovered": 1,
+            "percent": 75.0
+          },
+          "mcdc": {
+            "count": 0,
+            "covered": 0,
+            "notcovered": 0,
+            "percent": 0.0
+          },
+          "functions": {
+            "count": 5,
+            "covered": 3,
+            "percent": 60.0
+          },
+          "instantiations": {
+            "count": 9,
+            "covered": 3,
+            "percent": 33.33333333333333
+          },
+          "lines": {
+            "count": 65,
+            "covered": 42,
+            "percent": 64.61538461538461
+          },
+          "regions": {
+            "count": 146,
+            "covered": 111,
+            "notcovered": 35,
+            "percent": 76.02739726027397
+          }
+        },
+        "zero_count_region_start_lines": [
+          16,
+          19,
+          26,
+          33,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          45,
+          46,
+          47
+        ]
+      },
+      {
+        "path": "examples/robots/travel/promotion/report.rs",
+        "summary_including_tests": {
+          "branches": {
+            "count": 12,
+            "covered": 10,
+            "notcovered": 2,
+            "percent": 83.33333333333334
+          },
+          "mcdc": {
+            "count": 0,
+            "covered": 0,
+            "notcovered": 0,
+            "percent": 0.0
+          },
+          "functions": {
+            "count": 24,
+            "covered": 24,
+            "percent": 100.0
+          },
+          "instantiations": {
+            "count": 34,
+            "covered": 31,
+            "percent": 91.17647058823528
+          },
+          "lines": {
+            "count": 229,
+            "covered": 229,
+            "percent": 100.0
+          },
+          "regions": {
+            "count": 386,
+            "covered": 385,
+            "notcovered": 1,
+            "percent": 99.74093264248705
+          }
+        },
+        "zero_count_region_start_lines": [
+          37
+        ]
+      }
+    ],
+    "gaps": [
+      "promotion::run success branch, examples/robots/travel/promotion/mod.rs:16-19, lacks an actually qualified policy",
+      "promotion::validate body and subprocess closure, examples/robots/travel/promotion/mod.rs:33-47, await a genuine PPO selection pass in the live probe",
+      "Report::evaluate per-stage evaluation error propagation, examples/robots/travel/promotion/report.rs:34-37, remains unhit",
+      "operational runtime, current_exe, spawn and report-write failures remain unhit"
+    ],
+    "claim": "Full changed-path coverage is not established."
+  },
+  "probe": {
+    "source_base": "8116f57dde8edb82f1727dc70eaaefe456ddffa6",
+    "source_patch_sha256": "5bb86d76e5f36b0aae05c034d73673d9562aef54f98b8c5fa22698d81c5107f3",
+    "binary_sha256": "3148e9fe6e202fd0e93add4e0ac6eb465577ff81aeac22c3e27573a9f896d9bd",
+    "parent_sha256": "7c2b9a6f2a0288faa27676d1514848710f4d5c24cd77505e75cf4990576a12b1",
+    "seed": 23,
+    "updates_per_stage": 1900,
+    "instrumentation": "LLVM branch coverage",
+    "created_utc": "2026-10-10T11:16:18.935874+00:00",
+    "first_ten_optimizer_records_match_old_trial": true
+  },
+  "probe_unit": "bevy-gym-travel-promotion-seed23-20261010.service",
+  "probe_output": "runs/drone-travel/promotion-seed23-20261010",
+  "qualification": "Final held-out suite, independent training-run qualification, remaining skills, six-agent RL and visible browser 3v3 remain required.",
+  "documentation_gates": {
+    "rumdl_exit": 0,
+    "personal_markdown_exit": 1,
+    "unchanged_paragraph_diagnostics": 13,
+    "verification": "Every diagnosed paragraph is present verbatim in HEAD.",
+    "doctests_exit": 0
+  }
+}

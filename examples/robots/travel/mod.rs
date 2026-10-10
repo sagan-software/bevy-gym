@@ -6,10 +6,12 @@ pub(crate) mod evaluation;
 pub(crate) mod held_out;
 pub(crate) mod model;
 mod progress;
+pub(crate) mod promotion;
 pub(crate) mod stage;
 
 use crate::learning::{encoding as motor_encoding, RecoveryBatch, SELECTION_SEEDS};
 use environment::TravelTask;
+use sha2::{Digest, Sha256};
 use stage::Stage;
 use std::{
     error::Error,
@@ -55,7 +57,9 @@ pub(crate) fn train(seed: u64, updates: NonZeroU32, output: &Path) -> Result<(),
                 continue;
             }
             let bytes = agent.policy().to_bytes()?;
-            std::fs::write(output.join(format!("{name}-{update}.mpk")), &bytes)?;
+            let checkpoint = output.join(format!("{name}-{update}.mpk"));
+            let digest = Sha256::digest(&bytes);
+            std::fs::write(&checkpoint, &bytes)?;
             let policy = model::load_policy(bytes)?;
             let episodes = evaluation::evaluate(stage, &policy, &SELECTION_SEEDS)?;
             let passed = evaluation::passes(stage, &episodes, &SELECTION_SEEDS);
@@ -66,7 +70,14 @@ pub(crate) fn train(seed: u64, updates: NonZeroU32, output: &Path) -> Result<(),
                 record.to_string(),
             )?;
             println!("{record}");
-            if passed {
+            if passed
+                && promotion::validate(
+                    stage,
+                    &checkpoint,
+                    &digest,
+                    &output.join(format!("{name}-{update}.promotion.json")),
+                )?
+            {
                 break;
             }
             if update == updates.get() {
