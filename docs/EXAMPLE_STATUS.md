@@ -4,6 +4,31 @@ Updated: 2026-10-10. Current work: RL-only drone/droid curriculum.
 
 ## Resume here
 
+### Standing checkpoint continuation, 2026-10-10
+
+`droid-standing warm-start` imports validated RL actor and critic parameters into
+fresh Adam optimizers. It retains exact source bytes and provenance before training.
+New counters and seed describe the new run; optimizer state is not resumed.
+The [guide](DROID_STANDING.md) defines the command and audit artifact.
+
+The seed-13 trial imports the failed seed-7 recovery checkpoint at update 600.
+It runs at most 2,400 new updates under
+`bevy-gym-standing-warm-start-seed13-20261010.service`, with a two-CPU quota and
+2 GiB memory limit. Output is `runs/droid-standing/seed13-warm-start-20261010`.
+The [evidence record](progress/droid-standing-warm-start.json) preserves the immutable
+binary, source patch, input hash and checks. Inspect live state before acting.
+
+Seven CLI checks pass. Three recurrent checkpoint/update tests pass in native and
+browser builds; the complete browser gate passes 218 tests. Required worker native
+and WASM Clippy commands pass. The frozen standing viewer uses a separate inference
+facade, removing caller-dependent feature checks that broke worker CI. Its rebuilt
+browser scene renders and steps a learned action.
+
+Candidate personal Rust lint is clean; strict personal Clippy still reports unchanged
+repository errors. The coverage record names the unreachable second configuration
+error path. Standing qualification, later skills and browser 3v3 remain unfinished.
+The RL-only 3v3 goal remains active.
+
 ### Standing viewer and storage recovery, 2026-10-10
 
 The halted local thread is `01a122d8-148d-79f2-b593-21d8472e877f`.

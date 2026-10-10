@@ -36,6 +36,35 @@ preserves the candidate. Selection runs every 20 updates and at the final update
 Each selection saves `standing-N.mpk`, its `.json` provenance, and
 `standing-N.evaluation.json`. The optimizer journal flushes after every update.
 
+Continue a saved RL actor and critic in a new directory:
+
+```sh
+nix develop --command cargo run --no-default-features --features robots \
+  --example droid-standing -- warm-start \
+  --checkpoint runs/droid-standing/seed7-recovery-20261010/standing-600.mpk \
+  --seed 13 --updates 2400 \
+  --output runs/droid-standing/seed13-warm-start
+```
+
+Warm start preserves actor and critic parameters. It creates fresh Adam optimizers,
+optimizer counters, minibatch ordering, environments, sampling streams and episode
+memory. It does not resume optimizer state. The seed controls the new training
+streams; it does not claim to initialize the imported parameters. The update budget
+and subsequent checkpoint counters describe only the new run.
+
+Metadata, SHA-256, architecture and finite parameters are validated before creating
+output. The run retains the exact imported bytes as `initial.mpk` and their validated
+seven-member sidecar as `initial.json`. `warm-start.json` emits exactly three required,
+non-null members, once each, in this order:
+
+- `schema`: the string `droid-standing-warm-start-v1`.
+- `seed`: the unsigned 64-bit seed for the new run.
+- `source`: the complete seven-member `droid-standing-v1` source record.
+
+This is an emitted audit artifact with no parser. Preserve it with subsequent
+checkpoints to retain the training lineage. Existing output directories are rejected.
+Qualification gates remain unchanged.
+
 Evaluate a saved candidate without training or modifying files:
 
 ```sh
@@ -307,3 +336,11 @@ standing sequence. Independent held-out evaluation failed all 32 cases. The
 [recovery record](progress/droid-standing-recovery.json) preserves the launch, prefix
 audit, final selection, checkpoint hash and optimizer-journal hash. The
 [held-out report](progress/droid-standing-recovery-evaluation.json) preserves every case.
+
+The next bounded trial imports update 600 and starts fresh optimization with seed 13.
+Its budget is 2,400 new updates. The unit is
+`bevy-gym-standing-warm-start-seed13-20261010.service`; output is
+`runs/droid-standing/seed13-warm-start-20261010`. The launch bundle is
+`/home/sagan/.cache/bevy-gym-quality-validation/standing-warm-start-seed13-20261010`.
+The [warm-start record](progress/droid-standing-warm-start.json) preserves source
+identity, validation and coverage gaps. Inspect live state before reporting results.

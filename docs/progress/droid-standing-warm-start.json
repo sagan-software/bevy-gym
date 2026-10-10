@@ -1,0 +1,227 @@
+{
+  "schema": "droid-standing-warm-start-evidence-v1",
+  "recorded_utc": "2026-10-10T06:33:41.735658+00:00",
+  "halted_thread": "01a122d8-148d-79f2-b593-21d8472e877f",
+  "manifest": {
+    "schema": "droid-standing-warm-start-run-v1",
+    "started_utc": "2026-10-10T06:31:53.765964+00:00",
+    "run_kind": "validated_actor_critic_import_fresh_adam",
+    "source_base": "da4fa2ded89a81784c22a4a9ff2a0ccddd89aa65",
+    "source_record": {
+      "schema": "droid-standing-v1",
+      "algorithm": "PPO",
+      "seed": 7,
+      "update": 600,
+      "transitions": 307200,
+      "optimizer_steps": 5800,
+      "sha256": "1d2edc383e8c57577a0efa9a829eea347d1d053c3c61bb0cc94ffd5b2c3ada9b"
+    },
+    "source_checkpoint": "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/runs/droid-standing/seed7-recovery-20261010/standing-600.mpk",
+    "patch_sha256": "8267657046eef41010508cd429e95d0db8dcf28d175e6557228b5dc08824eeb5",
+    "source_files_sha256": {
+      "examples/robots/learning/inference.rs": "e20c37d56d68b0ea8694d9a15b78a6112d40b7a5d9620ed4d0e8e35c36a5a218",
+      "examples/robots/learning/mod.rs": "67a25cad0b9235820b7c701cbf7c12aec488efa4d159d21e36662a0b67ebee2a",
+      "examples/robots/standing/checkpoint.rs": "52906347d788941be774011213554baae2568926e4fa9ffee8377dfb264b3fd8",
+      "examples/robots/standing/cli.rs": "14e8e7ccd3dd1865a443d068d069bde9cbbbce08773c8e3c9092b29524c4022c",
+      "examples/robots/standing/model.rs": "94440079321007689f379462ca9ad3a46bd8de64f5b04f9c8e156e0a247c9970",
+      "examples/robots/standing/training.rs": "1c5d39e808cb40c8817a076db720dbc1a8c4b00944bf64d75f47752554bedca7",
+      "examples/robots/standing_viewer.rs": "0a2773971c2afa142430115d93ca2ad8b66fcb4b1c658b45c26a7222ba522a39",
+      "flake.nix": "4a6b0794ca86cb775e1ff57f0a321bad36036ae43bfe9bf9f1d36becd97f9a73",
+      "src/training/recurrent_ppo/mod.rs": "4a97799435cd71daab5740300bf7627f84a3a7d4ba9b910f4154d293bc323553",
+      "tests/recurrent_ppo_bytes.rs": "3e2efc3057f3cf25c5f668e233a5b26aff4b2c62bd13dc3f5556e2206e1a742c",
+      "tests/test_droid_standing_cli.py": "530f281420b8274f52c17a6157fc7bde83accfafd763b636b4e4704c875bdc13",
+      "Cargo.lock": "a6dd6c536e8b1d666b30790c0c97257528f9103b2e1c6ed7c8dc94c95a9fb258",
+      "Cargo.toml": "c171ef5058012ebc620bf16b0a86395bc9243a3b5b18a3a287029ddd7119439f",
+      "flake.lock": "63b488e7cd5b17188b11c718cb8b5fe6b18c12b0271f7641d2f985004b4f78ac"
+    },
+    "binary_sha256": "a56ec1fb4ea1ae00f9b354b0ce51f2f2a44fc28f06edb6a84f2c58c3450e6a8a",
+    "command": [
+      "/home/sagan/.cache/bevy-gym-quality-validation/standing-warm-start-seed13-20261010/droid-standing",
+      "warm-start",
+      "--checkpoint",
+      "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/runs/droid-standing/seed7-recovery-20261010/standing-600.mpk",
+      "--seed",
+      "13",
+      "--updates",
+      "2400",
+      "--output",
+      "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/runs/droid-standing/seed13-warm-start-20261010"
+    ],
+    "unit": "bevy-gym-standing-warm-start-seed13-20261010.service",
+    "log": "/home/sagan/.cache/bevy-gym-quality-validation/standing-warm-start-seed13-20261010.log",
+    "resource_limits": {
+      "cpu_quota_percent": 200,
+      "memory_max_bytes": 2147483648,
+      "nice": 10
+    },
+    "new_update_budget": 2400,
+    "qualification": "unqualified; unchanged selection and held-out gates",
+    "fresh_state": [
+      "Adam moments",
+      "optimizer counter",
+      "minibatch RNG from seed 13",
+      "episode memory",
+      "environment and sampling streams"
+    ]
+  },
+  "source_files_sha256": {
+    "examples/robots/learning/inference.rs": "e20c37d56d68b0ea8694d9a15b78a6112d40b7a5d9620ed4d0e8e35c36a5a218",
+    "examples/robots/learning/mod.rs": "67a25cad0b9235820b7c701cbf7c12aec488efa4d159d21e36662a0b67ebee2a",
+    "examples/robots/standing/checkpoint.rs": "52906347d788941be774011213554baae2568926e4fa9ffee8377dfb264b3fd8",
+    "examples/robots/standing/cli.rs": "14e8e7ccd3dd1865a443d068d069bde9cbbbce08773c8e3c9092b29524c4022c",
+    "examples/robots/standing/model.rs": "94440079321007689f379462ca9ad3a46bd8de64f5b04f9c8e156e0a247c9970",
+    "examples/robots/standing/training.rs": "1c5d39e808cb40c8817a076db720dbc1a8c4b00944bf64d75f47752554bedca7",
+    "examples/robots/standing_viewer.rs": "0a2773971c2afa142430115d93ca2ad8b66fcb4b1c658b45c26a7222ba522a39",
+    "src/training/recurrent_ppo/mod.rs": "4a97799435cd71daab5740300bf7627f84a3a7d4ba9b910f4154d293bc323553",
+    "tests/recurrent_ppo_bytes.rs": "3e2efc3057f3cf25c5f668e233a5b26aff4b2c62bd13dc3f5556e2206e1a742c"
+  },
+  "red_evidence": {
+    "api": "missing RecurrentPpoAgent::load_bytes; E0599",
+    "cli": "warm-start command rejected with exit 2 instead of required exit 1",
+    "gradient_regression": "direct from_inner conversion preserved inference but the subsequent PPO update left actor behavior unchanged; loading records into initialized training modules fixed the observed assertion"
+  },
+  "gates": {
+    "native_fallback": "cargo fmt --all -- --check; cargo test; cargo clippy --all-targets --all-features -- -D warnings passed",
+    "focused_native": "19 droid_learning, 18 droid_skill_session, 3 recurrent_ppo_bytes passed",
+    "cli": "7 checks passed",
+    "browser": "nix run .#drone-browser-check; 218 tests across 25 suites passed",
+    "worker_native": "required all-target/all-feature strict Clippy passed; 25 protocol tests passed",
+    "worker_wasm": "required all-feature strict Clippy passed",
+    "frozen_wasm": "pure inference strict Clippy and four-scene build/package script passed",
+    "personal_rust": "Clippy and Dylint report no changed-line diagnostics",
+    "strict_personal_errors": {
+      "error": 88
+    },
+    "python": "no diagnostics",
+    "nix": "no diagnostics",
+    "examples_docs": "11 droid-standing example tests and 12 robot rustdoc tests passed; one existing ignored rustdoc",
+    "personal_markdown": "nine unchanged LIAMC005 paragraph-length findings in historical EXAMPLE_STATUS entries; changed paragraphs clean"
+  },
+  "coverage": {
+    "changed_line_report": {
+      "src/training/recurrent_ppo/mod.rs": {
+        "instrumented_changed_lines": 32,
+        "hit_changed_lines": 28,
+        "unhit_changed_lines": [
+          1227,
+          1240,
+          1250,
+          1259
+        ],
+        "missing_branch_outcomes": [],
+        "notes": {
+          "1227,1240,1250": "zero-count segment boundaries fall on comments; llvm-cov show marks these non-executable",
+          "1259": "Self::new error propagation is unhit because policy loading already validated the same configuration; successful construction and subsequent parameter transfers are hit"
+        },
+        "production_line_interpretation": {
+          "hit": 28,
+          "instrumented": 29,
+          "unhit_error_propagation_line": 1259,
+          "comment_boundary_segments_excluded": [
+            1227,
+            1240,
+            1250
+          ]
+        }
+      },
+      "examples/robots/learning/mod.rs": {
+        "instrumented_changed_lines": 0,
+        "hit_changed_lines": 0,
+        "unhit_changed_lines": [],
+        "missing_branch_outcomes": []
+      },
+      "examples/robots/standing/checkpoint.rs": {
+        "instrumented_changed_lines": 8,
+        "hit_changed_lines": 8,
+        "unhit_changed_lines": [],
+        "missing_branch_outcomes": []
+      },
+      "examples/robots/standing/cli.rs": {
+        "instrumented_changed_lines": 5,
+        "hit_changed_lines": 5,
+        "unhit_changed_lines": [],
+        "missing_branch_outcomes": []
+      },
+      "examples/robots/standing/model.rs": {
+        "instrumented_changed_lines": 8,
+        "hit_changed_lines": 8,
+        "unhit_changed_lines": [],
+        "missing_branch_outcomes": []
+      },
+      "examples/robots/standing/training.rs": {
+        "instrumented_changed_lines": 32,
+        "hit_changed_lines": 32,
+        "unhit_changed_lines": [],
+        "missing_branch_outcomes": []
+      }
+    },
+    "files": [
+      "standing-warm-start-coverage-final.json",
+      "standing-warm-start-cli-coverage-explicit.json"
+    ],
+    "gaps": [
+      "RecurrentPpoAgent::load_bytes line 1259: second identical configuration validation cannot fail after policy validation; implicit error propagation remains unhit",
+      "examples/robots/standing/training.rs:97,102,112: initial artifact write failures from full or unwritable storage are not injected; existing ? propagation returns errors",
+      "New inference facade contains module declarations and reexports; compile validation establishes its selected feature surface"
+    ]
+  },
+  "browser_recheck": {
+    "runtime_hash": "3fc645c59b5611531db7ba7a17e2ac0efbbd3e3d5667f459a97233a6bf470637",
+    "viewport_css": [
+      390,
+      844
+    ],
+    "screenshot": "standing-warm-start/browser-step.png",
+    "observed": "Paused at action 1 with pelvis speed 0.28 m/s and maximum learned torque fraction 0.27",
+    "verification_boundary": "existing update-100 unqualified frozen policy; training update600 is not substituted into the published scene"
+  },
+  "run_at_audit": {
+    "complete_updates": 26,
+    "last_optimizer_record": {
+      "actor_learning_rate": 0.0003,
+      "actor_loss": -0.03200042103526357,
+      "approximate_kl": 0.01482813594677144,
+      "critic_learning_rate": 0.001,
+      "critic_loss": 3.3537360746922786,
+      "entropy": -16.035252724774182,
+      "lesson": "droid-standing-v1",
+      "optimizer_steps": 208,
+      "optimizer_updates": 8,
+      "update": 26,
+      "valid_samples": 512
+    },
+    "imported_bytes_equal": true,
+    "initial_record_equal": true,
+    "warm_start_record_equal": true,
+    "qualification": "pending; no warm-start checkpoint is claimed qualified",
+    "selection20": {
+      "passed": false,
+      "steps": [
+        81,
+        81,
+        81,
+        99,
+        79
+      ],
+      "stable_actions": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  "logs_sha256": {
+    "standing-warm-start-api-red.log": "c2ff3075e90707f0a0f9532a6271462e3987dd416eb6ad7aab1af59625ac5882",
+    "standing-warm-start-cli-red.log": "484089c88ac4bd5ccbd7e1c114086eff7e68f82d6911c8441e7b16923b2a2060",
+    "standing-warm-start-final-native.log": "b4baca1b9635d096b467f508d40e7d94e8e3facce22bf18b93ee59d7189a906b",
+    "standing-warm-start-browser-gates-final.log": "d842666deb791007eacc3846cd5e182a635f2dce5a22c3d6e7ff091d63de5055",
+    "standing-warm-start-browser-build-final.log": "793102aedbd14c7c584ad8f96b22423e479710a716d07e140eb761143ac88c8b",
+    "standing-warm-start-worker-native.log": "29307bb207d8f4f3a123bc1b2ce298b203042b8dffe4babb47bb1a911df5fb8f",
+    "standing-warm-start-personal-root-final.log": "09956f949ada9ae02737fd20d1a630b3589d2646c2f22537c79711633d4f661f",
+    "standing-warm-start-python-lint-final.log": "0e8bbae39af51717e91a0834d03d0c2b8abeb055edb6fa6b22e7b6cbeac19cfc",
+    "standing-warm-start-nix-lint.log": "0e8bbae39af51717e91a0834d03d0c2b8abeb055edb6fa6b22e7b6cbeac19cfc",
+    "standing-warm-start-cli-coverage-final.log": "3307ab942a49c872d75681df6d78b4a9a24f72e487159d3d40984b0c0cacdd52"
+  }
+}

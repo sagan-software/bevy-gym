@@ -6,6 +6,7 @@ use super::{
     evaluation, model,
 };
 use bevy_gym::training::RecurrentPpoUpdate;
+use serde::Serialize;
 use std::{
     error::Error,
     io::Write,
@@ -14,13 +15,76 @@ use std::{
 };
 use tokio::{fs, io::AsyncWriteExt};
 
+/// Mutually exclusive weight origins; every run creates fresh optimization and episode state.
+enum Start<'a> {
+    /// Seeded random initialization.
+    Random,
+    /// Validated actor/critic import from an existing checkpoint.
+    Checkpoint(&'a Path),
+}
+
+/// Fixed emitted audit profile; no parser or alternate spelling is provided.
+#[derive(Serialize)]
+enum WarmStartSchema {
+    /// Fresh optimizer, minibatch RNG, environments, samplers and recurrent memory.
+    #[serde(rename = "droid-standing-warm-start-v1")]
+    V1,
+}
+
+/// Run-local seed and source identity, independent of the unchanged checkpoint sidecar.
+#[derive(Serialize)]
+struct WarmStartRecord<'a> {
+    /// Closed warm-start semantics and format version.
+    schema: WarmStartSchema,
+    /// New run's seed; it does not claim to initialize the imported parameters.
+    seed: u64,
+    /// Validated source counters and SHA-256 of the retained initial.mpk bytes.
+    source: &'a Record,
+}
+
 /// Train from random parameters; every selection uses a reloaded frozen policy.
 pub(crate) async fn train(
     seed: u64,
     updates: NonZeroU32,
     output: &Path,
 ) -> Result<(), Box<dyn Error>> {
-    let mut agent = model::new_agent(seed)?;
+    Box::pin(train_from(seed, updates, output, Start::Random)).await
+}
+
+/// Continue RL weights with fresh optimizer state and a separately recorded source identity.
+pub(crate) async fn warm_start(
+    seed: u64,
+    updates: NonZeroU32,
+    output: &Path,
+    checkpoint: &Path,
+) -> Result<(), Box<dyn Error>> {
+    Box::pin(train_from(
+        seed,
+        updates,
+        output,
+        Start::Checkpoint(checkpoint),
+    ))
+    .await
+}
+
+/// Validate the selected initialization before creating output or collecting any transitions.
+async fn train_from(
+    seed: u64,
+    updates: NonZeroU32,
+    output: &Path,
+    start: Start<'_>,
+) -> Result<(), Box<dyn Error>> {
+    let (mut agent, initial) = match start {
+        Start::Random => (model::new_agent(seed)?, None),
+        Start::Checkpoint(path) => {
+            let bytes = fs::read(path).await?;
+            let metadata = fs::read(path.with_extension("json")).await?;
+            let record = Record::for_bytes(&bytes, &metadata)?;
+            // One cold byte copy retains exact source evidence while Burn consumes its decoder input.
+            let agent = model::warm_start(seed, bytes.clone())?;
+            (agent, Some((bytes, record)))
+        }
+    };
     // A new directory prevents accidental replacement of previous trials or evidence.
     let parent = output
         .parent()
@@ -28,6 +92,25 @@ pub(crate) async fn train(
         .unwrap_or_else(|| Path::new("."));
     fs::create_dir_all(parent).await?;
     fs::create_dir(output).await?;
+    if let Some((bytes, record)) = initial {
+        // Preserve the source before optimization; counters in subsequent sidecars remain run-local.
+        fs::write(output.join("initial.mpk"), &bytes).await?;
+        fs::write(
+            output.join("initial.json"),
+            serde_json::to_vec_pretty(&record)?,
+        )
+        .await?;
+        let origin = WarmStartRecord {
+            schema: WarmStartSchema::V1,
+            seed,
+            source: &record,
+        };
+        fs::write(
+            output.join("warm-start.json"),
+            serde_json::to_vec_pretty(&origin)?,
+        )
+        .await?;
+    }
     let mut progress = fs::File::create(output.join("optimization.jsonl")).await?;
     let mut row = Vec::with_capacity(512);
     let mut rollout = batch(seed, &agent.policy());

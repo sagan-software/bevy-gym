@@ -126,6 +126,84 @@ class StandingCliTests(unittest.TestCase):
         provenance = json.loads((output / "standing-2.json").read_text())
         self.assertEqual(provenance["transitions"], 1024)
 
+    def test_checkpoint_start_preserves_source_and_records_fresh_state(
+        self,
+    ) -> None:
+        """Retain source identity and start fresh optimization state."""
+        source_bytes = self.checkpoint.read_bytes()
+        metadata = self.checkpoint.with_suffix(".json")
+        source_record = json.loads(metadata.read_text())
+        output = self.root / "checkpoint-start"
+        result = self.run_command(
+            "warm-start", "--checkpoint", str(self.checkpoint),
+            "--seed", "13", "--updates", "1", "--output", str(output),
+        )
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("exhausted its update budget", result.stderr)
+        self.assertEqual(self.checkpoint.read_bytes(), source_bytes)
+        self.assertEqual((output / "initial.mpk").read_bytes(), source_bytes)
+        self.assertEqual(
+            json.loads((output / "initial.json").read_text()), source_record
+        )
+        self.assertEqual(
+            json.loads((output / "warm-start.json").read_text()),
+            {
+                "schema": "droid-standing-warm-start-v1",
+                "seed": 13,
+                "source": source_record,
+            },
+        )
+        record = json.loads((output / "standing-1.json").read_text())
+        self.assertEqual(record["seed"], 13)
+        self.assertEqual(record["update"], 1)
+        self.assertEqual(record["transitions"], 512)
+        journal = json.loads((output / "optimization.jsonl").read_text())
+        self.assertGreater(journal["optimizer_updates"], 0)
+        self.assertEqual(journal["valid_samples"], 512)
+        before = {path.name: path.read_bytes() for path in output.iterdir()}
+        rejected = self.run_command(
+            "warm-start", "--checkpoint", str(self.checkpoint),
+            "--updates", "1", "--output", str(output),
+        )
+        self.assertEqual(rejected.returncode, 1)
+        self.assertEqual(
+            before,
+            {path.name: path.read_bytes() for path in output.iterdir()},
+        )
+
+    def test_invalid_checkpoint_start_cannot_create_output(self) -> None:
+        """Reject invalid input before creating an output directory."""
+        absent = self.root / "absent.mpk"
+        unidentified = self.root / "unidentified.mpk"
+        unidentified.write_bytes(self.checkpoint.read_bytes())
+        corrupt = self.root / "bad-digest.mpk"
+        corrupt.write_bytes(b"corrupt weights")
+        metadata = self.checkpoint.with_suffix(".json")
+        source_record = json.loads(metadata.read_text())
+        corrupt.with_suffix(".json").write_text(json.dumps(source_record))
+        malformed = self.root / "malformed.mpk"
+        malformed.write_bytes(b"not a network")
+        digest = hashlib.sha256(malformed.read_bytes()).hexdigest()
+        source_record["sha256"] = digest
+        malformed.with_suffix(".json").write_text(json.dumps(source_record))
+        invalid = (absent, unidentified, corrupt, malformed)
+        for index, checkpoint in enumerate(invalid):
+            with self.subTest(checkpoint=checkpoint.name):
+                output = self.root / f"rejected-{index}"
+                result = self.run_command(
+                    "warm-start", "--checkpoint",
+                    str(checkpoint),
+                    "--updates", "1", "--output", str(output),
+                )
+                self.assertEqual(result.returncode, 1)
+                self.assertEqual(result.stdout, "")
+                self.assertFalse(output.exists())
+        self.assertEqual(self.run_command("warm-start").returncode, 2)
+        self.assertEqual(self.run_command(
+            "warm-start", "--checkpoint", str(self.checkpoint),
+            "--updates", "0",
+        ).returncode, 2)
+
     def test_missing_or_corrupt_inference_never_emits_an_episode(self) -> None:
         """Reject missing records and changed weights before inference."""
         missing = self.run_command(

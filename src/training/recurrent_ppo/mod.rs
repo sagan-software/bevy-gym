@@ -1215,6 +1215,58 @@ impl RecurrentPpoAgent {
         Ok(agent)
     }
 
+    /// Load validated actor and critic bytes with fresh optimizer and rollout RNG state.
+    ///
+    /// Every parameter transfers unchanged. This starts a new optimization run;
+    /// it does not restore Adam moments, optimizer counters, or episode memory.
+    /// Import takes O(parameters) time and space and consumes the supplied bytes.
+    /// Burn 0.21 wraps the validated inference modules through `from_inner`:
+    /// <https://docs.rs/burn/0.21.0/burn/module/trait.AutodiffModule.html>.
+    ///
+    /// # Errors
+    ///
+    /// Returns a configuration or checkpoint error before constructing a usable learner
+    /// when bytes are corrupt, parameter shapes differ, or parameters are nonfinite.
+    pub fn load_bytes(
+        bytes: Vec<u8>,
+        observation_dim: usize,
+        global_state_dim: usize,
+        value_count: usize,
+        action_low: &[f32],
+        action_high: &[f32],
+        config: RecurrentPpoConfig,
+        seeds: SeedConfig,
+    ) -> Result<Self, RecurrentPpoError> {
+        // Validate the complete inference record before converting any parameter to autodiff.
+        let policy = RecurrentPpoPolicy::load_bytes(
+            bytes,
+            observation_dim,
+            global_state_dim,
+            value_count,
+            action_low,
+            action_high,
+            &config,
+        )?;
+        // New Adam instances and the supplied RNG seed define a fresh optimization run.
+        let mut agent = Self::new(
+            observation_dim,
+            global_state_dim,
+            value_count,
+            action_low,
+            action_high,
+            config,
+            seeds,
+        )?;
+        // Loading into initialized training modules retains their enabled gradient flags.
+        agent.actor = agent
+            .actor
+            .load_record(RecurrentActor::from_inner(policy.actor).into_record());
+        agent.critic = agent
+            .critic
+            .load_record(CentralCritic::from_inner(policy.critic).into_record());
+        Ok(agent)
+    }
+
     /// Load a recurrent actor while retaining a newly initialized critic.
     ///
     /// This transfer mode preserves decentralized behavior across curriculum

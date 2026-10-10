@@ -1,9 +1,9 @@
 //! Inspect frozen PPO torque control of the physical droid, including its failed balance.
 #[expect(
     dead_code,
-    unused_imports,
     reason = "The scene loads frozen weights; trainer commands are separate examples."
 )]
+#[path = "learning/inference.rs"]
 mod learning;
 #[expect(
     dead_code,

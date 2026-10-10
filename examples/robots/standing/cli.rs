@@ -27,6 +27,21 @@ enum Command {
         #[arg(long, default_value = "runs/droid-standing/seed7")]
         output: PathBuf,
     },
+    /// Start from RL actor/critic weights with fresh optimizer and episode state.
+    WarmStart {
+        /// Valid standing checkpoint and its required seven-member provenance sidecar.
+        #[arg(long)]
+        checkpoint: PathBuf,
+        /// Maximum new 512-transition batches; prior updates are recorded separately.
+        #[arg(long, default_value = "600")]
+        updates: NonZeroU32,
+        /// New root for minibatch ordering and independent training streams.
+        #[arg(long, default_value = "13")]
+        seed: u64,
+        /// New output directory; an existing path is rejected.
+        #[arg(long, default_value = "runs/droid-standing/checkpoint-start-seed13")]
+        output: PathBuf,
+    },
     /// Evaluate frozen weights without training or writing files.
     Evaluate {
         /// Weight file accompanied by its required .json PPO provenance record.
@@ -54,6 +69,12 @@ async fn execute(command: Command) -> Result<(), Box<dyn Error>> {
             seed,
             output,
         } => Box::pin(training::train(seed, updates, &output)).await,
+        Command::WarmStart {
+            checkpoint,
+            updates,
+            seed,
+            output,
+        } => Box::pin(training::warm_start(seed, updates, &output, &checkpoint)).await,
         Command::Evaluate { checkpoint, seed } => {
             // Read each file once; identity validation precedes construction of any environment.
             let bytes = tokio::fs::read(&checkpoint).await?;

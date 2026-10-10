@@ -16,7 +16,7 @@ use std::{
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(try_from = "WireRecord", into = "WireRecord")]
 pub(crate) struct Record {
-    /// Root used for initialization and disjoint training streams.
+    /// Run seed for disjoint training streams; warm-start evidence identifies imported weights.
     seed: u64,
     /// Completed batches, each containing exactly 512 environment transitions.
     update: NonZeroU32,
@@ -30,6 +30,15 @@ impl Record {
     /// Read the validated positive number of completed PPO batches.
     pub(crate) const fn update(&self) -> NonZeroU32 {
         self.update
+    }
+
+    /// Validate the metadata and borrowed byte identity before architecture activation.
+    pub(crate) fn for_bytes(bytes: &[u8], metadata: &[u8]) -> Result<Self, Box<dyn Error>> {
+        let record: Self = serde_json::from_slice(metadata)?;
+        if Sha256::digest(bytes) != record.digest {
+            return Err("standing checkpoint digest mismatch".into());
+        }
+        Ok(record)
     }
 
     /// Bind an actual positive update to the exact bytes written by the trainer.
@@ -105,7 +114,7 @@ struct WireRecord {
     schema: Schema,
     /// Exact training-method identifier.
     algorithm: Algorithm,
-    /// Initialization and training root.
+    /// Run seed; separate warm-start evidence identifies any imported parameters.
     seed: u64,
     /// Positive completed update count.
     update: NonZeroU32,
@@ -172,10 +181,7 @@ pub(crate) fn from_bytes(
     bytes: Vec<u8>,
     metadata: &[u8],
 ) -> Result<(RecurrentPpoPolicy, Record), Box<dyn Error>> {
-    let record: Record = serde_json::from_slice(metadata)?;
-    if Sha256::digest(&bytes) != record.digest {
-        return Err("standing checkpoint digest mismatch".into());
-    }
+    let record = Record::for_bytes(&bytes, metadata)?;
     Ok((model::load_policy(bytes)?, record))
 }
 

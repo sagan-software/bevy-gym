@@ -35,6 +35,24 @@ pub(crate) fn new_agent(seed: u64) -> Result<RecurrentPpoAgent, RecurrentPpoErro
     )
 }
 
+/// Import the same actor/critic architecture while resetting both Adam optimizers.
+#[cfg(not(target_arch = "wasm32"))]
+pub(crate) fn warm_start(
+    seed: u64,
+    bytes: Vec<u8>,
+) -> Result<RecurrentPpoAgent, RecurrentPpoError> {
+    RecurrentPpoAgent::load_bytes(
+        bytes,
+        FEATURES,
+        FEATURES,
+        1,
+        &[-1.0; 26],
+        &[1.0; 26],
+        configuration(),
+        SeedConfig::from_root(seed),
+    )
+}
+
 /// Restore the exact observation and action architecture without fallback.
 pub(crate) fn load_policy(bytes: Vec<u8>) -> Result<RecurrentPpoPolicy, RecurrentPpoError> {
     RecurrentPpoPolicy::load_bytes(
