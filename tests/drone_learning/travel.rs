@@ -72,6 +72,8 @@ fn qualified_recovery_actor_transfers_before_heading_training() {
 mod environment;
 #[path = "../../examples/robots/travel/evaluation.rs"]
 mod evaluation;
+#[path = "../../examples/robots/travel/progress.rs"]
+mod progress;
 #[path = "../../examples/robots/travel/stage.rs"]
 mod stage;
 

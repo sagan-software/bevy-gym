@@ -5,6 +5,7 @@ pub(crate) mod environment;
 pub(crate) mod evaluation;
 pub(crate) mod held_out;
 pub(crate) mod model;
+mod progress;
 pub(crate) mod stage;
 
 use crate::learning::{encoding as motor_encoding, RecoveryBatch, SELECTION_SEEDS};
@@ -12,6 +13,8 @@ use environment::TravelTask;
 use stage::Stage;
 use std::{
     error::Error,
+    fs::File,
+    io::BufWriter,
     num::{NonZeroU16, NonZeroU32},
     path::Path,
 };
@@ -20,6 +23,7 @@ use std::{
 pub(crate) fn train(seed: u64, updates: NonZeroU32, output: &Path) -> Result<(), Box<dyn Error>> {
     let mut agent = model::new_agent(seed)?;
     std::fs::create_dir_all(output)?;
+    let mut progress = BufWriter::new(File::create(output.join("optimization.jsonl"))?);
     let transfer = serde_json::json!({"event":"checkpoint-transfer", "source":"qualified-recovery",
         "source_checkpoint":"docs/progress/drone-recovery-transfer.mpk",
         "qualified_record_sha256":"7c2b9a6f2a0288faa27676d1514848710f4d5c24cd77505e75cf4990576a12b1",
@@ -40,6 +44,13 @@ pub(crate) fn train(seed: u64, updates: NonZeroU32, output: &Path) -> Result<(),
             // Every lane uses this frozen snapshot; both optimizers update only afterward.
             let sequences = batch.collect(&agent.policy())?;
             let metrics = agent.update(&sequences)?;
+            // Preserve every update, including those between checkpoint selections.
+            progress::record(
+                &mut progress,
+                stage,
+                NonZeroU32::new(update).expect("update loop starts at one"),
+                &metrics,
+            )?;
             if update % 20 != 0 && update != updates.get() {
                 continue;
             }

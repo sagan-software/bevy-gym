@@ -2,6 +2,7 @@
 
 import hashlib
 import json
+import math
 import os
 from pathlib import Path
 import subprocess
@@ -49,13 +50,30 @@ class DroneCurriculumCli(unittest.TestCase):
             self.assertEqual(record["update"], 1)
             self.assertGreater(record["optimizer_steps"], 0)
             self.assertEqual(len(record["episodes"]), 5)
+            progress_path = Path(directory) / "optimization.jsonl"
+            progress = [json.loads(line)
+                        for line in progress_path.read_text().splitlines()]
+            self.assertEqual(len(progress), 1)
+            self.assertEqual(progress[0]["lesson"], "travel-endurance")
+            self.assertEqual(progress[0]["update"], 1)
+            self.assertEqual(progress[0]["valid_samples"], 512)
+            self.assertEqual(progress[0]["optimizer_steps"],
+                             record["optimizer_steps"])
+            self.assertGreater(progress[0]["optimizer_updates"], 0)
+            for field in ("actor_loss", "critic_loss", "entropy",
+                          "approximate_kl", "actor_learning_rate",
+                          "critic_learning_rate"):
+                self.assertIsInstance(progress[0][field], float)
+                self.assertTrue(math.isfinite(progress[0][field]), field)
             transfer = json.loads((Path(directory) / "transfer.json").read_text())
             self.assertEqual(transfer["source"], "qualified-recovery")
             self.assertEqual(transfer["destination"], "travel-endurance")
             self.assertEqual(transfer["optimizer"], "fresh")
             self.assertEqual(transfer["actor_observations"], 13)
             self.assertEqual(sorted(p.name for p in Path(directory).iterdir()),
-                             ["transfer.json", "travel-endurance-1.json", "travel-endurance-1.mpk"])
+                             ["optimization.jsonl", "transfer.json",
+                              "travel-endurance-1.json",
+                              "travel-endurance-1.mpk"])
             checkpoint = Path(directory) / "travel-endurance-1.mpk"
             before = checkpoint.read_bytes()
             inference = subprocess.run(
@@ -102,6 +120,64 @@ class DroneCurriculumCli(unittest.TestCase):
                                  [(1 << 64) - 1 - offset for offset in range(1, 33)])
             self.assertEqual(checkpoint.read_bytes(), before)
             self.assertFalse((output / "unused").exists())
+
+    def test_travel_refuses_an_unwritable_progress_destination(self):
+        with tempfile.TemporaryDirectory() as directory:
+            destination = Path(directory) / "optimization.jsonl"
+            destination.mkdir()
+            result = subprocess.run(
+                [str(TARGET / "debug/examples/drone-curriculum"),
+                 "--lesson", "travel", "--updates", "1",
+                 "--output", directory],
+                cwd=ROOT, capture_output=True, text=True, check=False,
+            )
+            self.assertEqual(result.returncode, 1)
+            self.assertTrue(result.stderr)
+            self.assertFalse(result.stdout)
+            self.assertEqual(list(Path(directory).iterdir()), [destination])
+            self.assertTrue(destination.is_dir())
+
+    @unittest.skipUnless(Path("/dev/full").exists(), "requires /dev/full")
+    def test_travel_stops_when_progress_flush_fails(self):
+        with tempfile.TemporaryDirectory() as directory:
+            destination = Path(directory) / "optimization.jsonl"
+            destination.symlink_to("/dev/full")
+            result = subprocess.run(
+                [str(TARGET / "debug/examples/drone-curriculum"),
+                 "--lesson", "travel", "--updates", "2",
+                 "--output", directory],
+                cwd=ROOT, capture_output=True, text=True, check=False,
+            )
+            self.assertEqual(result.returncode, 1)
+            self.assertTrue(result.stderr)
+            self.assertNotIn("exhausted", result.stderr)
+            self.assertEqual(json.loads(result.stdout)["event"],
+                             "checkpoint-transfer")
+            self.assertEqual(sorted(p.name for p in Path(directory).iterdir()),
+                             ["optimization.jsonl", "transfer.json"])
+            self.assertTrue(destination.is_symlink())
+
+    def test_travel_progress_includes_updates_between_selections(self):
+        with tempfile.TemporaryDirectory() as directory:
+            result = subprocess.run(
+                [str(TARGET / "debug/examples/drone-curriculum"),
+                 "--lesson", "travel", "--updates", "2", "--seed", "11",
+                 "--output", directory],
+                cwd=ROOT, capture_output=True, text=True, check=False,
+            )
+            self.assertEqual(result.returncode, 1, result.stderr)
+            progress_path = Path(directory) / "optimization.jsonl"
+            rows = [json.loads(line)
+                    for line in progress_path.read_text().splitlines()]
+            self.assertEqual([row["update"] for row in rows], [1, 2])
+            self.assertEqual([row["valid_samples"] for row in rows],
+                             [512, 512])
+            self.assertLess(rows[0]["optimizer_steps"],
+                            rows[1]["optimizer_steps"])
+            first = Path(directory) / "travel-endurance-1.json"
+            second = Path(directory) / "travel-endurance-2.json"
+            self.assertFalse(first.exists())
+            self.assertTrue(second.is_file())
 
     def test_travel_inference_rejects_missing_and_incompatible_checkpoints(self):
         for checkpoint in (ROOT / "absent-travel-checkpoint.mpk",

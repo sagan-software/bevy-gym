@@ -216,6 +216,48 @@ source, source checkpoint, run manifest, and checkpoint chain. Use these final r
 for independent evaluation after selection; do not feed their episodes into training
 or tune promotion thresholds against them. No current travel candidate is qualified.
 
+### Optimizer records
+
+Each travel training invocation creates or truncates `optimization.jsonl` in its
+output directory. Use a fresh directory to preserve earlier runs. Each completed
+PPO update writes one UTF-8 JSON object followed by LF, then flushes the writer
+before selection or the next rollout. This includes updates between checkpoint
+selections. Flush makes data available to readers; it does not promise power-loss
+durability. A write failure can leave a partial final line.
+
+Every object contains these required members; none may be absent or null:
+
+- `lesson`: one of `travel-endurance`, `travel-near`, `travel-far`, `travel-fast`.
+- `update`: positive integer index within the stage, starting at one.
+- `optimizer_steps`: cumulative integer actor/critic minibatch update count.
+- `optimizer_updates`: positive integer minibatch update count for this call.
+- `valid_samples`: positive integer count of distinct rollout transitions, currently 512.
+- `actor_loss`: finite number, the clipped surrogate loss including the entropy term.
+- `critic_loss`: finite number, half the mean squared value residual.
+- `entropy`: finite number, pre-tanh diagonal Gaussian differential entropy in nats.
+- `approximate_kl`: finite number, mean old-minus-current action log probability in nats.
+- `actor_learning_rate` and `critic_learning_rate`: finite numeric optimizer step sizes.
+
+Losses and step sizes are dimensionless under this lesson's dimensionless reward
+and feature encoding. Metrics average valid timesteps across optimizer passes.
+Actor loss, entropy and the sampled KL estimate may be negative; these values are
+preserved. Object member order is unspecified. Rows follow stage and update order;
+the update index restarts when a stage changes. No row is an evaluation or promotion.
+
+NaN and either infinity stop the trainer with `non-finite PPO metric: FIELD` before
+writing that record. Creation, write and flush errors also stop training visibly.
+The completed optimizer update is not rolled back, and no subsequent rollout or
+selection runs after the error. The existing checkpoint cadence and qualification
+gates are unchanged. [Validation](progress/drone-travel-progress.json) records
+error-path tests, native/WASM results and measured coverage.
+
+A bounded [critic-warmup comparison](progress/drone-travel-optimization-probe.json)
+used zero or 20 critic-only updates before 20 PPO updates, with training seed 11.
+Both final policies failed all five survival evaluations. Mean returns were 208.7
+without warmup and 244.7 with warmup, below the unchanged source's 279.2.
+Warmup is not enabled in the trainer. This probe used selection seeds, never the
+held-out suite, and does not establish improvement or qualification.
+
 ### Observation encoding
 
 The actor and critic each receive 13 dimensionless features. In order, these are

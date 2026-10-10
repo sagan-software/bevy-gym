@@ -4,6 +4,48 @@ Updated: 2026-10-09. Current work: RL-only drone/droid curriculum.
 
 ## Resume here
 
+### Per-update travel diagnostics and independent trial, 2026-10-09
+
+`7e05631d1b70eddc614fe904d651ce0b10380eed` is verified on GitHub main. Its CI passed;
+Browser preview remained pending at the last check. The travel trial scene remains
+explicitly unqualified. The original dirty checkout was not edited.
+
+Travel training now flushes `optimization.jsonl` after every completed PPO update.
+The [guide](DRONE_TRAVEL.md#optimizer-records) defines each field, finite-value rules,
+ordering and failure behavior. Invalid measurements and output failures stop training
+before further rollouts or selection. These diagnostics do not alter agent actions,
+rewards, optimizer settings, checkpoint cadence or promotion gates.
+
+The [bounded comparison](progress/drone-travel-optimization-probe.json) tested zero
+versus 20 critic-only updates before 20 PPO updates on seed 11. The five evaluation
+records remained exactly unchanged during critic warmup. Both post-PPO policies
+crashed in all five episodes; mean returns were 208.7 and 244.7, below the source's
+279.2. Warmup also consumed minibatch-shuffle RNG, so this comparison does not isolate
+critic fitting alone. Warmup remains disabled. Preserve both failed probe checkpoints
+and the probe source under the paths recorded in its evidence.
+
+`bevy-gym-travel-endurance-seed19-20261009.service` is active, with seed 19 and a
+2,400-update maximum per stage. Its independent binary and source manifest are
+preserved; it uses the original PPO settings and all unchanged selection/held-out
+gates. Artifacts are under `runs/drone-travel/endurance-seed19-20261009` and the log is
+`/home/sagan/.cache/bevy-gym-quality-validation/travel-endurance-seed19.log`.
+Poll the live unit and progress file before acting; do not restart from an expired
+observation. Seed-11 near-travel and endurance failures remain preserved.
+
+[Validation evidence](progress/drone-travel-progress.json) records 31 native learning
+tests, 17 curriculum tests, 14 CLI tests and 176 browser tests passing. Root tests,
+strict native/WASM Clippy and WASM compilation pass. Changed-line personal Rust and
+Python diagnostics are clean; strict personal Clippy and 45 unchanged Python
+diagnostics remain repository-level gaps. Coverage hits all 150 logger lines,
+including tests, both finite-validation branch outcomes and all seven changed
+trainer lines. No whole-package coverage claim is made.
+
+Next: monitor seed 19 through unchanged selection, diagnose its recorded optimizer
+behavior, and independently evaluate any selected candidate before qualification.
+Research the articulated standing environment while training runs. Travel
+qualification, later drone lessons, physical droid lessons, multi-agent training
+and the spectator 3v3 arena remain unfinished. The curriculum goal remains active.
+
 ### Travel trial scene and endurance failure, 2026-10-09
 
 `fe83e779e7e9735efe4c6a533c7efb8d86daad11` was verified on GitHub main before this
