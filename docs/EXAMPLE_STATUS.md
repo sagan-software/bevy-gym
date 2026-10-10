@@ -6,6 +6,10 @@ The [record](progress/droid-standing-posture-reward.json) retains the profile,
 source hashes, checkpoint, optimizer journal and coverage gaps.
 All 245 browser tests, 31 native learning tests and 14 CLI tests pass.
 
+The [recorded seed-23 trial](progress/droid-standing-posture-seed23.json) is active
+with a 24,000-update limit. Its first 20 optimizer records match the smoke exactly.
+It imports the unqualified seed-17 actor and critic with fresh Adam and episode state.
+
 The completed droid run’s strongest selection candidate, update 22,940, failed
 held-out qualification. Five of 32 episodes survived the horizon, with every final
 stable streak zero. The [record](progress/standing-seed17-update22940/summary.json)
