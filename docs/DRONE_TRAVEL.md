@@ -26,6 +26,18 @@ The first fifteen optimizer records and update-20 selection report match the ori
 exactly. The update-20 checkpoint bytes differ, so byte reproducibility is not established.
 Held-out and independent-run evidence remain required.
 
+The recovery run completed all 2,400 updates and exhausted its budget.
+All five final selection episodes survived 1,000 actions. Seed 0 failed with
+0.279 radians of heading error and no final settled streak; the limit is pi/12.
+Independent held-out endurance evaluation also failed despite all 32 episodes surviving.
+Its worst heading error was 0.659 radians, and its shortest final settled streak was zero.
+
+The [completion record](progress/drone-travel-recovery-final.json) and
+[complete held-out suite](progress/drone-travel-recovery-final-held-out.json) preserve
+checkpoint and executable hashes, terminal state and all 128 episodes. Near, far and
+fast results measure untrained transfer; those stages were never reached in training.
+The seed-23 batched trial continues independently. No travel checkpoint is qualified.
+
 ## Batched training trial
 
 The [seed-23 trial](./progress/drone-travel-batched-trial.json) uses the batched PPO

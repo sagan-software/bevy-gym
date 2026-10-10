@@ -1,0 +1,1084 @@
+{
+  "recorded_utc": "2026-10-10T10:13:10.781193+00:00",
+  "scope": "All complete five-root selection reports available at snapshot; no held-out results, no qualification claim",
+  "source_revision": "40a4c6724c5443ce6b9efb726c09897557757132",
+  "rows": 261,
+  "source_reports": [
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-100.evaluation.json",
+      "sha256": "a0d75c67f810a0ac6a7c8253805c578a7b55e35813e53d25f323a0c0f97d2ff3"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-1000.evaluation.json",
+      "sha256": "3f1e4c88b083666bf48b68b6491b2e824b9cecb2e11a93efba3b176004ed45d9"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-1020.evaluation.json",
+      "sha256": "948ffad24b9066f131d962cbc575dd53b860bf3e2d762c7be5b43b82cff5d8b2"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-1040.evaluation.json",
+      "sha256": "fa9a30e324b12256667e80dd7838f0b84169920e7641cbbfde19d7a4b6ac4a25"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-1060.evaluation.json",
+      "sha256": "8c6c063931f58fa51bb3b2e88d3624f442f5f45a2dc27339129d589b1d9873d2"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-1080.evaluation.json",
+      "sha256": "f86b148e54ce58f0556f1d158b58c33a31e1fb626b78d51633226ff968ba373d"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-1100.evaluation.json",
+      "sha256": "e85a4786cb34d62ba0ec53e4a4dd7d2ba5193c7e32f42afc7da87bb4a106988f"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-1120.evaluation.json",
+      "sha256": "08664aff8c22b5aef22b70003408ec774fbaa22166eb5240e83cc9e005fd1d9f"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-1140.evaluation.json",
+      "sha256": "814130249b25f2337624c267bff62214e65927f0ff32b26061152a601187ed34"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-1160.evaluation.json",
+      "sha256": "fa3b89bc97824d2fdaf87866b4828cd66b8436d1c9e61a3254c32ecf6c412d8d"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-1180.evaluation.json",
+      "sha256": "82a589d5e34167b5deb7ae5ce4396376766a4ab81644b846e976f6e9c7373c3a"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-120.evaluation.json",
+      "sha256": "1c855692503751780a33de41331a131854e77b8b1f490b69b52d659b50ef405c"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-1200.evaluation.json",
+      "sha256": "ad34875b3939c25217c52c8202bcf84566caaea1eba6b55f21c3144763b84204"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-1220.evaluation.json",
+      "sha256": "fe8dc15a744b756d0308953f33cf9c03d5dfab0a02ed7266aaeb7a9a3ddc7660"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-1240.evaluation.json",
+      "sha256": "3055d32171c9c8479caaa7fc809ca123cc60a5b653cbd383bf9aba12dd97fb7a"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-1260.evaluation.json",
+      "sha256": "64498d7e00ebce88ab97163a5801bb0144d79b3362488518450cf9e53848023d"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-1280.evaluation.json",
+      "sha256": "3d7492aedf90e01756aea13bb3f428001f6fc91390210272d26b641138b53cb6"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-1300.evaluation.json",
+      "sha256": "c58a5cf56b66245e98b1168aa9ebffa3e81f17dd9fcd0888277c8dc31dce95b9"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-1320.evaluation.json",
+      "sha256": "7403334a7bcf2de5e1651e9b7275ff541468b08aa6a49382d6d892d37451b8f4"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-1340.evaluation.json",
+      "sha256": "7cfc914240197cee172589fc3bf39e8f8e207081c7d314248f7d6341ba02c3f0"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-1360.evaluation.json",
+      "sha256": "b49bc2a2f822b78c59eb1e21f3d7f1a5832884c07df5b5b2472258a46c3ef564"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-1380.evaluation.json",
+      "sha256": "55bf05bee991c73fa3eba30bfe7364b2793a5200bd6288bc1997d94b7ee3f14d"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-140.evaluation.json",
+      "sha256": "f264e7e4d0615ce476d3d93f25873ef8fdf8059ec6a7f44b836cc5aecca57804"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-1400.evaluation.json",
+      "sha256": "1044f1c880202cd43346da5d6ee4b960c9c2db0d03c74d32f5f04f003bcf6fb3"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-1420.evaluation.json",
+      "sha256": "823f68c2c04971c370ade5f5cddcea8cb3d28e2d092ebb2aa4daf898d5adc11b"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-1440.evaluation.json",
+      "sha256": "5edef11ffb58ef45eaaf7f6219c3225fd59ab0eee6cefc04f63258430ca0ea6d"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-1460.evaluation.json",
+      "sha256": "60fe39f6214b1f2711ddc76b8cd79f2d08d6f1e64a2f09233907945f5eef53b0"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-1480.evaluation.json",
+      "sha256": "c55dbcac5813a37fa5387ec202e4df3815898a1045ab318bb27c3344fb785978"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-1500.evaluation.json",
+      "sha256": "d5c3ba91641e59f75fe2fcbf4af228c4f5f908e44ba1d4c8b1bbc8680d0d9d88"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-1520.evaluation.json",
+      "sha256": "6890577ce3b4104a44a394a9806739685895a7034886785d2bfbdd7bc2e06f81"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-1540.evaluation.json",
+      "sha256": "281097a58ef9e6c1ffdb11ddf35cb11a21ab3d7f8670ab6e63bbaf655839ef1a"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-1560.evaluation.json",
+      "sha256": "e71553adb462f5977f60893a6f5aad134736fe80acf32be28cdedb02b8704c63"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-1580.evaluation.json",
+      "sha256": "673cc414a7aac581253f71aaa78da7e4715a36b2fda9ba79c6dc6d0d2c8a3130"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-160.evaluation.json",
+      "sha256": "865c1fc9b540db850dbcff27f515691a5292e819bd9493c62aabf628bde04c11"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-1600.evaluation.json",
+      "sha256": "bc271182db055a440c9570b0c0d7a2fabee603ef665bd83ba58c3e1bf9b8233a"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-1620.evaluation.json",
+      "sha256": "ca294182c614ec6bcc76a89024a600a40f19095f16205efda4e35934ba9379ca"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-1640.evaluation.json",
+      "sha256": "85477f302429e2a96870047a8df0c71433661733019d4e7d0156f88069a074ee"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-1660.evaluation.json",
+      "sha256": "d12569d3f4d4a2bf15ada87d91b35a0e36276e637bd8fd43a1ae128832868b28"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-1680.evaluation.json",
+      "sha256": "db4e8e2e49a8de2063b682e28862121a7c93e2cbae9882033887ceee91ddfab7"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-1700.evaluation.json",
+      "sha256": "3b1cfe14478283103e5f8b2a3c603758e61b499ab7ce276a8cc8679101237893"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-1720.evaluation.json",
+      "sha256": "975894db564ac2ae21c497cc2fe68c810b19c499e0887662b715f71c77e81557"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-1740.evaluation.json",
+      "sha256": "fcc883c29968535e8bd96929108481088422056f730733d501e7344a474d1f69"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-1760.evaluation.json",
+      "sha256": "4626e9c944df50a8a687fbb6e8d3e2e1e5ec5f0769c0964646f069e4488e23ba"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-1780.evaluation.json",
+      "sha256": "a1ede916313a95495be016d5e193c198a83e82f82f213a1b1ae14b3041fd90e2"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-180.evaluation.json",
+      "sha256": "b1381b2153b2cfa06f128a8cb6878b2f671486ada7dd1a2cf70025519105efd8"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-1800.evaluation.json",
+      "sha256": "fe357faa355886afe3ba0cbd81ff26e52a502b18e87b223b426692123aa54e68"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-1820.evaluation.json",
+      "sha256": "d51f7b9be4fb4ad4a903dc0ce3462ee65df62fee0af945bbebf4111686b88943"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-1840.evaluation.json",
+      "sha256": "9a68ea6c2a18778ea046d180fad30324830af6617f6598fbfd3d951908bc1efc"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-1860.evaluation.json",
+      "sha256": "593cf5c72108367480b806af19e42b6db3e19bb349ce229097f40ea796bd74e3"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-1880.evaluation.json",
+      "sha256": "961f237d860dcf1511bfa948bca5f3630288bdc4af6d06fcae19b315a6013278"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-20.evaluation.json",
+      "sha256": "64bf7f02a9e68fd5076aeac9c357bc2f1858671b655ea0a422eb43a72ece1f0b"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-200.evaluation.json",
+      "sha256": "8b9344d9c5b1460174bd3bc0426bc76d59bf722812af9c904b14bb154fe95d48"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-220.evaluation.json",
+      "sha256": "4d5b51e0dfc0eacf7dd2cdb42585b50ca391539fd167c2c724fc8853118dc43f"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-240.evaluation.json",
+      "sha256": "db0b94183bbad61d21a37dac41904ffc3fa3309e3c0c19a2dff472575ff91f99"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-260.evaluation.json",
+      "sha256": "94669b284463cc104d68eeb8f2c1110a3ca4d80675ac74f7aaf7d7bc7ab63ed8"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-280.evaluation.json",
+      "sha256": "66e87a21b26d259f14454ff44243255a9b6bc92f19f65ce9c8c736b7416b35df"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-300.evaluation.json",
+      "sha256": "128d745b24ccb9b97180ebda3e1fe97ea1a8be5d4a101325b604cfd1270bd7c7"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-320.evaluation.json",
+      "sha256": "65a999d7e72ecb3b3acf79b600d648af9aab022700df5be7ebaeee2c6cd0c5db"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-340.evaluation.json",
+      "sha256": "c2292b9cd42a7ec1683f7cb2f7c93360dd5e2cbac373d1349fe192a716eb620b"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-360.evaluation.json",
+      "sha256": "3ac226ba08122593e9003cdc769def52d0faf76014c0473540b8a64f1b2438f7"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-380.evaluation.json",
+      "sha256": "2a5f6f4cf9edeca657c5c16aa607326bd878cba8fc6af2bbb4bb8b4a192e3ebc"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-40.evaluation.json",
+      "sha256": "ed24dbb6b91d335908f2e7c3f6abc8faca457dc4944896fff818959330366986"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-400.evaluation.json",
+      "sha256": "66baf966d056b9911b3c3f55c36838e35c92d2d316a80cf217a3693c56b41a24"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-420.evaluation.json",
+      "sha256": "169e8730ea4be7533d4ef46bca057cea838221bf999093909c04a4757699d964"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-440.evaluation.json",
+      "sha256": "2cff6aa31a703696c911f94c6ac6134b13167e6e2c0aa353adf2b63b75564c11"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-460.evaluation.json",
+      "sha256": "ee12b44c6d7966ec54109d1d6854b6eb7495aa2bf2643f96d825a617ddda7186"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-480.evaluation.json",
+      "sha256": "fac5bd77565a3b67beaa6df13b0e58b2d46d157a5ca29e1def1bcbca13e97498"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-500.evaluation.json",
+      "sha256": "8725bd776c1a54f81084a5ca12cac8e0d0a5e439245cf8f1c4e073892981f747"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-520.evaluation.json",
+      "sha256": "90d67fee7c432d0ec93dd9288990900410eb321c72666d74c0842c99a709c174"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-540.evaluation.json",
+      "sha256": "f1c6b7d3b1193f379a12aa7a5c75042ce37397f0901581ff8e49ad4aa8b06f5e"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-560.evaluation.json",
+      "sha256": "f80c3878902e49b70c4755383fcfbfcb6e90deac9e060d34cc217b1f99606e59"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-580.evaluation.json",
+      "sha256": "c5b8a29fdbe910411b8c9849040859c93e7a010f495067c80fec24d00d24f10e"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-60.evaluation.json",
+      "sha256": "36c85aed5947143163e79646cce32a52ebaef09a540e2fc339fa3b9238d30ab5"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-600.evaluation.json",
+      "sha256": "5ab0723b6e735e01cb199bd0811cbe78bda1b915188862656d3c785abeca7f64"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-620.evaluation.json",
+      "sha256": "81ada185369e0c3e8158db9e6718033b85924359c5fef10a25797c6568277e1f"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-640.evaluation.json",
+      "sha256": "ada56e0c6f74aa50e324afd1f1f1d0cacf66f963789f8c7fa6cbb6125eb72994"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-660.evaluation.json",
+      "sha256": "dd9aa4b96313aba0b2e34e7a5e9e6d347281378b8506015c2e6584a2b7952fd1"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-680.evaluation.json",
+      "sha256": "fd61bec961fdfc386754902225811e2938c088a670378aff333cb998d1acacd4"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-700.evaluation.json",
+      "sha256": "7ced73541705f35034091f9188cc427160a95b374abfa4b2437651c6e9185be1"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-720.evaluation.json",
+      "sha256": "85acafa0e15ac545dbcbbe36af72ab90add06142bdff4d3588a8f65f7549da08"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-740.evaluation.json",
+      "sha256": "a1ae4332ec0e2dbde2a9ebab127703332d550aa40693c96f57810c2e675eba3e"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-760.evaluation.json",
+      "sha256": "7d8581067366939bb6c6845ef2edcec8c7e1c1653b91a403116b183b4510631c"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-780.evaluation.json",
+      "sha256": "9fa4ca39c3fa7305ed0dd9444a1896fc701cf56e4a22470ee346907867130b51"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-80.evaluation.json",
+      "sha256": "2f10685290ede0c9bc445fb407801affc5d0aef570dee02c4d54fb13d254bd6e"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-800.evaluation.json",
+      "sha256": "a1b83ae7d02db803c7495b33e1b2b911caf1185b8ca27e40ab86c7b6a224fa84"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-820.evaluation.json",
+      "sha256": "0d91dad3b035afcebbb5f1c28564f846d21412a5402c0df938bc963680a345d6"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-840.evaluation.json",
+      "sha256": "fcb000cbbd371deb2d33c1d6944a62607d1a17961723c2e67502606eb9b8da25"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-860.evaluation.json",
+      "sha256": "b82da8b1faf5398c2cfbdbe859bb80ade7afdd007e1b2ca988eb2cf390b3ba17"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-880.evaluation.json",
+      "sha256": "3f5eea1fc082e3b6000fc8c10931ba9366ff932da669bbf3f9d8afe81113753b"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-900.evaluation.json",
+      "sha256": "fd0ec7aa24dfe64c20f468f672ec77568a1b7f86368459728ab20cf8a07bb8ee"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-920.evaluation.json",
+      "sha256": "ceed2e62a43ce7aaf521c938e4f5b783a1a130cb1d86212b449d316e7638e61a"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-940.evaluation.json",
+      "sha256": "dc2bd5e0d50213f0f69f514eb71fb700ea167d4f6b216b9e81e5eaa181adde2a"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-960.evaluation.json",
+      "sha256": "b2b6a66f81ae135dd814e30bb4bc5764e1d0580fce89404367d0f1f2dfbf4582"
+    },
+    {
+      "path": "runs/droid-standing/seed17-batched-20261010/standing-980.evaluation.json",
+      "sha256": "863f40a8528a0b6fc7b1ab46595e53674cceaa3ef35349434adcf8d1af0261c8"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-100.json",
+      "sha256": "241f7f3437f4bc17eedb875256c20b6bb0c8cc79564a3ed35b5c974e738c7ddd"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-1000.json",
+      "sha256": "4e8795f18ede939b3a4e218728bae48a781b31349afe413a725478f2cdcb882e"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-1020.json",
+      "sha256": "6dc83b443b003c404ddaf59642573b5462957a071b0e6c2828523d26c1589719"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-1040.json",
+      "sha256": "a4879b1e7f1d69bc659d39d16be2305b0a7c6dc4125e7f8ed1136dea25196f29"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-1060.json",
+      "sha256": "c221bb1e3059e14943c93814d2f6f440ed4e605f0ea87b8d828f26e94bf59c8a"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-1080.json",
+      "sha256": "77fde5fbe9dce5e523aa57019b3e91edf074a1f2a93806a7ae7b57c499f2712d"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-1100.json",
+      "sha256": "68e383e348a100e138e4a59a0e200c361184b0696f227cb2ff9966e89ceccf2e"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-1120.json",
+      "sha256": "6710c43bf3588e414d14843b2228fcbbbd41687009dbc0e2b0094e4aab748ea0"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-1140.json",
+      "sha256": "37d204fa2f7ab3ca5f5785cbd50dcedd911a0674e35fcc06aa345c7f1cf855e8"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-1160.json",
+      "sha256": "44f1048964c2cd2cd3881819ac07049f3ec71bc393eb0e6f8e8aaf074eb3e8fd"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-1180.json",
+      "sha256": "976e57ec4ecc35499fa5890a07c760af87e71ff749304678d8afd16f20fd3d90"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-120.json",
+      "sha256": "1bcdcc5796cb5e97c80029dce3224f0cf0858c5f8057a88cca175ff4df09797d"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-1200.json",
+      "sha256": "4899d67daf879d6457f0a5cde773e1032cd03f237fb4f3c029b2252afefd97a2"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-1220.json",
+      "sha256": "89fdff7cf7cc9de314e6db8c4c5c7a16469871a31eada0471a1f52e5c2f899b8"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-1240.json",
+      "sha256": "efd2268915e77494ce6ec82d2a85cdbaa6b5af63418b4ac79d85f885e10d5b37"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-1260.json",
+      "sha256": "d8ae6f8e5725eb76c0b9a3d63daa7c45206d69c5c288cabbdd40c824359b8d88"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-1280.json",
+      "sha256": "1dcb8d252b821b3ae2b9fa26e6fe16752867f8d3d00b3882ce9cd569c2d00a14"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-1300.json",
+      "sha256": "5d3a3f5e087e5219664228e9f5ffdccd747e6a90d052317b1c2b15bc9200dfba"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-1320.json",
+      "sha256": "6c51059e650d0e654e6019a16244af4cf4c3da53c883db1835a4f04062c50875"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-1340.json",
+      "sha256": "0b8ff35a39e74f9bebb4c1aadd3c942d5a8e3f3d827936c2df68903ec483454b"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-1360.json",
+      "sha256": "558d5be340e1cc3293f9d3e18015d5362889b75ecc1f1a2758106d3dc9d5d1b8"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-1380.json",
+      "sha256": "01e6c8ce714550a1db16431582eecd159b9b26c53337508b2d8f12b3a0ecfdfa"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-140.json",
+      "sha256": "6ca6d696013ed0cf0a5784f4367254aea80d5cd00c897913b2685f7b197b9f70"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-1400.json",
+      "sha256": "60c9c0ba944421c2e90c8e0b3375a1cae9921cb57f449ece1ef30e6f63efaaf1"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-1420.json",
+      "sha256": "30d7a8e0a27f8611737dec9169cd6d19da3c764f163fb3259701aec82e2db985"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-1440.json",
+      "sha256": "486b100269e1f6f718e6430a3f327be5f8090291b71c6048e09668f793664470"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-1460.json",
+      "sha256": "91ee90bbc72df25bab5b8858c76403735610b8ac619d787f8fe4ba98ff5cce10"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-1480.json",
+      "sha256": "b6850ec71fe81d0c796b2b081dffaeb54af0d52e548d29ba9754e1dad9cfb307"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-1500.json",
+      "sha256": "cbfaeeec03927ddc8bd927f7a8241e0d81a66a261555893c328836a67c2b57ec"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-1520.json",
+      "sha256": "585aab704bbcb71679e9fcfde5a36f5aead42ab71bf2d433fc7c69cb33bf1e00"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-1540.json",
+      "sha256": "00ec9223c32b2a0329df91cfc60da41d439a507fa60369c8122ba9c5c78fba2f"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-1560.json",
+      "sha256": "51dcdde1a28f8f14e45e101a54abd756c46b1be60d00998748a42ec11487007e"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-1580.json",
+      "sha256": "f709b6db3ce9aa68374a98920a2e54c34d66cd161327a4136ced37e53fbf040a"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-160.json",
+      "sha256": "e58679edfa672fb7b32af85b361f1e5024716846a09222f3793fc930e7d8789c"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-1600.json",
+      "sha256": "2f7ede1978c80c9cb7df36452b21feca27949b62ba191ff3a00ee2954b58a46d"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-1620.json",
+      "sha256": "ab5751f4063196819339081b0c0708df96f7f4582bfbed66f2f78b08e1372c3d"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-1640.json",
+      "sha256": "26f0c795acdf036710e294342ceb84517f922ba8d14c46346cfee3fbb633088c"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-1660.json",
+      "sha256": "201bc6a2e5bfaf18f8d0ed213f2b4bed6c2b49a8c0a8d9f19fa68924ccdc41ea"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-1680.json",
+      "sha256": "51fa3c5ecee2e41203a944c21729698cda32af980890fcfa52d2d604d6425eaf"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-1700.json",
+      "sha256": "7b0fbe1f6c51c266b5a90debb6d12aa6981a9aac5ddc470ba0806d7cc8ebac3f"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-1720.json",
+      "sha256": "ba7dda6871b4cbee105cfb6a1ba4f197e2ab7a9ed2a7fc51496d260ffcc79810"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-1740.json",
+      "sha256": "7a9058205c6c1b96dac8afed049c343422c303dd3f84e2b38cd90275d6aa64e5"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-1760.json",
+      "sha256": "62354b57f3f7275882507121c9fba2d9f5fcb3fa4f46516ac80f53aaa70829a1"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-1780.json",
+      "sha256": "cf2eeed3eb63adbe9cd3284eea2e4966d708af050f828d4bc406e360801963c8"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-180.json",
+      "sha256": "0166d0b7cf9f801d0089c9c3eca1055b39d785ac81f88cb6e9154e557da03296"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-1800.json",
+      "sha256": "da56a7286124e2eb49ee5f15fbc722fd247880ae2b02e8e82ba3ff60dd039541"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-1820.json",
+      "sha256": "f6d61f159a6876b75913b819823281ce0aa7b4ab68bde1e0526587866ebdee57"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-1840.json",
+      "sha256": "2936fe7d1b226574b9db466e09e29e6cd12f8dddce95bd96395c6f460af6ae70"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-1860.json",
+      "sha256": "730f1fa9e0f11d95621b9bd361359df629ae4ac64cfada583fae9052e4205e41"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-1880.json",
+      "sha256": "9c5f30f701eec580d884f88405fc1b5e323f329ac71d22566b00f87831c80df0"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-1900.json",
+      "sha256": "1f56d0f00699d2adff6b83f0bf89f61c2e4bc967c44a2da20a447b1822392fd9"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-1920.json",
+      "sha256": "bc9b3a5b10ecd1228b452c9d3c84e7894df9d5dac7bae74af22d86d7d04da3b0"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-1940.json",
+      "sha256": "10cfe5d342a99ceb45e366d7cf550eaef2e8d26061213206a2d25bfced2d9aed"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-1960.json",
+      "sha256": "c8607f205f875b52db8a347f4de88834288e7fa4065b1b604b31fd43f07c4e4e"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-1980.json",
+      "sha256": "7af7e58df0de40e2ec04002063bb29cb25de75ff28f43d260bbfd90be009bbea"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-20.json",
+      "sha256": "192bbb7a1be2b670e49d1c346c23d4af2206e2d881563195f3347e02c25654ac"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-200.json",
+      "sha256": "a35249ddf65f5afe3efcd5002ac5230ab9829b8a3932e461787eb26e2b24f984"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-2000.json",
+      "sha256": "6f285b3deb50e86d14ac60115d8f62ae45a082e1909720662c96ad236841ebee"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-2020.json",
+      "sha256": "c27124fbcb02bbd47202697d3e32cc7ebfa049e5f3c43f0aea9104cb7298c6c5"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-2040.json",
+      "sha256": "b0e24630353e1414c8b4139ea585107ae2a378f59d8094a81948e7817c636461"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-2060.json",
+      "sha256": "e003f7c512a10627da1458a8dfaa7f0249f46968e90835d673d119f63f525f3f"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-2080.json",
+      "sha256": "d479b233182709c4c6005ac582d00dd89e5bf44adb87b629a268309fa51697ff"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-2100.json",
+      "sha256": "40d29ecc71906821eed2dcce00700094c276008f5c126d0fed0a782bcc1bfc2e"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-2120.json",
+      "sha256": "bdba087e6554a9dd969bcb9de67803dcc57053ed4070b0758456167f5f93ba22"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-2140.json",
+      "sha256": "f3b418c133ebcc287e6c32b17d5e6e1ab9a7bc6b38e7aedf5171b5187f4c683f"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-2160.json",
+      "sha256": "f886a8da5eb378729a0d64412304f9fbd2db761544df8ef7f3dce20c18410809"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-2180.json",
+      "sha256": "c6e0c409583e7bb8d0eb8c39e7ba213b8c2019a3ebe852aaa27a797ce3d259a5"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-220.json",
+      "sha256": "6bd89fe5ab4aeb06a90a1108d9de6a0ed3fbc9d4026014587c6af0c97ff44ed2"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-2200.json",
+      "sha256": "55f41d398b14901d1a1936d453d24d6d12ef6a117f371878baad373807f4763d"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-2220.json",
+      "sha256": "ee46f910270c29306b2fe2710f542a14ef41ee21d4e4d6681a1bf46446a7e490"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-2240.json",
+      "sha256": "8d7a76a7977078ce292c62ada6e9e2e036091cc25ebbb1ede53efe80c3209bf8"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-2260.json",
+      "sha256": "c6063b2ffce658360568d71a5edea6a14185ce3f057e96c23ac69b1c33aad4be"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-2280.json",
+      "sha256": "6322bee2d525a49316f71e402bc8b9e4dffcd1f25d0bb787553744ddb4f332b4"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-2300.json",
+      "sha256": "68a41ed7500f16ff8d916bd5c5b2f2a02470596ceff362952ecda50f29e0434f"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-2320.json",
+      "sha256": "fb98acefe0479b5650f59d49fcd01e6477a4565996758d4061966f01d9d01788"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-2340.json",
+      "sha256": "33b8020bfc52947850a80300ccc7f25378ab505d24196979edcfc50b0d390ccc"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-2360.json",
+      "sha256": "1b3f149aeff466aacfc809e0abb55914ec8574dac1c36c4439cf006147a6ee22"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-240.json",
+      "sha256": "1dfa0115b12f84515e3b7e3b70d94af6169e3063c2d65aa04ded08ed0d5585eb"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-260.json",
+      "sha256": "e7068e34780777a3be340a09509e853d7005d89465fcb46488d6d1bebbb05858"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-280.json",
+      "sha256": "af853bf228259e93c4c4e23148de8268191ba4c677c0a625b417de46abeae253"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-300.json",
+      "sha256": "73e066814ec8e06633d8a7fc8bba82252dd7b12eeb1ea87f95cae3b2260a0800"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-320.json",
+      "sha256": "40f04731d12ecc12d5e2089cb8efe3a183dc58ee7ac75cac6ff12ff31a9c5dc2"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-340.json",
+      "sha256": "f92fd7ccb8aac3ce6301c8405847b5e4bb2803a995d9062b33f1481a17129da4"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-360.json",
+      "sha256": "46f042fcb46ae277c8dcf4aeebb32286630cc87adc2bdc4793fcd9a0b41d3d74"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-380.json",
+      "sha256": "6acb9c8cb1bf29c4949ceb040424569c57b76c30ac9938f1f891e9e3bdea0d73"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-40.json",
+      "sha256": "5df89516334b95d874894a153dbfe6e9b052505141bd059daca409e73939b31c"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-400.json",
+      "sha256": "9a3779e8dcc29381fff6dc516741909bff481df1d965c7020f2b15e673914aa7"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-420.json",
+      "sha256": "22b2490676a8b6d2444db4c84d1804e9e9789851a4074677516e4a1c12dc3e16"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-440.json",
+      "sha256": "d00bf9afb0d2f6175e5546cc20c77c12111f8c836e864a26494c2c7d7b004d16"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-460.json",
+      "sha256": "3319a63017ed356a1823d66fc5958a799879f592d866b15bcaa81fc52d8f8737"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-480.json",
+      "sha256": "d57a9d9e78c5e86e365138bf4b8d99d80eeb1a6d91640adf476a8581b91c412d"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-500.json",
+      "sha256": "c7fa101332e193b59daa24f088f9bbb0d773a6a399b13d1ee112d31ea6267415"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-520.json",
+      "sha256": "f144e74d2de87158505863ebbb9e54904b1fd8ca4c54bac918ed18c3f8c7f5f5"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-540.json",
+      "sha256": "8bb7f0607be122769b797acd8c1873e106d057f0c65d642a6b52fc3dc4e18b21"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-560.json",
+      "sha256": "2e2cad4624868edf653493f3a8a6ab2356b913c4152f282b574196911a56f31d"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-580.json",
+      "sha256": "d6c6fd479d4601778fc955103668eb1c820bafdfa124f25f068745b913d65649"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-60.json",
+      "sha256": "2ad5e856f4d59a8ffe25d0e5be805b47adec457c8342f376e7172b89bac08583"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-600.json",
+      "sha256": "e0ab04364da0852cc3006b7f2a342bbfe8fb9888335cc6032e25d0e6a8c6750e"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-620.json",
+      "sha256": "d2b65a94aeb305967da6e610f3024a1ebcbfaf4a705c26d6a2518cdb70507b36"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-640.json",
+      "sha256": "4c9eb0d3a8cdbfaa89feb2e39bd6896d87bcdfec5b8e092ea40a6dfcdc07ad81"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-660.json",
+      "sha256": "fe3c623af7e8901242f782ddd62eb5966d8db1233bf25a8081281b76b567eab2"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-680.json",
+      "sha256": "625fe6f5b1f6ba7064736293569c5728a2a375ffab9c649679a65eac65e457db"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-700.json",
+      "sha256": "9fd06e515ac935b649b1d1f1de0c5f8b8cfb3e9603609a1f37441811452e94ae"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-720.json",
+      "sha256": "2ce26a0825b11432c5ac705ec891ddb5db1b192a40a5c93bc6bf1acd172af7f7"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-740.json",
+      "sha256": "da73ecc7194a3e49de5c0bc7be60e1911c6976d06eaba382a014a38d093909aa"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-760.json",
+      "sha256": "42d91e61e3edcfae0960776aa363becbe623ceca04e50cb2d4ed9b16183b6c27"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-780.json",
+      "sha256": "7d8662755b4b5ff071bcbcaf2467ac185b93441ca26e26c6d51cec64f761bbbb"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-80.json",
+      "sha256": "bffb5c2da8c22c5041f9d52c89221e0404d90625cf43b49ae281c2120730997e"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-800.json",
+      "sha256": "e63c15425b500e89d2298f7016ba1b7ea91a27b257627064d81ea7b6a50006a7"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-820.json",
+      "sha256": "82d2c8ea2c7ea7f0b56f44acb40ba981761ea5d97dc9aba3b803152d1d70a714"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-840.json",
+      "sha256": "f4bcc22a9005df480ce9c1e31d348d5568605987f05a52794941252f8016d8e3"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-860.json",
+      "sha256": "1ab9974c4e8eebf76cd87fdb438b81cf0fa050732c597f70aa6c442b51692814"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-880.json",
+      "sha256": "4d70f21c297e8106251cf7917cefdd8b69ad809b912643fca54ee5175baa653a"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-900.json",
+      "sha256": "761809d59cb41f9b140da005d95343577f5d81a391de9f6bbee497b1964b59a4"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-920.json",
+      "sha256": "785865cfc906eb8d3102d6934024102ec5eaea9123c3a1928dc3bdd0193eb63c"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-940.json",
+      "sha256": "63bd3ab9615b0bc08041dc4123a00f696953e2098e188e8f015ce0ba5c7ece91"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-960.json",
+      "sha256": "2027e882c2420ab3f7a3eb6deb0da9c6416f20bdce93a3649c1bad73c66535a6"
+    },
+    {
+      "path": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-980.json",
+      "sha256": "49e951aeb4b3d3929d9c291bf5b0fd9eaa31ee9f9b06870eb755f0e84b678e60"
+    },
+    {
+      "path": "runs/drone-travel/batched-seed23-20261010/travel-endurance-100.json",
+      "sha256": "05d786f5c13416b402b6560c9c7f892f3dcfd5a10e24b9e21a37c946c8930170"
+    },
+    {
+      "path": "runs/drone-travel/batched-seed23-20261010/travel-endurance-120.json",
+      "sha256": "eb1f162032f514ef5a438d3ada8dc9e667138b5c86af34ba874d513a10d48478"
+    },
+    {
+      "path": "runs/drone-travel/batched-seed23-20261010/travel-endurance-140.json",
+      "sha256": "56a150d77711ed2c2eff106723978e2bc17583068119800a1d62dd41a08efaac"
+    },
+    {
+      "path": "runs/drone-travel/batched-seed23-20261010/travel-endurance-160.json",
+      "sha256": "73f2efa09272d776cb8a8a07053468887187cb945a400b595ffbde6f4128acd5"
+    },
+    {
+      "path": "runs/drone-travel/batched-seed23-20261010/travel-endurance-180.json",
+      "sha256": "c8dfc1768dbe408af538ad59ad1d5ac0114a33b01cc4e0f4f09524fa3c4f7040"
+    },
+    {
+      "path": "runs/drone-travel/batched-seed23-20261010/travel-endurance-20.json",
+      "sha256": "da0b88e1b12c998729882320b36d8f6d4d8581454f92cfbd12a2c4abbd01f287"
+    },
+    {
+      "path": "runs/drone-travel/batched-seed23-20261010/travel-endurance-200.json",
+      "sha256": "f3d7bc7ba8cbdf37da8d3fda7b7876e847ec4fa2d6f3520cb7c039a8985de6e7"
+    },
+    {
+      "path": "runs/drone-travel/batched-seed23-20261010/travel-endurance-220.json",
+      "sha256": "fdddc6ade7dc2d842c546372a875cca60372e1fe11cc0f4236d7cdee7cd86f13"
+    },
+    {
+      "path": "runs/drone-travel/batched-seed23-20261010/travel-endurance-240.json",
+      "sha256": "0df1b2ba3233089e316c4eedd4bbd310cd3149fb408a0b319d8c49901292736e"
+    },
+    {
+      "path": "runs/drone-travel/batched-seed23-20261010/travel-endurance-260.json",
+      "sha256": "ed254d07cb99161adc524dcbcb2bf30e2b1ac0d4ed1c3ba43216405bcd877557"
+    },
+    {
+      "path": "runs/drone-travel/batched-seed23-20261010/travel-endurance-280.json",
+      "sha256": "ee47a16b63e2c799b42d9bb6cf73f48f88a509cf2ae519f18a5911a82340e849"
+    },
+    {
+      "path": "runs/drone-travel/batched-seed23-20261010/travel-endurance-300.json",
+      "sha256": "de65e3057d388512f0d23a8254a8af0f46ae3f6af7082d1223649272f4cc2e54"
+    },
+    {
+      "path": "runs/drone-travel/batched-seed23-20261010/travel-endurance-320.json",
+      "sha256": "ef9b4a91348666cc9a51f822badc7d2d4c5dd0d96218f7a5ab40a72e06861c7d"
+    },
+    {
+      "path": "runs/drone-travel/batched-seed23-20261010/travel-endurance-340.json",
+      "sha256": "3ed8cf5ee704d111dc25984a4271763f650488943380443c92c842e73cb37b6a"
+    },
+    {
+      "path": "runs/drone-travel/batched-seed23-20261010/travel-endurance-360.json",
+      "sha256": "b6501a278ee66efb1d5469a76d234c2f22b706f4df543dc1b8469042b0e7b9fe"
+    },
+    {
+      "path": "runs/drone-travel/batched-seed23-20261010/travel-endurance-380.json",
+      "sha256": "d9f9cef104212f6b84744f010ad099e7c11ade9ddb19ca6acf6633ba0b2e9d9c"
+    },
+    {
+      "path": "runs/drone-travel/batched-seed23-20261010/travel-endurance-40.json",
+      "sha256": "2fc78fcd2f0668c90b47f5e53b022eff035b1eb04db23aff0e7ee071a33bf43f"
+    },
+    {
+      "path": "runs/drone-travel/batched-seed23-20261010/travel-endurance-400.json",
+      "sha256": "c1cd42da8c719877e05e790a1a09f43ae8d11249754f6eb4667dc552e2cc39bb"
+    },
+    {
+      "path": "runs/drone-travel/batched-seed23-20261010/travel-endurance-420.json",
+      "sha256": "f1d28e42d711b0e973c9fb4ced4de3d90c611b0df93ef72baaf7f97f0aac00a3"
+    },
+    {
+      "path": "runs/drone-travel/batched-seed23-20261010/travel-endurance-440.json",
+      "sha256": "7cebed3ca775c9f05168d00b30beaa83f021865f9c01895ac815031eafab3445"
+    },
+    {
+      "path": "runs/drone-travel/batched-seed23-20261010/travel-endurance-460.json",
+      "sha256": "585d3f1de2fc3b674d912f9e45b8a70e9332862ba73a40b97c69886b11d0cdc4"
+    },
+    {
+      "path": "runs/drone-travel/batched-seed23-20261010/travel-endurance-480.json",
+      "sha256": "e73b309eb246bd5fe8123b22279118472ee2f14b7f4e93d25b62856c980abb4b"
+    },
+    {
+      "path": "runs/drone-travel/batched-seed23-20261010/travel-endurance-500.json",
+      "sha256": "68c95d8208d8ad7f1daabd69eccb17065e14a05695ed3e33ff1667c9a7524f71"
+    },
+    {
+      "path": "runs/drone-travel/batched-seed23-20261010/travel-endurance-520.json",
+      "sha256": "3512cb7e21ea40e055b99a9d12d480c9f5b4532c355dde1a2b1fe948a2a8cc7f"
+    },
+    {
+      "path": "runs/drone-travel/batched-seed23-20261010/travel-endurance-540.json",
+      "sha256": "aa32f55bd4fb98694a8262a26bd504621842f6ffa852756c209ad976879ccb1c"
+    },
+    {
+      "path": "runs/drone-travel/batched-seed23-20261010/travel-endurance-560.json",
+      "sha256": "ad9bab9a5dfcfcdd4c589c779ed936c25ff6cfb5a0a6cf4dc78f5a48850eb381"
+    },
+    {
+      "path": "runs/drone-travel/batched-seed23-20261010/travel-endurance-580.json",
+      "sha256": "c1164410642a33751d1ad46469434a7fbfd9eb5446152c0f5429e8a4ac0bc424"
+    },
+    {
+      "path": "runs/drone-travel/batched-seed23-20261010/travel-endurance-60.json",
+      "sha256": "db7f097980b0cc639c2fe706ac18555e399a6333af87bf549a715fd78a610c72"
+    },
+    {
+      "path": "runs/drone-travel/batched-seed23-20261010/travel-endurance-600.json",
+      "sha256": "82bae033318a1d7814278a2862c5492594bddecc44630fd0606ec2eea34485fa"
+    },
+    {
+      "path": "runs/drone-travel/batched-seed23-20261010/travel-endurance-620.json",
+      "sha256": "268e345d9688aa968a6ae21ae235c66e89cfc3c3a44fb2bd040c43ececbca02f"
+    },
+    {
+      "path": "runs/drone-travel/batched-seed23-20261010/travel-endurance-640.json",
+      "sha256": "cce97f70300231858b62eda3ee193d62154281988656f2eda49d963cdc428f01"
+    },
+    {
+      "path": "runs/drone-travel/batched-seed23-20261010/travel-endurance-660.json",
+      "sha256": "0c85177c1d1d895e9a51371294337a36c846cc27bedfaa555354b8d5b00fb48b"
+    },
+    {
+      "path": "runs/drone-travel/batched-seed23-20261010/travel-endurance-680.json",
+      "sha256": "5b4918a2f3f10a65b641c7aa9bee3aad1f3900780048ce0d8389ac523c2047d6"
+    },
+    {
+      "path": "runs/drone-travel/batched-seed23-20261010/travel-endurance-700.json",
+      "sha256": "c2630085f922a6474b9776dd55804208b4e8464c7ac962c15deceb09e3aef2a5"
+    },
+    {
+      "path": "runs/drone-travel/batched-seed23-20261010/travel-endurance-720.json",
+      "sha256": "ed7b4d773fd0b2b08549460ab178bf56e98550c14ee5eaf00df22447a04b1675"
+    },
+    {
+      "path": "runs/drone-travel/batched-seed23-20261010/travel-endurance-740.json",
+      "sha256": "15bcd73a03dbda4b84afc521ac992150950d18e99e8e5592c830105a8059392a"
+    },
+    {
+      "path": "runs/drone-travel/batched-seed23-20261010/travel-endurance-760.json",
+      "sha256": "dc064ccf088bd5df6676ca10be1b67d956e5e3ba6621c616fe1b04e7d4dc8122"
+    },
+    {
+      "path": "runs/drone-travel/batched-seed23-20261010/travel-endurance-780.json",
+      "sha256": "53d08fd7246ec6432e0bdef6fcd9fab8cbd70394573dc34999e36daa91b891b1"
+    },
+    {
+      "path": "runs/drone-travel/batched-seed23-20261010/travel-endurance-80.json",
+      "sha256": "7ddba7b6b562fd620b4a6c80cb6b3390a5b89620c4203ea3949f4ccc26981c55"
+    },
+    {
+      "path": "runs/drone-travel/batched-seed23-20261010/travel-endurance-800.json",
+      "sha256": "f3f156325ed5d62b148bd8c47a3ae793fab9bc34b57090d869ec845b96299238"
+    },
+    {
+      "path": "runs/drone-travel/batched-seed23-20261010/travel-endurance-820.json",
+      "sha256": "81a65a96ecd3cbc84b891ce1d595bf9d88804f758c0700f2a552a8a3443a11eb"
+    },
+    {
+      "path": "runs/drone-travel/batched-seed23-20261010/travel-endurance-840.json",
+      "sha256": "e15777e96a60f6d03c79da00b77997519dd5eb095f527a28d4752b4f7c975a4b"
+    },
+    {
+      "path": "runs/drone-travel/batched-seed23-20261010/travel-endurance-860.json",
+      "sha256": "0f486cd2ab84eedc7c3d584922e797147313d2bef839a162afc17695e72fa62f"
+    },
+    {
+      "path": "runs/drone-travel/batched-seed23-20261010/travel-endurance-880.json",
+      "sha256": "db971497f59b4ce885fdd528029e7f6e794763bc9a7086e6ea36f53feecc898d"
+    },
+    {
+      "path": "runs/drone-travel/batched-seed23-20261010/travel-endurance-900.json",
+      "sha256": "0ef26b7713ab12a4be7a4a3c0799c50e6e154e6606ccd410689f8f51198b1eb8"
+    },
+    {
+      "path": "runs/drone-travel/batched-seed23-20261010/travel-endurance-920.json",
+      "sha256": "9ccbaec7387fc13ffb022e98c83259c46efba9bd65e6bea91e2371ec2f3b2f0a"
+    },
+    {
+      "path": "runs/drone-travel/batched-seed23-20261010/travel-endurance-940.json",
+      "sha256": "d3d7688de63ee394fbdb170dc8e3ebbf0a855acb54ea461a14fc6c9f82b68ada"
+    },
+    {
+      "path": "runs/drone-travel/batched-seed23-20261010/travel-endurance-960.json",
+      "sha256": "b72086719765d1c0057a4599482c35c89dd9486c898cdf05929ddf4d83f18293"
+    },
+    {
+      "path": "runs/drone-travel/batched-seed23-20261010/travel-endurance-980.json",
+      "sha256": "761bad2fbc0265dfb4a216b8706828002cf7d5306126fe981893642de16803c2"
+    }
+  ],
+  "csv_sha256": "68815cd1823b7826349b564a1601a104c07102a903fc3f985e45aef4e685337a",
+  "runs": {
+    "standing-seed17": {
+      "reports": 94,
+      "latest_selection_update": 1880,
+      "passed_selections": 0
+    },
+    "travel-seed19": {
+      "reports": 118,
+      "latest_selection_update": 2360,
+      "passed_selections": 0
+    },
+    "travel-seed23": {
+      "reports": 49,
+      "latest_selection_update": 980,
+      "passed_selections": 0
+    }
+  },
+  "artifacts": {
+    "selection.png": "961396278a9b2f8a83a6e6d6450320bf50521b9338f8d0f1aa3ea4584eb3fc0f",
+    "selection.pdf": "8cc734f0b5743899557ec23a1905171cedc9dd239c797671e619d969ab9b3730"
+  },
+  "plot_scope": {
+    "standing": "minimum five-root episode duration and minimum final stable streak",
+    "travel": "five-root mean return, maximum final heading error/distance/speed, minimum final settled streak",
+    "gate_sources": [
+      "examples/robots/standing/evaluation.rs",
+      "examples/robots/travel/evaluation.rs",
+      "examples/robots/travel/stage.rs"
+    ],
+    "interpretation": "Standing duration stays near 100 actions against 1000 required. Travel distance and speed improve, but heading and final settled streak still fail. No selection report passes."
+  }
+}

@@ -4,6 +4,33 @@ Updated: 2026-10-10. Current work: RL-only drone/droid curriculum.
 
 ## Resume here
 
+### Travel recovery budget exhausted, 2026-10-10
+
+The seed-19 recovery run completed 2,400 updates and 1,228,800 transitions.
+Its final five selection episodes survived, but seed 0 failed heading and settling.
+Independent held-out endurance evaluation also failed: all 32 episodes survived,
+but maximum heading error reached 0.659 radians against pi/12 permitted.
+The [completion record](progress/drone-travel-recovery-final.json) and
+[128-episode report](progress/drone-travel-recovery-final-held-out.json) retain the evidence.
+
+The old unit is terminal with status 1. Its checkpoints and logs remain preserved.
+The larger seed-23 travel and seed-17 standing units continue independently.
+Neither lesson is qualified; browser 3v3 remains unfinished.
+
+### Curriculum selection history, 2026-10-10
+
+The [selection plot](progress/curriculum-selection-20261010/selection.png) records
+94 standing seed-17 reports, 118 travel seed-19 reports and 49 travel seed-23 reports.
+The [CSV](progress/curriculum-selection-20261010/selection.csv) and
+[manifest](progress/curriculum-selection-20261010/manifest.json) retain all plotted
+values and source-report hashes. This snapshot ends at updates 1,880, 2,360 and 980,
+respectively. All 261 selection reports fail; this is not held-out qualification.
+
+Standing's shortest selection episodes remain near 100 actions against 1,000 required.
+Travel distance and speed improve, but heading and final settling still fail.
+The fixed gates remain unchanged. Inspect the live units before choosing checkpoints;
+do not advance either curriculum from survival or reward alone.
+
 ### Batched PPO and larger curriculum trials, 2026-10-10
 
 `e8b7941` batches recurrent actor evaluations and excludes padding before losses.

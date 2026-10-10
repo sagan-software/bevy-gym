@@ -1,0 +1,127 @@
+{
+  "schema": "drone-travel-recovery-final-v1",
+  "recorded_utc": "2026-10-10T10:16:52.494757+00:00",
+  "unit": "bevy-gym-travel-endurance-seed19-recovery-20261010.service",
+  "unit_terminal_state": "ActiveState=failed\nSubState=failed\nMainPID=0\nExecMainStatus=1\n",
+  "reason": "Lesson travel-endurance exhausted its update budget without passing.",
+  "output": "runs/drone-travel/endurance-seed19-recovery-20261010",
+  "updates": 2400,
+  "transitions": 1228800,
+  "optimizer_steps": 14284,
+  "checkpoint_sha256": "5bbc33b1b9e9eabb61355003d30627c0d3c1b95aadd79f170906e21e45775c6b",
+  "optimization_journal_sha256": "d8f54a46d4d6be62aae13ea664aced0a1581df153db4572b692628a84d66510c",
+  "original_binary_sha256": "de141b84733a17c7a5a1abff9ad30946d449659509d06fc308f5ccf4293f13d6",
+  "selection": {
+    "episodes": [
+      {
+        "final_distance": 0.15971730649471283,
+        "final_heading_error": 0.2787727415561676,
+        "final_speed": 0.001831508707255125,
+        "first_arrival": 1,
+        "reward": 943.2824597358704,
+        "seed": 0,
+        "settled_actions": 0,
+        "steps": 1000,
+        "survived": true
+      },
+      {
+        "final_distance": 0.15936647355556488,
+        "final_heading_error": 0.008064119145274162,
+        "final_speed": 0.0013628484448418021,
+        "first_arrival": 1,
+        "reward": 960.6136676669121,
+        "seed": 1,
+        "settled_actions": 936,
+        "steps": 1000,
+        "survived": true
+      },
+      {
+        "final_distance": 0.15913480520248413,
+        "final_heading_error": 0.16638728976249695,
+        "final_speed": 0.0016831145621836185,
+        "first_arrival": 1,
+        "reward": 952.3062020540237,
+        "seed": 2,
+        "settled_actions": 901,
+        "steps": 1000,
+        "survived": true
+      },
+      {
+        "final_distance": 0.15941131114959717,
+        "final_heading_error": 0.10843958705663681,
+        "final_speed": 0.0015781212132424116,
+        "first_arrival": 1,
+        "reward": 958.1508764624596,
+        "seed": 42,
+        "settled_actions": 933,
+        "steps": 1000,
+        "survived": true
+      },
+      {
+        "final_distance": 0.1594957411289215,
+        "final_heading_error": 0.10346569865942001,
+        "final_speed": 0.0030370645690709352,
+        "first_arrival": 1,
+        "reward": 967.9284691810608,
+        "seed": 18446744073709551615,
+        "settled_actions": 1000,
+        "steps": 1000,
+        "survived": true
+      }
+    ],
+    "lesson": "travel-endurance",
+    "optimizer_steps": 14284,
+    "passed": false,
+    "update": 2400
+  },
+  "held_out_command": {
+    "command": [
+      "/home/sagan/.cache/bevy-gym-quality-validation/travel-endurance-seed19-20261009/drone-curriculum",
+      "--lesson",
+      "travel",
+      "--evaluate-held-out",
+      "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-2400.mpk"
+    ],
+    "exit_code": 1,
+    "elapsed_seconds": 5.021990499226376
+  },
+  "held_out_summary": [
+    {
+      "stage": "travel-endurance",
+      "evaluation": "failed",
+      "episodes": 32,
+      "survivors": 32,
+      "maximum_heading_error_rad": 0.6589545011520386,
+      "minimum_settled_actions": 0,
+      "mean_return": 943.6608329415321
+    },
+    {
+      "stage": "travel-near",
+      "evaluation": "failed",
+      "episodes": 32,
+      "survivors": 32,
+      "maximum_heading_error_rad": 3.0290420055389404,
+      "minimum_settled_actions": 0,
+      "mean_return": 524.7053984646773
+    },
+    {
+      "stage": "travel-far",
+      "evaluation": "failed",
+      "episodes": 32,
+      "survivors": 31,
+      "maximum_heading_error_rad": 3.125326633453369,
+      "minimum_settled_actions": 0,
+      "mean_return": 435.1398421004404
+    },
+    {
+      "stage": "travel-fast",
+      "evaluation": "failed",
+      "episodes": 32,
+      "survivors": 17,
+      "maximum_heading_error_rad": 3.1019017696380615,
+      "minimum_settled_actions": 0,
+      "mean_return": 181.78830002045788
+    }
+  ],
+  "qualification": "failed; endurance not promoted; near/far/fast results are untrained transfer diagnostics, not completed lessons"
+}
