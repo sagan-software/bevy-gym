@@ -1,0 +1,1126 @@
+{
+  "recorded_utc": "2026-10-10T13:58:36.055802+00:00",
+  "training_manifest": {
+    "source_revision": "49d637e2e6b04a0f84aa8db026b8a068bb214484",
+    "binary_sha256": "d58a608dbec7d0f77c424b514ce39f3dd66f51241c0ac62d6d885ca2eef241c9",
+    "parent_checkpoint": "docs/progress/drone-recovery-transfer.mpk",
+    "parent_sha256": "7c2b9a6f2a0288faa27676d1514848710f4d5c24cd77505e75cf4990576a12b1",
+    "seed": 29,
+    "updates_per_stage": 24000,
+    "initialization": "Qualified recovery actor; zero added heading weights; fresh critic, Adam, samplers, counters and recurrent state. Not an optimizer-state resume.",
+    "promotion": "Separate-process validation of proposed stage and prerequisites; final held-out suite excluded from transitions.",
+    "command": [
+      "systemd-run",
+      "--user",
+      "--unit=bevy-gym-travel-gated-seed29-20261010",
+      "--property=CPUQuota=200%",
+      "--property=MemoryMax=2G",
+      "--property=Nice=10",
+      "--property=WorkingDirectory=/home/sagan/Code/github.com/sagan-software/bevy-gym-quality",
+      "--property=StandardOutput=append:/home/sagan/.cache/bevy-gym-quality-validation/travel-gated-seed29-20261010.log",
+      "--property=StandardError=append:/home/sagan/.cache/bevy-gym-quality-validation/travel-gated-seed29-20261010.log",
+      "nix",
+      "develop",
+      "--command",
+      "env",
+      "-u",
+      "CFLAGS",
+      "/home/sagan/.cache/bevy-gym-quality-validation/travel-gated-seed29-20261010/drone-curriculum",
+      "--lesson",
+      "travel",
+      "--seed",
+      "29",
+      "--updates",
+      "24000",
+      "--output",
+      "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/runs/drone-travel/gated-seed29-20261010"
+    ],
+    "created_utc": "2026-10-10T11:25:32.574701+00:00"
+  },
+  "terminal": {
+    "service": "bevy-gym-travel-gated-seed29-20261010.service",
+    "state": "failed",
+    "exit_status": 1,
+    "error": "Lesson travel-near exhausted its update budget without passing.",
+    "near_updates": 24000,
+    "near_transitions": 12288000,
+    "cumulative_transitions": 15800320,
+    "far_checkpoint_count": 0,
+    "fast_checkpoint_count": 0
+  },
+  "checkpoint": {
+    "path": "docs/progress/travel-near-seed29/checkpoint.mpk",
+    "sha256": "ff36de41a00e21723df1fc7312f3e2dea8bc1e9aa207dd3b8d786512fee33ed2",
+    "bytes": 47111
+  },
+  "selection": {
+    "episodes": [
+      {
+        "final_distance": 0.2871071696281433,
+        "final_heading_error": 1.5865719318389893,
+        "final_speed": 0.012742332182824612,
+        "first_arrival": null,
+        "reward": 686.5503684878349,
+        "seed": 0,
+        "settled_actions": 0,
+        "steps": 1000,
+        "survived": true
+      },
+      {
+        "final_distance": 0.2898406982421875,
+        "final_heading_error": 2.356355905532837,
+        "final_speed": 0.013544033281505108,
+        "first_arrival": null,
+        "reward": 37.37346444594445,
+        "seed": 1,
+        "settled_actions": 0,
+        "steps": 1000,
+        "survived": true
+      },
+      {
+        "final_distance": 0.2882746458053589,
+        "final_heading_error": 0.15577912330627441,
+        "final_speed": 0.013087949715554714,
+        "first_arrival": 921,
+        "reward": 737.5144502818584,
+        "seed": 2,
+        "settled_actions": 80,
+        "steps": 1000,
+        "survived": true
+      },
+      {
+        "final_distance": 0.28735223412513733,
+        "final_heading_error": 1.2106738090515137,
+        "final_speed": 0.012809697538614273,
+        "first_arrival": 160,
+        "reward": 772.7104695439339,
+        "seed": 42,
+        "settled_actions": 0,
+        "steps": 1000,
+        "survived": true
+      },
+      {
+        "final_distance": 0.28845226764678955,
+        "final_heading_error": 0.4058740437030792,
+        "final_speed": 0.013145023956894875,
+        "first_arrival": null,
+        "reward": 672.2557343542576,
+        "seed": 18446744073709551615,
+        "settled_actions": 0,
+        "steps": 1000,
+        "survived": true
+      }
+    ],
+    "lesson": "travel-near",
+    "optimizer_steps": 164756,
+    "passed": false,
+    "update": 24000
+  },
+  "prerequisite_replay": {
+    "report": {
+      "schema": "travel-promotion-v1",
+      "checkpoint_sha256": "ff36de41a00e21723df1fc7312f3e2dea8bc1e9aa207dd3b8d786512fee33ed2",
+      "stages": [
+        {
+          "stage": "travel-endurance",
+          "episodes": [
+            {
+              "seed": 18446744073709550591,
+              "steps": 1000,
+              "reward": 889.8782616853714,
+              "survived": true,
+              "first_arrival": 1,
+              "settled_actions": 0,
+              "final_distance": 0.2879001,
+              "final_heading_error": 0.4254348,
+              "final_speed": 0.0129792765
+            },
+            {
+              "seed": 18446744073709550590,
+              "steps": 1000,
+              "reward": 832.7332714796066,
+              "survived": true,
+              "first_arrival": 1,
+              "settled_actions": 0,
+              "final_distance": 0.2874066,
+              "final_heading_error": 1.1120936,
+              "final_speed": 0.012845849
+            },
+            {
+              "seed": 18446744073709550589,
+              "steps": 1000,
+              "reward": 834.4557015299797,
+              "survived": true,
+              "first_arrival": 1,
+              "settled_actions": 0,
+              "final_distance": 0.28737935,
+              "final_heading_error": 1.1864408,
+              "final_speed": 0.012824229
+            },
+            {
+              "seed": 18446744073709550588,
+              "steps": 1000,
+              "reward": 760.0633075833321,
+              "survived": true,
+              "first_arrival": 1,
+              "settled_actions": 0,
+              "final_distance": 0.28723332,
+              "final_heading_error": 1.397075,
+              "final_speed": 0.012779647
+            },
+            {
+              "seed": 18446744073709550587,
+              "steps": 1000,
+              "reward": 873.1127138733864,
+              "survived": true,
+              "first_arrival": 1,
+              "settled_actions": 0,
+              "final_distance": 0.2875696,
+              "final_heading_error": 0.8970419,
+              "final_speed": 0.012879007
+            },
+            {
+              "seed": 18446744073709550586,
+              "steps": 1000,
+              "reward": 892.4775995016098,
+              "survived": true,
+              "first_arrival": 1,
+              "settled_actions": 0,
+              "final_distance": 0.2878685,
+              "final_heading_error": 0.46342018,
+              "final_speed": 0.012968721
+            },
+            {
+              "seed": 18446744073709550585,
+              "steps": 1000,
+              "reward": 885.5956524610519,
+              "survived": true,
+              "first_arrival": 1,
+              "settled_actions": 0,
+              "final_distance": 0.28780687,
+              "final_heading_error": 0.5659075,
+              "final_speed": 0.012939007
+            },
+            {
+              "seed": 18446744073709550584,
+              "steps": 1000,
+              "reward": 864.2894813418388,
+              "survived": true,
+              "first_arrival": 1,
+              "settled_actions": 0,
+              "final_distance": 0.28756204,
+              "final_heading_error": 0.92340475,
+              "final_speed": 0.012870152
+            },
+            {
+              "seed": 18446744073709550583,
+              "steps": 1000,
+              "reward": 530.8788827955723,
+              "survived": true,
+              "first_arrival": 1,
+              "settled_actions": 0,
+              "final_distance": 0.28678724,
+              "final_heading_error": 2.0498164,
+              "final_speed": 0.01265234
+            },
+            {
+              "seed": 18446744073709550582,
+              "steps": 1000,
+              "reward": 860.9678127765656,
+              "survived": true,
+              "first_arrival": 1,
+              "settled_actions": 0,
+              "final_distance": 0.28757435,
+              "final_heading_error": 0.90044165,
+              "final_speed": 0.012875841
+            },
+            {
+              "seed": 18446744073709550581,
+              "steps": 1000,
+              "reward": 892.589862704277,
+              "survived": true,
+              "first_arrival": 1,
+              "settled_actions": 0,
+              "final_distance": 0.28773168,
+              "final_heading_error": 0.65356714,
+              "final_speed": 0.012927754
+            },
+            {
+              "seed": 18446744073709550580,
+              "steps": 1000,
+              "reward": 861.4905416965485,
+              "survived": true,
+              "first_arrival": 1,
+              "settled_actions": 0,
+              "final_distance": 0.28746694,
+              "final_heading_error": 1.0444034,
+              "final_speed": 0.012849023
+            },
+            {
+              "seed": 18446744073709550579,
+              "steps": 1000,
+              "reward": 851.0611756443977,
+              "survived": true,
+              "first_arrival": 1,
+              "settled_actions": 0,
+              "final_distance": 0.28743774,
+              "final_heading_error": 1.0790312,
+              "final_speed": 0.012848014
+            },
+            {
+              "seed": 18446744073709550578,
+              "steps": 1000,
+              "reward": 863.5279026627541,
+              "survived": true,
+              "first_arrival": 1,
+              "settled_actions": 0,
+              "final_distance": 0.287455,
+              "final_heading_error": 1.0434482,
+              "final_speed": 0.012851325
+            },
+            {
+              "seed": 18446744073709550577,
+              "steps": 1000,
+              "reward": 863.229044675827,
+              "survived": true,
+              "first_arrival": 1,
+              "settled_actions": 0,
+              "final_distance": 0.2874952,
+              "final_heading_error": 0.9983576,
+              "final_speed": 0.01286078
+            },
+            {
+              "seed": 18446744073709550576,
+              "steps": 1000,
+              "reward": 840.5800777673721,
+              "survived": true,
+              "first_arrival": 1,
+              "settled_actions": 0,
+              "final_distance": 0.2873862,
+              "final_heading_error": 1.1660163,
+              "final_speed": 0.012831885
+            },
+            {
+              "seed": 18446744073709550575,
+              "steps": 1000,
+              "reward": 841.6409600973129,
+              "survived": true,
+              "first_arrival": 1,
+              "settled_actions": 0,
+              "final_distance": 0.28738883,
+              "final_heading_error": 1.13538,
+              "final_speed": 0.012841291
+            },
+            {
+              "seed": 18446744073709550574,
+              "steps": 1000,
+              "reward": 870.412366271019,
+              "survived": true,
+              "first_arrival": 1,
+              "settled_actions": 384,
+              "final_distance": 0.2880013,
+              "final_heading_error": 0.25106555,
+              "final_speed": 0.013013688
+            },
+            {
+              "seed": 18446744073709550573,
+              "steps": 1000,
+              "reward": 856.1120233535767,
+              "survived": true,
+              "first_arrival": 1,
+              "settled_actions": 0,
+              "final_distance": 0.28750297,
+              "final_heading_error": 0.999718,
+              "final_speed": 0.012858588
+            },
+            {
+              "seed": 18446744073709550572,
+              "steps": 1000,
+              "reward": 890.8630854487419,
+              "survived": true,
+              "first_arrival": 1,
+              "settled_actions": 0,
+              "final_distance": 0.28783038,
+              "final_heading_error": 0.5131584,
+              "final_speed": 0.012954146
+            },
+            {
+              "seed": 18446744073709550571,
+              "steps": 1000,
+              "reward": 866.4262862801552,
+              "survived": true,
+              "first_arrival": 1,
+              "settled_actions": 0,
+              "final_distance": 0.28751582,
+              "final_heading_error": 0.9589308,
+              "final_speed": 0.012865496
+            },
+            {
+              "seed": 18446744073709550570,
+              "steps": 1000,
+              "reward": 892.0560194253922,
+              "survived": true,
+              "first_arrival": 1,
+              "settled_actions": 0,
+              "final_distance": 0.287687,
+              "final_heading_error": 0.7165985,
+              "final_speed": 0.012916345
+            },
+            {
+              "seed": 18446744073709550569,
+              "steps": 1000,
+              "reward": 899.7022085785866,
+              "survived": true,
+              "first_arrival": 1,
+              "settled_actions": 0,
+              "final_distance": 0.2877216,
+              "final_heading_error": 0.6467889,
+              "final_speed": 0.012934518
+            },
+            {
+              "seed": 18446744073709550568,
+              "steps": 1000,
+              "reward": 832.7064342498779,
+              "survived": true,
+              "first_arrival": 1,
+              "settled_actions": 0,
+              "final_distance": 0.28739083,
+              "final_heading_error": 1.1604272,
+              "final_speed": 0.012836705
+            },
+            {
+              "seed": 18446744073709550567,
+              "steps": 1000,
+              "reward": 885.6634883880615,
+              "survived": true,
+              "first_arrival": 1,
+              "settled_actions": 0,
+              "final_distance": 0.28777415,
+              "final_heading_error": 0.60663265,
+              "final_speed": 0.012933234
+            },
+            {
+              "seed": 18446744073709550566,
+              "steps": 1000,
+              "reward": 881.3763211965561,
+              "survived": true,
+              "first_arrival": 1,
+              "settled_actions": 0,
+              "final_distance": 0.28758624,
+              "final_heading_error": 0.88461167,
+              "final_speed": 0.0128893135
+            },
+            {
+              "seed": 18446744073709550565,
+              "steps": 1000,
+              "reward": 896.2417678236961,
+              "survived": true,
+              "first_arrival": 1,
+              "settled_actions": 0,
+              "final_distance": 0.28767183,
+              "final_heading_error": 0.7425674,
+              "final_speed": 0.012907687
+            },
+            {
+              "seed": 18446744073709550564,
+              "steps": 1000,
+              "reward": 887.039946615696,
+              "survived": true,
+              "first_arrival": 1,
+              "settled_actions": 0,
+              "final_distance": 0.2875991,
+              "final_heading_error": 0.8395539,
+              "final_speed": 0.012894585
+            },
+            {
+              "seed": 18446744073709550563,
+              "steps": 1000,
+              "reward": 880.4067139625549,
+              "survived": true,
+              "first_arrival": 1,
+              "settled_actions": 0,
+              "final_distance": 0.28758276,
+              "final_heading_error": 0.84990835,
+              "final_speed": 0.012896213
+            },
+            {
+              "seed": 18446744073709550562,
+              "steps": 1000,
+              "reward": 877.3534871339798,
+              "survived": true,
+              "first_arrival": 1,
+              "settled_actions": 0,
+              "final_distance": 0.2875955,
+              "final_heading_error": 0.8549127,
+              "final_speed": 0.012895511
+            },
+            {
+              "seed": 18446744073709550561,
+              "steps": 1000,
+              "reward": 880.954970240593,
+              "survived": true,
+              "first_arrival": 1,
+              "settled_actions": 0,
+              "final_distance": 0.2876097,
+              "final_heading_error": 0.81132346,
+              "final_speed": 0.012902236
+            },
+            {
+              "seed": 18446744073709550560,
+              "steps": 1000,
+              "reward": 879.0236261487007,
+              "survived": true,
+              "first_arrival": 1,
+              "settled_actions": 0,
+              "final_distance": 0.28751805,
+              "final_heading_error": 0.9593173,
+              "final_speed": 0.012869805
+            }
+          ]
+        }
+      ]
+    },
+    "stderr": "Error: \"Promotion validation failed; no stage transition is allowed.\"",
+    "process_exit_status": "Not retained by the observation call; stderr and the complete report establish gate rejection.",
+    "command": [
+      "nix",
+      "develop",
+      "--command",
+      "/home/sagan/.cache/bevy-gym-quality-validation/travel-gated-seed29-20261010/drone-curriculum",
+      "--lesson",
+      "travel",
+      "--evaluate-promotion",
+      "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/runs/drone-travel/gated-seed29-20261010/travel-near-24000.mpk",
+      "--travel-stage",
+      "travel-endurance"
+    ],
+    "pool": "The original 32 promotion-validation roots, not the final held-out pool.",
+    "zero_final_settled_streaks": 31,
+    "nonzero_final_settled_streak": {
+      "seed": 18446744073709550574,
+      "actions": 384
+    },
+    "contrast": "The transferred endurance checkpoint passed this pool at update 6860. The near checkpoint now fails the complete gate."
+  },
+  "diagnostic": {
+    "source_revision": "721a8334fa69616dca9e0515511afcf949abb388",
+    "helper_source_cache_path": "/home/sagan/.cache/bevy-gym-quality-validation/travel-seed29-diagnostic/src/main.rs",
+    "helper_source_sha256": "1ad17a3b57aad6c6ae265234ea08351679636c3b913513b27048c3df1e222678",
+    "manifest_sha256": "ce151bd278818bbb5cc3cacea80207af499cf4a8c51eef7b6d1c130f3d294ba2",
+    "lock_sha256": "bd6e7b03ed194bc761485ca71b605b9547b07931d52c8774fdff27df3c442b5b",
+    "binary_path": "/home/sagan/.cache/bevy-gym-quality-validation/target/debug/bevy-gym-travel-diagnostic",
+    "binary_sha256": "6b3b61b226c8e77a7c93a12c08de37b5ec6d15c8156710b2af6bae4931bbaa07",
+    "method": "The frozen RL actor selects every motor action; recurrent state is retained. No teacher, fallback or training update runs. The helper imports the existing environment, encoding and model.",
+    "build_boundary": "The cache helper builds; six dead-code warnings arise from imported helpers. It has not passed strict lint or qualification.",
+    "command_template": [
+      "nix",
+      "develop",
+      "--command",
+      "/home/sagan/.cache/bevy-gym-quality-validation/target/debug/bevy-gym-travel-diagnostic",
+      "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/runs/drone-travel/gated-seed29-20261010/travel-near-24000.mpk",
+      "--seed",
+      "SELECTION_ROOT"
+    ],
+    "trace_csv": {
+      "path": "docs/progress/travel-near-seed29/trace.csv",
+      "sha256": "36535c4feb905205d514fd6fad7455730b73c65d588d37ff1748570726e6d184",
+      "rows": 5000
+    },
+    "traces": [
+      {
+        "seed": 0,
+        "cache_path": "/home/sagan/.cache/bevy-gym-quality-validation/travel-seed29-diagnostic/near-24000-seed0.jsonl",
+        "sha256": "4cf5d3e429a6148f01d6256b1e527c9200a03630cbbb36ae3e48c48dd7969449",
+        "frames": 1000,
+        "summary": {
+          "actions": 1000,
+          "checkpoint": "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/runs/drone-travel/gated-seed29-20261010/travel-near-24000.mpk",
+          "diagnostic": "selection-task-frozen-trace",
+          "distance_m": 0.2871071696281433,
+          "heading_error_rad": 1.5865719318389893,
+          "qualification": "not established by this trace",
+          "return": 686.5503684878349,
+          "seed": 0,
+          "speed_m_s": 0.012742332182824612
+        },
+        "analysis": {
+          "seed": 0,
+          "matches_saved_selection_exactly": true,
+          "first_arrival": null,
+          "last_heading_and_position_band_action": null,
+          "final_settled_actions": 0,
+          "last100_mean_abs_heading_rad": 1.5211974132061004,
+          "last100_mean_abs_world_y_angular_velocity_rad_s": 0.06605253353714943,
+          "last100_mean_motor_contrast": -4.5664310455322266e-05,
+          "sampled_actions": [
+            {
+              "action_index": 1,
+              "heading_after_rad": -0.3744324743747711,
+              "angular_velocity_rad_s": [
+                -0.30713140964508057,
+                0.3747783303260803,
+                0.1779213845729828
+              ],
+              "alternating_motor_contrast": -0.02474188804626465,
+              "distance_m": 0.9851922988891602,
+              "speed_m_s": 0.2395947277545929
+            },
+            {
+              "action_index": 100,
+              "heading_after_rad": -0.6594829559326172,
+              "angular_velocity_rad_s": [
+                0.16015568375587463,
+                -0.016399754211306572,
+                0.15108269453048706
+              ],
+              "alternating_motor_contrast": 0.024578630924224854,
+              "distance_m": 0.5084208250045776,
+              "speed_m_s": 0.35461366176605225
+            },
+            {
+              "action_index": 250,
+              "heading_after_rad": -0.5365257263183594,
+              "angular_velocity_rad_s": [
+                -0.010425535030663013,
+                0.08611217886209488,
+                -0.011136194691061974
+              ],
+              "alternating_motor_contrast": 0.00038373470306396484,
+              "distance_m": 0.2509487569332123,
+              "speed_m_s": 0.07800494879484177
+            },
+            {
+              "action_index": 500,
+              "heading_after_rad": -0.9228089451789856,
+              "angular_velocity_rad_s": [
+                -0.00025100313359871507,
+                0.06478466093540192,
+                -0.00040137890027835965
+              ],
+              "alternating_motor_contrast": 0.0013270080089569092,
+              "distance_m": 0.2844546437263489,
+              "speed_m_s": 0.014002866111695766
+            },
+            {
+              "action_index": 750,
+              "heading_after_rad": -1.2560323476791382,
+              "angular_velocity_rad_s": [
+                -2.8904632927151397e-06,
+                0.06600047647953033,
+                -8.02482281869743e-06
+              ],
+              "alternating_motor_contrast": 7.11679458618164e-05,
+              "distance_m": 0.2872222661972046,
+              "speed_m_s": 0.012805137783288956
+            },
+            {
+              "action_index": 1000,
+              "heading_after_rad": -1.5865719318389893,
+              "angular_velocity_rad_s": [
+                -2.5308618205599487e-06,
+                0.06600698828697205,
+                -1.4160468708723783e-07
+              ],
+              "alternating_motor_contrast": -2.866983413696289e-05,
+              "distance_m": 0.2871071696281433,
+              "speed_m_s": 0.012742332182824612
+            }
+          ]
+        }
+      },
+      {
+        "seed": 1,
+        "cache_path": "/home/sagan/.cache/bevy-gym-quality-validation/travel-seed29-diagnostic/near-24000-seed1.jsonl",
+        "sha256": "122e251cb99057dcc070f5e97fa282b4b2012b9bfe7a3974e3b1a8352ee352c8",
+        "frames": 1000,
+        "summary": {
+          "actions": 1000,
+          "checkpoint": "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/runs/drone-travel/gated-seed29-20261010/travel-near-24000.mpk",
+          "diagnostic": "selection-task-frozen-trace",
+          "distance_m": 0.2898406982421875,
+          "heading_error_rad": 2.356355905532837,
+          "qualification": "not established by this trace",
+          "return": 37.37346444594445,
+          "seed": 1,
+          "speed_m_s": 0.013544033281505108
+        },
+        "analysis": {
+          "seed": 1,
+          "matches_saved_selection_exactly": true,
+          "first_arrival": null,
+          "last_heading_and_position_band_action": null,
+          "final_settled_actions": 0,
+          "last100_mean_abs_heading_rad": 2.4238988304138185,
+          "last100_mean_abs_world_y_angular_velocity_rad_s": 0.06823670543730259,
+          "last100_mean_motor_contrast": -3.174781799316406e-05,
+          "sampled_actions": [
+            {
+              "action_index": 1,
+              "heading_after_rad": -2.363997220993042,
+              "angular_velocity_rad_s": [
+                -0.36342325806617737,
+                0.1678052693605423,
+                0.2130005955696106
+              ],
+              "alternating_motor_contrast": -0.13953396677970886,
+              "distance_m": 0.5728666186332703,
+              "speed_m_s": 0.605323314666748
+            },
+            {
+              "action_index": 100,
+              "heading_after_rad": -2.714233636856079,
+              "angular_velocity_rad_s": [
+                0.007687179371714592,
+                0.1847216784954071,
+                0.04542868584394455
+              ],
+              "alternating_motor_contrast": -0.10439255833625793,
+              "distance_m": 0.3582998216152191,
+              "speed_m_s": 0.43692120909690857
+            },
+            {
+              "action_index": 250,
+              "heading_after_rad": -2.912578821182251,
+              "angular_velocity_rad_s": [
+                -0.004280256573110819,
+                0.046635646373033524,
+                0.001882264856249094
+              ],
+              "alternating_motor_contrast": 0.02258971333503723,
+              "distance_m": 0.27517157793045044,
+              "speed_m_s": 0.04062596336007118
+            },
+            {
+              "action_index": 500,
+              "heading_after_rad": 3.0393831729888916,
+              "angular_velocity_rad_s": [
+                -0.0004739811411127448,
+                0.06617670506238937,
+                0.0011229837546125054
+              ],
+              "alternating_motor_contrast": 0.0027006864547729492,
+              "distance_m": 0.28920212388038635,
+              "speed_m_s": 0.019564537331461906
+            },
+            {
+              "action_index": 750,
+              "heading_after_rad": 2.6977410316467285,
+              "angular_velocity_rad_s": [
+                -3.507095971144736e-05,
+                0.0683009922504425,
+                1.0549097169132438e-05
+              ],
+              "alternating_motor_contrast": 1.9729137420654297e-05,
+              "distance_m": 0.29010188579559326,
+              "speed_m_s": 0.013642711564898491
+            },
+            {
+              "action_index": 1000,
+              "heading_after_rad": 2.356355905532837,
+              "angular_velocity_rad_s": [
+                1.1760380402847659e-06,
+                0.06820003688335419,
+                5.878334377484862e-06
+              ],
+              "alternating_motor_contrast": -2.8520822525024414e-05,
+              "distance_m": 0.2898406982421875,
+              "speed_m_s": 0.013544033281505108
+            }
+          ]
+        }
+      },
+      {
+        "seed": 2,
+        "cache_path": "/home/sagan/.cache/bevy-gym-quality-validation/travel-seed29-diagnostic/near-24000-seed2.jsonl",
+        "sha256": "def369ae96dff5af340b86af65de97d6d58e6a8082e4efaeb9504530ad87e368",
+        "frames": 1000,
+        "summary": {
+          "actions": 1000,
+          "checkpoint": "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/runs/drone-travel/gated-seed29-20261010/travel-near-24000.mpk",
+          "diagnostic": "selection-task-frozen-trace",
+          "distance_m": 0.2882746458053589,
+          "heading_error_rad": 0.15577912330627441,
+          "qualification": "not established by this trace",
+          "return": 737.5144502818584,
+          "seed": 2,
+          "speed_m_s": 0.013087949715554714
+        },
+        "analysis": {
+          "seed": 2,
+          "matches_saved_selection_exactly": true,
+          "first_arrival": 921,
+          "last_heading_and_position_band_action": 1000,
+          "final_settled_actions": 80,
+          "last100_mean_abs_heading_rad": 0.22211504250764846,
+          "last100_mean_abs_world_y_angular_velocity_rad_s": 0.06701874665915966,
+          "last100_mean_motor_contrast": -3.060072660446167e-05,
+          "sampled_actions": [
+            {
+              "action_index": 1,
+              "heading_after_rad": 1.6811190843582153,
+              "angular_velocity_rad_s": [
+                -0.3857432007789612,
+                -0.055668383836746216,
+                -0.19646252691745758
+              ],
+              "alternating_motor_contrast": -0.04737257957458496,
+              "distance_m": 0.7948504686355591,
+              "speed_m_s": 0.5353912115097046
+            },
+            {
+              "action_index": 100,
+              "heading_after_rad": 1.3924760818481445,
+              "angular_velocity_rad_s": [
+                -0.4473181366920471,
+                0.12880192697048187,
+                -0.0963512510061264
+              ],
+              "alternating_motor_contrast": -0.1099197268486023,
+              "distance_m": 0.3734777271747589,
+              "speed_m_s": 0.6175590753555298
+            },
+            {
+              "action_index": 250,
+              "heading_after_rad": 1.1544744968414307,
+              "angular_velocity_rad_s": [
+                0.0354200080037117,
+                0.04141467809677124,
+                -0.01874205283820629
+              ],
+              "alternating_motor_contrast": 0.021014750003814697,
+              "distance_m": 0.28011101484298706,
+              "speed_m_s": 0.04029156267642975
+            },
+            {
+              "action_index": 500,
+              "heading_after_rad": 0.8263792991638184,
+              "angular_velocity_rad_s": [
+                0.0001327559439232573,
+                0.06610970944166183,
+                -0.0002844836562871933
+              ],
+              "alternating_motor_contrast": -6.434321403503418e-05,
+              "distance_m": 0.2894183099269867,
+              "speed_m_s": 0.012927351519465446
+            },
+            {
+              "action_index": 750,
+              "heading_after_rad": 0.4910496771335602,
+              "angular_velocity_rad_s": [
+                -6.0079514696553815e-06,
+                0.06713294237852097,
+                -7.48659340388258e-06
+              ],
+              "alternating_motor_contrast": -8.848309516906738e-05,
+              "distance_m": 0.2886003255844116,
+              "speed_m_s": 0.013108162209391594
+            },
+            {
+              "action_index": 1000,
+              "heading_after_rad": 0.15577912330627441,
+              "angular_velocity_rad_s": [
+                -4.916027592116734e-06,
+                0.0669848769903183,
+                1.036773824125703e-06
+              ],
+              "alternating_motor_contrast": -2.568960189819336e-05,
+              "distance_m": 0.2882746458053589,
+              "speed_m_s": 0.013087949715554714
+            }
+          ]
+        }
+      },
+      {
+        "seed": 42,
+        "cache_path": "/home/sagan/.cache/bevy-gym-quality-validation/travel-seed29-diagnostic/near-24000-seed42.jsonl",
+        "sha256": "c8de973cdf402a0c95254f8ce959897d8bfa3a210eb5492bf73697cb4d2f07d8",
+        "frames": 1000,
+        "summary": {
+          "actions": 1000,
+          "checkpoint": "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/runs/drone-travel/gated-seed29-20261010/travel-near-24000.mpk",
+          "diagnostic": "selection-task-frozen-trace",
+          "distance_m": 0.28735223412513733,
+          "heading_error_rad": 1.2106738090515137,
+          "qualification": "not established by this trace",
+          "return": 772.7104695439339,
+          "seed": 42,
+          "speed_m_s": 0.012809697538614273
+        },
+        "analysis": {
+          "seed": 42,
+          "matches_saved_selection_exactly": true,
+          "first_arrival": 160,
+          "last_heading_and_position_band_action": 301,
+          "final_settled_actions": 0,
+          "last100_mean_abs_heading_rad": 1.1450818181037903,
+          "last100_mean_abs_world_y_angular_velocity_rad_s": 0.06627016760408878,
+          "last100_mean_motor_contrast": -3.771305084228516e-05,
+          "sampled_actions": [
+            {
+              "action_index": 1,
+              "heading_after_rad": 1.4554520845413208,
+              "angular_velocity_rad_s": [
+                -0.02986673265695572,
+                0.27640295028686523,
+                -0.34386691451072693
+              ],
+              "alternating_motor_contrast": -0.056293338537216187,
+              "distance_m": 0.8503637909889221,
+              "speed_m_s": 0.37847235798835754
+            },
+            {
+              "action_index": 100,
+              "heading_after_rad": 0.2785792648792267,
+              "angular_velocity_rad_s": [
+                -0.025894053280353546,
+                0.5070300102233887,
+                0.0757790356874466
+              ],
+              "alternating_motor_contrast": -0.1886659860610962,
+              "distance_m": 0.7725386619567871,
+              "speed_m_s": 0.4991072714328766
+            },
+            {
+              "action_index": 250,
+              "heading_after_rad": -0.21987546980381012,
+              "angular_velocity_rad_s": [
+                0.0011119937989860773,
+                0.022373411804437637,
+                0.002182210795581341
+              ],
+              "alternating_motor_contrast": 0.025944054126739502,
+              "distance_m": 0.27418994903564453,
+              "speed_m_s": 0.09213408827781677
+            },
+            {
+              "action_index": 500,
+              "heading_after_rad": -0.5485958456993103,
+              "angular_velocity_rad_s": [
+                -0.00041518552461639047,
+                0.06369143724441528,
+                -0.00027152735856361687
+              ],
+              "alternating_motor_contrast": 0.00010135769844055176,
+              "distance_m": 0.2886849343776703,
+              "speed_m_s": 0.013094085268676281
+            },
+            {
+              "action_index": 750,
+              "heading_after_rad": -0.8792725801467896,
+              "angular_velocity_rad_s": [
+                -8.81461710378062e-06,
+                0.06631679832935333,
+                -2.1596220904029906e-05
+              ],
+              "alternating_motor_contrast": -0.0001329481601715088,
+              "distance_m": 0.2877168655395508,
+              "speed_m_s": 0.012758915312588215
+            },
+            {
+              "action_index": 1000,
+              "heading_after_rad": -1.2106738090515137,
+              "angular_velocity_rad_s": [
+                -1.5778821307321778e-06,
+                0.06622546911239624,
+                -5.235176104179118e-06
+              ],
+              "alternating_motor_contrast": -3.11732292175293e-05,
+              "distance_m": 0.28735223412513733,
+              "speed_m_s": 0.012809697538614273
+            }
+          ]
+        }
+      },
+      {
+        "seed": 18446744073709551615,
+        "cache_path": "/home/sagan/.cache/bevy-gym-quality-validation/travel-seed29-diagnostic/near-24000-seed18446744073709551615.jsonl",
+        "sha256": "c2ec6c7c004ffeb58a616692c132ddfa61d3216c546403a7cf407e620df10ea6",
+        "frames": 1000,
+        "summary": {
+          "actions": 1000,
+          "checkpoint": "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/runs/drone-travel/gated-seed29-20261010/travel-near-24000.mpk",
+          "diagnostic": "selection-task-frozen-trace",
+          "distance_m": 0.28845226764678955,
+          "heading_error_rad": 0.4058740437030792,
+          "qualification": "not established by this trace",
+          "return": 672.2557343542576,
+          "seed": 18446744073709551615,
+          "speed_m_s": 0.013145023956894875
+        },
+        "analysis": {
+          "seed": 18446744073709551615,
+          "matches_saved_selection_exactly": true,
+          "first_arrival": null,
+          "last_heading_and_position_band_action": null,
+          "final_settled_actions": 0,
+          "last100_mean_abs_heading_rad": 0.4723422759771347,
+          "last100_mean_abs_world_y_angular_velocity_rad_s": 0.06714952409267426,
+          "last100_mean_motor_contrast": -2.654820680618286e-05,
+          "sampled_actions": [
+            {
+              "action_index": 1,
+              "heading_after_rad": 1.2864333391189575,
+              "angular_velocity_rad_s": [
+                -0.18300902843475342,
+                -0.13754847645759583,
+                -0.11665603518486023
+              ],
+              "alternating_motor_contrast": 0.017531216144561768,
+              "distance_m": 0.5172054171562195,
+              "speed_m_s": 0.45727112889289856
+            },
+            {
+              "action_index": 100,
+              "heading_after_rad": 1.5020275115966797,
+              "angular_velocity_rad_s": [
+                -0.15079180896282196,
+                -0.04208699241280556,
+                1.7605721950531006e-05
+              ],
+              "alternating_motor_contrast": 0.14376989006996155,
+              "distance_m": 0.32191187143325806,
+              "speed_m_s": 0.10633890330791473
+            },
+            {
+              "action_index": 250,
+              "heading_after_rad": 1.4390592575073242,
+              "angular_velocity_rad_s": [
+                0.0002331974683329463,
+                0.08892954885959625,
+                -0.00027876297826878726
+              ],
+              "alternating_motor_contrast": -0.008792728185653687,
+              "distance_m": 0.2784528136253357,
+              "speed_m_s": 0.04706808924674988
+            },
+            {
+              "action_index": 500,
+              "heading_after_rad": 1.0799217224121094,
+              "angular_velocity_rad_s": [
+                0.00017906181165017188,
+                0.06764766573905945,
+                -1.703456655377522e-05
+              ],
+              "alternating_motor_contrast": 0.00019723176956176758,
+              "distance_m": 0.28768596053123474,
+              "speed_m_s": 0.014005988836288452
+            },
+            {
+              "action_index": 750,
+              "heading_after_rad": 0.7419219017028809,
+              "angular_velocity_rad_s": [
+                1.4230381566449068e-06,
+                0.06724605709314346,
+                -1.9622593754320405e-06
+              ],
+              "alternating_motor_contrast": 1.9490718841552734e-05,
+              "distance_m": 0.28863289952278137,
+              "speed_m_s": 0.013232952915132046
+            },
+            {
+              "action_index": 1000,
+              "heading_after_rad": 0.4058740437030792,
+              "angular_velocity_rad_s": [
+                -1.6505584881087998e-06,
+                0.06712251901626587,
+                1.6851597592904e-06
+              ],
+              "alternating_motor_contrast": -2.2083520889282227e-05,
+              "distance_m": 0.28845226764678955,
+              "speed_m_s": 0.013145023956894875
+            }
+          ]
+        }
+      }
+    ],
+    "verified": "All five summaries exactly match saved selection. Every action input and motor is finite, with four motor fractions in [0,1].",
+    "interpretation": "All five late trajectories retain positive world-Y angular velocity near 0.066 to 0.068 rad/s. Seed 42 reaches the joint position/heading band, then leaves it. This does not establish an actuator or encoding defect."
+  },
+  "qualification": {
+    "near": false,
+    "full_travel": false,
+    "final_held_out_evaluation": "Not run for this failed near candidate.",
+    "next_hypothesis": "Test training-only prerequisite rehearsal while preserving original physics, rewards, selection, promotion and final held-out gates. This hypothesis remains unimplemented and unproven."
+  },
+  "verification_scope": "Evidence and documentation only; no production, test, policy or browser code changed.",
+  "verification": {
+    "artifact_hashes": "Checkpoint, CSV and all five complete cache JSONL traces match the recorded SHA-256 values.",
+    "rows": "5,000 finite measurement rows; actuator fractions in [0,1].",
+    "markdown_format": {
+      "command": "nix develop --command rumdl check docs/EXAMPLE_STATUS.md",
+      "exit_status": 0
+    },
+    "personal_markdown": {
+      "command": "/home/sagan/Code/gitlab.com/liamcurry/lints/scripts/nix-safe run markdown-lints -- /home/sagan/Code/github.com/sagan-software/bevy-gym-quality/docs/EXAMPLE_STATUS.md",
+      "exit_status": 1,
+      "unchanged_paragraph_diagnostics": [
+        {
+          "line": 521,
+          "paragraph_sha256": "5c8e23fc0ddc1330917c00ae964f112707850ade667ad1202380edee8d41eab3",
+          "unchanged_from_head": true
+        },
+        {
+          "line": 634,
+          "paragraph_sha256": "5b65068517702ea64d30bd07763c4a8bd82c9ac6ff20f12181e7400f14dbfa7c",
+          "unchanged_from_head": true
+        },
+        {
+          "line": 656,
+          "paragraph_sha256": "48b858d5afe35037938b8681a4b6bd534b2b2c97bb520ad3d08f01604e2c8645",
+          "unchanged_from_head": true
+        },
+        {
+          "line": 670,
+          "paragraph_sha256": "ed2c8a54dea73fb3424dbe20f0f95e507d997c9fc4f13d97032f6bc9d9d3909d",
+          "unchanged_from_head": true
+        },
+        {
+          "line": 697,
+          "paragraph_sha256": "65000decb51546b284e17d7e3b4a65820343e3369aa5cd86a1810dde65688670",
+          "unchanged_from_head": true
+        },
+        {
+          "line": 713,
+          "paragraph_sha256": "2bed3caf0ff9fa67171507612bd88e36c2909e4350914c3b568041320963b911",
+          "unchanged_from_head": true
+        },
+        {
+          "line": 723,
+          "paragraph_sha256": "bd4597fe2716df9adf448457f1921dd54c4ed4f5db6ad2daded95c9db1cd0676",
+          "unchanged_from_head": true
+        },
+        {
+          "line": 730,
+          "paragraph_sha256": "efd4f620ff48b4222eea0d2224c23900ed8216869e228f49e1a3a7f85c996cb0",
+          "unchanged_from_head": true
+        },
+        {
+          "line": 792,
+          "paragraph_sha256": "f6201dbd57fd08c2145738a995a4a4aefaecf46695ddd0ce9eceb9b95be947ae",
+          "unchanged_from_head": true
+        }
+      ],
+      "changed_paragraph_diagnostics": 0
+    },
+    "diff_check": "git diff --check passes.",
+    "production_checks": "Not rerun for evidence-only changes. The preceding environment implementation passed its native, browser and strict Rust gates.",
+    "csv_format": "LF line endings; all 5,000 parsed records unchanged after normalizing csv.writer CRLF output."
+  },
+  "selection_gate_summary": {
+    "episodes": 5,
+    "survival_passes": 5,
+    "deadline_action": 500,
+    "arrival_deadline_passes": 1,
+    "minimum_final_settled_actions": 100,
+    "settled_streak_passes": 0,
+    "maximum_final_distance_m": 0.5,
+    "distance_passes": 5,
+    "maximum_abs_heading_rad": 0.2617993950843811,
+    "heading_passes": 1,
+    "maximum_final_speed_m_s": 0.5,
+    "speed_passes": 5,
+    "minimum_mean_return": 600,
+    "actual_mean_return": 581.2808974227659,
+    "mean_return_passed": false
+  }
+}

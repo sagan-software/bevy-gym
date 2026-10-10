@@ -4,6 +4,34 @@ Updated: 2026-10-10. Current work: RL-only drone/droid curriculum.
 
 ## Resume here
 
+### Near travel exhausts its budget and loses endurance retention, 2026-10-10
+
+The gated seed-29 run exhausted 24,000 near-travel updates and exited 1.
+All five selection episodes survived 1,000 actions, but none passed the final
+100-action settled requirement. Four also failed the final heading limit.
+Mean return was 581.281 against 600 required.
+No far or fast checkpoint exists. The [complete record](progress/travel-near-seed29/evaluation.json)
+and [checkpoint](progress/travel-near-seed29/checkpoint.mpk) preserve the failed candidate.
+
+Frozen-policy traces reproduce all five saved selection scores exactly.
+The [5,000-action CSV](progress/travel-near-seed29/trace.csv) records heading, angular
+velocity, distance, speed and four actual motor commands. Every input and motor
+is finite, and motor fractions remain within `[0, 1]`. All five late trajectories
+retain positive world-Y angular velocity near 0.066–0.068 radians per second.
+Seed 42 reaches the joint position/heading band, then leaves it.
+
+The same frozen checkpoint also fails the original 32-case endurance validation pool.
+All cases survive; 31 finish with zero settled actions and one retains 384.
+The transferred endurance checkpoint passed this pool before near training.
+This establishes lost prerequisite retention, without proving an actuator or encoding defect.
+The final held-out pool was not evaluated for this failed near candidate.
+
+Next: test training-only prerequisite rehearsal while preserving physics, rewards
+and every qualification gate. This hypothesis remains unimplemented and unproven.
+Standing and seed-31 training continue. Full travel, later curriculum lessons
+and shared browser 3v3 remain unfinished. Storage retains 33 GiB available;
+no checkpoints or caches were deleted.
+
 ### Clearance combines travel tasks and local collision ranges, 2026-10-10
 
 `DroneClearance` now pairs body, destination and six local ranges in one snapshot.
