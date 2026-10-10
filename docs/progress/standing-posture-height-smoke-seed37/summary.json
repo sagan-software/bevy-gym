@@ -259,7 +259,7 @@
     "artifact_green": "Train and warm-start emit the exact nine-member contract; evaluate and trace reject the profile"
   },
   "files_sha256": {
-    "coverage.json": "3c013b40f2b94a5f5961c062a8c97bbeaa61a7a0de91257434f65ec7fb94804a",
+    "coverage.json": "3ffe436997f9d2cb9357ba5d12c381e9b25ecddf54b2f4ba640eaa582b018933",
     "selection.json": "55792a01a0dddb666839faf029899c2b7e40dc2974dd1fceef9db623b74b5bab",
     "result.json": "8bf01d814d276dde5fab79c09a8d339782d9917d7679c522f181f431a3723fda",
     "training-reward.json": "2535f85f94537f0bb8e099fa03e2aced39aced9d53d4a128ff9c51ba2bae45fb",

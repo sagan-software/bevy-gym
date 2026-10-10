@@ -647,6 +647,9 @@ match the smoke trial exactly. Completion and independent qualification remain p
 Validation passes 132 default native tests, 480 robot native tests, 318 WASM tests
 and 15 CLI tests. Strict Clippy and personal Rust/Python lint pass. All 43 changed
 production coverage regions were hit. The reward wrapper has 73 of 73 production
-regions and six of six branch outcomes hit. The coverage record lists unchanged
-error-propagation and qualification-success gaps separately. Nix lint still fails
-on the ten recorded baseline findings outside this change.
+regions and six of six branch outcomes hit.
+
+The coverage record lists unchanged error propagation from runtime construction,
+models, action decoding, optimizers, serialization and file operations. It also
+lists unhit qualification success returns. Nix lint still fails on the ten recorded
+baseline findings outside this change.

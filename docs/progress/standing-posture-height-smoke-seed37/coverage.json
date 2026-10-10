@@ -285,7 +285,7 @@
       18
     ]
   ],
-  "gap_reason": "All listed gaps are unchanged paths: propagation of model, action-decoding, optimizer, serialization or filesystem errors, and success returns requiring a trained policy that passes standing evaluation. The current checkpoints fail those gates; no injected successful controller is used.",
+  "gap_reason": "All listed gaps are unchanged paths: propagation of runtime-construction, model, action-decoding, optimizer, serialization or filesystem errors, and success returns requiring a trained policy that passes standing evaluation. The current checkpoints fail those gates; no injected successful controller is used.",
   "objects": [
     {
       "path": "/home/sagan/.cache/bevy-gym-quality-validation/coverage-build/llvm-cov-target/debug/deps/droid_learning-0b26a37c37e15331",
