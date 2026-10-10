@@ -1,0 +1,222 @@
+{
+  "recorded_utc": "2026-10-10T08:26:08.298892+00:00",
+  "source_revision": "1c26bfe065ef5c31a0d978a7d00b361eea587c00",
+  "scope": "Temporary native five-update probe; no persistent production or training-configuration changes.",
+  "hardware_cpu": "Intel(R) Core(TM) i7-8565U CPU @ 1.80GHz",
+  "backend": "Burn 0.21.0 Flex with Autodiff",
+  "input_checkpoint": "runs/droid-standing/seed13-warm-start-20261010/standing-660.mpk",
+  "input_provenance": {
+    "schema": "droid-standing-v1",
+    "algorithm": "PPO",
+    "seed": 13,
+    "update": 660,
+    "transitions": 337920,
+    "optimizer_steps": 5280,
+    "sha256": "613a6a1a1b2d6288910e40f77a4b64894bc9ca8363c1cbb56298bd79eca5d01e"
+  },
+  "fresh_seed": 17,
+  "transitions_per_update": 512,
+  "updates_per_trial": 5,
+  "warmed_rows": [
+    2,
+    3,
+    4,
+    5
+  ],
+  "criterion": {
+    "recorded_utc": "2026-10-10T07:59:08.104934+00:00",
+    "baseline_warmed_optimizer_median_us": 5321163.5,
+    "required_warmed_optimizer_median_us": 2660581.75,
+    "criterion": "At least twice the warmed optimizer throughput, with the same five-update seeded standing workload, preserved inference action parity and unchanged public backend aliases.",
+    "probe_sha256": "99a7ca8ce4464657a75991aeb2002b3f909e1ff908aaef0d05ff21780f6baa22"
+  },
+  "trials": [
+    {
+      "name": "baseline",
+      "root_opt_level": 1,
+      "dependency_opt_level": 3,
+      "native_burn_features": [
+        "autodiff"
+      ],
+      "test_passed": true,
+      "rows": [
+        {
+          "update": 1,
+          "snapshot_us": 7,
+          "collect_us": 220647,
+          "optimize_us": 10561205
+        },
+        {
+          "update": 2,
+          "snapshot_us": 20,
+          "collect_us": 217155,
+          "optimize_us": 5012626
+        },
+        {
+          "update": 3,
+          "snapshot_us": 29,
+          "collect_us": 215891,
+          "optimize_us": 4661471
+        },
+        {
+          "update": 4,
+          "snapshot_us": 32,
+          "collect_us": 212520,
+          "optimize_us": 7100892
+        },
+        {
+          "update": 5,
+          "snapshot_us": 32,
+          "collect_us": 207071,
+          "optimize_us": 5629701
+        }
+      ],
+      "warmed_optimizer_median_us": 5321163.5,
+      "log": "/home/sagan/.cache/bevy-gym-quality-validation/droid-training-timing-probe.log",
+      "log_sha256": "58b1a9ba7724b47e93a959e188be0fdfbef8377450f69e93fc8e7cd738aa0e09"
+    },
+    {
+      "name": "root-opt-level-3",
+      "root_opt_level": 3,
+      "dependency_opt_level": 3,
+      "native_burn_features": [
+        "autodiff"
+      ],
+      "test_passed": true,
+      "rows": [
+        {
+          "update": 1,
+          "snapshot_us": 7,
+          "collect_us": 216934,
+          "optimize_us": 10301171
+        },
+        {
+          "update": 2,
+          "snapshot_us": 20,
+          "collect_us": 218421,
+          "optimize_us": 4300589
+        },
+        {
+          "update": 3,
+          "snapshot_us": 28,
+          "collect_us": 218655,
+          "optimize_us": 4159541
+        },
+        {
+          "update": 4,
+          "snapshot_us": 24,
+          "collect_us": 215825,
+          "optimize_us": 6248265
+        },
+        {
+          "update": 5,
+          "snapshot_us": 18,
+          "collect_us": 203378,
+          "optimize_us": 5805123
+        }
+      ],
+      "warmed_optimizer_median_us": 5052856.0,
+      "log": "/home/sagan/.cache/bevy-gym-quality-validation/droid-training-timing-opt3.log",
+      "log_sha256": "7b01e5ac01fbc45d9c253cf4e05a10b29c1626b576b66b188fee2b57ddda0117"
+    },
+    {
+      "name": "native-defaults",
+      "root_opt_level": 1,
+      "dependency_opt_level": 3,
+      "native_burn_features": [
+        "autodiff",
+        "default"
+      ],
+      "test_passed": true,
+      "rows": [
+        {
+          "update": 1,
+          "snapshot_us": 7,
+          "collect_us": 220924,
+          "optimize_us": 9529890
+        },
+        {
+          "update": 2,
+          "snapshot_us": 22,
+          "collect_us": 217849,
+          "optimize_us": 4794102
+        },
+        {
+          "update": 3,
+          "snapshot_us": 31,
+          "collect_us": 215902,
+          "optimize_us": 4399109
+        },
+        {
+          "update": 4,
+          "snapshot_us": 14,
+          "collect_us": 217056,
+          "optimize_us": 5331034
+        },
+        {
+          "update": 5,
+          "snapshot_us": 31,
+          "collect_us": 214521,
+          "optimize_us": 5969930
+        }
+      ],
+      "warmed_optimizer_median_us": 5062568.0,
+      "log": "/home/sagan/.cache/bevy-gym-quality-validation/droid-training-timing-native-defaults.log",
+      "log_sha256": "ecbea7e59e799742e61c91093f7bb348ecae4d5d86eadc4b071344f1f67675de"
+    },
+    {
+      "name": "native-simd",
+      "root_opt_level": 1,
+      "dependency_opt_level": 3,
+      "native_burn_features": [
+        "autodiff",
+        "simd"
+      ],
+      "test_passed": true,
+      "rows": [
+        {
+          "update": 1,
+          "snapshot_us": 7,
+          "collect_us": 217473,
+          "optimize_us": 9210623
+        },
+        {
+          "update": 2,
+          "snapshot_us": 22,
+          "collect_us": 219547,
+          "optimize_us": 4640768
+        },
+        {
+          "update": 3,
+          "snapshot_us": 29,
+          "collect_us": 217082,
+          "optimize_us": 4835820
+        },
+        {
+          "update": 4,
+          "snapshot_us": 29,
+          "collect_us": 208776,
+          "optimize_us": 5238552
+        },
+        {
+          "update": 5,
+          "snapshot_us": 28,
+          "collect_us": 217193,
+          "optimize_us": 6322196
+        }
+      ],
+      "warmed_optimizer_median_us": 5037186.0,
+      "log": "/home/sagan/.cache/bevy-gym-quality-validation/droid-training-timing-native-simd.log",
+      "log_sha256": "fa7b1a8fe4344ffdffcc2856f747f67d7e8910a76f19656734103100c6cb38f5"
+    }
+  ],
+  "probe_source_sha256": "99a7ca8ce4464657a75991aeb2002b3f909e1ff908aaef0d05ff21780f6baa22",
+  "probe_source": "//! Temporary timing probe over a saved RL actor and the actual standing trainer.\n#[expect(dead_code, unused_imports, reason = \"Only the actual collector and model are timed.\")]\n#[path = \"../examples/robots/learning/mod.rs\"]\nmod learning;\n#[expect(dead_code, reason = \"The profile shares the complete standing module.\")]\n#[path = \"../examples/robots/standing/mod.rs\"]\nmod standing;\n\n#[test]\nfn profile_actual_standing_training() {\n    let path = std::path::Path::new(env!(\"CARGO_MANIFEST_DIR\"))\n        .join(\"runs/droid-standing/seed13-warm-start-20261010/standing-660.mpk\");\n    let bytes = std::fs::read(&path).expect(\"preserved RL actor and critic\");\n    let metadata = std::fs::read(path.with_extension(\"json\")).expect(\"saved provenance\");\n    standing::checkpoint::Record::for_bytes(&bytes, &metadata).expect(\"digest matches\");\n    let mut agent = standing::model::warm_start(17, bytes).expect(\"valid same architecture\");\n    let mut batch = standing::batch(17, &agent.policy());\n    for update in 1..=5 {\n        let started = std::time::Instant::now();\n        let policy = agent.policy();\n        let snapshot_us = started.elapsed().as_micros();\n        let started = std::time::Instant::now();\n        let sequences = batch.collect(&policy).expect(\"512 physical RL transitions\");\n        let collect_us = started.elapsed().as_micros();\n        let started = std::time::Instant::now();\n        let metrics = agent.update(&sequences).expect(\"actual PPO update\");\n        let optimize_us = started.elapsed().as_micros();\n        assert_eq!(metrics.valid_samples, 512);\n        println!(\"PROFILE update={update} snapshot_us={snapshot_us} collect_us={collect_us} optimize_us={optimize_us}\");\n    }\n}\n",
+  "limitations": [
+    "One run per configuration under concurrent standing and travel training; timings do not establish a statistically reliable gain.",
+    "Each trial verified 512 valid samples per update; parameter hashes, PPO metrics and cross-configuration action parity were not compared.",
+    "No candidate met the predeclared throughput threshold, so feature patches were reverted before correctness/parity qualification.",
+    "The input checkpoint failed standing selection; timing does not qualify a controller."
+  ],
+  "decision": "Retain the baseline native features and profile. Preserve immutable live training binaries. Optimize the PPO path only after a separate measured experiment meets its acceptance criteria."
+}

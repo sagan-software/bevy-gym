@@ -431,3 +431,13 @@ Its budget is 2,400 new updates. The unit is
 `/home/sagan/.cache/bevy-gym-quality-validation/standing-warm-start-seed13-20261010`.
 The [warm-start record](progress/droid-standing-warm-start.json) preserves source
 identity, validation and coverage gaps. Inspect live state before reporting results.
+
+A [native training profile](./progress/droid-standing-training-profile.json) records
+five-update trials using the same saved RL actor and seed 17. Warmed PPO optimization
+medians were 5.32 seconds for the baseline, 5.05 seconds with root optimization level
+3, 5.06 seconds with native Burn defaults, and 5.04 seconds with native SIMD. Collection
+took about 0.21 seconds per 512 transitions. None met the predeclared 2.66-second
+optimizer target.
+
+Each configuration ran once alongside both live training runs; these
+measurements do not establish a reliable gain. The experiment patches were reverted.
