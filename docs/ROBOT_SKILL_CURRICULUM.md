@@ -95,7 +95,9 @@ of the same shared-world implementation, not independent duels combined visually
 
 The [shared robot world](ROBOT_WORLD.md) now contains all six original physical
 bodies in one solver and validates complete actuator frames from one snapshot.
-Competitive rules, trained team controllers and match qualification remain unfinished.
+Its browser diagnostic runs frozen PPO inference with separate memory for each robot.
+Spectator controls do not choose actuator requests. Competitive rules, shared-task
+training and match qualification remain unfinished.
 
 Collect all living agents' actions from one observation snapshot before stepping
 physics. Batch trajectories across arenas. Share weights within a team and retain

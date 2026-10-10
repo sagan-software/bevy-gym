@@ -1,0 +1,53 @@
+{
+  "recorded_utc": "2026-10-10T21:44:32.773298+00:00",
+  "source_revision": "234333643c1339579caa14e8615189c623e5eddd",
+  "binary_sha256": "702115bbf3fb11a1396f9091464cf1d7a22471ea942f8f4c8b794f0845cc253a",
+  "unit": "bevy-gym-standing-posture-seed23-retry-20261010.service",
+  "run": {
+    "seed": 23,
+    "updates": 24000,
+    "complete_optimizer_records": 24000,
+    "transitions": 12288000,
+    "optimizer_steps": 186692,
+    "selection_reports": 1200,
+    "passed_selection_reports": 0,
+    "exit_status": 1,
+    "failure": "Standing exhausted its update budget without passing; checkpoint is not qualified."
+  },
+  "selection": {
+    "update": 23540,
+    "episodes": 5,
+    "full_gate_cases": 2,
+    "survivors": 4,
+    "passed": false,
+    "selection_rule": "Chosen from all 1200 selection reports before held-out evaluation. Lexicographic descending: full-gate case count, survivors, minimum stable streak, total stable streak, minimum steps, total steps. No held-out result enters ranking. Numeric physical bounds use their f32 source constants."
+  },
+  "held_out": {
+    "episodes": 32,
+    "full_gate_cases": 1,
+    "survivors": 12,
+    "stable_streak_at_least_100": 2,
+    "passed": false,
+    "exit_status": 1,
+    "failure": "Standing evaluation failed; checkpoint is not qualified."
+  },
+  "lineage": {
+    "original_parent_sha256": "9c9e4c5bc8f7734da9835161476997e6d39d2aba28b24439e932a1f9949a2fdb",
+    "training_profile": "droid-standing-posture-reward-v1",
+    "evaluation": "unchanged original-standing-v1",
+    "initialization": "Imported actor and critic; fresh Adam, counters, samplers, environments and episode memories. Storage retry restarted from the original parent.",
+    "interrupted_run_archive": "../standing-posture-storage-restart/summary.json"
+  },
+  "qualification": "Failed. No lesson promotion. The shared viewer retains its separately recorded seed-17 update-22940 checkpoint.",
+  "files": {
+    "checkpoint.json": "2034ab972d782d2a93837f91829d1b49a56499b7172fc31d1311ffa57351d27d",
+    "checkpoint.mpk": "5a7b813491c0125cfa66eb268d98efd1bed181226ae4eff6861c768afad40c08",
+    "held-out.json": "d1338c0c418a5bb659ebb3c88bd16f61d1cc15f4a2cb8b37ee4bc792162c3856",
+    "launch.json": "03dafaa9cba0125eeb55679403d9a88104d9cfec6e38a26588b7a4b3114624cb",
+    "optimization.jsonl.gz": "1c511968c7043e808f3ecefdcf439d4ae4d3c15bafa9ce4a6bf7570a63a553a7",
+    "selection-history.jsonl.gz": "699a6c5de33d9bdca35121b228f96e9cfcb81775bc59c0a965185bc368bbd896",
+    "selection.json": "5d75c59d9ce3ef5029fade352b303aa5eef75d7c2d810c08f7caebc6cba76eda",
+    "training-reward.json": "93513f8fe24e6cdba6e44b4a7b30e78f77bebb3834f6781d637f682a0faafa95",
+    "warm-start.json": "0cfa5ebb93123c3d455fa451985f73e6b79728e94d60008b696a908c806b9abb"
+  }
+}

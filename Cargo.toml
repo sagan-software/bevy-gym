@@ -142,6 +142,12 @@ optional = true
 [target.'cfg(target_arch = "wasm32")'.dev-dependencies.wasm-bindgen-test]
 version = "=0.3.71"
 
+# Viewer examples read their scene attribute before loading checkpoint bytes.
+# Keep the DOM binding on the locked wasm-bindgen 0.2.121 release family.
+[target.'cfg(all(target_arch = "wasm32", target_os = "unknown"))'.dev-dependencies.web-sys]
+features = ["Window", "Document", "Element"]
+version = "=0.3.98"
+
 [dependencies.shakmaty]
 version = "0.30.1"
 

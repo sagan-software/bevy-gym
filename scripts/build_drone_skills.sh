@@ -24,23 +24,34 @@ skill_target="$(cargo metadata --locked --no-deps --format-version 1 |
     python3 -c 'import json, sys; print(json.load(sys.stdin)["target_directory"])')"
 cargo build --locked --no-default-features --target wasm32-unknown-unknown \
     --features robots,browser,render-core,bevy/webgl2 \
-    --example drone-hover-scene --example drone-recovery-scene --example drone-travel-scene --example droid-standing-scene "${flags[@]}"
-for lesson in hover recovery travel standing; do
+    --example drone-hover-scene --example drone-recovery-scene \
+    --example drone-travel-scene --example droid-standing-scene "${flags[@]}"
+for lesson in hover recovery travel standing world; do
     destination="$output/$lesson"
     mkdir -p -- "$destination/assets/robots" "$destination/assets/fonts" "$destination/LICENSES"
     example="drone-$lesson-scene"
-    if [[ "$lesson" == standing ]]; then example=droid-standing-scene; fi
+    if [[ "$lesson" == standing || "$lesson" == world ]]; then
+        example=droid-standing-scene
+    fi
     wasm-bindgen --target web --out-name lesson --out-dir "$destination" \
         "$skill_target/wasm32-unknown-unknown/$profile/examples/$example.wasm"
     cp -- robot-web/skills/{index.html,start.js,styles.css} "$destination/"
     cp -- assets/robots/{drone.glb,README.md} "$destination/assets/robots/"
     cp -- assets/fonts/{MonaSans-VariableFont.ttf,OFL.txt} "$destination/assets/fonts/"
     cp -- LICENSES/DRONE-CC-BY-3.0.txt "$destination/LICENSES/"
-    if [[ "$lesson" == standing ]]; then
+    if [[ "$lesson" == standing || "$lesson" == world ]]; then
         mkdir -p -- "$destination/assets/robots/survival"
         cp -- assets/robots/survival/{mannequin.glb,README.md,manifest.json} "$destination/assets/robots/survival/"
         cp -- assets/robots/survival/LICENSE-ANIMATIONS.txt "$destination/assets/robots/survival/"
-        sed -i 's|assets/robots/README.md|assets/robots/survival/README.md|' "$destination/index.html"
+        if [[ "$lesson" == standing ]]; then
+            sed -i 's|assets/robots/README.md|assets/robots/survival/README.md|' "$destination/index.html"
+        else
+            world_credits='>Drone credits</a>'
+            world_credits+='<a href="assets/robots/survival/README.md">Droid credits</a>'
+            sed -i -e 's|id="drone-canvas"|id="drone-canvas" data-scene="shared-world"|' \
+                -e "s|>Asset credits</a>|$world_credits|" \
+                "$destination/index.html"
+        fi
     fi
     case "$lesson" in
     hover)
@@ -59,9 +70,22 @@ for lesson in hover recovery travel standing; do
         title='Standing trial'
         guide=DROID_STANDING
         ;;
+    world)
+        title='Shared world trial'
+        guide=ROBOT_WORLD
+        ;;
     esac
     sed -i -e "s/LESSON_TITLE/$title/g" -e "s/LESSON_GUIDE/$guide/g" "$destination/index.html"
-    if [[ "$lesson" == standing ]]; then sed -i 's/R resets./R resets. V changes speed./' "$destination/index.html"; fi
+    if [[ "$lesson" == standing ]]; then
+        sed -i 's/R resets./R resets. V changes speed./' "$destination/index.html"
+    fi
+    if [[ "$lesson" == world ]]; then
+        world_controls='R resets. V changes speed.'
+        world_controls+=' C cycles the overview and six follow targets.'
+        world_controls+=' F selects free camera. WASD moves the free camera,'
+        world_controls+=' Q and E raise and lower it, and arrow keys turn it.'
+        sed -i "s/R resets./$world_controls/" "$destination/index.html"
+    fi
     # Pin the bindings and binary to one URL so reloads cannot mix checkpoint builds.
     runtime_hash="$(cd -- "$destination" && sha256sum lesson.js lesson_bg.wasm start.js | sha256sum | cut -d ' ' -f 1)"
     runtime_directory="build-$runtime_hash"

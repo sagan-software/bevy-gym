@@ -1,0 +1,188 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-10T21:53:34Z",
+  "title": "Design System: Bevy Gym Browser Skills",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Pale blue",
+        "canonical": "#B8E1E6",
+        "tonalRamp": [
+          "oklch(15% 0.043 205.5)",
+          "oklch(25% 0.043 205.5)",
+          "oklch(35% 0.043 205.5)",
+          "oklch(45% 0.043 205.5)",
+          "oklch(55% 0.043 205.5)",
+          "oklch(65% 0.043 205.5)",
+          "oklch(75% 0.043 205.5)",
+          "oklch(95% 0.043 205.5)"
+        ]
+      },
+      "charcoal": {
+        "role": "neutral",
+        "displayName": "Charcoal",
+        "canonical": "#171A1C",
+        "tonalRamp": [
+          "oklch(15% 0.006 236.9)",
+          "oklch(25% 0.006 236.9)",
+          "oklch(35% 0.006 236.9)",
+          "oklch(45% 0.006 236.9)",
+          "oklch(55% 0.006 236.9)",
+          "oklch(65% 0.006 236.9)",
+          "oklch(75% 0.006 236.9)",
+          "oklch(95% 0.006 236.9)"
+        ]
+      },
+      "shell-text": {
+        "role": "neutral",
+        "displayName": "Cool white",
+        "canonical": "#EDF0F1",
+        "tonalRamp": [
+          "oklch(15% 0.003 219.5)",
+          "oklch(25% 0.003 219.5)",
+          "oklch(35% 0.003 219.5)",
+          "oklch(45% 0.003 219.5)",
+          "oklch(55% 0.003 219.5)",
+          "oklch(65% 0.003 219.5)",
+          "oklch(75% 0.003 219.5)",
+          "oklch(95% 0.003 219.5)"
+        ]
+      },
+      "control-text": {
+        "role": "neutral",
+        "displayName": "White control text",
+        "canonical": "#FFFFFF",
+        "tonalRamp": [
+          "oklch(15% 0.000 89.9)",
+          "oklch(25% 0.000 89.9)",
+          "oklch(35% 0.000 89.9)",
+          "oklch(45% 0.000 89.9)",
+          "oklch(55% 0.000 89.9)",
+          "oklch(65% 0.000 89.9)",
+          "oklch(75% 0.000 89.9)",
+          "oklch(95% 0.000 89.9)"
+        ]
+      },
+      "world-sky": {
+        "role": "neutral",
+        "displayName": "Light grey sky",
+        "canonical": "#B8C4C9",
+        "tonalRamp": [
+          "oklch(15% 0.015 224.5)",
+          "oklch(25% 0.015 224.5)",
+          "oklch(35% 0.015 224.5)",
+          "oklch(45% 0.015 224.5)",
+          "oklch(55% 0.015 224.5)",
+          "oklch(65% 0.015 224.5)",
+          "oklch(75% 0.015 224.5)",
+          "oklch(95% 0.015 224.5)"
+        ]
+      },
+      "world-ground": {
+        "role": "neutral",
+        "displayName": "Muted sage ground",
+        "canonical": "#8C998F",
+        "tonalRamp": [
+          "oklch(15% 0.021 152.6)",
+          "oklch(25% 0.021 152.6)",
+          "oklch(35% 0.021 152.6)",
+          "oklch(45% 0.021 152.6)",
+          "oklch(55% 0.021 152.6)",
+          "oklch(65% 0.021 152.6)",
+          "oklch(75% 0.021 152.6)",
+          "oklch(95% 0.021 152.6)"
+        ]
+      },
+      "reset-marker": {
+        "role": "neutral",
+        "displayName": "Pale ground marker",
+        "canonical": "#D6D6C4",
+        "tonalRamp": [
+          "oklch(15% 0.024 106.9)",
+          "oklch(25% 0.024 106.9)",
+          "oklch(35% 0.024 106.9)",
+          "oklch(45% 0.024 106.9)",
+          "oklch(55% 0.024 106.9)",
+          "oklch(65% 0.024 106.9)",
+          "oklch(75% 0.024 106.9)",
+          "oklch(95% 0.024 106.9)"
+        ]
+      },
+      "control": {
+        "role": "neutral",
+        "displayName": "Charcoal control grey",
+        "canonical": "#383D40",
+        "tonalRamp": [
+          "oklch(15% 0.009 233.9)",
+          "oklch(25% 0.009 233.9)",
+          "oklch(35% 0.009 233.9)",
+          "oklch(45% 0.009 233.9)",
+          "oklch(55% 0.009 233.9)",
+          "oklch(65% 0.009 233.9)",
+          "oklch(75% 0.009 233.9)",
+          "oklch(95% 0.009 233.9)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "scene-title": {
+        "displayName": "Scene title",
+        "purpose": "Names the inspection trial."
+      },
+      "status": {
+        "displayName": "Status",
+        "purpose": "Shows playback, model, and policy state."
+      },
+      "control-label": {
+        "displayName": "Control label",
+        "purpose": "Names a playback or camera control."
+      },
+      "footer-link": {
+        "displayName": "Footer link",
+        "purpose": "Links to the training guide and asset credits."
+      },
+      "robot-label": {
+        "displayName": "Robot label",
+        "purpose": "Identifies a robot in the scene."
+      },
+      "checkpoint-id": {
+        "displayName": "Checkpoint identity",
+        "purpose": "Names the frozen policy and its checkpoint update."
+      }
+    },
+    "breakpoints": [
+      {
+        "name": "skill-mobile",
+        "value": "600px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Browser skill footer links",
+      "kind": "custom",
+      "refersTo": "footer-links",
+      "description": "Training guide and asset-credit links below the simulation canvas.",
+      "html": "<footer class=\"ds-skill-footer\"><a href=\"https://github.com/sagan-software/bevy-gym/blob/main/docs/ROBOT_WORLD.md\">Training and evaluation guide</a><a href=\"assets/robots/README.md\">Drone credits</a><a href=\"assets/robots/survival/README.md\">Droid credits</a></footer>",
+      "css": ".ds-skill-footer { display: flex; flex-wrap: wrap; gap: 12px 24px; padding: 18px; font-family: Mona, sans-serif; font-size: 14px; } .ds-skill-footer a { color: #B8E1E6; text-underline-offset: 3px; } .ds-skill-footer a:hover { color: #FFFFFF; } .ds-skill-footer a:focus-visible { outline: 2px solid #B8E1E6; outline-offset: -3px; } @media (max-width: 600px) { .ds-skill-footer { gap: 10px 20px; } }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The shared-world browser skill shows three drones and three droids in one Bevy canvas.",
+    "overview": "The shared-world browser skill shows three drones and three droids in one Bevy canvas. Playback state and controls sit over the scene. The guide and model credits appear below it.\n\nThe standing and shared-world scenes use the same Mona Sans asset, sky, ground, reset markers, and charcoal panels. The shared-world viewer extends the standing inspection layout to six robots and two checkpoint identities.",
+    "keyCharacteristics": [
+      "The scene stays visible behind the status and control panels.",
+      "Mona Sans appears in the browser shell and Bevy UI.",
+      "The scene uses a light grey sky, muted ground, and the licensed robot models."
+    ],
+    "rules": [],
+    "dos": [
+      "Do reuse the bundled Mona Sans face in the browser shell and Bevy overlays.",
+      "Do keep the guide and asset credits below the canvas, with underlines and visible focus."
+    ],
+    "donts": [
+      "Don't replace the licensed drone or mannequin assets when extending these browser scenes."
+    ]
+  }
+}

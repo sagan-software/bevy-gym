@@ -10,9 +10,16 @@ and 14 CLI tests.
 The [recorded seed-23 trial](progress/droid-standing-posture-seed23.json) stopped
 after 5,728 complete optimizer records because the filesystem filled.
 The [restart](progress/standing-posture-storage-restart/summary.json) imports the
-same original seed-17 parent with fresh Adam and a 24,000-update limit.
-At the recorded observation, its first 5,728 optimizer records match the entire
-completed interrupted prefix. It remains unqualified.
+same original seed-17 parent with fresh Adam. Its first 5,728 optimizer records
+match the entire completed interrupted prefix. It completed 24,000 updates and
+failed selection.
+
+The [strongest checkpoint](progress/standing-posture-seed23-update23540/summary.json)
+passes two of five selection cases and one of 32 held-out cases.
+Twelve held-out episodes survive the horizon. Standing remains unqualified.
+
+The [next bounded run](progress/droid-standing-posture-seed31.json) uses that checkpoint,
+seed 31 and fresh Adam. Completion and qualification remain pending.
 
 The completed droid run’s strongest selection candidate, update 22,940, failed
 held-out qualification. Five of 32 episodes survived the horizon, with every final
@@ -23,6 +30,20 @@ No droid standing policy is qualified.
 Updated: 2026-10-10. Current work: RL-only drone/droid curriculum.
 
 ## Resume here
+
+### Browser shared-world inference, 2026-10-10
+
+The [shared world scene](ROBOT_WORLD.md) now renders three drones and three physical
+droids in one solver. Frozen PPO actors choose every actuator request, with separate
+recurrent memory for each robot. Models, checkpoint identities and the unqualified
+label remain visible. Playback starts paused and waits for all six complete models.
+
+Run, pause, step, reset and speed controls work through keys and pointer presses.
+The overview, six follow views and free camera affect presentation only.
+The [scene record](progress/robot-world-scene.json) preserves desktop and narrow browser
+recordings, source hashes, exact validation commands and measured coverage gaps.
+Standing remains the default viewer mode. Invalid explicit modes fail before playback.
+Competitive rules, shared-task training and 3v3 qualification remain unfinished.
 
 ### Shared six-agent physical world, 2026-10-10
 

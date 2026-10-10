@@ -1,6 +1,6 @@
 //! Frozen physical standing trial with presentation-only playback controls.
 
-mod projection;
+pub(crate) mod projection;
 mod rig;
 mod view;
 

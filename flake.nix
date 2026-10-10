@@ -336,9 +336,11 @@
               )
             }"
             cargo test --locked --no-default-features --features robots,browser \
-              --target wasm32-unknown-unknown --test robot_world --test pursuit_arena --test pursuit_combat --test pursuit_shots --test pursuit_sight --test pursuit_hearing --test pursuit_return_fire --test pursuit_navigation --test drone_hover --test drone_obstacles --test drone_damage --test drone_impulse --test drone_damage_baseline --test drone_recovery --test drone_travel --test droid_standing --test droid_projection --test drone_tracking --test drone_parity "$@"
+              --target wasm32-unknown-unknown --test robot_world --test robot_world_view_mode --test pursuit_arena --test pursuit_combat --test pursuit_shots --test pursuit_sight --test pursuit_hearing --test pursuit_return_fire --test pursuit_navigation --test drone_hover --test drone_obstacles --test drone_damage --test drone_impulse --test drone_damage_baseline --test drone_recovery --test drone_travel --test droid_standing --test droid_projection --test drone_tracking --test drone_parity "$@"
             cargo test --locked --no-default-features --features robots,browser,browser-training \
               --target wasm32-unknown-unknown --test drone_learning --test droid_learning --test droid_skill_session --test drone_skill_session --test drone_damage_training --test recurrent_behavior_sequence --test recurrent_ppo_bytes "$@"
+            cargo test --locked --no-default-features --features robots,browser,browser-training,render-core,bevy/webgl2 \
+              --target wasm32-unknown-unknown --example droid-standing-scene "$@"
           '';
         };
 

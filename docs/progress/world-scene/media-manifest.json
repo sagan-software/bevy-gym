@@ -1,0 +1,284 @@
+{
+  "desktop.png": {
+    "origin": "/home/sagan/.t3/userdata/browser-artifacts/browser-screenshot-100-105-254-50-mv2v7z5d-6935bcc9.png",
+    "bytes": 507060,
+    "sha256": "c5ebdd4e6af4ce866be64ae4e56d8f85e7d3b75d9ede230da1bb398cae5086d9",
+    "runtime": "build-c1bdc3f58359c1026584f6ed31fa839ef61172a65006ec93b4e8d8e427ba199d"
+  },
+  "mobile.png": {
+    "origin": "/home/sagan/.t3/userdata/browser-artifacts/browser-screenshot-100-105-254-50-mv2vd86q-1d0ad4df.png",
+    "bytes": 228067,
+    "sha256": "86f784a0fd46b785edebfc3047b2d835d785e18ed3d31fad2cfcb289bdeb4ce2",
+    "runtime": "build-c1bdc3f58359c1026584f6ed31fa839ef61172a65006ec93b4e8d8e427ba199d"
+  },
+  "desktop-step.png": {
+    "origin": "/home/sagan/.t3/userdata/browser-artifacts/browser-screenshot-100-105-254-50-mv2v8sw7-0f9dfdeb.png",
+    "bytes": 513359,
+    "sha256": "8d054d1138991f3994699374050073ec89a6fc85f207d6004c7cc3bd3476b903",
+    "runtime": "build-c1bdc3f58359c1026584f6ed31fa839ef61172a65006ec93b4e8d8e427ba199d"
+  },
+  "desktop-complete.png": {
+    "origin": "/home/sagan/.t3/userdata/browser-artifacts/browser-screenshot-100-105-254-50-mv2vatdf-889afeb4.png",
+    "bytes": 494435,
+    "sha256": "6304c684ff7523a0310242f6077b63ef6a127405f86386199322b03778f4c7cd",
+    "runtime": "build-c1bdc3f58359c1026584f6ed31fa839ef61172a65006ec93b4e8d8e427ba199d"
+  },
+  "mobile-complete.png": {
+    "origin": "/home/sagan/.t3/userdata/browser-artifacts/browser-screenshot-100-105-254-50-mv2vpkd7-ec27f9f3.png",
+    "bytes": 222469,
+    "sha256": "d459146604f9d87f2672202352ad6e8534fc931ef82b0043341632a681f07f32",
+    "runtime": "build-c1bdc3f58359c1026584f6ed31fa839ef61172a65006ec93b4e8d8e427ba199d"
+  },
+  "follow-drone-1.png": {
+    "origin": "/home/sagan/.t3/userdata/browser-artifacts/browser-screenshot-100-105-254-50-mv2vgwfw-00a60768.png",
+    "bytes": 238376,
+    "sha256": "83f23544b371b10d95838b66ac23cccf3c5e1ab6485b0908c2bb0b4c8baaa521",
+    "runtime": "build-c1bdc3f58359c1026584f6ed31fa839ef61172a65006ec93b4e8d8e427ba199d"
+  },
+  "follow-drone-2.png": {
+    "origin": "/home/sagan/.t3/userdata/browser-artifacts/browser-screenshot-100-105-254-50-mv2vgwml-4422a4a9.png",
+    "bytes": 238503,
+    "sha256": "631b1f7eb2871379a63ed536d41a1c2e4fcb9f7fc31c4326609aeb18a0aacc27",
+    "runtime": "build-c1bdc3f58359c1026584f6ed31fa839ef61172a65006ec93b4e8d8e427ba199d"
+  },
+  "follow-drone-3.png": {
+    "origin": "/home/sagan/.t3/userdata/browser-artifacts/browser-screenshot-100-105-254-50-mv2vgwuc-0e96e015.png",
+    "bytes": 228728,
+    "sha256": "297650826b1b0c7d151334b609374c09df68775e0917526276379a7ac7ecc22d",
+    "runtime": "build-c1bdc3f58359c1026584f6ed31fa839ef61172a65006ec93b4e8d8e427ba199d"
+  },
+  "follow-droid-1.png": {
+    "origin": "/home/sagan/.t3/userdata/browser-artifacts/browser-screenshot-100-105-254-50-mv2vgx1z-1f3d20ff.png",
+    "bytes": 289361,
+    "sha256": "1ce9b4058dcdf28147db514a025a5f1d74c5570d531275fb50fd2718c4244346",
+    "runtime": "build-c1bdc3f58359c1026584f6ed31fa839ef61172a65006ec93b4e8d8e427ba199d"
+  },
+  "follow-droid-2.png": {
+    "origin": "/home/sagan/.t3/userdata/browser-artifacts/browser-screenshot-100-105-254-50-mv2vgx9q-2ce7fcdc.png",
+    "bytes": 294017,
+    "sha256": "273d48230b8d7cc618106e45d36d3de1851ac15cb8ae3682de9b0f30657b4d51",
+    "runtime": "build-c1bdc3f58359c1026584f6ed31fa839ef61172a65006ec93b4e8d8e427ba199d"
+  },
+  "follow-droid-3.png": {
+    "origin": "/home/sagan/.t3/userdata/browser-artifacts/browser-screenshot-100-105-254-50-mv2vgxf8-3d615989.png",
+    "bytes": 231623,
+    "sha256": "7c64042c38fce707b0291d2ed12dfa72e4c5c5d42484d2cfed9ad8e2ddb4622e",
+    "runtime": "build-c1bdc3f58359c1026584f6ed31fa839ef61172a65006ec93b4e8d8e427ba199d"
+  },
+  "desktop.mp4": {
+    "origin": "/home/sagan/.t3/userdata/attachments/41cd14c3-ecda-4844-8b4a-ca574c8ab017-62ae1e4d-b874-44eb-a9c3-940bc96588fc-mp4.mp4",
+    "bytes": 4505360,
+    "sha256": "192128af076bb8a610a83241e4451b2b00b23cf6a8484b7ef677b9f5cacaa9ea",
+    "probe": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "width": 1856,
+          "height": 1160
+        }
+      ],
+      "format": {
+        "duration": "138.478667",
+        "size": "4505360"
+      }
+    },
+    "runtime": "build-c1bdc3f58359c1026584f6ed31fa839ef61172a65006ec93b4e8d8e427ba199d"
+  },
+  "mobile.mp4": {
+    "origin": "/home/sagan/.t3/userdata/attachments/41cd14c3-ecda-4844-8b4a-ca574c8ab017-f72e1769-19c6-4b41-b1b5-0fc976b197d6-mp4.mp4",
+    "bytes": 5328469,
+    "sha256": "547a54e07addfa206afa5cc44c0ab2abef625d6f5e297f5843a9ad0e695049e6",
+    "probe": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "width": 566,
+          "height": 1224
+        }
+      ],
+      "format": {
+        "duration": "377.716167",
+        "size": "5328469"
+      }
+    },
+    "runtime": "build-c1bdc3f58359c1026584f6ed31fa839ef61172a65006ec93b4e8d8e427ba199d"
+  },
+  "mobile-controls.mp4": {
+    "origin": "/home/sagan/.t3/userdata/attachments/41cd14c3-ecda-4844-8b4a-ca574c8ab017-e26b1fc6-d311-43f6-b236-8b0bebcc4a86-mp4.mp4",
+    "bytes": 1577460,
+    "sha256": "84be64820f080c4fb40e0a2ec6d8d3b1196e72823d965c156d25dfecf7910866",
+    "probe": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "width": 566,
+          "height": 1224
+        }
+      ],
+      "format": {
+        "duration": "124.370433",
+        "size": "1577460"
+      }
+    },
+    "runtime": "build-c1bdc3f58359c1026584f6ed31fa839ef61172a65006ec93b4e8d8e427ba199d"
+  },
+  "startup-failure-before.png": {
+    "origin": "/home/sagan/.t3/userdata/browser-artifacts/browser-screenshot-100-105-254-50-mv2vzrlm-883a9ec8.png",
+    "bytes": 14358,
+    "sha256": "3a70fa2726c3b7cc040f9281d98152c58ad6036776ec909b5494f18e14d39250",
+    "runtime": "build-c1bdc3f58359c1026584f6ed31fa839ef61172a65006ec93b4e8d8e427ba199d"
+  },
+  "startup-invalid-mode.png": {
+    "origin": "/home/sagan/.t3/userdata/browser-artifacts/browser-screenshot-100-105-254-50-mv2xlkiw-6f049710.png",
+    "bytes": 27397,
+    "sha256": "6d5939e90406af4a59eae8f5dfdcc91a46309c47285f5c3eed71e097a507c550",
+    "runtime": "build-ab6287633ea9fbd9c9342ca4add367070ccd80ccf67f259a4dfdd30fd88b696c"
+  },
+  "startup-missing-canvas.png": {
+    "origin": "/home/sagan/.t3/userdata/browser-artifacts/browser-screenshot-100-105-254-50-mv2xm9g2-f6cccf27.png",
+    "bytes": 24883,
+    "sha256": "305a81bbdc97b441d68fc7e3f57432f62a03ab1f5238d68f46d467c4a676e009",
+    "runtime": "build-ab6287633ea9fbd9c9342ca4add367070ccd80ccf67f259a4dfdd30fd88b696c"
+  },
+  "standing-default-step.png": {
+    "origin": "/home/sagan/.t3/userdata/browser-artifacts/browser-screenshot-100-105-254-50-mv2xpgzd-a2c9abce.png",
+    "bytes": 273509,
+    "sha256": "013c50f363ca76760f08a3fb848643111a53263f1ddd916d285825789f11f8e5",
+    "runtime": "build-ab6287633ea9fbd9c9342ca4add367070ccd80ccf67f259a4dfdd30fd88b696c"
+  },
+  "desktop-contact-sheet.png": {
+    "derivation": "ffmpeg; uniform contact sheet from the corresponding full T3 preview recording. No scene content edited.",
+    "bytes": 117034,
+    "sha256": "5810660fa6052164ae73688a854dee703aad0bd16b72a12df50b83eff808497e",
+    "runtime": "build-c1bdc3f58359c1026584f6ed31fa839ef61172a65006ec93b4e8d8e427ba199d"
+  },
+  "mobile-contact-sheet.png": {
+    "derivation": "ffmpeg; uniform contact sheet from the corresponding full T3 preview recording. No scene content edited.",
+    "bytes": 234118,
+    "sha256": "2a0aaf1c885cf18a3d5b74d730b983c3f07d4bb8a547735f70e7115a569fa6e6",
+    "runtime": "build-c1bdc3f58359c1026584f6ed31fa839ef61172a65006ec93b4e8d8e427ba199d"
+  },
+  "mobile-controls-contact-sheet.png": {
+    "derivation": "ffmpeg; uniform contact sheet from the corresponding full T3 preview recording. No scene content edited.",
+    "bytes": 206569,
+    "sha256": "f28e8ae209deeb2b11f2311aa8cfd37e64ac90a0eaee27d8304bdeaaeb440186",
+    "runtime": "build-c1bdc3f58359c1026584f6ed31fa839ef61172a65006ec93b4e8d8e427ba199d"
+  },
+  "world-startup-fixed-step.png": {
+    "origin": "/home/sagan/.t3/userdata/browser-artifacts/browser-screenshot-100-105-254-50-mv2xt169-7c725ab1.png",
+    "bytes": 226662,
+    "sha256": "7a13c5fed253584a84abe59aaf6ca6feb2a2f714dd9859e2b52b202ca525795d",
+    "runtime": "build-ab6287633ea9fbd9c9342ca4add367070ccd80ccf67f259a4dfdd30fd88b696c",
+    "observed": "All six models, paused at 0.02 seconds after one policy step."
+  },
+  "release-desktop.png": {
+    "origin": "/home/sagan/.t3/userdata/browser-artifacts/browser-screenshot-100-105-254-50-mv2y3k71-7955b6e3.png",
+    "bytes": 507060,
+    "sha256": "c5ebdd4e6af4ce866be64ae4e56d8f85e7d3b75d9ede230da1bb398cae5086d9",
+    "runtime": "build-7dd084b1e9c46ad70270c58ba051909db4a1b3dd438a06f41450d6eb3f377f5d"
+  },
+  "release-desktop-step.png": {
+    "origin": "/home/sagan/.t3/userdata/browser-artifacts/browser-screenshot-100-105-254-50-mv2y3sl6-dc926521.png",
+    "bytes": 513359,
+    "sha256": "8d054d1138991f3994699374050073ec89a6fc85f207d6004c7cc3bd3476b903",
+    "runtime": "build-7dd084b1e9c46ad70270c58ba051909db4a1b3dd438a06f41450d6eb3f377f5d"
+  },
+  "release-desktop-complete.png": {
+    "origin": "/home/sagan/.t3/userdata/browser-artifacts/browser-screenshot-100-105-254-50-mv2y552q-81c9d96a.png",
+    "bytes": 504868,
+    "sha256": "65f7dd9b505f8b18dca7d675f58d208437c00f7b99591edbddbc7ba0951c296c",
+    "runtime": "build-7dd084b1e9c46ad70270c58ba051909db4a1b3dd438a06f41450d6eb3f377f5d"
+  },
+  "release-mobile.png": {
+    "origin": "/home/sagan/.t3/userdata/browser-artifacts/browser-screenshot-100-105-254-50-mv2y5fux-655e07a6.png",
+    "bytes": 228373,
+    "sha256": "3e918f01a4076abdfa14bf93be332c9366b2e2637300beeffbc5961dfa2657c6",
+    "runtime": "build-7dd084b1e9c46ad70270c58ba051909db4a1b3dd438a06f41450d6eb3f377f5d"
+  },
+  "release-mobile-complete.png": {
+    "origin": "/home/sagan/.t3/userdata/browser-artifacts/browser-screenshot-100-105-254-50-mv2y5ve2-51fe9ee6.png",
+    "bytes": 221763,
+    "sha256": "524952422ffaeac10ff3ed573e5934cf4ecc93ee8a1eb02058ca7f60e1804ce1",
+    "runtime": "build-7dd084b1e9c46ad70270c58ba051909db4a1b3dd438a06f41450d6eb3f377f5d"
+  },
+  "release-inference.mp4": {
+    "origin": "/home/sagan/.t3/userdata/attachments/41cd14c3-ecda-4844-8b4a-ca574c8ab017-84fbf76a-ef50-42e0-8fd6-43618dad79de-mp4.mp4",
+    "bytes": 3964586,
+    "sha256": "ddd195838bb92f4fad6d7f735b06eb6fc1a0ddf2d5d46b94aae44c477d8346d1",
+    "runtime": "build-7dd084b1e9c46ad70270c58ba051909db4a1b3dd438a06f41450d6eb3f377f5d",
+    "probe": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "width": 1856,
+          "height": 1160
+        }
+      ],
+      "format": {
+        "duration": "108.546967",
+        "size": "3964586"
+      }
+    },
+    "decode_validation": {
+      "command": "ffmpeg -hide_banner -loglevel error -xerror -i /home/sagan/Code/github.com/sagan-software/bevy-gym-quality/docs/progress/world-scene/release-inference.mp4 -f null -",
+      "exit": 183,
+      "log": "/home/sagan/.cache/bevy-gym-quality-validation/world-view-release-inference.mp4-decode.log",
+      "log_sha256": "a6393f7aec4f27e3c94f716f8cf7589b4bc74435fc3fc7f1fad5e2bfce56fd53"
+    },
+    "status": "failed recording attempt; mixed viewport capture has decode errors; not used as complete video proof"
+  },
+  "release-mobile.mp4": {
+    "origin": "/home/sagan/.t3/userdata/attachments/41cd14c3-ecda-4844-8b4a-ca574c8ab017-705aa2a9-8285-4057-876f-11e72d1952d3-mp4.mp4",
+    "bytes": 461174,
+    "sha256": "bfcd84fa23bf326016fe1fa3f14e047f6145465cffb18e651b77f51fa9528bf6",
+    "runtime": "build-7dd084b1e9c46ad70270c58ba051909db4a1b3dd438a06f41450d6eb3f377f5d",
+    "probe": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "width": 566,
+          "height": 1224
+        }
+      ],
+      "format": {
+        "duration": "28.502633",
+        "size": "461174"
+      }
+    },
+    "decode_validation": {
+      "command": "ffmpeg -hide_banner -loglevel error -xerror -i /home/sagan/Code/github.com/sagan-software/bevy-gym-quality/docs/progress/world-scene/release-mobile.mp4 -f null -",
+      "exit": 0,
+      "log": "/home/sagan/.cache/bevy-gym-quality-validation/world-view-release-mobile.mp4-decode.log",
+      "log_sha256": "4acfda22a195da031c0e4bf341d9f5e39a4b09374715b97b6815d09091845a9b"
+    },
+    "status": "decoded without errors"
+  },
+  "release-contact-sheet.png": {
+    "bytes": 221332,
+    "sha256": "69a75514b5dc53e3202ff3e56f2fe03ee276fcadff617720cf8eb457de38a0e5",
+    "runtime": "build-7dd084b1e9c46ad70270c58ba051909db4a1b3dd438a06f41450d6eb3f377f5d",
+    "derivation": "ffmpeg uniform contact sheet from failed mixed-viewport recording. Not complete video proof."
+  },
+  "release-mobile-step.png": {
+    "origin": "/home/sagan/.t3/userdata/browser-artifacts/browser-screenshot-100-105-254-50-mv2y8dmi-a7693c58.png",
+    "bytes": 227853,
+    "sha256": "eb5d5ea83ca6d2fa7f0e05a1a0a25c6d873364891e2d48290aa754bc34e80b55",
+    "runtime": "build-7dd084b1e9c46ad70270c58ba051909db4a1b3dd438a06f41450d6eb3f377f5d"
+  },
+  "release-mobile-contact-sheet.png": {
+    "bytes": 236356,
+    "sha256": "a42bc156ae2ee3186961b32fd4cbbb663e14c15b39e366c85ccdc630e31c2208",
+    "runtime": "build-7dd084b1e9c46ad70270c58ba051909db4a1b3dd438a06f41450d6eb3f377f5d",
+    "derivation": "ffmpeg; twelve uniform frames from the fixed narrow-viewport release recording. Decode validation passed; no scene content edited."
+  }
+}

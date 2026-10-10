@@ -1,0 +1,232 @@
+{
+  "source_base": "299f8cf5d038f00ef8484cf14b2cd36f35bd4132",
+  "scope": "Nix lint findings concern unchanged ignore rules, unchanged unrelated manifests and unchanged flake source-root expressions.",
+  "diagnostics": [
+    {
+      "description": "direnv artifact directory `.direnv/` is not ignored recursively; add `.direnv/` to Git ignore rules",
+      "check_name": "liamc/direnv-artifact-directory",
+      "fingerprint": "2db02d2148d6ed44282c12d5cc24ceb6867d2d7ef89f176533e5e3e2eed0e8d2",
+      "severity": "major",
+      "location": {
+        "path": ".envrc",
+        "lines": {
+          "begin": 1
+        },
+        "positions": {
+          "begin": {
+            "line": 1,
+            "column": 1
+          }
+        }
+      }
+    },
+    {
+      "description": "Rust artifact directory `target/` is not ignored recursively; add `target/` to Git ignore rules",
+      "check_name": "liamc/rust-artifact-directory",
+      "fingerprint": "1072524427fef07ad5d4fee2997b83b921b78404bf976e43d84df30f464ec3ad",
+      "severity": "major",
+      "location": {
+        "path": "Cargo.toml",
+        "lines": {
+          "begin": 1
+        },
+        "positions": {
+          "begin": {
+            "line": 1,
+            "column": 1
+          }
+        }
+      }
+    },
+    {
+      "description": "Python artifact directory `.mypy_cache/` is not ignored recursively; add `.mypy_cache/` to Git ignore rules",
+      "check_name": "liamc/python-artifact-directory",
+      "fingerprint": "70e9210b20ce15e7a7fc5c4006e6b8ace6399bb4794add7ee3c325b18d402207",
+      "severity": "major",
+      "location": {
+        "path": "ai/skills/bmad-story-automator/pyproject.toml",
+        "lines": {
+          "begin": 1
+        },
+        "positions": {
+          "begin": {
+            "line": 1,
+            "column": 1
+          }
+        }
+      }
+    },
+    {
+      "description": "Python artifact directory `.pytest_cache/` is not ignored recursively; add `.pytest_cache/` to Git ignore rules",
+      "check_name": "liamc/python-artifact-directory",
+      "fingerprint": "97e43cbfd6d0a9078a551beb05696d5c77d7d566f4a48937081e692e9c8beba4",
+      "severity": "major",
+      "location": {
+        "path": "ai/skills/bmad-story-automator/pyproject.toml",
+        "lines": {
+          "begin": 1
+        },
+        "positions": {
+          "begin": {
+            "line": 1,
+            "column": 1
+          }
+        }
+      }
+    },
+    {
+      "description": "Python artifact directory `.ruff_cache/` is not ignored recursively; add `.ruff_cache/` to Git ignore rules",
+      "check_name": "liamc/python-artifact-directory",
+      "fingerprint": "c8df0456336b88256ba21e2c0644fffe622913957574e9731993d962a7b93488",
+      "severity": "major",
+      "location": {
+        "path": "ai/skills/bmad-story-automator/pyproject.toml",
+        "lines": {
+          "begin": 1
+        },
+        "positions": {
+          "begin": {
+            "line": 1,
+            "column": 1
+          }
+        }
+      }
+    },
+    {
+      "description": "Python artifact directory `.venv/` is not ignored recursively; add `.venv/` to Git ignore rules",
+      "check_name": "liamc/python-artifact-directory",
+      "fingerprint": "f41cbfa6c0c4e4c70442a32fbb571e2e06bbff022106275c5fb4642b0c8d5671",
+      "severity": "major",
+      "location": {
+        "path": "ai/skills/bmad-story-automator/pyproject.toml",
+        "lines": {
+          "begin": 1
+        },
+        "positions": {
+          "begin": {
+            "line": 1,
+            "column": 1
+          }
+        }
+      }
+    },
+    {
+      "description": "Wrap this source root in `lib.cleanSourceWith`, filtered `builtins.path`, or `lib.fileset.toSource`",
+      "check_name": "statix/unfiltered_source_root",
+      "fingerprint": "8ef0319c0582137f9988e108a3839fab27b7b3825c345a494673916168425ecd",
+      "severity": "minor",
+      "location": {
+        "path": "flake.nix",
+        "lines": {
+          "begin": 119
+        },
+        "positions": {
+          "begin": {
+            "line": 119,
+            "column": 18
+          }
+        }
+      }
+    },
+    {
+      "description": "Wrap this source root in `lib.cleanSourceWith`, filtered `builtins.path`, or `lib.fileset.toSource`",
+      "check_name": "statix/unfiltered_source_root",
+      "fingerprint": "bdc44f9a587d15d3c8a768d088bae7067b5c3759de89f07497d46af54b408a05",
+      "severity": "minor",
+      "location": {
+        "path": "flake.nix",
+        "lines": {
+          "begin": 200
+        },
+        "positions": {
+          "begin": {
+            "line": 200,
+            "column": 20
+          }
+        }
+      }
+    },
+    {
+      "description": "Rust artifact directory `target/` is not ignored recursively; add `target/` to Git ignore rules",
+      "check_name": "liamc/rust-artifact-directory",
+      "fingerprint": "ac92ab7700865483a6a074cbf50f0a5629f4bf4fe25f6de34e1eb403be255a0e",
+      "severity": "major",
+      "location": {
+        "path": "vendor/bevy-ragdoll-rapier3d/Cargo.toml",
+        "lines": {
+          "begin": 1
+        },
+        "positions": {
+          "begin": {
+            "line": 1,
+            "column": 1
+          }
+        }
+      }
+    },
+    {
+      "description": "Rust artifact directory `target/` is not ignored recursively; add `target/` to Git ignore rules",
+      "check_name": "liamc/rust-artifact-directory",
+      "fingerprint": "e22666594785cc16f1031b2618a915eda1dee9792d267cfcd1886b9adbb40699",
+      "severity": "major",
+      "location": {
+        "path": "vendor/bevy-ragdoll/Cargo.toml",
+        "lines": {
+          "begin": 1
+        },
+        "positions": {
+          "begin": {
+            "line": 1,
+            "column": 1
+          }
+        }
+      }
+    }
+  ],
+  "unchanged_evidence": [
+    {
+      "path": ".gitignore",
+      "unchanged_from_HEAD": true,
+      "sha256": "c3ec04c297984f3dc32ee279fcd8fb48f3b361d977ad5332107560109206eebe"
+    },
+    {
+      "path": ".envrc",
+      "unchanged_from_HEAD": true,
+      "sha256": "6dcca4c369392919d647dbc5086ba5a99cfb38a3a969a3487581d3ed4741de5a"
+    },
+    {
+      "path": "ai/skills/bmad-story-automator/pyproject.toml",
+      "unchanged_from_HEAD": true,
+      "sha256": "c81f23d1956b7cc4e311b20eb60d8b37169db2eea6194b56d1d3163f083f3974"
+    },
+    {
+      "path": "vendor/bevy-ragdoll/Cargo.toml",
+      "unchanged_from_HEAD": true,
+      "sha256": "fdae4f0758ec4ea4b4eab5799bfcdc626f49acba9b25c11a94c3b39feac5ceed"
+    },
+    {
+      "path": "vendor/bevy-ragdoll-rapier3d/Cargo.toml",
+      "unchanged_from_HEAD": true,
+      "sha256": "9c21dab8b261e38091fb0d2dc4dcfca0eac5cbae107f15fc5b73c77d4ce62fde"
+    },
+    {
+      "path": "Cargo.toml",
+      "line": 1,
+      "text": "[package]",
+      "unchanged_from_HEAD": true
+    },
+    {
+      "path": "flake.nix",
+      "line": 119,
+      "text": "          root = ./.;",
+      "unchanged_from_HEAD": true
+    },
+    {
+      "path": "flake.nix",
+      "line": 200,
+      "text": "            root = ./.;",
+      "unchanged_from_HEAD": true
+    }
+  ],
+  "gate_status": "failed: ten repository diagnostics; zero diagnostics in candidate changes"
+}

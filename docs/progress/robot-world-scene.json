@@ -1,0 +1,455 @@
+{
+  "schema": "robot-world-scene-evidence-v1",
+  "record_status": "Diagnostic inference verified. Nix lint fails on ten unchanged repository diagnostics. Native-window, physical-mobile and post-publication GUI checks remain unverified.",
+  "source_base": "299f8cf5d038f00ef8484cf14b2cd36f35bd4132",
+  "source_sha256": {
+    "Cargo.lock": "10c5d31f6369858c81b84b503903dcb1425321a09159b3113edd0065f13b32a8",
+    "Cargo.toml": "09cf9949138945f5bd48a61d3209e98e6eaf73c8255a1054d1b1e84b995c7d43",
+    "examples/robots/standing_scene/mod.rs": "0b9bad6fd32ae604af0fbf7da794dadec56e112dfbb21dec646033efb114c78a",
+    "examples/robots/standing_viewer.rs": "61920fbf5ab20a15dc21b112e0145a3895c46c2561949d56efdae84267a49dc4",
+    "examples/robots/world_scene/camera.rs": "c9557a7b8cc13dcced14d2f0884a0807b6c67c103a4a4676561c4f4b305a443c",
+    "examples/robots/world_scene/mode.rs": "c5ae4489b2e5e5e14b911b73e05a78793581d34a0a07049958949bb8c74ab0e7",
+    "examples/robots/world_scene/player.rs": "96f36275c79a6226e9d6b5d4672c16e2a36c1ff65546406664b800243abdb606",
+    "examples/robots/world_scene/rig.rs": "ddc7a6c673fe8ec322ca721cc5c8397650480d9e5bfcc60c18073aacb4a06552",
+    "examples/robots/world_scene/rig_tests.rs": "fdfafbda8f12d93d3a0fd881a361adf4f914f9bb7bc24b65894350753f43e8eb",
+    "examples/robots/world_scene/selector.rs": "626d675c08653b008cd4040a0defa5cf7aab7ec13d255ae73e7810aeeade5ada",
+    "examples/robots/world_scene/view.rs": "acb93ef1e1464bb9427b1d8f369aaae729ed439f8ba3af657b86c8c0cbcf6713",
+    "examples/robots/world_scene/view_tests.rs": "f2269eb683579173bfa2e0669014a02ce6c79401c0a2ae20b0cae9505577260c",
+    "examples/robots/world_scene/viewer.rs": "fe9e165f44a0c4e380a57ab7452db090d934c9210d80082e55a16958957588f7",
+    "flake.nix": "4414d587147a9746bc8fb945da1c51deb90b1b58dd318fa28de5205bb7854dde",
+    "scripts/build_drone_skills.sh": "90dd6e4c948f33e6f4d12ff9734ded1a3907b86cea6e9ddf6e0ae3343e01652d",
+    "tests/droid_skill_session.rs": "08082b47e147ad8fe0dd55d215d7fd0dae750bd8c755d15f10040c5b8ad5fbfd",
+    "tests/droid_skill_session/world_camera.rs": "40ec8006e622aa26a8443f8ca71e013b6c14584c6bb3526ccc09ba8d1e4bb152",
+    "tests/droid_skill_session/world_player.rs": "734dc62ada4fa108d23dad547ffa8e8f2ff1b211b5da5d7aefbce8f19905e5eb",
+    "tests/robot_world_view_mode.rs": "20dd907089abb18332626a5b34644ef4708736eda7ed4f546c4e17bebd43c664"
+  },
+  "scope": "Browser diagnostic shared-world inference; no shared-task or competitive qualification.",
+  "qualification": "unqualified",
+  "actor_contract": {
+    "decision_interval_ms": 20,
+    "solver_substeps": 4,
+    "horizon_ms": 20000,
+    "agents_per_team": 3,
+    "frozen_policies": 2,
+    "separate_memories": 6,
+    "drone_inputs": 12,
+    "drone_outputs": 4,
+    "droid_inputs": 204,
+    "droid_outputs": 26,
+    "all_actions_before_physics": true,
+    "memory_commit": "After successful common physical advancement",
+    "policy_inputs": "Own body and passive reset target; no other robot state, reward or critic state",
+    "failure": "Drop both policies; retain the original typed cause; no fallback; reset does not revive failure"
+  },
+  "checkpoints": {
+    "drone": {
+      "path": "docs/progress/drone-hover.mpk",
+      "sha256": "5aa47c6941b1aa243c4eafcb0fafaf8c6fa9ee816944dc5a5ca0d3f95712403b",
+      "training": "PPO seed 7, update 280, 143360 transitions",
+      "evidence": "docs/progress/drone-checkpoint-transfer.json",
+      "qualification": "Standalone calm hover only; not the shared task"
+    },
+    "droid": {
+      "path": "docs/progress/standing-seed17-update22940/checkpoint.mpk",
+      "record": {
+        "schema": "droid-standing-v1",
+        "algorithm": "PPO",
+        "seed": 17,
+        "update": 22940,
+        "transitions": 11745280,
+        "optimizer_steps": 172980,
+        "sha256": "9c9e4c5bc8f7734da9835161476997e6d39d2aba28b24439e932a1f9949a2fdb"
+      },
+      "evidence": "docs/progress/standing-seed17-update22940/summary.json",
+      "qualification": "Failed original standing selection and held-out evaluation"
+    }
+  },
+  "playback": {
+    "default_mode": "standing",
+    "explicit_modes": [
+      "standing",
+      "shared-world"
+    ],
+    "world_mode": "data-scene=\"shared-world\" on #drone-canvas",
+    "initial_state": "Paused after all six complete, distinct model rigs bind.",
+    "commands": [
+      "Run",
+      "Pause",
+      "Step",
+      "Reset",
+      "Speed"
+    ],
+    "rates": [
+      1,
+      4,
+      16
+    ],
+    "clip_seconds": 20,
+    "policy_interval_ms": 20,
+    "step": "One common policy frame and four 5 ms solver substeps; then pause.",
+    "reset": "Restore six physical bodies and six separate recurrent memories; remain paused.",
+    "failure": "Sticky; no actor, scripted or manual actuator fallback.",
+    "camera": [
+      "All",
+      "Drone 1",
+      "Drone 2",
+      "Drone 3",
+      "Droid 1",
+      "Droid 2",
+      "Droid 3",
+      "Free"
+    ],
+    "camera_contract": "Changes presentation only; no policy input, memory, clock or actuator changes."
+  },
+  "browser": {
+    "tool": "T3 Code collaborative browser",
+    "desktop_css_pixels": [
+      1280,
+      800
+    ],
+    "narrow_css_pixels": [
+      390,
+      844
+    ],
+    "device_pixel_ratio": 1.4500000476837158,
+    "adapter": "ANGLE NVIDIA GeForce RTX 5070 Ti; WebGL 2.0",
+    "visibility": "Preview tools returned visible=false even after preview_open(open=true, show=true). Captured rendered browser content; no physically visible native-window proof.",
+    "device_scope": "Desktop browser resized to narrow CSS dimensions; no physical mobile-device test.",
+    "native_window": "unverified",
+    "verified_controls": [
+      "run",
+      "pause",
+      "step",
+      "reset",
+      "1x",
+      "4x",
+      "16x",
+      "all six follow targets",
+      "free camera keys",
+      "pointer controls",
+      "20-second clip completion"
+    ],
+    "media_manifest": "docs/progress/world-scene/media-manifest.json",
+    "startup_regression": {
+      "before": {
+        "runtime": "build-c1bdc3f58359c1026584f6ed31fa839ef61172a65006ec93b4e8d8e427ba199d",
+        "scene": "unsupported",
+        "visible_error": null,
+        "models_requested": 0,
+        "passed": false,
+        "capture": "docs/progress/world-scene/startup-failure-before.png"
+      },
+      "after_invalid_mode": {
+        "runtime": "build-ab6287633ea9fbd9c9342ca4add367070ccd80ccf67f259a4dfdd30fd88b696c",
+        "scene": "unsupported",
+        "visible_error": "The lesson could not start: scene must be standing or shared-world. Reload to retry.",
+        "model_requests": [],
+        "screenshot": "docs/progress/world-scene/startup-invalid-mode.png",
+        "passed": true
+      },
+      "after_missing_canvas": {
+        "runtime": "build-ab6287633ea9fbd9c9342ca4add367070ccd80ccf67f259a4dfdd30fd88b696c",
+        "visible_error": "The lesson could not start: viewer canvas unavailable. Reload to retry.",
+        "models_requested": 0,
+        "passed": true,
+        "capture": "docs/progress/world-scene/startup-missing-canvas.png"
+      },
+      "standing_default": {
+        "passed": true,
+        "observed": "Standing default starts paused and advances to 1/1000 actions after N.",
+        "capture": "docs/progress/world-scene/standing-default-step.png"
+      },
+      "shared_world_positive": {
+        "passed": true,
+        "observed": "All six models rendered; paused at 0.02 seconds after N.",
+        "capture": "docs/progress/world-scene/world-startup-fixed-step.png"
+      }
+    },
+    "production_url": "http://100.105.254.50:8784/world/?release-check=1",
+    "production_verification": {
+      "passed": true,
+      "runtime": "build-7dd084b1e9c46ad70270c58ba051909db4a1b3dd438a06f41450d6eb3f377f5d",
+      "captures": [
+        "release-desktop.png",
+        "release-desktop-step.png",
+        "release-desktop-complete.png",
+        "release-mobile.png",
+        "release-mobile-complete.png",
+        "release-inference.mp4",
+        "release-mobile-step.png",
+        "release-mobile.mp4",
+        "release-mobile-contact-sheet.png"
+      ],
+      "observed": [
+        "Six licensed models rendered at 0.00 seconds.",
+        "N advances to 0.02 seconds and pauses.",
+        "Run at 1x reaches Clip complete at 20.00 seconds.",
+        "R restores 0.00 seconds and paused state.",
+        "Narrow layout shows six robots and all controls.",
+        "16x playback reaches Clip complete at 20.00 seconds."
+      ],
+      "media_manifest": "docs/progress/world-scene/media-manifest.json",
+      "failed_video_attempt": "release-inference.mp4 decodes with errors after mixed-viewport recording. Production screenshot observations remain valid. See media-manifest.json.",
+      "clean_narrow_recording": {
+        "path": "docs/progress/world-scene/release-mobile.mp4",
+        "decode_exit": 0,
+        "contact_sheet": "docs/progress/world-scene/release-mobile-contact-sheet.png"
+      }
+    },
+    "preview_disconnection": "T3 desktop automation host disconnected at 2026-10-10T22:12:01Z after completed release screenshots and narrow recording. Additional desktop recording and post-publication GUI verification unavailable."
+  },
+  "coverage": {
+    "configured_command": "cargo llvm-cov --no-clean --branch --features robots --example droid-standing-scene --test droid_skill_session --test robot_world_view_mode --json --output-path /home/sagan/.cache/bevy-gym-quality-validation/world-view-coverage-final-linked7.json",
+    "authoritative_method": "Three current executables ran with separate fresh raw profiles. Only those three profiles were merged; llvm-cov export against those exact objects returned no diagnostics. Coordinate hits use the maximum across instantiations. Prior no-clean aggregates are not authoritative.",
+    "objects": [
+      {
+        "path": "/home/sagan/.cache/bevy-gym-quality-validation/coverage-target/debug/examples/droid_standing_scene-054c2d40a60400e4",
+        "sha256": "727ae61fb22f9713a679bfe657719e7fee9b6eb258a819a8bdbc88eeef8bb6ff"
+      },
+      {
+        "path": "/home/sagan/.cache/bevy-gym-quality-validation/coverage-target/debug/deps/droid_skill_session-4e14768964021903",
+        "sha256": "08422813bb9fc2ea34d55722a1f3fcc4c8c04eb2c7491e2841e0bfeb86c55f28"
+      },
+      {
+        "path": "/home/sagan/.cache/bevy-gym-quality-validation/coverage-target/debug/deps/robot_world_view_mode-760435d31482d4db",
+        "sha256": "a0c368754ad70ce4e8300e8a87bfd30efd662a732b880b3e34914a948859ff37"
+      }
+    ],
+    "files": "docs/progress/world-scene/coverage.json",
+    "regions": 1348,
+    "hit_regions": 1286,
+    "branch_outcomes": 132,
+    "hit_branch_outcomes": 129,
+    "gap_reasons": [
+      {
+        "file": "examples/robots/world_scene/player.rs",
+        "lines": [
+          141,
+          179
+        ],
+        "gap": "Loaded-session error and post-advance failure alternatives have no legal reproducer with the fixed trusted checkpoints and valid 20-second clip. No injected fault or scripted fallback was added."
+      },
+      {
+        "file": "examples/robots/world_scene/rig.rs",
+        "lines": [
+          283,
+          288,
+          292
+        ],
+        "gap": "Root named-body identity transform and loop exhaustion do not occur in the packaged GLB hierarchies. The repeated immutable ancestor lookup error is unreachable after the preceding successful lookup."
+      },
+      {
+        "file": "examples/robots/world_scene/view.rs",
+        "lines": [
+          580
+        ],
+        "gap": "Inference-stopped callback is not reached by trusted bundled checkpoints in the valid clip."
+      },
+      {
+        "file": "examples/robots/world_scene/viewer.rs",
+        "lines": [
+          13,
+          64
+        ],
+        "gap": "Native App/window startup is not called by native test executables. The WASM application executes in browser captures; that execution is outside these native LLVM profiles."
+      },
+      {
+        "file": "examples/robots/world_scene/selector.rs",
+        "gap": "LLVM export reports zero production regions for the derived native CLI selector. Native public-seam and WASM selector tests provide behavior evidence."
+      },
+      {
+        "file": "examples/robots/standing_viewer.rs",
+        "gap": "WASM start and selected_mode are outside native LLVM coverage. Two WASM tests and actual browser negative/positive checks cover startup behavior."
+      }
+    ],
+    "configured_exit": 0,
+    "configured_log": "/home/sagan/.cache/bevy-gym-quality-validation/world-view-coverage-final-linked7.log",
+    "configured_log_sha256": "75b50f6d820b8abce5dfa4c58ab52c0a76eedd6e7ab37e9e8f7abbaab6434d30",
+    "fresh_profile_objects_still_match_after_final_configured_gate": true
+  },
+  "finish_review": {
+    "disposition": "ship",
+    "implementation": "Installed degraded reviewer and documenter fallbacks; shipped agent definitions unavailable.",
+    "material_layout_findings": 0,
+    "retracted_finding": "Scaled narrow-video clipping claim was retracted after raw 566x1224 frames were inspected.",
+    "documentation": [
+      "DESIGN.md",
+      ".impeccable/design.json",
+      ".impeccable/surfaces/examples-robots-standing-viewer-rs-documentation.md"
+    ],
+    "PRODUCT.md": "absent"
+  },
+  "unfinished": [
+    "Standing qualification",
+    "Full drone travel qualification",
+    "Shared-task training",
+    "Competitive weapons, sensors and match rules",
+    "Qualified 3v3 policies",
+    "Physically visible native-window and physical-mobile verification"
+  ],
+  "native_gates": [
+    {
+      "command": "cargo fmt --all -- --check",
+      "exit": 0,
+      "passed_tests": 0,
+      "failed_tests": 0,
+      "ignored_tests": 0,
+      "log": "/home/sagan/.cache/bevy-gym-quality-validation/world-view-format-final7.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "cargo test",
+      "exit": 0,
+      "passed_tests": 132,
+      "failed_tests": 0,
+      "ignored_tests": 1,
+      "log": "/home/sagan/.cache/bevy-gym-quality-validation/world-view-default-tests-final7.log",
+      "log_sha256": "0d2b9ba12149971c067d0060ee00eafe59c9dcc516e088142d1385b2fbdaa6e9"
+    },
+    {
+      "command": "cargo test --features robots",
+      "exit": 0,
+      "passed_tests": 476,
+      "failed_tests": 0,
+      "ignored_tests": 3,
+      "log": "/home/sagan/.cache/bevy-gym-quality-validation/world-view-robot-tests-final7.log",
+      "log_sha256": "dd5938380597eeb014adcf1b538d20ff140254fd550134cd7f07c1dcaf22c4b8"
+    },
+    {
+      "command": "cargo test --features robots --example droid-standing-scene",
+      "exit": 0,
+      "passed_tests": 53,
+      "failed_tests": 0,
+      "ignored_tests": 0,
+      "log": "/home/sagan/.cache/bevy-gym-quality-validation/world-view-focused-final7.log",
+      "log_sha256": "5e4efe0d3d9e87e5bddac25b84fa123b6f64ca9322ce109c90e0a7ac7b491a52"
+    },
+    {
+      "command": "cargo clippy --all-targets --all-features -- -D warnings",
+      "exit": 0,
+      "passed_tests": 0,
+      "failed_tests": 0,
+      "ignored_tests": 0,
+      "log": "/home/sagan/.cache/bevy-gym-quality-validation/world-view-clippy-final7.log",
+      "log_sha256": "a548bd5756b5811c81245e19735b4e47fa8c0844d0f2a325ecb32fc78dfa8d76"
+    }
+  ],
+  "personal_lints": {
+    "command": "nix develop --command env -u CFLAGS CARGO_TARGET_DIR=/home/sagan/.cache/bevy-gym-quality-validation/personal-target CARGO_BUILD_BUILD_DIR=/home/sagan/.cache/bevy-gym-quality-validation/personal-build CARGO_PROFILE_DEV_DEBUG=0 CARGO_PROFILE_TEST_DEBUG=0 CARGO_INCREMENTAL=0 CARGO_BUILD_JOBS=2 /home/sagan/Code/gitlab.com/liamcurry/lints/scripts/nix-safe run lint -- --repo /home/sagan/Code/github.com/sagan-software/bevy-gym-quality --rust --package bevy-gym --manifest-path /home/sagan/Code/github.com/sagan-software/bevy-gym-quality/Cargo.toml --all-targets --all-features --no-deps --no-deny-warnings --extra-rustc-arg=-Aunused_crate_dependencies --changed-range HEAD --log-dir /home/sagan/.cache/bevy-gym-quality-validation/logs/world-view-personal10",
+    "exit": 0,
+    "log": "/home/sagan/.cache/bevy-gym-quality-validation/world-view-personal10.log",
+    "log_sha256": "0749862632baf0513bdabecfc0e1ae439a669eff545ffbf7633fdcbbaac38b99",
+    "actual_compiler": "1.98.0-nightly-2026-06-15",
+    "candidate_local_diagnostics": 0,
+    "clippy_exit": 0,
+    "dylint_exit": 0
+  },
+  "shell_lints": {
+    "command": "liamc-shell-lints scripts/build_drone_skills.sh",
+    "exit": 0,
+    "log": "/home/sagan/.cache/bevy-gym-quality-validation/world-view-shell-lints-final.log",
+    "log_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  "markdown_lints": {
+    "command": "liamc-markdown-lints docs/ROBOT_WORLD.md docs/ROBOT_SKILL_CURRICULUM.md docs/EXAMPLE_STATUS.md robot-web/skills/README.md DESIGN.md .impeccable/surfaces/examples-robots-standing-viewer-rs.md .impeccable/surfaces/examples-robots-standing-viewer-rs-documentation.md",
+    "exit": 0,
+    "log": "/home/sagan/.cache/bevy-gym-quality-validation/world-view-markdown-final2.log",
+    "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "nix_lints": {
+    "command": "liamc-nix-lints -- flake.nix",
+    "exit": 1,
+    "log": "/home/sagan/.cache/bevy-gym-quality-validation/world-view-nix-lints-final.log",
+    "log_sha256": "418c17d66bdb4416ca1b80474c7f03fae735cc31059b0b0a9c20929e4abd9b3a",
+    "diagnostics": 10,
+    "candidate_local_diagnostics": 0,
+    "unchanged_evidence": "docs/progress/world-scene/nix-baseline.json",
+    "status": "failed"
+  },
+  "production_build": {
+    "builder": "scripts/build_drone_skills.sh --release",
+    "post_format_exit": 0,
+    "html_bytes_identical_after_shell_format_fix": true,
+    "pages": {
+      "hover": "a19cee0c522f5f874a8a448d87bd3e87a4f416d48dcd7a42df20b3c4f0b4bcd8",
+      "recovery": "c6f8d09adcd761a5d1962f8fa8972a4a6294410a041966104266695d2d8f54b5",
+      "travel": "069e5d6d03a7621aad878a6cd0d6a792c5187fedf6019505d499dc00bdc9d999",
+      "standing": "d0a7a2308b93cfed9e5ecf2a8e16e8fd64bbbd232b6d140836efe272058f92dd",
+      "world": "970314723af754edb0e64af013abdce60987fdeda5258e8799b02d830bee68b9"
+    },
+    "world_runtime": "build-7dd084b1e9c46ad70270c58ba051909db4a1b3dd438a06f41450d6eb3f377f5d",
+    "runtime_sha256": {
+      "lesson.js": "3ee18940ef71fe117392d29626ad3f8cd6c346abf649e9bc338d8c42a512e585",
+      "lesson_bg.wasm": "450230457344ba14f4b54d08d4ce3ac7fa528e06991f8f555a87a4c60946daf7",
+      "start.js": "5cd43ad287ecdbe72127933e3d95a93b29370cbbb2cdc82195bf47bfa4e135c4"
+    },
+    "world_wasm_bytes": 79788438
+  },
+  "execution_environment": {
+    "cwd": "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality",
+    "native_wrapper": "nix develop --command env -u CFLAGS",
+    "CARGO_TARGET_DIR": "/home/sagan/.cache/bevy-gym-quality-validation/target",
+    "CARGO_BUILD_BUILD_DIR": "/home/sagan/.cache/bevy-gym-quality-validation/build",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_INCREMENTAL": "0",
+    "CARGO_BUILD_JOBS": "2",
+    "wasm_target": "/home/sagan/.cache/bevy-gym-quality-validation/flight-release-target",
+    "wasm_build": "/home/sagan/.cache/bevy-gym-quality-validation/flight-release-build"
+  },
+  "wasm_gate": {
+    "command": "nix run .#drone-browser-check",
+    "exit": 0,
+    "suites": 28,
+    "passed_tests": 313,
+    "failed_tests": 0,
+    "ignored_tests": 0,
+    "log": "/home/sagan/.cache/bevy-gym-quality-validation/world-view-browser-gate-final5.log",
+    "log_sha256": "373cf4bca36f7f179f94dbc03810f3dc266ef770f2a94903c56f33ac9121b795",
+    "method": "Headless Chrome test execution; separate T3 browser captures establish rendered application behavior."
+  },
+  "recorded_utc": "2026-10-10T22:19:26+00:00",
+  "source_instruction_audit": {
+    "nearest": "ai/AGENTS.md",
+    "sha256": "f34326c44d9fbdd5eaf37cb220cdadc91fe738a90d39d5794531498c07f84aa1",
+    "tracked_AI_reviewer_instruction_files": [],
+    "coverage_limit": "Exact unhit regions and branch outcomes, with reasons, are retained. No claim of complete coverage.",
+    "new_allow_or_expect_attributes": 0,
+    "manual_process_argument_iteration": 0,
+    "positional_format_placeholders": 0
+  },
+  "final_documentation_gates": [
+    {
+      "command": "cargo run --features robots,render-core --example droid-standing-scene -- --help",
+      "exit": 0,
+      "passed_tests": 0,
+      "ignored_tests": 0,
+      "log": "/home/sagan/.cache/bevy-gym-quality-validation/world-view-example-help-final.log",
+      "log_sha256": "58fc0e576a5fbad3a8dccffe8de4405595dfe81a5433862a47598d12068958f8"
+    },
+    {
+      "command": "cargo test --doc",
+      "exit": 0,
+      "passed_tests": 2,
+      "ignored_tests": 1,
+      "log": "/home/sagan/.cache/bevy-gym-quality-validation/world-view-doc-tests-final.log",
+      "log_sha256": "1c45d790f62d62e2669a56050cf9d23da47c7df1b3146ae4372e3783aef1fd7a"
+    },
+    {
+      "command": "cargo test --features robots --doc",
+      "exit": 0,
+      "passed_tests": 19,
+      "ignored_tests": 1,
+      "log": "/home/sagan/.cache/bevy-gym-quality-validation/world-view-robot-doc-tests-final.log",
+      "log_sha256": "7eb5ebaaa470134185cb2f3c93e44be4bcd522c0dc2ac20a628a1aa50688752c"
+    },
+    {
+      "command": "cargo fmt --all -- --check",
+      "exit": 0,
+      "passed_tests": 0,
+      "ignored_tests": 0,
+      "log": "/home/sagan/.cache/bevy-gym-quality-validation/world-view-format-after-docs.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

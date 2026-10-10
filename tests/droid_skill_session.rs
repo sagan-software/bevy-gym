@@ -25,6 +25,19 @@ use standing::session;
 #[path = "droid_skill_session/world.rs"]
 mod shared_world;
 
+/// Camera framing borrows physical snapshots without entering actor inputs.
+#[path = "../examples/robots/world_scene/camera.rs"]
+mod world_camera;
+/// Frustum checks cover all six agents and each individual follow target.
+#[path = "droid_skill_session/world_camera.rs"]
+mod world_camera_tests;
+/// Presentation commands cannot bypass six-model readiness or alter policy steps.
+#[path = "../examples/robots/world_scene/player.rs"]
+mod world_player;
+/// Run shared playback commands against directly advanced frozen sessions.
+#[path = "droid_skill_session/world_player.rs"]
+mod world_player_tests;
+
 /// Preserved PPO update 100; failed selection, never qualified standing evidence.
 const CHECKPOINT: &[u8] = include_bytes!("../docs/progress/droid-standing-trial.mpk");
 /// Exact byte identity and recorded PPO counters for this candidate.

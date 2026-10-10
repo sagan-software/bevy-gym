@@ -1,14 +1,35 @@
 # Shared robot world
 
-Run the reset-only guide:
+Run the diagnostic 3v3 scene:
+
+```sh
+nix develop --command cargo run --features robots,render-core \
+  --example droid-standing-scene -- --scene shared-world
+```
+
+Build and serve the browser scenes:
+
+```sh
+nix develop --command scripts/build_drone_skills.sh
+python3 -m http.server 8000 --directory robot-web/skills-dist
+```
+
+Open <http://localhost:8000/world/>. Three drones and three articulated droids
+run frozen PPO inference in one collision solver. The scene starts paused.
+It waits for all six licensed models before advancing any agent.
+Standing remains the executable's default scene when `--scene` is absent.
+
+The scene is an unqualified diagnostic. Competitive rules, shared-task training
+and match qualification remain unfinished. The qualification label stays visible.
+The droids can fall during the complete clip.
+
+The reset-only guide remains available:
 
 ```sh
 nix develop --command cargo run --features robots --example robot-world-contract
 ```
 
-The guide reads the initial positions of three drones and three droids.
-It does not select actions or advance physics. Competitive rules, qualified
-team policies and browser match playback remain unfinished.
+That guide reads the initial positions without choosing actions or advancing physics.
 
 ## Bodies and clock
 
@@ -93,7 +114,7 @@ Two complete frozen droid RL traces match the previous binaries and published
 traces byte for byte. All 64 drone promotion cases also match the previous
 evaluator byte for byte. Those candidates remain unqualified.
 These checks establish tested body-model preservation and WASM execution;
-visible browser 3v3 inference remains unfinished.
+shared competitive training and qualification remain unfinished.
 
 ## Frozen six-controller inference
 
@@ -139,5 +160,62 @@ validation and coverage. Every recorded production branch outcome is covered.
 Three defensive production
 paths remain unhit: loading the known-valid embedded hover reference, rejecting
 the constant initial world snapshot and rejecting constant world reconstruction
-during reset. The session is backend inference evidence; its browser scene,
-competitive rules, shared-task training and qualification remain unfinished.
+during reset. The session supplies the diagnostic browser scene below. Competitive rules,
+shared-task training and qualification remain unfinished.
+
+## Spectator controls
+
+Run or Space toggles playback. Step or N pauses and advances one common 20 ms frame.
+Reset or R rebuilds every body and clears each ready controller's memory and last action.
+
+V cycles one, four and sixteen common frames per fixed presentation tick.
+These rates preserve the physical timestep and do not guarantee a wall-clock frame rate.
+A complete clip ends at 20 seconds. Reset starts another clip.
+
+C cycles the overview and follow views for Drone 1, Drone 2, Drone 3, Droid 1,
+Droid 2 and Droid 3. F selects the free camera. In free camera mode, WASD moves,
+Q and E raise and lower the camera, and arrow keys turn it. Keys 0 through 6
+select the overview or an individual robot. Camera input affects presentation only.
+
+Follow views show the selected robot's actual motor requests or joint torques.
+Before the first action, the readout identifies the absence of an applied request.
+
+The controls also work through pointer presses. Their rows wrap at narrow widths.
+Both team checkpoint identities stay below the controls. The guide and both model
+credits remain linked below the canvas. The scene runs inference without an optimizer.
+
+The mode vocabulary is exactly `standing` and `shared-world`.
+Browser markup uses `data-scene="shared-world"` on `#drone-canvas`.
+An absent attribute selects standing. An empty, whitespace-padded or unsupported
+explicit value fails initialization before loading policies or models.
+The page shows the initialization error. Missing models, incomplete skeleton mappings
+and inference failures also stop playback with a visible error and no fallback.
+
+## Scene evidence
+
+The [scene record](progress/robot-world-scene.json) retains policy hashes, source hashes,
+validation commands, measured coverage gaps and browser evidence.
+The [desktop recording](progress/world-scene/desktop.mp4) includes the complete clip.
+The [narrow recording](progress/world-scene/mobile.mp4) includes all six follow views
+and free camera checks. The [control recording](progress/world-scene/mobile-controls.mp4)
+records pointer controls and completion at increased playback rates.
+
+The release [desktop capture](progress/world-scene/release-desktop.png) and
+[narrow capture](progress/world-scene/release-mobile.png) show the final runtime.
+The release [narrow recording](progress/world-scene/release-mobile.mp4) reaches
+the complete clip at sixteen frames per tick and decodes without errors.
+The scene record also retains a failed mixed-viewport recording attempt.
+
+Narrow checks use a 390 by 844 CSS-pixel desktop browser viewport.
+They do not establish execution on a physical mobile device.
+
+Native rendering builds and tests pass; native window interaction is unverified.
+Native/WASM action parity remains the 128-frame test described above.
+It does not establish complete physical-trajectory equality across platforms.
+The recordings demonstrate frozen RL inference, including failed standing behavior.
+They do not establish learned shared-task competence or competitive qualification.
+
+Formatting, native tests, strict Clippy, personal Rust lint, shell lint and
+Markdown lint pass. All 313 WASM tests pass, including startup-error checks.
+Nix lint reports ten diagnostics in unchanged repository code and ignore rules.
+The scene record preserves their locations and comparison with the base revision.

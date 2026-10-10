@@ -1,0 +1,73 @@
+{
+  "created_utc": "2026-10-10T21:45:03.249823+00:00",
+  "source_revision": "234333643c1339579caa14e8615189c623e5eddd",
+  "unit": "bevy-gym-standing-posture-seed31-20261010.service",
+  "binary": "/home/sagan/.cache/bevy-gym-quality-validation/standing-posture-seed23-retry-20261010/droid-standing",
+  "binary_sha256": "702115bbf3fb11a1396f9091464cf1d7a22471ea942f8f4c8b794f0845cc253a",
+  "parent_checkpoint": "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/docs/progress/standing-posture-seed23-update23540/checkpoint.mpk",
+  "parent_sha256": "5a7b813491c0125cfa66eb268d98efd1bed181226ae4eff6861c768afad40c08",
+  "parent_selection": "Seed-23 update 23540 ranked by unchanged selection gates before held-out evaluation. Parent passes 2/5 selection cases and 1/32 held-out cases; remains unqualified.",
+  "reward_profile": "droid-standing-posture-reward-v1",
+  "seed": 31,
+  "updates": 24000,
+  "maximum_transitions": 12288000,
+  "initialization": "Import actor and critic; fresh Adam, counters, sampling streams, environments and recurrent memories. No optimizer-state resume.",
+  "qualification": "Unqualified. Five-case selection, 32 held-out cases and independent repeat evidence remain required. Exhausted budget is failure.",
+  "output": "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/runs/droid-standing/posture-seed31-20261010",
+  "log": "/home/sagan/.cache/bevy-gym-quality-validation/standing-posture-seed31-20261010.log",
+  "resource_limits": {
+    "CPUQuota": "200%",
+    "MemoryMax": "2G",
+    "Nice": 10
+  },
+  "comparison": "New bounded training from the stronger selection checkpoint. No matched-baseline improvement or lesson promotion claimed.",
+  "command": [
+    "nix",
+    "develop",
+    "--command",
+    "env",
+    "-u",
+    "CFLAGS",
+    "/home/sagan/.cache/bevy-gym-quality-validation/standing-posture-seed23-retry-20261010/droid-standing",
+    "warm-start",
+    "--checkpoint",
+    "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/docs/progress/standing-posture-seed23-update23540/checkpoint.mpk",
+    "--reward-profile",
+    "posture-v1",
+    "--seed",
+    "31",
+    "--updates",
+    "24000",
+    "--output",
+    "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/runs/droid-standing/posture-seed31-20261010"
+  ],
+  "observed_state": {
+    "observed_utc": "2026-10-10T21:51:46.682025+00:00",
+    "active_state": "active",
+    "complete_updates": 548,
+    "last_complete": {
+      "actor_learning_rate": 0.0003,
+      "actor_loss": -0.0006611000767406949,
+      "approximate_kl": 0.024278624673794297,
+      "critic_learning_rate": 0.001,
+      "critic_loss": 10.938597339540138,
+      "entropy": -11.82808169675991,
+      "lesson": "droid-standing-v1",
+      "optimizer_steps": 4056,
+      "optimizer_updates": 8,
+      "update": 548,
+      "valid_samples": 512
+    },
+    "initial_checkpoint_matches_parent": true,
+    "initial_metadata_matches_parent": true,
+    "reward_profile_record": {
+      "contact_both": 1.0,
+      "contact_none": 0.25,
+      "contact_one": 0.5,
+      "evaluation": "original-standing-v1",
+      "posture_up_projection_scale": 0.03407418727874756,
+      "schema": "droid-standing-posture-reward-v1",
+      "seed": 31
+    }
+  }
+}
