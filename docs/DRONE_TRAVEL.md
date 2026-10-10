@@ -4,6 +4,28 @@ Status: reusable environment, PPO training, and frozen inference implemented.
 The standalone scene displays an unqualified RL trial. No travel checkpoint is qualified.
 Historical tracking weights are imitation-trained and do not qualify this lesson.
 
+## Interrupted run recovery
+
+The seed-19 endurance trial stopped with `No space left on device` after 1,520
+complete PPO updates. Its saved update-1,500 selection survives all five roots,
+but fails heading, settling and return gates. The stopped artifacts remain in
+`runs/drone-travel/endurance-seed19-20261009`.
+
+The recovery run uses the same immutable binary, seed, qualified recovery checkpoint
+and 2,400-update budget per stage. It writes to the separate directory
+`runs/drone-travel/endurance-seed19-recovery-20261010` under
+`bevy-gym-travel-endurance-seed19-recovery-20261010.service`.
+This replays training from initialization with fresh optimizers; it does not restore
+optimizer state from update 1,520. The original recipe retains the learner and
+optimizer across stages only after their fixed selection gates pass.
+
+The [recovery evidence](./progress/drone-travel-storage-recovery.json) records source,
+binary and prerequisite hashes, the launch command and compared optimizer prefix.
+Inspect the service and current selection records before reporting progress.
+The first fifteen optimizer records and update-20 selection report match the original
+exactly. The update-20 checkpoint bytes differ, so byte reproducibility is not established.
+Held-out and independent-run evidence remain required.
+
 ## Run the travel scene
 
 ```sh

@@ -1,0 +1,49 @@
+{
+  "schema": "drone-travel-recovery-run-v1",
+  "created_utc": "2026-10-10T07:20:58.972486+00:00",
+  "current_repository_commit": "b8498787c740dc1b06765f3fbb9081b4e5dff02a",
+  "original_source_base": "7e05631d1b70eddc614fe904d651ce0b10380eed",
+  "original_run": "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/runs/drone-travel/endurance-seed19-20261009",
+  "original_manifest_sha256": "73ece7f82238948051d90df5f3277e0dede0271fdd2b5e64bc409b04015df2c2",
+  "original_source_patch_sha256": "f3d54971305c9d781cd859a098b1857bdd9046b188fd7775f229584fb6a73312",
+  "binary": "/home/sagan/.cache/bevy-gym-quality-validation/travel-endurance-seed19-20261009/drone-curriculum",
+  "binary_sha256": "de141b84733a17c7a5a1abff9ad30946d449659509d06fc308f5ccf4293f13d6",
+  "prerequisite": "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/docs/progress/drone-recovery-transfer.mpk",
+  "prerequisite_sha256": "7c2b9a6f2a0288faa27676d1514848710f4d5c24cd77505e75cf4990576a12b1",
+  "seed": 19,
+  "maximum_updates_per_stage": 2400,
+  "command": [
+    "--lesson",
+    "travel",
+    "--seed",
+    "19",
+    "--updates",
+    "2400",
+    "--output",
+    "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/runs/drone-travel/endurance-seed19-recovery-20261010"
+  ],
+  "service": "bevy-gym-travel-endurance-seed19-recovery-20261010.service",
+  "log": "/home/sagan/.cache/bevy-gym-quality-validation/travel-endurance-seed19-recovery-20261010.log",
+  "optimizer_handling": "Fresh from the same initialization recipe; no optimizer-state resume. Replay prefix must be checked against the stopped run.",
+  "qualification": "Not established; fixed selection and held-out gates remain required.",
+  "audited_utc": "2026-10-10T07:22:14.357258+00:00",
+  "verified_service": [
+    "ActiveState=active",
+    "SubState=running",
+    "MainPID=421957"
+  ],
+  "complete_optimizer_records_compared": 15,
+  "original_complete_optimizer_records": 1520,
+  "optimizer_prefix_exact_match": true,
+  "checkpoint_byte_reproducibility": "First update-20 checkpoint hashes differ despite matching optimizer prefix and selection report.",
+  "source_recovery_manifest_sha256": "57ffaf4341423d0d627302957e99a52bdaee6eebc829668ae7dc992dd4617259",
+  "first_selection": {
+    "update": 20,
+    "exact_original_report_match": true,
+    "passed": false,
+    "report": "runs/drone-travel/endurance-seed19-recovery-20261010/travel-endurance-20.json",
+    "report_sha256": "192bbb7a1be2b670e49d1c346c23d4af2206e2d881563195f3347e02c25654ac",
+    "original_checkpoint_sha256": "94e5b7ebdcf888ffd5d58352852c0a940a08c57ddec7898214ac99363172da68",
+    "recovered_checkpoint_sha256": "f5e21ae8a3a0ceec5516467005034fcc955a90571b11dfef665e52f7c5981a6c"
+  }
+}

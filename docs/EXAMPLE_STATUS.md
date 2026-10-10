@@ -4,6 +4,21 @@ Updated: 2026-10-10. Current work: RL-only drone/droid curriculum.
 
 ## Resume here
 
+### Travel storage recovery, 2026-10-10
+
+The seed-19 travel run stopped at update 1,520 with `No space left on device`.
+Recovery replays its original immutable binary and seed in a new directory, with
+the same qualified recovery checkpoint and 2,400-update budget per stage.
+The service is `bevy-gym-travel-endurance-seed19-recovery-20261010.service`.
+It creates fresh optimizers from the original recipe; it does not restore a saved
+optimizer state. The stopped run remains preserved.
+
+The [recovery evidence](./progress/drone-travel-storage-recovery.json) records the
+launch and exact optimizer-prefix comparison. The
+[travel guide](DRONE_TRAVEL.md#interrupted-run-recovery) identifies both directories.
+Inspect live state before acting. Travel remains unqualified, and the seed-13
+standing trial continues independently. The RL-only browser 3v3 goal remains active.
+
 ### Complete frozen standing traces, 2026-10-10
 
 `droid-standing trace` records the reset and every applied RL action's resulting
