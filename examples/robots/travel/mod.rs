@@ -36,7 +36,7 @@ pub(crate) fn train(seed: u64, updates: NonZeroU32, output: &Path) -> Result<(),
             seed,
             &agent.policy(),
             TravelTask::factory(stage),
-            encoding::encode,
+            |observation| encoding::encode(*observation),
             NonZeroU16::new(1_000).expect("positive travel horizon"),
         );
         let name = stage.name();

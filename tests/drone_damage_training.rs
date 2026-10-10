@@ -62,7 +62,7 @@ fn real_damage_batches_update_a_separate_sixteen_input_policy() {
         7,
         &policy,
         DamageTask::front_left,
-        encode,
+        |observation| encode(*observation),
         std::num::NonZeroU16::new(500).unwrap(),
     );
     let samples = batch.collect(&policy).unwrap();

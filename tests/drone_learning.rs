@@ -333,7 +333,7 @@ fn travel_observations_reuse_collection_and_reset_independent_memory() {
     };
     // This fixture tests collection plumbing, not a trained travel observation contract.
     let encode_body =
-        |observation: bevy_gym::robots::DroneTravelObservation| encode(observation.body());
+        |observation: &bevy_gym::robots::DroneTravelObservation| encode(observation.body());
     let mut batch = RecoveryBatch::with_task(
         7,
         &policy,

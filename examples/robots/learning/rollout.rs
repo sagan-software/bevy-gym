@@ -13,18 +13,20 @@ use super::{decode_action, encode, GAE_LAMBDA, GAMMA};
 /// Eight independent training lanes, each contributing 64 actions per update.
 pub(crate) struct RecoveryBatch<E = DroneHover, const N: usize = 12>
 where
-    E: Env<Action = DroneAction>,
+    E: Env,
 {
     /// Persistent environments and recurrent state, never shared with evaluation.
     lanes: [Lane<E>; 8],
     /// Root streams used to derive each lane's next episode seed.
     seeds: SeedConfig,
     /// Fixed-width task encoder shared by policy and value observations.
-    encode: fn(E::Observation) -> [f32; N],
+    encode: fn(&E::Observation) -> [f32; N],
+    /// Validate complete policy outputs before they can advance physics.
+    decode: fn(&[f32]) -> Result<E::Action, Box<dyn Error>>,
 }
 
 /// One continuing episode and its independent policy-sampling stream.
-struct Lane<E: Env<Action = DroneAction>> {
+struct Lane<E: Env> {
     /// Private environment behind the lesson's positive action limit.
     environment: TimeLimit<E>,
     /// Most recent observation, replaced atomically after each action or reset.
@@ -71,7 +73,7 @@ impl RecoveryBatch {
             seed,
             policy,
             make_environment,
-            encode,
+            |observation| encode(*observation),
             NonZeroU16::new(500).expect("positive task limit"),
         )
     }
@@ -84,13 +86,38 @@ where
 {
     /// Reuse bounded collection for another typed drone task and observation width.
     ///
-    /// The encoder receives a copied snapshot with the environment's observation type.
+    /// The encoder borrows a snapshot with the environment's observation type.
     /// Collection retains eight independent lanes and their recurrent memories.
     pub(crate) fn with_task(
         seed: u64,
         policy: &RecurrentPpoPolicy,
         make_environment: fn() -> E,
-        encode: fn(E::Observation) -> [f32; N],
+        encode: fn(&E::Observation) -> [f32; N],
+        limit: NonZeroU16,
+    ) -> Self {
+        Self::with_actions(
+            seed,
+            policy,
+            make_environment,
+            encode,
+            |values| Ok(decode_action(values)?),
+            limit,
+        )
+    }
+}
+
+impl<E, const N: usize> RecoveryBatch<E, N>
+where
+    E: Env,
+    E::Observation: Copy,
+{
+    /// Collect another typed actuator contract with a borrowed observation encoder.
+    pub(crate) fn with_actions(
+        seed: u64,
+        policy: &RecurrentPpoPolicy,
+        make_environment: fn() -> E,
+        encode: fn(&E::Observation) -> [f32; N],
+        decode: fn(&[f32]) -> Result<E::Action, Box<dyn Error>>,
         limit: NonZeroU16,
     ) -> Self {
         let seeds = SeedConfig::from_root(seed);
@@ -112,6 +139,7 @@ where
             lanes,
             seeds,
             encode,
+            decode,
         }
     }
 
@@ -125,12 +153,12 @@ where
             let mut initial_memory = lane.memory.clone();
             let mut transitions = Vec::with_capacity(64);
             for step in 0..64 {
-                let observation = (self.encode)(lane.observation);
+                let observation = (self.encode)(&lane.observation);
                 let action = policy.sample_action(&observation, &lane.memory, &mut lane.sampler)?;
                 let value = policy.value(&observation, 0)?;
-                let result = lane.environment.step(decode_action(&action.action)?);
+                let result = lane.environment.step((self.decode)(&action.action)?);
                 // Read the final state's value before a reset can replace that state.
-                let next_value = policy.value(&(self.encode)(result.observation), 0)?;
+                let next_value = policy.value(&(self.encode)(&result.observation), 0)?;
                 lane.memory = action.next_memory;
                 lane.observation = result.observation;
                 transitions.push(Transition {

@@ -598,3 +598,8 @@ required-features = ["robots", "render-core"]
 name = "droid-standing-contract"
 path = "examples/robots/standing_contract.rs"
 required-features = ["robots"]
+
+[[example]]
+name = "droid-standing"
+path = "examples/robots/standing_train.rs"
+required-features = ["robots"]

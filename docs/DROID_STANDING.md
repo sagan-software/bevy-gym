@@ -1,16 +1,38 @@
 # Articulated droid standing
 
-Status: physical environment implemented; RL training, scene and qualification pending.
-No standing checkpoint exists. This reset-only command prints physical segment centres:
+Status: PPO training and frozen inference run through the physical environment.
+No standing policy is qualified. The physical mannequin scene remains unfinished.
+
+Train a new candidate in a new directory:
 
 ```sh
 nix develop --command cargo run --no-default-features --features robots \
-  --example droid-standing-contract
+  --example droid-standing -- train --seed 7 --updates 600 \
+  --output runs/droid-standing/seed7
 ```
 
-The command never steps an autonomous agent. Deterministic torque fixtures exist only
-in tests. A future trainer and frozen-policy scene must use the same `DroidStanding`
-implementation. No standing competence or rendered mannequin alignment is claimed.
+An existing output directory is rejected. Budget exhaustion exits unsuccessfully and
+preserves the candidate. Selection runs every 20 updates and at the final update.
+Each selection saves `standing-N.mpk`, its `.json` provenance, and
+`standing-N.evaluation.json`. The optimizer journal flushes after every update.
+
+Evaluate a saved candidate without training or modifying files:
+
+```sh
+nix develop --command cargo run --no-default-features --features robots \
+  --example droid-standing -- evaluate \
+  --checkpoint runs/droid-standing/seed7/standing-600.mpk
+```
+
+Replace `600` with the saved update number. Omission of `--seed` evaluates all
+32 held-out roots. `--seed 42` inspects one episode and cannot qualify a checkpoint.
+Failed evaluation prints its complete report and exits unsuccessfully. Missing,
+corrupt or incompatible inference stops before an episode, without a fallback.
+
+The native CLI and browser tests reuse `DroidStanding`, the same encoder, model and
+evaluator. File-based CLI operations are native-only; its WASM entry point returns
+an explicit error. A browser scene is still required. The reset-only
+`droid-standing-contract` example remains available for inspecting physical anchors.
 
 ## Physical model
 
@@ -80,7 +102,7 @@ an independently defined Euler-angle decomposition. Translation is locked at eve
 world position in metres, a segment-to-world unit quaternion, world linear velocity
 in m/s, world angular velocity in rad/s and an active-floor-contact flag.
 Joint-relative rotations and velocities can be derived from linked segment states.
-The policy tensor encoding remains unfinished; this is the physical observation API.
+The actor encoding below derives its features from this physical observation API.
 
 `DroidBody::ALL` orders pelvis, torso, head, left upper arm, left forearm, right upper
 arm, right forearm, left thigh, left calf, left foot, right thigh, right calf, right foot.
@@ -137,7 +159,92 @@ Strict repository Clippy passes; strict personal Clippy retains unchanged reposi
 findings. Changed-line personal Rust lint is clean. Two unchanged Nix source-filter
 findings remain at `flake.nix:119` and `flake.nix:200`.
 
-Actor encoding, training and inference commands, frozen qualification thresholds,
-checkpoint evidence, physical mannequin rendering and browser recordings remain
-unfinished. The reset-only guide is not the independently runnable trained standing
-lesson required by the curriculum. No existing pursuit controller was extended.
+The [training evidence](progress/droid-standing-training.json) records the separate
+PPO, checkpoint and CLI checks. Training infrastructure does not establish balance.
+The physical mannequin scene, browser recordings and qualified checkpoint remain
+unfinished. No existing pursuit controller was extended.
+
+## Actor encoding and PPO
+
+The actor receives 204 dimensionless values. Let `R` be the inverse pelvis rotation,
+`p` its world position in metres, `v` its world velocity in m/s, and `w` its world
+angular velocity in rad/s. All triples use XYZ order.
+
+The first twelve values are `R * ((0, 0.99, 0) m - p) / 1 m`,
+`R * world_up`, `R * v / (2 m/s)`, and `R * w / (4 rad/s)`.
+Each remaining segment follows `DroidBody::ALL`, excluding pelvis, and contributes:
+
+1. `R * (segment_position - p) / 1 m`.
+2. Its up and forward (-Z) unit vectors rotated into the pelvis frame.
+3. `R * (segment_velocity - v) / (2 m/s)`.
+4. `R * (segment_angular_velocity - w) / (4 rad/s)`.
+5. Its active floor-contact flag, encoded as zero or one.
+
+The velocity features are rotated differences of world velocities, not derivatives
+in a rotating frame. Two orientation vectors preserve equivalent quaternion signs.
+Encoding borrows the observation and fills one fixed array in O(13) time and space.
+No reward, episode outcome or privileged critic information enters the actor.
+
+The actor has a 64-unit LSTM and 26 bounded outputs. The separate 128/64-unit critic
+receives the same physical features for this single-agent lesson. Eight independent
+lanes retain separate recurrent memory and sampling streams. Each contributes
+64 transitions per update; the policy stays fixed during all 512 transitions.
+These lanes are independent skill episodes, not a shared competition world.
+
+PPO uses actor learning rate 0.0003, critic learning rate 0.001, discount 0.995,
+GAE lambda 0.95, initial log standard deviation -2, entropy coefficient 0.001,
+four epochs and minibatches of eight sequences. Training starts from random weights.
+No imitation targets, posture controllers or constant-action substitutes are used.
+The decoder checks width 26 before validating every finite torque fraction in [-1, 1].
+
+## Frozen qualification gates
+
+Selection roots are `[0, 1, 2, 42, 18446744073709551615]` in that order.
+Held-out roots descend from `18446744073709551614` through `18446744073709551583`.
+Training roots exclude these partitions. Evaluation starts fresh recurrent memory
+for each episode and requests the frozen actor's mean action without optimizer calls.
+
+Every episode must survive 1,000 actions (20 seconds), earn at least 800 total reward,
+and finish with at least 100 consecutive stable actions. Each stable action requires:
+
+- Pelvis height in inclusive [0.85, 1.15] m.
+- Torso-up projection in inclusive [0.9659258, 1], approximately within 15 degrees of vertical.
+- Horizontal pelvis distance from the origin in inclusive [0, 0.5] m.
+- Pelvis speed in inclusive [0, 0.25] m/s.
+- Both feet in active floor contact.
+
+The evaluator rejects missing, reordered or extra cases and non-finite measurements.
+Selection alone cannot qualify a checkpoint. All 32 held-out cases and independent
+training provenance must pass. These thresholds were fixed before the retained seed-7
+trial; a failed run does not change them.
+
+## Checkpoint record
+
+The required UTF-8 JSON sidecar is an object with exactly seven required members:
+`schema` is the string `droid-standing-v1`; `algorithm` is the string `PPO`;
+`seed` is an unsigned 64-bit integer; `update` is a positive unsigned 32-bit integer;
+`transitions` is an unsigned 64-bit integer equal to `update * 512`;
+`optimizer_steps` is a positive unsigned 64-bit integer; and `sha256` is exactly
+64 lowercase ASCII hexadecimal characters identifying the weight bytes.
+
+Unknown, duplicate, missing or null members are rejected. Objects cannot replace the
+closed string values. Member order is accepted freely; emission follows the order
+above. Parsing retains numeric values, validates the derived transition count, and
+stores the hash as 32 bytes. Identity validation precedes architecture validation.
+
+The sidecar establishes byte identity and internal consistency. It cannot independently
+prove training history or competence. Preserve the launch command, source revision and
+patch, source hashes, binary hash, optimizer journal and independent evaluations.
+The journal rejects non-finite PPO metrics before JSON serialization or another rollout.
+
+## Retained seed-7 trial
+
+`bevy-gym-standing-seed7-20261009.service` runs at most 600 updates. Artifacts are in
+`runs/droid-standing/seed7-20261009`; the log is
+`/home/sagan/.cache/bevy-gym-quality-validation/standing-seed7.log`.
+The immutable binary, source patch and manifest are under that cache's
+`standing-seed7-20261009` directory. Inspect the live unit before taking action.
+
+At update 20, all five selection episodes failed after 27–35 actions. Their rewards
+were 11.56–16.29. The failed checkpoint and evaluation remain preserved. This early
+failure does not establish the final outcome of the running trial.

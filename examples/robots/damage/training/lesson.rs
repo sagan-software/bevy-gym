@@ -75,7 +75,7 @@ impl Lesson {
             seed,
             policy,
             make,
-            encode,
+            |observation| encode(*observation),
             NonZeroU16::new(limit).expect("positive lesson horizon"),
         )
     }

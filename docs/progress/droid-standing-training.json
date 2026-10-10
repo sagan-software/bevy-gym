@@ -1,0 +1,413 @@
+{
+  "source_base": "74a7832de870d2d6ef23051975ee9dd04cbcbd0e",
+  "status": "training infrastructure implemented; standing unqualified; scene unfinished",
+  "red_evidence": [
+    "standing-learning-red.log",
+    "standing-evaluation-red.log",
+    "standing-checkpoint-red.log",
+    "standing-cli-red.log",
+    "standing-record-profile-red.log"
+  ],
+  "tests": {
+    "native_droid_learning": 19,
+    "native_drone_learning": 31,
+    "native_drone_learning_ignored": 1,
+    "native_damage_training": 16,
+    "cli": 5,
+    "browser_droid_learning": 17,
+    "browser_suite": 197,
+    "robot_doctests_passed": 12,
+    "robot_doctests_ignored": 1,
+    "native_ci_contracts": 270
+  },
+  "coverage": {
+    "method": "LLVM branch instrumentation; exact three learning test objects plus native CLI object; union line and branch coordinates across canonical source paths and instantiations. Native one/two-update fixtures and held-out/single inference do not establish competence.",
+    "files": [
+      {
+        "path": "examples/robots/learning/rollout.rs",
+        "sha256": "97a255bf47fd31a42b4127c1ac82cdf7b693c41532e188bf378f15f7840d7358",
+        "instrumented_lines": 240,
+        "covered_lines": 240,
+        "unhit_lines": [],
+        "branch_outcomes": {
+          "174,20,174,43": [
+            true,
+            true
+          ],
+          "174,47,174,57": [
+            true,
+            true
+          ],
+          "176,24,176,47": [
+            true,
+            true
+          ]
+        }
+      },
+      {
+        "path": "examples/robots/standing/checkpoint.rs",
+        "sha256": "1a4f7c03238ad681b3ba093070fac03c1b2858cefb847baed758b941ff9309ed",
+        "instrumented_lines": 135,
+        "covered_lines": 135,
+        "unhit_lines": [],
+        "branch_outcomes": {
+          "170,8,170,47": [
+            true,
+            true
+          ],
+          "148,8,148,24": [
+            true,
+            true
+          ],
+          "149,12,151,80": [
+            true,
+            true
+          ],
+          "134,12,134,66": [
+            true,
+            true
+          ],
+          "151,25,151,46": [
+            true,
+            true
+          ]
+        }
+      },
+      {
+        "path": "examples/robots/standing/cli.rs",
+        "sha256": "3d19ab3f7f2bf4a30f576428ec9dfc4f7ca94deff3eb82341e6dc7822a63ebc0",
+        "instrumented_lines": 34,
+        "covered_lines": 33,
+        "unhit_lines": [
+          79
+        ],
+        "branch_outcomes": {
+          "68,28,68,42": [
+            true,
+            true
+          ],
+          "78,16,78,22": [
+            false,
+            true
+          ]
+        }
+      },
+      {
+        "path": "examples/robots/standing/encoding.rs",
+        "sha256": "c16b70bc912bb1aed6a38e775fa689c182d6cdbb2760989f4cfe153384948338",
+        "instrumented_lines": 74,
+        "covered_lines": 74,
+        "unhit_lines": [],
+        "branch_outcomes": {}
+      },
+      {
+        "path": "examples/robots/standing/evaluation.rs",
+        "sha256": "75b64edcc960f183b71e547ebe078db491969916a54b920e31a0a34cbc088578",
+        "instrumented_lines": 144,
+        "covered_lines": 143,
+        "unhit_lines": [
+          98
+        ],
+        "branch_outcomes": {
+          "50,13,50,32": [
+            true,
+            true
+          ],
+          "51,20,51,34": [
+            true,
+            true
+          ],
+          "52,20,52,42": [
+            true,
+            true
+          ],
+          "53,20,53,67": [
+            true,
+            true
+          ],
+          "54,20,54,44": [
+            true,
+            true
+          ],
+          "55,20,55,41": [
+            true,
+            true
+          ],
+          "47,5,47,22": [
+            true,
+            true
+          ],
+          "48,12,48,39": [
+            true,
+            true
+          ],
+          "62,5,62,48": [
+            true,
+            true
+          ],
+          "63,12,63,62": [
+            true,
+            true
+          ],
+          "64,12,64,55": [
+            true,
+            true
+          ],
+          "65,12,65,53": [
+            true,
+            true
+          ],
+          "97,34,97,47": [
+            false,
+            true
+          ],
+          "104,12,104,35": [
+            true,
+            true
+          ],
+          "125,20,125,73": [
+            true,
+            true
+          ]
+        }
+      },
+      {
+        "path": "examples/robots/standing/mod.rs",
+        "sha256": "96d3c1267393d339b2a9d8005f00f9ca45eade39d8af303cecebce033252aae1",
+        "instrumented_lines": 12,
+        "covered_lines": 12,
+        "unhit_lines": [],
+        "branch_outcomes": {}
+      },
+      {
+        "path": "examples/robots/standing/model.rs",
+        "sha256": "826de142f510971addd687a89012900a48465ce1cfc70653f540fa8d26201f14",
+        "instrumented_lines": 24,
+        "covered_lines": 24,
+        "unhit_lines": [],
+        "branch_outcomes": {}
+      },
+      {
+        "path": "examples/robots/standing/training.rs",
+        "sha256": "40a6f816223e49e627846582bc32ce4ba1fbc1338a5d3ae93e5c561bd91d1160",
+        "instrumented_lines": 151,
+        "covered_lines": 150,
+        "unhit_lines": [
+          47
+        ],
+        "branch_outcomes": {
+          "43,12,43,44": [
+            true,
+            false
+          ],
+          "43,48,43,65": [
+            true,
+            true
+          ],
+          "46,12,46,96": [
+            false,
+            true
+          ],
+          "97,12,97,30": [
+            true,
+            true
+          ]
+        }
+      },
+      {
+        "path": "examples/robots/standing_train.rs",
+        "sha256": "3ebe3a68ce2f9a5dab46ee588eb49dd30bb649d283d409e0894027e10c9745c3",
+        "instrumented_lines": 3,
+        "covered_lines": 3,
+        "unhit_lines": [],
+        "branch_outcomes": {}
+      }
+    ],
+    "gaps": [
+      "cli.rs:79 successful evaluation exit is unhit because no policy qualifies.",
+      "evaluation.rs:98 stable streak advancement is unhit by physical episodes; gate boundary fixtures pass independently.",
+      "training.rs:47 successful early completion is unhit because selection fails.",
+      "training.rs:43 update-20 cadence before final budget is observed in the retained run but not in the one/two-update instrumented fixtures.",
+      "Native CLI WASM rejection main is compile-checked, not executed in browser tests.",
+      "No physical mannequin scene or visual recordings exist yet.",
+      "No whole-package coverage claim."
+    ],
+    "covered_lines": 814,
+    "instrumented_lines": 817,
+    "covered_branch_outcomes": 54,
+    "branch_outcomes": 58
+  },
+  "validation": {
+    "native_strict_clippy": "passed --all-targets --all-features -- -D warnings",
+    "wasm_strict_clippy": "passed robots,browser,browser-training test droid_learning and example droid-standing",
+    "root_tests": "passed",
+    "changed_personal_rust": "No candidate diagnostics; strict Clippy exits 101 with 88 unchanged diagnostics in 14 files.",
+    "python_personal": "passed",
+    "markdown": "Ten unchanged paragraph-length findings; no new paragraph finding.",
+    "prior_commit_ci": "74a7832 CI passed; Browser preview still in progress at inspection.",
+    "rumdl": "passed all three edited Markdown files",
+    "nix_personal": "Two unchanged source-filter diagnostics at flake.nix:119 and :200.",
+    "ci_example_build": "passed drone-hover, drone-recovery, drone-curriculum and droid-standing"
+  },
+  "retained_trial": {
+    "unit": "bevy-gym-standing-seed7-20261009.service",
+    "artifacts": "runs/droid-standing/seed7-20261009",
+    "launch_manifest": "/home/sagan/.cache/bevy-gym-quality-validation/standing-seed7-20261009/manifest.json",
+    "seed": 7,
+    "maximum_updates": 600,
+    "selection_update20": {
+      "episodes": [
+        {
+          "final_distance": 0.19244545698165894,
+          "final_height": 0.6391600370407104,
+          "final_speed": 2.0380260944366455,
+          "final_upright": -0.7968133687973022,
+          "reward": 14.553088322281837,
+          "seed": 0,
+          "stable_actions": 0,
+          "steps": 35,
+          "supported": false,
+          "survived": false
+        },
+        {
+          "final_distance": 0.1543162763118744,
+          "final_height": 0.4905555546283722,
+          "final_speed": 2.543560266494751,
+          "final_upright": 0.5818358659744263,
+          "reward": 11.560019563883543,
+          "seed": 1,
+          "stable_actions": 0,
+          "steps": 27,
+          "supported": true,
+          "survived": false
+        },
+        {
+          "final_distance": 0.24014201760292053,
+          "final_height": 0.6615796685218811,
+          "final_speed": 1.4758343696594238,
+          "final_upright": -0.37125492095947266,
+          "reward": 12.72752070426941,
+          "seed": 2,
+          "stable_actions": 0,
+          "steps": 31,
+          "supported": false,
+          "survived": false
+        },
+        {
+          "final_distance": 0.2443191409111023,
+          "final_height": 0.7012155652046204,
+          "final_speed": 1.1616697311401367,
+          "final_upright": -0.458007276058197,
+          "reward": 14.119540311396122,
+          "seed": 42,
+          "stable_actions": 0,
+          "steps": 33,
+          "supported": true,
+          "survived": false
+        },
+        {
+          "final_distance": 0.14375613629817963,
+          "final_height": 0.4931061565876007,
+          "final_speed": 2.194592237472534,
+          "final_upright": 0.13958072662353516,
+          "reward": 16.28884994983673,
+          "seed": 18446744073709551615,
+          "stable_actions": 0,
+          "steps": 35,
+          "supported": true,
+          "survived": false
+        }
+      ],
+      "mode": "selection",
+      "passed": false,
+      "provenance": {
+        "algorithm": "PPO",
+        "optimizer_steps": 312,
+        "schema": "droid-standing-v1",
+        "seed": 7,
+        "sha256": "2ad1c17fb0103bf0d90a33958090d64d93da247c93ba03bf8aa05af0aacb7a21",
+        "transitions": 10240,
+        "update": 20
+      },
+      "qualification": "requires held-out evaluation and independent run evidence"
+    },
+    "selection_update100": {
+      "episodes": [
+        {
+          "final_distance": 0.6322128772735596,
+          "final_height": 0.49234089255332947,
+          "final_speed": 3.328639507293701,
+          "final_upright": 0.3483283519744873,
+          "reward": 27.52155952528119,
+          "seed": 0,
+          "stable_actions": 0,
+          "steps": 51,
+          "supported": false,
+          "survived": false
+        },
+        {
+          "final_distance": 0.22776663303375244,
+          "final_height": 0.5434862971305847,
+          "final_speed": 2.4589717388153076,
+          "final_upright": -0.7628244757652283,
+          "reward": 25.015388070605695,
+          "seed": 1,
+          "stable_actions": 0,
+          "steps": 48,
+          "supported": false,
+          "survived": false
+        },
+        {
+          "final_distance": 0.4926098883152008,
+          "final_height": 0.49772411584854126,
+          "final_speed": 2.772487163543701,
+          "final_upright": -0.3720513582229614,
+          "reward": 18.850872229784727,
+          "seed": 2,
+          "stable_actions": 0,
+          "steps": 41,
+          "supported": false,
+          "survived": false
+        },
+        {
+          "final_distance": 0.7390267252922058,
+          "final_height": 0.4969693124294281,
+          "final_speed": 2.6519110202789307,
+          "final_upright": 0.33019012212753296,
+          "reward": 34.01410171762109,
+          "seed": 42,
+          "stable_actions": 0,
+          "steps": 62,
+          "supported": true,
+          "survived": false
+        },
+        {
+          "final_distance": 0.5968997478485107,
+          "final_height": 0.5796793103218079,
+          "final_speed": 2.177945137023926,
+          "final_upright": -0.25258588790893555,
+          "reward": 33.88451868109405,
+          "seed": 18446744073709551615,
+          "stable_actions": 0,
+          "steps": 59,
+          "supported": false,
+          "survived": false
+        }
+      ],
+      "mode": "selection",
+      "passed": false,
+      "provenance": {
+        "algorithm": "PPO",
+        "optimizer_steps": 1316,
+        "schema": "droid-standing-v1",
+        "seed": 7,
+        "sha256": "bd7ee38c4a7e44cfc615c366cafcd8b48e9bc0ba57522fd7fec33ee1fded3024",
+        "transitions": 51200,
+        "update": 100
+      },
+      "qualification": "requires held-out evaluation and independent run evidence"
+    },
+    "source_difference_at_publish": "The only Rust changes after binary capture are the rollout encoder documentation and a test assertion. The launch patch and hashes preserve the exact trained source."
+  },
+  "next": "Inspect retained standing and travel trials; implement physical mannequin frozen-policy scene; close success-path coverage with behavioral evidence; qualify independently before transfer."
+}

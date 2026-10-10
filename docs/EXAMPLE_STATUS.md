@@ -4,6 +4,45 @@ Updated: 2026-10-09. Current work: RL-only drone/droid curriculum.
 
 ## Resume here
 
+### Standing PPO workflow, 2026-10-09
+
+`74a7832de870d2d6ef23051975ee9dd04cbcbd0e` is verified on GitHub main.
+The original dirty checkout remains untouched. The standalone `droid-standing`
+trainer and frozen evaluator now reuse the physical environment. The
+[guide](DROID_STANDING.md) defines the 204-value actor input, 26 torque outputs,
+fixed qualification gates, checkpoint profile and runnable commands.
+
+The retained seed-7 trial is active under
+`bevy-gym-standing-seed7-20261009.service`, with a 600-update budget. Artifacts are
+in `runs/droid-standing/seed7-20261009`. The log is
+`/home/sagan/.cache/bevy-gym-quality-validation/standing-seed7.log`; the immutable
+binary, source patch and manifest are in the cache's `standing-seed7-20261009`
+directory. At update 20, all five selection episodes failed after 27–35 actions.
+No standing checkpoint is qualified. Inspect live state before taking action.
+
+[Training evidence](progress/droid-standing-training.json) records 19 native standing
+learning tests, five executable tests and 197 browser tests, including 17 standing tests.
+The existing drone learning and damage training tests also pass. Strict native/WASM
+Clippy and root tests pass. Candidate personal Rust and Python lint are clean;
+strict personal Clippy still fails on unchanged repository diagnostics.
+
+Measured native coverage hits 814 of 817 instrumented lines and 54 of 58 branch
+outcomes across the changed collector and standing modules, including their tests.
+It leaves the successful CLI exit, stable-streak increment
+and successful trainer exit unhit. The update-20 cadence is observed in the retained
+run but remains uninstrumented. Exact coordinates and source hashes are recorded.
+No successful synthetic gate fixture is presented as trained balance.
+
+Travel seed 19 remains active, with update 1412 observed and no promotion.
+Standing selection at update 100 failed all five cases after 41–62 actions.
+These are snapshots, not final run outcomes.
+All earlier failed trials remain preserved.
+
+Next: inspect both runs, implement the
+physical mannequin frozen-policy scene, and evaluate selected checkpoints on held-out
+roots. Later skills, shared multi-agent training and spectator 3v3 remain unfinished.
+The curriculum goal remains active.
+
 ### Articulated droid mechanics, 2026-10-09
 
 `6cbc50022d16244ec66391833a6d9eb9e21fc48e` is verified on GitHub main; its contracts
