@@ -4,6 +4,57 @@ Status: reusable environment, PPO training, and frozen inference implemented.
 The standalone scene displays an unqualified RL trial. No travel checkpoint is qualified.
 Historical tracking weights are imitation-trained and do not qualify this lesson.
 
+## Training task rehearsal
+
+Use the optional rehearsal recipe to test retention during travel training:
+
+```sh
+nix develop --command cargo run --no-default-features --features robots \
+  --example drone-curriculum -- --lesson travel --rehearse-prerequisites \
+  --seed 29 --updates 24000 --output runs/drone-travel/rehearsed-seed29
+```
+
+Endurance retains its original task distribution. During each later stage, half
+of the reset draw interval selects the current task. The remaining half divides
+among earlier stages: endurance for near; endurance and near for far; endurance,
+near and far for fast. Each reset chooses one fixed task from these existing distributions.
+No future stage is sampled. Every actuator request still comes from the RL actor.
+
+Task selection uses reset channel two. Body and destination draws retain channels
+zero and one. Explicit roots restart the streams; continuing resets advance them.
+The training adapter owns the original task without duplicating its reset state.
+Construction performs one additional bounded reset only for the rehearsal recipe.
+Sampling takes constant time and allocates no extra collection.
+
+The flag accepts no value. It requires `--lesson travel` and conflicts with
+`--evaluate-checkpoint`, `--evaluate-held-out`, `--evaluate-promotion` and
+`--initialize-from`. Every evaluator retains its original single-stage distribution.
+The four stage tags, promotion report, gates, physics, rewards and policy architecture
+remain unchanged. The default command retains its existing artifacts and behavior.
+
+Rehearsal writes `training-recipe.json` before collecting any samples. The writer emits
+exactly six members, with none absent or null. This artifact has no input parser.
+
+- `recipe`: string `travel-prerequisite-rehearsal-v1`.
+- `task_stream_channel`: integer `2`.
+- `current_stage_fraction`: number `0.5`; endurance remains entirely endurance.
+- `prerequisites`: string `remaining half split among earlier stages; endurance unchanged`.
+- `evaluation`: string `original-single-stage`.
+- `seed`: the run's unsigned 64-bit root seed.
+
+The [rehearsal record](progress/drone-travel-rehearsal.json) preserves source hashes,
+reset and actuator tests, CLI rejection cases, coverage and the 20-update smoke run.
+All smoke optimizer records match the original seed-29 prefix exactly.
+Checkpoint containers can differ because parameter identifiers are freshly assigned.
+The smoke run exhausts its budget without passing. Retention improvement and travel
+qualification remain unproven.
+
+The original gated seeds 29 and 31 both exhausted 24,000 near-travel updates.
+Their [seed-29](progress/travel-near-seed29/evaluation.json) and
+[seed-31](progress/travel-near-seed31/evaluation.json) records preserve failed checkpoints.
+The seed-29 near checkpoint also loses endurance retention on the promotion pool.
+The rehearsal recipe is a training experiment; it cannot promote either failed candidate.
+
 ## Interrupted run recovery
 
 The seed-19 endurance trial stopped with `No space left on device` after 1,520

@@ -1,0 +1,1067 @@
+{
+  "recorded_utc": "2026-10-10T14:37:31.748580+00:00",
+  "source": {
+    "base_revision": "9ef184175d4d28b5a371bc8dc698325e185134d1",
+    "code_patch_sha256": "6b6c3f4183a73d8583cee279463a7b1dcb9f37d829dfd0c65d3e75aeca5cd653",
+    "files_sha256": {
+      "examples/robots/curriculum.rs": "d1ce5cfd8f580474af6db1d64787621a36fa8ba1a07e597fcbe5c679e985123e",
+      "examples/robots/travel/environment.rs": "ffb97c895c8a877bcb1e893a8b1c69a999d9ed145cdf25dab583bed5f3dcb193",
+      "examples/robots/travel/mod.rs": "ddfcb8a724506645cb9e7b63104d6987d966f8977874ece091d45a5b9182fd34",
+      "examples/robots/travel/sampling.rs": "357859703880e84d8783f70fec8f9edaeec1d88a298cd4ac10c588c110708491",
+      "tests/drone_learning/travel.rs": "53cd18a15ec478982eacd8d14af678b1e3c48acae163bd681b98227a6c020fb4",
+      "tests/test_drone_curriculum_cli.py": "a712c6e9fba8c7f7e7e8063dacea0451da93c8f14cdbae5059ca1e01ee367396"
+    }
+  },
+  "reason": "Seed 29 exhausted near training and lost earlier endurance retention on the promotion-validation pool. The local rehearsal profile is an unqualified retention experiment.",
+  "invariants": {
+    "closed_modes": [
+      "original training",
+      "rehearsal training",
+      "original frozen evaluation"
+    ],
+    "closed_stages": [
+      "travel-endurance",
+      "travel-near",
+      "travel-far",
+      "travel-fast"
+    ],
+    "authority": "The RL actor selects every motor action. Only task sampling changes. Physics, rewards, actuator validation, encoding, weights initialization and every evaluation gate are unchanged.",
+    "derived_state": "TrainingTask owns TravelTask and Recipe; the root and episode counter remain owned only by TravelTask. A sampled stage is derived once at reset.",
+    "performance": "Task selection takes constant time and constant auxiliary space. Factories are noncapturing function pointers. Rehearsal construction makes one extra call to the existing reset procedure. No new hot collection allocation."
+  },
+  "reset_profile": {
+    "body_channel": 0,
+    "destination_channel": 1,
+    "mixture_channel": 2,
+    "draw": "One SplitMix64 unit_f64 value on its finite [0,1) grid per rehearsal reset.",
+    "endurance": "Entire interval retains endurance.",
+    "near": "[0,0.5): endurance; [0.5,1): near.",
+    "far": "[0,0.25): endurance; [0.25,0.5): near; [0.5,1): far.",
+    "fast": "[0,1/6): endurance; [1/6,1/3): near; [1/3,0.5): far; [0.5,1): fast.",
+    "explicit_root": "Restart original streams and episode zero.",
+    "continuation": "Advance the existing wrapping episode counter; select the new task without consuming body or destination draws."
+  },
+  "red_green": {
+    "environment_red": "Missing rehearsal_factory produced E0599; rehearsal-env-green.log then passed the original Env seam. The factory moved into the training-only sampling adapter during strict-lint remediation.",
+    "cli_red": "The old executable rejected --rehearse-prerequisites with exit 2; the opt-in training regression then passed.",
+    "private_checkpoint": "Partition boundary tests were added after the external reset/action regression passed.",
+    "architectural_correction": "Keep rehearsal-only code outside the frozen-scene module; both modes delegate to the same reset and motor implementation."
+  },
+  "tests": {
+    "env": "Every stage; roots 0 through 63 and u64::MAX; constructor versus seed zero; explicit and continuing resets; exact original task snapshots; every prerequisite sampled and no future stage; identical physical responses under two isolated actuator fixtures.",
+    "partition": "0, 0.166, 1/6, 0.249, 0.25, 0.333, 1/3, 0.499, 0.5 and 0.999 across their applicable stages.",
+    "cli": "Default versus opt-in endurance selection, optimizer records and frozen inference; six exact recipe members; missing/other lesson, all inference conflicts, checkpoint initialization conflict and an unexpected false token; recipe and artifact write failures; failed scheduled selection continues from update 20 to update 21."
+  },
+  "checks": {
+    "fmt": {
+      "log": "/home/sagan/.cache/bevy-gym-quality-validation/rehearsal-fmt.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_status": 0
+    },
+    "native": {
+      "log": "/home/sagan/.cache/bevy-gym-quality-validation/rehearsal-native.log",
+      "sha256": "f09e7a37166fa54c059a26ac69dbae9b5fa20ed00413f964a5c95d2e721baf08",
+      "command": [
+        "cargo",
+        "test"
+      ],
+      "exit_status": 0,
+      "passed": 132,
+      "ignored": 1
+    },
+    "clippy": {
+      "log": "/home/sagan/.cache/bevy-gym-quality-validation/rehearsal-clippy.log",
+      "sha256": "89da68bea0266f4de39c2e5332ebe51bf46729dda8db4fb7aac462c72f8e7cc1",
+      "command": [
+        "cargo",
+        "clippy",
+        "--all-targets",
+        "--all-features",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_status": 0
+    },
+    "learning": {
+      "log": "/home/sagan/.cache/bevy-gym-quality-validation/rehearsal-learning.log",
+      "sha256": "472a7e8178f51c47a2d440809d91465800b163aa74637a13896c85696eb00b6b",
+      "command": [
+        "cargo",
+        "test",
+        "--no-default-features",
+        "--features",
+        "robots",
+        "--test",
+        "drone_learning"
+      ],
+      "exit_status": 0,
+      "passed": 43,
+      "ignored": 1
+    },
+    "browser": {
+      "log": "/home/sagan/.cache/bevy-gym-quality-validation/rehearsal-browser.log",
+      "sha256": "e5f42753eadf66264b868b05de8fe5fe9e44bac27736ab453fa3e9932f903244",
+      "command": [
+        "nix",
+        "run",
+        ".#drone-browser-check"
+      ],
+      "exit_status": 0,
+      "passed": 240,
+      "suites": 25
+    },
+    "cli-coverage-tests": {
+      "log": "/home/sagan/.cache/bevy-gym-quality-validation/rehearsal-cli-coverage-tests.log",
+      "sha256": "9d570bc19b591bfbe0f7bfda8f85c91a5cc07d9e707174dcb8d56e99fd61c1c9",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "tests.test_drone_curriculum_cli"
+      ],
+      "exit_status": 0,
+      "passed": 21
+    },
+    "personal": {
+      "log": "/home/sagan/.cache/bevy-gym-quality-validation/rehearsal-personal.log",
+      "sha256": "ac3dad69f99b005d5c4f74ef1d899b1eefd8cdc961cbba2af79dfe475dbbac07",
+      "exit_status": 0,
+      "changed_diagnostics": 0,
+      "changed_hunks": 19,
+      "mode": "Existing no-deny-warnings runner profile; strict all-target/all-feature Clippy passes separately."
+    },
+    "python-lint": {
+      "log": "/home/sagan/.cache/bevy-gym-quality-validation/rehearsal-python-lint.log",
+      "sha256": "32e3a4eeba78672b73fa8feb8e984dd5a9b09e57280c8afe0e9eefd80c048ac7",
+      "exit_status": 1,
+      "unchanged_diagnostics": 45,
+      "changed_diagnostics": 0,
+      "hunk_verification": "Every diagnosed line lies outside changed post-image hunks."
+    },
+    "markdown": {
+      "format": {
+        "command": [
+          "nix",
+          "develop",
+          "--command",
+          "rumdl",
+          "check",
+          "docs/DRONE_TRAVEL.md",
+          "docs/EXAMPLE_STATUS.md"
+        ],
+        "cache_dir": "/home/sagan/.cache/bevy-gym-quality-validation/rehearsal-rumdl-corrected-cache",
+        "exit_status": 0,
+        "reason_for_fresh_cache": "The original cache retained missing-link diagnostics after targets were created; a fresh external cache verifies the actual targets without deleting the original cache."
+      },
+      "personal": {
+        "exit_status": 1,
+        "changed_diagnostics": 0,
+        "unchanged_paragraphs": [
+          {
+            "path": "docs/DRONE_TRAVEL.md",
+            "line": 445,
+            "paragraph_sha256": "caedbb3ddebade40000154528f072dd732e90945a88c342d962fd6d5fc571387",
+            "unchanged": true
+          },
+          {
+            "path": "docs/DRONE_TRAVEL.md",
+            "line": 519,
+            "paragraph_sha256": "449898d9d99de42820f43edaff4896dcfccf0cdc88611cd81ba4ec55ea84a270",
+            "unchanged": true
+          },
+          {
+            "path": "docs/DRONE_TRAVEL.md",
+            "line": 531,
+            "paragraph_sha256": "03465eb1ad53d0eafd1ddfb075a727c597ae7d5f2d231f334e41babe3fd2384f",
+            "unchanged": true
+          },
+          {
+            "path": "docs/DRONE_TRAVEL.md",
+            "line": 598,
+            "paragraph_sha256": "88c016c19f5a458d497ed22992235dab3b71c8682bfdd008874ae5e3247014c7",
+            "unchanged": true
+          },
+          {
+            "path": "docs/EXAMPLE_STATUS.md",
+            "line": 556,
+            "paragraph_sha256": "5c8e23fc0ddc1330917c00ae964f112707850ade667ad1202380edee8d41eab3",
+            "unchanged": true
+          },
+          {
+            "path": "docs/EXAMPLE_STATUS.md",
+            "line": 669,
+            "paragraph_sha256": "5b65068517702ea64d30bd07763c4a8bd82c9ac6ff20f12181e7400f14dbfa7c",
+            "unchanged": true
+          },
+          {
+            "path": "docs/EXAMPLE_STATUS.md",
+            "line": 691,
+            "paragraph_sha256": "48b858d5afe35037938b8681a4b6bd534b2b2c97bb520ad3d08f01604e2c8645",
+            "unchanged": true
+          },
+          {
+            "path": "docs/EXAMPLE_STATUS.md",
+            "line": 705,
+            "paragraph_sha256": "ed2c8a54dea73fb3424dbe20f0f95e507d997c9fc4f13d97032f6bc9d9d3909d",
+            "unchanged": true
+          },
+          {
+            "path": "docs/EXAMPLE_STATUS.md",
+            "line": 732,
+            "paragraph_sha256": "65000decb51546b284e17d7e3b4a65820343e3369aa5cd86a1810dde65688670",
+            "unchanged": true
+          },
+          {
+            "path": "docs/EXAMPLE_STATUS.md",
+            "line": 748,
+            "paragraph_sha256": "2bed3caf0ff9fa67171507612bd88e36c2909e4350914c3b568041320963b911",
+            "unchanged": true
+          },
+          {
+            "path": "docs/EXAMPLE_STATUS.md",
+            "line": 758,
+            "paragraph_sha256": "bd4597fe2716df9adf448457f1921dd54c4ed4f5db6ad2daded95c9db1cd0676",
+            "unchanged": true
+          },
+          {
+            "path": "docs/EXAMPLE_STATUS.md",
+            "line": 765,
+            "paragraph_sha256": "efd4f620ff48b4222eea0d2224c23900ed8216869e228f49e1a3a7f85c996cb0",
+            "unchanged": true
+          },
+          {
+            "path": "docs/EXAMPLE_STATUS.md",
+            "line": 827,
+            "paragraph_sha256": "f6201dbd57fd08c2145738a995a4a4aefaecf46695ddd0ce9eceb9b95be947ae",
+            "unchanged": true
+          }
+        ]
+      }
+    },
+    "final_documentation": {
+      "example": [
+        "cargo",
+        "run",
+        "--no-default-features",
+        "--features",
+        "robots",
+        "--example",
+        "drone-curriculum",
+        "--",
+        "--help"
+      ],
+      "doctests": [
+        "cargo",
+        "test",
+        "--no-default-features",
+        "--features",
+        "robots",
+        "--doc"
+      ],
+      "format": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_statuses": [
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  "coverage": {
+    "tool": "cargo llvm-cov with nightly branch instrumentation, then LLVM export scoped to the current drone_learning and drone-curriculum binaries. The default report also inventories older cached binaries; scoped export avoids counting obsolete source versions.",
+    "export_command": [
+      "/nix/store/llz63b99xvpsk2bhrzbh7z1grxxfa4h9-rust-mixed/lib/rustlib/x86_64-unknown-linux-gnu/bin/llvm-cov",
+      "export",
+      "-format=text",
+      "-instr-profile=/home/sagan/.cache/bevy-gym-quality-validation/coverage-target/bevy-gym-quality.profdata",
+      "-object",
+      "/home/sagan/.cache/bevy-gym-quality-validation/coverage-target/debug/deps/drone_learning-90b00c74d78606d3",
+      "-object",
+      "/home/sagan/.cache/bevy-gym-quality-validation/coverage-target/debug/examples/drone-curriculum"
+    ],
+    "raw_report": "/home/sagan/.cache/bevy-gym-quality-validation/rehearsal-current-coverage.json",
+    "raw_sha256": "f15130ab6205dd1312af2ffb257997944500e7f71dbca37853fd13415532a86f",
+    "current_objects": [
+      {
+        "path": "/home/sagan/.cache/bevy-gym-quality-validation/coverage-target/debug/deps/drone_learning-90b00c74d78606d3",
+        "sha256": "d0698dc26ad33c2eedb9eb08a330434bfcd6ee0dc696574e4fa1d131c4a3661d"
+      },
+      {
+        "path": "/home/sagan/.cache/bevy-gym-quality-validation/coverage-target/debug/examples/drone-curriculum",
+        "sha256": "1662681be816f235e00e1f7e33fad9db3024206c473a335e40a113f12d91a1e3"
+      }
+    ],
+    "summaries": [
+      {
+        "path": "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/examples/robots/curriculum.rs",
+        "summary": {
+          "branches": {
+            "count": 36,
+            "covered": 33,
+            "notcovered": 3,
+            "percent": 91.66666666666666
+          },
+          "functions": {
+            "count": 5,
+            "covered": 5,
+            "percent": 100
+          },
+          "instantiations": {
+            "count": 5,
+            "covered": 5,
+            "percent": 100
+          },
+          "lines": {
+            "count": 105,
+            "covered": 102,
+            "percent": 97.14285714285714
+          },
+          "mcdc": {
+            "count": 0,
+            "covered": 0,
+            "notcovered": 0,
+            "percent": 0
+          },
+          "regions": {
+            "count": 195,
+            "covered": 179,
+            "notcovered": 16,
+            "percent": 91.7948717948718
+          }
+        },
+        "unhit_branch_outcomes": [
+          [
+            184,
+            16,
+            184,
+            32,
+            20,
+            0,
+            0,
+            0,
+            4
+          ],
+          [
+            184,
+            36,
+            184,
+            67,
+            0,
+            20,
+            0,
+            0,
+            4
+          ],
+          [
+            203,
+            16,
+            203,
+            47,
+            172,
+            0,
+            0,
+            0,
+            4
+          ]
+        ]
+      },
+      {
+        "path": "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/examples/robots/travel/environment.rs",
+        "summary": {
+          "branches": {
+            "count": 2,
+            "covered": 1,
+            "notcovered": 1,
+            "percent": 50
+          },
+          "functions": {
+            "count": 10,
+            "covered": 7,
+            "percent": 70
+          },
+          "instantiations": {
+            "count": 10,
+            "covered": 7,
+            "percent": 70
+          },
+          "lines": {
+            "count": 61,
+            "covered": 56,
+            "percent": 91.80327868852459
+          },
+          "mcdc": {
+            "count": 0,
+            "covered": 0,
+            "notcovered": 0,
+            "percent": 0
+          },
+          "regions": {
+            "count": 116,
+            "covered": 109,
+            "notcovered": 7,
+            "percent": 93.96551724137932
+          }
+        },
+        "unhit_branch_outcomes": [
+          [
+            43,
+            16,
+            43,
+            26,
+            1699,
+            0,
+            0,
+            0,
+            4
+          ]
+        ]
+      },
+      {
+        "path": "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/examples/robots/travel/mod.rs",
+        "summary": {
+          "branches": {
+            "count": 10,
+            "covered": 7,
+            "notcovered": 3,
+            "percent": 70
+          },
+          "functions": {
+            "count": 7,
+            "covered": 7,
+            "percent": 100
+          },
+          "instantiations": {
+            "count": 7,
+            "covered": 7,
+            "percent": 100
+          },
+          "lines": {
+            "count": 107,
+            "covered": 99,
+            "percent": 92.5233644859813
+          },
+          "mcdc": {
+            "count": 0,
+            "covered": 0,
+            "notcovered": 0,
+            "percent": 0
+          },
+          "regions": {
+            "count": 217,
+            "covered": 201,
+            "notcovered": 16,
+            "percent": 92.62672811059907
+          }
+        },
+        "unhit_branch_outcomes": [
+          [
+            75,
+            16,
+            75,
+            22,
+            0,
+            32,
+            0,
+            0,
+            4
+          ],
+          [
+            76,
+            20,
+            81,
+            19,
+            0,
+            0,
+            0,
+            0,
+            4
+          ]
+        ]
+      },
+      {
+        "path": "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/examples/robots/travel/sampling.rs",
+        "summary": {
+          "branches": {
+            "count": 12,
+            "covered": 0,
+            "notcovered": 12,
+            "percent": 0
+          },
+          "functions": {
+            "count": 14,
+            "covered": 8,
+            "percent": 57.14285714285714
+          },
+          "instantiations": {
+            "count": 14,
+            "covered": 8,
+            "percent": 57.14285714285714
+          },
+          "lines": {
+            "count": 44,
+            "covered": 30,
+            "percent": 68.18181818181817
+          },
+          "mcdc": {
+            "count": 0,
+            "covered": 0,
+            "notcovered": 0,
+            "percent": 0
+          },
+          "regions": {
+            "count": 87,
+            "covered": 49,
+            "notcovered": 38,
+            "percent": 56.32183908045977
+          }
+        },
+        "unhit_branch_outcomes": [
+          [
+            89,
+            24,
+            89,
+            34,
+            0,
+            0,
+            0,
+            0,
+            4
+          ],
+          [
+            90,
+            23,
+            90,
+            34,
+            0,
+            0,
+            0,
+            0,
+            4
+          ],
+          [
+            91,
+            23,
+            91,
+            33,
+            0,
+            0,
+            0,
+            0,
+            4
+          ],
+          [
+            92,
+            24,
+            92,
+            40,
+            0,
+            0,
+            0,
+            0,
+            4
+          ],
+          [
+            93,
+            24,
+            93,
+            40,
+            0,
+            0,
+            0,
+            0,
+            4
+          ],
+          [
+            94,
+            24,
+            94,
+            34,
+            0,
+            0,
+            0,
+            0,
+            4
+          ]
+        ]
+      },
+      {
+        "path": "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/tests/drone_learning/../../examples/robots/travel/environment.rs",
+        "summary": {
+          "branches": {
+            "count": 2,
+            "covered": 2,
+            "notcovered": 0,
+            "percent": 100
+          },
+          "functions": {
+            "count": 10,
+            "covered": 10,
+            "percent": 100
+          },
+          "instantiations": {
+            "count": 10,
+            "covered": 10,
+            "percent": 100
+          },
+          "lines": {
+            "count": 61,
+            "covered": 61,
+            "percent": 100
+          },
+          "mcdc": {
+            "count": 0,
+            "covered": 0,
+            "notcovered": 0,
+            "percent": 0
+          },
+          "regions": {
+            "count": 116,
+            "covered": 116,
+            "notcovered": 0,
+            "percent": 100
+          }
+        },
+        "unhit_branch_outcomes": []
+      },
+      {
+        "path": "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/tests/drone_learning/../../examples/robots/travel/sampling.rs",
+        "summary": {
+          "branches": {
+            "count": 12,
+            "covered": 12,
+            "notcovered": 0,
+            "percent": 100
+          },
+          "functions": {
+            "count": 15,
+            "covered": 15,
+            "percent": 100
+          },
+          "instantiations": {
+            "count": 15,
+            "covered": 15,
+            "percent": 100
+          },
+          "lines": {
+            "count": 67,
+            "covered": 67,
+            "percent": 100
+          },
+          "mcdc": {
+            "count": 0,
+            "covered": 0,
+            "notcovered": 0,
+            "percent": 0
+          },
+          "regions": {
+            "count": 116,
+            "covered": 116,
+            "notcovered": 0,
+            "percent": 100
+          }
+        },
+        "unhit_branch_outcomes": []
+      }
+    ],
+    "gaps": "Integration instances cover every reset and sampling line, function and branch. CLI copies of six non-endurance mixture factories and three non-endurance original factories remain unused; the CLI continuing-reset outcome is unhit but covered at the Env seam. The original successful parent-promotion predicate and validation outcomes remain unhit in training coverage. Three unchanged hover/recovery loop outcomes are unhit. No new CLI-mode branch remains unhit."
+  },
+  "smoke": {
+    "seed": 29,
+    "updates": 20,
+    "transitions": 10240,
+    "exit_status": 1,
+    "checkpoint": {
+      "path": "docs/progress/drone-travel-rehearsal-smoke.mpk",
+      "sha256": "d45258bc99563ba244d94f4365324e1e08e62f599b90cfc720269013f58c88f7",
+      "bytes": 47111
+    },
+    "recipe": {
+      "current_stage_fraction": 0.5,
+      "evaluation": "original-single-stage",
+      "prerequisites": "remaining half split among earlier stages; endurance unchanged",
+      "recipe": "travel-prerequisite-rehearsal-v1",
+      "seed": 29,
+      "task_stream_channel": 2
+    },
+    "selection": {
+      "episodes": [
+        {
+          "final_distance": 2.095153570175171,
+          "final_heading_error": 1.7834779024124146,
+          "final_speed": 2.943122625350952,
+          "first_arrival": 1,
+          "reward": 248.09620688426367,
+          "seed": 0,
+          "settled_actions": 0,
+          "steps": 704,
+          "survived": false
+        },
+        {
+          "final_distance": 2.0855283737182617,
+          "final_heading_error": 2.0133090019226074,
+          "final_speed": 2.3817355632781982,
+          "first_arrival": 1,
+          "reward": 263.9299561760927,
+          "seed": 1,
+          "settled_actions": 0,
+          "steps": 738,
+          "survived": false
+        },
+        {
+          "final_distance": 2.0767099857330322,
+          "final_heading_error": 2.179368495941162,
+          "final_speed": 2.5294952392578125,
+          "first_arrival": 1,
+          "reward": 291.5111842358601,
+          "seed": 2,
+          "settled_actions": 0,
+          "steps": 772,
+          "survived": false
+        },
+        {
+          "final_distance": 2.0293896198272705,
+          "final_heading_error": 2.042506456375122,
+          "final_speed": 2.946686029434204,
+          "first_arrival": 1,
+          "reward": 266.25229727909755,
+          "seed": 42,
+          "settled_actions": 0,
+          "steps": 719,
+          "survived": false
+        },
+        {
+          "final_distance": 2.165337085723877,
+          "final_heading_error": 2.189744234085083,
+          "final_speed": 2.8919568061828613,
+          "first_arrival": 1,
+          "reward": 308.5025832755773,
+          "seed": 18446744073709551615,
+          "settled_actions": 0,
+          "steps": 812,
+          "survived": false
+        }
+      ],
+      "lesson": "travel-endurance",
+      "optimizer_steps": 96,
+      "passed": false,
+      "update": 20
+    },
+    "optimizer_prefix_matches_original_exactly": true,
+    "selection_matches_original_exactly": true,
+    "checkpoint_container_reproducibility": "Not established; fresh Burn parameter identifiers differ across processes. Frozen inference equivalence is tested.",
+    "optimizer_records": [
+      {
+        "actor_learning_rate": 0.0003,
+        "actor_loss": -0.004986311250831932,
+        "approximate_kl": 0.007581775251310319,
+        "critic_learning_rate": 0.001,
+        "critic_loss": 62.93479084968567,
+        "entropy": -2.4649358987808228,
+        "lesson": "travel-endurance",
+        "optimizer_steps": 4,
+        "optimizer_updates": 4,
+        "update": 1,
+        "valid_samples": 512
+      },
+      {
+        "actor_learning_rate": 0.0003,
+        "actor_loss": -0.004232376464642584,
+        "approximate_kl": 0.00675680220592767,
+        "critic_learning_rate": 0.001,
+        "critic_loss": 40.008961617946625,
+        "entropy": -2.4624167680740356,
+        "lesson": "travel-endurance",
+        "optimizer_steps": 8,
+        "optimizer_updates": 4,
+        "update": 2,
+        "valid_samples": 512
+      },
+      {
+        "actor_learning_rate": 0.0003,
+        "actor_loss": 0.0010105353139806539,
+        "approximate_kl": 4.350964445620775e-05,
+        "critic_learning_rate": 0.001,
+        "critic_loss": 10.702582906000316,
+        "entropy": -2.461396813392639,
+        "lesson": "travel-endurance",
+        "optimizer_steps": 12,
+        "optimizer_updates": 4,
+        "update": 3,
+        "valid_samples": 512
+      },
+      {
+        "actor_learning_rate": 0.0003,
+        "actor_loss": -0.002610887517221272,
+        "approximate_kl": 0.00533353426726535,
+        "critic_learning_rate": 0.001,
+        "critic_loss": 20.659697776660323,
+        "entropy": -2.4609602093696594,
+        "lesson": "travel-endurance",
+        "optimizer_steps": 16,
+        "optimizer_updates": 4,
+        "update": 4,
+        "valid_samples": 512
+      },
+      {
+        "actor_learning_rate": 0.0003,
+        "actor_loss": -0.0017362255020998418,
+        "approximate_kl": -6.0801394283771515e-06,
+        "critic_learning_rate": 0.001,
+        "critic_loss": 26.173651807010174,
+        "entropy": -2.460915744304657,
+        "lesson": "travel-endurance",
+        "optimizer_steps": 20,
+        "optimizer_updates": 4,
+        "update": 5,
+        "valid_samples": 512
+      },
+      {
+        "actor_learning_rate": 0.0003,
+        "actor_loss": 0.0012898330169264227,
+        "approximate_kl": 0.007904906233306974,
+        "critic_learning_rate": 0.001,
+        "critic_loss": 14.239007342606783,
+        "entropy": -2.460322141647339,
+        "lesson": "travel-endurance",
+        "optimizer_steps": 24,
+        "optimizer_updates": 4,
+        "update": 6,
+        "valid_samples": 512
+      },
+      {
+        "actor_learning_rate": 0.0003,
+        "actor_loss": 7.843610364943743e-05,
+        "approximate_kl": 0.002506591728888452,
+        "critic_learning_rate": 0.001,
+        "critic_loss": 25.140803545713425,
+        "entropy": -2.4605807662010193,
+        "lesson": "travel-endurance",
+        "optimizer_steps": 28,
+        "optimizer_updates": 4,
+        "update": 7,
+        "valid_samples": 512
+      },
+      {
+        "actor_learning_rate": 0.0003,
+        "actor_loss": -0.0011645304039120674,
+        "approximate_kl": 0.013268248119857162,
+        "critic_learning_rate": 0.001,
+        "critic_loss": 23.891578927636147,
+        "entropy": -2.4612516164779663,
+        "lesson": "travel-endurance",
+        "optimizer_steps": 32,
+        "optimizer_updates": 4,
+        "update": 8,
+        "valid_samples": 512
+      },
+      {
+        "actor_learning_rate": 0.0003,
+        "actor_loss": -0.0023370946873910725,
+        "approximate_kl": 0.005163099645869806,
+        "critic_learning_rate": 0.001,
+        "critic_loss": 15.616428643465042,
+        "entropy": -2.460991322994232,
+        "lesson": "travel-endurance",
+        "optimizer_steps": 36,
+        "optimizer_updates": 4,
+        "update": 9,
+        "valid_samples": 512
+      },
+      {
+        "actor_learning_rate": 0.0003,
+        "actor_loss": -0.0002843751572072506,
+        "approximate_kl": 0.023210897445096593,
+        "critic_learning_rate": 0.001,
+        "critic_loss": 11.12623206526041,
+        "entropy": -2.4609986133873463,
+        "lesson": "travel-endurance",
+        "optimizer_steps": 44,
+        "optimizer_updates": 8,
+        "update": 10,
+        "valid_samples": 512
+      },
+      {
+        "actor_learning_rate": 0.0003,
+        "actor_loss": -0.0034697552509896923,
+        "approximate_kl": 0.011195678367627672,
+        "critic_learning_rate": 0.001,
+        "critic_loss": 20.846940190669557,
+        "entropy": -2.4638949937652797,
+        "lesson": "travel-endurance",
+        "optimizer_steps": 52,
+        "optimizer_updates": 8,
+        "update": 11,
+        "valid_samples": 512
+      },
+      {
+        "actor_learning_rate": 0.0003,
+        "actor_loss": 0.0015832963399589062,
+        "approximate_kl": 0.007522650892497043,
+        "critic_learning_rate": 0.001,
+        "critic_loss": 37.284113481640816,
+        "entropy": -2.4656626284122467,
+        "lesson": "travel-endurance",
+        "optimizer_steps": 60,
+        "optimizer_updates": 8,
+        "update": 12,
+        "valid_samples": 512
+      },
+      {
+        "actor_learning_rate": 0.0003,
+        "actor_loss": -0.0034696887341851834,
+        "approximate_kl": 0.00652883189468411,
+        "critic_learning_rate": 0.001,
+        "critic_loss": 11.829973185434937,
+        "entropy": -2.4666521986946464,
+        "lesson": "travel-endurance",
+        "optimizer_steps": 68,
+        "optimizer_updates": 8,
+        "update": 13,
+        "valid_samples": 512
+      },
+      {
+        "actor_learning_rate": 0.0003,
+        "actor_loss": 0.0020531177578959614,
+        "approximate_kl": 0.00034449691884219646,
+        "critic_learning_rate": 0.001,
+        "critic_loss": 11.378748108982109,
+        "entropy": -2.4672968983650208,
+        "lesson": "travel-endurance",
+        "optimizer_steps": 72,
+        "optimizer_updates": 4,
+        "update": 14,
+        "valid_samples": 512
+      },
+      {
+        "actor_learning_rate": 0.0003,
+        "actor_loss": 0.001251959998626262,
+        "approximate_kl": -0.00010598351946100593,
+        "critic_learning_rate": 0.001,
+        "critic_loss": 11.630547888402361,
+        "entropy": -2.4676331281661987,
+        "lesson": "travel-endurance",
+        "optimizer_steps": 76,
+        "optimizer_updates": 4,
+        "update": 15,
+        "valid_samples": 512
+      },
+      {
+        "actor_learning_rate": 0.0003,
+        "actor_loss": -0.0008815046167001128,
+        "approximate_kl": 0.0011207146453671157,
+        "critic_learning_rate": 0.001,
+        "critic_loss": 17.819936663261615,
+        "entropy": -2.4675616025924683,
+        "lesson": "travel-endurance",
+        "optimizer_steps": 80,
+        "optimizer_updates": 4,
+        "update": 16,
+        "valid_samples": 512
+      },
+      {
+        "actor_learning_rate": 0.0003,
+        "actor_loss": 0.00017555238446220756,
+        "approximate_kl": 0.00034485507057979703,
+        "critic_learning_rate": 0.001,
+        "critic_loss": 11.68820517975837,
+        "entropy": -2.4680119156837463,
+        "lesson": "travel-endurance",
+        "optimizer_steps": 84,
+        "optimizer_updates": 4,
+        "update": 17,
+        "valid_samples": 512
+      },
+      {
+        "actor_learning_rate": 0.0003,
+        "actor_loss": 0.00023383938241750002,
+        "approximate_kl": 0.007315463095437735,
+        "critic_learning_rate": 0.001,
+        "critic_loss": 9.0731690376997,
+        "entropy": -2.468774974346161,
+        "lesson": "travel-endurance",
+        "optimizer_steps": 88,
+        "optimizer_updates": 4,
+        "update": 18,
+        "valid_samples": 512
+      },
+      {
+        "actor_learning_rate": 0.0003,
+        "actor_loss": -0.0004700704012066126,
+        "approximate_kl": 0.0010524389799684286,
+        "critic_learning_rate": 0.001,
+        "critic_loss": 12.527035327628255,
+        "entropy": -2.469388723373413,
+        "lesson": "travel-endurance",
+        "optimizer_steps": 92,
+        "optimizer_updates": 4,
+        "update": 19,
+        "valid_samples": 512
+      },
+      {
+        "actor_learning_rate": 0.0003,
+        "actor_loss": 0.0015385880833491683,
+        "approximate_kl": 0.0015343669801950455,
+        "critic_learning_rate": 0.001,
+        "critic_loss": 12.793902540579438,
+        "entropy": -2.4702155590057373,
+        "lesson": "travel-endurance",
+        "optimizer_steps": 96,
+        "optimizer_updates": 4,
+        "update": 20,
+        "valid_samples": 512
+      }
+    ],
+    "algorithm": "PPO",
+    "transfer": {
+      "actor_observations": 13,
+      "critic": "fresh",
+      "destination": "travel-endurance",
+      "event": "checkpoint-transfer",
+      "inserted_heading_weights": "zero",
+      "optimizer": "fresh",
+      "optimizer_steps": 0,
+      "qualified_record_sha256": "7c2b9a6f2a0288faa27676d1514848710f4d5c24cd77505e75cf4990576a12b1",
+      "seed": 29,
+      "source": "qualified-recovery",
+      "source_checkpoint": "docs/progress/drone-recovery-transfer.mpk"
+    },
+    "observation_contract": "XYZ body-frame destination displacement divided by 2 metres, world up expressed in body coordinates, linear velocity divided by 2 m/s, angular velocity divided by 2 rad/s, followed by signed world-Y heading error in radians divided by pi radians; thirteen inputs in the unchanged order.",
+    "action_contract": "Four dimensionless motor fractions from the unchanged bounded Gaussian RL policy, ordered front-left, front-right, rear-right, rear-left. Existing [0,1] validation rejects invalid requests.",
+    "recurrent_state": "Retained within episodes and between continuing rollout batches; reset at episode boundaries.",
+    "reward_source": {
+      "path": "src/robots/travel.rs",
+      "sha256": "d94e7b9e777c91565ad6c95b9780da7356948fb43bdf06a75b98ef7ae7108a7b",
+      "profile": "The unchanged travel reward and terminal-contact behavior."
+    }
+  },
+  "qualification": {
+    "recipe_retention_benefit": false,
+    "travel": false,
+    "browser_3v3": false,
+    "state": "No qualification benefit is claimed. A full rehearsal run and independent held-out evaluation remain required."
+  },
+  "research": {
+    "primary_source": "https://arxiv.org/abs/1705.06366v5",
+    "inspected": "Task generation for goal-conditioned RL. The interval mixture is a local experiment, not an adopted algorithm or a guaranteed retention method."
+  },
+  "storage": "Two owned check processes were stopped after source changes and omitted zero-debug flags caused duplicate compilation. Corrected flags reuse existing caches. Checkpoints remain preserved.",
+  "environment": {
+    "native": "nix develop; unset CFLAGS; target and build directories under the external quality-validation cache; CARGO_PROFILE_DEV_DEBUG=0; CARGO_PROFILE_TEST_DEBUG=0; CARGO_BUILD_JOBS=2.",
+    "browser": "Same zero-debug profile; flight-release-target and flight-release-build; exact nix run .#drone-browser-check.",
+    "personal": "Same zero-debug profile; personal-target and personal-build; existing liamc-lints all-target/all-feature changed-range HEAD command.",
+    "coverage": "Same zero-debug profile; coverage-target and coverage-build; CARGO_LLVM_COV_TARGET_DIR set; RUSTC_BOOTSTRAP=1 for branch measurement."
+  }
+}

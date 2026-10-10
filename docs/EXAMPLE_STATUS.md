@@ -4,6 +4,41 @@ Updated: 2026-10-10. Current work: RL-only drone/droid curriculum.
 
 ## Resume here
 
+### Training-only travel prerequisite rehearsal, 2026-10-10
+
+`--rehearse-prerequisites` now selects existing prerequisite tasks during travel training.
+Later stages retain half the reset draw interval for the current task and split
+half among prerequisites. Endurance remains unchanged. Body and destination streams,
+physics, rewards, policy inputs and every evaluation gate retain their original behavior.
+The [guide](DRONE_TRAVEL.md#training-task-rehearsal) defines the recipe and CLI restrictions.
+
+The [record](progress/drone-travel-rehearsal.json) preserves tests, source identity and coverage.
+All 240 browser tests, 132 default native tests, 43 learning tests and 21 CLI tests pass.
+Formatting, strict Clippy and changed-line Rust lint pass. Native integration tests
+execute every line, function and branch of the reset adapter and rehearsal module.
+Unused CLI factory copies and the unchanged successful-promotion path remain unhit.
+Personal Python lint retains 45 unchanged line-length diagnostics.
+
+The 20-update smoke run collects 10,240 RL transitions and fails selection.
+Its optimizer prefix matches the original seed-29 run exactly. Parameter identifiers
+prevent a claim of checkpoint-container reproducibility. Retention improvement and
+full travel qualification remain unproven. Later curriculum lessons and shared
+browser 3v3 remain unfinished.
+
+Seed 31 has also exhausted 24,000 near-travel updates and exited 1.
+All five final episodes survive, but fail distance, heading and settled-streak gates.
+The [complete record](progress/travel-near-seed31/evaluation.json) and
+[checkpoint](progress/travel-near-seed31/checkpoint.mpk) preserve the failed candidate.
+No far or fast checkpoint exists. Its failed near candidate was not evaluated
+on the final held-out pool.
+
+Standing seed 17 also exhausted 24,000 updates, or 12,288,000 transitions, and exited 1.
+One final selection episode survives 1,000 actions; the others last 127–887 actions.
+Every final stable streak is zero.
+The [complete record](progress/standing-seed17-batched-final/evaluation.json)
+and [checkpoint](progress/standing-seed17-batched-final/checkpoint.mpk) preserve this failure.
+Standing remains unqualified.
+
 ### Near travel exhausts its budget and loses endurance retention, 2026-10-10
 
 The gated seed-29 run exhausted 24,000 near-travel updates and exited 1.

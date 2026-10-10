@@ -33,6 +33,27 @@ impl TravelTask {
         }
     }
 
+    /// Reset through a training adapter while retaining the original body and task streams.
+    pub(crate) fn reset_episode(
+        &mut self,
+        seed: Option<u64>,
+        select: fn(Stage, SeedConfig, u64) -> Stage,
+    ) -> Reset<DroneTravelObservation> {
+        // Explicit roots restart both streams; continuing resets advance one episode.
+        if let Some(seed) = seed {
+            self.seeds = SeedConfig::from_root(seed);
+            self.episode = 0;
+        } else {
+            self.episode = self.episode.wrapping_add(1);
+        }
+        let stage = select(self.stage, self.seeds, self.episode);
+        self.environment = make_episode(stage, self.seeds, self.episode);
+        Reset {
+            observation: self.environment.observation(),
+            info: (),
+        }
+    }
+
     /// Supply a noncapturing factory to the shared rollout collector.
     pub(crate) fn factory(stage: Stage) -> fn() -> Self {
         match stage {
@@ -50,18 +71,7 @@ impl Env for TravelTask {
     type Info = ();
 
     fn reset(&mut self, seed: Option<u64>) -> Reset<Self::Observation> {
-        // Explicit roots restart both streams; continuing resets advance one episode.
-        if let Some(seed) = seed {
-            self.seeds = SeedConfig::from_root(seed);
-            self.episode = 0;
-        } else {
-            self.episode = self.episode.wrapping_add(1);
-        }
-        self.environment = make_episode(self.stage, self.seeds, self.episode);
-        Reset {
-            observation: self.environment.observation(),
-            info: (),
-        }
+        self.reset_episode(seed, |stage, _, _| stage)
     }
 
     fn step(&mut self, action: Self::Action) -> Step<Self::Observation> {

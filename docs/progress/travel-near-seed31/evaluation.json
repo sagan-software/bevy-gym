@@ -1,0 +1,125 @@
+{
+  "recorded_utc": "2026-10-10T14:30:13.751957+00:00",
+  "manifest": {
+    "source_revision": "49d637e2e6b04a0f84aa8db026b8a068bb214484",
+    "binary_sha256": "d58a608dbec7d0f77c424b514ce39f3dd66f51241c0ac62d6d885ca2eef241c9",
+    "parent_checkpoint": "docs/progress/drone-recovery-transfer.mpk",
+    "parent_sha256": "7c2b9a6f2a0288faa27676d1514848710f4d5c24cd77505e75cf4990576a12b1",
+    "seed": 31,
+    "updates_per_stage": 24000,
+    "initialization": "Qualified recovery actor; zero added heading weights; fresh critic, Adam, samplers, counters and recurrent state. Not an optimizer-state resume.",
+    "promotion": "Separate-process validation of proposed stage and prerequisites; final held-out suite excluded from transitions.",
+    "command": [
+      "systemd-run",
+      "--user",
+      "--unit=bevy-gym-travel-gated-seed31-20261010",
+      "--property=CPUQuota=100%",
+      "--property=MemoryMax=2G",
+      "--property=Nice=10",
+      "--property=WorkingDirectory=/home/sagan/Code/github.com/sagan-software/bevy-gym-quality",
+      "--property=StandardOutput=append:/home/sagan/.cache/bevy-gym-quality-validation/travel-gated-seed31-20261010.log",
+      "--property=StandardError=append:/home/sagan/.cache/bevy-gym-quality-validation/travel-gated-seed31-20261010.log",
+      "nix",
+      "develop",
+      "--command",
+      "env",
+      "-u",
+      "CFLAGS",
+      "/home/sagan/.cache/bevy-gym-quality-validation/travel-gated-seed29-20261010/drone-curriculum",
+      "--lesson",
+      "travel",
+      "--seed",
+      "31",
+      "--updates",
+      "24000",
+      "--output",
+      "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/runs/drone-travel/gated-seed31-20261010"
+    ],
+    "created_utc": "2026-10-10T12:14:26.361955+00:00",
+    "purpose": "Independent RL optimization run from the same qualified recovery parent. No final held-out feedback enters training or validation."
+  },
+  "terminal": {
+    "service": "bevy-gym-travel-gated-seed31-20261010.service",
+    "state": "failed",
+    "exit_status": 1,
+    "error": "Lesson travel-near exhausted its update budget without passing.",
+    "near_transitions": 12288000,
+    "cumulative_transitions": 15042560,
+    "far_checkpoints": 0,
+    "fast_checkpoints": 0
+  },
+  "checkpoint": {
+    "path": "docs/progress/travel-near-seed31/checkpoint.mpk",
+    "bytes": 47111,
+    "sha256": "85d0264700f5617eae517fb76a64236167f4298c4c14636f6ba37a0247a70bca"
+  },
+  "selection": {
+    "episodes": [
+      {
+        "final_distance": 2.2708799839019775,
+        "final_heading_error": 2.383955717086792,
+        "final_speed": 0.2611071765422821,
+        "first_arrival": 151,
+        "reward": 170.15797574677435,
+        "seed": 0,
+        "settled_actions": 0,
+        "steps": 1000,
+        "survived": true
+      },
+      {
+        "final_distance": 2.268601655960083,
+        "final_heading_error": 0.3607671856880188,
+        "final_speed": 0.26053479313850403,
+        "first_arrival": 211,
+        "reward": 150.67475117190395,
+        "seed": 1,
+        "settled_actions": 0,
+        "steps": 1000,
+        "survived": true
+      },
+      {
+        "final_distance": 2.2781198024749756,
+        "final_heading_error": 2.005078077316284,
+        "final_speed": 0.28682538866996765,
+        "first_arrival": 270,
+        "reward": 162.84923759800859,
+        "seed": 2,
+        "settled_actions": 0,
+        "steps": 1000,
+        "survived": true
+      },
+      {
+        "final_distance": 2.2792294025421143,
+        "final_heading_error": 1.9305864572525024,
+        "final_speed": 0.2704616189002991,
+        "first_arrival": 56,
+        "reward": 198.44008406764533,
+        "seed": 42,
+        "settled_actions": 0,
+        "steps": 1000,
+        "survived": true
+      },
+      {
+        "final_distance": 2.2647788524627686,
+        "final_heading_error": 0.612795352935791,
+        "final_speed": 0.2720966339111328,
+        "first_arrival": 200,
+        "reward": 178.29589243808005,
+        "seed": 18446744073709551615,
+        "settled_actions": 0,
+        "steps": 1000,
+        "survived": true
+      }
+    ],
+    "lesson": "travel-near",
+    "optimizer_steps": 155480,
+    "passed": false,
+    "update": 24000
+  },
+  "qualification": {
+    "near": false,
+    "full_travel": false,
+    "final_held_out": "Not evaluated for the failed near candidate.",
+    "endurance": "The earlier endurance checkpoint passed promotion validation but failed one of 32 final held-out cases; see drone-travel-endurance-seed31.json."
+  }
+}

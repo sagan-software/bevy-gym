@@ -1,0 +1,146 @@
+{
+  "recorded_utc": "2026-10-10T14:42:08.478671+00:00",
+  "launch": {
+    "recorded_utc": "2026-10-10T09:52:54.196859+00:00",
+    "unit": "bevy-gym-standing-batched-seed17-20261010.service",
+    "command": [
+      "/run/current-system/sw/bin/nix",
+      "develop",
+      "--command",
+      "/home/sagan/.cache/bevy-gym-quality-validation/standing-batched-seed17-20261010/droid-standing",
+      "warm-start",
+      "--checkpoint",
+      "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/runs/droid-standing/seed13-warm-start-20261010/standing-660.mpk",
+      "--seed",
+      "17",
+      "--updates",
+      "24000",
+      "--output",
+      "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/runs/droid-standing/seed17-batched-20261010"
+    ],
+    "output": "runs/droid-standing/seed17-batched-20261010",
+    "base": "dc7ede63e64c8205f3dcf3a89a097fdd61b8e399",
+    "source_patch_sha256": "4856d8cacb666674eaa703a4ee4f9017256a779c674e9c5638cd025600cc9698",
+    "source_sha256": {
+      "src/training/recurrent_ppo/mod.rs": "189031ec0f25d1d501b90999f6069c97c9b53b71ab25b28e9bece24aaf55fa9e",
+      "tests/recurrent_ppo_bytes.rs": "075250d9f56aad3c18d71a7fc02b3e403163f4ff1d6b3dfef6a73a63dae01a7e",
+      "tests/fixtures/recurrent_ppo_scalar_minibatch.json": "980988d84298b8497e34390cac3592b9c4e2775f8ded065da6fa73a028a3d57d",
+      "Cargo.toml": "c171ef5058012ebc620bf16b0a86395bc9243a3b5b18a3a287029ddd7119439f",
+      "Cargo.lock": "a6dd6c536e8b1d666b30790c0c97257528f9103b2e1c6ed7c8dc94c95a9fb258"
+    },
+    "binary_sha256": "f3741f3ce3a57a43674ddc17b18d813d07652781673f1b0e55e8fcd410cd7f7c",
+    "source_checkpoint_sha256": "613a6a1a1b2d6288910e40f77a4b64894bc9ca8363c1cbb56298bd79eca5d01e",
+    "initialization": "Import actor and critic from seed-13 update 660; reset Adam optimizers, counters, samplers and episode memories. This is not optimizer-state resume.",
+    "parent_selection": "Highest mean reward across the 120 fixed selection reports from seed-13 updates 20 through 2400. Every report failed; the parent is not qualified. Held-out results were not used for ranking.",
+    "updates": 24000,
+    "maximum_transitions": 12288000,
+    "rationale": "The 600-update recovery and 2400-update warm start failed. The verified batched optimizer supports a larger bounded sample budget without changing physical rules, rewards or qualification gates.",
+    "resource_limits": {
+      "CPUQuota": "200%",
+      "MemoryMax": "2G",
+      "Nice": 10
+    },
+    "qualification": "Requires fixed standing selection, held-out evaluation and independent run evidence. Budget exhaustion is failure.",
+    "observed_state": {
+      "active": "active",
+      "substate": "running",
+      "main_pid": 523722,
+      "optimizer_update_observed": 216,
+      "initial_checkpoint_bytes_match_parent": true,
+      "initial_sidecar_bytes_match_parent": true,
+      "first_ten_optimizer_records_match_smoke": true
+    }
+  },
+  "terminal": {
+    "state": "failed",
+    "exit_status": 1,
+    "error": "Standing exhausted its update budget without passing; checkpoint is not qualified."
+  },
+  "provenance": {
+    "schema": "droid-standing-v1",
+    "algorithm": "PPO",
+    "seed": 17,
+    "update": 24000,
+    "transitions": 12288000,
+    "optimizer_steps": 180316,
+    "sha256": "bbfa4527d592782749bdeb1d491cee87f1c2fe23104f60938abf9142f0da2baa"
+  },
+  "checkpoint": "docs/progress/standing-seed17-batched-final/checkpoint.mpk",
+  "selection": {
+    "episodes": [
+      {
+        "final_distance": 0.134294331073761,
+        "final_height": 0.9434865713119507,
+        "final_speed": 0.026130996644496918,
+        "final_upright": 0.8197757601737976,
+        "reward": 828.4724399149418,
+        "seed": 0,
+        "stable_actions": 0,
+        "steps": 1000,
+        "supported": true,
+        "survived": true
+      },
+      {
+        "final_distance": 1.0893102884292603,
+        "final_height": 0.4992406666278839,
+        "final_speed": 3.4232959747314453,
+        "final_upright": -0.5499082803726196,
+        "reward": 711.7496812678874,
+        "seed": 1,
+        "stable_actions": 0,
+        "steps": 887,
+        "supported": false,
+        "survived": false
+      },
+      {
+        "final_distance": 1.4815577268600464,
+        "final_height": 0.49014416337013245,
+        "final_speed": 3.3318066596984863,
+        "final_upright": -0.5278295278549194,
+        "reward": 477.9294190108776,
+        "seed": 2,
+        "stable_actions": 0,
+        "steps": 639,
+        "supported": true,
+        "survived": false
+      },
+      {
+        "final_distance": 0.8339723348617554,
+        "final_height": 0.48546305298805237,
+        "final_speed": 3.5627148151397705,
+        "final_upright": -0.4710206389427185,
+        "reward": 566.681049558334,
+        "seed": 42,
+        "stable_actions": 0,
+        "steps": 715,
+        "supported": false,
+        "survived": false
+      },
+      {
+        "final_distance": 0.9749307036399841,
+        "final_height": 0.5378625392913818,
+        "final_speed": 3.1028988361358643,
+        "final_upright": -0.4260633587837219,
+        "reward": 79.21960994880646,
+        "seed": 18446744073709551615,
+        "stable_actions": 0,
+        "steps": 127,
+        "supported": false,
+        "survived": false
+      }
+    ],
+    "mode": "selection",
+    "passed": false,
+    "provenance": {
+      "algorithm": "PPO",
+      "optimizer_steps": 180316,
+      "schema": "droid-standing-v1",
+      "seed": 17,
+      "sha256": "bbfa4527d592782749bdeb1d491cee87f1c2fe23104f60938abf9142f0da2baa",
+      "transitions": 12288000,
+      "update": 24000
+    },
+    "qualification": "requires held-out evaluation and independent run evidence"
+  },
+  "qualification": "Failed final selection. This final checkpoint was not evaluated on held-out roots; its selection does not establish competence. Historical evaluated candidates remain preserved."
+}

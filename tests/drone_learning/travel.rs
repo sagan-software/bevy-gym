@@ -129,6 +129,8 @@ mod environment;
 mod evaluation;
 #[path = "../../examples/robots/travel/progress.rs"]
 mod progress;
+#[path = "../../examples/robots/travel/sampling.rs"]
+mod sampling;
 #[path = "../../examples/robots/travel/stage.rs"]
 mod stage;
 
@@ -280,4 +282,77 @@ fn endurance_precedes_travel_without_relaxing_the_final_stages() {
     assert_eq!(stage::Stage::Near.deadline(), 500);
     assert_eq!(stage::Stage::Far.deadline(), 500);
     assert_eq!(stage::Stage::Fast.deadline(), 250);
+}
+
+/// Rehearsal resets select existing tasks without changing their physics or action requests.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn prerequisite_rehearsal_reuses_exact_tasks_and_repeatable_streams() {
+    use bevy_gym::{robots::DroneAction, Env};
+    for stage in stage::Stage::ALL {
+        let mut task = sampling::Recipe::Rehearsal.factory(stage)();
+        let mut replay = sampling::Recipe::Rehearsal.factory(stage)();
+        let action = DroneAction::try_from([0.5; 4]).expect("isolated motor fixture");
+        replay.reset(Some(0));
+        assert_eq!(task.step(action), replay.step(action));
+        let mut seen = [false; 4];
+        for seed in (0..64).chain([u64::MAX]) {
+            let initial = task.reset(Some(seed));
+            assert_eq!(initial, replay.reset(Some(seed)));
+            let (index, mut expected) = matching_original_task(stage, seed, &initial);
+            seen[index] = true;
+            for fractions in [[0.5; 4], [0.4, 0.6, 0.5, 0.5]] {
+                let action = DroneAction::try_from(fractions).expect("isolated motor fixture");
+                assert_eq!(task.step(action), expected.step(action));
+                replay.step(action);
+            }
+            let continued = task.reset(None);
+            assert_eq!(continued, replay.reset(None));
+            assert!(stage.through().any(|candidate| {
+                let mut expected = environment::TravelTask::new(candidate);
+                expected.reset(Some(seed));
+                continued == expected.reset(None)
+            }));
+            assert_eq!(initial, task.reset(Some(seed)));
+        }
+        for used in seen.iter().take(stage.through().count()) {
+            assert!(*used, "every prior and current distribution is sampled");
+        }
+        assert!(seen.iter().skip(stage.through().count()).all(|used| !used));
+    }
+}
+
+/// Match a sampled snapshot against independently constructed original stage tasks.
+fn matching_original_task(
+    stage: stage::Stage,
+    seed: u64,
+    initial: &bevy_gym::Reset<bevy_gym::robots::DroneTravelObservation>,
+) -> (usize, environment::TravelTask) {
+    use bevy_gym::Env;
+    stage
+        .through()
+        .enumerate()
+        .find_map(|(index, candidate)| {
+            let mut expected = environment::TravelTask::new(candidate);
+            (*initial == expected.reset(Some(seed))).then_some((index, expected))
+        })
+        .expect("one unchanged prerequisite or current task")
+}
+
+/// The default training adapter preserves each original reset stream exactly.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn original_training_recipe_retains_all_reset_streams() {
+    use bevy_gym::Env;
+    for stage in stage::Stage::ALL {
+        let mut original = sampling::Recipe::Original.factory(stage)();
+        let mut original_reference = environment::TravelTask::new(stage);
+        for seed in [0, 42, u64::MAX] {
+            assert_eq!(
+                original.reset(Some(seed)),
+                original_reference.reset(Some(seed))
+            );
+            assert_eq!(original.reset(None), original_reference.reset(None));
+        }
+    }
 }

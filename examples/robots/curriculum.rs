@@ -41,6 +41,9 @@ struct Options {
     /// Select the task distribution for frozen travel inference.
     #[arg(long, value_enum, requires = "travel_evaluation")]
     travel_stage: Option<travel::stage::Stage>,
+    /// Rehearse prior travel tasks during training; evaluation remains single-stage.
+    #[arg(long, num_args = 0, default_missing_value = "enabled", value_enum, requires = "lesson", conflicts_with_all = ["evaluate_checkpoint", "evaluate_held_out", "evaluate_promotion", "initialize_from"])]
+    rehearse_prerequisites: Option<Rehearsal>,
     /// Maximum 512-transition updates per lesson; exhaustion does not pass a lesson.
     #[arg(long, default_value = "600")]
     updates: NonZeroU32,
@@ -50,6 +53,13 @@ struct Options {
     /// Directory for lesson-named checkpoints and scores.
     #[arg(long, default_value = "runs/drone-curriculum")]
     output: PathBuf,
+}
+
+/// Presence-only opt-in to prerequisite rehearsal during travel training.
+#[derive(Clone, Copy, ValueEnum)]
+enum Rehearsal {
+    /// Select the documented rehearsal recipe without accepting a boolean value.
+    Enabled,
 }
 
 /// Select either a twelve-input control lesson or the goal-conditioned travel curriculum.
@@ -96,6 +106,12 @@ impl ValueEnum for travel::stage::Stage {
 /// Retain the agent across lessons and replace only the episode collection state.
 fn main() -> Result<(), Box<dyn Error>> {
     let options = Options::parse();
+    // Reject unsupported rehearsal before loading a policy or creating output artifacts.
+    if options.rehearse_prerequisites.is_some()
+        && !matches!(options.lesson, Some(SelectedLesson::Travel))
+    {
+        return Err("--rehearse-prerequisites requires --lesson travel".into());
+    }
     // Reject incompatible inference modes before loading weights or creating output.
     if options.evaluate_checkpoint.is_some()
         && !matches!(options.lesson, Some(SelectedLesson::Travel))
@@ -141,7 +157,12 @@ fn main() -> Result<(), Box<dyn Error>> {
                     path,
                 );
             }
-            return travel::train(options.seed, options.updates, &options.output);
+            return match options.rehearse_prerequisites {
+                Some(Rehearsal::Enabled) => {
+                    travel::train_rehearsed(options.seed, options.updates, &options.output)
+                }
+                None => travel::train(options.seed, options.updates, &options.output),
+            };
         }
         None => &[Lesson::Hover, Lesson::Recovery],
     };

@@ -16,6 +16,174 @@ TARGET = Path(os.environ.get("CARGO_TARGET_DIR", ROOT / "target"))
 class DroneCurriculumCli(unittest.TestCase):
     """A bounded standalone lesson must save its own failed evaluation."""
 
+    def test_rehearsal_preserves_endurance(self):
+        """The opt-in recipe preserves the first stage."""
+        with tempfile.TemporaryDirectory() as directory:
+            outputs = []
+            for mode in ([], ["--rehearse-prerequisites"]):
+                name = "rehearsal" if mode else "original"
+                output = Path(directory) / name
+                result = subprocess.run(
+                    [str(TARGET / "debug/examples/drone-curriculum"),
+                     "--lesson", "travel", "--updates", "1", "--seed", "11",
+                     "--output", str(output), *mode],
+                    cwd=ROOT, capture_output=True, text=True, check=False,
+                )
+                self.assertEqual(result.returncode, 1, result.stderr)
+                self.assertIn(
+                    "Lesson travel-endurance exhausted", result.stderr,
+                )
+                outputs.append(output)
+            original, rehearsal = outputs
+            for name in ("travel-endurance-1.json", "transfer.json",
+                         "optimization.jsonl"):
+                self.assertEqual((original / name).read_bytes(),
+                                 (rehearsal / name).read_bytes(), name)
+            # Burn assigns fresh parameter IDs. Compare frozen inference.
+            scores = []
+            for output in outputs:
+                inference = subprocess.run(
+                    [str(TARGET / "debug/examples/drone-curriculum"),
+                     "--lesson", "travel", "--evaluate-checkpoint",
+                     str(output / "travel-endurance-1.mpk"), "--travel-stage",
+                     "travel-endurance", "--seed", "42"],
+                    cwd=ROOT, capture_output=True, text=True, check=False,
+                )
+                self.assertEqual(inference.returncode, 0, inference.stderr)
+                scores.append(json.loads(inference.stdout)["episodes"])
+            self.assertEqual(*scores)
+            self.assertFalse((original / "training-recipe.json").exists())
+            recipe_path = rehearsal / "training-recipe.json"
+            recipe = json.loads(recipe_path.read_text())
+            self.assertEqual(
+                recipe["recipe"], "travel-prerequisite-rehearsal-v1",
+            )
+            self.assertEqual(recipe["task_stream_channel"], 2)
+            self.assertEqual(recipe["evaluation"], "original-single-stage")
+            self.assertEqual(recipe["current_stage_fraction"], 0.5)
+            self.assertEqual(recipe["seed"], 11)
+            self.assertEqual(
+                recipe["prerequisites"],
+                "remaining half split among earlier stages; "
+                "endurance unchanged",
+            )
+            self.assertEqual(set(recipe), {
+                "recipe", "task_stream_channel", "current_stage_fraction",
+                "prerequisites", "evaluation", "seed",
+            })
+
+    def test_rehearsal_rejects_other_lessons_and_all_inference_modes(self):
+        """Unsupported modes fail before checkpoint loading or output."""
+        cases = [
+            (["--lesson", "hover"], 1),
+            (["--lesson", "recovery"], 1),
+            ([], 2),
+            (["--lesson", "travel", "--evaluate-checkpoint", "missing"], 2),
+            (["--lesson", "travel", "--evaluate-held-out", "missing"], 2),
+            (["--lesson", "travel", "--evaluate-promotion", "missing",
+              "--travel-stage", "travel-near"], 2),
+            (["--lesson", "travel", "--initialize-from",
+              "qualified-hover"], 2),
+            (["--lesson", "travel", "false"], 2),
+        ]
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / "must-not-exist"
+            for arguments, status in cases:
+                with self.subTest(arguments=arguments):
+                    result = subprocess.run(
+                        [str(TARGET / "debug/examples/drone-curriculum"),
+                         "--rehearse-prerequisites", "--output", str(output),
+                         *arguments],
+                        cwd=ROOT, capture_output=True, text=True, check=False,
+                    )
+                    self.assertEqual(result.returncode, status, result.stderr)
+                    if "false" in arguments:
+                        self.assertIn(
+                            "unexpected argument 'false'", result.stderr,
+                        )
+                    else:
+                        self.assertIn("rehearse-prerequisites", result.stderr)
+                    self.assertFalse(
+                        output.exists(),
+                    )
+
+    def test_rehearsal_record_failure_stops_before_rollout(self):
+        """Blocking the recipe artifact prevents unrecorded training."""
+        with tempfile.TemporaryDirectory() as directory:
+            (Path(directory) / "training-recipe.json").mkdir()
+            result = subprocess.run(
+                [str(TARGET / "debug/examples/drone-curriculum"),
+                 "--lesson", "travel", "--rehearse-prerequisites",
+                 "--updates", "1", "--output", directory],
+                cwd=ROOT, capture_output=True, text=True, check=False,
+            )
+            self.assertEqual(result.returncode, 1)
+            self.assertEqual(result.stdout, "")
+            self.assertFalse((Path(directory) / "optimization.jsonl").exists())
+            self.assertFalse((Path(directory) / "transfer.json").exists())
+
+    def test_rehearsal_output_failures_stop_before_promotion(self):
+        """Blocked artifact paths stop training before promotion."""
+        for name in ("optimization.jsonl", "transfer.json",
+                     "travel-endurance-1.mpk", "travel-endurance-1.json"):
+            with (
+                self.subTest(name=name),
+                tempfile.TemporaryDirectory() as path,
+            ):
+                output = Path(path)
+                (output / name).mkdir()
+                result = subprocess.run(
+                    [str(TARGET / "debug/examples/drone-curriculum"),
+                     "--lesson", "travel", "--rehearse-prerequisites",
+                     "--updates", "1", "--output", path],
+                    cwd=ROOT, capture_output=True, text=True, check=False,
+                )
+                self.assertEqual(result.returncode, 1)
+                self.assertIn("Is a directory", result.stderr)
+                self.assertFalse(list(output.glob("*.promotion.json")))
+                self.assertFalse(list(output.glob("travel-near-*")))
+                if name in ("optimization.jsonl", "transfer.json"):
+                    self.assertEqual(result.stdout, "")
+        with tempfile.TemporaryDirectory() as path:
+            output = Path(path) / "existing-file"
+            output.write_text("preserved")
+            result = subprocess.run(
+                [str(TARGET / "debug/examples/drone-curriculum"),
+                 "--lesson", "travel", "--rehearse-prerequisites",
+                 "--updates", "1", "--output", str(output)],
+                cwd=ROOT, capture_output=True, text=True, check=False,
+            )
+            self.assertEqual(result.returncode, 1)
+            self.assertEqual(result.stdout, "")
+            self.assertEqual(output.read_text(), "preserved")
+
+    def test_rehearsal_failed_selection_continues_to_budget(self):
+        """Failed selection keeps collecting until the final update."""
+        with tempfile.TemporaryDirectory() as path:
+            output = Path(path)
+            result = subprocess.run(
+                [str(TARGET / "debug/examples/drone-curriculum"),
+                 "--lesson", "travel", "--rehearse-prerequisites",
+                 "--updates", "21", "--seed", "29", "--output", path],
+                cwd=ROOT, capture_output=True, text=True, check=False,
+            )
+            self.assertEqual(result.returncode, 1)
+            for update in (20, 21):
+                record = json.loads(
+                    (output / f"travel-endurance-{update}.json").read_text(),
+                )
+                self.assertFalse(record["passed"])
+                self.assertEqual(record["update"], update)
+            rows = (output / "optimization.jsonl").read_text().splitlines()
+            progress = [json.loads(line) for line in rows]
+            self.assertEqual(len(progress), 21)
+            self.assertEqual(sum(row["valid_samples"] for row in progress),
+                             10_752)
+            self.assertGreater(progress[-1]["optimizer_steps"],
+                               progress[-2]["optimizer_steps"])
+            self.assertFalse(list(output.glob("travel-near-*")))
+            self.assertFalse(list(output.glob("*.promotion.json")))
+
     def test_selected_lesson_exhausts_without_training_another_lesson(self):
         for lesson in ("hover", "recovery"):
             with self.subTest(lesson=lesson), tempfile.TemporaryDirectory() as directory:
