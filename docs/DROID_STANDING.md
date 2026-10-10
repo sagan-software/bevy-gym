@@ -472,3 +472,18 @@ unqualified. Adam state, counters, samplers and episode memories start fresh. Th
 physical rules, rewards and qualification gates remain fixed. Before reporting
 progress, inspect unit `bevy-gym-standing-batched-seed17-20261010.service` and output
 `runs/droid-standing/seed17-batched-20261010`.
+
+## Seed-17 held-out checkpoint evaluation
+
+Update 7,920 had the highest selection mean return among 402 completed reports.
+That selection rule chose the checkpoint before held-out evaluation. Frozen
+inference through the immutable training executable failed all 32 held-out cases.
+Episodes lasted 208–445 actions, with a mean of 328, against 1,000 required.
+Every final stable streak was zero. Improved selection return does not qualify standing.
+
+The [complete evidence](progress/standing-seed17-update7920/evaluation.json) records
+both selection and held-out results, checkpoint and executable hashes, and the
+exact command. Checkpoint bytes remained unchanged. The
+[episode CSV](progress/standing-seed17-update7920/episodes.csv) and
+[plot](progress/standing-seed17-update7920/held-out.png) retain every case.
+The larger seed-17 run continues; no standing policy is qualified.

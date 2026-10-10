@@ -1,0 +1,610 @@
+{
+  "recorded_utc": "2026-10-10T11:26:44.231530+00:00",
+  "source_revision": "49d637e2e6b04a0f84aa8db026b8a068bb214484",
+  "probe_manifest": {
+    "source_base": "8116f57dde8edb82f1727dc70eaaefe456ddffa6",
+    "source_patch_sha256": "5bb86d76e5f36b0aae05c034d73673d9562aef54f98b8c5fa22698d81c5107f3",
+    "binary_sha256": "3148e9fe6e202fd0e93add4e0ac6eb465577ff81aeac22c3e27573a9f896d9bd",
+    "parent_sha256": "7c2b9a6f2a0288faa27676d1514848710f4d5c24cd77505e75cf4990576a12b1",
+    "seed": 23,
+    "updates_per_stage": 1900,
+    "instrumentation": "LLVM branch coverage",
+    "created_utc": "2026-10-10T11:16:18.935874+00:00"
+  },
+  "terminal_state": [
+    "ActiveState=failed",
+    "MainPID=0",
+    "ExecMainStatus=1"
+  ],
+  "training_updates": 1900,
+  "transitions": 972800,
+  "optimizer_prefix_matching_old_trial": 1860,
+  "selection_1860_matches_old_trial": true,
+  "checkpoint_byte_reproducibility": "not established; checkpoint SHA differs despite equal optimizer records and selection results",
+  "selection_1860": {
+    "episodes": [
+      {
+        "final_distance": 0.4129287302494049,
+        "final_heading_error": 0.04769962280988693,
+        "final_speed": 0.007733442820608616,
+        "first_arrival": 1,
+        "reward": 846.1339010596275,
+        "seed": 0,
+        "settled_actions": 585,
+        "steps": 1000,
+        "survived": true
+      },
+      {
+        "final_distance": 0.412477046251297,
+        "final_heading_error": 0.17015911638736725,
+        "final_speed": 0.007347604259848595,
+        "first_arrival": 1,
+        "reward": 846.1610907316208,
+        "seed": 1,
+        "settled_actions": 250,
+        "steps": 1000,
+        "survived": true
+      },
+      {
+        "final_distance": 0.4127825200557709,
+        "final_heading_error": 0.055249981582164764,
+        "final_speed": 0.007571323774755001,
+        "first_arrival": 1,
+        "reward": 858.6870933175087,
+        "seed": 2,
+        "settled_actions": 563,
+        "steps": 1000,
+        "survived": true
+      },
+      {
+        "final_distance": 0.4124312698841095,
+        "final_heading_error": 0.17210696637630463,
+        "final_speed": 0.007369610480964184,
+        "first_arrival": 1,
+        "reward": 848.8169644474983,
+        "seed": 42,
+        "settled_actions": 244,
+        "steps": 1000,
+        "survived": true
+      },
+      {
+        "final_distance": 0.4135397970676422,
+        "final_heading_error": 0.1923174411058426,
+        "final_speed": 0.0076814079657197,
+        "first_arrival": 1,
+        "reward": 871.5627961158752,
+        "seed": 18446744073709551615,
+        "settled_actions": 1000,
+        "steps": 1000,
+        "survived": true
+      }
+    ],
+    "lesson": "travel-endurance",
+    "optimizer_steps": 11184,
+    "passed": true,
+    "update": 1860
+  },
+  "validation_1860": {
+    "schema": "travel-promotion-v1",
+    "checkpoint_sha256": "447031d6c443b60bfac054816e4498557ec8b7a28ee573f6100b6dab9913ac27",
+    "stages": [
+      {
+        "stage": "travel-endurance",
+        "episodes": [
+          {
+            "seed": 18446744073709550591,
+            "steps": 1000,
+            "reward": 862.2886841893196,
+            "survived": true,
+            "first_arrival": 1,
+            "settled_actions": 0,
+            "final_distance": 0.41379675,
+            "final_heading_error": 0.33511433,
+            "final_speed": 0.007184288
+          },
+          {
+            "seed": 18446744073709550590,
+            "steps": 1000,
+            "reward": 830.1170758605003,
+            "survived": true,
+            "first_arrival": 1,
+            "settled_actions": 786,
+            "final_distance": 0.4133291,
+            "final_heading_error": 0.13805862,
+            "final_speed": 0.007315153
+          },
+          {
+            "seed": 18446744073709550589,
+            "steps": 1000,
+            "reward": 876.4373105168343,
+            "survived": true,
+            "first_arrival": 1,
+            "settled_actions": 975,
+            "final_distance": 0.41324052,
+            "final_heading_error": 0.12995958,
+            "final_speed": 0.007398054
+          },
+          {
+            "seed": 18446744073709550588,
+            "steps": 1000,
+            "reward": 836.0361084342003,
+            "survived": true,
+            "first_arrival": 1,
+            "settled_actions": 142,
+            "final_distance": 0.41237867,
+            "final_heading_error": 0.20955975,
+            "final_speed": 0.007913928
+          },
+          {
+            "seed": 18446744073709550587,
+            "steps": 1000,
+            "reward": 867.816037774086,
+            "survived": true,
+            "first_arrival": 1,
+            "settled_actions": 982,
+            "final_distance": 0.4131916,
+            "final_heading_error": 0.076580234,
+            "final_speed": 0.007814144
+          },
+          {
+            "seed": 18446744073709550586,
+            "steps": 1000,
+            "reward": 859.3319121003151,
+            "survived": true,
+            "first_arrival": 1,
+            "settled_actions": 0,
+            "final_distance": 0.41412663,
+            "final_heading_error": 0.4419541,
+            "final_speed": 0.007474052
+          },
+          {
+            "seed": 18446744073709550585,
+            "steps": 1000,
+            "reward": 859.6599118709564,
+            "survived": true,
+            "first_arrival": 1,
+            "settled_actions": 921,
+            "final_distance": 0.4132124,
+            "final_heading_error": 0.08809544,
+            "final_speed": 0.0078018573
+          },
+          {
+            "seed": 18446744073709550584,
+            "steps": 1000,
+            "reward": 849.714039504528,
+            "survived": true,
+            "first_arrival": 1,
+            "settled_actions": 429,
+            "final_distance": 0.41264537,
+            "final_heading_error": 0.105335444,
+            "final_speed": 0.007755331
+          },
+          {
+            "seed": 18446744073709550583,
+            "steps": 1000,
+            "reward": 842.7522323131561,
+            "survived": true,
+            "first_arrival": 1,
+            "settled_actions": 242,
+            "final_distance": 0.4124278,
+            "final_heading_error": 0.17299348,
+            "final_speed": 0.0074506584
+          },
+          {
+            "seed": 18446744073709550582,
+            "steps": 1000,
+            "reward": 828.8125236034393,
+            "survived": true,
+            "first_arrival": 1,
+            "settled_actions": 756,
+            "final_distance": 0.41296545,
+            "final_heading_error": 0.00029842928,
+            "final_speed": 0.0075147697
+          },
+          {
+            "seed": 18446744073709550581,
+            "steps": 1000,
+            "reward": 851.3720938563347,
+            "survived": true,
+            "first_arrival": 1,
+            "settled_actions": 978,
+            "final_distance": 0.41365162,
+            "final_heading_error": 0.23994316,
+            "final_speed": 0.0076593924
+          },
+          {
+            "seed": 18446744073709550580,
+            "steps": 1000,
+            "reward": 873.1990368962288,
+            "survived": true,
+            "first_arrival": 1,
+            "settled_actions": 989,
+            "final_distance": 0.41348687,
+            "final_heading_error": 0.18538336,
+            "final_speed": 0.00776933
+          },
+          {
+            "seed": 18446744073709550579,
+            "steps": 1000,
+            "reward": 869.0506170392036,
+            "survived": true,
+            "first_arrival": 1,
+            "settled_actions": 907,
+            "final_distance": 0.41317382,
+            "final_heading_error": 0.065627046,
+            "final_speed": 0.007867489
+          },
+          {
+            "seed": 18446744073709550578,
+            "steps": 1000,
+            "reward": 874.165630698204,
+            "survived": true,
+            "first_arrival": 1,
+            "settled_actions": 1000,
+            "final_distance": 0.41357586,
+            "final_heading_error": 0.23966514,
+            "final_speed": 0.0075823623
+          },
+          {
+            "seed": 18446744073709550577,
+            "steps": 1000,
+            "reward": 855.376925110817,
+            "survived": true,
+            "first_arrival": 1,
+            "settled_actions": 912,
+            "final_distance": 0.41329676,
+            "final_heading_error": 0.12007545,
+            "final_speed": 0.0075516803
+          },
+          {
+            "seed": 18446744073709550576,
+            "steps": 1000,
+            "reward": 873.8664346337318,
+            "survived": true,
+            "first_arrival": 1,
+            "settled_actions": 996,
+            "final_distance": 0.41341057,
+            "final_heading_error": 0.19709605,
+            "final_speed": 0.007447854
+          },
+          {
+            "seed": 18446744073709550575,
+            "steps": 1000,
+            "reward": 862.4914717078209,
+            "survived": true,
+            "first_arrival": 1,
+            "settled_actions": 0,
+            "final_distance": 0.41365972,
+            "final_heading_error": 0.31660482,
+            "final_speed": 0.0070683346
+          },
+          {
+            "seed": 18446744073709550574,
+            "steps": 1000,
+            "reward": 823.1496033668518,
+            "survived": true,
+            "first_arrival": 1,
+            "settled_actions": 0,
+            "final_distance": 0.41458377,
+            "final_heading_error": 0.5962563,
+            "final_speed": 0.007577172
+          },
+          {
+            "seed": 18446744073709550573,
+            "steps": 1000,
+            "reward": 863.2054978013039,
+            "survived": true,
+            "first_arrival": 1,
+            "settled_actions": 897,
+            "final_distance": 0.4131348,
+            "final_heading_error": 0.05549245,
+            "final_speed": 0.007852238
+          },
+          {
+            "seed": 18446744073709550572,
+            "steps": 1000,
+            "reward": 856.5423468947411,
+            "survived": true,
+            "first_arrival": 1,
+            "settled_actions": 0,
+            "final_distance": 0.41386235,
+            "final_heading_error": 0.3158051,
+            "final_speed": 0.007797248
+          },
+          {
+            "seed": 18446744073709550571,
+            "steps": 1000,
+            "reward": 864.6357538104057,
+            "survived": true,
+            "first_arrival": 1,
+            "settled_actions": 890,
+            "final_distance": 0.41309515,
+            "final_heading_error": 0.03598423,
+            "final_speed": 0.008015919
+          },
+          {
+            "seed": 18446744073709550570,
+            "steps": 1000,
+            "reward": 866.6345808506012,
+            "survived": true,
+            "first_arrival": 1,
+            "settled_actions": 978,
+            "final_distance": 0.4134988,
+            "final_heading_error": 0.21005733,
+            "final_speed": 0.007582266
+          },
+          {
+            "seed": 18446744073709550569,
+            "steps": 1000,
+            "reward": 869.9323272705078,
+            "survived": true,
+            "first_arrival": 1,
+            "settled_actions": 0,
+            "final_distance": 0.41375434,
+            "final_heading_error": 0.31346494,
+            "final_speed": 0.007606697
+          },
+          {
+            "seed": 18446744073709550568,
+            "steps": 1000,
+            "reward": 869.525015771389,
+            "survived": true,
+            "first_arrival": 1,
+            "settled_actions": 898,
+            "final_distance": 0.41307074,
+            "final_heading_error": 0.055812724,
+            "final_speed": 0.007770822
+          },
+          {
+            "seed": 18446744073709550567,
+            "steps": 1000,
+            "reward": 841.4603629112244,
+            "survived": true,
+            "first_arrival": 1,
+            "settled_actions": 889,
+            "final_distance": 0.4134393,
+            "final_heading_error": 0.12582117,
+            "final_speed": 0.0078111766
+          },
+          {
+            "seed": 18446744073709550566,
+            "steps": 1000,
+            "reward": 861.5661760568619,
+            "survived": true,
+            "first_arrival": 1,
+            "settled_actions": 0,
+            "final_distance": 0.41366196,
+            "final_heading_error": 0.29626578,
+            "final_speed": 0.007449467
+          },
+          {
+            "seed": 18446744073709550565,
+            "steps": 1000,
+            "reward": 867.041073858738,
+            "survived": true,
+            "first_arrival": 1,
+            "settled_actions": 0,
+            "final_distance": 0.41377333,
+            "final_heading_error": 0.32381827,
+            "final_speed": 0.007559876
+          },
+          {
+            "seed": 18446744073709550564,
+            "steps": 1000,
+            "reward": 861.520703971386,
+            "survived": true,
+            "first_arrival": 1,
+            "settled_actions": 1000,
+            "final_distance": 0.41351542,
+            "final_heading_error": 0.20320864,
+            "final_speed": 0.0076205707
+          },
+          {
+            "seed": 18446744073709550563,
+            "steps": 1000,
+            "reward": 869.1142340302467,
+            "survived": true,
+            "first_arrival": 1,
+            "settled_actions": 896,
+            "final_distance": 0.41365156,
+            "final_heading_error": 0.22461918,
+            "final_speed": 0.007856296
+          },
+          {
+            "seed": 18446744073709550562,
+            "steps": 1000,
+            "reward": 861.8430493474007,
+            "survived": true,
+            "first_arrival": 1,
+            "settled_actions": 882,
+            "final_distance": 0.41341794,
+            "final_heading_error": 0.17301913,
+            "final_speed": 0.007887116
+          },
+          {
+            "seed": 18446744073709550561,
+            "steps": 1000,
+            "reward": 863.252564072609,
+            "survived": true,
+            "first_arrival": 1,
+            "settled_actions": 874,
+            "final_distance": 0.41355124,
+            "final_heading_error": 0.21698256,
+            "final_speed": 0.007791837
+          },
+          {
+            "seed": 18446744073709550560,
+            "steps": 1000,
+            "reward": 867.5289076566696,
+            "survived": true,
+            "first_arrival": 1,
+            "settled_actions": 1000,
+            "final_distance": 0.4136161,
+            "final_heading_error": 0.2339076,
+            "final_speed": 0.0076725273
+          }
+        ]
+      }
+    ]
+  },
+  "final_selection_1900": {
+    "episodes": [
+      {
+        "final_distance": 0.3529127538204193,
+        "final_heading_error": 0.3449956178665161,
+        "final_speed": 0.009024381637573242,
+        "first_arrival": 1,
+        "reward": 891.994007229805,
+        "seed": 0,
+        "settled_actions": 0,
+        "steps": 1000,
+        "survived": true
+      },
+      {
+        "final_distance": 0.3533858060836792,
+        "final_heading_error": 0.12965716421604156,
+        "final_speed": 0.009015577845275402,
+        "first_arrival": 1,
+        "reward": 889.4979712367058,
+        "seed": 1,
+        "settled_actions": 759,
+        "steps": 1000,
+        "survived": true
+      },
+      {
+        "final_distance": 0.35303372144699097,
+        "final_heading_error": 0.30397847294807434,
+        "final_speed": 0.009020241908729076,
+        "first_arrival": 1,
+        "reward": 870.1691235303879,
+        "seed": 2,
+        "settled_actions": 0,
+        "steps": 1000,
+        "survived": true
+      },
+      {
+        "final_distance": 0.35333964228630066,
+        "final_heading_error": 0.15359684824943542,
+        "final_speed": 0.009016759693622589,
+        "first_arrival": 1,
+        "reward": 892.1908477544785,
+        "seed": 42,
+        "settled_actions": 786,
+        "steps": 1000,
+        "survived": true
+      },
+      {
+        "final_distance": 0.3524188697338104,
+        "final_heading_error": 0.5756089091300964,
+        "final_speed": 0.009028947912156582,
+        "first_arrival": 1,
+        "reward": 871.0923193097115,
+        "seed": 18446744073709551615,
+        "settled_actions": 0,
+        "steps": 1000,
+        "survived": true
+      }
+    ],
+    "lesson": "travel-endurance",
+    "optimizer_steps": 11404,
+    "passed": false,
+    "update": 1900
+  },
+  "near_stage_outputs": 0,
+  "result": "Real PPO selection pass was independently rejected; training continued in endurance to budget exhaustion and exited 1. No promotion or qualification.",
+  "coverage_after_probe": [
+    {
+      "path": "examples/robots/travel/promotion/mod.rs",
+      "summary_including_tests": {
+        "branches": {
+          "count": 4,
+          "covered": 3,
+          "notcovered": 1,
+          "percent": 75.0
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0.0
+        },
+        "functions": {
+          "count": 5,
+          "covered": 5,
+          "percent": 100.0
+        },
+        "instantiations": {
+          "count": 9,
+          "covered": 6,
+          "percent": 66.66666666666666
+        },
+        "lines": {
+          "count": 65,
+          "covered": 63,
+          "percent": 96.92307692307692
+        },
+        "regions": {
+          "count": 146,
+          "covered": 140,
+          "notcovered": 6,
+          "percent": 95.8904109589041
+        }
+      },
+      "zero_count_region_start_lines": [
+        16,
+        19,
+        35,
+        37,
+        43,
+        45
+      ]
+    },
+    {
+      "path": "examples/robots/travel/promotion/report.rs",
+      "summary_including_tests": {
+        "branches": {
+          "count": 12,
+          "covered": 10,
+          "notcovered": 2,
+          "percent": 83.33333333333334
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0.0
+        },
+        "functions": {
+          "count": 24,
+          "covered": 24,
+          "percent": 100.0
+        },
+        "instantiations": {
+          "count": 34,
+          "covered": 32,
+          "percent": 94.11764705882352
+        },
+        "lines": {
+          "count": 229,
+          "covered": 229,
+          "percent": 100.0
+        },
+        "regions": {
+          "count": 386,
+          "covered": 385,
+          "notcovered": 1,
+          "percent": 99.74093264248705
+        }
+      },
+      "zero_count_region_start_lines": [
+        37
+      ]
+    }
+  ],
+  "remaining_gaps": [
+    "promotion::run successful-policy return at mod.rs:16-19 awaits a genuinely qualified travel policy",
+    "Runtime construction, current_exe, subprocess I/O and report-write error propagation regions remain unhit at mod.rs:35,37,43,45",
+    "Per-stage evaluation error propagation remains unhit at report.rs:37"
+  ],
+  "final_held_out_policy": "Separate final roots remain excluded from promotion decisions."
+}

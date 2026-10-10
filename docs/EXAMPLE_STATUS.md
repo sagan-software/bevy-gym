@@ -4,6 +4,27 @@ Updated: 2026-10-10. Current work: RL-only drone/droid curriculum.
 
 ## Resume here
 
+### Real promotion rejection and standing held-out failure, 2026-10-10
+
+The new trainer rejected the update-1,860 travel selection in a separate process.
+All 32 validation episodes survived, but heading reached 0.596 radians and the
+shortest settled streak was zero. Training remained in endurance, exhausted 1,900
+updates and exited 1. No near-stage output exists. The
+[completion record](progress/drone-travel-promotion-probe.json) preserves every
+validation case, checkpoint identity and measured coverage gaps.
+
+The [seed-29 trial](progress/drone-travel-gated-seed29.json) now trains with the enforced
+gate and a 24,000-update budget per stage. The older immutable seed-23 trial retains
+selection-only transitions; they do not establish qualification.
+
+Standing update 7,920, chosen by highest selection mean return, failed all 32 held-out
+cases. Episodes lasted 208–445 actions and every final stable streak was zero.
+The [complete record](progress/standing-seed17-update7920/evaluation.json),
+[CSV](progress/standing-seed17-update7920/episodes.csv) and
+[plot](progress/standing-seed17-update7920/held-out.png) preserve the evidence.
+Standing and travel remain unqualified. Next: inspect the gated trial and continued
+standing training before choosing further curriculum work. Browser 3v3 remains unfinished.
+
 ### Separate-process travel promotion gate, 2026-10-10
 
 The current trainer now validates every prerequisite on 32 separate validation
@@ -15,7 +36,8 @@ Native tests, CLI tests, browser tests and strict Clippy pass. Personal Rust lin
 reports no changed-line diagnostics; its strict child still fails on the existing
 backlog. Python lint retains 45 unchanged line-length diagnostics. The
 [promotion record](progress/drone-travel-promotion.json) identifies measured coverage
-and unhit process paths. The immutable 1,900-update seed-23 PPO probe is running.
+and unhit process paths. The immutable 1,900-update seed-23 PPO probe has since
+exhausted its budget.
 
 The older immutable trial still uses selection-only transitions. Standing and
 travel remain unqualified. Next: inspect the probe's independent reports and

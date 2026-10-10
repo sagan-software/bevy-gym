@@ -121,12 +121,37 @@ JSON decoding retains these numeric types; consumers must preserve full `u64` se
 precision. Object member order is irrelevant; stage and episode array order is required.
 
 The [promotion evidence](progress/drone-travel-promotion.json) records tests,
-coverage gaps and the immutable bounded PPO probe. The probe uses seed 23 and
+coverage gaps and the immutable bounded PPO probe. The completed probe used seed 23 and
 1,900 updates per stage under
 `bevy-gym-travel-promotion-seed23-20261010.service`, with output in
 `runs/drone-travel/promotion-seed23-20261010`. Inspect its current state and reports
 before claiming that a real training transition exercised this gate. No travel
 checkpoint is qualified, and browser 3v3 remains unfinished.
+
+## Promotion gate exercised by real PPO
+
+The [bounded seed-23 probe](progress/drone-travel-promotion-probe.json) completed
+1,900 updates and 972,800 transitions. Its first 1,860 optimizer records and
+update-1,860 selection report match the older trial exactly. Checkpoint bytes differ,
+so checkpoint-byte reproducibility remains unestablished.
+
+Selection passed at update 1,860. The separate process evaluated 32 validation
+roots against the same saved checkpoint SHA-256. All episodes survived, but maximum
+heading error was 0.596 radians against pi/12 permitted, and the shortest settled
+streak was zero. The parent rejected promotion, continued endurance through update
+1,900 and exited with status 1 after budget exhaustion. No near-stage outputs exist.
+
+Coverage now records all five promotion-module functions executed. Its line count,
+including tests, is 63/65; report validation records 229/229 lines. Successful-policy
+return and operational error propagation remain unhit. The completion record names
+the exact gaps. This demonstrates rejection, not successful qualification.
+
+The [seed-29 trial](progress/drone-travel-gated-seed29.json) uses the current enforced
+gate and a 24,000-update budget per stage. It transfers the qualified recovery actor
+with zero added heading weights, a fresh critic and fresh Adam, sampling and recurrent
+state. It does not resume optimizer state. The immutable executable runs under
+`bevy-gym-travel-gated-seed29-20261010.service`, with output in
+`runs/drone-travel/gated-seed29-20261010`. Inspect live reports before claiming progress.
 
 ## Run the travel scene
 
