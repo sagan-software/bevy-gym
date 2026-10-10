@@ -74,8 +74,10 @@ lesson. That is not a qualified implementation of the graded-damage curriculum a
 
 Current death ragdolls are useful integration evidence but do not implement living
 joint control. Authored locomotion playback cannot satisfy any droid locomotion gate.
-No droid lesson above is currently trained. Research and validate articulated dynamics
-before freezing the observation/action schema or launching expensive training.
+No droid lesson above is currently trained. The [standing mechanics](DROID_STANDING.md)
+now provide a tested thirteen-segment, twenty-six-actuator environment. Actor encoding,
+training, qualification and the physical mannequin scene remain unfinished. Validate
+those boundaries before launching expensive training.
 
 ## Shared competition
 

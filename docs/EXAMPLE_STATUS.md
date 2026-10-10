@@ -4,6 +4,48 @@ Updated: 2026-10-09. Current work: RL-only drone/droid curriculum.
 
 ## Resume here
 
+### Articulated droid mechanics, 2026-10-09
+
+`6cbc50022d16244ec66391833a6d9eb9e21fc48e` is verified on GitHub main; its contracts
+and strict CI jobs passed. The original dirty checkout remains untouched.
+
+`DroidStanding` now implements physical standing mechanics with thirteen dynamic
+segments, twelve limited joints and twenty-six validated torque outputs. Each output
+applies equal and opposite torques to its linked bodies. Joint motors, animation and
+root movement do not choose motion. The [guide](DROID_STANDING.md) documents the
+model, action/observation contract, reward, reset rules and licensed mannequin anchors.
+
+The reset-only `droid-standing-contract` example prints body centres. It does not
+command an agent. Policy encoding, PPO training, inference, physical mannequin
+rendering, qualification thresholds and checkpoints remain unfinished. This checkpoint
+does not establish standing competence or complete the standalone standing lesson.
+
+[Evidence](progress/droid-standing-physics.json) records four native public droid
+tests, seven internal tests, 101 instrumented library tests and 180 browser tests.
+Coverage hits all 439 instrumented droid-module lines, including tests, and all
+30 production branch outcomes. Constant data has no instrumented counts; failing
+test assertions remain unexecuted. No whole-package coverage claim is made.
+
+Root tests, strict native/WASM Clippy, WASM compilation and formatting pass.
+Changed-line personal Rust lint is clean. Strict personal Clippy retains unchanged
+repository findings; personal Nix lint retains two unchanged source-filter findings
+at `flake.nix:119` and `:200`. Ten unchanged Markdown paragraph-length findings remain.
+
+The reset-only example runs, with all seven instrumented lines hit. Robot doctests
+pass 12 cases with one existing ignore, including both droid privacy checks.
+The standing scene and its visual evidence do not exist yet.
+
+The seed-19 travel endurance unit remains active. The evidence snapshot records
+update 684 and failed selection at update 680; inspect live state before acting.
+Artifacts remain under `runs/drone-travel/endurance-seed19-20261009`, with per-update
+metrics and the preserved source manifest. Prior failed trials remain unchanged.
+
+Next: implement the standing actor encoding, PPO collection and checkpoint evaluation
+through this environment, then the frozen-policy mannequin scene. Freeze qualification
+criteria before training. Monitor seed 19 and independently evaluate any selected
+travel candidate. Later skills, multi-agent training and spectator 3v3 remain unfinished;
+the curriculum goal remains active.
+
 ### Per-update travel diagnostics and independent trial, 2026-10-09
 
 `7e05631d1b70eddc614fe904d651ce0b10380eed` is verified on GitHub main. Its CI passed;

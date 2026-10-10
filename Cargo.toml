@@ -593,3 +593,8 @@ required-features = ["robots", "render-core"]
 name = "drone-travel-scene"
 path = "examples/robots/travel_scene.rs"
 required-features = ["robots", "render-core"]
+
+[[example]]
+name = "droid-standing-contract"
+path = "examples/robots/standing_contract.rs"
+required-features = ["robots"]

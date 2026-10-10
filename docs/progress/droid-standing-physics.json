@@ -1,0 +1,433 @@
+{
+  "status": "physical environment only; training, rendered scene and qualification pending",
+  "source_base": "6cbc50022d16244ec66391833a6d9eb9e21fc48e",
+  "captured_utc": "2026-10-10T02:41:42.561527+00:00",
+  "source_sha256": {
+    "src/robots/droid/geometry.rs": "254183a12f0dc647958435b5280da1887023a83b6a52cc300f977d1d284ba49b",
+    "src/robots/droid/physics.rs": "2183ada834106d9aa60507f46b3dd02a426fae1cadd851afdb4986e56641b23c",
+    "src/robots/droid/body.rs": "50163941ebab8baf97634805e6e972e7d2bc8cd5ec8872fabb8e9ddfee312fb1",
+    "src/robots/droid/mod.rs": "fa4a89579f79511e69c2f49df41760eda8abd3a0ccb76b773de8ee04a6181395",
+    "src/robots/droid/body_state.rs": "cfc5bfc9bbb939060cdb33163cbec44e187bc25223361007355328f4e5f975b3",
+    "src/robots/droid/action.rs": "5304b460bced4412b50462c0922e2a5572a6482c3b63e2be6cb9e736691aed3d",
+    "src/robots/droid/standing.rs": "aaee3f09a1f02a77cebaab3017433a452ff25bf080e4468295b76646324b1aa8",
+    "src/robots/droid/observation.rs": "b676fa4ce9907d48d5596c50a0c3e2772225d883f02c8cf5a37222b64525c364",
+    "src/robots/droid/actuator.rs": "9d80fc64dc074efa3a0a17cb83bc482f904ecddf5129e4af8398054af51982aa",
+    "src/robots/mod.rs": "50e159f1dc09537fbffd919ef2782a5e61c8834efaa50c962c134d4e2f0001a8",
+    "tests/droid_standing.rs": "3c7cad420bf6b57fa12f55f66ee1a0aabd57be4cb80dab5da7a4dbace9001031",
+    "examples/robots/standing_contract.rs": "4a1954dc93bb86aeaf5e8f0de2ff011abc133ef71a78d97b12aaa6e020b946dd",
+    "Cargo.toml": "5b71320267793138623454eb28691cc4a5cdf5d76c0dd4e1e7c9ab0ecf8367ec",
+    "flake.nix": "02828e9021215d34ac081436cd9f5ab13dac3ec208b2ee98696721ef04e2a2f9",
+    ".github/workflows/ci.yml": "e8b9af2149fc9558577a62a712bdc5f76dcc95a2aceb5c2562cf8d90db0b7bc5"
+  },
+  "mannequin_sha256": "a0b15a89d3b21bf20ac48f8ac32fa16f20a9f32b170dfacd01a5375d7190d97f",
+  "model": {
+    "segments": 13,
+    "joints": 12,
+    "actuators": 26,
+    "mass_kg": 70,
+    "policy_interval_ms": 20,
+    "physics_interval_ms": 5,
+    "mechanics": "bounded direct equal/opposite torques; passive joint limits and contacts; no joint motors or animation"
+  },
+  "red_test": {
+    "log": "/home/sagan/.cache/bevy-gym-quality-validation/droid-red.log",
+    "exit": 101,
+    "error": "unresolved imports DroidAction, DroidBody, DroidStanding"
+  },
+  "validation": {
+    "native_droid_integration_tests": 4,
+    "native_droid_internal_tests": 7,
+    "instrumented_library_tests": 101,
+    "browser_tests": 180,
+    "browser_suites": 21,
+    "strict_personal": "Clippy child exit 101 from unchanged repository diagnostics; changed-line clean; Dylint child exit 0",
+    "nix_personal_findings": [
+      {
+        "path": "flake.nix",
+        "line": 119,
+        "check": "statix/unfiltered_source_root",
+        "changed": false
+      },
+      {
+        "path": "flake.nix",
+        "line": 200,
+        "check": "statix/unfiltered_source_root",
+        "changed": false
+      }
+    ],
+    "cargo_fmt_all_check": "passed",
+    "cargo_test": "passed",
+    "cargo_clippy_all_targets_all_features_deny_warnings": "passed",
+    "wasm_droid_clippy": "passed",
+    "wasm_library_check": "passed",
+    "native_droid_focused": "passed",
+    "browser_contracts": "passed",
+    "rendered_scene": "not implemented or visually verified",
+    "robot_doctests": {
+      "passed": 12,
+      "ignored": 1,
+      "droid_compile_fail_cases": 2
+    },
+    "reset_only_example": "executed; thirteen centres printed; no Env::step call",
+    "strict_personal_primary_diagnostics": 88,
+    "strict_personal_affected_unchanged_files": 14,
+    "markdown_personal": "changed text clean after paragraph split; ten unchanged paragraph-length findings remain",
+    "markdown_syntax": "checked by rumdl"
+  },
+  "coverage": {
+    "report": "/home/sagan/.cache/bevy-gym-quality-validation/droid-coverage.json",
+    "files": [
+      {
+        "path": "src/robots/droid/action.rs",
+        "instrumented_lines_including_tests": {
+          "count": 17,
+          "covered": 17,
+          "percent": 100.0
+        },
+        "production_branch_hits": [
+          {
+            "coordinates": [
+              38,
+              12,
+              40,
+              76
+            ],
+            "true": 332,
+            "false": 260
+          },
+          {
+            "coordinates": [
+              40,
+              26,
+              40,
+              43
+            ],
+            "true": 11986,
+            "false": 156
+          }
+        ]
+      },
+      {
+        "path": "src/robots/droid/body_state.rs",
+        "instrumented_lines_including_tests": {
+          "count": 15,
+          "covered": 15,
+          "percent": 100.0
+        },
+        "production_branch_hits": []
+      },
+      {
+        "path": "src/robots/droid/geometry.rs",
+        "instrumented_lines_including_tests": {
+          "count": 3,
+          "covered": 3,
+          "percent": 100.0
+        },
+        "production_branch_hits": []
+      },
+      {
+        "path": "src/robots/droid/observation.rs",
+        "instrumented_lines_including_tests": {
+          "count": 3,
+          "covered": 3,
+          "percent": 100.0
+        },
+        "production_branch_hits": []
+      },
+      {
+        "path": "src/robots/droid/physics.rs",
+        "instrumented_lines_including_tests": {
+          "count": 237,
+          "covered": 237,
+          "percent": 100.0
+        },
+        "production_branch_hits": [
+          {
+            "coordinates": [
+              87,
+              24,
+              87,
+              38
+            ],
+            "true": 1768,
+            "false": 680
+          },
+          {
+            "coordinates": [
+              134,
+              24,
+              134,
+              34
+            ],
+            "true": 18356,
+            "false": 7060
+          }
+        ]
+      },
+      {
+        "path": "src/robots/droid/standing.rs",
+        "instrumented_lines_including_tests": {
+          "count": 164,
+          "covered": 164,
+          "percent": 100.0
+        },
+        "production_branch_hits": [
+          {
+            "coordinates": [
+              72,
+              9,
+              72,
+              63
+            ],
+            "true": 8,
+            "false": 1274
+          },
+          {
+            "coordinates": [
+              76,
+              17,
+              76,
+              38
+            ],
+            "true": 76,
+            "false": 13576
+          },
+          {
+            "coordinates": [
+              77,
+              24,
+              77,
+              55
+            ],
+            "true": 78,
+            "false": 13498
+          },
+          {
+            "coordinates": [
+              78,
+              24,
+              78,
+              59
+            ],
+            "true": 78,
+            "false": 13420
+          },
+          {
+            "coordinates": [
+              79,
+              24,
+              79,
+              60
+            ],
+            "true": 78,
+            "false": 13342
+          },
+          {
+            "coordinates": [
+              80,
+              24,
+              80,
+              46
+            ],
+            "true": 52,
+            "false": 13290
+          },
+          {
+            "coordinates": [
+              81,
+              24,
+              81,
+              46
+            ],
+            "true": 52,
+            "false": 13238
+          },
+          {
+            "coordinates": [
+              82,
+              24,
+              82,
+              58
+            ],
+            "true": 50,
+            "false": 13188
+          },
+          {
+            "coordinates": [
+              83,
+              25,
+              83,
+              45
+            ],
+            "true": 294,
+            "false": 12894
+          },
+          {
+            "coordinates": [
+              132,
+              12,
+              132,
+              41
+            ],
+            "true": 164,
+            "false": 6
+          },
+          {
+            "coordinates": [
+              137,
+              20,
+              137,
+              66
+            ],
+            "true": 2,
+            "false": 648
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "Counts include internal test lines. Constant data, enum declarations and re-exports have no instrumented lines.",
+      "Failed assertion branches in private tests are unexecuted; all instrumented production branch outcomes are hit.",
+      "Compiler-enforced private access is checked separately by compile-fail doctests.",
+      "No policy, render path or trained standing behavior exists in this checkpoint."
+    ],
+    "reset_only_example": {
+      "report": "/home/sagan/.cache/bevy-gym-quality-validation/droid-example-exact.json",
+      "instrumented_lines": 7,
+      "hit_lines": 7
+    },
+    "report_sha256": "9b923a18e4abb73e9c92a0919ddc65070591a8fb019385d637f94027c9c6160c"
+  },
+  "travel_run_snapshot": {
+    "unit": "bevy-gym-travel-endurance-seed19-20261009.service",
+    "state": [
+      "ActiveState=active",
+      "SubState=running"
+    ],
+    "artifacts": "runs/drone-travel/endurance-seed19-20261009",
+    "latest_optimizer": {
+      "actor_learning_rate": 0.0003,
+      "actor_loss": 0.0026847687549889088,
+      "approximate_kl": 0.00024152215337380767,
+      "critic_learning_rate": 0.001,
+      "critic_loss": 11.698755102232099,
+      "entropy": -2.456834852695465,
+      "lesson": "travel-endurance",
+      "optimizer_steps": 4720,
+      "optimizer_updates": 4,
+      "update": 684,
+      "valid_samples": 512
+    },
+    "latest_selection": {
+      "episodes": [
+        {
+          "final_distance": 4.6299638748168945,
+          "final_heading_error": 1.1183165311813354,
+          "final_speed": 4.005802154541016,
+          "first_arrival": 1,
+          "reward": 388.8215249250643,
+          "seed": 0,
+          "settled_actions": 0,
+          "steps": 852,
+          "survived": false
+        },
+        {
+          "final_distance": 1.110205054283142,
+          "final_heading_error": 1.0311771631240845,
+          "final_speed": 0.6426064968109131,
+          "first_arrival": 1,
+          "reward": 484.3884330216715,
+          "seed": 1,
+          "settled_actions": 0,
+          "steps": 1000,
+          "survived": true
+        },
+        {
+          "final_distance": 5.36536979675293,
+          "final_heading_error": 1.0504260063171387,
+          "final_speed": 5.53537130355835,
+          "first_arrival": 1,
+          "reward": 163.80601197248325,
+          "seed": 2,
+          "settled_actions": 0,
+          "steps": 553,
+          "survived": false
+        },
+        {
+          "final_distance": 4.545314311981201,
+          "final_heading_error": 0.3917091190814972,
+          "final_speed": 3.8122668266296387,
+          "first_arrival": 1,
+          "reward": 377.9123922348226,
+          "seed": 42,
+          "settled_actions": 0,
+          "steps": 773,
+          "survived": false
+        },
+        {
+          "final_distance": 3.0830185413360596,
+          "final_heading_error": 2.0676729679107666,
+          "final_speed": 1.435534954071045,
+          "first_arrival": 1,
+          "reward": 216.7805623379536,
+          "seed": 18446744073709551615,
+          "settled_actions": 0,
+          "steps": 600,
+          "survived": false
+        }
+      ],
+      "lesson": "travel-endurance",
+      "optimizer_steps": 4696,
+      "passed": false,
+      "update": 680
+    },
+    "qualification": false
+  },
+  "next": "Implement PPO actor encoding, collection, evaluation-only promotion, checkpoint provenance and a frozen-policy standing scene using this exact environment.",
+  "validation_logs": {
+    "droid-red.log": {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/droid-red.log",
+      "sha256": "52308463b5f3028f3c4dd6693dc5a902765e7e05285ced7d969c13e0a63dc969"
+    },
+    "droid-signatures.log": {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/droid-signatures.log",
+      "sha256": "7aeea4e91167f9d6cf3b604021dd27678a5a1b5127121d8653d58e18a064b429"
+    },
+    "droid-focused-final.log": {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/droid-focused-final.log",
+      "sha256": "a597e40064c3767223179c14aa1087f80cdaee079c798e33d5b6840c624175bb"
+    },
+    "droid-gates-final.log": {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/droid-gates-final.log",
+      "sha256": "0a552b733440f9b2eee417b0fb720c892533a32a7426fe68a44ce0bab0a5cfb6"
+    },
+    "droid-final-verification.log": {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/droid-final-verification.log",
+      "sha256": "7d044beca7c0e16e72ecaa9e93e7522054ff2bae0a243fba10853ad0ca8dc126"
+    },
+    "droid-browser.log": {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/droid-browser.log",
+      "sha256": "e930dd6c838f358a6b158ffd6e5883d77c030250ad4e5d8a1ef13c08c7e32a4f"
+    },
+    "droid-coverage-final.log": {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/droid-coverage-final.log",
+      "sha256": "3b38479c1f2ecc4d8c7fcee07aad54529f2cea2a0ce4a88da273d8261bd18dfa"
+    },
+    "droid-example-coverage.log": {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/droid-example-coverage.log",
+      "sha256": "cae3f7f941bca6da5dfb987aa7c0348dc59f3da76fea52babb26f7154c17aa9d"
+    },
+    "droid-personal-final.log": {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/droid-personal-final.log",
+      "sha256": "c019760aaea54d9de5df0b10558439f5b1f29e6446dcd64e0da0ee376030a0cc"
+    },
+    "droid-personal-strict.log": {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/droid-personal-strict.log",
+      "sha256": "5609fa1d2687408ca673d9f1494211a665bb36c33725929ee6014a5b0cb789eb"
+    },
+    "droid-nix-lint.log": {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/droid-nix-lint.log",
+      "sha256": "ed93dd696a6219bec5360282b4ac2931b6b5acf6016d98a6116339486a041733"
+    }
+  }
+}

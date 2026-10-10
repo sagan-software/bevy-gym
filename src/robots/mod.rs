@@ -2,6 +2,7 @@
 
 mod action;
 mod destination;
+mod droid;
 mod episode_ended;
 mod hover;
 mod impulse;
@@ -24,3 +25,8 @@ pub use obstacle::{DroneObstacle, InvalidDroneObstacle};
 pub use destination::{DroneDestination, InvalidDroneDestination};
 pub use travel::DroneTravel;
 pub use travel_observation::DroneTravelObservation;
+
+pub use droid::{
+    DroidAction, DroidActuator, DroidBody, DroidBodyState, DroidObservation, DroidStanding,
+    InvalidDroidAction,
+};
