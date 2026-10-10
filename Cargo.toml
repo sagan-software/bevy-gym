@@ -588,3 +588,8 @@ required-features = ["robots", "render-core"]
 name = "drone-recovery-scene"
 path = "examples/robots/recovery_scene.rs"
 required-features = ["robots", "render-core"]
+
+[[example]]
+name = "drone-travel-scene"
+path = "examples/robots/travel_scene.rs"
+required-features = ["robots", "render-core"]

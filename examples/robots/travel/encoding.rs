@@ -3,7 +3,7 @@
 use bevy::math::Vec3;
 use bevy_gym::robots::{DroneDestination, DroneObservation, DroneTravelObservation};
 
-use crate::learning::encoding::encode_target;
+use super::motor_encoding::encode_target;
 
 /// Encode twelve existing motor features followed by signed heading error divided by pi.
 ///

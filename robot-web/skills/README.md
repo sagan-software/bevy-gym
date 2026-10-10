@@ -1,6 +1,6 @@
 # Frozen RL skill scenes
 
-Build and serve the independent hover and disturbed recovery lessons:
+Build and serve the independent hover, disturbed recovery, and travel lessons:
 
 ```sh
 nix develop --command scripts/build_drone_skills.sh
@@ -8,14 +8,21 @@ python3 -m http.server 8000 --directory robot-web/skills-dist
 ```
 
 Open [hover](http://localhost:8000/hover/) or
-[disturbed recovery](http://localhost:8000/recovery/). Select Run to start an episode.
+[disturbed recovery](http://localhost:8000/recovery/), or the
+[unqualified travel trial](http://localhost:8000/travel/). Select Run to start an episode.
 Space toggles playback, N applies one policy action, and R resets seed 42.
 The buttons provide the same actions. Reset clears recurrent memory.
 
-Each executable embeds `docs/progress/drone-curriculum.mpk`, SHA-256
+Hover and recovery embed `docs/progress/drone-curriculum.mpk`, SHA-256
 `8b94182a1368f5449a52db5c0859160fc5819d6772c0547f31d240df7a0a465a`.
 The checkpoint was trained with PPO through hover and disturbed recovery.
 Both lessons pass their 32-seed held-out evaluation in native and browser tests.
+
+Travel embeds the failed RL candidate `docs/progress/drone-travel-trial.mpk`,
+SHA-256 `0f5a36039389e68c66281029d77eb2d7397bba8483e4a1f366092f512397d5f7`.
+It has no travel qualification. The [travel guide](../../docs/DRONE_TRAVEL.md)
+records its training provenance, contracts, failed results, and evaluation commands.
+
 These scenes do not train or load arbitrary checkpoints. The separate
 [hover](../../docs/DRONE_HOVER.md) and [recovery](../../docs/DRONE_RECOVERY.md)
 guides provide training and native checkpoint-selection commands.
@@ -26,7 +33,7 @@ playback controls never provide motor commands. Inference errors remain visible
 and prevent further actions. There is no fallback controller.
 
 For deployment, build with `scripts/build_drone_skills.sh --release` inside
-`nix develop`. Output goes to `robot-web/skills-dist-release`.
+`nix develop`. All three pages go to `robot-web/skills-dist-release`.
 GitHub Pages places these pages under `/bevy-gym/robots/skills/`.
 The gallery links each lesson and identifies the old mixed-controller viewer as
 historical. Bindings and WASM use one content-hashed runtime directory per lesson.

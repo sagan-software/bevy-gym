@@ -2,6 +2,7 @@
 
 use bevy::prelude::*;
 use bevy_gym::{robots::DroneMotor, EpisodeStatus};
+use std::fmt::Write;
 
 use super::{drone_model, Playback, Viewer};
 
@@ -78,11 +79,16 @@ pub(super) fn setup(
         Camera3d::default(),
         Transform::from_xyz(2.2, 3.4, -3.2).looking_at(Vec3::new(0.0, 2.0, 0.0), Vec3::Y),
     ));
-    controls(&mut commands, &assets, viewer.title);
+    controls(
+        &mut commands,
+        &assets,
+        viewer.title,
+        &viewer.checkpoint_label,
+    );
 }
 
 /// Keep the scene visible between its telemetry and playback controls.
-fn controls(commands: &mut Commands<'_, '_>, assets: &AssetServer, title: &str) {
+fn controls(commands: &mut Commands<'_, '_>, assets: &AssetServer, title: &str, checkpoint: &str) {
     let font = assets.load("fonts/MonaSans-VariableFont.ttf");
     commands
         .spawn(Node {
@@ -95,7 +101,7 @@ fn controls(commands: &mut Commands<'_, '_>, assets: &AssetServer, title: &str) 
         })
         .with_children(|root| {
             header(root, &font, title);
-            footer(root, &font);
+            footer(root, &font, checkpoint);
         });
 }
 
@@ -134,7 +140,7 @@ fn header(root: &mut ChildSpawnerCommands<'_>, font: &Handle<Font>, title: &str)
 }
 
 /// Group playback controls separately from the physics scene.
-fn footer(root: &mut ChildSpawnerCommands<'_>, font: &Handle<Font>) {
+fn footer(root: &mut ChildSpawnerCommands<'_>, font: &Handle<Font>, checkpoint: &str) {
     root.spawn((
         Node {
             padding: UiRect::all(px(12)),
@@ -164,7 +170,7 @@ fn footer(root: &mut ChildSpawnerCommands<'_>, font: &Handle<Font>) {
                 }
             });
         panel.spawn((
-            Text::new("Frozen RL · curriculum 8b94182a1368\nDrone by NateGazzard · CC BY 3.0"),
+            Text::new(format!("{checkpoint}\nDrone by NateGazzard · CC BY 3.0")),
             TextFont {
                 font: font.clone(),
                 font_size: 13.0,
@@ -266,8 +272,18 @@ pub(super) fn project(
     let observation = session.observation();
     body.translation = observation.position();
     body.rotation = observation.orientation();
-    **camera = Transform::from_translation(observation.position() + Vec3::new(2.2, 1.4, -3.2))
-        .looking_at(observation.position(), Vec3::Y);
+    let (focus, scale) = session.destination().map_or_else(
+        || (observation.position(), 1.0),
+        |goal| {
+            let distance = observation.position().distance(goal.position());
+            (
+                (observation.position() + goal.position()) * 0.5,
+                distance.mul_add(0.35, 1.0),
+            )
+        },
+    );
+    **camera = Transform::from_translation(focus + Vec3::new(2.2, 1.4, -3.2) * scale)
+        .looking_at(focus, Vec3::Y);
     if let Some(action) = session.last_action() {
         // Illustration only: the actuator command is a force fraction, not rotor RPM.
         let phase = session.steps() as f32 * 0.02 * 200.0;
@@ -284,6 +300,26 @@ pub(super) fn project(
             }
         }
     }
+}
+
+/// Draw task geometry without adding colliders or selecting policy actions.
+pub(super) fn target(viewer: Res<'_, Viewer>, mut gizmos: Gizmos<'_, '_>) {
+    let Ok(session) = &viewer.session else {
+        return;
+    };
+    let Some(goal) = session.destination() else {
+        return;
+    };
+    let position = goal.position();
+    let heading = goal.heading();
+    let color = Color::srgb(0.07, 0.23, 0.44);
+    // The half-metre sphere shows the position gate; the arrow shows desired horizontal heading.
+    gizmos.sphere(Isometry3d::from_translation(position), 0.5, color);
+    gizmos.arrow(
+        position,
+        position + Vec3::new(heading.x, 0.0, heading.y) * 0.8,
+        color,
+    );
 }
 
 /// Surface model and policy failures instead of drawing a seemingly active agent.
@@ -308,23 +344,36 @@ pub(super) fn refresh(
             } else if let Some(bevy::asset::LoadState::Failed(error)) = model_state {
                 format!("Model failed: {error}")
             } else {
-                let state = match session.status() {
-                    EpisodeStatus::Terminated => "Crashed",
-                    EpisodeStatus::Truncated => "Episode complete",
-                    EpisodeStatus::Continuing => match viewer.playback {
-                        Playback::Paused => "Paused",
-                        Playback::Running => "Running",
-                    },
-                };
-                let steps = session.steps();
-                let distance = session
-                    .observation()
-                    .position()
-                    .distance(Vec3::new(0.0, 2.0, 0.0));
-                format!("{state} · {steps}/500 actions\nTarget distance {distance:.2} m")
+                telemetry(session, &viewer.playback)
             }
         }
     };
+}
+
+/// Format read-only measurements without equating episode completion with qualification.
+fn telemetry(session: &super::presentation::SceneSession, playback: &Playback) -> String {
+    let state = match session.status() {
+        EpisodeStatus::Terminated => "Crashed",
+        EpisodeStatus::Truncated => "Episode complete",
+        EpisodeStatus::Continuing => match playback {
+            Playback::Paused => "Paused",
+            Playback::Running => "Running",
+        },
+    };
+    let steps = session.steps();
+    let horizon = session.horizon();
+    let distance = session.observation().position().distance(session.target());
+    let mut text = format!("{state} · {steps}/{horizon} actions\nTarget distance {distance:.2} m");
+    if let Some(heading) = session.heading_error() {
+        let degrees = heading.to_degrees();
+        let speed = session.observation().linear_velocity().length();
+        write!(
+            &mut text,
+            "\nHeading error {degrees:.1}° · speed {speed:.2} m/s"
+        )
+        .expect("formatting into a String is infallible");
+    }
+    text
 }
 
 #[cfg(test)]
@@ -343,9 +392,16 @@ mod tests {
                 DroneHover::default,
                 42,
             )
+            .map(super::super::presentation::SceneSession::Control)
             .map_err(|error| error.to_string()),
+            checkpoint_label: "test checkpoint".to_owned(),
             playback: Playback::Paused,
         };
+        let initial = viewer.session.as_ref().expect("valid session");
+        assert_eq!(initial.horizon(), 500);
+        assert!(initial.destination().is_none());
+        assert!(initial.error().is_none());
+        assert!(telemetry(initial, &viewer.playback).starts_with("Paused · 0/500 actions"));
         apply(Control::Play, &mut viewer);
         assert!(matches!(viewer.playback, Playback::Running));
         apply(Control::Play, &mut viewer);
@@ -374,5 +430,71 @@ mod tests {
                 Some("invalid checkpoint")
             );
         }
+    }
+
+    /// Travel playback and telemetry use the same immutable task and episode limits.
+    #[test]
+    fn travel_controls_preserve_actions_and_show_the_full_horizon() {
+        use super::super::{presentation::SceneSession, travel};
+        let mut viewer = Viewer {
+            title: "Travel trial",
+            session: travel::load(
+                include_bytes!("../../../docs/progress/drone-travel-trial.mpk").to_vec(),
+                42,
+            )
+            .map(SceneSession::Travel)
+            .map_err(|error| error.to_string()),
+            checkpoint_label: "Unqualified RL trial".to_owned(),
+            playback: Playback::Paused,
+        };
+        let session = viewer.session.as_ref().expect("trial loads");
+        assert_eq!(session.horizon(), 1_000);
+        assert!(session.destination().is_some());
+        assert!(session.error().is_none());
+        let text = telemetry(session, &viewer.playback);
+        assert!(text.starts_with("Paused · 0/1000 actions"));
+        assert!(text.contains("Heading error"));
+        assert!(text.contains("m/s"));
+        apply(Control::Step, &mut viewer);
+        let first = viewer.session.as_ref().expect("stepped").last_action();
+        apply(Control::Reset, &mut viewer);
+        assert_eq!(viewer.session.as_ref().expect("reset").steps(), 0);
+        apply(Control::Step, &mut viewer);
+        assert_eq!(
+            viewer.session.as_ref().expect("replay").last_action(),
+            first
+        );
+        apply(Control::Play, &mut viewer);
+        assert!(
+            telemetry(viewer.session.as_ref().expect("running"), &viewer.playback)
+                .starts_with("Running")
+        );
+        let session = viewer.session.as_mut().expect("valid trial");
+        while !session.status().is_done() {
+            session.step();
+        }
+        assert_eq!(session.steps(), 1_000);
+        assert!(telemetry(session, &viewer.playback).starts_with("Episode complete"));
+        session.step();
+        assert_eq!(session.steps(), 1_000);
+    }
+
+    /// A real failed RL episode must be identified as a crash, never as successful qualification.
+    #[test]
+    fn failed_trial_is_reported_as_crashed() {
+        use super::super::{presentation::SceneSession, travel};
+        let mut session = SceneSession::Travel(
+            travel::load(
+                include_bytes!("../../../docs/progress/drone-travel-trial.mpk").to_vec(),
+                0,
+            )
+            .expect("recorded trial"),
+        );
+        while !session.status().is_done() {
+            session.step();
+        }
+        assert!(session.status().is_terminal());
+        assert!(session.steps() < session.horizon());
+        assert!(telemetry(&session, &Playback::Paused).starts_with("Crashed"));
     }
 }

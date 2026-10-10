@@ -4,6 +4,48 @@ Updated: 2026-10-09. Current work: RL-only drone/droid curriculum.
 
 ## Resume here
 
+### Travel trial scene and endurance failure, 2026-10-09
+
+`fe83e779e7e9735efe4c6a533c7efb8d86daad11` was verified on GitHub main before this
+checkpoint. `drone-travel-scene` now runs separately in native and browser builds,
+using the exact training task and encoder. Run, pause, step and reset affect playback
+only. The scene shows target position, heading, speed, checkpoint identity, and
+`Unqualified RL` status. The [guide](DRONE_TRAVEL.md) provides copyable commands.
+
+The embedded checkpoint is `docs/progress/drone-travel-trial.mpk`, original near-travel
+seed 11 update 120, SHA-256
+`0f5a36039389e68c66281029d77eb2d7397bba8483e4a1f366092f512397d5f7`.
+It failed selection. Browser seed 42 survives the horizon but misses the position,
+heading and speed gates. Desktop/mobile recordings and inspected contact sheets
+are under `docs/progress/travel-scene/`; [evidence](progress/drone-travel-scene.json)
+records source hashes and exact coverage gaps. No travel competence is claimed.
+
+The endurance unit `bevy-gym-travel-endurance-seed11-20261009.service` has now
+failed with exit status 1 after all 600 updates. The final evaluation has two
+survivors out of five, no settled episodes, and no promotion. The
+[failure record](progress/drone-travel-endurance-failed.json) preserves all 30
+selection results, checkpoint hashes and source provenance. Artifacts remain in
+`runs/drone-travel/endurance-seed11-20261009`; the log remains
+`/home/sagan/.cache/bevy-gym-quality-validation/travel-endurance-seed11.log`.
+No training job remains active for this task. Preserve both failed travel runs.
+
+Native tests, strict native/WASM Clippy, WASM builds, and 173 browser tests pass.
+Changed-line personal Rust lint is clean. Strict personal Clippy still fails on
+unchanged repository diagnostics. Markdown syntax passes; personal Markdown retains
+13 unchanged paragraph-length findings, with changed paragraphs clean.
+
+Instrumented native coverage hits every changed
+line in the session, presentation and travel-loading adapters. Renderer startup,
+projection and target drawing have exact uncovered lines recorded in the evidence;
+actual browser execution does not supply instrumented hit counts. Native window
+interaction and browser inference fault injection remain unverified.
+
+Next: diagnose the failed endurance optimization using recorded trajectories and
+actor/critic measurements, then test a bounded training change without weakening
+promotion or held-out criteria. Travel qualification, later drone lessons, physical
+droid lessons, multi-agent training and the spectator 3v3 arena remain unfinished.
+The active curriculum goal remains open.
+
 ### Held-out travel evaluation and original trial failure, 2026-10-09
 
 `8a5a4cc971e6e463bfb6d4a5e507c3a59ab3ce2f` is verified on GitHub main. The original

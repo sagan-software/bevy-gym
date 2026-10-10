@@ -7,7 +7,7 @@ pub(crate) mod held_out;
 pub(crate) mod model;
 pub(crate) mod stage;
 
-use crate::learning::{RecoveryBatch, SELECTION_SEEDS};
+use crate::learning::{encoding as motor_encoding, RecoveryBatch, SELECTION_SEEDS};
 use environment::TravelTask;
 use stage::Stage;
 use std::{

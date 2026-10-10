@@ -43,7 +43,7 @@ jobs:
       - run: nix develop --command python3 tests/test_drone_skill_cli.py
       - run: nix develop --command python3 tests/test_drone_curriculum_cli.py
       - run: nix develop --command cargo test --features robots --example drone-flight
-      - run: nix develop --command cargo test --features robots --example drone-hover-scene --example drone-recovery-scene
+      - run: nix develop --command cargo test --features robots --example drone-hover-scene --example drone-recovery-scene --example drone-travel-scene
       - run: nix develop --command cargo test -p bevy-gym-pursuit-viewer --example drone-pursuit
       - run: nix develop --command cargo run --no-default-features --features robots --example pursuit-search
       - run: nix develop --command cargo check --no-default-features --features robots,browser --target wasm32-unknown-unknown

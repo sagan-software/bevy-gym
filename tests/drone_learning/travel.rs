@@ -3,6 +3,7 @@
 #[path = "../../examples/robots/travel/encoding.rs"]
 mod encoding;
 
+use crate::learning::encoding as motor_encoding;
 use bevy::math::{Vec2, Vec3};
 use bevy_gym::robots::{DroneDestination, DroneHover};
 

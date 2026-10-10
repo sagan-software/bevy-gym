@@ -6,12 +6,16 @@ mod drone_model;
 mod encoding;
 #[path = "../learning/model.rs"]
 mod model;
+mod presentation;
 mod session;
+mod travel;
 mod view;
 
 use bevy::{asset::AssetMetaCheck, prelude::*};
 use bevy_gym::robots::DroneHover;
+use presentation::SceneSession;
 use session::Session;
+use sha2::{Digest, Sha256};
 
 /// User playback mode; this never supplies an actuator command.
 #[derive(Default)]
@@ -29,19 +33,49 @@ struct Viewer {
     /// Fixed lesson selected by the executable, never by an agent controller.
     title: &'static str,
     /// Validated frozen session, or the diagnostic preventing playback.
-    session: Result<Session, String>,
+    session: Result<SceneSession, String>,
+    /// Frozen checkpoint identity and qualification state, fixed by the executable.
+    checkpoint_label: String,
     /// Spectator's playback choice.
     playback: Playback,
 }
 
 /// Start one independent lesson with the recorded curriculum checkpoint.
 pub(super) fn run(title: &'static str, factory: fn() -> DroneHover) {
-    let session = Session::load(
-        include_bytes!("../../../docs/progress/drone-curriculum.mpk").to_vec(),
-        factory,
-        42,
-    )
-    .map_err(|error| error.to_string());
+    let bytes = include_bytes!("../../../docs/progress/drone-curriculum.mpk");
+    let session = Session::load(bytes.to_vec(), factory, 42)
+        .map(SceneSession::Control)
+        .map_err(|error| error.to_string());
+    start(
+        title,
+        session,
+        checkpoint_label(bytes, "Frozen RL · curriculum"),
+    );
+}
+
+/// Show the recorded failed RL travel candidate without claiming qualification.
+pub(super) fn run_travel() {
+    let bytes = include_bytes!("../../../docs/progress/drone-travel-trial.mpk");
+    let session = travel::load(bytes.to_vec(), 42)
+        .map(SceneSession::Travel)
+        .map_err(|error| error.to_string());
+    start(
+        "Travel trial",
+        session,
+        checkpoint_label(bytes, "Unqualified RL · trial"),
+    );
+}
+
+/// Derive the visible identity from the exact embedded policy record.
+fn checkpoint_label(bytes: &[u8], status: &str) -> String {
+    let digest = Sha256::digest(bytes);
+    let hex = format!("{digest:x}");
+    let prefix = hex.get(..12).expect("SHA-256 hex has 64 ASCII characters");
+    format!("{status} {prefix}")
+}
+
+/// Share the established scene, assets and controls between independently runnable lessons.
+fn start(title: &'static str, session: Result<SceneSession, String>, checkpoint_label: String) {
     App::new()
         .add_plugins(
             DefaultPlugins
@@ -69,13 +103,14 @@ pub(super) fn run(title: &'static str, factory: fn() -> DroneHover) {
         .insert_resource(Viewer {
             title,
             session,
+            checkpoint_label,
             playback: Playback::Paused,
         })
         .add_systems(Startup, view::setup)
         .add_systems(FixedUpdate, advance)
         .add_systems(
             Update,
-            (view::keyboard, view::project, view::refresh).chain(),
+            (view::keyboard, view::project, view::target, view::refresh).chain(),
         )
         .run();
 }
@@ -86,5 +121,23 @@ fn advance(mut viewer: ResMut<'_, Viewer>) {
         if let Ok(session) = &mut viewer.session {
             session.step();
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// Display identity must follow loaded bytes, including the established SHA-256 test vector.
+    #[test]
+    fn checkpoint_label_uses_the_actual_bytes() {
+        assert_eq!(checkpoint_label(b"abc", "Trial"), "Trial ba7816bf8f01");
+        assert_eq!(
+            checkpoint_label(
+                include_bytes!("../../../docs/progress/drone-travel-trial.mpk"),
+                "Unqualified RL · trial"
+            ),
+            "Unqualified RL · trial 0f5a36039389"
+        );
     }
 }

@@ -1,10 +1,11 @@
 //! Frozen recurrent inference with no route to manual or fallback motor commands.
 
-use bevy_gym::robots::{DroneAction, DroneHover, DroneObservation};
+use bevy_gym::robots::{DroneAction, DroneHover};
 use bevy_gym::training::{RecurrentMemory, RecurrentPpoPolicy};
 use bevy_gym::{Env, EpisodeStatus, TimeLimit};
 
 use super::{encoding, model};
+use std::num::NonZeroU16;
 
 /// Either usable frozen weights and episode memory, or a permanent inference stop.
 enum Inference {
@@ -19,12 +20,18 @@ enum Inference {
     Failed(String),
 }
 
-/// Private physics and policy state shared by the two standalone scenes.
-pub(crate) struct Session {
-    /// The same ten-second environment used by curriculum evaluation.
-    environment: TimeLimit<DroneHover>,
+/// Private physics and policy state shared by the standalone skill scenes.
+pub(crate) struct Session<E = DroneHover, const N: usize = 12>
+where
+    E: Env<Action = DroneAction>,
+    E::Observation: Copy,
+{
+    /// The same bounded physical task used by curriculum evaluation.
+    environment: TimeLimit<E>,
     /// Latest authoritative pose and velocities, including the initial reset.
-    observation: DroneObservation,
+    observation: E::Observation,
+    /// Shared task encoder; no presentation state enters policy inference.
+    encode: fn(E::Observation) -> [f32; N],
     /// Environment completion; inference failures remain a separate diagnostic.
     status: EpisodeStatus,
     /// The only source of actuator commands.
@@ -41,19 +48,44 @@ impl Session {
         seed: u64,
     ) -> Result<Self, Box<dyn std::error::Error>> {
         let policy = model::load_policy(bytes)?;
+        Ok(Self::from_policy(
+            policy,
+            factory(),
+            seed,
+            NonZeroU16::new(500).expect("positive hover horizon"),
+            encoding::encode,
+        ))
+    }
+}
+
+impl<E, const N: usize> Session<E, N>
+where
+    E: Env<Action = DroneAction>,
+    E::Observation: Copy,
+{
+    /// Keep one validated policy and one typed task behind the same playback boundary.
+    pub(crate) fn from_policy(
+        policy: RecurrentPpoPolicy,
+        environment: E,
+        seed: u64,
+        limit: NonZeroU16,
+        encode: fn(E::Observation) -> [f32; N],
+    ) -> Self {
         let memory = policy.initial_memory();
-        let mut environment = TimeLimit::new(factory(), 500)?;
+        let mut environment = TimeLimit::new(environment, usize::from(limit.get()))
+            .expect("the action horizon is nonzero by type");
         let observation = environment.reset(Some(seed)).observation;
-        Ok(Self {
+        Self {
             environment,
             observation,
+            encode,
             status: EpisodeStatus::Continuing,
             inference: Inference::Ready {
                 policy: Box::new(policy),
                 memory,
             },
             last_action: None,
-        })
+        }
     }
 
     /// Infer and validate one action before advancing physics; failures are sticky.
@@ -65,7 +97,7 @@ impl Session {
             return;
         };
         // Inference sees only the observation, never reward or critic features.
-        let inferred = match policy.mean_action(&encoding::encode(self.observation), memory) {
+        let inferred = match policy.mean_action(&(self.encode)(self.observation), memory) {
             Ok(inferred) => inferred,
             Err(error) => {
                 self.inference = Inference::Failed(error.to_string());
@@ -98,7 +130,7 @@ impl Session {
     }
 
     /// Read the authoritative observation without exposing physics mutation.
-    pub(crate) const fn observation(&self) -> DroneObservation {
+    pub(crate) const fn observation(&self) -> E::Observation {
         self.observation
     }
 
@@ -110,6 +142,11 @@ impl Session {
     /// Read the actual number of applied actions.
     pub(crate) const fn steps(&self) -> usize {
         self.environment.elapsed_steps()
+    }
+
+    /// Read the configured horizon without storing a duplicate count.
+    pub(crate) const fn horizon(&self) -> usize {
+        self.environment.max_episode_steps()
     }
 
     /// Read motor values only after a policy action has reached physics.

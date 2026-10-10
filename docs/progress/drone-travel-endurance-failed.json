@@ -1,0 +1,2151 @@
+{
+  "date": "2026-10-09",
+  "status": "failed",
+  "unit": "bevy-gym-travel-endurance-seed11-20261009.service",
+  "verified_unit_state": "failed",
+  "exit_status": 1,
+  "error": "Error: \"Lesson travel-endurance exhausted its update budget without passing.\"",
+  "run_manifest": {
+    "base_commit": "b643be7be5d3ad3208853f4ce61c70c235366f0c",
+    "seed": 11,
+    "maximum_updates_per_stage": 600,
+    "command": [
+      "--lesson",
+      "travel",
+      "--seed",
+      "11",
+      "--updates",
+      "600",
+      "--output",
+      "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/runs/drone-travel/endurance-seed11-20261009"
+    ],
+    "source_sha256": {
+      "examples/robots/travel/encoding.rs": "2774a719376533ffa1a5f1fba3c6f2de05789a6a4c3a5fdbd30d6c6e4c8299fb",
+      "examples/robots/travel/evaluation.rs": "0d691f3c393caaf4a5a49adfd2c7294c4504c445e041915745a460a509d0f36f",
+      "examples/robots/travel/model.rs": "a49cb52c2524f50e8dfd595b6a02b7718ee778affd521ef0cb01026b9431a662",
+      "examples/robots/travel/mod.rs": "7b3f9744c3ee8628edc5aeb38df73c1a41fb70b4248ab374fde6b85696c20c9c",
+      "examples/robots/travel/stage.rs": "09aae7694046ee927847258371fcd7cde664ad65c7844d70a4263be1c09a2be1",
+      "examples/robots/travel/environment.rs": "3c9f24f1ecc55e3e5dc170b1b10ee6e89ce6f8ae8c9e8ae8441d92d0dab5949a",
+      "examples/robots/learning/encoding.rs": "587c484f2e61d7c5e3c193e8ee669bb724bdc2fc61813868034e08dc17a9c522",
+      "examples/robots/learning/evaluation.rs": "8ea15793d01a5541281bb7408e30f62ad598ad6fd480add9567854f39afa87e9",
+      "examples/robots/learning/model.rs": "52110a41d3e7f91c3aae7ffb567aeb36a0c2c43b888717ab8987cfb09908cff1",
+      "examples/robots/learning/mod.rs": "67a25cad0b9235820b7c701cbf7c12aec488efa4d159d21e36662a0b67ebee2a",
+      "examples/robots/learning/episode.rs": "4059666975400e4313fcbd74d59c6028f7ec57700f537e9bd729a8ef69e004d9",
+      "examples/robots/learning/rollout.rs": "ca9e459599db87b309cada3f603cd941f1bf07f6b541ba9b6da93a3f70749e07",
+      "examples/robots/curriculum.rs": "c89ec14043da678d2a9add53610be53189add443cba3f5521f8a8fcc5b9568a8"
+    },
+    "binary": "/home/sagan/.cache/bevy-gym-quality-validation/travel-endurance-seed11-20261009/drone-curriculum",
+    "binary_sha256": "864f4ad6a33345156d448bdab46c7d3e481715af94d9bb940bce615da934154a",
+    "change": "Prepend 20-second initial-position/initial-heading endurance; original travel gates and PPO settings unchanged"
+  },
+  "log": "/home/sagan/.cache/bevy-gym-quality-validation/travel-endurance-seed11.log",
+  "log_sha256": "35a850306f215994e034818612fbb10b857920d9e4494a77335667b321a57143",
+  "final_evaluation": {
+    "episodes": [
+      {
+        "final_distance": 4.789483547210693,
+        "final_heading_error": 1.5822678804397583,
+        "final_speed": 4.2197699546813965,
+        "first_arrival": 1,
+        "reward": 128.28426163457334,
+        "seed": 0,
+        "settled_actions": 0,
+        "steps": 987,
+        "survived": false
+      },
+      {
+        "final_distance": 6.756106376647949,
+        "final_heading_error": 0.2569167912006378,
+        "final_speed": 2.4520580768585205,
+        "first_arrival": 1,
+        "reward": 155.6079578846693,
+        "seed": 1,
+        "settled_actions": 0,
+        "steps": 1000,
+        "survived": true
+      },
+      {
+        "final_distance": 8.708864212036133,
+        "final_heading_error": 1.284690260887146,
+        "final_speed": 8.765290260314941,
+        "first_arrival": 1,
+        "reward": 164.1698357053101,
+        "seed": 2,
+        "settled_actions": 0,
+        "steps": 903,
+        "survived": false
+      },
+      {
+        "final_distance": 2.1908979415893555,
+        "final_heading_error": 1.4198724031448364,
+        "final_speed": 1.3310941457748413,
+        "first_arrival": 1,
+        "reward": 116.48948218562873,
+        "seed": 42,
+        "settled_actions": 0,
+        "steps": 1000,
+        "survived": true
+      },
+      {
+        "final_distance": 7.3964056968688965,
+        "final_heading_error": 0.7386658191680908,
+        "final_speed": 2.846146583557129,
+        "first_arrival": 1,
+        "reward": 142.9469591465313,
+        "seed": 18446744073709551615,
+        "settled_actions": 0,
+        "steps": 634,
+        "survived": false
+      }
+    ],
+    "lesson": "travel-endurance",
+    "optimizer_steps": 3956,
+    "passed": false,
+    "update": 600
+  },
+  "selection_evaluations": [
+    {
+      "episodes": [
+        {
+          "final_distance": 1.8068970441818237,
+          "final_heading_error": 0.40746256709098816,
+          "final_speed": 0.9799140095710754,
+          "first_arrival": 1,
+          "reward": 182.69949820946204,
+          "seed": 0,
+          "settled_actions": 0,
+          "steps": 448,
+          "survived": false
+        },
+        {
+          "final_distance": 1.868667483329773,
+          "final_heading_error": 0.43266555666923523,
+          "final_speed": 0.8735451102256775,
+          "first_arrival": 1,
+          "reward": 204.0773967722198,
+          "seed": 1,
+          "settled_actions": 0,
+          "steps": 475,
+          "survived": false
+        },
+        {
+          "final_distance": 1.8906018733978271,
+          "final_heading_error": 0.6372511386871338,
+          "final_speed": 0.8760839104652405,
+          "first_arrival": 1,
+          "reward": 219.18733557802625,
+          "seed": 2,
+          "settled_actions": 0,
+          "steps": 502,
+          "survived": false
+        },
+        {
+          "final_distance": 1.881314754486084,
+          "final_heading_error": 0.1847722828388214,
+          "final_speed": 0.8843158483505249,
+          "first_arrival": 1,
+          "reward": 200.83978348693927,
+          "seed": 42,
+          "settled_actions": 0,
+          "steps": 458,
+          "survived": false
+        },
+        {
+          "final_distance": 1.8396090269088745,
+          "final_heading_error": 0.32673051953315735,
+          "final_speed": 0.8219572901725769,
+          "first_arrival": 1,
+          "reward": 236.64822445204118,
+          "seed": 18446744073709551615,
+          "settled_actions": 0,
+          "steps": 529,
+          "survived": false
+        }
+      ],
+      "lesson": "travel-endurance",
+      "optimizer_steps": 104,
+      "passed": false,
+      "update": 20
+    },
+    {
+      "episodes": [
+        {
+          "final_distance": 1.8861432075500488,
+          "final_heading_error": 2.338834285736084,
+          "final_speed": 1.2366474866867065,
+          "first_arrival": 1,
+          "reward": 176.55995259747579,
+          "seed": 0,
+          "settled_actions": 0,
+          "steps": 442,
+          "survived": false
+        },
+        {
+          "final_distance": 1.8937731981277466,
+          "final_heading_error": 2.200451135635376,
+          "final_speed": 1.3342121839523315,
+          "first_arrival": 1,
+          "reward": 198.0245692929384,
+          "seed": 1,
+          "settled_actions": 0,
+          "steps": 471,
+          "survived": false
+        },
+        {
+          "final_distance": 1.8999478816986084,
+          "final_heading_error": 2.078697681427002,
+          "final_speed": 1.3285150527954102,
+          "first_arrival": 1,
+          "reward": 215.33010611854843,
+          "seed": 2,
+          "settled_actions": 0,
+          "steps": 499,
+          "survived": false
+        },
+        {
+          "final_distance": 1.8910377025604248,
+          "final_heading_error": 2.4089465141296387,
+          "final_speed": 1.3433516025543213,
+          "first_arrival": 1,
+          "reward": 197.8300500234327,
+          "seed": 42,
+          "settled_actions": 0,
+          "steps": 451,
+          "survived": false
+        },
+        {
+          "final_distance": 1.8880711793899536,
+          "final_heading_error": 2.384262800216675,
+          "final_speed": 1.254150152206421,
+          "first_arrival": 1,
+          "reward": 242.80035550082607,
+          "seed": 18446744073709551615,
+          "settled_actions": 0,
+          "steps": 536,
+          "survived": false
+        }
+      ],
+      "lesson": "travel-endurance",
+      "optimizer_steps": 224,
+      "passed": false,
+      "update": 40
+    },
+    {
+      "episodes": [
+        {
+          "final_distance": 1.9069395065307617,
+          "final_heading_error": 1.5276702642440796,
+          "final_speed": 1.0894163846969604,
+          "first_arrival": 1,
+          "reward": 162.76759851134557,
+          "seed": 0,
+          "settled_actions": 0,
+          "steps": 512,
+          "survived": false
+        },
+        {
+          "final_distance": 1.9210762977600098,
+          "final_heading_error": 1.5976848602294922,
+          "final_speed": 1.1222748756408691,
+          "first_arrival": 1,
+          "reward": 182.00834400768508,
+          "seed": 1,
+          "settled_actions": 0,
+          "steps": 542,
+          "survived": false
+        },
+        {
+          "final_distance": 1.915000081062317,
+          "final_heading_error": 1.6291736364364624,
+          "final_speed": 1.1154980659484863,
+          "first_arrival": 1,
+          "reward": 201.97169383376604,
+          "seed": 2,
+          "settled_actions": 0,
+          "steps": 573,
+          "survived": false
+        },
+        {
+          "final_distance": 1.920044183731079,
+          "final_heading_error": 1.3764262199401855,
+          "final_speed": 1.1738245487213135,
+          "first_arrival": 1,
+          "reward": 181.16833286602923,
+          "seed": 42,
+          "settled_actions": 0,
+          "steps": 521,
+          "survived": false
+        },
+        {
+          "final_distance": 1.925114631652832,
+          "final_heading_error": 1.6810553073883057,
+          "final_speed": 1.0911390781402588,
+          "first_arrival": 1,
+          "reward": 225.24519316107762,
+          "seed": 18446744073709551615,
+          "settled_actions": 0,
+          "steps": 621,
+          "survived": false
+        }
+      ],
+      "lesson": "travel-endurance",
+      "optimizer_steps": 352,
+      "passed": false,
+      "update": 60
+    },
+    {
+      "episodes": [
+        {
+          "final_distance": 2.113097906112671,
+          "final_heading_error": 1.5819309949874878,
+          "final_speed": 2.834813356399536,
+          "first_arrival": 1,
+          "reward": 107.71870626532473,
+          "seed": 0,
+          "settled_actions": 0,
+          "steps": 711,
+          "survived": false
+        },
+        {
+          "final_distance": 1.8836907148361206,
+          "final_heading_error": 0.349334716796875,
+          "final_speed": 3.1652238368988037,
+          "first_arrival": 1,
+          "reward": 128.8722740748599,
+          "seed": 1,
+          "settled_actions": 0,
+          "steps": 1000,
+          "survived": true
+        },
+        {
+          "final_distance": 4.948687553405762,
+          "final_heading_error": 2.163792848587036,
+          "final_speed": 4.482297897338867,
+          "first_arrival": 1,
+          "reward": 120.50608053820906,
+          "seed": 2,
+          "settled_actions": 0,
+          "steps": 1000,
+          "survived": true
+        },
+        {
+          "final_distance": 1.6971439123153687,
+          "final_heading_error": 0.1774253249168396,
+          "final_speed": 3.438602924346924,
+          "first_arrival": 1,
+          "reward": 130.22781069714074,
+          "seed": 42,
+          "settled_actions": 0,
+          "steps": 1000,
+          "survived": true
+        },
+        {
+          "final_distance": 3.8863189220428467,
+          "final_heading_error": 2.4396164417266846,
+          "final_speed": 4.429818153381348,
+          "first_arrival": 1,
+          "reward": 106.72381913289428,
+          "seed": 18446744073709551615,
+          "settled_actions": 0,
+          "steps": 407,
+          "survived": false
+        }
+      ],
+      "lesson": "travel-endurance",
+      "optimizer_steps": 476,
+      "passed": false,
+      "update": 80
+    },
+    {
+      "episodes": [
+        {
+          "final_distance": 8.660903930664062,
+          "final_heading_error": 1.77137291431427,
+          "final_speed": 6.429440021514893,
+          "first_arrival": 1,
+          "reward": 48.895491962786764,
+          "seed": 0,
+          "settled_actions": 0,
+          "steps": 222,
+          "survived": false
+        },
+        {
+          "final_distance": 4.8324480056762695,
+          "final_heading_error": 1.933077096939087,
+          "final_speed": 1.6991676092147827,
+          "first_arrival": 1,
+          "reward": 56.05995097756386,
+          "seed": 1,
+          "settled_actions": 0,
+          "steps": 220,
+          "survived": false
+        },
+        {
+          "final_distance": 7.0531907081604,
+          "final_heading_error": 0.5737919807434082,
+          "final_speed": 2.1347548961639404,
+          "first_arrival": 1,
+          "reward": 70.61648087855428,
+          "seed": 2,
+          "settled_actions": 0,
+          "steps": 236,
+          "survived": false
+        },
+        {
+          "final_distance": 8.598095893859863,
+          "final_heading_error": 1.0677225589752197,
+          "final_speed": 10.238140106201172,
+          "first_arrival": 1,
+          "reward": 62.94818424510595,
+          "seed": 42,
+          "settled_actions": 0,
+          "steps": 249,
+          "survived": false
+        },
+        {
+          "final_distance": 2.9552652835845947,
+          "final_heading_error": 1.5067652463912964,
+          "final_speed": 0.6940907835960388,
+          "first_arrival": 1,
+          "reward": 65.91606439059251,
+          "seed": 18446744073709551615,
+          "settled_actions": 0,
+          "steps": 254,
+          "survived": false
+        }
+      ],
+      "lesson": "travel-endurance",
+      "optimizer_steps": 604,
+      "passed": false,
+      "update": 100
+    },
+    {
+      "episodes": [
+        {
+          "final_distance": 10.379225730895996,
+          "final_heading_error": 1.7780336141586304,
+          "final_speed": 10.952240943908691,
+          "first_arrival": 1,
+          "reward": 42.400691251503304,
+          "seed": 0,
+          "settled_actions": 0,
+          "steps": 165,
+          "survived": false
+        },
+        {
+          "final_distance": 10.087749481201172,
+          "final_heading_error": 0.3902173638343811,
+          "final_speed": 9.871566772460938,
+          "first_arrival": 1,
+          "reward": 49.00434455834329,
+          "seed": 1,
+          "settled_actions": 0,
+          "steps": 164,
+          "survived": false
+        },
+        {
+          "final_distance": 9.717988967895508,
+          "final_heading_error": 0.015411995351314545,
+          "final_speed": 7.005923748016357,
+          "first_arrival": 1,
+          "reward": 60.6185935465619,
+          "seed": 2,
+          "settled_actions": 0,
+          "steps": 204,
+          "survived": false
+        },
+        {
+          "final_distance": 10.767146110534668,
+          "final_heading_error": 1.1179898977279663,
+          "final_speed": 9.379535675048828,
+          "first_arrival": 1,
+          "reward": 54.941209085285664,
+          "seed": 42,
+          "settled_actions": 0,
+          "steps": 177,
+          "survived": false
+        },
+        {
+          "final_distance": 3.3595638275146484,
+          "final_heading_error": 2.5527429580688477,
+          "final_speed": 3.2830240726470947,
+          "first_arrival": 1,
+          "reward": 53.3181422194466,
+          "seed": 18446744073709551615,
+          "settled_actions": 0,
+          "steps": 227,
+          "survived": false
+        }
+      ],
+      "lesson": "travel-endurance",
+      "optimizer_steps": 764,
+      "passed": false,
+      "update": 120
+    },
+    {
+      "episodes": [
+        {
+          "final_distance": 10.553101539611816,
+          "final_heading_error": 0.7373496294021606,
+          "final_speed": 7.351062774658203,
+          "first_arrival": 1,
+          "reward": 47.325423867907375,
+          "seed": 0,
+          "settled_actions": 0,
+          "steps": 234,
+          "survived": false
+        },
+        {
+          "final_distance": 8.26507568359375,
+          "final_heading_error": 0.28048354387283325,
+          "final_speed": 2.386491537094116,
+          "first_arrival": 1,
+          "reward": 52.35463161487132,
+          "seed": 1,
+          "settled_actions": 0,
+          "steps": 227,
+          "survived": false
+        },
+        {
+          "final_distance": 8.103147506713867,
+          "final_heading_error": 0.16695737838745117,
+          "final_speed": 11.654701232910156,
+          "first_arrival": 1,
+          "reward": 66.15299004781991,
+          "seed": 2,
+          "settled_actions": 0,
+          "steps": 243,
+          "survived": false
+        },
+        {
+          "final_distance": 3.781888008117676,
+          "final_heading_error": 0.06827081739902496,
+          "final_speed": 0.9600884914398193,
+          "first_arrival": 1,
+          "reward": 59.61759935133159,
+          "seed": 42,
+          "settled_actions": 0,
+          "steps": 254,
+          "survived": false
+        },
+        {
+          "final_distance": 10.24892520904541,
+          "final_heading_error": 2.150186777114868,
+          "final_speed": 9.22498893737793,
+          "first_arrival": 1,
+          "reward": 60.27087635041971,
+          "seed": 18446744073709551615,
+          "settled_actions": 0,
+          "steps": 242,
+          "survived": false
+        }
+      ],
+      "lesson": "travel-endurance",
+      "optimizer_steps": 924,
+      "passed": false,
+      "update": 140
+    },
+    {
+      "episodes": [
+        {
+          "final_distance": 8.507553100585938,
+          "final_heading_error": 0.3227165937423706,
+          "final_speed": 4.213749885559082,
+          "first_arrival": 1,
+          "reward": 53.64231946063228,
+          "seed": 0,
+          "settled_actions": 0,
+          "steps": 222,
+          "survived": false
+        },
+        {
+          "final_distance": 10.49500560760498,
+          "final_heading_error": 0.45476606488227844,
+          "final_speed": 10.606588363647461,
+          "first_arrival": 1,
+          "reward": 57.56652950437274,
+          "seed": 1,
+          "settled_actions": 0,
+          "steps": 292,
+          "survived": false
+        },
+        {
+          "final_distance": 7.5063934326171875,
+          "final_heading_error": 2.5793240070343018,
+          "final_speed": 4.152221202850342,
+          "first_arrival": 1,
+          "reward": 71.26017679576762,
+          "seed": 2,
+          "settled_actions": 0,
+          "steps": 319,
+          "survived": false
+        },
+        {
+          "final_distance": 11.738384246826172,
+          "final_heading_error": 1.5823898315429688,
+          "final_speed": 8.490242004394531,
+          "first_arrival": 1,
+          "reward": 64.58558888291009,
+          "seed": 42,
+          "settled_actions": 0,
+          "steps": 297,
+          "survived": false
+        },
+        {
+          "final_distance": 5.904725074768066,
+          "final_heading_error": 3.07184100151062,
+          "final_speed": 9.306306838989258,
+          "first_arrival": 1,
+          "reward": 68.00970143585255,
+          "seed": 18446744073709551615,
+          "settled_actions": 0,
+          "steps": 277,
+          "survived": false
+        }
+      ],
+      "lesson": "travel-endurance",
+      "optimizer_steps": 1072,
+      "passed": false,
+      "update": 160
+    },
+    {
+      "episodes": [
+        {
+          "final_distance": 8.472723960876465,
+          "final_heading_error": 0.4219000041484833,
+          "final_speed": 7.354910373687744,
+          "first_arrival": 1,
+          "reward": 64.10241704434156,
+          "seed": 0,
+          "settled_actions": 0,
+          "steps": 296,
+          "survived": false
+        },
+        {
+          "final_distance": 11.82066535949707,
+          "final_heading_error": 0.5842352509498596,
+          "final_speed": 21.427122116088867,
+          "first_arrival": 1,
+          "reward": 69.06872633006424,
+          "seed": 1,
+          "settled_actions": 0,
+          "steps": 421,
+          "survived": false
+        },
+        {
+          "final_distance": 9.488748550415039,
+          "final_heading_error": 1.2705918550491333,
+          "final_speed": 8.969258308410645,
+          "first_arrival": 1,
+          "reward": 80.78397898193361,
+          "seed": 2,
+          "settled_actions": 0,
+          "steps": 273,
+          "survived": false
+        },
+        {
+          "final_distance": 2.334995746612549,
+          "final_heading_error": 0.32002127170562744,
+          "final_speed": 5.923479080200195,
+          "first_arrival": 1,
+          "reward": 76.60178764397278,
+          "seed": 42,
+          "settled_actions": 0,
+          "steps": 385,
+          "survived": false
+        },
+        {
+          "final_distance": 7.524160861968994,
+          "final_heading_error": 0.20617274940013885,
+          "final_speed": 3.251331090927124,
+          "first_arrival": 1,
+          "reward": 78.34923031210201,
+          "seed": 18446744073709551615,
+          "settled_actions": 0,
+          "steps": 258,
+          "survived": false
+        }
+      ],
+      "lesson": "travel-endurance",
+      "optimizer_steps": 1228,
+      "passed": false,
+      "update": 180
+    },
+    {
+      "episodes": [
+        {
+          "final_distance": 11.159167289733887,
+          "final_heading_error": 0.5590267181396484,
+          "final_speed": 11.949978828430176,
+          "first_arrival": 1,
+          "reward": 58.556315143126994,
+          "seed": 0,
+          "settled_actions": 0,
+          "steps": 224,
+          "survived": false
+        },
+        {
+          "final_distance": 6.94709587097168,
+          "final_heading_error": 0.39381739497184753,
+          "final_speed": 5.114131450653076,
+          "first_arrival": 1,
+          "reward": 57.304694681894034,
+          "seed": 1,
+          "settled_actions": 0,
+          "steps": 262,
+          "survived": false
+        },
+        {
+          "final_distance": 6.900946140289307,
+          "final_heading_error": 2.8058598041534424,
+          "final_speed": 4.049346923828125,
+          "first_arrival": 1,
+          "reward": 72.01899072824745,
+          "seed": 2,
+          "settled_actions": 0,
+          "steps": 331,
+          "survived": false
+        },
+        {
+          "final_distance": 10.80843734741211,
+          "final_heading_error": 0.9329690933227539,
+          "final_speed": 10.604321479797363,
+          "first_arrival": 1,
+          "reward": 65.35436204168946,
+          "seed": 42,
+          "settled_actions": 0,
+          "steps": 285,
+          "survived": false
+        },
+        {
+          "final_distance": 6.7698750495910645,
+          "final_heading_error": 2.7807834148406982,
+          "final_speed": 5.21090030670166,
+          "first_arrival": 1,
+          "reward": 69.65353111409058,
+          "seed": 18446744073709551615,
+          "settled_actions": 0,
+          "steps": 254,
+          "survived": false
+        }
+      ],
+      "lesson": "travel-endurance",
+      "optimizer_steps": 1372,
+      "passed": false,
+      "update": 200
+    },
+    {
+      "episodes": [
+        {
+          "final_distance": 3.2694404125213623,
+          "final_heading_error": 0.48247671127319336,
+          "final_speed": 7.833617210388184,
+          "first_arrival": 1,
+          "reward": 63.33620784152299,
+          "seed": 0,
+          "settled_actions": 0,
+          "steps": 333,
+          "survived": false
+        },
+        {
+          "final_distance": 6.352899551391602,
+          "final_heading_error": 0.733350932598114,
+          "final_speed": 3.4881482124328613,
+          "first_arrival": 1,
+          "reward": 55.087931552901864,
+          "seed": 1,
+          "settled_actions": 0,
+          "steps": 227,
+          "survived": false
+        },
+        {
+          "final_distance": 3.6260106563568115,
+          "final_heading_error": 0.4175240099430084,
+          "final_speed": 3.2457616329193115,
+          "first_arrival": 1,
+          "reward": 74.87204645946622,
+          "seed": 2,
+          "settled_actions": 0,
+          "steps": 297,
+          "survived": false
+        },
+        {
+          "final_distance": 6.404884338378906,
+          "final_heading_error": 1.4015156030654907,
+          "final_speed": 2.759479522705078,
+          "first_arrival": 1,
+          "reward": 62.65518614090979,
+          "seed": 42,
+          "settled_actions": 0,
+          "steps": 254,
+          "survived": false
+        },
+        {
+          "final_distance": 7.460305690765381,
+          "final_heading_error": 0.7888097167015076,
+          "final_speed": 7.584719657897949,
+          "first_arrival": 1,
+          "reward": 70.7020816981094,
+          "seed": 18446744073709551615,
+          "settled_actions": 0,
+          "steps": 262,
+          "survived": false
+        }
+      ],
+      "lesson": "travel-endurance",
+      "optimizer_steps": 1516,
+      "passed": false,
+      "update": 220
+    },
+    {
+      "episodes": [
+        {
+          "final_distance": 13.264275550842285,
+          "final_heading_error": 1.7457813024520874,
+          "final_speed": 13.1014404296875,
+          "first_arrival": 1,
+          "reward": 122.12884137088258,
+          "seed": 0,
+          "settled_actions": 0,
+          "steps": 590,
+          "survived": false
+        },
+        {
+          "final_distance": 10.952564239501953,
+          "final_heading_error": 1.0313987731933594,
+          "final_speed": 10.407246589660645,
+          "first_arrival": 1,
+          "reward": 115.31575669469748,
+          "seed": 1,
+          "settled_actions": 0,
+          "steps": 615,
+          "survived": false
+        },
+        {
+          "final_distance": 10.396392822265625,
+          "final_heading_error": 2.1253225803375244,
+          "final_speed": 12.107317924499512,
+          "first_arrival": 1,
+          "reward": 112.97053290542681,
+          "seed": 2,
+          "settled_actions": 0,
+          "steps": 487,
+          "survived": false
+        },
+        {
+          "final_distance": 12.896292686462402,
+          "final_heading_error": 1.8062188625335693,
+          "final_speed": 13.696898460388184,
+          "first_arrival": 1,
+          "reward": 126.87763348832715,
+          "seed": 42,
+          "settled_actions": 0,
+          "steps": 630,
+          "survived": false
+        },
+        {
+          "final_distance": 11.532830238342285,
+          "final_heading_error": 1.2527544498443604,
+          "final_speed": 12.035627365112305,
+          "first_arrival": 1,
+          "reward": 104.08991952299644,
+          "seed": 18446744073709551615,
+          "settled_actions": 0,
+          "steps": 420,
+          "survived": false
+        }
+      ],
+      "lesson": "travel-endurance",
+      "optimizer_steps": 1660,
+      "passed": false,
+      "update": 240
+    },
+    {
+      "episodes": [
+        {
+          "final_distance": 2.83453106880188,
+          "final_heading_error": 2.9756076335906982,
+          "final_speed": 1.6455624103546143,
+          "first_arrival": 1,
+          "reward": 343.5637768940287,
+          "seed": 0,
+          "settled_actions": 0,
+          "steps": 1000,
+          "survived": true
+        },
+        {
+          "final_distance": 2.888007402420044,
+          "final_heading_error": 2.9151768684387207,
+          "final_speed": 1.5174106359481812,
+          "first_arrival": 1,
+          "reward": 364.7220721576723,
+          "seed": 1,
+          "settled_actions": 0,
+          "steps": 1000,
+          "survived": true
+        },
+        {
+          "final_distance": 2.103816032409668,
+          "final_heading_error": 2.598147392272949,
+          "final_speed": 2.073059558868408,
+          "first_arrival": 1,
+          "reward": 321.8607788982696,
+          "seed": 2,
+          "settled_actions": 0,
+          "steps": 1000,
+          "survived": true
+        },
+        {
+          "final_distance": 2.648122787475586,
+          "final_heading_error": 1.3541427850723267,
+          "final_speed": 1.38041353225708,
+          "first_arrival": 1,
+          "reward": 275.82005859612036,
+          "seed": 42,
+          "settled_actions": 0,
+          "steps": 1000,
+          "survived": true
+        },
+        {
+          "final_distance": 1.7104417085647583,
+          "final_heading_error": 2.347946882247925,
+          "final_speed": 3.0423712730407715,
+          "first_arrival": 1,
+          "reward": 250.15614287227845,
+          "seed": 18446744073709551615,
+          "settled_actions": 0,
+          "steps": 1000,
+          "survived": true
+        }
+      ],
+      "lesson": "travel-endurance",
+      "optimizer_steps": 1788,
+      "passed": false,
+      "update": 260
+    },
+    {
+      "episodes": [
+        {
+          "final_distance": 1.5468759536743164,
+          "final_heading_error": 1.8487975597381592,
+          "final_speed": 0.6388970613479614,
+          "first_arrival": 1,
+          "reward": 244.0159794371575,
+          "seed": 0,
+          "settled_actions": 0,
+          "steps": 1000,
+          "survived": true
+        },
+        {
+          "final_distance": 1.5108208656311035,
+          "final_heading_error": 2.6688241958618164,
+          "final_speed": 0.6117260456085205,
+          "first_arrival": 1,
+          "reward": 333.47664287500083,
+          "seed": 1,
+          "settled_actions": 0,
+          "steps": 1000,
+          "survived": true
+        },
+        {
+          "final_distance": 1.4138630628585815,
+          "final_heading_error": 0.4521803855895996,
+          "final_speed": 0.6168922185897827,
+          "first_arrival": 1,
+          "reward": 438.2582571565654,
+          "seed": 2,
+          "settled_actions": 0,
+          "steps": 1000,
+          "survived": true
+        },
+        {
+          "final_distance": 1.655137538909912,
+          "final_heading_error": 0.21932601928710938,
+          "final_speed": 0.5869365334510803,
+          "first_arrival": 1,
+          "reward": 192.42693513928486,
+          "seed": 42,
+          "settled_actions": 0,
+          "steps": 1000,
+          "survived": true
+        },
+        {
+          "final_distance": 1.6750651597976685,
+          "final_heading_error": 2.8218936920166016,
+          "final_speed": 1.3009039163589478,
+          "first_arrival": 1,
+          "reward": 398.5204672790901,
+          "seed": 18446744073709551615,
+          "settled_actions": 0,
+          "steps": 1000,
+          "survived": true
+        }
+      ],
+      "lesson": "travel-endurance",
+      "optimizer_steps": 1904,
+      "passed": false,
+      "update": 280
+    },
+    {
+      "episodes": [
+        {
+          "final_distance": 7.433738708496094,
+          "final_heading_error": 1.9358562231063843,
+          "final_speed": 2.3897464275360107,
+          "first_arrival": 1,
+          "reward": 100.20043635647744,
+          "seed": 0,
+          "settled_actions": 0,
+          "steps": 580,
+          "survived": false
+        },
+        {
+          "final_distance": 6.3537373542785645,
+          "final_heading_error": 1.8669532537460327,
+          "final_speed": 4.474313259124756,
+          "first_arrival": 1,
+          "reward": 113.23255684389733,
+          "seed": 1,
+          "settled_actions": 0,
+          "steps": 614,
+          "survived": false
+        },
+        {
+          "final_distance": 8.074283599853516,
+          "final_heading_error": 2.015199899673462,
+          "final_speed": 4.68698787689209,
+          "first_arrival": 1,
+          "reward": 104.80994626344182,
+          "seed": 2,
+          "settled_actions": 0,
+          "steps": 739,
+          "survived": false
+        },
+        {
+          "final_distance": 5.992847442626953,
+          "final_heading_error": 2.894946813583374,
+          "final_speed": 6.179985046386719,
+          "first_arrival": 1,
+          "reward": 92.32081214448408,
+          "seed": 42,
+          "settled_actions": 0,
+          "steps": 581,
+          "survived": false
+        },
+        {
+          "final_distance": 5.348289966583252,
+          "final_heading_error": 0.4032309055328369,
+          "final_speed": 0.8074294924736023,
+          "first_arrival": 1,
+          "reward": 198.69705146178603,
+          "seed": 18446744073709551615,
+          "settled_actions": 0,
+          "steps": 1000,
+          "survived": true
+        }
+      ],
+      "lesson": "travel-endurance",
+      "optimizer_steps": 2024,
+      "passed": false,
+      "update": 300
+    },
+    {
+      "episodes": [
+        {
+          "final_distance": 8.260210990905762,
+          "final_heading_error": 2.6708292961120605,
+          "final_speed": 4.676607608795166,
+          "first_arrival": 1,
+          "reward": 97.00666559180536,
+          "seed": 0,
+          "settled_actions": 0,
+          "steps": 563,
+          "survived": false
+        },
+        {
+          "final_distance": 12.417162895202637,
+          "final_heading_error": 1.0402334928512573,
+          "final_speed": 2.2433552742004395,
+          "first_arrival": 1,
+          "reward": 100.67075687538909,
+          "seed": 1,
+          "settled_actions": 0,
+          "steps": 694,
+          "survived": false
+        },
+        {
+          "final_distance": 9.21760368347168,
+          "final_heading_error": 1.5553855895996094,
+          "final_speed": 4.719038486480713,
+          "first_arrival": 1,
+          "reward": 98.07932853718012,
+          "seed": 2,
+          "settled_actions": 0,
+          "steps": 841,
+          "survived": false
+        },
+        {
+          "final_distance": 7.003348350524902,
+          "final_heading_error": 3.043785810470581,
+          "final_speed": 4.71539306640625,
+          "first_arrival": 1,
+          "reward": 83.96610987368331,
+          "seed": 42,
+          "settled_actions": 0,
+          "steps": 582,
+          "survived": false
+        },
+        {
+          "final_distance": 3.0235748291015625,
+          "final_heading_error": 0.8535037636756897,
+          "final_speed": 1.983825922012329,
+          "first_arrival": 1,
+          "reward": 111.73488380051276,
+          "seed": 18446744073709551615,
+          "settled_actions": 0,
+          "steps": 625,
+          "survived": false
+        }
+      ],
+      "lesson": "travel-endurance",
+      "optimizer_steps": 2148,
+      "passed": false,
+      "update": 320
+    },
+    {
+      "episodes": [
+        {
+          "final_distance": 11.153448104858398,
+          "final_heading_error": 0.5599080920219421,
+          "final_speed": 6.364952564239502,
+          "first_arrival": 1,
+          "reward": 85.0591346216388,
+          "seed": 0,
+          "settled_actions": 0,
+          "steps": 392,
+          "survived": false
+        },
+        {
+          "final_distance": 10.925870895385742,
+          "final_heading_error": 1.6794472932815552,
+          "final_speed": 6.869284152984619,
+          "first_arrival": 1,
+          "reward": 87.48983818455599,
+          "seed": 1,
+          "settled_actions": 0,
+          "steps": 531,
+          "survived": false
+        },
+        {
+          "final_distance": 3.7609474658966064,
+          "final_heading_error": 2.6568655967712402,
+          "final_speed": 2.6776111125946045,
+          "first_arrival": 1,
+          "reward": 60.793247733148746,
+          "seed": 2,
+          "settled_actions": 0,
+          "steps": 462,
+          "survived": false
+        },
+        {
+          "final_distance": 7.674471855163574,
+          "final_heading_error": 1.4264055490493774,
+          "final_speed": 2.1552042961120605,
+          "first_arrival": 1,
+          "reward": 75.40033928770572,
+          "seed": 42,
+          "settled_actions": 0,
+          "steps": 433,
+          "survived": false
+        },
+        {
+          "final_distance": 4.282535552978516,
+          "final_heading_error": 0.9574458003044128,
+          "final_speed": 1.9109982252120972,
+          "first_arrival": 1,
+          "reward": 84.14244585607958,
+          "seed": 18446744073709551615,
+          "settled_actions": 0,
+          "steps": 412,
+          "survived": false
+        }
+      ],
+      "lesson": "travel-endurance",
+      "optimizer_steps": 2260,
+      "passed": false,
+      "update": 340
+    },
+    {
+      "episodes": [
+        {
+          "final_distance": 6.315663814544678,
+          "final_heading_error": 0.9933356046676636,
+          "final_speed": 8.79084587097168,
+          "first_arrival": 1,
+          "reward": 71.19451249472331,
+          "seed": 0,
+          "settled_actions": 0,
+          "steps": 401,
+          "survived": false
+        },
+        {
+          "final_distance": 8.589619636535645,
+          "final_heading_error": 0.050466254353523254,
+          "final_speed": 6.183427810668945,
+          "first_arrival": 1,
+          "reward": 67.62203354097437,
+          "seed": 1,
+          "settled_actions": 0,
+          "steps": 403,
+          "survived": false
+        },
+        {
+          "final_distance": 7.314362525939941,
+          "final_heading_error": 2.961778402328491,
+          "final_speed": 9.089566230773926,
+          "first_arrival": 1,
+          "reward": 50.7854259472806,
+          "seed": 2,
+          "settled_actions": 0,
+          "steps": 345,
+          "survived": false
+        },
+        {
+          "final_distance": 8.084142684936523,
+          "final_heading_error": 0.22187478840351105,
+          "final_speed": 4.52893590927124,
+          "first_arrival": 1,
+          "reward": 61.7329486933304,
+          "seed": 42,
+          "settled_actions": 0,
+          "steps": 400,
+          "survived": false
+        },
+        {
+          "final_distance": 7.481091499328613,
+          "final_heading_error": 2.4253666400909424,
+          "final_speed": 6.9976606369018555,
+          "first_arrival": 1,
+          "reward": 76.05360462656245,
+          "seed": 18446744073709551615,
+          "settled_actions": 0,
+          "steps": 507,
+          "survived": false
+        }
+      ],
+      "lesson": "travel-endurance",
+      "optimizer_steps": 2404,
+      "passed": false,
+      "update": 360
+    },
+    {
+      "episodes": [
+        {
+          "final_distance": 11.114782333374023,
+          "final_heading_error": 0.9105611443519592,
+          "final_speed": 4.959512710571289,
+          "first_arrival": 1,
+          "reward": 61.988863518461585,
+          "seed": 0,
+          "settled_actions": 0,
+          "steps": 285,
+          "survived": false
+        },
+        {
+          "final_distance": 10.333966255187988,
+          "final_heading_error": 0.3316033184528351,
+          "final_speed": 1.271780014038086,
+          "first_arrival": 1,
+          "reward": 61.03059583995491,
+          "seed": 1,
+          "settled_actions": 0,
+          "steps": 316,
+          "survived": false
+        },
+        {
+          "final_distance": 12.842750549316406,
+          "final_heading_error": 2.0457732677459717,
+          "final_speed": 6.206215858459473,
+          "first_arrival": 1,
+          "reward": 53.38703053214704,
+          "seed": 2,
+          "settled_actions": 0,
+          "steps": 587,
+          "survived": false
+        },
+        {
+          "final_distance": 9.549113273620605,
+          "final_heading_error": 0.2108779400587082,
+          "final_speed": 2.5027432441711426,
+          "first_arrival": 1,
+          "reward": 57.417686343193054,
+          "seed": 42,
+          "settled_actions": 0,
+          "steps": 298,
+          "survived": false
+        },
+        {
+          "final_distance": 7.681209564208984,
+          "final_heading_error": 2.3623697757720947,
+          "final_speed": 4.897769927978516,
+          "first_arrival": 1,
+          "reward": 61.61229176586494,
+          "seed": 18446744073709551615,
+          "settled_actions": 0,
+          "steps": 321,
+          "survived": false
+        }
+      ],
+      "lesson": "travel-endurance",
+      "optimizer_steps": 2564,
+      "passed": false,
+      "update": 380
+    },
+    {
+      "episodes": [
+        {
+          "final_distance": 10.440309524536133,
+          "final_heading_error": 0.7559350728988647,
+          "final_speed": 3.509657621383667,
+          "first_arrival": 1,
+          "reward": 67.71983147785068,
+          "seed": 0,
+          "settled_actions": 0,
+          "steps": 286,
+          "survived": false
+        },
+        {
+          "final_distance": 7.410179615020752,
+          "final_heading_error": 2.9805455207824707,
+          "final_speed": 2.8754477500915527,
+          "first_arrival": 1,
+          "reward": 71.84238627477316,
+          "seed": 1,
+          "settled_actions": 0,
+          "steps": 332,
+          "survived": false
+        },
+        {
+          "final_distance": 4.590536594390869,
+          "final_heading_error": 0.6963500380516052,
+          "final_speed": 2.302466630935669,
+          "first_arrival": 1,
+          "reward": 63.61190675199032,
+          "seed": 2,
+          "settled_actions": 0,
+          "steps": 353,
+          "survived": false
+        },
+        {
+          "final_distance": 4.822319984436035,
+          "final_heading_error": 2.1192545890808105,
+          "final_speed": 4.009462833404541,
+          "first_arrival": 1,
+          "reward": 66.4152401793981,
+          "seed": 42,
+          "settled_actions": 0,
+          "steps": 331,
+          "survived": false
+        },
+        {
+          "final_distance": 2.728756904602051,
+          "final_heading_error": 0.14127284288406372,
+          "final_speed": 3.7277965545654297,
+          "first_arrival": 1,
+          "reward": 84.90001665707678,
+          "seed": 18446744073709551615,
+          "settled_actions": 0,
+          "steps": 410,
+          "survived": false
+        }
+      ],
+      "lesson": "travel-endurance",
+      "optimizer_steps": 2708,
+      "passed": false,
+      "update": 400
+    },
+    {
+      "episodes": [
+        {
+          "final_distance": 9.055184364318848,
+          "final_heading_error": 1.5195547342300415,
+          "final_speed": 9.85969066619873,
+          "first_arrival": 1,
+          "reward": 62.656208478379995,
+          "seed": 0,
+          "settled_actions": 0,
+          "steps": 244,
+          "survived": false
+        },
+        {
+          "final_distance": 8.875139236450195,
+          "final_heading_error": 0.9964183568954468,
+          "final_speed": 9.713159561157227,
+          "first_arrival": 1,
+          "reward": 74.99691818468273,
+          "seed": 1,
+          "settled_actions": 0,
+          "steps": 289,
+          "survived": false
+        },
+        {
+          "final_distance": 5.98427152633667,
+          "final_heading_error": 0.5390612483024597,
+          "final_speed": 6.279923915863037,
+          "first_arrival": 1,
+          "reward": 63.16978686489165,
+          "seed": 2,
+          "settled_actions": 0,
+          "steps": 298,
+          "survived": false
+        },
+        {
+          "final_distance": 7.575841903686523,
+          "final_heading_error": 1.8158860206604004,
+          "final_speed": 7.3266215324401855,
+          "first_arrival": 1,
+          "reward": 70.98947159014642,
+          "seed": 42,
+          "settled_actions": 0,
+          "steps": 279,
+          "survived": false
+        },
+        {
+          "final_distance": 7.600918769836426,
+          "final_heading_error": 1.862158179283142,
+          "final_speed": 3.4728963375091553,
+          "first_arrival": 1,
+          "reward": 75.06668833829463,
+          "seed": 18446744073709551615,
+          "settled_actions": 0,
+          "steps": 319,
+          "survived": false
+        }
+      ],
+      "lesson": "travel-endurance",
+      "optimizer_steps": 2852,
+      "passed": false,
+      "update": 420
+    },
+    {
+      "episodes": [
+        {
+          "final_distance": 7.388255596160889,
+          "final_heading_error": 1.3623396158218384,
+          "final_speed": 7.752151966094971,
+          "first_arrival": 1,
+          "reward": 60.49143134243786,
+          "seed": 0,
+          "settled_actions": 0,
+          "steps": 238,
+          "survived": false
+        },
+        {
+          "final_distance": 8.93492317199707,
+          "final_heading_error": 1.0061343908309937,
+          "final_speed": 9.004846572875977,
+          "first_arrival": 1,
+          "reward": 77.83379516005516,
+          "seed": 1,
+          "settled_actions": 0,
+          "steps": 284,
+          "survived": false
+        },
+        {
+          "final_distance": 6.76770544052124,
+          "final_heading_error": 1.5254207849502563,
+          "final_speed": 6.566649913787842,
+          "first_arrival": 1,
+          "reward": 71.85280625987798,
+          "seed": 2,
+          "settled_actions": 0,
+          "steps": 299,
+          "survived": false
+        },
+        {
+          "final_distance": 8.57187557220459,
+          "final_heading_error": 0.06782305240631104,
+          "final_speed": 10.225605010986328,
+          "first_arrival": 1,
+          "reward": 77.49382826313376,
+          "seed": 42,
+          "settled_actions": 0,
+          "steps": 279,
+          "survived": false
+        },
+        {
+          "final_distance": 7.347487449645996,
+          "final_heading_error": 2.0906121730804443,
+          "final_speed": 2.550976276397705,
+          "first_arrival": 1,
+          "reward": 78.3091299510561,
+          "seed": 18446744073709551615,
+          "settled_actions": 0,
+          "steps": 312,
+          "survived": false
+        }
+      ],
+      "lesson": "travel-endurance",
+      "optimizer_steps": 3000,
+      "passed": false,
+      "update": 440
+    },
+    {
+      "episodes": [
+        {
+          "final_distance": 5.315650939941406,
+          "final_heading_error": 0.8096917271614075,
+          "final_speed": 7.139169692993164,
+          "first_arrival": 1,
+          "reward": 64.91792249120772,
+          "seed": 0,
+          "settled_actions": 0,
+          "steps": 305,
+          "survived": false
+        },
+        {
+          "final_distance": 10.186396598815918,
+          "final_heading_error": 0.3962894380092621,
+          "final_speed": 7.8654866218566895,
+          "first_arrival": 1,
+          "reward": 91.56587579566985,
+          "seed": 1,
+          "settled_actions": 0,
+          "steps": 420,
+          "survived": false
+        },
+        {
+          "final_distance": 7.955392360687256,
+          "final_heading_error": 0.40797367691993713,
+          "final_speed": 3.268446207046509,
+          "first_arrival": 1,
+          "reward": 88.67866212129593,
+          "seed": 2,
+          "settled_actions": 0,
+          "steps": 343,
+          "survived": false
+        },
+        {
+          "final_distance": 10.543840408325195,
+          "final_heading_error": 0.02556762844324112,
+          "final_speed": 7.112593650817871,
+          "first_arrival": 1,
+          "reward": 92.98475558590144,
+          "seed": 42,
+          "settled_actions": 0,
+          "steps": 429,
+          "survived": false
+        },
+        {
+          "final_distance": 8.537688255310059,
+          "final_heading_error": 1.8702735900878906,
+          "final_speed": 3.5896711349487305,
+          "first_arrival": 1,
+          "reward": 87.82722963124979,
+          "seed": 18446744073709551615,
+          "settled_actions": 0,
+          "steps": 317,
+          "survived": false
+        }
+      ],
+      "lesson": "travel-endurance",
+      "optimizer_steps": 3136,
+      "passed": false,
+      "update": 460
+    },
+    {
+      "episodes": [
+        {
+          "final_distance": 2.9083645343780518,
+          "final_heading_error": 2.112706184387207,
+          "final_speed": 1.392707347869873,
+          "first_arrival": 1,
+          "reward": 99.91758889704943,
+          "seed": 0,
+          "settled_actions": 0,
+          "steps": 1000,
+          "survived": true
+        },
+        {
+          "final_distance": 4.183972358703613,
+          "final_heading_error": 1.8633625507354736,
+          "final_speed": 3.7345354557037354,
+          "first_arrival": 1,
+          "reward": 130.0399268195033,
+          "seed": 1,
+          "settled_actions": 0,
+          "steps": 802,
+          "survived": false
+        },
+        {
+          "final_distance": 4.0592193603515625,
+          "final_heading_error": 1.237774133682251,
+          "final_speed": 4.341829299926758,
+          "first_arrival": 1,
+          "reward": 138.77402845025063,
+          "seed": 2,
+          "settled_actions": 0,
+          "steps": 803,
+          "survived": false
+        },
+        {
+          "final_distance": 4.913812637329102,
+          "final_heading_error": 2.977343797683716,
+          "final_speed": 1.4126801490783691,
+          "first_arrival": 1,
+          "reward": 110.13917109041358,
+          "seed": 42,
+          "settled_actions": 0,
+          "steps": 1000,
+          "survived": true
+        },
+        {
+          "final_distance": 4.842659950256348,
+          "final_heading_error": 1.025972843170166,
+          "final_speed": 3.819953680038452,
+          "first_arrival": 1,
+          "reward": 204.17211316153407,
+          "seed": 18446744073709551615,
+          "settled_actions": 0,
+          "steps": 993,
+          "survived": false
+        }
+      ],
+      "lesson": "travel-endurance",
+      "optimizer_steps": 3268,
+      "passed": false,
+      "update": 480
+    },
+    {
+      "episodes": [
+        {
+          "final_distance": 0.8893408179283142,
+          "final_heading_error": 2.8840789794921875,
+          "final_speed": 0.9239553809165955,
+          "first_arrival": 1,
+          "reward": 310.5724565954879,
+          "seed": 0,
+          "settled_actions": 0,
+          "steps": 1000,
+          "survived": true
+        },
+        {
+          "final_distance": 0.8943365216255188,
+          "final_heading_error": 2.6314024925231934,
+          "final_speed": 0.9146100878715515,
+          "first_arrival": 1,
+          "reward": 317.0956980774017,
+          "seed": 1,
+          "settled_actions": 0,
+          "steps": 1000,
+          "survived": true
+        },
+        {
+          "final_distance": 0.9028812646865845,
+          "final_heading_error": 0.2609214782714844,
+          "final_speed": 0.8676472902297974,
+          "first_arrival": 1,
+          "reward": 287.689295778162,
+          "seed": 2,
+          "settled_actions": 0,
+          "steps": 1000,
+          "survived": true
+        },
+        {
+          "final_distance": 0.8815553784370422,
+          "final_heading_error": 1.511565089225769,
+          "final_speed": 0.9659759402275085,
+          "first_arrival": 1,
+          "reward": 289.08112058832194,
+          "seed": 42,
+          "settled_actions": 0,
+          "steps": 1000,
+          "survived": true
+        },
+        {
+          "final_distance": 0.9035655856132507,
+          "final_heading_error": 1.49466073513031,
+          "final_speed": 0.7207463383674622,
+          "first_arrival": 1,
+          "reward": 384.17711689505813,
+          "seed": 18446744073709551615,
+          "settled_actions": 0,
+          "steps": 1000,
+          "survived": true
+        }
+      ],
+      "lesson": "travel-endurance",
+      "optimizer_steps": 3384,
+      "passed": false,
+      "update": 500
+    },
+    {
+      "episodes": [
+        {
+          "final_distance": 0.9540561437606812,
+          "final_heading_error": 2.1170754432678223,
+          "final_speed": 1.1521196365356445,
+          "first_arrival": 1,
+          "reward": 310.84098386406185,
+          "seed": 0,
+          "settled_actions": 0,
+          "steps": 1000,
+          "survived": true
+        },
+        {
+          "final_distance": 0.9612289071083069,
+          "final_heading_error": 3.0525333881378174,
+          "final_speed": 1.261836051940918,
+          "first_arrival": 1,
+          "reward": 286.7528905644358,
+          "seed": 1,
+          "settled_actions": 0,
+          "steps": 1000,
+          "survived": true
+        },
+        {
+          "final_distance": 0.9469011425971985,
+          "final_heading_error": 0.37034541368484497,
+          "final_speed": 1.1274598836898804,
+          "first_arrival": 1,
+          "reward": 271.6328938187253,
+          "seed": 2,
+          "settled_actions": 0,
+          "steps": 1000,
+          "survived": true
+        },
+        {
+          "final_distance": 0.9017661809921265,
+          "final_heading_error": 1.8661890029907227,
+          "final_speed": 1.6648118495941162,
+          "first_arrival": 1,
+          "reward": 277.4252212916035,
+          "seed": 42,
+          "settled_actions": 0,
+          "steps": 1000,
+          "survived": true
+        },
+        {
+          "final_distance": 0.8696350455284119,
+          "final_heading_error": 1.746848702430725,
+          "final_speed": 0.9645082950592041,
+          "first_arrival": 1,
+          "reward": 325.4068807480435,
+          "seed": 18446744073709551615,
+          "settled_actions": 0,
+          "steps": 1000,
+          "survived": true
+        }
+      ],
+      "lesson": "travel-endurance",
+      "optimizer_steps": 3496,
+      "passed": false,
+      "update": 520
+    },
+    {
+      "episodes": [
+        {
+          "final_distance": 2.2612855434417725,
+          "final_heading_error": 1.7391769886016846,
+          "final_speed": 2.695162057876587,
+          "first_arrival": 1,
+          "reward": 166.7388405679012,
+          "seed": 0,
+          "settled_actions": 0,
+          "steps": 611,
+          "survived": false
+        },
+        {
+          "final_distance": 3.216917037963867,
+          "final_heading_error": 0.8664001822471619,
+          "final_speed": 5.402363300323486,
+          "first_arrival": 1,
+          "reward": 103.6136786127463,
+          "seed": 1,
+          "settled_actions": 0,
+          "steps": 390,
+          "survived": false
+        },
+        {
+          "final_distance": 4.596207141876221,
+          "final_heading_error": 1.1872931718826294,
+          "final_speed": 1.223921775817871,
+          "first_arrival": 1,
+          "reward": 106.09048331379017,
+          "seed": 2,
+          "settled_actions": 0,
+          "steps": 449,
+          "survived": false
+        },
+        {
+          "final_distance": 2.185558557510376,
+          "final_heading_error": 0.7802944183349609,
+          "final_speed": 5.968883037567139,
+          "first_arrival": 1,
+          "reward": 85.23614917993109,
+          "seed": 42,
+          "settled_actions": 0,
+          "steps": 359,
+          "survived": false
+        },
+        {
+          "final_distance": 2.322556257247925,
+          "final_heading_error": 1.5508005619049072,
+          "final_speed": 2.63907790184021,
+          "first_arrival": 1,
+          "reward": 217.53025884091767,
+          "seed": 18446744073709551615,
+          "settled_actions": 0,
+          "steps": 775,
+          "survived": false
+        }
+      ],
+      "lesson": "travel-endurance",
+      "optimizer_steps": 3608,
+      "passed": false,
+      "update": 540
+    },
+    {
+      "episodes": [
+        {
+          "final_distance": 5.556722640991211,
+          "final_heading_error": 3.0047848224639893,
+          "final_speed": 1.9110174179077148,
+          "first_arrival": 1,
+          "reward": 136.88635289576996,
+          "seed": 0,
+          "settled_actions": 0,
+          "steps": 460,
+          "survived": false
+        },
+        {
+          "final_distance": 7.071752071380615,
+          "final_heading_error": 1.7496778964996338,
+          "final_speed": 3.4552958011627197,
+          "first_arrival": 1,
+          "reward": 96.79048925847746,
+          "seed": 1,
+          "settled_actions": 0,
+          "steps": 424,
+          "survived": false
+        },
+        {
+          "final_distance": 5.098745346069336,
+          "final_heading_error": 2.9778857231140137,
+          "final_speed": 4.155099868774414,
+          "first_arrival": 1,
+          "reward": 106.2353403535526,
+          "seed": 2,
+          "settled_actions": 0,
+          "steps": 548,
+          "survived": false
+        },
+        {
+          "final_distance": 5.129007816314697,
+          "final_heading_error": 1.4157030582427979,
+          "final_speed": 7.251966953277588,
+          "first_arrival": 1,
+          "reward": 87.06975496350788,
+          "seed": 42,
+          "settled_actions": 0,
+          "steps": 372,
+          "survived": false
+        },
+        {
+          "final_distance": 1.1818774938583374,
+          "final_heading_error": 1.482851505279541,
+          "final_speed": 0.9090492129325867,
+          "first_arrival": 1,
+          "reward": 255.14093168141278,
+          "seed": 18446744073709551615,
+          "settled_actions": 0,
+          "steps": 1000,
+          "survived": true
+        }
+      ],
+      "lesson": "travel-endurance",
+      "optimizer_steps": 3716,
+      "passed": false,
+      "update": 560
+    },
+    {
+      "episodes": [
+        {
+          "final_distance": 1.6384752988815308,
+          "final_heading_error": 2.3811142444610596,
+          "final_speed": 0.20852479338645935,
+          "first_arrival": 1,
+          "reward": 209.58466161618708,
+          "seed": 0,
+          "settled_actions": 0,
+          "steps": 1000,
+          "survived": true
+        },
+        {
+          "final_distance": 0.870373010635376,
+          "final_heading_error": 2.6512293815612793,
+          "final_speed": 1.4818851947784424,
+          "first_arrival": 1,
+          "reward": 159.6191524375463,
+          "seed": 1,
+          "settled_actions": 0,
+          "steps": 1000,
+          "survived": true
+        },
+        {
+          "final_distance": 1.6398725509643555,
+          "final_heading_error": 1.0415934324264526,
+          "final_speed": 0.6590766310691833,
+          "first_arrival": 1,
+          "reward": 149.70814955965034,
+          "seed": 2,
+          "settled_actions": 0,
+          "steps": 1000,
+          "survived": true
+        },
+        {
+          "final_distance": 1.6061054468154907,
+          "final_heading_error": 1.2355990409851074,
+          "final_speed": 1.1014763116836548,
+          "first_arrival": 1,
+          "reward": 158.51534902320418,
+          "seed": 42,
+          "settled_actions": 0,
+          "steps": 1000,
+          "survived": true
+        },
+        {
+          "final_distance": 2.634993314743042,
+          "final_heading_error": 1.3230607509613037,
+          "final_speed": 2.0185070037841797,
+          "first_arrival": 1,
+          "reward": 310.9642871208489,
+          "seed": 18446744073709551615,
+          "settled_actions": 0,
+          "steps": 1000,
+          "survived": true
+        }
+      ],
+      "lesson": "travel-endurance",
+      "optimizer_steps": 3836,
+      "passed": false,
+      "update": 580
+    },
+    {
+      "episodes": [
+        {
+          "final_distance": 4.789483547210693,
+          "final_heading_error": 1.5822678804397583,
+          "final_speed": 4.2197699546813965,
+          "first_arrival": 1,
+          "reward": 128.28426163457334,
+          "seed": 0,
+          "settled_actions": 0,
+          "steps": 987,
+          "survived": false
+        },
+        {
+          "final_distance": 6.756106376647949,
+          "final_heading_error": 0.2569167912006378,
+          "final_speed": 2.4520580768585205,
+          "first_arrival": 1,
+          "reward": 155.6079578846693,
+          "seed": 1,
+          "settled_actions": 0,
+          "steps": 1000,
+          "survived": true
+        },
+        {
+          "final_distance": 8.708864212036133,
+          "final_heading_error": 1.284690260887146,
+          "final_speed": 8.765290260314941,
+          "first_arrival": 1,
+          "reward": 164.1698357053101,
+          "seed": 2,
+          "settled_actions": 0,
+          "steps": 903,
+          "survived": false
+        },
+        {
+          "final_distance": 2.1908979415893555,
+          "final_heading_error": 1.4198724031448364,
+          "final_speed": 1.3310941457748413,
+          "first_arrival": 1,
+          "reward": 116.48948218562873,
+          "seed": 42,
+          "settled_actions": 0,
+          "steps": 1000,
+          "survived": true
+        },
+        {
+          "final_distance": 7.3964056968688965,
+          "final_heading_error": 0.7386658191680908,
+          "final_speed": 2.846146583557129,
+          "first_arrival": 1,
+          "reward": 142.9469591465313,
+          "seed": 18446744073709551615,
+          "settled_actions": 0,
+          "steps": 634,
+          "survived": false
+        }
+      ],
+      "lesson": "travel-endurance",
+      "optimizer_steps": 3956,
+      "passed": false,
+      "update": 600
+    }
+  ],
+  "checkpoints": [
+    {
+      "update": 20,
+      "path": "runs/drone-travel/endurance-seed11-20261009/travel-endurance-20.mpk",
+      "sha256": "9aa204331569972e7c0bcde3762cf211f2562e03b0fd3c191117c05677d059d3"
+    },
+    {
+      "update": 40,
+      "path": "runs/drone-travel/endurance-seed11-20261009/travel-endurance-40.mpk",
+      "sha256": "72ab127f1e68fb450d5824623cb23ab46f10742994ea45dd0d5b3df116af2834"
+    },
+    {
+      "update": 60,
+      "path": "runs/drone-travel/endurance-seed11-20261009/travel-endurance-60.mpk",
+      "sha256": "cf657af653afee5f9e104498ebd6b5c4010760227ba20d72ab853212fe51d818"
+    },
+    {
+      "update": 80,
+      "path": "runs/drone-travel/endurance-seed11-20261009/travel-endurance-80.mpk",
+      "sha256": "1505e47bad96919809acaebb24c50da07d77f41c7631d270cb417411871653d9"
+    },
+    {
+      "update": 100,
+      "path": "runs/drone-travel/endurance-seed11-20261009/travel-endurance-100.mpk",
+      "sha256": "b8e843b901b62488918e6d9f564e4db92f192b1041145e2e85f2d23177e59bfd"
+    },
+    {
+      "update": 120,
+      "path": "runs/drone-travel/endurance-seed11-20261009/travel-endurance-120.mpk",
+      "sha256": "148d8585b33a9934793056b261618367dbf767bc9f125b5c42510e9094ca7ccb"
+    },
+    {
+      "update": 140,
+      "path": "runs/drone-travel/endurance-seed11-20261009/travel-endurance-140.mpk",
+      "sha256": "03b64e3ee57094057a0effc4b347393d98eabb60fe6174c23f1e2634c0346ed8"
+    },
+    {
+      "update": 160,
+      "path": "runs/drone-travel/endurance-seed11-20261009/travel-endurance-160.mpk",
+      "sha256": "d542786d1bdb0367f8460aedd75ba6827280d532dcd797b8a777860e62e851fd"
+    },
+    {
+      "update": 180,
+      "path": "runs/drone-travel/endurance-seed11-20261009/travel-endurance-180.mpk",
+      "sha256": "00c16aaa63450711cc796e12f85e84fd0abe72f65273da68a621d553adfc715f"
+    },
+    {
+      "update": 200,
+      "path": "runs/drone-travel/endurance-seed11-20261009/travel-endurance-200.mpk",
+      "sha256": "445359dc20973f86f64d7206059d5f0ed94477f1c38e033fa9fbdab827d96132"
+    },
+    {
+      "update": 220,
+      "path": "runs/drone-travel/endurance-seed11-20261009/travel-endurance-220.mpk",
+      "sha256": "0bf31ce30b2c2c11a331bde0de6f0d6a46d25f55724e777609c5d42b46d73018"
+    },
+    {
+      "update": 240,
+      "path": "runs/drone-travel/endurance-seed11-20261009/travel-endurance-240.mpk",
+      "sha256": "fa159789c92052e6b15182929c5200f87160e521edb7782fb120b68818d05feb"
+    },
+    {
+      "update": 260,
+      "path": "runs/drone-travel/endurance-seed11-20261009/travel-endurance-260.mpk",
+      "sha256": "080de230c0d89948d585b2096c4079060c8c7a359a27fe344484f37aae42c185"
+    },
+    {
+      "update": 280,
+      "path": "runs/drone-travel/endurance-seed11-20261009/travel-endurance-280.mpk",
+      "sha256": "b195ad57bd3fcc0f14882a78e1378300dfcc048d61a774791978ea76fa44fe81"
+    },
+    {
+      "update": 300,
+      "path": "runs/drone-travel/endurance-seed11-20261009/travel-endurance-300.mpk",
+      "sha256": "568c021dfe4731482a5ad63d159661ec83c248cfe67b18a6f8d591d91f627fec"
+    },
+    {
+      "update": 320,
+      "path": "runs/drone-travel/endurance-seed11-20261009/travel-endurance-320.mpk",
+      "sha256": "8ec663b7d9be720f637f73f90d8d83067a7508be4340b27940609a972da766be"
+    },
+    {
+      "update": 340,
+      "path": "runs/drone-travel/endurance-seed11-20261009/travel-endurance-340.mpk",
+      "sha256": "6299bb5ee6b4b90f46f9643b238f0ba438fd5413de6e6a911359c867f89f8422"
+    },
+    {
+      "update": 360,
+      "path": "runs/drone-travel/endurance-seed11-20261009/travel-endurance-360.mpk",
+      "sha256": "d9277e5a116fb50841bf9aeca8f5b190fcef6124b29f5cb351db8fefeb2e6020"
+    },
+    {
+      "update": 380,
+      "path": "runs/drone-travel/endurance-seed11-20261009/travel-endurance-380.mpk",
+      "sha256": "d1cd516c59b9324e6a199c985254960b40c0f29c9ce361dfa1246e9a93281ca5"
+    },
+    {
+      "update": 400,
+      "path": "runs/drone-travel/endurance-seed11-20261009/travel-endurance-400.mpk",
+      "sha256": "634c7e0c395514a47cbdc525fb5f5581b40397da4c7bd9d8732eac8fc9269071"
+    },
+    {
+      "update": 420,
+      "path": "runs/drone-travel/endurance-seed11-20261009/travel-endurance-420.mpk",
+      "sha256": "5abf4c4d2eaba6bf8a95413066aefca5fcfc592d6c16c4bd0b62e2678bb1a399"
+    },
+    {
+      "update": 440,
+      "path": "runs/drone-travel/endurance-seed11-20261009/travel-endurance-440.mpk",
+      "sha256": "69ce3477d0947a811455313d1be6498883050a6f7086466656aed4f7ce3f39c9"
+    },
+    {
+      "update": 460,
+      "path": "runs/drone-travel/endurance-seed11-20261009/travel-endurance-460.mpk",
+      "sha256": "b66d70fe3027a04362d21915857dc54f2c36b0b51f3c96c67c0362aa5415c12a"
+    },
+    {
+      "update": 480,
+      "path": "runs/drone-travel/endurance-seed11-20261009/travel-endurance-480.mpk",
+      "sha256": "c8aac963ce3440b42922564d2498b06cca3c1d326a4e8648aaf6a9a0b10ea98a"
+    },
+    {
+      "update": 500,
+      "path": "runs/drone-travel/endurance-seed11-20261009/travel-endurance-500.mpk",
+      "sha256": "96947f37bd2303733ef61a8a4c14ba8276d954ffbbaf789c13dcb0e6fa30a9cb"
+    },
+    {
+      "update": 520,
+      "path": "runs/drone-travel/endurance-seed11-20261009/travel-endurance-520.mpk",
+      "sha256": "d79e9c6c86f3fb1afb830caa9d2816cd4bf744a3ba88a8a6bbceac8ff783c63f"
+    },
+    {
+      "update": 540,
+      "path": "runs/drone-travel/endurance-seed11-20261009/travel-endurance-540.mpk",
+      "sha256": "cde4de74d896842a0cdf1b636484d48ed69ee54b5b4764fb98ea58a054f13196"
+    },
+    {
+      "update": 560,
+      "path": "runs/drone-travel/endurance-seed11-20261009/travel-endurance-560.mpk",
+      "sha256": "15e2f9dc5ae2899b1f8817fe6c40ab86df410d766687f930583c64bd2bd96bda"
+    },
+    {
+      "update": 580,
+      "path": "runs/drone-travel/endurance-seed11-20261009/travel-endurance-580.mpk",
+      "sha256": "48c4a8b4c8b8a01ea0cd0aa215d3cc848ed6945c189bb2aa4aadbf056546f00a"
+    },
+    {
+      "update": 600,
+      "path": "runs/drone-travel/endurance-seed11-20261009/travel-endurance-600.mpk",
+      "sha256": "124b5993a4d6723d72682741e0ba48c66e8d3dd8954e47f0270a540fde22ffe2"
+    }
+  ],
+  "qualification": "No promotion; budget exhausted. No travel or endurance checkpoint is qualified."
+}

@@ -1,8 +1,47 @@
 # Drone travel lesson
 
 Status: reusable environment, PPO training, and frozen inference implemented.
-Qualification and the standalone browser scene remain unfinished. Historical tracking
-weights are imitation-trained and do not qualify this lesson.
+The standalone scene displays an unqualified RL trial. No travel checkpoint is qualified.
+Historical tracking weights are imitation-trained and do not qualify this lesson.
+
+## Run the travel scene
+
+```sh
+nix develop --command cargo run --features robots --example drone-travel-scene
+```
+
+For browser playback:
+
+```sh
+nix develop --command scripts/build_drone_skills.sh
+python3 -m http.server 8000 --directory robot-web/skills-dist
+```
+
+Open [the travel trial](http://localhost:8000/travel/). Run or Space starts and pauses
+playback; Step or N applies one policy action; Reset or R restarts seed 42 and clears
+recurrent memory. The scene runs the same `TravelTask` near-stage environment and 13-feature
+encoder as training.
+
+The actor chooses every motor fraction. The camera and goal
+marker read observations only. The marker's radius is 0.5 m; its arrow shows the
+requested heading. Rendering does not move the physical body or select actions.
+
+The embedded `docs/progress/drone-travel-trial.mpk` is original seed-11 near-travel
+update 120, after 61,440 travel transitions from the qualified recovery actor.
+Its SHA-256 is `0f5a36039389e68c66281029d77eb2d7397bba8483e4a1f366092f512397d5f7`.
+It failed selection, and its full run later exhausted 600 updates without promotion.
+The scene labels it `Unqualified RL` and derives the displayed identity from loaded
+bytes.
+
+The seed-42 episode survives 1,000 actions but finishes approximately 0.97 m
+from the goal, with 150.7 degrees heading error and 1.60 m/s speed. Completion is
+not qualification. Load and inference errors prevent further actions; no fallback
+controller exists. Training remains a separate command below.
+
+[Scene evidence](progress/drone-travel-scene.json) records native/WASM action parity,
+coverage gaps, desktop/mobile recordings, inspected contact sheets, and licensed
+asset provenance. Mobile checks use a 390-pixel browser viewport, not a physical
+mobile device. Native window interaction remains unverified.
 
 ## Environment
 
