@@ -4,6 +4,26 @@ Updated: 2026-10-10. Current work: RL-only drone/droid curriculum.
 
 ## Resume here
 
+### Batched PPO and larger curriculum trials, 2026-10-10
+
+`e8b7941` batches recurrent actor evaluations and excludes padding before losses.
+Native and browser regressions pass against retained scalar results. The standing
+probe reduced warmed optimization from 5.32 to 0.47 seconds. The
+[batching record](./progress/recurrent-ppo-batching.json) preserves exact gates,
+coverage scope and existing strict personal-lint failures. CI was still running
+when the next travel trial launched; inspect its current result separately.
+
+The seed-13 standing run completed 2,400 updates and failed all 32 held-out cases.
+The [standing trial](./progress/droid-standing-batched-trial.json) now uses seed 17
+and a 24,000-update budget from the failed parent with highest selection mean reward.
+The [travel trial](./progress/drone-travel-batched-trial.json) uses seed 23 and
+24,000 updates per stage from the qualified recovery actor. Both retain fixed rewards,
+physical rules and gates. Both start fresh optimization, with provenance recorded.
+
+Inspect each unit and output before reporting progress. Standing and travel remain
+unqualified. Later skills, shared competitive training and browser 3v3 remain unfinished.
+The full RL-only browser 3v3 goal remains active.
+
 ### Travel storage recovery, 2026-10-10
 
 The seed-19 travel run stopped at update 1,520 with `No space left on device`.

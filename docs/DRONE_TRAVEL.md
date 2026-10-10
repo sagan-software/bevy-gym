@@ -26,6 +26,24 @@ The first fifteen optimizer records and update-20 selection report match the ori
 exactly. The update-20 checkpoint bytes differ, so byte reproducibility is not established.
 Held-out and independent-run evidence remain required.
 
+## Batched training trial
+
+The [seed-23 trial](./progress/drone-travel-batched-trial.json) uses the batched PPO
+optimizer at `e8b7941`, with a 24,000-update limit per stage. It transfers the same
+qualified recovery actor and inserts the same zero-weight heading input. The critic,
+Adam optimizers, counters and seed streams start fresh. Rewards, physical rules,
+observations, actions and promotion gates remain unchanged.
+
+The ten-update smoke run completed 5,120 RL transitions and failed selection.
+The first ten optimizer records in the larger trial match that smoke run exactly.
+This does not establish checkpoint-byte reproducibility or qualification. The older
+seed-19 recovery run remains preserved and runs independently until its budget ends.
+
+Before reporting progress, inspect
+`bevy-gym-travel-batched-seed23-20261010.service` and
+`runs/drone-travel/batched-seed23-20261010`. Held-out evaluation and independent
+run evidence remain required before promotion is reported.
+
 ## Run the travel scene
 
 ```sh

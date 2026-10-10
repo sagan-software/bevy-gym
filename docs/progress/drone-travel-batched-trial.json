@@ -1,0 +1,73 @@
+{
+  "recorded_utc": "2026-10-10T10:08:33.078223+00:00",
+  "source_revision": "e8b794137e2f90609a94d5a7092eebc393f2451b",
+  "binary": "/home/sagan/.cache/bevy-gym-quality-validation/travel-batched-seed23-20261010/drone-curriculum",
+  "binary_sha256": "20ad629b07ae606a353fd46fdfad7630590b830d932901613ebdb8de04c6f001",
+  "prerequisite_checkpoint": "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/docs/progress/drone-recovery-transfer.mpk",
+  "prerequisite_sha256": "7c2b9a6f2a0288faa27676d1514848710f4d5c24cd77505e75cf4990576a12b1",
+  "initialization": "qualified recovery actor with zero-weight heading input; fresh critic, Adam optimizers, counters and seed streams",
+  "seed": 23,
+  "updates_per_stage": 24000,
+  "stages": [
+    "travel-endurance",
+    "travel-near",
+    "travel-far",
+    "travel-fast"
+  ],
+  "promotion": "fixed per-case selection gates, then held-out and independent evidence; budget exhaustion fails",
+  "environment_and_rewards": "unchanged from source revision; no scripted actions",
+  "build_log": "/home/sagan/.cache/bevy-gym-quality-validation/travel-batching-build.log",
+  "build_log_sha256": "ee48804512148dfcaecf7f0d5849d510926585283d6fcd5f883321a1e1cbbcdf",
+  "command": [
+    "/run/current-system/sw/bin/nix",
+    "develop",
+    "--command",
+    "/home/sagan/.cache/bevy-gym-quality-validation/travel-batched-seed23-20261010/drone-curriculum",
+    "--lesson",
+    "travel",
+    "--seed",
+    "23",
+    "--updates",
+    "24000",
+    "--output",
+    "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/runs/drone-travel/batched-seed23-20261010"
+  ],
+  "unit": "bevy-gym-travel-batched-seed23-20261010.service",
+  "output": "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/runs/drone-travel/batched-seed23-20261010",
+  "cpu_quota": "200%",
+  "memory_max": "2G",
+  "smoke": {
+    "output": "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/runs/drone-travel/batched-smoke-seed23-20261010",
+    "updates": 10,
+    "valid_samples_per_update": 512,
+    "selection_passed": false,
+    "exit_code": 1,
+    "reason": "budget exhausted without promotion"
+  },
+  "qualification": "not established; no stage qualified",
+  "schema": "drone-travel-batched-trial-v1",
+  "observed_utc": "2026-10-10T10:09:39.472099+00:00",
+  "observed_unit_state": "ActiveState=active\nSubState=running\nMainPID=532267\nExecMainStatus=0\n",
+  "observed_update": 131,
+  "first_ten_optimizer_records_match_smoke": true,
+  "immutable_manifest": "/home/sagan/.cache/bevy-gym-quality-validation/travel-batched-seed23-20261010/run.json",
+  "immutable_manifest_sha256": "c31785de6fe2c7f82dd634462b9f5f5fa6ea0dda51818d956cd69b22646a094f",
+  "trainer_tests": {
+    "command": "cargo test --no-default-features --features robots --example drone-curriculum",
+    "exit_code": 0,
+    "passed": 17,
+    "log": "/home/sagan/.cache/bevy-gym-quality-validation/travel-batching-example-tests.log",
+    "log_sha256": "7da25437b503971585e080dbb916da42d966087c191ee9cee1407aeb61b7a095"
+  },
+  "checkpoint_storage_bound_bytes": 226132800,
+  "documentation_validation": {
+    "rumdl": "passed for both changed Markdown files",
+    "personal_markdown": "failed on 13 unchanged LIAMC005 paragraph diagnostics; exact HEAD comparison accounts for inserted lines; no added paragraph diagnosed",
+    "personal_log": "/home/sagan/.cache/bevy-gym-quality-validation/travel-batched-markdown.log",
+    "personal_log_sha256": "e1d8af22d85da20f68639f6cd509cb900a6f569f479f4d5c0ab889f4acaa910d",
+    "baseline_log": "/home/sagan/.cache/bevy-gym-quality-validation/travel-batched-markdown-baseline.log",
+    "baseline_log_sha256": "62dabaa58f80055012329398a4f8cd05cef019013b666585e9bb9e5ee37691f6",
+    "post_documentation_example_tests": "17 passed",
+    "post_documentation_doc_tests": "12 passed, 1 ignored"
+  }
+}
