@@ -1,0 +1,73 @@
+{
+  "schema": "drone-travel-heading-learning-evidence-v1",
+  "recorded_utc": "2026-10-10T07:33:57.431697+00:00",
+  "source_base": "557b917c7de50b9bd5a212777e45288f4511ee01",
+  "changed_test": "tests/drone_learning/travel.rs",
+  "test_sha256": "5006f88a13450b7238042afce706aeb1f92386f4aff5b0e1828eb714621d81ec",
+  "test": "travel::transferred_heading_input_learns_from_ppo",
+  "question": "Can PPO teach the zero-weight heading input inserted into the qualified recovery actor?",
+  "observations": [
+    "Opposite heading inputs produce identical actions and recurrent memory immediately after transfer.",
+    "One PPO update changes actions and recurrent memory to depend on the inserted heading input."
+  ],
+  "fixture_boundary": "Synthetic samples and advantages remain isolated in the test; no environment controller or training recipe changed.",
+  "initial_probe": "Passed on the existing implementation. No production bug was established and no production behavior changed.",
+  "checks": {
+    "required_native_fmt_test_clippy": "passed",
+    "native_drone_learning": "32 passed, 1 ignored",
+    "browser": "220 passed across 25 suites",
+    "candidate_personal_rust_lint": "Clippy and Dylint report no diagnostics on changed lines",
+    "strict_personal_rust_lint": "Underlying strict Clippy still fails on unchanged repository diagnostics; no changed-line diagnostics.",
+    "markdown": "rumdl passes; personal Markdown lint reports three unchanged paragraph-length errors in DRONE_TRAVEL.md and no diagnostics in the added prose."
+  },
+  "coverage": {
+    "report": "/home/sagan/.cache/bevy-gym-quality-validation/travel-heading-learning-coverage.json",
+    "sha256": "3d511ff7a87cd00267cd0230f944ca720b31b9d703efbac32952c369415cf270",
+    "mode": "Instrumented focused test with retained earlier profiles; the migration function records an execution count of 1 in this test binary.",
+    "added_production_lines": 0,
+    "boundary": "The report includes unrelated existing paths and does not establish complete production coverage. The file-based migration test runs natively; browser migration trainability is unverified."
+  },
+  "qualification": "No standing or travel qualification established by this isolated optimizer test.",
+  "logs": [
+    {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/travel-heading-learning-probe.log",
+      "sha256": "b7b240be7d13bdb68061c11a6d469b8ee8845880a5d2d88c5747080ef881712a"
+    },
+    {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/travel-heading-learning-native.log",
+      "sha256": "f533914fe72f7dfbcd3ac368f868abf281de0930cdbc88dddd4d05ded65a1d7e"
+    },
+    {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/travel-heading-learning-browser.log",
+      "sha256": "16f104683b319748e6247ba9b8fae5e540262f7d94d073bd0cde35712985e9ff"
+    },
+    {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/travel-heading-learning-personal.log",
+      "sha256": "04905d6d2bdd5e592c13ee0c56c1230be41bc4bef567a8ba3dbe84ff1fca4f3d"
+    },
+    {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/travel-heading-learning-personal-strict.log",
+      "sha256": "1854b73024983b37d15f6c927810a2fd51bccee8e9b93b7e0620c45f73a6b496"
+    },
+    {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/travel-heading-learning-coverage.log",
+      "sha256": "ba0f1462fdf9557b2c41711aa58f5ef448f7283a18148b15757d3dd50b388c0a"
+    },
+    {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/travel-heading-learning-post-doc.log",
+      "sha256": "49c6f33c2f017392ff487e45d2d404bea28a07fe0433f4e9ab13c12d0f30d0ba"
+    },
+    {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/travel-heading-learning-markdown.log",
+      "sha256": "5c11e54ae63a31c6cfda84ee001c5dd35b0d6e0dd1729af10c3251772ccf3808"
+    }
+  ],
+  "previous_remote_ci": {
+    "commit": "557b917c7de50b9bd5a212777e45288f4511ee01",
+    "run": 38034304704,
+    "conclusion": "success",
+    "strict": "success",
+    "contracts": "success",
+    "boundary": "Validates the earlier shared scene facade repair; the newly added test has only local validation before this push."
+  }
+}

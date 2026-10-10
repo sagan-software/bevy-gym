@@ -169,6 +169,13 @@ It copies the recurrent actor and adds one zero-weight heading input. The critic
 optimizers, and sampling streams start fresh. A `transfer.json` record precedes
 training. Tests prove unchanged actions and recurrent memory at transfer.
 
+The native `transferred_heading_input_learns_from_ppo` test starts with identical
+actions and memory for opposite heading inputs. After one PPO update, both depend
+on the heading input. Its samples and advantages are isolated optimizer fixtures.
+This establishes trainability of the inserted input, not travel qualification.
+The [evidence record](./progress/drone-travel-heading-learning.json) preserves the
+test, browser checks and coverage boundaries.
+
 Each update collects eight lanes of 64 actions through `TravelTask` and the shared
 `DroneTravel` implementation. Policy weights remain fixed during collection;
 PPO updates follow the 512 transitions. Each lane owns its recurrent memory.

@@ -68,6 +68,61 @@ fn qualified_recovery_actor_transfers_before_heading_training() {
     }
 }
 
+/// PPO must teach the inserted heading channel, not only update the inherited output head.
+#[cfg(not(target_arch = "wasm32"))]
+#[test]
+fn transferred_heading_input_learns_from_ppo() {
+    use bevy_gym::training::{RecurrentPpoSequence, RecurrentSampler};
+
+    let mut agent = model::new_agent(17).expect("qualified actor transfers");
+    let before = agent.policy();
+    let body = DroneHover::default().observation();
+    let destination = DroneDestination::try_from((body.position(), Vec2::X))
+        .expect("valid diagnostic destination");
+    let first_inputs = encoding::encode_goal(body, destination);
+    let mut opposite_inputs = first_inputs;
+    *opposite_inputs.last_mut().expect("heading channel") *= -1.0;
+    let memory = before.initial_memory();
+    assert_eq!(
+        before
+            .mean_action(&first_inputs, &memory)
+            .expect("first heading"),
+        before
+            .mean_action(&opposite_inputs, &memory)
+            .expect("opposite heading"),
+    );
+
+    // Isolated samples and advantages exercise the optimizer; they are not an example controller.
+    let mut sampler = RecurrentSampler::new(23);
+    let first = before
+        .sample_action(&first_inputs, &memory, &mut sampler)
+        .expect("first sample");
+    let second = before
+        .sample_action(&opposite_inputs, &first.next_memory, &mut sampler)
+        .expect("second sample");
+    let sequence = RecurrentPpoSequence {
+        observations: vec![first_inputs.to_vec(), opposite_inputs.to_vec()],
+        global_states: vec![first_inputs.to_vec(), opposite_inputs.to_vec()],
+        pre_tanh_actions: vec![first.pre_tanh_action, second.pre_tanh_action],
+        old_log_probabilities: vec![first.log_probability, second.log_probability],
+        advantages: vec![1.0, -1.0],
+        returns: vec![2.0, 1.0],
+        value_index: 0,
+        initial_memory: memory.clone(),
+    };
+    let update = agent.update(&[sequence]).expect("PPO update");
+    assert!(update.optimizer_updates > 0);
+    let after = agent.policy();
+    let first_action = after
+        .mean_action(&first_inputs, &memory)
+        .expect("learned first heading");
+    let opposite_action = after
+        .mean_action(&opposite_inputs, &memory)
+        .expect("learned opposite heading");
+    assert_ne!(first_action.action, opposite_action.action);
+    assert_ne!(first_action.next_memory, opposite_action.next_memory);
+}
+
 #[path = "../../examples/robots/travel/environment.rs"]
 mod environment;
 #[path = "../../examples/robots/travel/evaluation.rs"]
