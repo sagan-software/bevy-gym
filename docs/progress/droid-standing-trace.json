@@ -1,0 +1,96 @@
+{
+  "schema": "droid-standing-trace-evidence-v1",
+  "recorded_utc": "2026-10-10T07:16:02.102042+00:00",
+  "source_base": "e0fd629b50bfd6683eb6c4f734fa6b6c1af3c955",
+  "capture": "standing-trace/capture.json",
+  "capture_sha256": "dbc1495885b2371b2fdf90a0a249adb9de3e45e4bc516daca5b39c829edf6dca",
+  "browser": {
+    "image": "standing-trace/browser-step.png",
+    "sha256": "22ba82fe359f96254849141a8b236b5f9a5a8b8a3eb888a34dcb05eb851cb9f3",
+    "viewport_css_px": [
+      390,
+      844
+    ],
+    "checkpoint_update": 100,
+    "qualified": false,
+    "proof": "Rebuilt shared session renders the mannequin and completes one requested learned action.",
+    "boundary": "This screenshot does not show the source600 or warm200 training candidate."
+  },
+  "checks": {
+    "native_required_gates": "passed",
+    "four_scene_example_tests": "passed",
+    "focused_standing_example_tests": 18,
+    "cli_tests": 9,
+    "browser_tests": 220,
+    "native_wasm_policy_action_parity": "passed, 26 outputs over 62 identical-input frames at 1e-5 tolerance",
+    "physical_trajectory_parity": "unverified",
+    "worker_native_and_wasm_strict_clippy": "passed",
+    "candidate_personal_rust_lint": "no diagnostics on changed lines",
+    "strict_personal_lint": "Command ran with -D warnings; underlying Clippy exits 101 on unchanged repository diagnostics. Clippy and Dylint report no diagnostics on changed lines.",
+    "markdown_personal_lint": "Nine unchanged EXAMPLE_STATUS.md paragraph-length errors remain; added prose has no diagnostics."
+  },
+  "coverage": {
+    "trace_production_branch_outcomes": 8,
+    "covered": 7,
+    "gap": "examples/robots/standing/trace.rs:120 true branch and line 121 error return lack direct inference-failure injection. Shared Session tests verify sticky inference errors but do not execute this trace handler.",
+    "other_evidence": [
+      "invalid checkpoint rejected before origin",
+      "JSON, LF and flush output failures stop emission",
+      "nonfinite feature and segment floats rejected",
+      "all three status spellings and f32 edge round trips tested",
+      "repeat trace bytes identical and checkpoint bytes unchanged"
+    ]
+  },
+  "previous_ci": {
+    "run_id": 38031485295,
+    "strict": "passed",
+    "contracts": "failed because shared rollout tests lacked full training imports in the scene test facade",
+    "repair": "Test builds select the full learning facade; runtime keeps the inference facade. The exact failed four-scene command passes locally.",
+    "new_remote_ci": "not yet run"
+  },
+  "active_training_audit": {
+    "service": "bevy-gym-standing-warm-start-seed13-20261010.service",
+    "budget_updates": 2400,
+    "latest_selection_update": 700,
+    "latest_selection_passed": false,
+    "qualification": "No qualified standing checkpoint established."
+  },
+  "logs": [
+    {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/standing-trace-native-final.log",
+      "sha256": "8e4d332d06e717cf0898407fd33ee5ab35c34a0e980af60410b62f7a9d2bd6af"
+    },
+    {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/standing-trace-browser-tests.log",
+      "sha256": "c4f8f595bcb73b67b15b4ba213904435ca2fa436cde6b09dc9a7954508f66e48"
+    },
+    {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/standing-trace-browser-build.log",
+      "sha256": "ab23c08d8f6fc0550e4a155c54d4cae3fafa1b50a2a78216992dc7080b61a9b9"
+    },
+    {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/standing-trace-personal-final.log",
+      "sha256": "962e2bec0f1bbc70cf6b42bd3583756c3e8da5e2bdb75b03335d605c5262851a"
+    },
+    {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/standing-trace-python-lint.log",
+      "sha256": "0e8bbae39af51717e91a0834d03d0c2b8abeb055edb6fa6b22e7b6cbeac19cfc"
+    },
+    {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/standing-trace-coverage-final.log",
+      "sha256": "2891744eb1daba9e37cb7b086c1b78549b9fdde9344a7bd2597a35c6e37ee74d"
+    },
+    {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/standing-trace-cli-red.log",
+      "sha256": "eb637467533013cc98a709626a2ceaa53b92af9a59424f08c8772cef8ad62600"
+    },
+    {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/standing-trace-personal-strict-final.log",
+      "sha256": "000c95bae98aa7ab296b9225b1c686c740b9d085529429415accc086108539a7"
+    },
+    {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/standing-trace-markdown-final.log",
+      "sha256": "3316b1f73997120d2d6663d79e8a0dafbfe52768db362e11f3aa8df2a4563975"
+    }
+  ]
+}

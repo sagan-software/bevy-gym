@@ -1,0 +1,320 @@
+{
+  "schema": "droid-standing-trace-capture-v1",
+  "captured_utc": "2026-10-10T06:54:27.209224+00:00",
+  "source_base": "e0fd629b50bfd6683eb6c4f734fa6b6c1af3c955",
+  "source_patch_sha256": "d3ed37d3c93f252822abb86010a6ffd9026e7b5e42f1d44f51e540620f304a9d",
+  "binary_sha256": "82504719ed97edc8d319e60986d089f4febf4b60ceac32a9fff70eee497f8b68",
+  "selection_seeds_only": true,
+  "recordings": [
+    {
+      "trial": "source600",
+      "seed": 0,
+      "file": "standing-trace/source600-seed0.jsonl.gz",
+      "jsonl_sha256": "7dc64c814cb7616c215f0340e29691d76ff285fb23a8e73f5c23d7a4bd551fd3",
+      "gzip_sha256": "fc87180a6430de3c1e272761e3ca2532462c93f79969acacd69e1147ebd59789",
+      "source": {
+        "schema": "droid-standing-v1",
+        "algorithm": "PPO",
+        "seed": 7,
+        "update": 600,
+        "transitions": 307200,
+        "optimizer_steps": 5800,
+        "sha256": "1d2edc383e8c57577a0efa9a829eea347d1d053c3c61bb0cc94ffd5b2c3ada9b"
+      },
+      "frames": 92,
+      "matches_selection_action_count": true,
+      "first_nonfoot_floor_contact": [
+        91,
+        "left-calf"
+      ],
+      "final_nonfoot_contacts": [
+        "left-calf"
+      ],
+      "both_feet_supported_frames": 84,
+      "last_supported_step": 86,
+      "final_pelvis_height_m": 0.659696,
+      "final_speed_m_per_s": 2.1960346698760986,
+      "qualified": false,
+      "observed_terminal_violations": [
+        "non-foot floor contact at segment 8"
+      ]
+    },
+    {
+      "trial": "source600",
+      "seed": 1,
+      "file": "standing-trace/source600-seed1.jsonl.gz",
+      "jsonl_sha256": "e729c700d690bdfac5ee42d735cd38106d32d6776223ef0b1501cc096fbc76c4",
+      "gzip_sha256": "05731d4de099e97e343560a81f747c50ad1f32fd7b43b10b2764381825ad38cf",
+      "source": {
+        "schema": "droid-standing-v1",
+        "algorithm": "PPO",
+        "seed": 7,
+        "update": 600,
+        "transitions": 307200,
+        "optimizer_steps": 5800,
+        "sha256": "1d2edc383e8c57577a0efa9a829eea347d1d053c3c61bb0cc94ffd5b2c3ada9b"
+      },
+      "frames": 79,
+      "matches_selection_action_count": true,
+      "first_nonfoot_floor_contact": null,
+      "final_nonfoot_contacts": [],
+      "both_feet_supported_frames": 66,
+      "last_supported_step": 69,
+      "final_pelvis_height_m": 0.49012357,
+      "final_speed_m_per_s": 2.4054746627807617,
+      "qualified": false,
+      "observed_terminal_violations": [
+        "pelvis height below 0.5 m"
+      ]
+    },
+    {
+      "trial": "source600",
+      "seed": 2,
+      "file": "standing-trace/source600-seed2.jsonl.gz",
+      "jsonl_sha256": "35f1d8ec50619b1f1c8437349e83dc0f78cb422e5d594f6df21f7ab5aa31c79b",
+      "gzip_sha256": "167d39a907cdd20755442afdbac36490b67532a37bf7a52281ad4e84786166d2",
+      "source": {
+        "schema": "droid-standing-v1",
+        "algorithm": "PPO",
+        "seed": 7,
+        "update": 600,
+        "transitions": 307200,
+        "optimizer_steps": 5800,
+        "sha256": "1d2edc383e8c57577a0efa9a829eea347d1d053c3c61bb0cc94ffd5b2c3ada9b"
+      },
+      "frames": 85,
+      "matches_selection_action_count": true,
+      "first_nonfoot_floor_contact": [
+        84,
+        "left-calf"
+      ],
+      "final_nonfoot_contacts": [
+        "left-calf"
+      ],
+      "both_feet_supported_frames": 71,
+      "last_supported_step": 74,
+      "final_pelvis_height_m": 0.5744104,
+      "final_speed_m_per_s": 2.378188371658325,
+      "qualified": false,
+      "observed_terminal_violations": [
+        "non-foot floor contact at segment 8"
+      ]
+    },
+    {
+      "trial": "source600",
+      "seed": 42,
+      "file": "standing-trace/source600-seed42.jsonl.gz",
+      "jsonl_sha256": "8d77444db22ec5cc2d2226172ff2e78b695ad146ac02c70714a2685c982dbd84",
+      "gzip_sha256": "c2c70ce1f486340d7c6df4f45dcde56e17bc551525e83c3e3ce707fd78ff48d1",
+      "source": {
+        "schema": "droid-standing-v1",
+        "algorithm": "PPO",
+        "seed": 7,
+        "update": 600,
+        "transitions": 307200,
+        "optimizer_steps": 5800,
+        "sha256": "1d2edc383e8c57577a0efa9a829eea347d1d053c3c61bb0cc94ffd5b2c3ada9b"
+      },
+      "frames": 97,
+      "matches_selection_action_count": true,
+      "first_nonfoot_floor_contact": [
+        96,
+        "left-calf"
+      ],
+      "final_nonfoot_contacts": [
+        "left-calf"
+      ],
+      "both_feet_supported_frames": 75,
+      "last_supported_step": 77,
+      "final_pelvis_height_m": 0.53659594,
+      "final_speed_m_per_s": 2.5145139694213867,
+      "qualified": false,
+      "observed_terminal_violations": [
+        "non-foot floor contact at segment 8"
+      ]
+    },
+    {
+      "trial": "source600",
+      "seed": 18446744073709551615,
+      "file": "standing-trace/source600-seed18446744073709551615.jsonl.gz",
+      "jsonl_sha256": "ce80ab621f3dc8378af866565698b0196b6ae09ead67814d3a00a3c5070ca93f",
+      "gzip_sha256": "c7b6cbbc88a4ae77bcbc971ea34d81b9366e55ec1bceb910784bdd29a368c409",
+      "source": {
+        "schema": "droid-standing-v1",
+        "algorithm": "PPO",
+        "seed": 7,
+        "update": 600,
+        "transitions": 307200,
+        "optimizer_steps": 5800,
+        "sha256": "1d2edc383e8c57577a0efa9a829eea347d1d053c3c61bb0cc94ffd5b2c3ada9b"
+      },
+      "frames": 83,
+      "matches_selection_action_count": true,
+      "first_nonfoot_floor_contact": null,
+      "final_nonfoot_contacts": [],
+      "both_feet_supported_frames": 80,
+      "last_supported_step": 82,
+      "final_pelvis_height_m": 0.48943493,
+      "final_speed_m_per_s": 3.003671169281006,
+      "qualified": false,
+      "observed_terminal_violations": [
+        "pelvis height below 0.5 m"
+      ]
+    },
+    {
+      "trial": "warm200",
+      "seed": 0,
+      "file": "standing-trace/warm200-seed0.jsonl.gz",
+      "jsonl_sha256": "3d4a845e831628af4888673cb13725ea855e3672fb619d4a589319c36447923f",
+      "gzip_sha256": "6e0646f67eb98b9f5d261c97ac93a8b37fe4833f54ba6eef72909d1f3b125896",
+      "source": {
+        "schema": "droid-standing-v1",
+        "algorithm": "PPO",
+        "seed": 13,
+        "update": 200,
+        "transitions": 102400,
+        "optimizer_steps": 1600,
+        "sha256": "0392fc5ee5cd5959912c3cfe447b8197e0e7bc9ab80d1222ba973b94406b9844"
+      },
+      "frames": 101,
+      "matches_selection_action_count": true,
+      "first_nonfoot_floor_contact": null,
+      "final_nonfoot_contacts": [],
+      "both_feet_supported_frames": 85,
+      "last_supported_step": 100,
+      "final_pelvis_height_m": 0.49186853,
+      "final_speed_m_per_s": 3.0281424522399902,
+      "qualified": false,
+      "observed_terminal_violations": [
+        "pelvis height below 0.5 m"
+      ]
+    },
+    {
+      "trial": "warm200",
+      "seed": 1,
+      "file": "standing-trace/warm200-seed1.jsonl.gz",
+      "jsonl_sha256": "b17d81ee6e3de99c1d2ac0ea304656681b45f6d1ad6b771fc8df032ba37ed8d5",
+      "gzip_sha256": "8aa5ae59d785f7148329b8ab9c1650d7bceecf5b6cf053a74a6d442d0c4d12c8",
+      "source": {
+        "schema": "droid-standing-v1",
+        "algorithm": "PPO",
+        "seed": 13,
+        "update": 200,
+        "transitions": 102400,
+        "optimizer_steps": 1600,
+        "sha256": "0392fc5ee5cd5959912c3cfe447b8197e0e7bc9ab80d1222ba973b94406b9844"
+      },
+      "frames": 132,
+      "matches_selection_action_count": true,
+      "first_nonfoot_floor_contact": [
+        131,
+        "right-calf"
+      ],
+      "final_nonfoot_contacts": [
+        "right-calf"
+      ],
+      "both_feet_supported_frames": 121,
+      "last_supported_step": 131,
+      "final_pelvis_height_m": 0.5325036,
+      "final_speed_m_per_s": 3.012481212615967,
+      "qualified": false,
+      "observed_terminal_violations": [
+        "non-foot floor contact at segment 11"
+      ]
+    },
+    {
+      "trial": "warm200",
+      "seed": 2,
+      "file": "standing-trace/warm200-seed2.jsonl.gz",
+      "jsonl_sha256": "b1532a521655a6b4ef460f7544b52a666066532a2e11e81262bea1621307992c",
+      "gzip_sha256": "e89c7064c9c25042989fdd0f97c4619e747425ad41599908f0c039511fb407ce",
+      "source": {
+        "schema": "droid-standing-v1",
+        "algorithm": "PPO",
+        "seed": 13,
+        "update": 200,
+        "transitions": 102400,
+        "optimizer_steps": 1600,
+        "sha256": "0392fc5ee5cd5959912c3cfe447b8197e0e7bc9ab80d1222ba973b94406b9844"
+      },
+      "frames": 92,
+      "matches_selection_action_count": true,
+      "first_nonfoot_floor_contact": [
+        91,
+        "right-calf"
+      ],
+      "final_nonfoot_contacts": [
+        "right-calf"
+      ],
+      "both_feet_supported_frames": 83,
+      "last_supported_step": 85,
+      "final_pelvis_height_m": 0.65470284,
+      "final_speed_m_per_s": 2.3636460304260254,
+      "qualified": false,
+      "observed_terminal_violations": [
+        "non-foot floor contact at segment 11"
+      ]
+    },
+    {
+      "trial": "warm200",
+      "seed": 42,
+      "file": "standing-trace/warm200-seed42.jsonl.gz",
+      "jsonl_sha256": "80edbe543048865d95e98844c3646ddef5005064ba33ab364e04b89bb9e7691b",
+      "gzip_sha256": "3a1a21d7c7a662cbfe05c16a7e075270f10b6bc7aa5c2489e3fad1f817bb3942",
+      "source": {
+        "schema": "droid-standing-v1",
+        "algorithm": "PPO",
+        "seed": 13,
+        "update": 200,
+        "transitions": 102400,
+        "optimizer_steps": 1600,
+        "sha256": "0392fc5ee5cd5959912c3cfe447b8197e0e7bc9ab80d1222ba973b94406b9844"
+      },
+      "frames": 89,
+      "matches_selection_action_count": true,
+      "first_nonfoot_floor_contact": null,
+      "final_nonfoot_contacts": [],
+      "both_feet_supported_frames": 77,
+      "last_supported_step": 88,
+      "final_pelvis_height_m": 0.48964527,
+      "final_speed_m_per_s": 2.931636333465576,
+      "qualified": false,
+      "observed_terminal_violations": [
+        "pelvis height below 0.5 m"
+      ]
+    },
+    {
+      "trial": "warm200",
+      "seed": 18446744073709551615,
+      "file": "standing-trace/warm200-seed18446744073709551615.jsonl.gz",
+      "jsonl_sha256": "3e3451fe1cdae6b1b21af1910a026ef24fc9cf82ca5081c4f7706b22a3080059",
+      "gzip_sha256": "c1adaed4433c472ad5edcf4e3062cb92350f602f2dc06d13898143f0a1cdf43b",
+      "source": {
+        "schema": "droid-standing-v1",
+        "algorithm": "PPO",
+        "seed": 13,
+        "update": 200,
+        "transitions": 102400,
+        "optimizer_steps": 1600,
+        "sha256": "0392fc5ee5cd5959912c3cfe447b8197e0e7bc9ab80d1222ba973b94406b9844"
+      },
+      "frames": 89,
+      "matches_selection_action_count": true,
+      "first_nonfoot_floor_contact": [
+        88,
+        "right-calf"
+      ],
+      "final_nonfoot_contacts": [
+        "right-calf"
+      ],
+      "both_feet_supported_frames": 80,
+      "last_supported_step": 81,
+      "final_pelvis_height_m": 0.5456967,
+      "final_speed_m_per_s": 2.9381256103515625,
+      "qualified": false,
+      "observed_terminal_violations": [
+        "non-foot floor contact at segment 11"
+      ]
+    }
+  ]
+}

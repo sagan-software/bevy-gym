@@ -14,13 +14,12 @@ wasm_bindgen_test::wasm_bindgen_test_configure!(run_in_browser);
 )]
 #[path = "../examples/robots/learning/mod.rs"]
 mod learning;
-#[path = "../examples/robots/standing_scene/session.rs"]
-mod session;
 #[expect(dead_code, reason = "The native CLI has separate executable tests.")]
 #[path = "../examples/robots/standing/mod.rs"]
 mod standing;
 
 use bevy_gym::{robots::DroidStanding, Env, TimeLimit};
+use standing::session;
 
 /// Preserved PPO update 100; failed selection, never qualified standing evidence.
 const CHECKPOINT: &[u8] = include_bytes!("../docs/progress/droid-standing-trial.mpk");

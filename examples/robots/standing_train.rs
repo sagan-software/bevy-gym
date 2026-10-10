@@ -8,6 +8,10 @@
 )]
 mod learning;
 #[cfg(not(target_arch = "wasm32"))]
+#[expect(
+    dead_code,
+    reason = "The CLI shares frozen playback methods with the independent viewer."
+)]
 mod standing;
 
 /// Dispatch the separate training and frozen-inference commands.

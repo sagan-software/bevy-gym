@@ -1,6 +1,6 @@
 //! Separate standing training and frozen evaluation commands.
 
-use super::{checkpoint, evaluation, training};
+use super::{checkpoint, evaluation, trace, training};
 use clap::{Parser, Subcommand};
 use std::{error::Error, num::NonZeroU32, path::PathBuf};
 
@@ -15,6 +15,15 @@ struct Options {
 /// Closed standalone workflow modes.
 #[derive(Subcommand)]
 enum Command {
+    /// Stream one frozen physical episode; completion is not standing qualification.
+    Trace {
+        /// Weight file and its required .json PPO provenance record.
+        #[arg(long)]
+        checkpoint: PathBuf,
+        /// Independent physical reset root; default matches the standing viewer.
+        #[arg(long, default_value = "42")]
+        seed: u64,
+    },
     /// Train with PPO; a failed budget returns an error and retains its candidate.
     Train {
         /// Maximum 512-transition updates; exhaustion never grants qualification.
@@ -64,6 +73,11 @@ pub(super) fn run() -> Result<(), Box<dyn Error>> {
 /// Await file operations while keeping policy updates between complete rollout batches.
 async fn execute(command: Command) -> Result<(), Box<dyn Error>> {
     match command {
+        Command::Trace { checkpoint, seed } => {
+            let bytes = tokio::fs::read(&checkpoint).await?;
+            let metadata = tokio::fs::read(checkpoint.with_extension("json")).await?;
+            trace::write(bytes, &metadata, seed, &mut std::io::stdout().lock())
+        }
         Command::Train {
             updates,
             seed,

@@ -4,6 +4,30 @@ Updated: 2026-10-10. Current work: RL-only drone/droid curriculum.
 
 ## Resume here
 
+### Complete frozen standing traces, 2026-10-10
+
+`droid-standing trace` records the reset and every applied RL action's resulting
+physical state. It shares the viewer session, retains checkpoint provenance and
+never runs an optimizer. The [guide](DROID_STANDING.md#frozen-episode-trace) defines
+the emitted JSONL contract and errors. Ten complete failed selection episodes are
+preserved in the [capture manifest](progress/standing-trace/capture.json).
+
+Native tests, strict repository Clippy, the four scene-example tests and nine CLI
+checks pass. The complete browser gate passes 220 tests, including policy-action
+parity. The rebuilt standing viewer renders and steps at a 390 by 844 viewport.
+The scene test facade also fixes the prior CI failure caused by missing collector
+test imports; runtime inference retains its separate facade.
+
+Seven of eight trace production branch outcomes are covered. The inference-error
+handler lacks a direct injected failure; session failure tests cover its underlying
+sticky error behavior. Candidate personal Rust lint is clean. Strict personal
+Clippy retains unchanged repository errors. The
+[evidence record](./progress/droid-standing-trace.json) names these boundaries.
+
+The seed-13 warm-start trial remains bounded to 2,400 updates. Inspect its service
+and output before acting. Standing qualification, later skills and browser 3v3
+remain unfinished. The RL-only 3v3 goal remains active.
+
 ### Standing checkpoint continuation, 2026-10-10
 
 `droid-standing warm-start` imports validated RL actor and critic parameters into

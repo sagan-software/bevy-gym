@@ -6,6 +6,12 @@ mod cli;
 pub(crate) mod encoding;
 pub(crate) mod evaluation;
 pub(crate) mod model;
+/// Frozen execution shared by physical inspection and rendered playback.
+#[path = "../standing_scene/session.rs"]
+pub(crate) mod session;
+/// Stream one frozen episode as read-only diagnostic evidence.
+#[cfg(not(target_arch = "wasm32"))]
+mod trace;
 #[cfg(not(target_arch = "wasm32"))]
 mod training;
 

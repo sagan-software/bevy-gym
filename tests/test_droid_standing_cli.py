@@ -2,9 +2,11 @@
 
 import hashlib
 import json
+import math
 import os
 from pathlib import Path
 import subprocess
+import struct
 import tempfile
 import unittest
 
@@ -226,6 +228,115 @@ class StandingCliTests(unittest.TestCase):
         self.assertEqual(corrupt.returncode, 1)
         self.assertIn("digest mismatch", corrupt.stderr)
         self.assertEqual(corrupt.stdout, "")
+
+    def test_trace_preserves_weights_and_matches_evaluation(self) -> None:
+        """Record every frozen action and its authoritative physical state."""
+        before = {
+            path.name: path.read_bytes() for path in self.output.iterdir()
+        }
+        result = self.run_command(
+            "trace", "--checkpoint", str(self.checkpoint), "--seed", "42"
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        rows = [json.loads(line) for line in result.stdout.splitlines()]
+        origin, *frames = rows
+        self.assertEqual(list(origin), [
+            "kind", "schema", "seed", "source", "horizon",
+            "policy_interval_ms",
+        ])
+        self.assertEqual(origin["kind"], "origin")
+        self.assertEqual(origin["schema"], "droid-standing-trace-v1")
+        self.assertEqual(origin["seed"], 42)
+        self.assertEqual(origin["horizon"], 1000)
+        self.assertEqual(origin["policy_interval_ms"], 20)
+        self.assertEqual(origin["source"], json.loads(
+            self.checkpoint.with_suffix(".json").read_text()
+        ))
+        self.assertIsNone(frames[0]["torques"])
+        self.assertEqual(frames[0]["status"], "continuing")
+        for index, frame in enumerate(frames):
+            self.assertEqual(list(frame), [
+                "kind", "step", "status", "torques", "observation",
+                "segments",
+            ])
+            self.assertEqual(frame["kind"], "frame")
+            self.assertEqual(frame["step"], index)
+            self.assertEqual(len(frame["observation"]), 204)
+            self.assertTrue(all(
+                math.isfinite(value) for value in frame["observation"]
+            ))
+            self.assertEqual(len(frame["segments"]), 13)
+            if index:
+                self.assertEqual(len(frame["torques"]), 26)
+                self.assertTrue(all(
+                    -1 <= value <= 1 for value in frame["torques"]
+                ))
+            for segment in frame["segments"]:
+                self.assertEqual(list(segment), [
+                    "position", "orientation", "linear_velocity",
+                    "angular_velocity", "floor_contact",
+                ])
+                self.assertEqual(len(segment["position"]), 3)
+                self.assertEqual(len(segment["orientation"]), 4)
+                self.assertEqual(len(segment["linear_velocity"]), 3)
+                self.assertEqual(len(segment["angular_velocity"]), 3)
+                self.assertIsInstance(segment["floor_contact"], bool)
+                self.assertTrue(all(
+                    math.isfinite(value)
+                    for field in (
+                        "position", "orientation", "linear_velocity",
+                        "angular_velocity",
+                    )
+                    for value in segment[field]
+                ))
+        final = frames[-1]
+        self.assertEqual(final["status"], "terminated")
+        evaluation = self.run_command(
+            "evaluate", "--checkpoint", str(self.checkpoint),
+            "--seed", "42",
+        )
+        score = json.loads(evaluation.stdout)["episodes"][0]
+        self.assertEqual(final["step"], score["steps"])
+        pelvis = final["segments"][0]
+        self.assertEqual(
+            struct.pack("f", pelvis["position"][1]),
+            struct.pack("f", score["final_height"]),
+        )
+        repeat = self.run_command(
+            "trace", "--checkpoint", str(self.checkpoint)
+        )
+        self.assertEqual(repeat.returncode, 0, repeat.stderr)
+        self.assertEqual(result.stdout, repeat.stdout)
+        self.assertEqual(before, {
+            path.name: path.read_bytes() for path in self.output.iterdir()
+        })
+
+    def test_trace_rejects_invalid_weights_before_any_record(self) -> None:
+        """Invalid identity and architecture cannot emit frozen evidence."""
+        missing = self.root / "trace-missing.mpk"
+        no_record = self.root / "trace-no-record.mpk"
+        no_record.write_bytes(self.checkpoint.read_bytes())
+        wrong_digest = self.root / "trace-wrong-digest.mpk"
+        wrong_digest.write_bytes(b"corrupt weights")
+        record = json.loads(self.checkpoint.with_suffix(".json").read_text())
+        wrong_digest.with_suffix(".json").write_text(json.dumps(record))
+        wrong_model = self.root / "trace-wrong-model.mpk"
+        wrong_model.write_bytes(b"not a network")
+        record["sha256"] = hashlib.sha256(wrong_model.read_bytes()).hexdigest()
+        wrong_model.with_suffix(".json").write_text(json.dumps(record))
+        for path in [missing, no_record, wrong_digest, wrong_model]:
+            result = self.run_command("trace", "--checkpoint", str(path))
+            self.assertEqual(result.returncode, 1)
+            self.assertEqual(result.stdout, "")
+        self.assertEqual(self.run_command("trace").returncode, 2)
+        self.assertEqual(self.run_command(
+            "trace", "--checkpoint", str(self.checkpoint), "--seed", "-1"
+        ).returncode, 2)
+        for invalid in ["18446744073709551616", "not-a-number"]:
+            self.assertEqual(self.run_command(
+                "trace", "--checkpoint", str(self.checkpoint),
+                "--seed", invalid,
+            ).returncode, 2)
 
 
 if __name__ == "__main__":

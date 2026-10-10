@@ -62,7 +62,12 @@ pub(crate) fn load(
 impl Session {
     /// Read the update count from the validated checkpoint instead of a display constant.
     pub(crate) const fn checkpoint_update(&self) -> std::num::NonZeroU32 {
-        self.record.update()
+        self.checkpoint_record().update()
+    }
+
+    /// Borrow validated checkpoint identity without exposing policy or physical mutation.
+    pub(crate) const fn checkpoint_record(&self) -> &checkpoint::Record {
+        &self.record
     }
 
     /// Infer and validate one action before advancing physics; failures are sticky.

@@ -2,9 +2,9 @@
 
 mod projection;
 mod rig;
-mod session;
 mod view;
 
+use crate::standing::session;
 use bevy::{asset::AssetMetaCheck, prelude::*};
 use sha2::{Digest, Sha256};
 

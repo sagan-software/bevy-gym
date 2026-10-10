@@ -3,7 +3,15 @@
     dead_code,
     reason = "The scene loads frozen weights; trainer commands are separate examples."
 )]
-#[path = "learning/inference.rs"]
+#[cfg_attr(not(test), path = "learning/inference.rs")]
+#[cfg_attr(test, path = "learning/mod.rs")]
+#[cfg_attr(
+    test,
+    expect(
+        unused_imports,
+        reason = "Shared collector tests need the complete training facade."
+    )
+)]
 mod learning;
 #[expect(
     dead_code,

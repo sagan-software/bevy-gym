@@ -83,6 +83,93 @@ evaluator. File-based CLI operations are native-only; its WASM entry point retur
 an explicit error. The frozen browser scene uses no optimizer. The reset-only
 `droid-standing-contract` example remains available for inspecting physical anchors.
 
+## Frozen episode trace
+
+Inspect every physical boundary without training or modifying the checkpoint:
+
+```sh
+nix develop --command cargo run --no-default-features --features robots \
+  --example droid-standing -- trace \
+  --checkpoint runs/droid-standing/seed7-recovery-20261010/standing-600.mpk \
+  --seed 42
+```
+
+The native command writes JSONL to standard output. The default seed is 42.
+It uses the same frozen session as the viewer and retains only the current frame.
+Each action comes from the recurrent RL actor. No optimizer runs.
+
+Exit 0 means the trace completed, including a failed standing episode.
+It does not qualify the checkpoint.
+
+Invalid checkpoints fail before any record with exit 1. Invalid arguments exit 2.
+Inference, nonfinite physical state and output errors stop tracing with exit 1.
+An output error can leave completed records and an incomplete final record.
+The checkpoint and its sidecar remain unchanged.
+
+The local `droid-standing-trace-v1` emitted profile follows
+[RFC 8259](https://www.rfc-editor.org/rfc/rfc8259) JSON and the
+[JSON Lines convention](https://jsonlines.org/).
+Output is UTF-8 without a byte-order mark. Each compact object occupies one line,
+followed by LF, including the last object. There are no empty lines.
+This command provides no trace parser or alternate input grammar.
+
+The first object has these required members, once each, in this order:
+
+- `kind`: `"origin"`.
+- `schema`: `"droid-standing-trace-v1"`.
+- `seed`: the unsigned 64-bit episode seed.
+- `source`: the validated checkpoint record, with `schema`, `algorithm`, `seed`,
+  `update`, `transitions`, `optimizer_steps` and `sha256`, in that order.
+- `horizon`: the integer 1000, measured in policy actions.
+- `policy_interval_ms`: the integer 20, the nominal milliseconds per action.
+
+`source` retains the existing `droid-standing-v1` provenance contract.
+Its algorithm is `"PPO"`; its SHA-256 is 64 lowercase hexadecimal characters.
+The seed is an unsigned 64-bit integer; update and optimizer counts are positive.
+`transitions` equals `update` times 512 environment transitions per update.
+Decode 64-bit integers exactly. JavaScript `Number` cannot represent every valid seed,
+including the captured seed `18446744073709551615`.
+
+Subsequent objects have these required members, once each, in this order:
+
+- `kind`: `"frame"`.
+- `step`: the completed action count, starting at 0 and increasing by one through
+  at most 1000. Frame 0 records the reset state.
+- `status`: `"continuing"`, `"terminated"` or `"truncated"`.
+- `torques`: null at reset; otherwise 26 finite dimensionless fractions in inclusive
+  [-1, 1], ordered by `DroidActuator::ALL` as documented below.
+- `observation`: 204 finite actor features from the current physical boundary,
+  ordered by the encoder documented below.
+- `segments`: thirteen physical objects, ordered pelvis, torso, head,
+  left-upper-arm, left-forearm, right-upper-arm, right-forearm, left-thigh,
+  left-calf, left-foot, right-thigh, right-calf, right-foot.
+
+Each segment has these required members, once each, in this order:
+
+- `position`: three finite world coordinates, XYZ in metres.
+- `orientation`: four finite quaternion components, XYZW, rotating segment axes
+  into world axes.
+- `linear_velocity`: three finite world components, XYZ in metres per second.
+- `angular_velocity`: three finite world components, XYZ in radians per second.
+- `floor_contact`: a boolean indicating active contact with the floor.
+
+No other member is null. The final frame has a terminal or truncated status.
+Frame N records the torques applied to frame N-1 and their resulting physical state.
+Its observation supplies the next action when the episode continues; recurrent
+memory persists between actions. A terminal 5 ms substep can end an action early,
+so the nominal interval does not establish exact elapsed time.
+
+The serializer emits finite `f32` values without application rounding.
+Decode them as `f32` to preserve their bits, including signed zero and subnormals.
+NaN and infinities fail before frame serialization rather than becoming JSON null.
+
+The [capture manifest](progress/standing-trace/capture.json) preserves ten complete
+failed selection episodes and compressed JSONL hashes. The source checkpoint at
+update 600 terminates after 78 to 96 actions. The warm-start checkpoint at update
+200 terminates after 88 to 131 actions. Each set contains three terminal calf-floor
+contacts and two terminal pelvis-height violations. These observations do not
+establish a single cause of failure or standing qualification.
+
 ## Physical model
 
 `DroidStanding` implements `Env` with `DroidAction`, `DroidObservation` and unit info.
