@@ -153,7 +153,7 @@ the original curriculum checkpoint, not these new transferred weights.
 
 ## Travel extension
 
-`--lesson travel` runs the separate near/far/fast PPO sequence described in the
+`--lesson travel` runs the separate endurance/near/far/fast PPO sequence described in the
 [travel guide](DRONE_TRAVEL.md). It transfers the qualified recovery actor into
 13-input observations with a zero-weight heading feature and a fresh critic and
 optimizer. Frozen inference uses `--evaluate-checkpoint` and the same environment.

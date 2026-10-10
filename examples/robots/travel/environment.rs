@@ -1,7 +1,9 @@
 //! Sample one task destination per episode without selecting motor actions.
 
 use bevy::math::{Vec2, Vec3};
-use bevy_gym::robots::{DroneAction, DroneDestination, DroneTravel, DroneTravelObservation};
+use bevy_gym::robots::{
+    DroneAction, DroneDestination, DroneHover, DroneTravel, DroneTravelObservation,
+};
 use bevy_gym::training::{SeedConfig, SplitMix64};
 use bevy_gym::{Env, Reset, Step};
 
@@ -34,6 +36,7 @@ impl TravelTask {
     /// Supply a noncapturing factory to the shared rollout collector.
     pub(crate) fn factory(stage: Stage) -> fn() -> Self {
         match stage {
+            Stage::Endurance => || Self::new(Stage::Endurance),
             Stage::Near => || Self::new(Stage::Near),
             Stage::Far => || Self::new(Stage::Far),
             Stage::Fast => || Self::new(Stage::Fast),
@@ -76,10 +79,21 @@ fn make_episode(stage: Stage, seeds: SeedConfig, episode: u64) -> DroneTravel {
     let heading = random.f32_between(-std::f32::consts::PI, std::f32::consts::PI);
     // Radius and height are metres; trigonometric factors and normalized heading are unitless.
     let position = Vec3::new(radius * azimuth.cos(), height, radius * azimuth.sin());
-    let destination =
-        DroneDestination::try_from((position, Vec2::new(heading.cos(), heading.sin())))
-            .expect("closed stages generate finite interior positions and nonzero headings");
+    let body_seed = seeds.environment_episode(0, episode);
+    let direction = match stage {
+        Stage::Endurance => {
+            // Derive a fixed task heading from the same seeded body, never from a controller.
+            // This adds one bounded reset-world construction only for the preparatory stage.
+            let mut initial = DroneHover::disturbed();
+            let body = initial.reset(Some(body_seed)).observation;
+            let forward = body.orientation() * Vec3::NEG_Z;
+            Vec2::new(forward.x, forward.z)
+        }
+        Stage::Near | Stage::Far | Stage::Fast => Vec2::new(heading.cos(), heading.sin()),
+    };
+    let destination = DroneDestination::try_from((position, direction))
+        .expect("closed stages generate finite interior positions and nonzero headings");
     let mut environment = DroneTravel::new(destination);
-    environment.reset(Some(seeds.environment_episode(0, episode)));
+    environment.reset(Some(body_seed));
     environment
 }

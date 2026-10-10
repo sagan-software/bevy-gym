@@ -22,7 +22,7 @@ pub(crate) fn train(seed: u64, updates: NonZeroU32, output: &Path) -> Result<(),
     let transfer = serde_json::json!({"event":"checkpoint-transfer", "source":"qualified-recovery",
         "source_checkpoint":"docs/progress/drone-recovery-transfer.mpk",
         "qualified_record_sha256":"7c2b9a6f2a0288faa27676d1514848710f4d5c24cd77505e75cf4990576a12b1",
-        "destination":"travel-near", "optimizer":"fresh", "critic":"fresh", "optimizer_steps":0,
+        "destination":"travel-endurance", "optimizer":"fresh", "critic":"fresh", "optimizer_steps":0,
         "actor_observations":13, "inserted_heading_weights":"zero", "seed":seed});
     std::fs::write(output.join("transfer.json"), transfer.to_string())?;
     println!("{transfer}");

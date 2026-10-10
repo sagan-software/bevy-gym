@@ -4,6 +4,45 @@ Updated: 2026-10-09. Current work: RL-only drone/droid curriculum.
 
 ## Resume here
 
+### Travel endurance prerequisite experiment, 2026-10-09
+
+`b643be7be5d3ad3208853f4ce61c70c235366f0c` is verified on GitHub main. It added
+travel PPO training and separate frozen inference. Its remote CI was running and
+Browser preview pending at publication; those states are not local test results.
+
+Frozen diagnostics found that the qualified recovery actor terminates after
+691–729 actions on all five original-target hover episodes extended to 1,000 actions.
+Its existing 500-action qualification remains valid. Near-travel episodes terminate
+at 592–671 actions before training. Later candidate 120 survives extended hover but
+misses position gates; candidate 400 terminates on all five. The
+[diagnostic evidence](progress/drone-travel-endurance.json) records exact endings.
+
+The trainer now prepends `travel-endurance`: original hover position, immutable
+initial heading, the same 1,000-action horizon and settling gates, and minimum mean
+return 800. All near/far/fast profiles and thresholds remain unchanged. Reward,
+actuators and PPO settings are unchanged. Tests fix initial geometry, repeatability,
+and the original travel boundaries. This is an experimental prerequisite, not a
+qualified controller or a proven remedy for every training failure.
+
+The original `bevy-gym-travel-seed11-20261009.service` remains untouched.
+A separate `bevy-gym-travel-endurance-seed11-20261009.service` is active, with seed 11
+and at most 600 updates per stage. Artifacts and the launch manifest are in
+`runs/drone-travel/endurance-seed11-20261009`; its immutable binary is under
+`/home/sagan/.cache/bevy-gym-quality-validation/travel-endurance-seed11-20261009/`.
+The log is `/home/sagan/.cache/bevy-gym-quality-validation/travel-endurance-seed11.log`.
+Inspect these live units before acting; do not restart either from an observation timeout.
+
+Native learning tests (28, one ignored), curriculum unit tests (12), CLI tests (nine),
+root tests, strict native/WASM Clippy, WASM compilation and the browser suite pass.
+All 16 measured changed production lines were hit. The evidence records existing
+trainer success/error gaps. Changed-line personal Rust and Python lint are clean;
+strict personal Clippy still fails on the unchanged repository backlog.
+
+Next: compare the completed trials, then qualify a frozen candidate on held-out
+goals before adding qualified transfer or claiming competence. Travel browser scene
+and video evidence, later drone lessons, physical droid lessons, multi-agent training,
+and the spectator 3v3 arena remain unfinished.
+
 ### Travel PPO training and frozen inference, 2026-10-09
 
 This checkpoint adds `drone-curriculum --lesson travel`. It transfers the

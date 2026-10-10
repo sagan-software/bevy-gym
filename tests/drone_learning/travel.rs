@@ -186,3 +186,37 @@ fn travel_evaluation_is_frozen_and_rejects_wrong_input_width() {
     let wrong = crate::learning::new_agent(7).expect("hover width").policy();
     evaluation::evaluate(stage::Stage::Near, &wrong, &[42]).expect_err("wrong width cannot act");
 }
+
+/// Preparatory endurance holds the original position and initial heading for the full travel horizon.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn endurance_precedes_travel_without_relaxing_the_final_stages() {
+    use bevy_gym::Env;
+    assert_eq!(stage::Stage::ALL.first(), Some(&stage::Stage::Endurance));
+    let mut environment = environment::TravelTask::new(stage::Stage::Endurance);
+    for seed in [0, 1, 2, 42, u64::MAX] {
+        let observation = environment.reset(Some(seed)).observation;
+        let destination = observation.destination();
+        assert_eq!(destination.position(), Vec3::new(0.0, 2.0, 0.0));
+        assert!(encoding::heading_error(observation.body(), destination).abs() < 1e-6);
+        assert_eq!(observation, environment.reset(Some(seed)).observation);
+    }
+    assert_eq!(stage::Stage::Near.bounds(), ((0.5, 1.0), (1.5, 2.5)));
+    assert_eq!(stage::Stage::Far.bounds(), ((2.0, 4.0), (1.0, 4.0)));
+    assert_eq!(stage::Stage::Fast.bounds(), ((4.0, 6.0), (1.0, 5.0)));
+    assert_eq!(
+        stage::Stage::Near.minimum_return().to_bits(),
+        600.0_f64.to_bits()
+    );
+    assert_eq!(
+        stage::Stage::Far.minimum_return().to_bits(),
+        500.0_f64.to_bits()
+    );
+    assert_eq!(
+        stage::Stage::Fast.minimum_return().to_bits(),
+        500.0_f64.to_bits()
+    );
+    assert_eq!(stage::Stage::Near.deadline(), 500);
+    assert_eq!(stage::Stage::Far.deadline(), 500);
+    assert_eq!(stage::Stage::Fast.deadline(), 250);
+}

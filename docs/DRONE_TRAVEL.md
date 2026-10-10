@@ -92,7 +92,7 @@ propagation regions remain unhit; the evidence records their exact locations.
 
 ## Training and frozen inference
 
-Run the three travel stages with a finite budget per stage:
+Run preparatory endurance followed by three travel stages, with a finite budget per stage:
 
 ```sh
 nix develop --command cargo run --no-default-features --features robots \
@@ -118,13 +118,14 @@ Evaluate a saved candidate without training:
 ```sh
 nix develop --command cargo run --no-default-features --features robots \
   --example drone-curriculum -- --lesson travel --seed 42 \
-  --evaluate-checkpoint runs/drone-travel/seed11/travel-near-20.mpk \
-  --travel-stage travel-near
+  --evaluate-checkpoint runs/drone-travel/seed11/travel-endurance-20.mpk \
+  --travel-stage travel-endurance
 ```
 
 The command requires an existing 13-input checkpoint and creates no output files.
 Missing, incompatible, or invalid inference fails visibly; there is no fallback.
-`--travel-stage` accepts `travel-near`, `travel-far`, or `travel-fast`, defaults to
+`--travel-stage` accepts `travel-endurance`, `travel-near`, `travel-far`, or
+`travel-fast`, defaults to
 `travel-near`, and requires `--evaluate-checkpoint`. Evaluation requires
 `--lesson travel` and conflicts with `--updates` and `--initialize-from`.
 A single episode explicitly reports that it does not establish qualification.
@@ -149,10 +150,17 @@ both streams at episode zero; omitted seeds advance the wrapping episode index.
 Stream 1 draws radius, azimuth, height, and heading in that order. Azimuth and heading
 use the sampler's float range from minus pi to pi. Position is
 `(radius × cos(azimuth), height, radius × sin(azimuth))`; heading is
-`(cos(heading), sin(heading))` in world X/Z.
+`(cos(heading), sin(heading))` in world X/Z for near, far, and fast travel.
+Endurance instead fixes position `(0, 2, 0)` metres and derives heading once from
+the seeded initial body's forward vector projected onto world X/Z. The destination
+then remains immutable; it does not follow the body or choose motor actions.
+This reset uses one additional temporary physics world, with constant time and space
+relative to episode length. The original travel sampling streams are unchanged.
 
 The fixed stage profiles are:
 
+- `travel-endurance`: original hover position and initial heading, first arrival by
+  action 500, mean return at least 800.
 - `travel-near`: radius 0.5–1 m, height 1.5–2.5 m, first arrival by action 500,
   mean return at least 600.
 - `travel-far`: radius 2–4 m, height 1–4 m, first arrival by action 500,
@@ -192,3 +200,20 @@ default curriculum still runs hover and recovery only. Existing hover/recovery
 videos do not establish travel competence.
 
 [flightmare]: https://github.com/uzh-rpg/flightmare/blob/master/flightlib/src/envs/quadrotor_env/quadrotor_env.cpp
+
+## Endurance prerequisite experiment
+
+Frozen diagnostics found a transfer gap: the qualified recovery actor terminated
+between actions 691 and 729 on all five original-target hover episodes extended to
+20 seconds. Its existing 500-action qualification remains valid. The same actor
+terminated between actions 592 and 671 on the five near-travel episodes. Update 120
+survived all five extended hover episodes but missed the position gate; update 400
+terminated on all five. These observations do not isolate every cause of PPO failure.
+
+[Diagnostic and validation evidence](progress/drone-travel-endurance.json) preserves
+the measured episode endings and source identity. The added endurance prerequisite
+trains the longer horizon before goal changes. It retains the existing reward,
+actuators, PPO settings, and every near/far/fast gate. Its success is unproven.
+The original trial remains preserved. A separate seed-11 experiment runs under
+`bevy-gym-travel-endurance-seed11-20261009.service`, with artifacts in
+`runs/drone-travel/endurance-seed11-20261009`. Neither trial establishes travel competence.

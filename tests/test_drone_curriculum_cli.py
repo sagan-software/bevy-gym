@@ -43,25 +43,25 @@ class DroneCurriculumCli(unittest.TestCase):
                 cwd=ROOT, capture_output=True, text=True, check=False,
             )
             self.assertEqual(result.returncode, 1, result.stderr)
-            self.assertIn("Lesson travel-near exhausted", result.stderr)
-            record = json.loads((Path(directory) / "travel-near-1.json").read_text())
+            self.assertIn("Lesson travel-endurance exhausted", result.stderr)
+            record = json.loads((Path(directory) / "travel-endurance-1.json").read_text())
             self.assertFalse(record["passed"])
             self.assertEqual(record["update"], 1)
             self.assertGreater(record["optimizer_steps"], 0)
             self.assertEqual(len(record["episodes"]), 5)
             transfer = json.loads((Path(directory) / "transfer.json").read_text())
             self.assertEqual(transfer["source"], "qualified-recovery")
-            self.assertEqual(transfer["destination"], "travel-near")
+            self.assertEqual(transfer["destination"], "travel-endurance")
             self.assertEqual(transfer["optimizer"], "fresh")
             self.assertEqual(transfer["actor_observations"], 13)
             self.assertEqual(sorted(p.name for p in Path(directory).iterdir()),
-                             ["transfer.json", "travel-near-1.json", "travel-near-1.mpk"])
-            checkpoint = Path(directory) / "travel-near-1.mpk"
+                             ["transfer.json", "travel-endurance-1.json", "travel-endurance-1.mpk"])
+            checkpoint = Path(directory) / "travel-endurance-1.mpk"
             before = checkpoint.read_bytes()
             inference = subprocess.run(
                 [str(TARGET / "debug/examples/drone-curriculum"),
                  "--lesson", "travel", "--evaluate-checkpoint", str(checkpoint),
-                 "--travel-stage", "travel-near", "--seed", "42",
+                 "--travel-stage", "travel-endurance", "--seed", "42",
                  "--output", str(Path(directory) / "inference-must-not-write")],
                 cwd=ROOT, capture_output=True, text=True, check=False,
             )
