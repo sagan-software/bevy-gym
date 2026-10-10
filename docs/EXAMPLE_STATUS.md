@@ -4,6 +4,40 @@ Updated: 2026-10-10. Current work: RL-only drone/droid curriculum.
 
 ## Resume here
 
+### Endurance passes held-out evaluation; standing browser refreshed, 2026-10-10
+
+Seed 29 passed endurance selection and separate-process validation at update 6,860,
+after 3,512,320 transitions. It also passed all 32 final held-out endurance cases:
+1,000 actions each, at least 891 final settled actions and maximum heading error
+0.233009 radians. The [complete record](progress/drone-travel-endurance-seed29.json)
+and [checkpoint](progress/drone-travel-endurance-seed29.mpk) preserve the result.
+The four-stage suite still exits 1 because later stages are untrained at this checkpoint.
+Travel remains unqualified. Seed 29 continues near travel; the
+[independent seed-31 run](progress/drone-travel-gated-seed31.json) has started with the
+same enforced promotion gates and a one-core CPU limit.
+
+Standing's browser scene now bundles the evaluated update-7,920 candidate and retains
+its `Unqualified RL` label. The camera follows observed body bounds without changing
+policy or physics. Desktop and mobile checks keep the terminal mesh in frame.
+The [recording](progress/standing-seed17-update7920/browser-desktop-one.mp4) and
+[evidence](progress/standing-seed17-update7920/browser-evidence.json) preserve checks,
+hashes and exact coverage gaps.
+
+All 230 browser tests pass, including a 366-frame
+native/WASM policy-action replay. Native tests, formatting and strict Clippy pass;
+changed-line personal Rust lint is clean. Five of six new camera branch outcomes
+are covered.
+
+Startup paths remain unhit in native LLVM tests, and native window
+interaction remains unverified. Physical trajectories differ: 366 native actions,
+418 browser actions. Standing remains unqualified; its seed-17 training continues.
+
+Markdown formatting passes. Personal Markdown lint retains 13 diagnostics; every
+diagnosed paragraph matches `HEAD` verbatim. New paragraphs pass its sentence limit.
+
+Next: inspect both gated travel runs and standing training before choosing another
+checkpoint. Later curriculum skills and browser 3v3 remain unfinished.
+
 ### Real promotion rejection and standing held-out failure, 2026-10-10
 
 The new trainer rejected the update-1,860 travel selection in a separate process.

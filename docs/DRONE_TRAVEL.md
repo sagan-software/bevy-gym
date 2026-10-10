@@ -69,8 +69,9 @@ against pi/12 permitted. The shortest final settled streak was zero. The
 [complete 128-episode suite](progress/drone-travel-endurance-seed23-held-out.json)
 preserve checkpoint identity and every case.
 
-Endurance remains unqualified. The immutable batched trial advances after selection
-alone. The current trainer requires separate-process validation before each transition.
+That seed-23 endurance checkpoint remains unqualified. The immutable batched trial
+advances after selection alone. The current trainer requires separate-process validation
+before each transition.
 The older process retains its historical behavior; its transitions do not establish qualification.
 
 ## Independent promotion validation
@@ -152,6 +153,34 @@ with zero added heading weights, a fresh critic and fresh Adam, sampling and rec
 state. It does not resume optimizer state. The immutable executable runs under
 `bevy-gym-travel-gated-seed29-20261010.service`, with output in
 `runs/drone-travel/gated-seed29-20261010`. Inspect live reports before claiming progress.
+
+## Seed-29 endurance passes independent evaluation
+
+At update 6,860, after 3,512,320 transitions, seed 29 passed five-root selection and
+all 32 separate-process validation cases. The trainer advanced to near travel only
+after checkpoint identity and physical gates agreed with the successful child status.
+The [complete record](progress/drone-travel-endurance-seed29.json) preserves selection,
+validation, the final suite, executable identity and the exact evaluation command.
+The [frozen checkpoint](progress/drone-travel-endurance-seed29.mpk) retains SHA-256
+`786beae0324155644eb9499ef215934c75adf19faea581d5fd23e93753b7de23`.
+
+Endurance also passed all 32 final held-out cases. Every episode survived 1,000 actions;
+the shortest final settled streak was 891 actions, maximum heading error was
+0.233009 radians, and mean return was 981.358. The complete four-stage report exits 1
+because near, far and fast remain untrained transfer diagnostics at this checkpoint.
+Travel remains unqualified; later stages and independent-run evidence remain required.
+
+Executing the frozen evaluator with these real RL weights also hit its successful
+return under LLVM coverage. The promotion module now records 64/65 lines, including
+tests, and all four instrumented branch outcomes. Serialization-error propagation
+at `examples/robots/travel/promotion/mod.rs:16` remains unhit.
+
+The [seed-31 run](progress/drone-travel-gated-seed31.json) independently trains from the
+same qualified recovery parent with fresh critic, Adam, samplers and recurrent state.
+It uses the enforced gates and 24,000 updates per stage, with a one-core CPU limit.
+Its service is `bevy-gym-travel-gated-seed31-20261010.service`; output is
+`runs/drone-travel/gated-seed31-20261010`. Inspect live reports before claiming progress.
+No final held-out feedback enters either training run.
 
 ## Run the travel scene
 

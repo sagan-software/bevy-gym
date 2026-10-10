@@ -262,6 +262,43 @@ fn apply(control: Control, viewer: &mut Viewer, rig: &Rig) {
     }
 }
 
+/// Follow observed body bounds; camera movement cannot issue actions or change physics.
+pub(super) fn frame_body(
+    viewer: Res<'_, Viewer>,
+    mut camera: Single<'_, '_, &mut Transform, With<Camera3d>>,
+) {
+    let Ok(session) = &viewer.session else {
+        return;
+    };
+    let observation = session.observation();
+    let positions = DroidBody::ALL.map(|body| observation.body(body).position());
+    if let Some(transform) = framed_transform(&positions) {
+        **camera = transform;
+    }
+}
+
+/// Centre finite body positions in metres while preserving the spectator's viewing direction.
+/// Bevy 0.18.1: <https://docs.rs/bevy/0.18.1/bevy/prelude/struct.Transform.html#method.looking_at>.
+fn framed_transform(positions: &[Vec3; 13]) -> Option<Transform> {
+    let mut minimum = Vec3::splat(f32::INFINITY);
+    let mut maximum = Vec3::splat(f32::NEG_INFINITY);
+    for position in positions {
+        if !position.is_finite() {
+            return None;
+        }
+        minimum = minimum.min(*position);
+        maximum = maximum.max(*position);
+    }
+    // Halving each metre coordinate before adding avoids overflow in the bounds midpoint.
+    let target = minimum * 0.5 + maximum * 0.5;
+    // The offset is in metres; the dimensionless 1.15 factor leaves room for the mesh.
+    // looking_at derives presentation rotation only.
+    Some(
+        Transform::from_translation(target + Vec3::new(2.7, 0.95, -3.2) * 1.15)
+            .looking_at(target, Vec3::Y),
+    )
+}
+
 /// Keyboard shortcuts are spectator input only.
 pub(super) fn keyboard(
     keys: Res<'_, ButtonInput<KeyCode>>,
@@ -340,6 +377,88 @@ fn telemetry(session: &Session, playback: &Playback, speed: super::Speed) -> Str
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// Keep the terminal body centres inside the mobile frustum without advancing policy state.
+    #[test]
+    fn camera_frames_the_evaluated_body_at_mobile_width() {
+        use bevy::camera::CameraProjection;
+        let mut session = crate::standing::session::load(
+            include_bytes!("../../../docs/progress/standing-seed17-update7920/policy.mpk").to_vec(),
+            include_bytes!("../../../docs/progress/standing-seed17-update7920/policy.json"),
+            42,
+        )
+        .expect("evaluated RL candidate");
+        while !session.status().is_done() {
+            session.step();
+        }
+        let before = session.observation();
+        let positions = DroidBody::ALL.map(|body| before.body(body).position());
+        let camera = framed_transform(&positions).expect("finite body");
+        // CSS width 390 px / height 788 px gives a dimensionless viewport aspect ratio.
+        let perspective = PerspectiveProjection {
+            aspect_ratio: 390.0 / 788.0,
+            ..default()
+        };
+        let clip_from_world =
+            perspective.get_clip_from_view() * GlobalTransform::from(camera).to_matrix().inverse();
+        for position in positions {
+            let clip = clip_from_world * position.extend(1.0);
+            // Divide homogeneous clip coordinates by W to obtain unitless device coordinates.
+            let ndc = clip.truncate() / clip.w;
+            assert!(
+                clip.w > 0.0
+                    && (0.0..=1.0).contains(&ndc.z)
+                    && ndc.x.abs() < 0.9
+                    && ndc.y.abs() < 0.9,
+                "visible centre {ndc:?}"
+            );
+        }
+        assert_eq!(
+            session.observation(),
+            before,
+            "camera cannot mutate physics"
+        );
+    }
+
+    /// Invalid body points retain the last camera; valid bounds shift only presentation.
+    #[test]
+    fn camera_rejects_nonfinite_points_and_preserves_failed_sessions() {
+        let points = [Vec3::new(2.0, 1.0, 3.0); 13];
+        let transform = framed_transform(&points).expect("finite coincident centres");
+        // Expected translation and the 0.00001 tolerance are measured in world metres.
+        assert!((transform.translation - Vec3::new(5.105, 2.0925, -0.68)).length() < 0.000_01);
+        for invalid in [f32::NAN, f32::INFINITY, f32::NEG_INFINITY] {
+            let mut invalid_points = points;
+            invalid_points[6].x = invalid;
+            assert!(framed_transform(&invalid_points).is_none());
+        }
+        let mut app = App::new();
+        app.insert_resource(Viewer {
+            title: "Trial",
+            session: Err("missing checkpoint".to_owned()),
+            checkpoint_label: String::new(),
+            playback: Playback::Paused,
+            speed: super::super::Speed::One,
+        })
+        .add_systems(Update, frame_body);
+        let entity = app.world_mut().spawn((Camera3d::default(), transform)).id();
+        app.update();
+        assert_eq!(app.world().get::<Transform>(entity), Some(&transform));
+        let bytes = include_bytes!("../../../docs/progress/standing-seed17-update7920/policy.mpk");
+        let record =
+            include_bytes!("../../../docs/progress/standing-seed17-update7920/policy.json");
+        let session = crate::standing::session::load(bytes.to_vec(), record, 42)
+            .expect("evaluated RL candidate");
+        let observation = session.observation();
+        app.world_mut().resource_mut::<Viewer>().session = Ok(session);
+        app.update();
+        assert_ne!(app.world().get::<Transform>(entity), Some(&transform));
+        let viewer = app.world().resource::<Viewer>();
+        let session = viewer.session.as_ref().expect("unchanged policy session");
+        assert_eq!(session.steps(), 0);
+        assert_eq!(session.observation(), observation);
+        assert!(session.last_action().is_none());
+    }
 
     /// The complete overlay exposes checkpoint failures and model readiness before playback.
     #[test]

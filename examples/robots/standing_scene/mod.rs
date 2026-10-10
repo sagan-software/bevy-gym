@@ -65,8 +65,8 @@ struct Viewer {
 
 /// Start the preserved failed PPO candidate; this is not a qualified standing lesson.
 pub(super) fn run() {
-    let bytes = include_bytes!("../../../docs/progress/droid-standing-trial.mpk");
-    let metadata = include_bytes!("../../../docs/progress/droid-standing-trial.json");
+    let bytes = include_bytes!("../../../docs/progress/standing-seed17-update7920/policy.mpk");
+    let metadata = include_bytes!("../../../docs/progress/standing-seed17-update7920/policy.json");
     let session = session::load(bytes.to_vec(), metadata, 42).map_err(|error| error.to_string());
     let digest = Sha256::digest(bytes);
     let hex = format!("{digest:x}");
@@ -116,7 +116,13 @@ pub(super) fn run() {
         .add_systems(FixedUpdate, advance)
         .add_systems(
             Update,
-            (view::keyboard, rig::project, view::refresh).chain(),
+            (
+                view::keyboard,
+                view::frame_body,
+                rig::project,
+                view::refresh,
+            )
+                .chain(),
         )
         .add_systems(PostUpdate, rig::capture.after(TransformSystems::Propagate))
         .run();

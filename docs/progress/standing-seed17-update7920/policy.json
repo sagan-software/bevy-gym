@@ -1,0 +1,9 @@
+{
+  "schema": "droid-standing-v1",
+  "algorithm": "PPO",
+  "seed": 17,
+  "update": 7920,
+  "transitions": 4055040,
+  "optimizer_steps": 63244,
+  "sha256": "bd0d16693de7ce4db52c2bceef9d50569a558efdd3efc9a34c3562e672e042a2"
+}

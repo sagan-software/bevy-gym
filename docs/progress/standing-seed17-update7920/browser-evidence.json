@@ -1,0 +1,263 @@
+{
+  "recorded_utc": "2026-10-10T12:14:49.037220+00:00",
+  "checkpoint": {
+    "schema": "droid-standing-v1",
+    "algorithm": "PPO",
+    "seed": 17,
+    "update": 7920,
+    "transitions": 4055040,
+    "optimizer_steps": 63244,
+    "sha256": "bd0d16693de7ce4db52c2bceef9d50569a558efdd3efc9a34c3562e672e042a2"
+  },
+  "qualification": "Unqualified. All 32 final held-out episodes failed; evaluation.json preserves every case.",
+  "native_action_parity": {
+    "frames": 366,
+    "input_features": 204,
+    "output_torque_fractions": 26,
+    "maximum_absolute_error": 1e-05,
+    "memory": "Fresh at frame zero; recurrent state preserved across recorded inputs.",
+    "native_trace_sha256": "518f397a74e901f8871db45560c807ed21e41d2f91b54a86c07ab4d43c72ec44",
+    "artifact_sha256": "808d7e987d0d9a36cfd65c0fba73fdc5f66908c09a09f2997acbe3e2d9843c7a",
+    "scope": "Identical actor inputs; excludes accumulated native/WASM physics differences."
+  },
+  "native_gates": [
+    {
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "log": "/home/sagan/.cache/bevy-gym-quality-validation/standing7920-release-native-0.log"
+    },
+    {
+      "command": [
+        "cargo",
+        "test"
+      ],
+      "exit_code": 0,
+      "log": "/home/sagan/.cache/bevy-gym-quality-validation/standing7920-release-native-1.log"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--features",
+        "robots",
+        "--example",
+        "droid-standing-scene",
+        "--test",
+        "droid_skill_session"
+      ],
+      "exit_code": 0,
+      "log": "/home/sagan/.cache/bevy-gym-quality-validation/standing7920-release-native-2.log"
+    },
+    {
+      "command": [
+        "cargo",
+        "clippy",
+        "--all-targets",
+        "--all-features",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "log": "/home/sagan/.cache/bevy-gym-quality-validation/standing7920-release-native-3.log"
+    }
+  ],
+  "browser_tests": {
+    "command": "nix run .#drone-browser-check",
+    "exit_code": 0,
+    "passed": 230,
+    "log": "/home/sagan/.cache/bevy-gym-quality-validation/standing7920-release-browser-tests.log"
+  },
+  "browser": {
+    "url": "http://100.105.254.50:4191/standing/?candidate=7920&framing=body-bounds-margin",
+    "build": "build-dcb152a5c37d53572ceb8931dcf7213ff3243247b8977f9635f6586832d491c7",
+    "viewports_css_pixels": [
+      [
+        390,
+        844
+      ],
+      [
+        1280,
+        800
+      ]
+    ],
+    "controls_checked": [
+      "Step (N)",
+      "Reset (R)",
+      "Run/Pause (Space)",
+      "Speed (V): 1, 4, 16"
+    ],
+    "terminal_policy_actions": 418,
+    "native_policy_actions": 366,
+    "full_trajectory_parity": "Not established; physical trajectories differ.",
+    "console_errors": 0,
+    "renderer": "WebGL2 ANGLE NVIDIA RTX 5070 Ti",
+    "visibility": "document.visibilityState=visible; preview metadata visible=false. Foreground inline pane visibility remains unverified.",
+    "native_window_interaction": "Unverified.",
+    "camera": "Readonly body bounds determine the spectator camera; no policy, observation, actuator or physical state writes.",
+    "review": "Inspected desktop and mobile screenshots and sampled mobile recording. The terminal body remains in frame; controls and checkpoint state are readable.",
+    "terminal_policy_actions_by_speed": {
+      "1": 418,
+      "16": 418
+    }
+  },
+  "personal_rust": {
+    "changed_line_diagnostics": 0,
+    "relaxed_clippy_exit": 0,
+    "strict_clippy_exit": 101,
+    "dylint_exit": 0,
+    "strict_failure": "Existing repository diagnostics outside changed lines. Strict repository cargo clippy passes.",
+    "logs": "/home/sagan/.cache/bevy-gym-quality-validation/logs/standing7920-release-personal-strict"
+  },
+  "artifacts": {
+    "browser-desktop-ready.png": "6c78a2ee827259eeeb0cb522fcb75c2b122615fdf877f4d628699ba474f2b168",
+    "browser-mobile.mp4": "0585cbf2fdfcbc01c0fc43abff0db51ca3f6dfd943a28e765be70d9d564a4339",
+    "browser-desktop-ended.png": "89075b633f50485c22ec31f26879e8a830e34369841fec6dae53ffff41cc35ad",
+    "browser-desktop-one-ended.png": "a0e07843d5ca4d0f0aec66360b75010a77c0404019f97cc6ad474d03138b7228",
+    "browser-mobile-ended.png": "f4cbc76c48df42ea3fb3798caa7b4b6c1546faf0ec24f4d1149f2f7113f23dc2",
+    "browser-mobile-ready.png": "a8a427f612825d748abc51147a7f21b4634c4172ac766e30f79b32a1baaa8eb8",
+    "browser-desktop-one.mp4": "dcfeba8d080fc27a338305667d8cbb3934ed687cd78d7112a6d8a1fb14b7bcb0",
+    "browser-desktop-step.png": "cd70a305e79bdb25d42c0d67656945f723439214e07754920f8dc4fea0ee6b29",
+    "browser-desktop.mp4": "6e6b56deebefe6c64e043ecd8eebc4cc17d02b01c85c2fdcd98bd79897e2c172"
+  },
+  "coverage": {
+    "command": "cargo llvm-cov --no-clean --branch --features robots --test droid_skill_session --example droid-standing-scene --json --output-path /home/sagan/.cache/bevy-gym-quality-validation/standing7920-coverage.json --disable-default-ignore-filename-regex",
+    "exit_code": 0,
+    "report_sha256": "6a98f5f989f345631a7f2e74a3eafde60bdd80ac5d84cf2096842b68ed8dbc98",
+    "report": "/home/sagan/.cache/bevy-gym-quality-validation/standing7920-coverage.json",
+    "new_camera_branch_outcomes": {
+      "covered": 5,
+      "total": 6
+    },
+    "framed_transform": "Both finite and nonfinite branches executed. NaN and both infinities rejected.",
+    "gaps": [
+      {
+        "path": "examples/robots/standing_scene/view.rs:275",
+        "gap": "frame_body None outcome unhit. Session exposes authoritative finite body observations; direct helper tests exercise nonfinite rejection."
+      },
+      {
+        "path": "examples/robots/standing_scene/mod.rs:68",
+        "gap": "Bundled checkpoint/sidecar loading and camera system registration at lines 120-126 remain unhit in native LLVM tests. Actual browser playback exercises startup and registration; native window interaction is unverified."
+      }
+    ],
+    "file_summaries_including_tests": {
+      "examples/robots/standing_scene/mod.rs": {
+        "branches": {
+          "count": 2,
+          "covered": 2,
+          "notcovered": 0,
+          "percent": 100.0
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0.0
+        },
+        "functions": {
+          "count": 9,
+          "covered": 5,
+          "percent": 55.55555555555556
+        },
+        "instantiations": {
+          "count": 9,
+          "covered": 5,
+          "percent": 55.55555555555556
+        },
+        "lines": {
+          "count": 143,
+          "covered": 85,
+          "percent": 59.44055944055944
+        },
+        "regions": {
+          "count": 190,
+          "covered": 121,
+          "notcovered": 69,
+          "percent": 63.684210526315795
+        }
+      },
+      "examples/robots/standing_scene/view.rs": {
+        "branches": {
+          "count": 36,
+          "covered": 27,
+          "notcovered": 9,
+          "percent": 75.0
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0.0
+        },
+        "functions": {
+          "count": 28,
+          "covered": 26,
+          "percent": 92.85714285714286
+        },
+        "instantiations": {
+          "count": 28,
+          "covered": 26,
+          "percent": 92.85714285714286
+        },
+        "lines": {
+          "count": 528,
+          "covered": 515,
+          "percent": 97.53787878787878
+        },
+        "regions": {
+          "count": 727,
+          "covered": 702,
+          "notcovered": 25,
+          "percent": 96.56121045392022
+        }
+      },
+      "tests/droid_skill_session.rs": {
+        "branches": {
+          "count": 6,
+          "covered": 5,
+          "notcovered": 1,
+          "percent": 83.33333333333334
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0.0
+        },
+        "functions": {
+          "count": 9,
+          "covered": 9,
+          "percent": 100.0
+        },
+        "instantiations": {
+          "count": 9,
+          "covered": 9,
+          "percent": 100.0
+        },
+        "lines": {
+          "count": 153,
+          "covered": 150,
+          "percent": 98.0392156862745
+        },
+        "regions": {
+          "count": 410,
+          "covered": 403,
+          "notcovered": 7,
+          "percent": 98.29268292682929
+        }
+      }
+    },
+    "initial_attempt": "Direct process terminated with exit 143 before producing a report. Detached exact-command retry passed."
+  },
+  "source_sha256": {
+    "examples/robots/standing_scene/mod.rs": "74219ded9bb9f93c81587d8d0c9760d77fb441a367b71d89dfd9586d82c0012f",
+    "examples/robots/standing_scene/view.rs": "94c09b41177456b0afd6141df55c175436de5fd1dc68b32d6cbfc0e89a885e76",
+    "tests/droid_skill_session.rs": "ff7f1a34596be3d9f0e874b539fdfbcbed0200ec2f109425dbfe18a8aba2cade"
+  }
+}

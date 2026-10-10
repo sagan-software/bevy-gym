@@ -180,10 +180,29 @@ fn standing_browser_policy_matches_native_actions_on_identical_inputs() {
         "../docs/progress/droid-standing-native-trace.json"
     ))
     .expect("preserved native trace");
-    let (policy, _) = standing::checkpoint::from_bytes(CHECKPOINT.to_vec(), RECORD)
-        .expect("same frozen candidate");
-    let mut memory = policy.initial_memory();
     assert_eq!(expected.len(), 62, "complete native recurrent episode");
+    assert_policy_actions(CHECKPOINT, RECORD, &expected);
+}
+
+/// The evaluated seed-17 bundle preserves native actions under browser inference.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn evaluated_standing_candidate_matches_native_actions_on_identical_inputs() {
+    let bytes = include_bytes!("../docs/progress/standing-seed17-update7920/policy.mpk");
+    let record = include_bytes!("../docs/progress/standing-seed17-update7920/policy.json");
+    let expected: Vec<serde_json::Value> = serde_json::from_str(include_str!(
+        "../docs/progress/standing-seed17-update7920/native-actions.json"
+    ))
+    .expect("complete independent native episode");
+    assert_eq!(expected.len(), 366, "complete seed-42 episode");
+    assert_policy_actions(bytes, record, &expected);
+}
+
+/// Replay recorded actor inputs with fresh memory, avoiding accumulated physics differences.
+fn assert_policy_actions(bytes: &[u8], record: &[u8], expected: &[serde_json::Value]) {
+    let (policy, _) =
+        standing::checkpoint::from_bytes(bytes.to_vec(), record).expect("same frozen candidate");
+    let mut memory = policy.initial_memory();
     for (frame, expected) in expected.iter().enumerate() {
         let input: Vec<f32> = expected["input"]
             .as_array()

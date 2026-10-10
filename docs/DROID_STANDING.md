@@ -3,7 +3,7 @@
 Status: PPO training and frozen inference run through the physical environment.
 No standing policy is qualified. The standalone mannequin scene runs frozen RL inference.
 
-Inspect the preserved failed candidate:
+Inspect the evaluated seed-17 candidate at PPO update 7,920:
 
 ```sh
 nix develop --command cargo run --features robots --example droid-standing-scene
@@ -487,3 +487,37 @@ exact command. Checkpoint bytes remained unchanged. The
 [episode CSV](progress/standing-seed17-update7920/episodes.csv) and
 [plot](progress/standing-seed17-update7920/held-out.png) retain every case.
 The larger seed-17 run continues; no standing policy is qualified.
+
+## Evaluated candidate in the browser
+
+The standalone scene now bundles the exact update-7,920 policy and its sidecar.
+The older update-100 artifacts remain preserved. The scene labels the current
+candidate `Unqualified RL` and shows its update and checkpoint digest.
+
+The [browser evidence](progress/standing-seed17-update7920/browser-evidence.json)
+records source and artifact hashes, checks and verification gaps. The
+[desktop recording](progress/standing-seed17-update7920/browser-desktop-one.mp4) shows
+1× playback; the [mobile recording](progress/standing-seed17-update7920/browser-mobile.mp4)
+shows 16× playback. Both end after 418 actions. Native seed-42 inference ends after
+366 actions. Full physical trajectory parity remains unestablished.
+
+The new native/WASM test replays 366 identical 204-feature actor inputs with fresh
+initial memory and compares all 26 torque fractions within absolute tolerance 0.00001.
+It retains recurrent state between inputs. All 230 browser tests pass, including this
+replay and the historical 62-frame replay. Native default tests, 24 session tests,
+26 scene tests, formatting and strict repository Clippy pass.
+
+The camera follows observed body bounds and leaves physical and policy state unchanged.
+A mobile frustum test checks every terminal body centre; invalid points preserve the
+camera. Desktop and mobile render checks keep the fallen mesh in frame.
+
+Coverage hits five of six new camera branch outcomes. `frame_body`'s `None` outcome
+at `examples/robots/standing_scene/view.rs:275` remains unhit because the session
+exposes authoritative finite body observations. Direct helper tests reject NaN and
+both infinities. Native LLVM tests do not execute bundled loading at
+`examples/robots/standing_scene/mod.rs:68` or system registration at lines 120–126.
+Browser playback exercises those paths.
+
+Native window interaction and foreground
+preview-pane visibility remain unverified. Changed-line personal Rust lint is clean;
+its strict Clippy child still fails on existing diagnostics outside changed lines.
