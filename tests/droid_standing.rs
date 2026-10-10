@@ -112,3 +112,18 @@ fn torques_actuate_every_axis() {
         }
     }
 }
+
+/// The read-only bind profile reconstructs every seeded reset without renderer constants.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn bind_positions_reconstruct_the_physical_reset() {
+    use bevy::math::Vec3;
+    for seed in [0, 42, u64::MAX] {
+        let observation = DroidStanding::default().reset(Some(seed)).observation;
+        let rotation = observation.body(DroidBody::Pelvis).orientation();
+        for body in DroidBody::ALL {
+            let expected = rotation * body.bind_position() + Vec3::Y * 0.03;
+            assert!(observation.body(body).position().distance(expected) < 0.000_001);
+        }
+    }
+}

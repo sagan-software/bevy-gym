@@ -1,0 +1,120 @@
+{
+  "manifest": {
+    "schema": "droid-standing-recovery-run-v1",
+    "started_utc": "2026-10-10T05:05:12.556662+00:00",
+    "run_kind": "restart_from_random_weights",
+    "interrupted_run": "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/runs/droid-standing/seed7-20261009",
+    "original_manifest": "/home/sagan/.cache/bevy-gym-quality-validation/standing-seed7-20261009/manifest.json",
+    "original_manifest_sha256": "8858b9378ee2309cb9b2c0c02a1435071adb5a3bc21939129996382910de5729",
+    "source_base": "74a7832de870d2d6ef23051975ee9dd04cbcbd0e",
+    "patch_sha256": "fc7b2f1844a3f23f7ec665781113b8345bae27c96011fe933b030e115d2536a8",
+    "binary_sha256": "43c48abcfcb94c516153aef0c2833cb9e376b09a3d577b615231a8231ce1d992",
+    "command": [
+      "/home/sagan/.cache/bevy-gym-quality-validation/standing-seed7-20261009/droid-standing",
+      "train",
+      "--seed",
+      "7",
+      "--updates",
+      "600",
+      "--output",
+      "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/runs/droid-standing/seed7-recovery-20261010"
+    ],
+    "unit": "bevy-gym-standing-seed7-recovery-20261010.service",
+    "log": "/home/sagan/.cache/bevy-gym-quality-validation/standing-seed7-recovery-20261010.log",
+    "resource_limits": {
+      "cpu_quota_percent": 200,
+      "memory_max_bytes": 2147483648,
+      "nice": 10
+    },
+    "qualification": "unqualified; selection and held-out gates unchanged"
+  },
+  "prefix_audit": {
+    "original_complete_updates": 217,
+    "recovery_complete_updates_at_audit": 533,
+    "optimizer_prefix_equal": true,
+    "checkpoint_byte_identity": "different at update20; not claimed"
+  },
+  "complete_updates": 600,
+  "terminal_error": "Standing exhausted its update budget without passing; checkpoint is not qualified.",
+  "selection600": {
+    "episodes": [
+      {
+        "final_distance": 0.6974053978919983,
+        "final_height": 0.6596959829330444,
+        "final_speed": 2.1960346698760986,
+        "final_upright": 0.7596964240074158,
+        "reward": 66.62000393867493,
+        "seed": 0,
+        "stable_actions": 0,
+        "steps": 91,
+        "supported": false,
+        "survived": false
+      },
+      {
+        "final_distance": 0.7806767225265503,
+        "final_height": 0.49012356996536255,
+        "final_speed": 2.4054746627807617,
+        "final_upright": 0.7732672095298767,
+        "reward": 51.561141818761826,
+        "seed": 1,
+        "stable_actions": 0,
+        "steps": 78,
+        "supported": false,
+        "survived": false
+      },
+      {
+        "final_distance": 0.7839524745941162,
+        "final_height": 0.5744103789329529,
+        "final_speed": 2.378188371658325,
+        "final_upright": 0.7376072406768799,
+        "reward": 57.264993377029896,
+        "seed": 2,
+        "stable_actions": 0,
+        "steps": 84,
+        "supported": false,
+        "survived": false
+      },
+      {
+        "final_distance": 0.8065574765205383,
+        "final_height": 0.5365959405899048,
+        "final_speed": 2.5145139694213867,
+        "final_upright": 0.7183732986450195,
+        "reward": 67.83626892790198,
+        "seed": 42,
+        "stable_actions": 0,
+        "steps": 96,
+        "supported": false,
+        "survived": false
+      },
+      {
+        "final_distance": 0.8092025518417358,
+        "final_height": 0.4894349277019501,
+        "final_speed": 3.003671169281006,
+        "final_upright": 0.5785547494888306,
+        "reward": 56.2839975617826,
+        "seed": 18446744073709551615,
+        "stable_actions": 0,
+        "steps": 82,
+        "supported": true,
+        "survived": false
+      }
+    ],
+    "mode": "selection",
+    "passed": false,
+    "provenance": {
+      "algorithm": "PPO",
+      "optimizer_steps": 5800,
+      "schema": "droid-standing-v1",
+      "seed": 7,
+      "sha256": "1d2edc383e8c57577a0efa9a829eea347d1d053c3c61bb0cc94ffd5b2c3ada9b",
+      "transitions": 307200,
+      "update": 600
+    },
+    "qualification": "requires held-out evaluation and independent run evidence"
+  },
+  "heldout600": "droid-standing-recovery-evaluation.json",
+  "checkpoint600_sha256": "1d2edc383e8c57577a0efa9a829eea347d1d053c3c61bb0cc94ffd5b2c3ada9b",
+  "optimizer_journal_sha256": "721db31f35f141afb0f2f6bd3d4495fb7d79428ad2728678ba8704e43b6476d0",
+  "optimizer_journal": "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/runs/droid-standing/seed7-recovery-20261010/optimization.jsonl",
+  "log_sha256": "2cd2b2ff82c2b9a5e0994776b1e43844cd32dc5033b9a11eda4bf51f1e7a21fc"
+}

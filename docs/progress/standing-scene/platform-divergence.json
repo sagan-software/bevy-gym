@@ -1,0 +1,15 @@
+{
+  "candidate": "docs/progress/droid-standing-trial.mpk",
+  "seed": 42,
+  "native_terminal_actions": 62,
+  "wasm_terminal_actions": 54,
+  "identical_input_policy_frames": 62,
+  "action_absolute_tolerance": 1e-05,
+  "first_frame_input_max_absolute_difference": 2.384185791015625e-07,
+  "first_frame_action_max_absolute_difference": 2.980232241545089e-08,
+  "first_post_step_features_max_absolute_difference": 4.744529724121094e-05,
+  "closed_loop_replay": "failed",
+  "physics_cause": "not isolated",
+  "policy_replay": "passed before terminal assertion",
+  "log": "resume-standing-parity-diagnosis-2.log"
+}

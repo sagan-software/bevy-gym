@@ -27,6 +27,11 @@ pub(crate) struct Record {
 }
 
 impl Record {
+    /// Read the validated positive number of completed PPO batches.
+    pub(crate) const fn update(&self) -> NonZeroU32 {
+        self.update
+    }
+
     /// Bind an actual positive update to the exact bytes written by the trainer.
     pub(crate) fn new(
         seed: u64,
@@ -115,12 +120,13 @@ struct WireRecord {
 impl From<Record> for WireRecord {
     fn from(record: Record) -> Self {
         let digest = record.digest;
+        let update = record.update();
         Self {
             schema: Schema::StandingV1,
             algorithm: Algorithm::Ppo,
             seed: record.seed,
-            update: record.update,
-            transitions: u64::from(record.update.get()) * 512,
+            update,
+            transitions: u64::from(update.get()) * 512,
             optimizer_steps: record.optimizer_steps,
             sha256: format!("{digest:x}"),
         }

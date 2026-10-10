@@ -1,8 +1,39 @@
 # Examples execution status
 
-Updated: 2026-10-09. Current work: RL-only drone/droid curriculum.
+Updated: 2026-10-10. Current work: RL-only drone/droid curriculum.
 
 ## Resume here
+
+### Standing viewer and storage recovery, 2026-10-10
+
+The halted local thread is `01a122d8-148d-79f2-b593-21d8472e877f`.
+Both standing seed 7 and travel seed 19 stopped with `No space left on device`.
+The original dirty checkout remains untouched. The
+[interruption record](progress/robot-storage-interruption.json) preserves the stopped
+runs, checkpoint identities and failed evaluations.
+
+`droid-standing-scene` now runs standalone frozen PPO inference in native and browser
+builds. All 26 torques come from the learned actor. Thirteen mannequin bones project
+from authoritative physical states; no authored animation runs. Run, pause, step,
+reset and speed controls change presentation timing only. The candidate remains
+explicitly unqualified. The [guide](DROID_STANDING.md) provides copyable commands.
+
+[Scene evidence](progress/droid-standing-scene.json) records desktop and narrow
+screenshots, inspected playback video, native/WASM gates and exact coverage gaps.
+Identical-input policy-action parity passes across 62 recurrent frames. Exact
+physical trajectory replay remains unverified: seed 42 ends after 62 native actions
+and 54 browser actions. No trajectory or standing qualification is claimed.
+
+A bounded recovery run restarts the same seed-7 recipe from random weights, using
+its immutable training binary. It preserves the stopped output directory. All 217
+complete optimizer records match the original prefix. The run completed all 600
+updates without passing selection; independent evaluation failed all 32 held-out
+cases. The [recovery record](progress/droid-standing-recovery.json) preserves the
+launch, hashes and failed results. No training unit remains active for this task.
+
+Next: diagnose the failed standing and travel policies before another bounded trial.
+Standing and travel qualification, later skills, shared multi-agent training and browser
+3v3 remain unfinished. The RL-only 3v3 goal remains active.
 
 ### Standing PPO workflow, 2026-10-09
 

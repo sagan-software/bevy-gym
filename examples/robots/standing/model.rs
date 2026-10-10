@@ -2,9 +2,9 @@
 
 use super::encoding::FEATURES;
 use crate::learning::{GAE_LAMBDA, GAMMA};
-use bevy_gym::training::{
-    RecurrentPpoAgent, RecurrentPpoConfig, RecurrentPpoError, RecurrentPpoPolicy, SeedConfig,
-};
+#[cfg(any(not(target_arch = "wasm32"), feature = "browser-training"))]
+use bevy_gym::training::{RecurrentPpoAgent, SeedConfig};
+use bevy_gym::training::{RecurrentPpoConfig, RecurrentPpoError, RecurrentPpoPolicy};
 
 /// Standing uses a 64-unit LSTM and a separate 128/64-unit critic.
 ///
@@ -22,6 +22,7 @@ fn configuration() -> RecurrentPpoConfig {
 }
 
 /// Start the standing actor and critic from seeded random parameters.
+#[cfg(any(not(target_arch = "wasm32"), feature = "browser-training"))]
 pub(crate) fn new_agent(seed: u64) -> Result<RecurrentPpoAgent, RecurrentPpoError> {
     RecurrentPpoAgent::new(
         FEATURES,

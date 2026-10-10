@@ -24,16 +24,24 @@ skill_target="$(cargo metadata --locked --no-deps --format-version 1 |
     python3 -c 'import json, sys; print(json.load(sys.stdin)["target_directory"])')"
 cargo build --locked --no-default-features --target wasm32-unknown-unknown \
     --features robots,browser,render-core,bevy/webgl2 \
-    --example drone-hover-scene --example drone-recovery-scene --example drone-travel-scene "${flags[@]}"
-for lesson in hover recovery travel; do
+    --example drone-hover-scene --example drone-recovery-scene --example drone-travel-scene --example droid-standing-scene "${flags[@]}"
+for lesson in hover recovery travel standing; do
     destination="$output/$lesson"
     mkdir -p -- "$destination/assets/robots" "$destination/assets/fonts" "$destination/LICENSES"
+    example="drone-$lesson-scene"
+    if [[ "$lesson" == standing ]]; then example=droid-standing-scene; fi
     wasm-bindgen --target web --out-name lesson --out-dir "$destination" \
-        "$skill_target/wasm32-unknown-unknown/$profile/examples/drone-$lesson-scene.wasm"
+        "$skill_target/wasm32-unknown-unknown/$profile/examples/$example.wasm"
     cp -- robot-web/skills/{index.html,start.js,styles.css} "$destination/"
     cp -- assets/robots/{drone.glb,README.md} "$destination/assets/robots/"
     cp -- assets/fonts/{MonaSans-VariableFont.ttf,OFL.txt} "$destination/assets/fonts/"
     cp -- LICENSES/DRONE-CC-BY-3.0.txt "$destination/LICENSES/"
+    if [[ "$lesson" == standing ]]; then
+        mkdir -p -- "$destination/assets/robots/survival"
+        cp -- assets/robots/survival/{mannequin.glb,README.md,manifest.json} "$destination/assets/robots/survival/"
+        cp -- assets/robots/survival/LICENSE-ANIMATIONS.txt "$destination/assets/robots/survival/"
+        sed -i 's|assets/robots/README.md|assets/robots/survival/README.md|' "$destination/index.html"
+    fi
     case "$lesson" in
     hover)
         title=Hover
@@ -47,8 +55,13 @@ for lesson in hover recovery travel; do
         title='Travel trial'
         guide=DRONE_TRAVEL
         ;;
+    standing)
+        title='Standing trial'
+        guide=DROID_STANDING
+        ;;
     esac
     sed -i -e "s/LESSON_TITLE/$title/g" -e "s/LESSON_GUIDE/$guide/g" "$destination/index.html"
+    if [[ "$lesson" == standing ]]; then sed -i 's/R resets./R resets. V changes speed./' "$destination/index.html"; fi
     # Pin the bindings and binary to one URL so reloads cannot mix checkpoint builds.
     runtime_hash="$(cd -- "$destination" && sha256sum lesson.js lesson_bg.wasm start.js | sha256sum | cut -d ' ' -f 1)"
     runtime_directory="build-$runtime_hash"

@@ -1,0 +1,482 @@
+{
+  "schema": "droid-standing-scene-v1",
+  "source_base": "ac3e05ee59ef024ff756805e3b96fed50be6d5d8",
+  "halted_thread": "01a122d8-148d-79f2-b593-21d8472e877f",
+  "qualification": "unqualified",
+  "candidate": {
+    "file": "droid-standing-trial.mpk",
+    "sha256": "bd7ee38c4a7e44cfc615c366cafcd8b48e9bc0ba57522fd7fec33ee1fded3024",
+    "record": {
+      "schema": "droid-standing-v1",
+      "algorithm": "PPO",
+      "seed": 7,
+      "update": 100,
+      "transitions": 51200,
+      "optimizer_steps": 1316,
+      "sha256": "bd7ee38c4a7e44cfc615c366cafcd8b48e9bc0ba57522fd7fec33ee1fded3024"
+    }
+  },
+  "source_sha256": {
+    ".github/workflows/ci.yml": "d738d148e86d906ee3e5a03a67a90364d1ce5615d3db3e8ce51d41b4c5cd62a9",
+    "Cargo.toml": "c171ef5058012ebc620bf16b0a86395bc9243a3b5b18a3a287029ddd7119439f",
+    "examples/robots/learning/mod.rs": "b4007bdbfd48650c81dc8409ff024a8519518ae2520da766a049c8c6f0191685",
+    "examples/robots/standing/checkpoint.rs": "537e234ee4c52800f419dd124a95802608a8314a9b2ae281ce41e5100fccfd27",
+    "examples/robots/standing/model.rs": "8f9f516794620427f8c0cfce90b868e88741f81fb738822541f5f2a0c8c48b2e",
+    "examples/robots/standing_scene/mod.rs": "015d86dda85cc617364b55bbf79ad8616825afb18a4e9e0576d5153a7b3e933a",
+    "examples/robots/standing_scene/projection.rs": "35c11dbb796931c4a8873f4e0911751e60b841df1d981c821ff0813b95a6a91c",
+    "examples/robots/standing_scene/rig.rs": "9bbc7aca2246c5c21a23567d6ceeb2033807109f5734d3eefb55c6fc0964b5e5",
+    "examples/robots/standing_scene/session.rs": "890d36425e458493c74dbb359d7b41162dfd96433ec5bf3ff913e70a81b8da2a",
+    "examples/robots/standing_scene/view.rs": "a1d48dd23cbde733a5483039b635fa319db643df84f3aab34adc9d9358251533",
+    "examples/robots/standing_viewer.rs": "83f2d5ecb5dce43f6bf941cd5d8393305efff2dc067b0d374bd290321324cac0",
+    "flake.nix": "2c4df8cd2148694d1e3cb95c0c4488259f05e1a1d1bb7f35adb790e90b8840da",
+    "scripts/build_drone_skills.sh": "42b464eb1958f256494accf88adc941817eeced678f9a1e76852df128c802dd8",
+    "src/robots/droid/body.rs": "ccbcec43cf5fe822907188d4b4a0c840300290dc580c7b9c0f643dbb07de7023",
+    "tests/droid_projection.rs": "b2435f34bd5598104a86dca6b834708f1994bb3a649a9fe6efcaca109493b192",
+    "tests/droid_skill_session.rs": "019a8968d5d47f22b15379b6037cc2ae843f6ede6d2aefb47ae7865fc9dde733",
+    "tests/droid_standing.rs": "92f5120d53758d17bb5ad91fd85a31643a24ad1b6e3adfe1e25327150605d7fc"
+  },
+  "checks": {
+    "native_fallback": "cargo fmt --all -- --check; cargo test; cargo clippy --all-targets --all-features -- -D warnings",
+    "native_scene_tests": 19,
+    "native_robot_contracts": "exact CI robot library/integration group and all four skill scenes passed",
+    "standing_cli_tests": 5,
+    "asset_provenance_tests": 4,
+    "browser_command": "nix run .#drone-browser-check",
+    "browser_tests": 215,
+    "wasm_clippy": "cargo clippy --no-default-features --features robots,browser,render-core,bevy/webgl2 --target wasm32-unknown-unknown --example droid-standing-scene -- -D warnings",
+    "changed_line_personal_rust": "no Clippy or Dylint diagnostics",
+    "strict_personal_clippy": "89 unchanged repository errors; exit 101",
+    "shell": "bash -n and shellcheck scripts/build_drone_skills.sh passed",
+    "config": "taplo format --check Cargo.toml; deadnix --fail flake.nix; statix check flake.nix passed",
+    "markdown_syntax": "rumdl check passed on the three changed Markdown files",
+    "personal_markdown": "nine unchanged paragraph-length findings in historical EXAMPLE_STATUS entries; changed paragraphs clean",
+    "robot_doctests": {
+      "passed": 12,
+      "ignored": 1
+    }
+  },
+  "failed_attempts": [
+    {
+      "check": "closed-loop native/browser physical trace",
+      "result": "native 62 versus WASM 54 terminal actions",
+      "evidence": "standing-scene/platform-divergence.json",
+      "disposition": "native trajectory regression retained; cross-platform policy check uses identical inputs; exact physical replay remains unverified"
+    },
+    {
+      "check": "full browser suite first attempt",
+      "result": "ChromeDriver SIGKILL and renderer timeout in unchanged drone_learning suite",
+      "disposition": "same complete command passed on retry without changing test parameters"
+    }
+  ],
+  "policy_parity": {
+    "inputs": "all 62 preserved native actor-input vectors of 204 values",
+    "outputs": "26 torque fractions per frame",
+    "recurrent_memory": "retained across all frames",
+    "absolute_tolerance": 1e-05,
+    "fixture": "droid-standing-native-trace.json",
+    "fixture_sha256": "da07d83364d796d3de706975bf5413a83f2db0695e2f2c2d4de41f79aaf35392"
+  },
+  "coverage": {
+    "command": "cargo llvm-cov --branch --no-clean --no-default-features --features robots,render-core,bevy/x11 --example droid-standing-scene --test droid_standing --test droid_skill_session --test droid_projection --json",
+    "explicit_export": "resume-standing-coverage-explicit-last.json",
+    "export_sha256": "afe4eb174dcdcc9a839257ac0d9770b6f01b8570e8c787839357d0c821536709",
+    "summaries_including_test_code": [
+      {
+        "source": "examples/robots/standing_scene/mod.rs",
+        "compiled_path": "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/examples/robots/standing_scene/mod.rs",
+        "summary": {
+          "branches": {
+            "count": 2,
+            "covered": 2,
+            "notcovered": 0,
+            "percent": 100
+          },
+          "functions": {
+            "count": 9,
+            "covered": 5,
+            "percent": 55.55555555555556
+          },
+          "instantiations": {
+            "count": 9,
+            "covered": 5,
+            "percent": 55.55555555555556
+          },
+          "lines": {
+            "count": 137,
+            "covered": 85,
+            "percent": 62.04379562043796
+          },
+          "mcdc": {
+            "count": 0,
+            "covered": 0,
+            "notcovered": 0,
+            "percent": 0
+          },
+          "regions": {
+            "count": 190,
+            "covered": 121,
+            "notcovered": 69,
+            "percent": 63.68421052631579
+          }
+        }
+      },
+      {
+        "source": "examples/robots/standing_scene/projection.rs",
+        "compiled_path": "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/examples/robots/standing_scene/projection.rs",
+        "summary": {
+          "branches": {
+            "count": 0,
+            "covered": 0,
+            "notcovered": 0,
+            "percent": 0
+          },
+          "functions": {
+            "count": 2,
+            "covered": 2,
+            "percent": 100
+          },
+          "instantiations": {
+            "count": 2,
+            "covered": 2,
+            "percent": 100
+          },
+          "lines": {
+            "count": 26,
+            "covered": 26,
+            "percent": 100
+          },
+          "mcdc": {
+            "count": 0,
+            "covered": 0,
+            "notcovered": 0,
+            "percent": 0
+          },
+          "regions": {
+            "count": 44,
+            "covered": 44,
+            "notcovered": 0,
+            "percent": 100
+          }
+        }
+      },
+      {
+        "source": "examples/robots/standing_scene/rig.rs",
+        "compiled_path": "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/examples/robots/standing_scene/rig.rs",
+        "summary": {
+          "branches": {
+            "count": 18,
+            "covered": 17,
+            "notcovered": 1,
+            "percent": 94.44444444444444
+          },
+          "functions": {
+            "count": 19,
+            "covered": 17,
+            "percent": 89.47368421052632
+          },
+          "instantiations": {
+            "count": 19,
+            "covered": 17,
+            "percent": 89.47368421052632
+          },
+          "lines": {
+            "count": 241,
+            "covered": 236,
+            "percent": 97.9253112033195
+          },
+          "mcdc": {
+            "count": 0,
+            "covered": 0,
+            "notcovered": 0,
+            "percent": 0
+          },
+          "regions": {
+            "count": 350,
+            "covered": 339,
+            "notcovered": 11,
+            "percent": 96.85714285714285
+          }
+        }
+      },
+      {
+        "source": "examples/robots/standing_scene/session.rs",
+        "compiled_path": "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/examples/robots/standing_scene/session.rs",
+        "summary": {
+          "branches": {
+            "count": 8,
+            "covered": 6,
+            "notcovered": 2,
+            "percent": 75
+          },
+          "functions": {
+            "count": 12,
+            "covered": 11,
+            "percent": 91.66666666666666
+          },
+          "instantiations": {
+            "count": 12,
+            "covered": 11,
+            "percent": 91.66666666666666
+          },
+          "lines": {
+            "count": 117,
+            "covered": 113,
+            "percent": 96.58119658119658
+          },
+          "mcdc": {
+            "count": 0,
+            "covered": 0,
+            "notcovered": 0,
+            "percent": 0
+          },
+          "regions": {
+            "count": 189,
+            "covered": 181,
+            "notcovered": 8,
+            "percent": 95.76719576719577
+          }
+        }
+      },
+      {
+        "source": "examples/robots/standing_scene/view.rs",
+        "compiled_path": "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/examples/robots/standing_scene/view.rs",
+        "summary": {
+          "branches": {
+            "count": 20,
+            "covered": 16,
+            "notcovered": 4,
+            "percent": 80
+          },
+          "functions": {
+            "count": 22,
+            "covered": 20,
+            "percent": 90.9090909090909
+          },
+          "instantiations": {
+            "count": 22,
+            "covered": 20,
+            "percent": 90.9090909090909
+          },
+          "lines": {
+            "count": 436,
+            "covered": 423,
+            "percent": 97.01834862385321
+          },
+          "mcdc": {
+            "count": 0,
+            "covered": 0,
+            "notcovered": 0,
+            "percent": 0
+          },
+          "regions": {
+            "count": 559,
+            "covered": 535,
+            "notcovered": 24,
+            "percent": 95.70661896243293
+          }
+        }
+      },
+      {
+        "source": "src/robots/droid/body.rs",
+        "compiled_path": "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/src/robots/droid/body.rs",
+        "summary": {
+          "branches": {
+            "count": 0,
+            "covered": 0,
+            "notcovered": 0,
+            "percent": 0
+          },
+          "functions": {
+            "count": 1,
+            "covered": 1,
+            "percent": 100
+          },
+          "instantiations": {
+            "count": 1,
+            "covered": 1,
+            "percent": 100
+          },
+          "lines": {
+            "count": 3,
+            "covered": 3,
+            "percent": 100
+          },
+          "mcdc": {
+            "count": 0,
+            "covered": 0,
+            "notcovered": 0,
+            "percent": 0
+          },
+          "regions": {
+            "count": 5,
+            "covered": 5,
+            "notcovered": 0,
+            "percent": 100
+          }
+        }
+      },
+      {
+        "source": "examples/robots/standing_scene/projection.rs",
+        "compiled_path": "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/tests/../examples/robots/standing_scene/projection.rs",
+        "summary": {
+          "branches": {
+            "count": 0,
+            "covered": 0,
+            "notcovered": 0,
+            "percent": 0
+          },
+          "functions": {
+            "count": 2,
+            "covered": 2,
+            "percent": 100
+          },
+          "instantiations": {
+            "count": 2,
+            "covered": 2,
+            "percent": 100
+          },
+          "lines": {
+            "count": 26,
+            "covered": 26,
+            "percent": 100
+          },
+          "mcdc": {
+            "count": 0,
+            "covered": 0,
+            "notcovered": 0,
+            "percent": 0
+          },
+          "regions": {
+            "count": 44,
+            "covered": 44,
+            "notcovered": 0,
+            "percent": 100
+          }
+        }
+      },
+      {
+        "source": "examples/robots/standing_scene/session.rs",
+        "compiled_path": "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/tests/../examples/robots/standing_scene/session.rs",
+        "summary": {
+          "branches": {
+            "count": 8,
+            "covered": 7,
+            "notcovered": 1,
+            "percent": 87.5
+          },
+          "functions": {
+            "count": 12,
+            "covered": 12,
+            "percent": 100
+          },
+          "instantiations": {
+            "count": 12,
+            "covered": 12,
+            "percent": 100
+          },
+          "lines": {
+            "count": 117,
+            "covered": 117,
+            "percent": 100
+          },
+          "mcdc": {
+            "count": 0,
+            "covered": 0,
+            "notcovered": 0,
+            "percent": 0
+          },
+          "regions": {
+            "count": 189,
+            "covered": 187,
+            "notcovered": 2,
+            "percent": 98.94179894179894
+          }
+        }
+      }
+    ],
+    "covered_production_branch_outcomes": {
+      "session": {
+        "covered": 6,
+        "total": 6
+      },
+      "rig": {
+        "covered": 14,
+        "total": 14
+      },
+      "viewer_advance": {
+        "covered": 2,
+        "total": 2
+      },
+      "view": {
+        "covered": 14,
+        "total": 18
+      }
+    },
+    "gaps": [
+      {
+        "source": "examples/robots/standing_scene/mod.rs",
+        "lines": "67-123",
+        "reason": "native GUI application entry and plugin setup not run under LLVM instrumentation; browser boot is recorded separately"
+      },
+      {
+        "source": "examples/robots/standing_scene/rig.rs",
+        "lines": [
+          68,
+          77
+        ],
+        "reason": "hierarchy query error closures have zero calls; valid, missing-bone and duplicate-bone contracts pass"
+      },
+      {
+        "source": "examples/robots/standing_scene/view.rs",
+        "lines": "56-58,212-217",
+        "reason": "scene-ready and pointer observers have zero native instrumented calls; browser model load and primary reset click verified manually; secondary pointer path unverified"
+      },
+      {
+        "source": "examples/robots/standing_scene/view.rs",
+        "lines": "302-304,320",
+        "reason": "inference-error/model-asset-error readouts and time-limit text unhit; failed candidate terminates before time limit; session inference stopping is tested"
+      }
+    ],
+    "whole_package_claim": "none"
+  },
+  "browser": {
+    "url": "http://100.105.254.50:4191/standing/",
+    "desktop_css_pixels": [
+      1280,
+      800
+    ],
+    "narrow_css_pixels": [
+      390,
+      844
+    ],
+    "native_window_interaction": "unverified",
+    "physical_mobile_device": "unverified",
+    "preview_panel_visible": false,
+    "document_rendered": true,
+    "actions_observed": [
+      "single learned action via N",
+      "primary-pointer reset",
+      "V speed 1 to 4",
+      "Space playback",
+      "terminal freeze after 54 actions",
+      "R reset to zero actions"
+    ],
+    "artifacts": {
+      "standing-scene/contact-sheet.png": "c919b1fed6ea3fd3b176485d8228647d472162de1cc3f95bad4f780741a7d150",
+      "standing-scene/playback.mp4": "94ac3dab6bac5fc4f10ea356a461f4c6b047225531e899acea598c1934dfabca",
+      "standing-scene/mobile.png": "892a5b95d3f275d95ec8b9e211ee78ffda040206b20d81371a6bec352fce79e0",
+      "standing-scene/platform-divergence.json": "05e2b1fe905877d87e7f3f9a5cdba30619a27fcf2d3709a4547ab6c7d9633ad0",
+      "standing-scene/desktop.png": "dd08aecbec19e1c08c55e33738ec913b16524297fa062b5f7e9a4922f01b900e"
+    },
+    "contact_sheet_inspected": true,
+    "impeccable_detect": "no findings on supplied Rust UI and packaged HTML surfaces"
+  },
+  "training_recovery": "droid-standing-recovery.json",
+  "remaining": [
+    "standing qualification",
+    "travel qualification",
+    "later drone and articulated droid skills",
+    "shared multi-agent RL training",
+    "3v3 browser spectator inference"
+  ]
+}

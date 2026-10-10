@@ -1,7 +1,27 @@
 # Articulated droid standing
 
 Status: PPO training and frozen inference run through the physical environment.
-No standing policy is qualified. The physical mannequin scene remains unfinished.
+No standing policy is qualified. The standalone mannequin scene runs frozen RL inference.
+
+Inspect the preserved failed candidate:
+
+```sh
+nix develop --command cargo run --features robots --example droid-standing-scene
+```
+
+Build and serve the browser lessons:
+
+```sh
+nix develop --command scripts/build_drone_skills.sh
+python3 -m http.server 8000 --directory robot-web/skills-dist
+```
+
+Open <http://localhost:8000/standing/>. Run starts playback; Step requests one learned
+action; Reset restores seed 42 and clears recurrent memory. Space, N and R provide
+the same controls. V cycles one, four and sixteen actions per presentation tick.
+
+Each action still advances at most 20 ms of physical time. These rates do not guarantee
+a wall-clock frame rate. Playback starts paused and waits for the complete model rig.
 
 Train a new candidate in a new directory:
 
@@ -31,7 +51,7 @@ corrupt or incompatible inference stops before an episode, without a fallback.
 
 The native CLI and browser tests reuse `DroidStanding`, the same encoder, model and
 evaluator. File-based CLI operations are native-only; its WASM entry point returns
-an explicit error. A browser scene is still required. The reset-only
+an explicit error. The frozen browser scene uses no optimizer. The reset-only
 `droid-standing-contract` example remains available for inspecting physical anchors.
 
 ## Physical model
@@ -128,7 +148,7 @@ Continuing reward is `upright * height / (1 + drift + speed)`:
 
 Termination earns zero. Reward shaping is not a qualification criterion. Standing
 promotion thresholds, held-out seeds and perturbation cases must be frozen before
-training. Checkpoint identity, training provenance and independent evaluation remain absent.
+training. The retained checkpoint records and evaluations below do not establish qualification.
 
 ## Mannequin provenance
 
@@ -142,8 +162,18 @@ The current model SHA-256 is
 The profile rotates the model's +Z-forward bind coordinates by π about Y. Spine uses
 `spine_01`; neck uses `neck_01`; shoulders use `upperarm_l/r`; elbows use `lowerarm_l/r`;
 hips use `thigh_l/r`; knees use `calf_l/r`; ankles use `foot_l/r`. Collision boxes
-approximate the armoured segments. Bone-to-physics rendering and its visual validation
-remain unfinished. No animation clip is loaded or played by this environment.
+approximate the armoured segments.
+
+The viewer projects all thirteen mapped bones from
+one physical observation. It caches global bind transforms after scene instantiation
+and transform propagation, then removes each segment centre before applying its
+physical position and rotation. Unmapped parent bones retain their bind offsets
+relative to their nearest mapped ancestor. Rendering never writes physical state.
+
+Missing or duplicate mapped bones prevent playback. A lost mapped transform stops
+playback with a visible mapping error. Checkpoint and inference failures also remain
+visible and stop actions. The GLTF loader may load authored clips; the viewer starts
+no authored clip and installs no animation graph.
 
 ## Validation and remaining work
 
@@ -161,8 +191,23 @@ findings remain at `flake.nix:119` and `flake.nix:200`.
 
 The [training evidence](progress/droid-standing-training.json) records the separate
 PPO, checkpoint and CLI checks. Training infrastructure does not establish balance.
-The physical mannequin scene, browser recordings and qualified checkpoint remain
-unfinished. No existing pursuit controller was extended.
+The [scene evidence](progress/droid-standing-scene.json) records native and browser
+checks, screenshots, playback video, source hashes and measured coverage gaps. The
+[recording](progress/standing-scene/playback.mp4) shows single-step, reset, speed
+selection and the failed candidate falling. Native window interaction remains
+unverified. No existing pursuit controller was extended.
+
+Cross-platform policy parity compares all 26 torque outputs across 62 identical
+204-value inputs, carrying recurrent memory, with absolute tolerance 0.00001.
+Each platform separately matches direct policy inference and physical stepping.
+Exact native/browser physical trajectory replay is unverified: seed 42 ended after
+62 native actions and 54 browser actions. Initial input differences reached
+0.0000002384185791015625 and grew through the episode.
+
+Rapier 0.36 enables `enhanced-determinism`, but its
+[determinism contract](https://rapier.rs/docs/user_guides/rust/determinism/) also
+requires identical initial values and deterministic calculations outside the solver.
+The divergence has not been isolated. No exact physical replay claim is made.
 
 ## Actor encoding and PPO
 
@@ -239,12 +284,26 @@ The journal rejects non-finite PPO metrics before JSON serialization or another 
 
 ## Retained seed-7 trial
 
-`bevy-gym-standing-seed7-20261009.service` runs at most 600 updates. Artifacts are in
-`runs/droid-standing/seed7-20261009`; the log is
-`/home/sagan/.cache/bevy-gym-quality-validation/standing-seed7.log`.
-The immutable binary, source patch and manifest are under that cache's
-`standing-seed7-20261009` directory. Inspect the live unit before taking action.
+The original seed-7 run stopped with `No space left on device` after 217 complete
+optimizer records. Its last saved checkpoint, update 200, failed all five selection
+cases and all 32 held-out cases. The travel seed-19 run also stopped on storage
+exhaustion after 1,520 complete updates. Its update-1,500 candidate survived all five
+selection horizons but failed qualification. The
+[interruption record](progress/robot-storage-interruption.json) preserves both results.
 
-At update 20, all five selection episodes failed after 27–35 actions. Their rewards
-were 11.56–16.29. The failed checkpoint and evaluation remain preserved. This early
-failure does not establish the final outcome of the running trial.
+The recovery run restarts from random weights with the same seed, immutable binary
+and 600-update recipe. It does not resume optimizer state or overwrite the stopped
+run. Artifacts are in `runs/droid-standing/seed7-recovery-20261010`; the user unit is
+`bevy-gym-standing-seed7-recovery-20261010.service`. The source manifest, binary and
+launch record remain under `/home/sagan/.cache/bevy-gym-quality-validation`.
+
+All 217 complete optimizer records match the original prefix exactly. Update-20
+selection measurements also match, while checkpoint bytes differ. No checkpoint
+byte reproducibility claim is made.
+
+The run completed all 600 updates and exhausted
+its budget without passing. Final selection lasted 78–96 actions, with no stable
+standing sequence. Independent held-out evaluation failed all 32 cases. The
+[recovery record](progress/droid-standing-recovery.json) preserves the launch, prefix
+audit, final selection, checkpoint hash and optimizer-journal hash. The
+[held-out report](progress/droid-standing-recovery-evaluation.json) preserves every case.

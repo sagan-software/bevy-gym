@@ -33,6 +33,15 @@ pub enum DroidBody {
 }
 
 impl DroidBody {
+    /// Return the segment centre in the common bind frame, in metres.
+    ///
+    /// Bind axes are +X right, +Y up and -Z forward; each segment has identity rotation.
+    /// Renderers use this read-only profile to align bones without changing physical state.
+    #[must_use]
+    pub fn bind_position(self) -> bevy::math::Vec3 {
+        bevy::math::Vec3::from_array(super::geometry::segment(self).centre.to_array())
+    }
+
     /// Every body in the stable observation order.
     pub const ALL: [Self; 13] = [
         Self::Pelvis,
