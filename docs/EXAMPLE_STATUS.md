@@ -4,6 +4,34 @@ Updated: 2026-10-09. Current work: RL-only drone/droid curriculum.
 
 ## Resume here
 
+### Travel environment foundation, 2026-10-09
+
+The transfer checkpoint `9a765cb2507a776ad0973fbd335fd14d755e51f3` is on GitHub main.
+`DroneTravel` now applies supplied motor actions through the existing disturbed-hover
+physics. A validated immutable destination supplies position and heading. It changes
+observations and reward without choosing actions. Public tests compare physical
+snapshots with the original environment under identical seeds and commands.
+
+The [guide](DRONE_TRAVEL.md) and [evidence](progress/drone-travel-environment.json)
+record boundaries, units, reset semantics, reward, and unfinished work. Native tests,
+strict native/WASM Clippy, root tests, the actual browser suite, and robot documentation
+tests pass. Changed-line personal Rust and Nix lint pass. Strict personal Rust lint
+still fails on the unchanged repository backlog. Coverage records 101/101 lines,
+including tests, and 16/16 branch outcomes. The unreachable normalization-error
+mapping region is the remaining gap; no full-package coverage claim is made.
+
+Travel has no trained policy, training/inference command, scene, or video yet.
+Next: generalize the existing rollout collector to typed travel observations, test
+qualified actor transfer with the heading input, then implement sampled-goal training
+and independent position/heading/speed gates. Existing imitation-only tracking is
+not a source checkpoint. Do not weaken the gates if training fails.
+
+No training job for this task is active. Preserve both damage failures and the
+completed seed-11 recovery transfer. Logs use
+`/home/sagan/.cache/bevy-gym-quality-validation/travel-environment-`.
+At the last remote check, `9a765cb` CI and Browser preview were still running;
+`14f20dd` jobs were cancelled. Local validation is separate from remote CI.
+
 ### Qualified standalone checkpoint transfer, 2026-10-09
 
 The browser scene checkpoint `14f20dd3e381b9120d5065bbf93d1a270fd46b6f` is pushed to

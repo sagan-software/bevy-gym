@@ -1,0 +1,156 @@
+{
+  "date": "2026-10-09",
+  "scope": "Goal-conditioned physical environment only; no qualified travel policy or scene",
+  "base_commit": "9a765cb2507a776ad0973fbd335fd14d755e51f3",
+  "source_sha256": {
+    "src/robots/destination.rs": "6c12342fe33d9f89f10ca69b5b68f96c31be25304b8d83640a44a0bdeb83c789",
+    "src/robots/travel.rs": "195c6065375bf62df213fa536c5af8e5990eeedd166c7d9e7fba3013bc8ea560",
+    "src/robots/travel_observation.rs": "ed701219314628c7228ef870c3b3b362f902b7e2aee072559c5da600807050f0",
+    "tests/drone_travel.rs": "1a33befc0e1fdec459ba17c547f622570ce07e46a60c374f423233b1e805b38c"
+  },
+  "tdd": {
+    "red_log": "/home/sagan/.cache/bevy-gym-quality-validation/travel-environment-red.log",
+    "failure": "unresolved DroneDestination and DroneTravel imports",
+    "public_seam": "Env reset/step and read-only observations",
+    "public_tests": 4,
+    "private_reward_tests": 1
+  },
+  "validation": {
+    "format": "passed",
+    "native_environment_tests": "4 passed",
+    "native_robot_unit_tests": "11 passed",
+    "root_cargo_test": "passed",
+    "strict_clippy_all_targets_all_features": "passed",
+    "strict_wasm_clippy": "passed",
+    "wasm_check": "passed",
+    "actual_browser_suite": "passed, including all four travel tests",
+    "personal_changed_line_clippy_and_dylint": "no diagnostics",
+    "strict_personal_clippy": "exit 101 on unchanged repository backlog; no changed-line diagnostics",
+    "personal_nix": "passed",
+    "robot_documentation_tests": "10 passed, one ignored",
+    "logs": "/home/sagan/.cache/bevy-gym-quality-validation/travel-environment-"
+  },
+  "coverage": {
+    "src/robots/destination.rs": {
+      "branches": {
+        "count": 14,
+        "covered": 14,
+        "notcovered": 0,
+        "percent": 100.0
+      },
+      "mcdc": {
+        "count": 0,
+        "covered": 0,
+        "notcovered": 0,
+        "percent": 0.0
+      },
+      "functions": {
+        "count": 4,
+        "covered": 4,
+        "percent": 100.0
+      },
+      "instantiations": {
+        "count": 8,
+        "covered": 7,
+        "percent": 87.5
+      },
+      "lines": {
+        "count": 27,
+        "covered": 27,
+        "percent": 100.0
+      },
+      "regions": {
+        "count": 36,
+        "covered": 35,
+        "notcovered": 1,
+        "percent": 97.22222222222221
+      }
+    },
+    "src/robots/travel.rs": {
+      "branches": {
+        "count": 2,
+        "covered": 2,
+        "notcovered": 0,
+        "percent": 100.0
+      },
+      "mcdc": {
+        "count": 0,
+        "covered": 0,
+        "notcovered": 0,
+        "percent": 0.0
+      },
+      "functions": {
+        "count": 6,
+        "covered": 6,
+        "percent": 100.0
+      },
+      "instantiations": {
+        "count": 11,
+        "covered": 7,
+        "percent": 63.63636363636363
+      },
+      "lines": {
+        "count": 68,
+        "covered": 68,
+        "percent": 100.0
+      },
+      "regions": {
+        "count": 97,
+        "covered": 97,
+        "notcovered": 0,
+        "percent": 100.0
+      }
+    },
+    "src/robots/travel_observation.rs": {
+      "branches": {
+        "count": 0,
+        "covered": 0,
+        "notcovered": 0,
+        "percent": 0.0
+      },
+      "mcdc": {
+        "count": 0,
+        "covered": 0,
+        "notcovered": 0,
+        "percent": 0.0
+      },
+      "functions": {
+        "count": 2,
+        "covered": 2,
+        "percent": 100.0
+      },
+      "instantiations": {
+        "count": 4,
+        "covered": 4,
+        "percent": 100.0
+      },
+      "lines": {
+        "count": 6,
+        "covered": 6,
+        "percent": 100.0
+      },
+      "regions": {
+        "count": 6,
+        "covered": 6,
+        "notcovered": 0,
+        "percent": 100.0
+      }
+    }
+  },
+  "coverage_limits": [
+    "101/101 measured lines includes the private reward test; 16/16 branch outcomes hit.",
+    "The Dir2 normalization error-mapping region at src/robots/destination.rs:57 is unhit: prior checks and scaling leave a finite vector with maximum absolute component one, whose norm cannot be zero or non-finite.",
+    "No whole-package coverage claim."
+  ],
+  "qualification_limits": [
+    "No travel policy trained or qualified.",
+    "No travel training/inference CLI or visual scene yet.",
+    "No travel browser recording; headless WASM verifies environment behavior only.",
+    "Approach-speed curriculum, goal sampling, network encoding and transfer remain next work."
+  ],
+  "primary_source_inspected": {
+    "url": "https://github.com/uzh-rpg/flightmare/blob/master/flightlib/src/envs/quadrotor_env/quadrotor_env.cpp",
+    "date": "2026-10-09",
+    "use": "Inspect separation of physical actions, resets, observations and rewards; local task does not claim Flightmare compatibility."
+  }
+}
