@@ -182,6 +182,26 @@ Its service is `bevy-gym-travel-gated-seed31-20261010.service`; output is
 `runs/drone-travel/gated-seed31-20261010`. Inspect live reports before claiming progress.
 No final held-out feedback enters either training run.
 
+## Seed-31 independent endurance evaluation fails
+
+Seed 31 passed five-root endurance selection and all 32 promotion-validation cases
+at update 5,380, after 2,754,560 transitions. The shortest validation settled streak
+was 364 actions. Its enforced trainer then advanced to near travel.
+The [complete record](progress/drone-travel-endurance-seed31.json) and
+[frozen checkpoint](progress/drone-travel-endurance-seed31.mpk) preserve this independent run.
+
+Final held-out endurance evaluation failed one of 32 cases. All episodes survived
+1,000 actions, but seed `18446744073709551600` finished with only 45 consecutive
+settled actions against 100 required. Its final distance, heading and speed passed;
+those endpoint measurements cannot replace the consecutive-action gate.
+The checkpoint retained SHA-256
+`d1d089f6025b861b7ed78c5962cfb5ad3eae8565a1333112993c26e89a90866f`.
+
+Seed 29 retains one final held-out endurance pass. Independent-run qualification
+remains unproven. The full seed-31 four-stage report exits 1; later stages are
+untrained transfer diagnostics at this checkpoint. Both gated training runs continue
+without final held-out feedback. Near, far and fast travel remain unqualified.
+
 ## Run the travel scene
 
 ```sh

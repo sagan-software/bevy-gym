@@ -4,6 +4,21 @@ Updated: 2026-10-10. Current work: RL-only drone/droid curriculum.
 
 ## Resume here
 
+### Independent endurance candidate fails one held-out case, 2026-10-10
+
+Seed 31 passed endurance selection and separate-process validation at update 5,380,
+then advanced to near travel. Final held-out evaluation failed one of 32 cases:
+seed `18446744073709551600` ended with only 45 settled actions against 100 required.
+All cases survived 1,000 actions. The failed case's final distance, heading and speed
+passed; endpoint measurements do not establish a sufficient consecutive settled streak.
+The [complete record](progress/drone-travel-endurance-seed31.json) and
+[checkpoint](progress/drone-travel-endurance-seed31.mpk) preserve every case and source identity.
+
+Seed 29 retains one final held-out endurance pass. Independent-run qualification
+remains unproven; near, far and fast travel remain unqualified. Both gated runs and
+standing training continue. The final held-out report does not enter training or
+promotion validation. Browser 3v3 and the later curriculum remain unfinished.
+
 ### Readonly range observations for clearance, 2026-10-10
 
 `DroneHover::ranges()` now measures six body-frame rays through current solid geometry.
