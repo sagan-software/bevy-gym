@@ -4,6 +4,44 @@ Updated: 2026-10-09. Current work: RL-only drone/droid curriculum.
 
 ## Resume here
 
+### Held-out travel evaluation and original trial failure, 2026-10-09
+
+`8a5a4cc971e6e463bfb6d4a5e507c3a59ab3ce2f` is verified on GitHub main. The original
+`bevy-gym-travel-seed11-20261009.service` has now exhausted all 600 near-travel updates
+and exited with status 1. Its terminal error is
+`Lesson travel-near exhausted its update budget without passing.` None of the five
+final episodes survived or settled. The [failure record](progress/drone-travel-seed11-failed.json)
+preserves all selection summaries, checkpoint hashes, and final episodes. Preserve
+all candidates, the source manifest,
+and the log under their existing paths; do not relabel this run as qualified.
+
+The separate endurance trial remains active. Its unit is
+`bevy-gym-travel-endurance-seed11-20261009.service`, with artifacts under
+`runs/drone-travel/endurance-seed11-20261009`. Inspect its live unit before acting.
+
+`drone-curriculum --lesson travel --evaluate-held-out PATH` now evaluates all four
+stages on 32 fixed held-out roots each. The report binds results to the SHA-256 of
+the exact bytes loaded once. It preserves all stage results on behavioral failure,
+returns a nonzero exit status, and never trains or modifies weights. Missing or
+incompatible weights and conflicting modes fail before reporting or output creation.
+A behavioral pass still requires independently verified RL provenance before qualification.
+
+The [guide](DRONE_TRAVEL.md) specifies the fixed suite, output fields, command,
+exit behavior and qualification boundary. The
+[evidence](progress/drone-travel-held-out.json) records tests, coverage gaps, and the
+original trial's final failure. Native learning tests (28, one ignored), 14 curriculum
+unit tests, 11 CLI tests, root tests, strict native/WASM Clippy, WASM compilation,
+browser tests and documentation checks pass. Changed-line personal Rust and Python
+lint are clean; strict personal Clippy retains the unchanged repository backlog.
+Coverage hit 99/99 evaluator lines and every production branch. The evidence records
+one test-only branch and one inference-error propagation gap. No real trained policy
+has passed this suite; synthetic success scores test aggregation only.
+No travel or endurance checkpoint is qualified.
+Next: inspect the endurance trial, diagnose any further failure from measured
+trajectories, and evaluate a selected candidate independently before qualified transfer.
+Browser travel playback, later drone lessons, physical droid lessons, multi-agent
+training, and the spectator 3v3 arena remain unfinished.
+
 ### Travel endurance prerequisite experiment, 2026-10-09
 
 `b643be7be5d3ad3208853f4ce61c70c235366f0c` is verified on GitHub main. It added
@@ -24,7 +62,8 @@ actuators and PPO settings are unchanged. Tests fix initial geometry, repeatabil
 and the original travel boundaries. This is an experimental prerequisite, not a
 qualified controller or a proven remedy for every training failure.
 
-The original `bevy-gym-travel-seed11-20261009.service` remains untouched.
+At this earlier checkpoint, the original `bevy-gym-travel-seed11-20261009.service`
+remained active and untouched. Its final failure is recorded above.
 A separate `bevy-gym-travel-endurance-seed11-20261009.service` is active, with seed 11
 and at most 600 updates per stage. Artifacts and the launch manifest are in
 `runs/drone-travel/endurance-seed11-20261009`; its immutable binary is under

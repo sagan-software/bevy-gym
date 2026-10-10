@@ -130,6 +130,53 @@ Missing, incompatible, or invalid inference fails visibly; there is no fallback.
 `--lesson travel` and conflicts with `--updates` and `--initialize-from`.
 A single episode explicitly reports that it does not establish qualification.
 
+### Held-out evaluation
+
+Evaluate a frozen selected checkpoint in a new process:
+
+```sh
+nix develop --command cargo run --no-default-features --features robots \
+  --example drone-curriculum -- --lesson travel \
+  --evaluate-held-out runs/drone-travel/seed11/travel-endurance-20.mpk \
+  > runs/drone-travel/seed11/held-out.json
+```
+
+The fixed `travel-v1` suite evaluates endurance, near, far, and fast in that order.
+Each stage uses 32 roots, descending from `u64::MAX - 1` through `u64::MAX - 32`.
+These roots are excluded from training and selection. Each episode starts with fresh
+recurrent memory. Every stage applies its existing full-horizon gates; failure in
+one stage does not skip later stages. No optimizer or exploration sampler is created.
+
+The evaluator reads the checkpoint once and hashes the exact bytes moved into
+validated loading. It uses [sha2 0.10.9](https://docs.rs/sha2/0.10.9/sha2/), already
+present in the lockfile and now a direct development dependency for this example.
+The command writes JSON to stdout and creates no files itself. The shell command
+above saves stdout. A failed behavioral gate still emits the complete report and
+returns exit status 1; all gates passing returns 0. Load or inference errors fail
+visibly. Missing and incompatible checkpoints produce no report.
+
+`--evaluate-held-out` requires `--lesson travel`. It conflicts with explicit
+`--seed`, `--updates`, `--initialize-from`, `--evaluate-checkpoint`, and `--travel-stage`.
+The default seed is unused. This mode always runs the full fixed suite.
+
+The report contains:
+
+- `mode`: the string `held-out-evaluation`.
+- `suite`: the string `travel-v1`; changes to these distributions, roots, or gates
+  require a new suite identity.
+- `checkpoint`: the supplied path; `checkpoint_sha256`: 64 lowercase hexadecimal
+  characters identifying the loaded bytes.
+- `evaluation`: `passed` only when every stage passes; otherwise `failed`.
+- `qualification`: `not established by evaluation alone`.
+- `stages`: four ordered objects containing `stage`, `evaluation`, and the 32
+  ordered `episodes` in the measurement format below.
+
+The report establishes behavioral results for exact bytes. It cannot establish how
+those bytes were trained. Qualification also requires the recorded RL training
+source, source checkpoint, run manifest, and checkpoint chain. Use these final roots
+for independent evaluation after selection; do not feed their episodes into training
+or tune promotion thresholds against them. No current travel candidate is qualified.
+
 ### Observation encoding
 
 The actor and critic each receive 13 dimensionless features. In order, these are
@@ -178,7 +225,8 @@ Every twentieth update and the final budgeted update save weights, reload frozen
 inference, and evaluate ordered seeds `0, 1, 2, 42, 18446744073709551615`.
 All episode gates and the mean-return gate must pass before the next stage.
 Exhaustion returns an error and preserves the failed candidate. These selection
-results do not replace independent held-out qualification, which remains pending.
+results do not replace independent held-out qualification. The command above supplies
+its behavioral evaluation; a passing trained candidate remains pending.
 
 Each stage record contains `lesson`, `update`, `passed`, `optimizer_steps`, and
 ordered `episodes`. Episode fields are `seed`, `steps`, summed unscaled `reward`,

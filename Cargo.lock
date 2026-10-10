@@ -625,6 +625,7 @@ dependencies = [
  "rapier3d 0.36.0",
  "serde",
  "serde_json",
+ "sha2",
  "shakmaty",
  "tokio",
  "wasm-bindgen",

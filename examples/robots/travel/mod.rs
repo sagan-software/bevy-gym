@@ -3,6 +3,7 @@
 pub(crate) mod encoding;
 pub(crate) mod environment;
 pub(crate) mod evaluation;
+pub(crate) mod held_out;
 pub(crate) mod model;
 pub(crate) mod stage;
 

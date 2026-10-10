@@ -149,6 +149,9 @@ version = "0.30.1"
 features = ["fs", "io-util", "process", "rt"]
 version = "1"
 
+[dev-dependencies]
+sha2 = "0.10.9"
+
 [[example]]
 name = "remember-cue"
 path = "examples/robots/remember.rs"

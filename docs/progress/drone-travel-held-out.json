@@ -1,0 +1,155 @@
+{
+  "date": "2026-10-09",
+  "base_commit": "8a5a4cc971e6e463bfb6d4a5e507c3a59ab3ce2f",
+  "scope": "Fixed held-out travel CLI evaluation; no trained policy qualification claimed",
+  "source_sha256": {
+    "Cargo.toml": "b6048c936f88c51fb384f3155d2d7516f57ebaf9e624d2a1f25edcc86ea4d3e8",
+    "Cargo.lock": "a6dd6c536e8b1d666b30790c0c97257528f9103b2e1c6ed7c8dc94c95a9fb258",
+    "examples/robots/curriculum.rs": "929a743385d3e66f649882ba22a4bbc7279450e2eeb1fc7aa5d1111e8807ae32",
+    "examples/robots/travel/held_out.rs": "4f41ae49ca2ec184d4fbb812d4c7d2eeeae0d8d6cf20da90bd4f26a8315a0da9",
+    "examples/robots/travel/mod.rs": "9456fa62130b66b9163287625ce385298a09e10234bd04d67aecc6085c2f3a84",
+    "tests/test_drone_curriculum_cli.py": "3841b6955e380c62da58d536f2aca62c086dbaf118907f249cd6774ce0be0ec1"
+  },
+  "contract": {
+    "mode": "held-out-evaluation",
+    "suite": "travel-v1",
+    "stages": [
+      "travel-endurance",
+      "travel-near",
+      "travel-far",
+      "travel-fast"
+    ],
+    "roots": "u64::MAX - 1 through u64::MAX - 32 in descending order; excluded from collector roots and selection",
+    "episodes": 128,
+    "checkpoint_identity": "SHA-256 over the same owned bytes consumed by validated loading; lowercase hexadecimal",
+    "exit": "0 only if all stage gates pass; 1 for behavioral failure after printing all results; visible load/inference errors without fallback",
+    "qualification_boundary": "A behavioral pass does not establish RL provenance. Verify the training source, source checkpoint, manifest and checkpoint chain separately."
+  },
+  "tdd": {
+    "red_log": "/home/sagan/.cache/bevy-gym-quality-validation/travel-heldout-red.log",
+    "failure": "--evaluate-held-out was unknown",
+    "seam": "Native CLI with a real one-update PPO candidate",
+    "assertions": [
+      "128 ordered episodes across four stages",
+      "Exact Python hashlib digest equality",
+      "Failure status and complete failed report",
+      "Checkpoint bytes unchanged and no output directory",
+      "Missing, incompatible and conflicting inputs fail before output"
+    ]
+  },
+  "validation": {
+    "native_learning": "28 passed, one ignored",
+    "curriculum_units": "14 passed",
+    "cli": "11 passed",
+    "root_tests": "passed",
+    "strict_native_wasm_clippy": "passed",
+    "wasm_check": "passed",
+    "actual_browser_suite": "passed",
+    "personal_changed_line_clippy_dylint": "no diagnostics after making label const",
+    "strict_personal": "unchanged repository backlog; no changed-line diagnostics",
+    "personal_python": "passed",
+    "logs": "/home/sagan/.cache/bevy-gym-quality-validation/travel-heldout-",
+    "documentation": "Markdown lint, root doctests and robot doctests passed"
+  },
+  "coverage": {
+    "file": "examples/robots/travel/held_out.rs",
+    "summary": {
+      "branches": {
+        "count": 10,
+        "covered": 9,
+        "notcovered": 1,
+        "percent": 90
+      },
+      "functions": {
+        "count": 15,
+        "covered": 15,
+        "percent": 100
+      },
+      "instantiations": {
+        "count": 23,
+        "covered": 21,
+        "percent": 91.30434782608695
+      },
+      "lines": {
+        "count": 99,
+        "covered": 99,
+        "percent": 100
+      },
+      "mcdc": {
+        "count": 0,
+        "covered": 0,
+        "notcovered": 0,
+        "percent": 0
+      },
+      "regions": {
+        "count": 175,
+        "covered": 174,
+        "notcovered": 1,
+        "percent": 99.42857142857143
+      }
+    },
+    "method": "Fresh instrumented example-unit and CLI profiles; explicit llvm-cov export; aggregate shared source locations across instantiations. Includes test code.",
+    "unhit_branches": [
+      {
+        "range": [
+          91,
+          59,
+          91,
+          73
+        ],
+        "true_hits": 31,
+        "false_hits": 0
+      }
+    ],
+    "unhit_regions": [
+      [
+        23,
+        70,
+        23,
+        71
+      ]
+    ],
+    "gaps": [
+      "The only unhit branch is the test-only descending-window predicate at line 91; every production branch was executed.",
+      "The inference-error propagation region at line 23 remains unhit after complete checkpoint validation.",
+      "No real trained checkpoint has passed the full suite. Synthetic scores prove aggregate success and return behavior only.",
+      "No whole-package coverage claim."
+    ]
+  },
+  "failed_coverage_probe": {
+    "purpose": "Exercise evaluation and reporting, not select a policy or tune training",
+    "checkpoint": "runs/drone-travel/endurance-seed11-20261009/travel-endurance-20.mpk",
+    "checkpoint_sha256": "9aa204331569972e7c0bcde3762cf211f2562e03b0fd3c191117c05677d059d3",
+    "evaluation": "failed",
+    "stages": [
+      {
+        "stage": "travel-endurance",
+        "evaluation": "failed",
+        "episodes": 32
+      },
+      {
+        "stage": "travel-near",
+        "evaluation": "failed",
+        "episodes": 32
+      },
+      {
+        "stage": "travel-far",
+        "evaluation": "failed",
+        "episodes": 32
+      },
+      {
+        "stage": "travel-fast",
+        "evaluation": "failed",
+        "episodes": 32
+      }
+    ],
+    "raw_report": "/home/sagan/.cache/bevy-gym-quality-validation/travel-heldout-failed-probe.json",
+    "raw_report_sha256": "0393c24704c96e8e5c486109b31554c1b8cafaa336243acff8f79116d2e31e81"
+  },
+  "original_trial_failure": "drone-travel-seed11-failed.json",
+  "unfinished": [
+    "Qualified travel policies and checkpoint transfer",
+    "Travel browser scene and recorded playback",
+    "Later drone lessons, physical droid lessons, multi-agent training, and spectator 3v3 arena"
+  ]
+}

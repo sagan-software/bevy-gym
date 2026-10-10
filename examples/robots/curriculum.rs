@@ -31,6 +31,9 @@ struct Options {
     /// Run frozen travel inference without collecting training samples or updating weights.
     #[arg(long, requires = "lesson", conflicts_with_all = ["updates", "initialize_from"])]
     evaluate_checkpoint: Option<PathBuf>,
+    /// Evaluate every travel stage on the fixed held-out seed suite without training.
+    #[arg(long, requires = "lesson", conflicts_with_all = ["updates", "initialize_from", "evaluate_checkpoint", "travel_stage", "seed"])]
+    evaluate_held_out: Option<PathBuf>,
     /// Select the task distribution for frozen travel inference.
     #[arg(long, value_enum, requires = "evaluate_checkpoint")]
     travel_stage: Option<travel::stage::Stage>,
@@ -95,6 +98,11 @@ fn main() -> Result<(), Box<dyn Error>> {
     {
         return Err("--evaluate-checkpoint requires --lesson travel".into());
     }
+    if options.evaluate_held_out.is_some()
+        && !matches!(options.lesson, Some(SelectedLesson::Travel))
+    {
+        return Err("--evaluate-held-out requires --lesson travel".into());
+    }
     // Reject unsupported transitions before loading weights or creating artifacts.
     if options.initialize_from.is_some()
         && !matches!(
@@ -108,6 +116,9 @@ fn main() -> Result<(), Box<dyn Error>> {
     let lessons = match &options.lesson {
         Some(SelectedLesson::Control(lesson)) => std::slice::from_ref(lesson),
         Some(SelectedLesson::Travel) => {
+            if let Some(path) = &options.evaluate_held_out {
+                return travel::held_out::run(path);
+            }
             if let Some(path) = &options.evaluate_checkpoint {
                 return travel::infer(
                     options.travel_stage.unwrap_or(travel::stage::Stage::Near),

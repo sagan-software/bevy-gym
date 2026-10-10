@@ -73,6 +73,36 @@ class DroneCurriculumCli(unittest.TestCase):
             self.assertEqual(checkpoint.read_bytes(), before)
             self.assertFalse((Path(directory) / "inference-must-not-write").exists())
 
+    def test_held_out_evaluation_binds_all_stages_to_unchanged_checkpoint(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory)
+            training = subprocess.run(
+                [str(TARGET / "debug/examples/drone-curriculum"), "--lesson", "travel",
+                 "--updates", "1", "--seed", "11", "--output", directory],
+                cwd=ROOT, capture_output=True, text=True, check=False,
+            )
+            self.assertEqual(training.returncode, 1, training.stderr)
+            checkpoint = output / "travel-endurance-1.mpk"
+            before = checkpoint.read_bytes()
+            result = subprocess.run(
+                [str(TARGET / "debug/examples/drone-curriculum"), "--lesson", "travel",
+                 "--evaluate-held-out", str(checkpoint), "--output", str(output / "unused")],
+                cwd=ROOT, capture_output=True, text=True, check=False,
+            )
+            self.assertEqual(result.returncode, 1, result.stderr)
+            report = json.loads(result.stdout)
+            self.assertEqual(report["mode"], "held-out-evaluation")
+            self.assertEqual(report["suite"], "travel-v1")
+            self.assertEqual(report["checkpoint_sha256"], hashlib.sha256(before).hexdigest())
+            self.assertEqual(report["evaluation"], "failed")
+            self.assertEqual([row["stage"] for row in report["stages"]],
+                             ["travel-endurance", "travel-near", "travel-far", "travel-fast"])
+            for row in report["stages"]:
+                self.assertEqual([episode["seed"] for episode in row["episodes"]],
+                                 [(1 << 64) - 1 - offset for offset in range(1, 33)])
+            self.assertEqual(checkpoint.read_bytes(), before)
+            self.assertFalse((output / "unused").exists())
+
     def test_travel_inference_rejects_missing_and_incompatible_checkpoints(self):
         for checkpoint in (ROOT / "absent-travel-checkpoint.mpk",
                            ROOT / "docs/progress/drone-recovery-transfer.mpk"):
@@ -85,6 +115,32 @@ class DroneCurriculumCli(unittest.TestCase):
                     cwd=ROOT, capture_output=True, text=True, check=False,
                 )
                 self.assertEqual(result.returncode, 1, result.stderr)
+                self.assertTrue(result.stderr)
+                self.assertFalse(output.exists())
+
+    def test_held_out_evaluation_rejects_missing_incompatible_and_conflicting_inputs(self):
+        cases = [
+            (["--evaluate-held-out", "missing"], 2),
+            (["--lesson", "hover", "--evaluate-held-out", "missing"], 1),
+            (["--lesson", "travel", "--evaluate-held-out", "missing"], 1),
+            (["--lesson", "travel", "--evaluate-held-out",
+              str(ROOT / "docs/progress/drone-recovery-transfer.mpk")], 1),
+        ]
+        for extra in (["--updates", "1"], ["--seed", "11"],
+                      ["--initialize-from", "qualified-hover"],
+                      ["--evaluate-checkpoint", "missing"],
+                      ["--travel-stage", "travel-near"]):
+            cases.append((["--lesson", "travel", "--evaluate-held-out", "missing", *extra], 2))
+        for arguments, status in cases:
+            with self.subTest(arguments=arguments), tempfile.TemporaryDirectory() as directory:
+                output = Path(directory) / "must-not-exist"
+                result = subprocess.run(
+                    [str(TARGET / "debug/examples/drone-curriculum"), *arguments,
+                     "--output", str(output)],
+                    cwd=ROOT, capture_output=True, text=True, check=False,
+                )
+                self.assertEqual(result.returncode, status, result.stderr)
+                self.assertFalse(result.stdout)
                 self.assertTrue(result.stderr)
                 self.assertFalse(output.exists())
 

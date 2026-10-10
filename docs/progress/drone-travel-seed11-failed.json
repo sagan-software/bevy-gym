@@ -1,0 +1,649 @@
+{
+  "date": "2026-10-09",
+  "status": "failed",
+  "unit": "bevy-gym-travel-seed11-20261009.service",
+  "verified_unit_state": "failed",
+  "exit_status": 1,
+  "error": "Error: \"Lesson travel-near exhausted its update budget without passing.\"",
+  "run_manifest": {
+    "base_commit": "21225b6c4d119a18e9602eb6ce1e841edb94dd2b",
+    "seed": 11,
+    "maximum_updates_per_stage": 600,
+    "command": [
+      "--lesson",
+      "travel",
+      "--seed",
+      "11",
+      "--updates",
+      "600",
+      "--output",
+      "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/runs/drone-travel/seed11-20261009"
+    ],
+    "source_sha256": {
+      "examples/robots/curriculum.rs": "dfbd6b1feb9066ff16aaeab4b1b4523004dfc956bc9a515e55ba52dde7340916",
+      "examples/robots/learning/encoding.rs": "587c484f2e61d7c5e3c193e8ee669bb724bdc2fc61813868034e08dc17a9c522",
+      "examples/robots/learning/mod.rs": "67a25cad0b9235820b7c701cbf7c12aec488efa4d159d21e36662a0b67ebee2a",
+      "examples/robots/travel/encoding.rs": "2774a719376533ffa1a5f1fba3c6f2de05789a6a4c3a5fdbd30d6c6e4c8299fb",
+      "examples/robots/travel/environment.rs": "f889ad88bae58c90f515e6cce5a27ae2484df1d53004d73d0e85007f027127a2",
+      "examples/robots/travel/evaluation.rs": "0d691f3c393caaf4a5a49adfd2c7294c4504c445e041915745a460a509d0f36f",
+      "examples/robots/travel/mod.rs": "edbeb4cfc35f966e92fdc5e22913238b5eea3e3123d1448da634481ebbf05a21",
+      "examples/robots/travel/model.rs": "b5da96cdc751988b3f8efb0bac6ad8fa50a23ba5029a1b3f9bc10892c0e7352d",
+      "examples/robots/travel/stage.rs": "35a154daef39fbd2fcf777db57bdd27c1ce54d198583aa2205ef7ea820c8aa37",
+      "tests/drone_learning.rs": "9e3c10077fe41bb563aedf546732fd6acb8cf7e442801a5b432c8e0f6d800447",
+      "tests/drone_learning/travel.rs": "821652049ccf0e3537a50a696497d8f5b5f356cac958783fe430eb215d214fc2",
+      "tests/test_drone_curriculum_cli.py": "78462a5ff37e03067b94037ead1b1b438e0f6abce4c65980893b3ab93a7be499"
+    },
+    "binary_sha256": "520de018063eafa4159f215195b029ee4e6aed1adc6ab9656509cd372cd71341",
+    "binary": "/home/sagan/.cache/bevy-gym-quality-validation/travel-policy-seed11-20261009/drone-curriculum",
+    "qualification": "unqualified; training trial"
+  },
+  "log": "/home/sagan/.cache/bevy-gym-quality-validation/travel-seed11.log",
+  "log_sha256": "01c6e8b0f3692bcd953e858401fa845d54f89dcaea4fac6fd1ac3cbac29e55e9",
+  "final_evaluation": {
+    "episodes": [
+      {
+        "final_distance": 5.760612487792969,
+        "final_heading_error": 1.8898824453353882,
+        "final_speed": 5.705686092376709,
+        "first_arrival": null,
+        "reward": 207.8772088547703,
+        "seed": 0,
+        "settled_actions": 0,
+        "steps": 904,
+        "survived": false
+      },
+      {
+        "final_distance": 5.765517234802246,
+        "final_heading_error": 0.882042646408081,
+        "final_speed": 5.682266712188721,
+        "first_arrival": null,
+        "reward": 77.26783127285307,
+        "seed": 1,
+        "settled_actions": 0,
+        "steps": 809,
+        "survived": false
+      },
+      {
+        "final_distance": 5.302736759185791,
+        "final_heading_error": 0.9864844679832458,
+        "final_speed": 5.538118839263916,
+        "first_arrival": null,
+        "reward": 82.93367279350059,
+        "seed": 2,
+        "settled_actions": 0,
+        "steps": 701,
+        "survived": false
+      },
+      {
+        "final_distance": 6.332197666168213,
+        "final_heading_error": 3.0227322578430176,
+        "final_speed": 6.380799293518066,
+        "first_arrival": null,
+        "reward": 161.5195702410192,
+        "seed": 42,
+        "settled_actions": 0,
+        "steps": 812,
+        "survived": false
+      },
+      {
+        "final_distance": 3.3756868839263916,
+        "final_heading_error": 2.0157015323638916,
+        "final_speed": 4.379907608032227,
+        "first_arrival": null,
+        "reward": 76.85800063039642,
+        "seed": 18446744073709551615,
+        "settled_actions": 0,
+        "steps": 597,
+        "survived": false
+      }
+    ],
+    "lesson": "travel-near",
+    "optimizer_steps": 3776,
+    "passed": false,
+    "update": 600
+  },
+  "selection_curve": [
+    {
+      "update": 20,
+      "optimizer_steps": 100,
+      "transitions": 10240,
+      "passed": false,
+      "mean_return": 245.49302349172612,
+      "survived": 0,
+      "arrived": 5,
+      "final_settled_actions": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "checkpoint": "runs/drone-travel/seed11-20261009/travel-near-20.mpk",
+      "sha256": "f83eb71d802c212589f3d4dfee69a39a68b8d773e6caa0f89aa41d6e06b71194"
+    },
+    {
+      "update": 40,
+      "optimizer_steps": 212,
+      "transitions": 20480,
+      "passed": false,
+      "mean_return": 275.2447063759556,
+      "survived": 0,
+      "arrived": 5,
+      "final_settled_actions": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "checkpoint": "runs/drone-travel/seed11-20261009/travel-near-40.mpk",
+      "sha256": "e57107aaebf18a5f41552e1958168551719c2917692b5e294e1114e12da4b2ed"
+    },
+    {
+      "update": 60,
+      "optimizer_steps": 332,
+      "transitions": 30720,
+      "passed": false,
+      "mean_return": 245.32295654001064,
+      "survived": 0,
+      "arrived": 4,
+      "final_settled_actions": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "checkpoint": "runs/drone-travel/seed11-20261009/travel-near-60.mpk",
+      "sha256": "299526fd5cca6f83b2b02e231b5a56b484ee502c18847cef7595fbbcf564095e"
+    },
+    {
+      "update": 80,
+      "optimizer_steps": 468,
+      "transitions": 40960,
+      "passed": false,
+      "mean_return": 181.65027969031433,
+      "survived": 0,
+      "arrived": 2,
+      "final_settled_actions": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "checkpoint": "runs/drone-travel/seed11-20261009/travel-near-80.mpk",
+      "sha256": "cc08bb60efdfb06fa9b4eef61d33b5a1b14799c538b282691357fc333bff3bad"
+    },
+    {
+      "update": 100,
+      "optimizer_steps": 604,
+      "transitions": 51200,
+      "passed": false,
+      "mean_return": 182.37134681360394,
+      "survived": 1,
+      "arrived": 1,
+      "final_settled_actions": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "checkpoint": "runs/drone-travel/seed11-20261009/travel-near-100.mpk",
+      "sha256": "5e12ada570bdec115d225dc061927951b46ab5ef5169eb7974173dedab38f9c2"
+    },
+    {
+      "update": 120,
+      "optimizer_steps": 732,
+      "transitions": 61440,
+      "passed": false,
+      "mean_return": 233.9631853615627,
+      "survived": 4,
+      "arrived": 0,
+      "final_settled_actions": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "checkpoint": "runs/drone-travel/seed11-20261009/travel-near-120.mpk",
+      "sha256": "0f5a36039389e68c66281029d77eb2d7397bba8483e4a1f366092f512397d5f7"
+    },
+    {
+      "update": 140,
+      "optimizer_steps": 856,
+      "transitions": 71680,
+      "passed": false,
+      "mean_return": 93.22273463118708,
+      "survived": 0,
+      "arrived": 0,
+      "final_settled_actions": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "checkpoint": "runs/drone-travel/seed11-20261009/travel-near-140.mpk",
+      "sha256": "d2e615c8ba66ec9d0a32b0158cffbf8ac4abc84fd883f1d8b9c01d9a351ab249"
+    },
+    {
+      "update": 160,
+      "optimizer_steps": 1004,
+      "transitions": 81920,
+      "passed": false,
+      "mean_return": 77.76220252852654,
+      "survived": 0,
+      "arrived": 0,
+      "final_settled_actions": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "checkpoint": "runs/drone-travel/seed11-20261009/travel-near-160.mpk",
+      "sha256": "6b1f0e0ab2ebfa5f14991bde8d9f10cd39f6930cb243e78efe6d22efc80d2837"
+    },
+    {
+      "update": 180,
+      "optimizer_steps": 1152,
+      "transitions": 92160,
+      "passed": false,
+      "mean_return": 91.97142877796432,
+      "survived": 0,
+      "arrived": 0,
+      "final_settled_actions": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "checkpoint": "runs/drone-travel/seed11-20261009/travel-near-180.mpk",
+      "sha256": "f5fe49c706095e9d206b4b09932b2bfcf69ceff0d8071cf6b96c3d718ff9b8a8"
+    },
+    {
+      "update": 200,
+      "optimizer_steps": 1276,
+      "transitions": 102400,
+      "passed": false,
+      "mean_return": 211.64029030263137,
+      "survived": 2,
+      "arrived": 0,
+      "final_settled_actions": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "checkpoint": "runs/drone-travel/seed11-20261009/travel-near-200.mpk",
+      "sha256": "5fec42fad81f1f2884a1635e437dba3715c630eeab9353363427b6201c2de2fe"
+    },
+    {
+      "update": 220,
+      "optimizer_steps": 1392,
+      "transitions": 112640,
+      "passed": false,
+      "mean_return": 92.77360731544408,
+      "survived": 4,
+      "arrived": 0,
+      "final_settled_actions": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "checkpoint": "runs/drone-travel/seed11-20261009/travel-near-220.mpk",
+      "sha256": "0ee463d81240ec66218b3306682a97e957baee4bbdc6d9741c6ca21b5457a54c"
+    },
+    {
+      "update": 240,
+      "optimizer_steps": 1528,
+      "transitions": 122880,
+      "passed": false,
+      "mean_return": 32.25619022369629,
+      "survived": 0,
+      "arrived": 0,
+      "final_settled_actions": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "checkpoint": "runs/drone-travel/seed11-20261009/travel-near-240.mpk",
+      "sha256": "dbc35480965ceba7dd990160512474e02817609f630bb153a2fa3b4bbaa19573"
+    },
+    {
+      "update": 260,
+      "optimizer_steps": 1664,
+      "transitions": 133120,
+      "passed": false,
+      "mean_return": 47.36812893528404,
+      "survived": 0,
+      "arrived": 0,
+      "final_settled_actions": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "checkpoint": "runs/drone-travel/seed11-20261009/travel-near-260.mpk",
+      "sha256": "b2c50172b2b654d9afd66ada3248f6f0f08c068c53ee933fcc58f81a11623f55"
+    },
+    {
+      "update": 280,
+      "optimizer_steps": 1796,
+      "transitions": 143360,
+      "passed": false,
+      "mean_return": 75.78115842663574,
+      "survived": 1,
+      "arrived": 0,
+      "final_settled_actions": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "checkpoint": "runs/drone-travel/seed11-20261009/travel-near-280.mpk",
+      "sha256": "31fb378a1af40409e229e314a38c3d60a22790f41c28ff6df8829003b9c57772"
+    },
+    {
+      "update": 300,
+      "optimizer_steps": 1896,
+      "transitions": 153600,
+      "passed": false,
+      "mean_return": 114.5394995844661,
+      "survived": 4,
+      "arrived": 0,
+      "final_settled_actions": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "checkpoint": "runs/drone-travel/seed11-20261009/travel-near-300.mpk",
+      "sha256": "f674c010e51de6a5859873efe24ac5dfdfe767a8b599eaf4490fef85ecd91ee0"
+    },
+    {
+      "update": 320,
+      "optimizer_steps": 2020,
+      "transitions": 163840,
+      "passed": false,
+      "mean_return": 52.17542771762819,
+      "survived": 1,
+      "arrived": 0,
+      "final_settled_actions": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "checkpoint": "runs/drone-travel/seed11-20261009/travel-near-320.mpk",
+      "sha256": "b13d5104b4e732391a1b438dbf316e110181c13bc77e019c9fdddc1979eb5244"
+    },
+    {
+      "update": 340,
+      "optimizer_steps": 2144,
+      "transitions": 174080,
+      "passed": false,
+      "mean_return": 39.488028639461845,
+      "survived": 0,
+      "arrived": 0,
+      "final_settled_actions": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "checkpoint": "runs/drone-travel/seed11-20261009/travel-near-340.mpk",
+      "sha256": "181f27fd9312586c7cfba60e5bc86f2d13609f94210fe5cf5ef3970050936ee8"
+    },
+    {
+      "update": 360,
+      "optimizer_steps": 2284,
+      "transitions": 184320,
+      "passed": false,
+      "mean_return": 46.615129980351774,
+      "survived": 0,
+      "arrived": 0,
+      "final_settled_actions": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "checkpoint": "runs/drone-travel/seed11-20261009/travel-near-360.mpk",
+      "sha256": "88742c5ae3285af7ed5460a68350256d4ed05bb95af2cb943c4d6b8d398aa47b"
+    },
+    {
+      "update": 380,
+      "optimizer_steps": 2412,
+      "transitions": 194560,
+      "passed": false,
+      "mean_return": 72.63547156944988,
+      "survived": 0,
+      "arrived": 0,
+      "final_settled_actions": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "checkpoint": "runs/drone-travel/seed11-20261009/travel-near-380.mpk",
+      "sha256": "f5c2b3fb2da27572c524474fcd84365225c02f3ae636c39d0f3557c53144e58b"
+    },
+    {
+      "update": 400,
+      "optimizer_steps": 2532,
+      "transitions": 204800,
+      "passed": false,
+      "mean_return": 43.53218465526588,
+      "survived": 0,
+      "arrived": 0,
+      "final_settled_actions": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "checkpoint": "runs/drone-travel/seed11-20261009/travel-near-400.mpk",
+      "sha256": "5f669eef7dc707897e98c664af7ecfa54b1eae83072e7d1052c2d12ae722e653"
+    },
+    {
+      "update": 420,
+      "optimizer_steps": 2672,
+      "transitions": 215040,
+      "passed": false,
+      "mean_return": 59.2063311016711,
+      "survived": 0,
+      "arrived": 0,
+      "final_settled_actions": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "checkpoint": "runs/drone-travel/seed11-20261009/travel-near-420.mpk",
+      "sha256": "398c945d81b4a47561571dceb9625b76551f59d3658236305a84126c250c06e5"
+    },
+    {
+      "update": 440,
+      "optimizer_steps": 2792,
+      "transitions": 225280,
+      "passed": false,
+      "mean_return": 124.8205027987996,
+      "survived": 2,
+      "arrived": 0,
+      "final_settled_actions": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "checkpoint": "runs/drone-travel/seed11-20261009/travel-near-440.mpk",
+      "sha256": "7ab0d6182e44eb7e2abb25093937cbd81ad68219495ea44a4b1c257e320474fe"
+    },
+    {
+      "update": 460,
+      "optimizer_steps": 2900,
+      "transitions": 235520,
+      "passed": false,
+      "mean_return": 188.56755350762396,
+      "survived": 5,
+      "arrived": 0,
+      "final_settled_actions": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "checkpoint": "runs/drone-travel/seed11-20261009/travel-near-460.mpk",
+      "sha256": "4ad8eacaa5d1e7bce2b2e55b7aa9475dc8d21b9a938a5ea0df4957fb75e09e14"
+    },
+    {
+      "update": 480,
+      "optimizer_steps": 3016,
+      "transitions": 245760,
+      "passed": false,
+      "mean_return": 77.11765083828213,
+      "survived": 0,
+      "arrived": 0,
+      "final_settled_actions": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "checkpoint": "runs/drone-travel/seed11-20261009/travel-near-480.mpk",
+      "sha256": "99eb29917d43b9230b18787e41ba3318909d9ab3284b4443a722213a06f084b3"
+    },
+    {
+      "update": 500,
+      "optimizer_steps": 3140,
+      "transitions": 256000,
+      "passed": false,
+      "mean_return": 75.07811420711418,
+      "survived": 0,
+      "arrived": 0,
+      "final_settled_actions": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "checkpoint": "runs/drone-travel/seed11-20261009/travel-near-500.mpk",
+      "sha256": "a6134f1b66fb2b7b981068aab6e07c34d483a63b6daa45fe6a853691d96d81c7"
+    },
+    {
+      "update": 520,
+      "optimizer_steps": 3264,
+      "transitions": 266240,
+      "passed": false,
+      "mean_return": 332.86219380042655,
+      "survived": 5,
+      "arrived": 1,
+      "final_settled_actions": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "checkpoint": "runs/drone-travel/seed11-20261009/travel-near-520.mpk",
+      "sha256": "0a2614be443146cf541e4b19eae0c7bc0171b020741c5951b6b67942bd2ef81f"
+    },
+    {
+      "update": 540,
+      "optimizer_steps": 3380,
+      "transitions": 276480,
+      "passed": false,
+      "mean_return": 101.87350353337096,
+      "survived": 4,
+      "arrived": 0,
+      "final_settled_actions": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "checkpoint": "runs/drone-travel/seed11-20261009/travel-near-540.mpk",
+      "sha256": "0c255041b06b236bdae6036d1834d45b26b463d11324b519da687351f59b85b3"
+    },
+    {
+      "update": 560,
+      "optimizer_steps": 3500,
+      "transitions": 286720,
+      "passed": false,
+      "mean_return": 54.06449845435854,
+      "survived": 1,
+      "arrived": 0,
+      "final_settled_actions": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "checkpoint": "runs/drone-travel/seed11-20261009/travel-near-560.mpk",
+      "sha256": "a1865506a3b24315dd9be26a821d9c676988551c8a5ce22c2f9ac21429602971"
+    },
+    {
+      "update": 580,
+      "optimizer_steps": 3648,
+      "transitions": 296960,
+      "passed": false,
+      "mean_return": 50.74514019983046,
+      "survived": 0,
+      "arrived": 0,
+      "final_settled_actions": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "checkpoint": "runs/drone-travel/seed11-20261009/travel-near-580.mpk",
+      "sha256": "339edf8de5bb7f043c2f11d03718e65394f4e07026640ba485f48efcd4cd0d06"
+    },
+    {
+      "update": 600,
+      "optimizer_steps": 3776,
+      "transitions": 307200,
+      "passed": false,
+      "mean_return": 121.29125675850791,
+      "survived": 0,
+      "arrived": 0,
+      "final_settled_actions": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "checkpoint": "runs/drone-travel/seed11-20261009/travel-near-600.mpk",
+      "sha256": "06938d247a845a754f02d723346d4a674f2976003ec7b3a1f87c16bb2f2cc112"
+    }
+  ],
+  "interpretation": "All 600 near-travel updates exhausted. No stage promotion and no qualified travel checkpoint. Selection scores do not establish held-out competence.",
+  "preservation": "All candidate weights and source.patch remain at recorded local paths. This artifact preserves hashes, all selection summaries, and final episodes."
+}
