@@ -424,8 +424,8 @@ standing sequence. Independent held-out evaluation failed all 32 cases. The
 audit, final selection, checkpoint hash and optimizer-journal hash. The
 [held-out report](progress/droid-standing-recovery-evaluation.json) preserves every case.
 
-The next bounded trial imports update 600 and starts fresh optimization with seed 13.
-Its budget is 2,400 new updates. The unit is
+The seed-13 trial imported update 600 and started fresh optimization.
+Its budget was 2,400 new updates. The unit is
 `bevy-gym-standing-warm-start-seed13-20261010.service`; output is
 `runs/droid-standing/seed13-warm-start-20261010`. The launch bundle is
 `/home/sagan/.cache/bevy-gym-quality-validation/standing-warm-start-seed13-20261010`.
@@ -440,4 +440,35 @@ took about 0.21 seconds per 512 transitions. None met the predeclared 2.66-secon
 optimizer target.
 
 Each configuration ran once alongside both live training runs; these
-measurements do not establish a reliable gain. The experiment patches were reverted.
+measurements do not establish a reliable gain. The native feature and profile patches
+were reverted.
+
+Recurrent PPO now evaluates each optimizer minibatch in one LSTM call. Shorter
+sequences receive trailing zero observation rows. The optimizer selects valid output
+rows before computing probability densities and losses. Each sequence retains its
+own initial memory, and the loss averages only valid timesteps. Batched tensor memory
+scales with lane count times maximum sequence length. When sequence lengths differ,
+padding adds work.
+
+The [batching record](./progress/recurrent-ppo-batching.json) preserves the original
+failing resource test, scalar comparisons, native/browser gates and coverage. The
+five-update padded prototype reduced median warmed optimization from 5.32 to 0.47
+seconds. The final executable completed ten updates in 7.00 seconds. Observed warmed
+update intervals had a 0.70-second median, including collection, optimization and
+journal flush. Polling and scheduling make those intervals approximate. This smoke
+run failed standing selection and does not qualify a policy.
+
+The seed-13 trial completed all 2,400 updates and exhausted its budget. Its final
+selection lasted 85 to 100 actions, with no survivors. Independent evaluation through
+the original executable failed all 32 held-out cases, lasting 83 to 128 actions.
+The [completion record](./progress/droid-standing-warm-start-final.json) and
+[complete held-out report](./progress/droid-standing-warm-start-final-evaluation.json)
+preserve the failure.
+
+The [next trial](./progress/droid-standing-batched-trial.json) uses the verified batched
+executable, seed 17 and a 24,000-update limit. It imports seed-13 update 660, which had
+the highest mean reward across the 120 fixed selection reports. That parent remains
+unqualified. Adam state, counters, samplers and episode memories start fresh. The
+physical rules, rewards and qualification gates remain fixed. Before reporting
+progress, inspect unit `bevy-gym-standing-batched-seed17-20261010.service` and output
+`runs/droid-standing/seed17-batched-20261010`.

@@ -1,0 +1,43 @@
+{
+  "recorded_utc": "2026-10-10T09:57:56.288463+00:00",
+  "unit": "bevy-gym-standing-warm-start-seed13-20261010.service",
+  "terminal_state": "failed",
+  "exec_main_status": 1,
+  "reason": "Standing exhausted its update budget without passing; checkpoint is not qualified.",
+  "complete_optimizer_records": 2400,
+  "completed_updates": 2400,
+  "transitions": 1228800,
+  "optimizer_steps": 19200,
+  "final_checkpoint_sha256": "077a81d092917f184f36b47341da07317ba6b702d7594e41bffaa61a179291e6",
+  "optimizer_journal_sha256": "2d4af70fdd2ed55473eda94e5d6052f1cd5be4fdddc32556e6de6170e33d5041",
+  "selection": {
+    "passed": false,
+    "steps": [
+      95,
+      90,
+      91,
+      100,
+      85
+    ],
+    "survived": 0
+  },
+  "held_out": {
+    "passed": false,
+    "episodes": 32,
+    "survived": 0,
+    "steps_min": 83,
+    "steps_max": 128,
+    "report": "droid-standing-warm-start-final-evaluation.json",
+    "original_binary_sha256": "a56ec1fb4ea1ae00f9b354b0ce51f2f2a44fc28f06edb6a84f2c58c3450e6a8a",
+    "cli_exit_code": 1
+  },
+  "selection_parent_for_next_trial": {
+    "update": 660,
+    "mean_reward": 81.83275812417268,
+    "mean_steps": 112.2,
+    "min_steps": 97,
+    "rule": "Highest mean reward across all 120 fixed selection reports; no held-out result used for ranking.",
+    "qualified": false
+  },
+  "qualification": "Failed selection and all 32 held-out cases; preserve the trial and do not promote."
+}

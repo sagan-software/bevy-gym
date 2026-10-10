@@ -1,0 +1,363 @@
+{
+  "recorded_utc": "2026-10-10T09:23:32.391370+00:00",
+  "base": "dc7ede63e64c8205f3dcf3a89a097fdd61b8e399",
+  "implementation": "One batch-first LSTM evaluation per optimizer minibatch; independent stored memories; zero observation rows after shorter unrolls; select valid rows before densities and losses; retain valid-timestep means and critic updates.",
+  "tensor_cost": "For fixed feature/hidden widths, recurrent tensor and graph size is proportional to minibatch lanes times maximum sequence length. Uneven lengths increase padded work.",
+  "resource_regression": {
+    "original_evaluations": 2,
+    "batched_evaluations": 1,
+    "minibatch_sequence_lengths": [
+      1,
+      3
+    ],
+    "optimizer_updates": 1,
+    "valid_samples": 4
+  },
+  "scalar_equivalence": {
+    "baseline_revision": "dc7ede63e64c8205f3dcf3a89a097fdd61b8e399",
+    "sequence_lengths": [
+      1,
+      4,
+      2,
+      3
+    ],
+    "fresh_model_seed": 123,
+    "sampler_seed": 321,
+    "optimizer_updates": 4,
+    "maximum_observed_native_diagnostic_difference": 1.1920928955078125e-07,
+    "maximum_observed_native_output_difference": 0.0,
+    "permanent_native_and_browser_tolerance": 3e-05,
+    "fixture_sha256": "980988d84298b8497e34390cac3592b9c4e2775f8ded065da6fa73a028a3d57d"
+  },
+  "prototype_optimizer_medians_seconds": {
+    "baseline": 5.3211635,
+    "equal_length_groups": 4.100731,
+    "padded_batch": 0.4718265
+  },
+  "final_executable": {
+    "recorded_utc": "2026-10-10T09:14:03.994985+00:00",
+    "base": "dc7ede63e64c8205f3dcf3a89a097fdd61b8e399",
+    "patch_sha256": "4856d8cacb666674eaa703a4ee4f9017256a779c674e9c5638cd025600cc9698",
+    "binary_sha256": "f3741f3ce3a57a43674ddc17b18d813d07652781673f1b0e55e8fcd410cd7f7c",
+    "input_sha256": "613a6a1a1b2d6288910e40f77a4b64894bc9ca8363c1cbb56298bd79eca5d01e",
+    "source_sha256": {
+      "src/training/recurrent_ppo/mod.rs": "189031ec0f25d1d501b90999f6069c97c9b53b71ab25b28e9bece24aaf55fa9e",
+      "tests/recurrent_ppo_bytes.rs": "075250d9f56aad3c18d71a7fc02b3e403163f4ff1d6b3dfef6a73a63dae01a7e",
+      "tests/fixtures/recurrent_ppo_scalar_minibatch.json": "980988d84298b8497e34390cac3592b9c4e2775f8ded065da6fa73a028a3d57d",
+      "Cargo.toml": "c171ef5058012ebc620bf16b0a86395bc9243a3b5b18a3a287029ddd7119439f",
+      "Cargo.lock": "a6dd6c536e8b1d666b30790c0c97257528f9103b2e1c6ed7c8dc94c95a9fb258"
+    },
+    "seed": 17,
+    "updates": 10,
+    "purpose": "Bounded timing smoke test of the final native training executable; not qualification."
+  },
+  "final_executable_timing": {
+    "command": [
+      "/home/sagan/.cache/bevy-gym-quality-validation/standing-batching-smoke-seed17-20261010/droid-standing",
+      "warm-start",
+      "--checkpoint",
+      "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/runs/droid-standing/seed13-warm-start-20261010/standing-660.mpk",
+      "--seed",
+      "17",
+      "--updates",
+      "10",
+      "--output",
+      "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/runs/droid-standing/seed17-batching-smoke-20261010"
+    ],
+    "exit_code": 1,
+    "elapsed_seconds": 7.000557885039598,
+    "valid_samples_per_update": 512,
+    "observation_poll_seconds": 0.005,
+    "observations": [
+      {
+        "update": 1,
+        "observed_seconds": 0.5083736891392618
+      },
+      {
+        "update": 2,
+        "observed_seconds": 1.1172501160763204
+      },
+      {
+        "update": 3,
+        "observed_seconds": 1.825953277060762
+      },
+      {
+        "update": 4,
+        "observed_seconds": 2.539427845971659
+      },
+      {
+        "update": 5,
+        "observed_seconds": 3.2321174200624228
+      },
+      {
+        "update": 6,
+        "observed_seconds": 3.9405960929580033
+      },
+      {
+        "update": 7,
+        "observed_seconds": 4.654577163979411
+      },
+      {
+        "update": 8,
+        "observed_seconds": 5.372910580132157
+      },
+      {
+        "update": 9,
+        "observed_seconds": 6.060971507104114
+      },
+      {
+        "update": 10,
+        "observed_seconds": 6.785090167075396
+      }
+    ],
+    "intervals": [
+      {
+        "update": 2,
+        "collection_optimization_and_flush_seconds": 0.6088764269370586
+      },
+      {
+        "update": 3,
+        "collection_optimization_and_flush_seconds": 0.7087031609844416
+      },
+      {
+        "update": 4,
+        "collection_optimization_and_flush_seconds": 0.7134745689108968
+      },
+      {
+        "update": 5,
+        "collection_optimization_and_flush_seconds": 0.6926895740907639
+      },
+      {
+        "update": 6,
+        "collection_optimization_and_flush_seconds": 0.7084786728955805
+      },
+      {
+        "update": 7,
+        "collection_optimization_and_flush_seconds": 0.7139810710214078
+      },
+      {
+        "update": 8,
+        "collection_optimization_and_flush_seconds": 0.7183334161527455
+      },
+      {
+        "update": 9,
+        "collection_optimization_and_flush_seconds": 0.6880609269719571
+      },
+      {
+        "update": 10,
+        "collection_optimization_and_flush_seconds": 0.7241186599712819
+      }
+    ],
+    "warmed_updates_2_through_5_median_seconds": 0.7006963675376028,
+    "criterion_seconds": 2.66058175,
+    "timing_scope": "Intervals include collection, PPO optimization and journal flush. Observations use a 5 ms polling interval and can include additional scheduling delay; these are not isolated optimizer timings.",
+    "journal_sha256": "13237bb120cbc7f8edc49d0df9a7f3a50ca8e93dfd8012e76418478f07050afc",
+    "qualification": "This ten-update smoke run does not qualify standing."
+  },
+  "smoke_selection": {
+    "passed": false,
+    "steps": [
+      117,
+      102,
+      119,
+      111,
+      113
+    ],
+    "survived": 0,
+    "checkpoint_sha256": "666d21f27b0c2490e4ba8ae1ce3562ac45dc1706cd9aa630201f795b9c906e74",
+    "cli_exit_code": 1,
+    "reason": "Completed ten updates; standing qualification failed and the CLI reported exhausted update budget."
+  },
+  "native_gates": [
+    {
+      "gate": "fmt",
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "log": "/home/sagan/.cache/bevy-gym-quality-validation/recurrent-batching-fmt.log"
+    },
+    {
+      "gate": "default-tests",
+      "command": [
+        "cargo",
+        "test"
+      ],
+      "exit_code": 0,
+      "log": "/home/sagan/.cache/bevy-gym-quality-validation/recurrent-batching-default-tests.log"
+    },
+    {
+      "gate": "robot-tests",
+      "command": [
+        "cargo",
+        "test",
+        "--no-default-features",
+        "--features",
+        "robots",
+        "--lib",
+        "--test",
+        "recurrent_ppo_bytes",
+        "--test",
+        "recurrent_behavior_sequence",
+        "--test",
+        "droid_learning",
+        "--test",
+        "drone_learning",
+        "--test",
+        "drone_damage_training"
+      ],
+      "exit_code": 0,
+      "log": "/home/sagan/.cache/bevy-gym-quality-validation/recurrent-batching-robot-tests.log"
+    },
+    {
+      "gate": "strict",
+      "command": [
+        "cargo",
+        "clippy",
+        "--all-targets",
+        "--all-features",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "log": "/home/sagan/.cache/bevy-gym-quality-validation/recurrent-batching-strict.log"
+    }
+  ],
+  "suite_summary": {
+    "default-tests": {
+      "suites": 36,
+      "passed": 132,
+      "failed": 0,
+      "ignored": 1
+    },
+    "robot-tests": {
+      "suites": 6,
+      "passed": 187,
+      "failed": 0,
+      "ignored": 1
+    },
+    "browser": {
+      "suites": 25,
+      "passed": 222,
+      "failed": 0,
+      "ignored": 0
+    }
+  },
+  "personal_lint": {
+    "changed_line_clippy": "passed",
+    "changed_line_dylint": "passed",
+    "strict_clippy_child_exit_code": 101,
+    "strict_clippy_changed_line_diagnostics": 0,
+    "strict_dylint_child_exit_code": 0,
+    "note": "Strict personal Clippy still reports repository diagnostics outside the changed lines. The wrapper exits zero; its Clippy child fails."
+  },
+  "coverage": {
+    "helpers": [
+      {
+        "name": "16actor_loss_batch",
+        "executions": 10,
+        "regions": 68,
+        "unhit_regions": 0,
+        "explicit_branches": 0
+      },
+      {
+        "name": "19actor_batch_targets",
+        "executions": 10,
+        "regions": 35,
+        "unhit_regions": 0,
+        "explicit_branches": 0
+      },
+      {
+        "name": "22actor_minibatch_inputs",
+        "executions": 10,
+        "regions": 48,
+        "unhit_regions": 0,
+        "explicit_branches": 0
+      },
+      {
+        "name": "24actor_batch_distribution",
+        "executions": 10,
+        "regions": 33,
+        "unhit_regions": 0,
+        "explicit_branches": 0
+      },
+      {
+        "name": "16actor_loss_batch",
+        "executions": 64,
+        "regions": 68,
+        "unhit_regions": 0,
+        "explicit_branches": 0
+      },
+      {
+        "name": "19actor_batch_targets",
+        "executions": 64,
+        "regions": 35,
+        "unhit_regions": 0,
+        "explicit_branches": 0
+      },
+      {
+        "name": "22actor_minibatch_inputs",
+        "executions": 64,
+        "regions": 48,
+        "unhit_regions": 0,
+        "explicit_branches": 0
+      },
+      {
+        "name": "24actor_batch_distribution",
+        "executions": 64,
+        "regions": 33,
+        "unhit_regions": 0,
+        "explicit_branches": 0
+      }
+    ],
+    "note": "Every mapped region in the four new helper bodies executed. The compiler emitted no explicit branch records for these helpers. This is not whole-module coverage. Empty minibatches are rejected at the public update boundary before the private nonempty expectation."
+  },
+  "logs": {
+    "fmt": {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/recurrent-batching-fmt.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "default-tests": {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/recurrent-batching-default-tests.log",
+      "sha256": "17c350bfc361db54f593d64596ea908a9eb19655da5288cc919f257371956bc8"
+    },
+    "robot-tests": {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/recurrent-batching-robot-tests.log",
+      "sha256": "4b8644d016a529be2b79d02b5e1463c111f77baa95180fbdc8cb693b5d57b8c4"
+    },
+    "strict": {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/recurrent-batching-strict.log",
+      "sha256": "fcd576a6a502ce229e1d72f6c381540eb7c6d4ba7b504f2b610e046bc6f67bf7"
+    },
+    "browser": {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/recurrent-batching-browser.log",
+      "sha256": "9e58b38d4d7aeb7160a59c9593781ceec15c8f5b813e461bbc2852989ad02f87"
+    },
+    "personal-final": {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/recurrent-batching-personal-final.log",
+      "sha256": "8d83600937f3f5f79b7e8fd1cabcc84ae9352e16c02e1cbead906c3434d72acc"
+    },
+    "personal-strict": {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/recurrent-batching-personal-strict.log",
+      "sha256": "8bb25b79519a2c55e75e56f9b12757353328856f8095316289cb6d1a2ad7ec0a"
+    },
+    "coverage": {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/recurrent-batching-coverage.log",
+      "sha256": "5162daabe2d9a9155536952b6f0a057bf03fa71c55128c4c26ec6ce24a05aca5"
+    },
+    "resource-red": {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/recurrent-batching-resource-red.log",
+      "sha256": "aa65a3ae78012860f6de911249436b4989f8ffab87c39a90c70380f8ddd0a225"
+    },
+    "example-build": {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/recurrent-batching-example-build.log",
+      "sha256": "509d6b795126be0ae3912aad6f02222fea762ad250f9bf6e83835ae71a9951f7"
+    }
+  },
+  "qualification": "No standing or travel policy is promoted by optimizer speed, tests or this timing smoke run."
+}

@@ -29,6 +29,12 @@ use super::checkpoint::{policy_recorder, CheckpointError, CheckpointOperation};
 #[cfg(any(not(target_arch = "wasm32"), feature = "browser-training"))]
 use super::rng::SeedConfig;
 
+#[cfg(test)]
+std::thread_local! {
+    /// Test-local count of recurrent evaluations, isolated from parallel test threads.
+    static ACTOR_FORWARD_CALLS: std::cell::Cell<usize> = const { std::cell::Cell::new(0) };
+}
+
 /// Constant in the diagonal Gaussian log-density formula.
 const LOG_TWO_PI: f32 = 1.837_877;
 
@@ -367,6 +373,8 @@ impl<B: Backend> RecurrentActor<B> {
         log_std_min: f32,
         log_std_max: f32,
     ) -> (Tensor<B, 2>, Tensor<B, 2>, LstmState<B, 2>) {
+        #[cfg(test)]
+        ACTOR_FORWARD_CALLS.with(|calls| calls.set(calls.get() + 1));
         let (encoded, final_state) = self.memory.forward(observations, initial_state);
         let [batch_size, sequence_length, hidden_size] = encoded.dims();
         let mean = self
@@ -1704,43 +1712,39 @@ impl RecurrentPpoAgent {
             // systematic last-update bias of trajectory-ordered chunks.
             self.minibatch_rng.shuffle(&mut minibatch_order);
             for minibatch in minibatch_order.chunks(self.config.minibatch_sequences) {
-                let mut actor_loss = None;
                 let mut critic_loss = None;
                 let mut minibatch_valid_timesteps = 0_usize;
+                // Keep independent memories in one recurrent batch and exclude padding
+                // before probability-density evaluation or valid-timestep averaging.
+                let (actor_loss, metrics) =
+                    self.actor_loss_batch(minibatch, advantage_mean, advantage_scale);
+                let timesteps = minibatch
+                    .iter()
+                    .map(|sequence| sequence.observations.len())
+                    .sum::<usize>();
+                let metric_weight = timesteps as f64;
+                totals.actor_loss = metrics.loss.mul_add(metric_weight, totals.actor_loss);
+                totals.entropy = metrics.entropy.mul_add(metric_weight, totals.entropy);
+                totals.approximate_kl = metrics
+                    .approximate_kl
+                    .mul_add(metric_weight, totals.approximate_kl);
                 for sequence in minibatch {
-                    let (sequence_actor_loss, actor_metrics) =
-                        self.actor_loss(sequence, advantage_mean, advantage_scale);
                     let (sequence_critic_loss, critic_loss_value) = self.critic_loss(sequence);
                     let valid_timesteps = sequence.observations.len();
                     let tensor_weight = valid_timesteps as f32;
                     let metric_weight = valid_timesteps as f64;
-                    actor_loss = Some(match actor_loss {
-                        Some(total) => total + sequence_actor_loss * tensor_weight,
-                        None => sequence_actor_loss * tensor_weight,
-                    });
                     critic_loss = Some(match critic_loss {
                         Some(total) => total + sequence_critic_loss * tensor_weight,
                         None => sequence_critic_loss * tensor_weight,
                     });
-                    totals.actor_loss =
-                        actor_metrics.loss.mul_add(metric_weight, totals.actor_loss);
                     totals.critic_loss =
                         critic_loss_value.mul_add(metric_weight, totals.critic_loss);
-                    totals.entropy = actor_metrics.entropy.mul_add(metric_weight, totals.entropy);
-                    totals.approximate_kl = actor_metrics
-                        .approximate_kl
-                        .mul_add(metric_weight, totals.approximate_kl);
                     totals.valid_timesteps = totals
                         .valid_timesteps
                         .saturating_add(valid_timesteps as u64);
                     minibatch_valid_timesteps =
                         minibatch_valid_timesteps.saturating_add(valid_timesteps);
                 }
-                let Some(actor_loss) = actor_loss else {
-                    return Err(RecurrentPpoError::invalid_sequence(
-                        "optimizer minibatches must be nonempty",
-                    ));
-                };
                 let Some(critic_loss) = critic_loss else {
                     return Err(RecurrentPpoError::invalid_sequence(
                         "optimizer minibatches must be nonempty",
@@ -1749,7 +1753,6 @@ impl RecurrentPpoAgent {
                 // Convert per-sequence means back into one valid-timestep mean
                 // so short terminal chunks cannot dominate full unrolls.
                 let divisor = minibatch_valid_timesteps as f32;
-                let actor_loss = actor_loss / divisor;
                 let critic_loss = critic_loss / divisor;
                 let actor_gradients =
                     GradientsParams::from_grads(actor_loss.backward(), &self.actor);
@@ -1867,37 +1870,16 @@ impl RecurrentPpoAgent {
         })
     }
 
-    /// Build one intact sequence's differentiable actor objective.
-    fn actor_loss(
+    /// Average the corrected PPO objective over valid timesteps only.
+    fn actor_loss_batch(
         &self,
-        sequence: &RecurrentPpoSequence,
+        sequences: &[&RecurrentPpoSequence],
         advantage_mean: f32,
         advantage_scale: f32,
     ) -> (Tensor<TrainingBackend, 1>, ActorMetrics) {
-        let sequence_length = sequence.observations.len();
-        let observations = encode_matrix::<TrainingBackend>(
-            &sequence.observations,
-            self.observation_dim,
-            &self.device,
-        )
-        .reshape([1, sequence_length, self.observation_dim]);
-        let state = memory_to_state::<TrainingBackend>(
-            &sequence.initial_memory,
-            &self.device,
-            self.config.actor_hidden_size,
-        );
-        let (mean, log_std, _) = self.actor.forward(
-            observations,
-            Some(state),
-            self.action_low.len(),
-            self.config.log_std_min,
-            self.config.log_std_max,
-        );
-        let samples = encode_matrix::<TrainingBackend>(
-            &sequence.pre_tanh_actions,
-            self.action_low.len(),
-            &self.device,
-        );
+        let (mean, log_std) = self.actor_batch_distribution(sequences);
+        let (samples, old_log_probabilities, advantages) =
+            self.actor_batch_targets(sequences, advantage_mean, advantage_scale);
         let new_log_probabilities = tensor_log_probabilities(
             mean,
             log_std.clone(),
@@ -1905,19 +1887,6 @@ impl RecurrentPpoAgent {
             &self.action_low,
             &self.action_high,
             self.config.log_probability_epsilon,
-            &self.device,
-        );
-        let old_log_probabilities = Tensor::<TrainingBackend, 1>::from_floats(
-            sequence.old_log_probabilities.as_slice(),
-            &self.device,
-        );
-        let normalized_advantages: Vec<_> = sequence
-            .advantages
-            .iter()
-            .map(|value| (value - advantage_mean) / advantage_scale)
-            .collect();
-        let advantages = Tensor::<TrainingBackend, 1>::from_floats(
-            normalized_advantages.as_slice(),
             &self.device,
         );
         let ratios = (new_log_probabilities.clone() - old_log_probabilities.clone()).exp();
@@ -1941,6 +1910,128 @@ impl RecurrentPpoAgent {
                 approximate_kl,
             },
         )
+    }
+
+    /// Encode padded observations and independent initial memories without cloning host rows.
+    ///
+    /// Burn 0.21 LSTM uses batch-first `[lanes, time, features]` inputs and
+    /// `[lanes, hidden]` states:
+    /// <https://docs.rs/burn/0.21.0/burn/nn/struct.Lstm.html#method.forward>.
+    /// Tensor/graph size is proportional to minibatch lanes times maximum unroll length.
+    fn actor_minibatch_inputs(
+        &self,
+        sequences: &[&RecurrentPpoSequence],
+    ) -> (
+        Tensor<TrainingBackend, 3>,
+        LstmState<TrainingBackend, 2>,
+        usize,
+    ) {
+        let sequence_length = sequences
+            .iter()
+            .map(|sequence| sequence.observations.len())
+            .max()
+            .expect("validated nonempty minibatch");
+        let zero_row = vec![0.0; self.observation_dim];
+        let observations = sequences
+            .iter()
+            .flat_map(|sequence| {
+                sequence
+                    .observations
+                    .iter()
+                    .map(Vec::as_slice)
+                    .chain(std::iter::repeat_n(
+                        zero_row.as_slice(),
+                        sequence_length - sequence.observations.len(),
+                    ))
+            })
+            .collect::<Vec<_>>();
+        let observations =
+            encode_matrix::<TrainingBackend>(&observations, self.observation_dim, &self.device)
+                .reshape([sequences.len(), sequence_length, self.observation_dim]);
+        let cells = sequences
+            .iter()
+            .map(|sequence| sequence.initial_memory.cell.as_slice())
+            .collect::<Vec<_>>();
+        let hidden = sequences
+            .iter()
+            .map(|sequence| sequence.initial_memory.hidden.as_slice())
+            .collect::<Vec<_>>();
+        let state = LstmState::new(
+            encode_matrix::<TrainingBackend>(&cells, self.config.actor_hidden_size, &self.device),
+            encode_matrix::<TrainingBackend>(&hidden, self.config.actor_hidden_size, &self.device),
+        );
+        (observations, state, sequence_length)
+    }
+
+    /// Evaluate one recurrent batch and retain valid output rows in sequence order.
+    fn actor_batch_distribution(
+        &self,
+        sequences: &[&RecurrentPpoSequence],
+    ) -> (Tensor<TrainingBackend, 2>, Tensor<TrainingBackend, 2>) {
+        let (observations, state, sequence_length) = self.actor_minibatch_inputs(sequences);
+        let (mean, log_std, _) = self.actor.forward(
+            observations,
+            Some(state),
+            self.action_low.len(),
+            self.config.log_std_min,
+            self.config.log_std_max,
+        );
+        // Padding occurs after each intact sequence. Selecting valid rows before
+        // density evaluation prevents padded ratios or advantages from affecting gradients.
+        let indices = sequences
+            .iter()
+            .enumerate()
+            .flat_map(|(lane, sequence)| {
+                (0..sequence.observations.len())
+                    .map(move |step| (lane * sequence_length + step) as i64)
+            })
+            .collect::<Vec<_>>();
+        let indices = Tensor::<TrainingBackend, 1, burn::tensor::Int>::from_ints(
+            indices.as_slice(),
+            &self.device,
+        );
+        (mean.select(0, indices.clone()), log_std.select(0, indices))
+    }
+
+    /// Encode stored actions, behavior probabilities and normalized advantages for valid rows.
+    fn actor_batch_targets(
+        &self,
+        sequences: &[&RecurrentPpoSequence],
+        advantage_mean: f32,
+        advantage_scale: f32,
+    ) -> (
+        Tensor<TrainingBackend, 2>,
+        Tensor<TrainingBackend, 1>,
+        Tensor<TrainingBackend, 1>,
+    ) {
+        let samples = sequences
+            .iter()
+            .flat_map(|sequence| sequence.pre_tanh_actions.iter().map(Vec::as_slice))
+            .collect::<Vec<_>>();
+        let samples =
+            encode_matrix::<TrainingBackend>(&samples, self.action_low.len(), &self.device);
+        let old_log_probabilities = sequences
+            .iter()
+            .flat_map(|sequence| sequence.old_log_probabilities.iter().copied())
+            .collect::<Vec<_>>();
+        let old_log_probabilities = Tensor::<TrainingBackend, 1>::from_floats(
+            old_log_probabilities.as_slice(),
+            &self.device,
+        );
+        let normalized_advantages = sequences
+            .iter()
+            .flat_map(|sequence| {
+                sequence
+                    .advantages
+                    .iter()
+                    .map(|value| (value - advantage_mean) / advantage_scale)
+            })
+            .collect::<Vec<_>>();
+        let advantages = Tensor::<TrainingBackend, 1>::from_floats(
+            normalized_advantages.as_slice(),
+            &self.device,
+        );
+        (samples, old_log_probabilities, advantages)
     }
 
     /// Build one sequence's differentiable centralized critic objective.
@@ -1984,7 +2075,7 @@ struct UpdateTotals {
     valid_timesteps: u64,
 }
 
-/// Diagnostics returned by one actor sequence update.
+/// Diagnostics returned by one actor minibatch objective.
 #[derive(Debug, Clone, Copy, PartialEq)]
 #[cfg(any(not(target_arch = "wasm32"), feature = "browser-training"))]
 struct ActorMetrics {
@@ -3051,5 +3142,35 @@ mod tests {
         assert_eq!(after.next_memory, before.next_memory);
         assert!(agent.shift_actor_mean_bias(2, 0.10).is_err());
         assert!(agent.shift_actor_mean_bias(0, f32::NAN).is_err());
+    }
+    /// One optimizer minibatch must use one LSTM evaluation despite different sequence lengths.
+    #[test]
+    fn optimizer_batches_recurrent_evaluation_once_per_minibatch() {
+        let config = RecurrentPpoConfig {
+            actor_hidden_size: 4,
+            critic_hidden_sizes: vec![4],
+            epochs: 1,
+            minibatch_sequences: 2,
+            ..RecurrentPpoConfig::default()
+        };
+        let mut agent =
+            RecurrentPpoAgent::new(2, 2, 1, &[-1.0], &[1.0], config, SeedConfig::from_root(131))
+                .expect("learner");
+        let memory = agent.policy().initial_memory();
+        let sequences = [1, 3].map(|length| RecurrentPpoSequence {
+            observations: vec![vec![0.1, -0.2]; length],
+            global_states: vec![vec![0.1, -0.2]; length],
+            pre_tanh_actions: vec![vec![0.0]; length],
+            old_log_probabilities: vec![0.0; length],
+            advantages: vec![1.0; length],
+            returns: vec![1.0; length],
+            value_index: 0,
+            initial_memory: memory.clone(),
+        });
+        ACTOR_FORWARD_CALLS.with(|calls| calls.set(0));
+        let update = agent.update(&sequences).expect("minibatch update");
+        assert_eq!(update.optimizer_updates, 1);
+        assert_eq!(update.valid_samples, 4);
+        ACTOR_FORWARD_CALLS.with(|calls| assert_eq!(calls.get(), 1));
     }
 }

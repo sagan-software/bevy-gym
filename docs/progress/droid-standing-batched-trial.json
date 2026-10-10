@@ -1,0 +1,51 @@
+{
+  "recorded_utc": "2026-10-10T09:52:54.196859+00:00",
+  "unit": "bevy-gym-standing-batched-seed17-20261010.service",
+  "command": [
+    "/run/current-system/sw/bin/nix",
+    "develop",
+    "--command",
+    "/home/sagan/.cache/bevy-gym-quality-validation/standing-batched-seed17-20261010/droid-standing",
+    "warm-start",
+    "--checkpoint",
+    "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/runs/droid-standing/seed13-warm-start-20261010/standing-660.mpk",
+    "--seed",
+    "17",
+    "--updates",
+    "24000",
+    "--output",
+    "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/runs/droid-standing/seed17-batched-20261010"
+  ],
+  "output": "runs/droid-standing/seed17-batched-20261010",
+  "base": "dc7ede63e64c8205f3dcf3a89a097fdd61b8e399",
+  "source_patch_sha256": "4856d8cacb666674eaa703a4ee4f9017256a779c674e9c5638cd025600cc9698",
+  "source_sha256": {
+    "src/training/recurrent_ppo/mod.rs": "189031ec0f25d1d501b90999f6069c97c9b53b71ab25b28e9bece24aaf55fa9e",
+    "tests/recurrent_ppo_bytes.rs": "075250d9f56aad3c18d71a7fc02b3e403163f4ff1d6b3dfef6a73a63dae01a7e",
+    "tests/fixtures/recurrent_ppo_scalar_minibatch.json": "980988d84298b8497e34390cac3592b9c4e2775f8ded065da6fa73a028a3d57d",
+    "Cargo.toml": "c171ef5058012ebc620bf16b0a86395bc9243a3b5b18a3a287029ddd7119439f",
+    "Cargo.lock": "a6dd6c536e8b1d666b30790c0c97257528f9103b2e1c6ed7c8dc94c95a9fb258"
+  },
+  "binary_sha256": "f3741f3ce3a57a43674ddc17b18d813d07652781673f1b0e55e8fcd410cd7f7c",
+  "source_checkpoint_sha256": "613a6a1a1b2d6288910e40f77a4b64894bc9ca8363c1cbb56298bd79eca5d01e",
+  "initialization": "Import actor and critic from seed-13 update 660; reset Adam optimizers, counters, samplers and episode memories. This is not optimizer-state resume.",
+  "parent_selection": "Highest mean reward across the 120 fixed selection reports from seed-13 updates 20 through 2400. Every report failed; the parent is not qualified. Held-out results were not used for ranking.",
+  "updates": 24000,
+  "maximum_transitions": 12288000,
+  "rationale": "The 600-update recovery and 2400-update warm start failed. The verified batched optimizer supports a larger bounded sample budget without changing physical rules, rewards or qualification gates.",
+  "resource_limits": {
+    "CPUQuota": "200%",
+    "MemoryMax": "2G",
+    "Nice": 10
+  },
+  "qualification": "Requires fixed standing selection, held-out evaluation and independent run evidence. Budget exhaustion is failure.",
+  "observed_state": {
+    "active": "active",
+    "substate": "running",
+    "main_pid": 523722,
+    "optimizer_update_observed": 216,
+    "initial_checkpoint_bytes_match_parent": true,
+    "initial_sidecar_bytes_match_parent": true,
+    "first_ten_optimizer_records_match_smoke": true
+  }
+}
