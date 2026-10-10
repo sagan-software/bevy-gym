@@ -1,0 +1,69 @@
+{
+  "created_utc": "2026-10-10T15:08:05.106082+00:00",
+  "source_revision": "4300eaa01dbd6c227767c233cd703fbe624b92a0",
+  "binary_path": "/home/sagan/.cache/bevy-gym-quality-validation/travel-rehearsed-seed29-20261010/drone-curriculum",
+  "binary_sha256": "2bafc46e8b9298ab720fb479f7963e3247afac85fe5ef3e5b921f5a7fffbfd83",
+  "recipe": "travel-prerequisite-rehearsal-v1",
+  "seed": 29,
+  "updates_per_stage": 24000,
+  "maximum_transitions": 49152000,
+  "parent_checkpoint": "docs/progress/drone-recovery-transfer.mpk",
+  "parent_sha256": "7c2b9a6f2a0288faa27676d1514848710f4d5c24cd77505e75cf4990576a12b1",
+  "initialization": "Qualified recovery actor, zero inserted heading weights, fresh critic and Adam. Not an optimizer-state resume; one learner and both optimizers remain shared across successful stage transitions.",
+  "comparison": "Same seed and original initialization isolate the new reset recipe. The 20-update endurance smoke exactly matches the original optimizer and selection prefix.",
+  "evaluation": "Every original gate remains unchanged. Separate-process prefix validation controls promotion; final held-out roots are excluded from training and validation. No retention benefit or qualification is claimed.",
+  "command": [
+    "systemd-run",
+    "--user",
+    "--unit=bevy-gym-travel-rehearsed-seed29-20261010",
+    "--property=CPUQuota=200%",
+    "--property=MemoryMax=2G",
+    "--property=Nice=10",
+    "--property=WorkingDirectory=/home/sagan/Code/github.com/sagan-software/bevy-gym-quality",
+    "--property=StandardOutput=append:/home/sagan/.cache/bevy-gym-quality-validation/travel-rehearsed-seed29-20261010.log",
+    "--property=StandardError=append:/home/sagan/.cache/bevy-gym-quality-validation/travel-rehearsed-seed29-20261010.log",
+    "nix",
+    "develop",
+    "--command",
+    "env",
+    "-u",
+    "CFLAGS",
+    "/home/sagan/.cache/bevy-gym-quality-validation/travel-rehearsed-seed29-20261010/drone-curriculum",
+    "--lesson",
+    "travel",
+    "--rehearse-prerequisites",
+    "--seed",
+    "29",
+    "--updates",
+    "24000",
+    "--output",
+    "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/runs/drone-travel/rehearsed-seed29-20261010"
+  ],
+  "output": "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/runs/drone-travel/rehearsed-seed29-20261010",
+  "log": "/home/sagan/.cache/bevy-gym-quality-validation/travel-rehearsed-seed29-20261010.log",
+  "observed_early_prefix": {
+    "update": 2829,
+    "first_twenty_optimizer_records_match_original_exactly": true,
+    "first_twenty_transitions": 10240
+  },
+  "launch_verification": {
+    "observed_utc": "2026-10-10T15:20:00.110359+00:00",
+    "active_state": "active",
+    "main_pid": 921552,
+    "binary_digest_matches_manifest": true,
+    "qualification": "unproven"
+  },
+  "publication_checks": {
+    "rumdl": "passed with external cache",
+    "configured_markdown_lints": "nine unchanged LIAMC005 paragraphs; each exactly matches source_revision, no changed diagnostics",
+    "source_ci": {
+      "url": "https://github.com/sagan-software/bevy-gym/actions/runs/38062271973",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    "source_browser_preview": {
+      "url": "https://github.com/sagan-software/bevy-gym/actions/runs/38062272108",
+      "observed_status": "pending"
+    }
+  }
+}

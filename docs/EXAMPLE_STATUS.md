@@ -25,6 +25,12 @@ prevent a claim of checkpoint-container reproducibility. Retention improvement a
 full travel qualification remain unproven. Later curriculum lessons and shared
 browser 3v3 remain unfinished.
 
+The [recorded rehearsal run](progress/drone-travel-rehearsed-seed29.json) now trains
+seed 29 with a 24,000-update limit per stage. Its immutable binary comes from
+`4300eaa`; its first 20 optimizer records match the original run exactly.
+The learner starts from the qualified recovery actor with fresh critic and Adam.
+Retention improvement remains unproven.
+
 Seed 31 has also exhausted 24,000 near-travel updates and exited 1.
 All five final episodes survive, but fail distance, heading and settled-streak gates.
 The [complete record](progress/travel-near-seed31/evaluation.json) and
