@@ -52,7 +52,7 @@ pub struct DroneHover {
     obstacles: Vec<DroneObstacle>,
 }
 
-/// Initial conditions selected by the two public constructors.
+/// Initial conditions retained across resets, independently of collision geometry.
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum ResetProfile {
     /// Upright and stationary, with only position offsets.
@@ -182,6 +182,23 @@ impl DroneHover {
         let mut environment = Self {
             reset_profile: ResetProfile::Disturbed,
             ..Self::default()
+        };
+        environment.reset(Some(0));
+        environment
+    }
+
+    /// Combine disturbed initial motion with immutable collision boxes.
+    ///
+    /// Initial construction and resets use the same distribution as [`Self::disturbed`].
+    /// Reset retains every supplied box. Empty input reproduces that task exactly.
+    /// Contact ends flight; construction does not reject overlapping geometry or
+    /// select avoidance actions. The caller must place feasible lesson geometry.
+    /// Construction collects the iterator once; reset rebuilds it in linear time.
+    #[must_use]
+    pub fn disturbed_with_obstacles(obstacles: impl IntoIterator<Item = DroneObstacle>) -> Self {
+        let mut environment = Self {
+            reset_profile: ResetProfile::Disturbed,
+            ..Self::with_obstacles(obstacles)
         };
         environment.reset(Some(0));
         environment

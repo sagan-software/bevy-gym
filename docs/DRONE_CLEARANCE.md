@@ -1,7 +1,8 @@
 # Drone clearance
 
-Status: readonly range observations are implemented. Clearance training, frozen
-inference and qualification remain unfinished. No clearance policy is bundled.
+Status: readonly range observations and disturbed resets with obstacles are implemented.
+Clearance training, frozen inference and qualification remain unfinished.
+No clearance policy is bundled.
 
 ## Quick start
 
@@ -15,6 +16,18 @@ nix develop --command cargo run --no-default-features --features robots --exampl
 `DroneRanges::distance(DroneRangeDirection::Down)` to read a direction.
 A hit returns `Some(DroneRangeDistance)`; `metres()` reads its distance.
 A missed ray returns `None`.
+
+Use `DroneHover::disturbed_with_obstacles(boxes)` to combine validated collision boxes
+with the recovery lesson's disturbed initial motion. Empty input matches
+`DroneHover::disturbed()` exactly. Reset retains the boxes and restores working motors.
+Any solid contact ends flight; the caller must supply feasible lesson geometry.
+
+The [geometry evidence](progress/drone-disturbed-obstacles.json) records seed-zero
+construction, seeded and unseeded reset streams, platform contact and frozen terminal reads.
+All 236 browser tests and 128 focused native robot tests pass. Default native tests,
+formatting, strict Clippy and changed-line personal Rust lint pass.
+Both used constructor instantiations execute every added region; two unused generic
+placeholder instances have zero counts. This adds no production branch.
 
 ## Range contract
 

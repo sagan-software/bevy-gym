@@ -317,3 +317,102 @@ fn ranges_preserve_trajectories_and_reset_streams() {
         assert_eq!(observed.observation(), before);
     }
 }
+
+/// Empty geometry preserves disturbed construction, reset streams and actuator trajectories.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn empty_obstacles_preserve_disturbed_trajectories_exactly() {
+    let mut original = DroneHover::disturbed();
+    let mut scene = DroneHover::disturbed_with_obstacles([]);
+    assert_eq!(scene.observation(), original.observation());
+    for seed in [Some(0), Some(42), Some(u64::MAX), None, None] {
+        assert_eq!(
+            scene.reset(seed).observation,
+            original.reset(seed).observation
+        );
+        for fractions in [[0.5; 4], [0.6; 4], [0.55, 0.45, 0.45, 0.55], [0.0; 4]] {
+            let command = DroneAction::try_from(fractions).expect("isolated actuator fixture");
+            for _ in 0..100 {
+                let expected = original.step(command);
+                let actual = scene.step(command);
+                assert_eq!(actual.observation, expected.observation);
+                assert_eq!(actual.reward.to_bits(), expected.reward.to_bits());
+                assert_eq!(actual.status, expected.status);
+            }
+        }
+    }
+}
+
+/// Disturbed reset streams retain geometry, restore motors and preserve terminal snapshots.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn disturbed_obstacles_survive_resets_and_contact_is_absorbing() {
+    use bevy_gym::robots::{DroneMotorState, DroneRangeDirection};
+    let platform = DroneObstacle::try_from((
+        Vec3::new(0.0, 0.9, 0.0),
+        Vec3::new(3.0, 0.1, 3.0),
+        Quat::IDENTITY,
+    ))
+    .expect("platform top at one metre");
+    let mut drone = DroneHover::disturbed_with_obstacles([platform]);
+    let mut control = DroneHover::disturbed();
+    assert_eq!(drone.observation(), control.observation());
+    assert_ne!(
+        drone.observation(),
+        DroneHover::with_obstacles([platform]).observation()
+    );
+    drone.fail_motor(DroneMotor::FrontLeft).expect("live motor");
+    for seed in [Some(42), Some(u64::MAX), None, None] {
+        let start = drone.reset(seed).observation;
+        assert_eq!(
+            start,
+            control.reset(seed).observation,
+            "reset stream independent of geometry"
+        );
+        for motor in [
+            DroneMotor::FrontLeft,
+            DroneMotor::FrontRight,
+            DroneMotor::RearRight,
+            DroneMotor::RearLeft,
+        ] {
+            assert_eq!(start.motor_state(motor), DroneMotorState::Working);
+        }
+        let ranges = drone.ranges();
+        let down = ranges
+            .distance(DroneRangeDirection::Down)
+            .expect("platform below body");
+        assert!(
+            (0.8..1.3).contains(&down.metres()),
+            "one-metre platform distance"
+        );
+        assert_eq!(drone.observation(), start, "readonly sensor");
+        assert_platform_contact_is_absorbing(&mut drone);
+    }
+}
+
+/// Check first contact and repeated terminal reads through the public environment seam.
+fn assert_platform_contact_is_absorbing(drone: &mut DroneHover) {
+    let off = DroneAction::try_from([0.0; 4]).expect("isolated actuator fixture");
+    let mut terminal = None;
+    for _ in 0..100 {
+        let step = drone.step(off);
+        if step.is_done() {
+            terminal = Some(step);
+            break;
+        }
+    }
+    let contact = terminal.expect("platform contact within two seconds");
+    assert_eq!(contact.status, EpisodeStatus::Terminated);
+    assert!(
+        contact.observation.position().y > 1.0,
+        "contact precedes floor"
+    );
+    assert_eq!(contact.reward.to_bits(), 0.0_f64.to_bits());
+    assert!(drone.fail_motor(DroneMotor::FrontLeft).is_err());
+    let frozen_ranges = drone.ranges();
+    let repeated = drone.step(off);
+    assert_eq!(repeated.observation, contact.observation);
+    assert_eq!(repeated.reward.to_bits(), contact.reward.to_bits());
+    assert_eq!(repeated.status, contact.status);
+    assert_eq!(drone.ranges(), frozen_ranges);
+}

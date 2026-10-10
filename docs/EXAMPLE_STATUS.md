@@ -4,6 +4,24 @@ Updated: 2026-10-10. Current work: RL-only drone/droid curriculum.
 
 ## Resume here
 
+### Disturbed flight retains obstacle geometry, 2026-10-10
+
+`DroneHover::disturbed_with_obstacles` combines the existing recovery distribution
+with validated static boxes. Empty geometry preserves disturbed trajectories exactly.
+Reset retains boxes and restores motors; contact freezes terminal observations and ranges.
+The [record](progress/drone-disturbed-obstacles.json) preserves the missing-API failure,
+source hashes, reset cases and checks.
+
+All 236 browser tests, default native tests and 128 focused robot tests pass.
+Formatting, strict Clippy and changed-line personal Rust lint pass.
+Both used constructor instantiations execute every added region; unused generic
+placeholders remain unhit. No production branch was added.
+
+Standing and both gated travel runs continue without changed controls or promotion gates.
+Standing and full travel remain unqualified. Next: compose destination and ranges into
+the clearance task, then freeze opening, braking and cover evaluation cases before training.
+Clearance inference, later skills and shared browser 3v3 remain unfinished.
+
 ### Independent endurance candidate fails one held-out case, 2026-10-10
 
 Seed 31 passed endurance selection and separate-process validation at update 5,380,
