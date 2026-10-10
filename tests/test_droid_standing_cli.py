@@ -81,6 +81,45 @@ class StandingCliTests(unittest.TestCase):
             )
         self.assertFalse((self.output / "training-reward.json").exists())
 
+    def test_posture_height_profile_records_the_complete_fixed_contract(
+        self,
+    ) -> None:
+        """Publish the exact height recipe for both PPO weight origins."""
+        for mode in ["train", "warm-start"]:
+            output = self.root / ("posture-height-" + mode)
+            arguments = [mode, "--reward-profile", "posture-height-v1"]
+            if mode == "warm-start":
+                arguments += ["--checkpoint", str(self.checkpoint)]
+            result = self.run_command(
+                *arguments, "--seed", "17", "--updates", "1",
+                "--output", str(output),
+            )
+            self.assertEqual(result.returncode, 1, result.stderr)
+            self.assertIn("exhausted its update budget", result.stderr)
+            self.assertEqual(
+                (output / "training-reward.json").read_text(),
+                '{"contact_both":1.0,"contact_none":0.25,"contact_one":0.5,'
+                '"evaluation":"original-standing-v1",'
+                '"pelvis_height_scale_m":0.1499999761581421,'
+                '"pelvis_height_target_m":1.0,'
+                '"posture_up_projection_scale":0.03407418727874756,'
+                '"schema":"droid-standing-posture-height-reward-v1",'
+                '"seed":17}',
+            )
+            journal = json.loads((output / "optimization.jsonl").read_text())
+            self.assertEqual(journal["valid_samples"], 512)
+            self.assertGreater(journal["optimizer_updates"], 0)
+            checkpoint = output / "standing-1.mpk"
+            before = checkpoint.read_bytes()
+            evaluated = self.run_command(
+                "evaluate", "--checkpoint", str(checkpoint), "--seed", "42"
+            )
+            self.assertEqual(evaluated.returncode, 1)
+            self.assertEqual(checkpoint.read_bytes(), before)
+            self.assertEqual(
+                json.loads(evaluated.stdout)["suite"], "single-episode"
+            )
+
     def test_reward_profile_rejects_invalid_and_frozen_modes(self) -> None:
         """Reject unknown profiles and training options on frozen commands."""
         output = self.root / "rejected-profile"
@@ -92,6 +131,10 @@ class StandingCliTests(unittest.TestCase):
              "--reward-profile", "posture-v1"),
             ("trace", "--checkpoint", str(self.checkpoint),
              "--reward-profile", "posture-v1"),
+            ("evaluate", "--checkpoint", str(self.checkpoint),
+             "--reward-profile", "posture-height-v1"),
+            ("trace", "--checkpoint", str(self.checkpoint),
+             "--reward-profile", "posture-height-v1"),
         ]:
             if arguments[0] == "train":
                 arguments += ("--output", str(output))

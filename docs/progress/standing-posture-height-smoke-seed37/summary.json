@@ -1,0 +1,272 @@
+{
+  "recorded_utc": "2026-10-10T23:34:15.528047+00:00",
+  "source_base": "7af0ddcaf64ddfd7d3e65e1336797369b3ee8549",
+  "source_patch_sha256": "208e24ced3183289176de5c8fb1a037f4e4ef3f82d67717dafcb20e613c1e56f",
+  "source_sha256": {
+    "examples/robots/standing/cli.rs": "981daa06fa1f9eb1fe2e106eb61954014e1d34f9dbc8ffb25deacacaed56c668",
+    "examples/robots/standing/evaluation.rs": "617b28f01af54d5b369aa4c42c66184500e9a44dcfdb7018a081d167133db7e2",
+    "examples/robots/standing/reward.rs": "325115eec184960dc77d9b45da5508c1647b2debea06a77054ea523b4cdf7b39",
+    "examples/robots/standing/training.rs": "3942a35af3562dc495642a4c44564fa5aaa109eae639bbe74418c99229b08ac8",
+    "tests/droid_learning.rs": "bb1d697a025e52e6cd66c54cb53f4440ef82f0f9d7ac32ee91cdd6b6befe378f",
+    "tests/test_droid_standing_cli.py": "e5903da1b809bbb8ed22da5a4335559ee030a337a306d5fefe65a7f7e2f37ef9"
+  },
+  "executable_sha256": "cf3546fc11a80968e45d5bf4dddb7834771ed9dbc55262c0b43fd08b50e95210",
+  "parent_sha256": "5a7b813491c0125cfa66eb268d98efd1bed181226ae4eff6861c768afad40c08",
+  "profile": {
+    "contact_both": 1.0,
+    "contact_none": 0.25,
+    "contact_one": 0.5,
+    "evaluation": "original-standing-v1",
+    "pelvis_height_scale_m": 0.1499999761581421,
+    "pelvis_height_target_m": 1.0,
+    "posture_up_projection_scale": 0.03407418727874756,
+    "schema": "droid-standing-posture-height-reward-v1",
+    "seed": 37
+  },
+  "trial": {
+    "seed": 37,
+    "updates": 20,
+    "transitions": 10240,
+    "optimizer_updates": 140,
+    "selection_passed": false,
+    "selection_cases_passed": 0,
+    "selection_horizon_survivors": 0,
+    "held_out_evaluated": false,
+    "exit_code": 1,
+    "qualification": "unqualified"
+  },
+  "checks": {
+    "exit_codes": {
+      "format": 0,
+      "default-tests": 0,
+      "robot-tests": 0,
+      "clippy": 0,
+      "cli-build": 0,
+      "browser": 0,
+      "personal_rust": 0,
+      "python_lint": 0,
+      "cli": 0,
+      "coverage": 0,
+      "nix_lint": 1
+    },
+    "default_native_passed": 132,
+    "robot_native_passed": 480,
+    "wasm_passed": 318,
+    "cli_passed": 15,
+    "learning_coverage_tests_passed": 40,
+    "example_coverage_tests_passed": 27,
+    "changed_production_regions": 43,
+    "changed_production_regions_hit": 43,
+    "reward_production_regions": 73,
+    "reward_production_regions_hit": 73,
+    "reward_production_branch_outcomes": 6,
+    "reward_production_branch_outcomes_hit": 6,
+    "nix_baseline": [
+      {
+        "description": "direnv artifact directory `.direnv/` is not ignored recursively; add `.direnv/` to Git ignore rules",
+        "check_name": "liamc/direnv-artifact-directory",
+        "fingerprint": "2db02d2148d6ed44282c12d5cc24ceb6867d2d7ef89f176533e5e3e2eed0e8d2",
+        "severity": "major",
+        "location": {
+          "path": ".envrc",
+          "lines": {
+            "begin": 1
+          },
+          "positions": {
+            "begin": {
+              "line": 1,
+              "column": 1
+            }
+          }
+        }
+      },
+      {
+        "description": "Rust artifact directory `target/` is not ignored recursively; add `target/` to Git ignore rules",
+        "check_name": "liamc/rust-artifact-directory",
+        "fingerprint": "1072524427fef07ad5d4fee2997b83b921b78404bf976e43d84df30f464ec3ad",
+        "severity": "major",
+        "location": {
+          "path": "Cargo.toml",
+          "lines": {
+            "begin": 1
+          },
+          "positions": {
+            "begin": {
+              "line": 1,
+              "column": 1
+            }
+          }
+        }
+      },
+      {
+        "description": "Python artifact directory `.mypy_cache/` is not ignored recursively; add `.mypy_cache/` to Git ignore rules",
+        "check_name": "liamc/python-artifact-directory",
+        "fingerprint": "70e9210b20ce15e7a7fc5c4006e6b8ace6399bb4794add7ee3c325b18d402207",
+        "severity": "major",
+        "location": {
+          "path": "ai/skills/bmad-story-automator/pyproject.toml",
+          "lines": {
+            "begin": 1
+          },
+          "positions": {
+            "begin": {
+              "line": 1,
+              "column": 1
+            }
+          }
+        }
+      },
+      {
+        "description": "Python artifact directory `.pytest_cache/` is not ignored recursively; add `.pytest_cache/` to Git ignore rules",
+        "check_name": "liamc/python-artifact-directory",
+        "fingerprint": "97e43cbfd6d0a9078a551beb05696d5c77d7d566f4a48937081e692e9c8beba4",
+        "severity": "major",
+        "location": {
+          "path": "ai/skills/bmad-story-automator/pyproject.toml",
+          "lines": {
+            "begin": 1
+          },
+          "positions": {
+            "begin": {
+              "line": 1,
+              "column": 1
+            }
+          }
+        }
+      },
+      {
+        "description": "Python artifact directory `.ruff_cache/` is not ignored recursively; add `.ruff_cache/` to Git ignore rules",
+        "check_name": "liamc/python-artifact-directory",
+        "fingerprint": "c8df0456336b88256ba21e2c0644fffe622913957574e9731993d962a7b93488",
+        "severity": "major",
+        "location": {
+          "path": "ai/skills/bmad-story-automator/pyproject.toml",
+          "lines": {
+            "begin": 1
+          },
+          "positions": {
+            "begin": {
+              "line": 1,
+              "column": 1
+            }
+          }
+        }
+      },
+      {
+        "description": "Python artifact directory `.venv/` is not ignored recursively; add `.venv/` to Git ignore rules",
+        "check_name": "liamc/python-artifact-directory",
+        "fingerprint": "f41cbfa6c0c4e4c70442a32fbb571e2e06bbff022106275c5fb4642b0c8d5671",
+        "severity": "major",
+        "location": {
+          "path": "ai/skills/bmad-story-automator/pyproject.toml",
+          "lines": {
+            "begin": 1
+          },
+          "positions": {
+            "begin": {
+              "line": 1,
+              "column": 1
+            }
+          }
+        }
+      },
+      {
+        "description": "Wrap this source root in `lib.cleanSourceWith`, filtered `builtins.path`, or `lib.fileset.toSource`",
+        "check_name": "statix/unfiltered_source_root",
+        "fingerprint": "8ef0319c0582137f9988e108a3839fab27b7b3825c345a494673916168425ecd",
+        "severity": "minor",
+        "location": {
+          "path": "flake.nix",
+          "lines": {
+            "begin": 119
+          },
+          "positions": {
+            "begin": {
+              "line": 119,
+              "column": 18
+            }
+          }
+        }
+      },
+      {
+        "description": "Wrap this source root in `lib.cleanSourceWith`, filtered `builtins.path`, or `lib.fileset.toSource`",
+        "check_name": "statix/unfiltered_source_root",
+        "fingerprint": "bdc44f9a587d15d3c8a768d088bae7067b5c3759de89f07497d46af54b408a05",
+        "severity": "minor",
+        "location": {
+          "path": "flake.nix",
+          "lines": {
+            "begin": 200
+          },
+          "positions": {
+            "begin": {
+              "line": 200,
+              "column": 20
+            }
+          }
+        }
+      },
+      {
+        "description": "Rust artifact directory `target/` is not ignored recursively; add `target/` to Git ignore rules",
+        "check_name": "liamc/rust-artifact-directory",
+        "fingerprint": "ac92ab7700865483a6a074cbf50f0a5629f4bf4fe25f6de34e1eb403be255a0e",
+        "severity": "major",
+        "location": {
+          "path": "vendor/bevy-ragdoll-rapier3d/Cargo.toml",
+          "lines": {
+            "begin": 1
+          },
+          "positions": {
+            "begin": {
+              "line": 1,
+              "column": 1
+            }
+          }
+        }
+      },
+      {
+        "description": "Rust artifact directory `target/` is not ignored recursively; add `target/` to Git ignore rules",
+        "check_name": "liamc/rust-artifact-directory",
+        "fingerprint": "e22666594785cc16f1031b2618a915eda1dee9792d267cfcd1886b9adbb40699",
+        "severity": "major",
+        "location": {
+          "path": "vendor/bevy-ragdoll/Cargo.toml",
+          "lines": {
+            "begin": 1
+          },
+          "positions": {
+            "begin": {
+              "line": 1,
+              "column": 1
+            }
+          }
+        }
+      }
+    ],
+    "coverage": "coverage.json"
+  },
+  "research": {
+    "source": "https://github.com/isaac-sim/IsaacLab/blob/v3.0.0-EA/source/isaaclab/isaaclab/envs/mdp/rewards.py#L102",
+    "version": "v3.0.0-EA",
+    "sha256": "2aef8c1ea395b7dfc8a893f7a2d33a2187ad06507134c9198ca34911f8b56b28",
+    "boundary": "Upstream flat-terrain root-Z squared-error penalty; local profile is a bounded Gaussian weight using authoritative pelvis Y above the zero-height floor."
+  },
+  "test_first": {
+    "public_red": "E0599 missing Recipe::PostureHeightV1",
+    "skeleton_red": "Factory compiled and then panicked at its unimplemented body",
+    "public_green": "Same actor samples and physical lifecycle; changed PPO targets and actual optimizer update",
+    "artifact_red": "Height recipe initially omitted both height members; exact CLI artifact test failed",
+    "artifact_green": "Train and warm-start emit the exact nine-member contract; evaluate and trace reject the profile"
+  },
+  "files_sha256": {
+    "coverage.json": "3c013b40f2b94a5f5961c062a8c97bbeaa61a7a0de91257434f65ec7fb94804a",
+    "selection.json": "55792a01a0dddb666839faf029899c2b7e40dc2974dd1fceef9db623b74b5bab",
+    "result.json": "8bf01d814d276dde5fab79c09a8d339782d9917d7679c522f181f431a3723fda",
+    "training-reward.json": "2535f85f94537f0bb8e099fa03e2aced39aced9d53d4a128ff9c51ba2bae45fb",
+    "checkpoint.json": "1e535216927ef8fe44370a091c8fc691de3ab2cb2d3ede5410c1d555d442d66e",
+    "optimization.jsonl": "a0f3f550751e3f190c84910a367524a146f15bdf0d9e38dab7f130de3bf13386",
+    "launch.json": "8a725a24f6bd75d83127f550d75ce31e6ca273718a91d4acefa99393cd841078",
+    "warm-start.json": "b2c8d1eff83aa7b9f970d3012f18a2da3a89cb6dba0d3614abf85ff1fa71a65c",
+    "checkpoint.mpk": "4b3da99d4d5996abc9829e0b4d69a383d277c8f930c64a068a808c460992bd57"
+  }
+}

@@ -127,7 +127,7 @@ async fn train_selected(
         (Recipe::Original, Some(checkpoint)) => {
             Box::pin(training::warm_start(seed, updates, output, checkpoint)).await
         }
-        (Recipe::PostureV1, checkpoint) => {
+        (Recipe::PostureV1 | Recipe::PostureHeightV1, checkpoint) => {
             Box::pin(training::train_profiled(
                 seed, updates, output, checkpoint, recipe,
             ))

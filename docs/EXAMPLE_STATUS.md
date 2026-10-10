@@ -1,5 +1,16 @@
 # Examples execution status
 
+A training-only pelvis-height reward is validated. Its
+[20-update smoke trial](progress/standing-posture-height-smoke-seed37/summary.json)
+used 10,240 RL transitions and failed all five selection episodes. It remains
+unqualified; held-out cases were not evaluated. Native, WASM, CLI and personal lint
+checks pass. Nix lint retains ten baseline findings outside this change.
+
+The [24,000-update height trial](progress/droid-standing-posture-height-seed37.json)
+is running from the recorded seed-23 PPO checkpoint with fresh Adam and seed 37.
+Its first 20 optimizer records reproduce the smoke trial. The qualification gates
+remain unchanged. The seed-31 posture trial continues independently.
+
 A training-only droid posture reward is implemented and validated. Its 20-update
 smoke trial used 10,240 RL transitions and failed selection; it is unqualified.
 The [record](progress/droid-standing-posture-reward.json) retains the profile,

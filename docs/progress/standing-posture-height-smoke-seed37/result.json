@@ -1,0 +1,37 @@
+{
+  "started_utc": "2026-10-10T23:32:53.046610+00:00",
+  "source_base": "7af0ddcaf64ddfd7d3e65e1336797369b3ee8549",
+  "source_patch_sha256": "208e24ced3183289176de5c8fb1a037f4e4ef3f82d67717dafcb20e613c1e56f",
+  "source_sha256": {
+    "examples/robots/standing/cli.rs": "981daa06fa1f9eb1fe2e106eb61954014e1d34f9dbc8ffb25deacacaed56c668",
+    "examples/robots/standing/evaluation.rs": "617b28f01af54d5b369aa4c42c66184500e9a44dcfdb7018a081d167133db7e2",
+    "examples/robots/standing/reward.rs": "325115eec184960dc77d9b45da5508c1647b2debea06a77054ea523b4cdf7b39",
+    "examples/robots/standing/training.rs": "3942a35af3562dc495642a4c44564fa5aaa109eae639bbe74418c99229b08ac8",
+    "tests/droid_learning.rs": "bb1d697a025e52e6cd66c54cb53f4440ef82f0f9d7ac32ee91cdd6b6befe378f",
+    "tests/test_droid_standing_cli.py": "e5903da1b809bbb8ed22da5a4335559ee030a337a306d5fefe65a7f7e2f37ef9"
+  },
+  "executable": "/home/sagan/.cache/bevy-gym-quality-validation/standing-posture-height-smoke-seed37-20261010/droid-standing",
+  "executable_sha256": "cf3546fc11a80968e45d5bf4dddb7834771ed9dbc55262c0b43fd08b50e95210",
+  "parent": "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/docs/progress/standing-posture-seed23-update23540/checkpoint.mpk",
+  "parent_sha256": "5a7b813491c0125cfa66eb268d98efd1bed181226ae4eff6861c768afad40c08",
+  "command": [
+    "/home/sagan/.cache/bevy-gym-quality-validation/standing-posture-height-smoke-seed37-20261010/droid-standing",
+    "warm-start",
+    "--checkpoint",
+    "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/docs/progress/standing-posture-seed23-update23540/checkpoint.mpk",
+    "--reward-profile",
+    "posture-height-v1",
+    "--seed",
+    "37",
+    "--updates",
+    "20",
+    "--output",
+    "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/runs/droid-standing/posture-height-smoke-seed37-20261010"
+  ],
+  "weight_origin": "Validated PPO actor/critic import; fresh Adam, counters, RNG, environments and recurrent memory.",
+  "qualification": "Unqualified; smoke selection is not independent qualification.",
+  "held_out": "Do not evaluate held-out cases for failed smoke selection.",
+  "exit_code": 1,
+  "elapsed_seconds": 11.897459313971922,
+  "finished_utc": "2026-10-10T23:33:05.192919+00:00"
+}

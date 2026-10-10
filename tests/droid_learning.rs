@@ -362,3 +362,103 @@ fn posture_rollout_changes_reward_targets_without_selecting_actions() {
     assert_eq!(metrics.valid_samples, 512);
     assert!(metrics.optimizer_updates > 0);
 }
+
+/// Height weighting changes PPO targets while the same actor supplies every physical sample.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn posture_height_recipe_preserves_policy_samples_and_changes_targets() {
+    use standing::reward::Recipe;
+    let mut agent = standing::model::new_agent(7).expect("seeded actor");
+    let policy = agent.policy();
+    let mut posture = standing::batch_with_recipe(7, &policy, Recipe::PostureV1);
+    let mut height = standing::batch_with_recipe(7, &policy, Recipe::PostureHeightV1);
+    let expected = posture.collect(&policy).expect("posture rollout");
+    let actual = height.collect(&policy).expect("posture-height rollout");
+    assert_eq!(expected.len(), actual.len());
+    let mut targets_changed = false;
+    for (posture, height) in expected.iter().zip(&actual) {
+        assert_eq!(posture.observations, height.observations);
+        assert_eq!(posture.global_states, height.global_states);
+        assert_eq!(posture.pre_tanh_actions, height.pre_tanh_actions);
+        assert_eq!(posture.old_log_probabilities, height.old_log_probabilities);
+        targets_changed |= posture.returns != height.returns;
+    }
+    assert!(targets_changed);
+
+    let observation = DroidStanding::default().reset(Some(42)).observation;
+    let features = standing::encoding::encode(&observation);
+    let before = policy
+        .mean_action(&features, &policy.initial_memory())
+        .expect("original actor");
+    let metrics = agent
+        .update(&actual)
+        .expect("real posture-height PPO update");
+    assert_eq!(metrics.valid_samples, 512);
+    assert!(metrics.optimizer_updates > 0);
+    let updated = agent.policy();
+    let after = updated
+        .mean_action(&features, &updated.initial_memory())
+        .expect("updated actor");
+    assert_ne!(before.action, after.action);
+    standing::encoding::decode(&after.action).expect("validated actuator requests");
+}
+
+/// A trained actor drives identical physical episodes under all three training recipes.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn posture_height_reward_preserves_trained_actor_physics_and_terminal_freezing() {
+    let (policy, _) = standing::checkpoint::from_bytes(
+        include_bytes!("../docs/progress/standing-posture-seed23-update23540/checkpoint.mpk")
+            .to_vec(),
+        include_bytes!("../docs/progress/standing-posture-seed23-update23540/checkpoint.json"),
+    )
+    .expect("recorded trained actor");
+    let mut observed_termination = false;
+    for seed in [0, 1, 42, u64::MAX] {
+        observed_termination |= assert_height_episode(&policy, seed);
+    }
+    assert!(observed_termination);
+}
+
+/// Compare one trained physical episode and report whether it reached a terminal state.
+fn assert_height_episode(policy: &bevy_gym::training::RecurrentPpoPolicy, seed: u64) -> bool {
+    use standing::reward::Recipe;
+    let mut observed_termination = false;
+    let mut original = DroidStanding::default();
+    let mut posture = Recipe::PostureV1.factory()();
+    let mut height = Recipe::PostureHeightV1.factory()();
+    let reset = original.reset(Some(seed));
+    assert_eq!(posture.reset(Some(seed)), reset);
+    assert_eq!(height.reset(Some(seed)), reset);
+    let mut observation = reset.observation;
+    let mut memory = policy.initial_memory();
+    let mut changed_reward = false;
+    for _ in 0..1_000 {
+        let request = policy
+            .mean_action(&standing::encoding::encode(&observation), &memory)
+            .expect("trained actuator request");
+        let action = standing::encoding::decode(&request.action).expect("validated request");
+        memory = request.next_memory;
+        let expected = original.step(action);
+        let previous = posture.step(action);
+        let actual = height.step(action);
+        assert_eq!(actual.observation, expected.observation);
+        assert_eq!(previous.observation, expected.observation);
+        assert_eq!(actual.status, expected.status);
+        assert_eq!(previous.status, expected.status);
+        assert!((0.0..=previous.reward).contains(&actual.reward));
+        changed_reward |= actual.reward < previous.reward;
+        if expected.status.is_done() {
+            observed_termination = true;
+            assert_eq!(actual.reward.to_bits(), expected.reward.to_bits());
+            assert_eq!(height.step(action), actual);
+            break;
+        }
+        observation = expected.observation;
+    }
+    assert!(changed_reward);
+    let reset = original.reset(None);
+    assert_eq!(posture.reset(None), reset);
+    assert_eq!(height.reset(None), reset);
+    observed_termination
+}

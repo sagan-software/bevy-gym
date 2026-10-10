@@ -587,3 +587,66 @@ That trial used 10,240 transitions and failed each of the five selection episode
 It has no held-out evaluation or qualification claim. All 245 browser tests,
 31 native learning tests and 14 CLI tests pass. The reward wrapper has full
 measured production line, region, function and branch coverage.
+
+## Training-only pelvis-height reward
+
+The optional `--reward-profile posture-height-v1` multiplies the `posture-v1`
+training reward by `exp(-((h - t) / s)^2)`. `h` is the authoritative post-action
+pelvis Y position above the zero-height floor, in metres. The target `t` is
+1.0 metre, the midpoint of the original f32 height bounds. The scale `s` is
+0.1499999761581421 metres, half their span after conversion to f64.
+The normalized error and Gaussian weight are dimensionless. The weight is 1
+at the target and `exp(-1)` at both original height bounds.
+
+[Isaac Lab v3.0.0-EA](https://github.com/isaac-sim/IsaacLab/blob/v3.0.0-EA/source/isaaclab/isaaclab/envs/mdp/rewards.py#L102)
+uses a squared root-Z height-error penalty on flat terrain. This local experiment
+uses a positive Gaussian weight and pelvis Y. It does not adopt the upstream reward.
+
+`original` remains the default. Both earlier reward profiles retain their behavior
+and artifact shapes. The PPO actor still receives 204 own-body features and chooses
+26 direct-torque fractions. Physics, reset streams, terminal rewards and frozen
+qualification gates remain unchanged. `evaluate` and `trace` reject reward overrides.
+
+```sh
+nix develop --command cargo run --features robots --example droid-standing -- \
+  warm-start \
+  --checkpoint docs/progress/standing-posture-seed23-update23540/checkpoint.mpk \
+  --reward-profile posture-height-v1 --seed 37 --updates 24000 \
+  --output runs/droid-standing/posture-height-seed37-reproduction
+```
+
+This imports the recorded PPO actor and critic. Adam, counters, samplers,
+environments and recurrent memory start fresh. It does not resume optimizer state.
+
+Before collection, `training-reward.json` emits one object with nine required
+members as compact UTF-8 JSON without a final newline. Its exact seed-37 text is:
+
+```json
+{"contact_both":1.0,"contact_none":0.25,"contact_one":0.5,"evaluation":"original-standing-v1","pelvis_height_scale_m":0.1499999761581421,"pelvis_height_target_m":1.0,"posture_up_projection_scale":0.03407418727874756,"schema":"droid-standing-posture-height-reward-v1","seed":37}
+```
+
+`schema` and `evaluation` are the fixed strings shown above. `seed` is the run's
+unsigned 64-bit integer. The other six members are JSON numbers with the exact
+values shown above. Contact weights and posture scale retain their earlier meanings;
+the two height members use metres. Every member appears once in the displayed order.
+
+No member is absent or null, and the writer emits no extensions. There is no input
+parser or normalization. A failed profile write stops before collecting transitions.
+
+The [smoke record](progress/standing-posture-height-smoke-seed37/summary.json)
+retains the source and executable hashes, parent identity, checkpoint, profile,
+optimizer journal, selection outcomes and coverage. The 20-update trial consumed
+10,240 transitions and performed 140 optimizer updates. All five selection episodes
+failed and none survived the horizon. Its checkpoint is unqualified; held-out cases
+were not evaluated.
+
+The [24,000-update trial](progress/droid-standing-posture-height-seed37.json)
+uses the same immutable executable, parent and seed. Its first 20 optimizer records
+match the smoke trial exactly. Completion and independent qualification remain pending.
+
+Validation passes 132 default native tests, 480 robot native tests, 318 WASM tests
+and 15 CLI tests. Strict Clippy and personal Rust/Python lint pass. All 43 changed
+production coverage regions were hit. The reward wrapper has 73 of 73 production
+regions and six of six branch outcomes hit. The coverage record lists unchanged
+error-propagation and qualification-success gaps separately. Nix lint still fails
+on the ten recorded baseline findings outside this change.

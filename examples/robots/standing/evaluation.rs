@@ -14,6 +14,10 @@ use std::error::Error;
 pub(crate) const HORIZON: u16 = 1_000;
 /// Ordered selection roots, separate from the collector's training partition.
 pub(crate) const SELECTION_SEEDS: [u64; 5] = [0, 1, 2, 42, u64::MAX];
+/// Smallest accepted pelvis height in metres; retain the original f32 boundary.
+pub(crate) const MIN_HEIGHT_M: f32 = 0.85;
+/// Largest accepted pelvis height in metres; retain the original f32 boundary.
+pub(crate) const MAX_HEIGHT_M: f32 = 1.15;
 /// Smallest accepted torso-up projection, the f32 approximation of cos(15 degrees).
 const MIN_UPRIGHT: f32 = 0.965_925_8;
 
@@ -59,7 +63,7 @@ pub(crate) fn passes(scores: &[Score], seeds: &[u64]) -> bool {
 
 /// Test balance without using reward to conceal missing physical measurements.
 fn stable(score: &Score) -> bool {
-    (0.85..=1.15).contains(&score.final_height)
+    (MIN_HEIGHT_M..=MAX_HEIGHT_M).contains(&score.final_height)
         && (MIN_UPRIGHT..=1.0).contains(&score.final_upright)
         && (0.0..=0.5).contains(&score.final_distance)
         && (0.0..=0.25).contains(&score.final_speed)

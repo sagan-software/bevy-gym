@@ -4,7 +4,7 @@ use super::{
     batch_with_recipe,
     checkpoint::{from_bytes, Record},
     evaluation, model,
-    reward::{Recipe, POSTURE_SCALE},
+    reward::{Recipe, HEIGHT_SCALE_M, HEIGHT_TARGET_M, POSTURE_SCALE},
 };
 use bevy_gym::training::{RecurrentPpoAgent, RecurrentPpoUpdate};
 use serde::Serialize;
@@ -197,12 +197,17 @@ async fn record_reward_profile(
     seed: u64,
     recipe: Recipe,
 ) -> Result<(), Box<dyn Error>> {
-    if recipe == Recipe::Original {
-        return Ok(());
-    }
-    let record = serde_json::json!({"schema":recipe, "seed":seed,
-        "posture_up_projection_scale":POSTURE_SCALE, "contact_both":1.0,
-        "contact_one":0.5, "contact_none":0.25, "evaluation":"original-standing-v1"});
+    // Keep each recipe's artifact shape fixed; the default emits no profile artifact.
+    let record = match recipe {
+        Recipe::Original => return Ok(()),
+        Recipe::PostureV1 => serde_json::json!({"schema":recipe, "seed":seed,
+            "posture_up_projection_scale":POSTURE_SCALE, "contact_both":1.0,
+            "contact_one":0.5, "contact_none":0.25, "evaluation":"original-standing-v1"}),
+        Recipe::PostureHeightV1 => serde_json::json!({"schema":recipe, "seed":seed,
+            "posture_up_projection_scale":POSTURE_SCALE, "contact_both":1.0,
+            "contact_one":0.5, "contact_none":0.25, "evaluation":"original-standing-v1",
+            "pelvis_height_target_m":HEIGHT_TARGET_M, "pelvis_height_scale_m":HEIGHT_SCALE_M}),
+    };
     fs::write(output.join("training-reward.json"), record.to_string()).await?;
     Ok(())
 }
@@ -289,9 +294,11 @@ mod tests {
             record_reward_profile(&directory, 17, Recipe::Original)
                 .await
                 .expect("original emits no profile");
-            record_reward_profile(&directory, 17, Recipe::PostureV1)
-                .await
-                .expect_err("profile cannot replace a directory");
+            for recipe in [Recipe::PostureV1, Recipe::PostureHeightV1] {
+                record_reward_profile(&directory, 17, recipe)
+                    .await
+                    .expect_err("profile cannot replace a directory");
+            }
             assert!(!directory.join("optimization.jsonl").exists());
             fs::remove_dir(&artifact)
                 .await

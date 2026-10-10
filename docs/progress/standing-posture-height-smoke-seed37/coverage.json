@@ -1,0 +1,317 @@
+{
+  "fresh_directory": "/home/sagan/.cache/bevy-gym-quality-validation/standing-height-fresh-coverage-1791675114800782317",
+  "method": "Independent per-executable exports; canonical source paths and identical coordinate regions are combined by maximum execution count. Test modules are excluded.",
+  "files": {
+    "reward": {
+      "production_regions": 73,
+      "production_regions_hit": 73,
+      "production_branch_outcomes": 6,
+      "production_branch_outcomes_hit": 6,
+      "changed_regions": 18,
+      "changed_regions_hit": 18,
+      "changed_region_gaps": [],
+      "changed_branch_gaps": [],
+      "all_branch_gaps": []
+    },
+    "evaluation": {
+      "production_regions": 130,
+      "production_regions_hit": 127,
+      "production_branch_outcomes": 30,
+      "production_branch_outcomes_hit": 30,
+      "changed_regions": 3,
+      "changed_regions_hit": 3,
+      "changed_region_gaps": [],
+      "changed_branch_gaps": [],
+      "all_branch_gaps": []
+    },
+    "cli": {
+      "production_regions": 135,
+      "production_regions_hit": 132,
+      "production_branch_outcomes": 4,
+      "production_branch_outcomes_hit": 3,
+      "changed_regions": 1,
+      "changed_regions_hit": 1,
+      "changed_region_gaps": [],
+      "changed_branch_gaps": [],
+      "all_branch_gaps": [
+        {
+          "coordinate": [
+            161,
+            8,
+            161,
+            14
+          ],
+          "hits": [
+            0,
+            7
+          ]
+        }
+      ]
+    },
+    "training": {
+      "production_regions": 318,
+      "production_regions_hit": 294,
+      "production_branch_outcomes": 10,
+      "production_branch_outcomes_hit": 9,
+      "changed_regions": 21,
+      "changed_regions_hit": 21,
+      "changed_region_gaps": [],
+      "changed_branch_gaps": [],
+      "all_branch_gaps": [
+        {
+          "coordinate": [
+            133,
+            12,
+            133,
+            96
+          ],
+          "hits": [
+            0,
+            11
+          ]
+        }
+      ]
+    }
+  },
+  "existing_region_gaps": [
+    [
+      "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/examples/robots/standing/evaluation.rs",
+      88,
+      89,
+      88,
+      90
+    ],
+    [
+      "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/examples/robots/standing/evaluation.rs",
+      93,
+      82,
+      93,
+      83
+    ],
+    [
+      "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/examples/robots/standing/evaluation.rs",
+      94,
+      71,
+      94,
+      72
+    ],
+    [
+      "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/examples/robots/standing/cli.rs",
+      149,
+      56,
+      149,
+      57
+    ],
+    [
+      "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/examples/robots/standing/cli.rs",
+      162,
+      9,
+      162,
+      15
+    ],
+    [
+      "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/examples/robots/standing/training.rs",
+      144,
+      42,
+      144,
+      43
+    ],
+    [
+      "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/examples/robots/standing/training.rs",
+      117,
+      54,
+      117,
+      55
+    ],
+    [
+      "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/examples/robots/standing/training.rs",
+      118,
+      81,
+      118,
+      82
+    ],
+    [
+      "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/examples/robots/standing/training.rs",
+      123,
+      57,
+      123,
+      58
+    ],
+    [
+      "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/examples/robots/standing/training.rs",
+      124,
+      47,
+      124,
+      48
+    ],
+    [
+      "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/examples/robots/standing/training.rs",
+      127,
+      50,
+      127,
+      51
+    ],
+    [
+      "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/examples/robots/standing/training.rs",
+      128,
+      39,
+      128,
+      40
+    ],
+    [
+      "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/examples/robots/standing/training.rs",
+      129,
+      31,
+      129,
+      32
+    ],
+    [
+      "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/examples/robots/standing/training.rs",
+      133,
+      87,
+      133,
+      88
+    ],
+    [
+      "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/examples/robots/standing/training.rs",
+      133,
+      95,
+      133,
+      96
+    ],
+    [
+      "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/examples/robots/standing/training.rs",
+      134,
+      20,
+      134,
+      26
+    ],
+    [
+      "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/examples/robots/standing/training.rs",
+      171,
+      37,
+      171,
+      38
+    ],
+    [
+      "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/examples/robots/standing/training.rs",
+      174,
+      60,
+      174,
+      61
+    ],
+    [
+      "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/examples/robots/standing/training.rs",
+      177,
+      47,
+      177,
+      48
+    ],
+    [
+      "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/examples/robots/standing/training.rs",
+      179,
+      15,
+      179,
+      16
+    ],
+    [
+      "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/examples/robots/standing/training.rs",
+      187,
+      47,
+      187,
+      48
+    ],
+    [
+      "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/examples/robots/standing/training.rs",
+      189,
+      15,
+      189,
+      16
+    ],
+    [
+      "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/examples/robots/standing/training.rs",
+      224,
+      92,
+      224,
+      93
+    ],
+    [
+      "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/examples/robots/standing/training.rs",
+      226,
+      54,
+      226,
+      55
+    ],
+    [
+      "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/examples/robots/standing/training.rs",
+      229,
+      41,
+      229,
+      42
+    ],
+    [
+      "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/examples/robots/standing/training.rs",
+      230,
+      66,
+      230,
+      67
+    ],
+    [
+      "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/examples/robots/standing/training.rs",
+      231,
+      51,
+      231,
+      52
+    ],
+    [
+      "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/examples/robots/standing/training.rs",
+      232,
+      79,
+      232,
+      80
+    ],
+    [
+      "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/examples/robots/standing/training.rs",
+      240,
+      11,
+      240,
+      12
+    ],
+    [
+      "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/examples/robots/standing/cli.rs",
+      79,
+      17,
+      79,
+      18
+    ]
+  ],
+  "gap_reason": "All listed gaps are unchanged paths: propagation of model, action-decoding, optimizer, serialization or filesystem errors, and success returns requiring a trained policy that passes standing evaluation. The current checkpoints fail those gates; no injected successful controller is used.",
+  "objects": [
+    {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/coverage-build/llvm-cov-target/debug/deps/droid_learning-0b26a37c37e15331",
+      "sha256": "c7293cf2b9708a37c54aace3da9862f0f501c99e897d9910b904272c46e77bc6"
+    },
+    {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/coverage-build/llvm-cov-target/debug/examples/droid_standing-822e24dc74510a8e",
+      "sha256": "4f980f4ea8beb7cefe54e2c37f952881d4b839f9277b9b451a423bb83a535839"
+    },
+    {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/coverage-build/llvm-cov-target/debug/examples/droid_standing-fa25455520ab3d10",
+      "sha256": "87bdf2442d7208a5d0956b39802df0f92ca8410d0bd21bccc08c1ac3eb8c7588"
+    }
+  ],
+  "exports": {
+    "object0": {
+      "sha256": "b1a3fbebe121e3aad4a2b39573925975854534c158807e2246ab84c3124088b7",
+      "diagnostics": ""
+    },
+    "object1": {
+      "sha256": "831e6c17696de250bfe913c3f9afa692402c5daa6155d6743f6fa4e93748d6f4",
+      "diagnostics": ""
+    },
+    "object2": {
+      "sha256": "aa4d5d05a397ab75926227b8613e14306fc76b3e7b0b1ae3e9b89431f6d38394",
+      "diagnostics": ""
+    }
+  }
+}
