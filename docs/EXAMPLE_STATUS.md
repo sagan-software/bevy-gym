@@ -4,11 +4,15 @@ A training-only droid posture reward is implemented and validated. Its 20-update
 smoke trial used 10,240 RL transitions and failed selection; it is unqualified.
 The [record](progress/droid-standing-posture-reward.json) retains the profile,
 source hashes, checkpoint, optimizer journal and coverage gaps.
-All 245 browser tests, 31 native learning tests and 14 CLI tests pass.
+The profile's recorded checks passed 245 browser tests, 31 native learning tests
+and 14 CLI tests.
 
-The [recorded seed-23 trial](progress/droid-standing-posture-seed23.json) is active
-with a 24,000-update limit. Its first 20 optimizer records match the smoke exactly.
-It imports the unqualified seed-17 actor and critic with fresh Adam and episode state.
+The [recorded seed-23 trial](progress/droid-standing-posture-seed23.json) stopped
+after 5,728 complete optimizer records because the filesystem filled.
+The [restart](progress/standing-posture-storage-restart/summary.json) imports the
+same original seed-17 parent with fresh Adam and a 24,000-update limit.
+At the recorded observation, its first 5,728 optimizer records match the entire
+completed interrupted prefix. It remains unqualified.
 
 The completed droid run’s strongest selection candidate, update 22,940, failed
 held-out qualification. Five of 32 episodes survived the horizon, with every final
@@ -19,6 +23,40 @@ No droid standing policy is qualified.
 Updated: 2026-10-10. Current work: RL-only drone/droid curriculum.
 
 ## Resume here
+
+### Shared six-agent physical world, 2026-10-10
+
+The [robot world](ROBOT_WORLD.md) owns all three drones and three articulated
+droids in one collision solver. Complete actuator frames use one source snapshot
+and advance four common 5 ms substeps. Stale and wrong-world frames stop advancement
+before actuation. The reset-only guide chooses no agent actions.
+
+The [record](progress/robot-world-foundation.json) preserves source hashes,
+coverage gaps and frozen RL regression comparisons. Both droid traces and all
+64 drone promotion cases match the previous binaries byte for byte.
+All 251 browser tests, 451 native robot tests and 132 default native tests pass.
+Strict Clippy, changed-line personal Rust lint, Nix lint and documentation checks pass.
+[Remote CI](https://github.com/sagan-software/bevy-gym/actions/runs/38074702064)
+passed for `ed9443e`. Competitive rules, trained team controllers and browser
+3v3 qualification remain unfinished.
+
+### Rehearsal fails; standing restarts after disk exhaustion, 2026-10-10
+
+The seed-29 rehearsal run exhausted 24,000 near-travel updates and exited 1.
+All five selection episodes survived 1,000 actions. Only seed 0 reached the
+arrival condition, at action 767; the deadline is action 500.
+The other four episodes ended with heading errors from 1.299899697303772 to
+2.0562386512756348 radians and zero settled actions.
+No far or fast checkpoint was promoted.
+
+The [failed candidate](progress/travel-rehearsed-seed29-final/summary.json)
+retains its weights, 30,860 complete optimizer records, 1,543 selection reports
+and every frozen retention case. All 32 near cases failed physical gates.
+Twenty-eight of 32 endurance cases failed physical gates.
+The [interrupted standing record](progress/standing-posture-storage-restart/summary.json)
+preserves the last complete selection, weights and unfinished journal tail.
+[Replay commands and restart details](TRAINING_INTERRUPTION.md) distinguish
+budget exhaustion from storage interruption. Both lessons remain unqualified.
 
 ### Training-only travel prerequisite rehearsal, 2026-10-10
 
@@ -582,10 +620,12 @@ original trial's final failure. Native learning tests (28, one ignored), 14 curr
 unit tests, 11 CLI tests, root tests, strict native/WASM Clippy, WASM compilation,
 browser tests and documentation checks pass. Changed-line personal Rust and Python
 lint are clean; strict personal Clippy retains the unchanged repository backlog.
+
 Coverage hit 99/99 evaluator lines and every production branch. The evidence records
 one test-only branch and one inference-error propagation gap. No real trained policy
 has passed this suite; synthetic success scores test aggregation only.
 No travel or endurance checkpoint is qualified.
+
 Next: inspect the endurance trial, diagnose any further failure from measured
 trajectories, and evaluate a selected candidate independently before qualified transfer.
 Browser travel playback, later drone lessons, physical droid lessons, multi-agent
@@ -695,6 +735,7 @@ Native learning tests (20 passed, one ignored), curriculum unit tests (10), CLI 
 lint is clean. [Collector evidence](progress/drone-travel-collector.json) records
 226/226 lines including tests and 6/6 branch outcomes across instantiations. The two
 existing critic-error propagation regions at rollout lines 130 and 133 remain unhit.
+
 Travel uses a body-only test encoder here; no trained travel controller is implied.
 
 At this earlier checkpoint, travel had no trained policy, training/inference command,
@@ -715,7 +756,9 @@ GitHub main. This checkpoint adds
 `--lesson recovery --initialize-from qualified-hover` to `drone-curriculum`.
 Only the recorded PPO hover checkpoint is accepted. Loaded actor and critic records
 must match its embedded reference. Unsupported destinations fail before output
-creation. Actor and critic weights transfer; the optimizer and sampling streams
+creation.
+
+Actor and critic weights transfer; the optimizer and sampling streams
 start fresh. A `transfer.json` record precedes the first update. The original
 in-memory curriculum still retains its optimizer between lessons.
 
@@ -728,15 +771,20 @@ A separate seed-11 trial passed recovery selection at update 20, using 88 optimi
 steps and 10,240 new transitions. Its service
 `bevy-gym-recovery-transfer-seed11-20261009.service` exited successfully. Artifacts
 remain in `runs/drone-recovery/transfer-seed11-20261009`. The frozen result is copied
-to `docs/progress/drone-recovery-transfer.mpk`. Native held-out evaluation passed
+to `docs/progress/drone-recovery-transfer.mpk`.
+
+Native held-out evaluation passed
 32/32 recovery episodes with mean return 441.3443 and mean distance 0.26578 metres.
 Hover replay also passed 32/32, with mean return 461.1305 and mean distance
 0.16483 metres. All three new qualification tests also pass in actual WASM execution.
 The [evidence](progress/drone-checkpoint-transfer.json) retains hashes and episodes.
+
 Native learning tests (19 passed, one ignored), curriculum unit tests (10), CLI
 tests (6), root tests, strict native/WASM Clippy, and the browser suite pass.
 Changed-line personal Rust and Python lint pass. Strict personal Rust lint remains
-blocked by the unchanged repository backlog. Transfer coverage is 71/71 lines
+blocked by the unchanged repository backlog.
+
+Transfer coverage is 71/71 lines
 including tests and 2/2 branch outcomes. Main coverage is 53/56 lines and 11/14
 branch outcomes; the evidence names error-propagation and existing loop gaps.
 Existing browser videos do not show these new weights.
@@ -755,7 +803,9 @@ droid lessons and the shared 3v3 arena remain unfinished.
 They share the same `DroneHover` factories and encoding as curriculum training and
 evaluation. Every motor command comes from the recorded PPO checkpoint. The renderer
 reads physical poses; Run, Step, and Reset cannot select agent actions. Load or
-inference failures stop playback without a fallback. Each scene identifies its
+inference failures stop playback without a fallback.
+
+Each scene identifies its
 checkpoint. The gallery distinguishes these scenes from the historical workbench.
 
 The [browser guide](../robot-web/skills/README.md), [hover guide](DRONE_HOVER.md),
@@ -770,7 +820,9 @@ The existing 32-seed disturbed-recovery qualification also passes again.
 Native tests, strict native/WASM Clippy, the complete browser suite, and changed-line
 personal Rust lint pass. Strict personal Clippy still fails on the unchanged
 repository backlog; the changed-line pass reports no diagnostics. Shell and Nix
-personal lint pass. Session coverage records
+personal lint pass.
+
+Session coverage records
 111/111 lines including its unit tests and 6/6 production branch outcomes. The
 remaining unhit branch belongs to test setup; the fixed positive horizon cannot
 exercise its error-propagation region. Renderer line coverage and browser fault
@@ -779,7 +831,9 @@ each boundary; no full-package coverage claim is made.
 
 Actual T3 browser playback completed both 500-action episodes. Hover ended 0.06 metres
 from the target; recovery ended 0.26 metres away. Playback controls and 1280-pixel and
-390-pixel layouts were inspected. A mobile canvas sizing defect was fixed. Videos
+390-pixel layouts were inspected. A mobile canvas sizing defect was fixed.
+
+Videos
 and inspected contact sheets are under `docs/progress/skill-scenes/`. Review ran in
 this thread because subagents were prohibited. Native window interaction and physical
 mobile devices remain unverified. Local captures use development WASM bundles.
@@ -787,7 +841,9 @@ mobile devices remain unverified. Local captures use development WASM bundles.
 Seed 11 exhausted all 600 fixed front-left updates and exited with status 1.
 `bevy-gym-rl-curriculum-seed11-20261009.service` is failed. The final error is
 `Lesson front-left exhausted its update budget without passing.` Hover passed at
-update 300. Training resets with the failed motor; evaluation requires intact flight
+update 300.
+
+Training resets with the failed motor; evaluation requires intact flight
 before a two-second failure and retained healthy flight. This distribution mismatch
 is an investigation target, not a proven explanation for every failure. Preserve
 both seed-7 and seed-11 artifacts. No training job is running for this task.
@@ -849,7 +905,9 @@ The seed-7 motor-failure failure remains preserved.
 Native tests, strict native and WASM Clippy, the complete browser suite, Python
 personal lint, and CLI failure/success checks pass. The worker's 25 protocol tests
 also pass. Personal Rust discovery reports no candidate diagnostics. Strict personal
-Clippy still reports the unchanged repository backlog. Coverage records all measured
+Clippy still reports the unchanged repository backlog.
+
+Coverage records all measured
 entry-point lines, all 13 runner lines, all 40 shared episode lines through integration tests,
 and both episode branch outcomes. The validation record identifies error-region gaps.
 Logs use `/home/sagan/.cache/bevy-gym-quality-validation/skill-cli-`.

@@ -1,0 +1,81 @@
+{
+  "schema": "standing-storage-interruption-v1",
+  "observed_utc": "2026-10-10T18:33:37.191745+00:00",
+  "source_commit": "234333643c1339579caa14e8615189c623e5eddd",
+  "launch_record": "docs/progress/droid-standing-posture-seed23.json",
+  "interrupted": {
+    "unit": "bevy-gym-standing-posture-seed23-20261010.service",
+    "state": "failed",
+    "exit": 1,
+    "exit_timestamp": "Sat 2026-10-10 10:55:35 MDT",
+    "reason": "StorageFull: No space left on device",
+    "budget_exhausted": false,
+    "last_complete_selection_update": 5720,
+    "complete_optimizer_records": 5728,
+    "last_optimizer_steps": 45596,
+    "complete_transitions": 2932736,
+    "last_selection_passed": false,
+    "all_five_selection_stable_streaks": 0,
+    "archive": {
+      "source": "runs/droid-standing/posture-seed23-20261010/optimization.jsonl",
+      "raw_sha256": "c4983d9b6d8f4eb779129205687d0ad780dfd1d18d7efc13d6f4ccffc1cb0846",
+      "compressed_sha256": "e3438788409ad66aa11459518fd14bde7a9d7faf027bcffa37266b1ab2d1a102",
+      "raw_bytes": 1736704,
+      "complete_records": 5728,
+      "invalid_records": [
+        {
+          "line": 5729,
+          "bytes": 176,
+          "sha256": "53bcfd29ee1d184a68170e48468f080109f7c48bf994847a3d880323cd884434"
+        }
+      ],
+      "last_complete": {
+        "actor_learning_rate": 0.0003,
+        "actor_loss": -0.013343237534627406,
+        "approximate_kl": 0.0411809099177865,
+        "critic_learning_rate": 0.001,
+        "critic_loss": 1.4147087101226532,
+        "entropy": -17.519600654952228,
+        "lesson": "droid-standing-v1",
+        "optimizer_steps": 45596,
+        "optimizer_updates": 8,
+        "update": 5728,
+        "valid_samples": 512
+      }
+    }
+  },
+  "restart": {
+    "launch": "restart-launch.json",
+    "state_at_observation": [
+      "ActiveState=active",
+      "SubState=running",
+      "MainPID=1046373",
+      "ExecMainStatus=0"
+    ],
+    "original_parent_sha256": "9c9e4c5bc8f7734da9835161476997e6d39d2aba28b24439e932a1f9949a2fdb",
+    "same_binary_sha256": "702115bbf3fb11a1396f9091464cf1d7a22471ea942f8f4c8b794f0845cc253a",
+    "fresh_optimizer": true,
+    "resumes_interrupted_optimizer": false,
+    "complete_records_at_observation": 6616,
+    "compared_prefix_records": 5728,
+    "all_compared_records_identical": true,
+    "qualification": "unqualified; unchanged selection, 32 held-out cases and independent repeat remain required",
+    "entire_completed_interrupted_prefix_matches": true
+  },
+  "files": {
+    "checkpoint.json": "f87565f24b868472c884a3ac04ae88ef43b6984e47252d350d073d7fe8b14ff9",
+    "checkpoint.mpk": "79d47de264bc87bdd831f13486eebe501392d9f39d164b0a74fb0bd0d72fd686",
+    "interrupted-optimization.jsonl.gz": "e3438788409ad66aa11459518fd14bde7a9d7faf027bcffa37266b1ab2d1a102",
+    "restart-launch.json": "03dafaa9cba0125eeb55679403d9a88104d9cfec6e38a26588b7a4b3114624cb",
+    "selection.json": "1f129c9daf76b6638170ce2910f976798944d5806bce47b7d7ab88a853f87438",
+    "training-reward.json": "93513f8fe24e6cdba6e44b4a7b30e78f77bebb3834f6781d637f682a0faafa95",
+    "warm-start.json": "0cfa5ebb93123c3d455fa451985f73e6b79728e94d60008b696a908c806b9abb",
+    "selection-history.jsonl.gz": "7984facedde19e67b42b42b4ce78a1b8b642601a8ee2ecf19f25fce9f337825a"
+  },
+  "selection_history": {
+    "records": 286,
+    "raw_sha256": "97cbda3b29f29b0dbb814ef060502962d3ffc232ba8521f0a4d3859805da13b6",
+    "compressed_sha256": "7984facedde19e67b42b42b4ce78a1b8b642601a8ee2ecf19f25fce9f337825a",
+    "source_log": "/home/sagan/.cache/bevy-gym-quality-validation/standing-posture-seed23-20261010.log"
+  }
+}

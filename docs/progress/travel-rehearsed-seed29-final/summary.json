@@ -1,0 +1,86 @@
+{
+  "schema": "drone-travel-failed-rehearsal-v1",
+  "observed_utc": "2026-10-10T18:18:53.216067+00:00",
+  "source_commit": "4300eaa01dbd6c227767c233cd703fbe624b92a0",
+  "binary_sha256": "2bafc46e8b9298ab720fb479f7963e3247afac85fe5ef3e5b921f5a7fffbfd83",
+  "launch_record": "docs/progress/drone-travel-rehearsed-seed29.json",
+  "unit": "bevy-gym-travel-rehearsed-seed29-20261010.service",
+  "process_result": {
+    "state": "failed",
+    "exit": 1,
+    "reason": "travel-near exhausted its 24000-update budget",
+    "exit_timestamp": "Sat 2026-10-10 10:30:43 MDT"
+  },
+  "training": {
+    "endurance_updates": 6860,
+    "near_updates": 24000,
+    "complete_optimizer_records": 30860,
+    "optimizer_steps": 147440,
+    "transitions": 15800320,
+    "selection_passed": false,
+    "far_or_fast_promoted": false
+  },
+  "optimization_archive": {
+    "source": "runs/drone-travel/rehearsed-seed29-20261010/optimization.jsonl",
+    "raw_sha256": "92ed4cf686faf41d5917c92f77af5ead7d3276bc90ba6c64e4e49edbf5bf51ef",
+    "compressed_sha256": "5635518cc7cbd40dc130a9f2f0332a418341ddcdc125ab0943667bbc31d74f97",
+    "raw_bytes": 9276398,
+    "complete_records": 30860,
+    "invalid_records": [],
+    "last_complete": {
+      "actor_learning_rate": 0.0003,
+      "actor_loss": 0.02919890161138028,
+      "approximate_kl": 0.07579489273484752,
+      "critic_learning_rate": 0.001,
+      "critic_loss": 0.32796584108655225,
+      "entropy": -8.760357797145844,
+      "lesson": "travel-near",
+      "optimizer_steps": 147440,
+      "optimizer_updates": 8,
+      "update": 24000,
+      "valid_samples": 512
+    }
+  },
+  "frozen_retention": {
+    "process_exit": 1,
+    "model_sha256": "d1d09e57e77e8e162213bca8e60d62ebd2105a3be0690b5524e4e9c5525ef2ad",
+    "fixed_held_out_cases_per_stage": 32,
+    "training_or_selection_uses_held_out": false,
+    "summaries": [
+      {
+        "stage": "travel-endurance",
+        "cases": 32,
+        "survived": 32,
+        "physical_failures": 28,
+        "mean_return": 885.9427935183048,
+        "minimum_mean_return": 800,
+        "mean_return_passed": true
+      },
+      {
+        "stage": "travel-near",
+        "cases": 32,
+        "survived": 32,
+        "physical_failures": 32,
+        "mean_return": 432.06209400540894,
+        "minimum_mean_return": 600,
+        "mean_return_passed": false
+      }
+    ],
+    "all_cases": "retention.json"
+  },
+  "files": {
+    "checkpoint.mpk": "d1d09e57e77e8e162213bca8e60d62ebd2105a3be0690b5524e4e9c5525ef2ad",
+    "optimization.jsonl.gz": "5635518cc7cbd40dc130a9f2f0332a418341ddcdc125ab0943667bbc31d74f97",
+    "retention.json": "4fdd0c456bc2734329c96cd34dc0a0fa70b0b0e323e7777897a6f880ee3ff677",
+    "selection.json": "1ba222b1bf87c5c0aae749c5e9bf6e095765ae5ed1a7717d637e17b3835b6b04",
+    "transfer.json": "53723eb32b8c41e21c0f7c329b7a9f9b88b1a65eee18b71ea4f81c3f6b8d04bf",
+    "selection-history.jsonl.gz": "f64755a65c77b12d86bc833de162df131038fc570bd0e074dca2174406e3c805"
+  },
+  "qualification": "failed; no full travel or 3v3 qualification",
+  "selection_history": {
+    "records": 1543,
+    "raw_sha256": "4267f6763ca178f71901b9c47b94c0bbb19303a792b4772251ac410616d077da",
+    "compressed_sha256": "f64755a65c77b12d86bc833de162df131038fc570bd0e074dca2174406e3c805",
+    "source_log": "/home/sagan/.cache/bevy-gym-quality-validation/travel-rehearsed-seed29-20261010.log"
+  }
+}

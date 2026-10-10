@@ -1,0 +1,40 @@
+{
+  "schema": "droid-standing-storage-restart-v1",
+  "source_commit": "234333643c1339579caa14e8615189c623e5eddd",
+  "binary_sha256": "702115bbf3fb11a1396f9091464cf1d7a22471ea942f8f4c8b794f0845cc253a",
+  "parent_sha256": "9c9e4c5bc8f7734da9835161476997e6d39d2aba28b24439e932a1f9949a2fdb",
+  "unit": "bevy-gym-standing-posture-seed23-retry-20261010.service",
+  "command": [
+    "nix",
+    "develop",
+    "--command",
+    "env",
+    "-u",
+    "CFLAGS",
+    "/home/sagan/.cache/bevy-gym-quality-validation/standing-posture-seed23-retry-20261010/droid-standing",
+    "warm-start",
+    "--checkpoint",
+    "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/docs/progress/standing-seed17-update22940/checkpoint.mpk",
+    "--reward-profile",
+    "posture-v1",
+    "--seed",
+    "23",
+    "--updates",
+    "24000",
+    "--output",
+    "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/runs/droid-standing/posture-seed23-retry-20261010"
+  ],
+  "output": "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/runs/droid-standing/posture-seed23-retry-20261010",
+  "log": "/home/sagan/.cache/bevy-gym-quality-validation/standing-posture-seed23-retry-20261010.log",
+  "interrupted_output": "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/runs/droid-standing/posture-seed23-20261010",
+  "interrupted_failure": "StorageFull: No space left on device",
+  "optimizer_state": "fresh; restart from original parent, not resumption from update 5720",
+  "qualification": "unqualified; requires unchanged selection gates, held-out suite and independent repeat",
+  "interrupted_last_complete_selection_update": 5720,
+  "interrupted_complete_optimization_records": 5728,
+  "interrupted_partial_tail": {
+    "bytes": 176,
+    "sha256": "53bcfd29ee1d184a68170e48468f080109f7c48bf994847a3d880323cd884434",
+    "preserved": true
+  }
+}
