@@ -2,7 +2,7 @@
 
 use std::{error::Error, num::NonZeroU16};
 
-use bevy_gym::robots::{DroneAction, DroneHover, DroneObservation};
+use bevy_gym::robots::{DroneAction, DroneHover};
 use bevy_gym::training::{
     RecurrentMemory, RecurrentPpoPolicy, RecurrentPpoSequence, RecurrentSampler, SeedConfig,
 };
@@ -13,22 +13,22 @@ use super::{decode_action, encode, GAE_LAMBDA, GAMMA};
 /// Eight independent training lanes, each contributing 64 actions per update.
 pub(crate) struct RecoveryBatch<E = DroneHover, const N: usize = 12>
 where
-    E: Env<Observation = DroneObservation, Action = DroneAction>,
+    E: Env<Action = DroneAction>,
 {
     /// Persistent environments and recurrent state, never shared with evaluation.
     lanes: [Lane<E>; 8],
     /// Root streams used to derive each lane's next episode seed.
     seeds: SeedConfig,
     /// Fixed-width task encoder shared by policy and value observations.
-    encode: fn(DroneObservation) -> [f32; N],
+    encode: fn(E::Observation) -> [f32; N],
 }
 
 /// One continuing episode and its independent policy-sampling stream.
-struct Lane<E: Env<Observation = DroneObservation, Action = DroneAction>> {
+struct Lane<E: Env<Action = DroneAction>> {
     /// Private environment behind the lesson's positive action limit.
     environment: TimeLimit<E>,
     /// Most recent observation, replaced atomically after each action or reset.
-    observation: DroneObservation,
+    observation: E::Observation,
     /// Actor context retained across consecutive rollout batches.
     memory: RecurrentMemory,
     /// Independent Gaussian exploration stream.
@@ -79,14 +79,18 @@ impl RecoveryBatch {
 
 impl<E, const N: usize> RecoveryBatch<E, N>
 where
-    E: Env<Observation = DroneObservation, Action = DroneAction>,
+    E: Env<Action = DroneAction>,
+    E::Observation: Copy,
 {
     /// Reuse bounded collection for another typed drone task and observation width.
+    ///
+    /// The encoder receives a copied snapshot with the environment's observation type.
+    /// Collection retains eight independent lanes and their recurrent memories.
     pub(crate) fn with_task(
         seed: u64,
         policy: &RecurrentPpoPolicy,
         make_environment: fn() -> E,
-        encode: fn(DroneObservation) -> [f32; N],
+        encode: fn(E::Observation) -> [f32; N],
         limit: NonZeroU16,
     ) -> Self {
         let seeds = SeedConfig::from_root(seed);

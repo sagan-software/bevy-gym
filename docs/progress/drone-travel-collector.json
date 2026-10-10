@@ -1,0 +1,85 @@
+{
+  "date": "2026-10-09",
+  "base_commit": "081bace99e04ee5c873b1534bcb4e4a1c2d1d485",
+  "scope": "Reuse bounded recurrent PPO collection with the environment observation type",
+  "source_sha256": {
+    "examples/robots/learning/rollout.rs": "ca9e459599db87b309cada3f603cd941f1bf07f6b541ba9b6da93a3f70749e07",
+    "tests/drone_learning.rs": "33bf60c438ccab76158cd7717ce86bad785e2e29e886aa4854036fda8cfd7de1"
+  },
+  "tdd": {
+    "red_log": "/home/sagan/.cache/bevy-gym-quality-validation/travel-collector-red.log",
+    "failure": "DroneTravel observation did not satisfy the hard-coded DroneObservation bound",
+    "regression": "travel_observations_reuse_collection_and_reset_independent_memory",
+    "assertions": [
+      "Two seeded collectors emit identical sequences.",
+      "Eight lanes collect exactly 512 one-action episodes.",
+      "Every episode starts with independent cleared recurrent memory.",
+      "Each sequence has one finite return and matching actor/critic inputs."
+    ],
+    "limitation": "The test uses a body-only encoder fixture to test collection plumbing; it is not the travel policy observation contract."
+  },
+  "validation": {
+    "native_learning": "20 passed, one ignored",
+    "native_curriculum_example": "10 passed",
+    "curriculum_cli": "6 passed",
+    "root_cargo_test": "passed",
+    "format": "passed",
+    "strict_native_and_wasm_clippy": "passed",
+    "wasm_check": "passed",
+    "actual_browser_suite": "passed",
+    "personal_changed_line_clippy_and_dylint": "no diagnostics",
+    "strict_personal_clippy": "unchanged repository backlog remains unresolved",
+    "logs": "/home/sagan/.cache/bevy-gym-quality-validation/travel-collector-"
+  },
+  "coverage": {
+    "file": "examples/robots/learning/rollout.rs",
+    "summary": {
+      "branches": {
+        "count": 6,
+        "covered": 6,
+        "notcovered": 0,
+        "percent": 100
+      },
+      "functions": {
+        "count": 14,
+        "covered": 14,
+        "percent": 100
+      },
+      "instantiations": {
+        "count": 17,
+        "covered": 17,
+        "percent": 100
+      },
+      "lines": {
+        "count": 226,
+        "covered": 226,
+        "percent": 100
+      },
+      "mcdc": {
+        "count": 0,
+        "covered": 0,
+        "notcovered": 0,
+        "percent": 0
+      },
+      "regions": {
+        "count": 390,
+        "covered": 388,
+        "notcovered": 2,
+        "percent": 99.48717948717949
+      }
+    },
+    "method": "Fresh instrumented integration-binary profiles exported explicitly; default cargo llvm-cov reporting excludes the imported example path.",
+    "gaps": [
+      "Line 130: critic value error before physics is not injected.",
+      "Line 133: critic value error after physics is not injected.",
+      "Counts include unit tests and aggregate the hover and travel instantiations.",
+      "The travel instantiation uses one-step truncations; continuing and rejection paths are exercised through the shared hover instantiation.",
+      "No whole-package coverage claim."
+    ]
+  },
+  "unfinished": [
+    "Define travel actor encoding and qualified checkpoint transfer.",
+    "Sample progressively harder destinations and define position, heading, speed and settling gates.",
+    "Train and qualify policies independently; add standalone inference and browser scene."
+  ]
+}

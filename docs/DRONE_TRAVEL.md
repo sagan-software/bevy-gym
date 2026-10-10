@@ -82,6 +82,14 @@ were hit. The unreachable normalization-error region is recorded separately.
 Strict native/WASM checks pass; changed-line personal lint is clean. Strict personal
 lint still fails on the unchanged repository backlog.
 
+The shared recurrent PPO collector now accepts the environment's typed observation.
+A [collection regression](progress/drone-travel-collector.json) checks 512 deterministic
+one-step travel episodes and cleared per-episode memory. Its body-only encoder is
+a test fixture, not the travel actor contract. Existing hover/recovery collection
+and qualification remain green. Collector coverage records 226/226 lines, including
+tests, and 6/6 branch outcomes across both instantiations. Two existing critic-error
+propagation regions remain unhit; the evidence records their exact locations.
+
 The next implementation must sample progressively harder goals, transfer a qualified
 RL actor, and collect rollouts through this same environment. Position and heading
 must reach independent held-out gates. Approach speed and settling time need

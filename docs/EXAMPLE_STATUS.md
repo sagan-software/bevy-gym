@@ -4,9 +4,9 @@ Updated: 2026-10-09. Current work: RL-only drone/droid curriculum.
 
 ## Resume here
 
-### Travel environment foundation, 2026-10-09
+### Travel environment and typed collection, 2026-10-09
 
-The transfer checkpoint `9a765cb2507a776ad0973fbd335fd14d755e51f3` is on GitHub main.
+The environment checkpoint `081bace99e04ee5c873b1534bcb4e4a1c2d1d485` is on GitHub main.
 `DroneTravel` now applies supplied motor actions through the existing disturbed-hover
 physics. A validated immutable destination supplies position and heading. It changes
 observations and reward without choosing actions. Public tests compare physical
@@ -20,15 +20,25 @@ still fails on the unchanged repository backlog. Coverage records 101/101 lines,
 including tests, and 16/16 branch outcomes. The unreachable normalization-error
 mapping region is the remaining gap; no full-package coverage claim is made.
 
+The shared rollout collector now accepts typed travel observations. Its regression
+checks 512 deterministic one-step travel episodes with cleared recurrent memory.
+Native learning tests (20 passed, one ignored), curriculum unit tests (10), CLI tests
+(6), strict native/WASM gates and the actual browser suite pass. Changed-line personal
+lint is clean. [Collector evidence](progress/drone-travel-collector.json) records
+226/226 lines including tests and 6/6 branch outcomes across instantiations. The two
+existing critic-error propagation regions at rollout lines 130 and 133 remain unhit.
+Travel uses a body-only test encoder here; no trained travel controller is implied.
+
 Travel has no trained policy, training/inference command, scene, or video yet.
-Next: generalize the existing rollout collector to typed travel observations, test
-qualified actor transfer with the heading input, then implement sampled-goal training
-and independent position/heading/speed gates. Existing imitation-only tracking is
+Next: define the travel observation encoding, test qualified actor transfer with
+heading input, then implement sampled-goal training and independent
+position/heading/speed gates. Existing imitation-only tracking is
 not a source checkpoint. Do not weaken the gates if training fails.
 
 No training job for this task is active. Preserve both damage failures and the
 completed seed-11 recovery transfer. Logs use
-`/home/sagan/.cache/bevy-gym-quality-validation/travel-environment-`.
+`/home/sagan/.cache/bevy-gym-quality-validation/travel-environment-` and
+`/home/sagan/.cache/bevy-gym-quality-validation/travel-collector-`.
 At the last remote check, `9a765cb` CI and Browser preview were still running;
 `14f20dd` jobs were cancelled. Local validation is separate from remote CI.
 

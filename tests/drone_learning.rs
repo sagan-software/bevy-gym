@@ -314,3 +314,50 @@ fn curriculum_evaluation_uses_separate_calm_and_disturbed_episodes() {
     assert_ne!(calm, disturbed);
     assert_eq!(policy.to_bytes().expect("serialize frozen policy"), before);
 }
+
+/// A typed travel snapshot can use the same collector and episode-memory boundaries.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn travel_observations_reuse_collection_and_reset_independent_memory() {
+    use bevy::math::{Vec2, Vec3};
+    use bevy_gym::robots::{DroneDestination, DroneTravel};
+    use std::num::NonZeroU16;
+
+    let policy = new_agent(7).expect("test policy").policy();
+    let make_environment = || {
+        let destination = DroneDestination::try_from((Vec3::new(3.0, 2.0, -2.0), Vec2::X))
+            .expect("test destination");
+        DroneTravel::new(destination)
+    };
+    // This fixture tests collection plumbing, not a trained travel observation contract.
+    let encode_body =
+        |observation: bevy_gym::robots::DroneTravelObservation| encode(observation.body());
+    let mut batch = RecoveryBatch::with_task(
+        7,
+        &policy,
+        make_environment,
+        encode_body,
+        NonZeroU16::new(1).expect("positive horizon"),
+    );
+    let mut replay = RecoveryBatch::with_task(
+        7,
+        &policy,
+        make_environment,
+        encode_body,
+        NonZeroU16::new(1).expect("positive horizon"),
+    );
+    let sequences = batch
+        .collect(&policy)
+        .expect("collect typed travel observations");
+    assert_eq!(
+        sequences,
+        replay.collect(&policy).expect("repeat collection")
+    );
+    assert_eq!(sequences.len(), 512);
+    for sequence in sequences {
+        assert_eq!(sequence.observations.len(), 1);
+        assert_eq!(sequence.initial_memory, policy.initial_memory());
+        assert!(sequence.returns.first().expect("one return").is_finite());
+        assert_eq!(sequence.observations, sequence.global_states);
+    }
+}
