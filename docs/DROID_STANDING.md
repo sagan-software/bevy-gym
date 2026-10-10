@@ -486,7 +486,8 @@ both selection and held-out results, checkpoint and executable hashes, and the
 exact command. Checkpoint bytes remained unchanged. The
 [episode CSV](progress/standing-seed17-update7920/episodes.csv) and
 [plot](progress/standing-seed17-update7920/held-out.png) retain every case.
-The larger seed-17 run continues; no standing policy is qualified.
+The seed-17 run has now exhausted its 24,000-update budget with exit 1.
+No standing policy is qualified.
 
 ## Evaluated candidate in the browser
 
@@ -521,3 +522,19 @@ Browser playback exercises those paths.
 Native window interaction and foreground
 preview-pane visibility remain unverified. Changed-line personal Rust lint is clean;
 its strict Clippy child still fails on existing diagnostics outside changed lines.
+
+## Completed seed-17 run
+
+Update 22,940 has the highest selection mean return across all 1,200 reports.
+The ranking used selection results only, before this candidate’s held-out evaluation.
+Five of 32 held-out episodes survived 1,000 actions; all final stable streaks were zero.
+Mean duration was 665.53125 actions. Frozen evaluation exited 1.
+The [record](progress/standing-seed17-update22940/summary.json) retains the unchanged
+checkpoint hash, full ranking, selection results, held-out results and commands.
+
+Selection seed 42 survived with return 826.67025, but its final torso-up projection
+was 0.73860, below the required 0.96593. The compressed traces retain every
+policy-selected torque and physical boundary for selection seeds 0 and 42.
+The current reward can exceed its threshold while posture fails. This does not
+establish a physics or optimizer defect. The next experiment will test a training-only
+reward profile emphasizing posture and foot support while preserving qualification gates.

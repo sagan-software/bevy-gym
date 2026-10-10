@@ -1,0 +1,61 @@
+{
+  "recorded_utc": "2026-10-10T15:22:48.528078+00:00",
+  "checkpoint_sha256_unchanged": "9c9e4c5bc8f7734da9835161476997e6d39d2aba28b24439e932a1f9949a2fdb",
+  "held_out": {
+    "passed": false,
+    "episodes": 32,
+    "survivors": 5,
+    "min_steps": 134,
+    "max_steps": 1000,
+    "mean_steps": 665.53125,
+    "mean_reward": 525.5292118531943,
+    "final_stable_streaks": [
+      0
+    ],
+    "exit_status": 1,
+    "error": "Error: \"Standing evaluation failed; checkpoint is not qualified.\"",
+    "report_sha256": "91556952e047762164df589278a1b763e40e0ae17b6736398fd7b4f637efcc49"
+  },
+  "selection_traces": {
+    "0": {
+      "actions": 744,
+      "failed_boundary_counts": {
+        "height": 14,
+        "upright": 736,
+        "distance": 18,
+        "speed": 78,
+        "support": 32
+      },
+      "maximum_stable_streak_reconstructed_from_serialized_f64_values": 0,
+      "final_stable_streak_reconstructed": 0,
+      "final_status": "terminated",
+      "final_up_projection_reconstructed": 0.5373354672136055,
+      "sha256": "b16e8541a4526aa0dc866f6f2e2565bc11967dceb5428e252f8ec1d6012938bf",
+      "note": "Post-action snapshots; reconstruction uses Python f64 from serialized f32. Native evaluator remains authoritative at boundaries."
+    },
+    "42": {
+      "actions": 1000,
+      "failed_boundary_counts": {
+        "height": 0,
+        "upright": 992,
+        "distance": 0,
+        "speed": 22,
+        "support": 7
+      },
+      "maximum_stable_streak_reconstructed_from_serialized_f64_values": 0,
+      "final_stable_streak_reconstructed": 0,
+      "final_status": "truncated",
+      "final_up_projection_reconstructed": 0.73859717885315,
+      "sha256": "2b47bd78f6ebd9db79ce01d98eda1b0fdadb286fc5cf3284e2aa5f2d18643c0d",
+      "note": "Post-action snapshots; reconstruction uses Python f64 from serialized f32. Native evaluator remains authoritative at boundaries."
+    }
+  },
+  "diagnosis": "Selection seed 42 survives and scores 826.6702486276627, but final torso-up projection 0.73859703540802 is below 0.9659258. Existing reward permits high return while posture fails; this is not evidence of a physics or optimizer defect.",
+  "next_action": "Test a training-only reward profile that emphasizes posture and foot support, preserving physics, policy-selected torques, checkpoint architecture and original qualification gates. Research and test the profile before launching another bounded run.",
+  "qualification": "Failed; no droid standing policy is qualified.",
+  "validation": {
+    "rumdl": "passes both changed guides",
+    "configured_markdown": "nine unchanged EXAMPLE_STATUS.md LIAMC005 paragraphs; exact paragraph comparison against HEAD confirms no changed diagnostics",
+    "data": "1200 selection reports; 32 held-out episodes; both traces finite and bounded, lengths/final torso-up projections agree with original selection report; checkpoint digest unchanged"
+  }
+}

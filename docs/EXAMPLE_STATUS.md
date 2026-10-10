@@ -1,5 +1,11 @@
 # Examples execution status
 
+The completed droid run’s strongest selection candidate, update 22,940, failed
+held-out qualification. Five of 32 episodes survived the horizon, with every final
+stable streak zero. The [record](progress/standing-seed17-update22940/summary.json)
+retains the ranking, frozen checkpoint, full evaluation and selection traces.
+No droid standing policy is qualified.
+
 Updated: 2026-10-10. Current work: RL-only drone/droid curriculum.
 
 ## Resume here

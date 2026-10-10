@@ -1,0 +1,8 @@
+{
+  "retrieved_source": "https://github.com/leggedrobotics/legged_gym/blob/8fa29acc6fd1910c3d9659eef6310bdd301cde0a/legged_gym/envs/base/legged_robot.py",
+  "revision": "8fa29acc6fd1910c3d9659eef6310bdd301cde0a",
+  "source_sha256": "bdaf5fa2dc123a539811b536c4a6feb9dadfcaf9df377d25d8ddbf434f531ff9",
+  "inspected_function": "    def _reward_orientation(self):\n        # Penalize non flat base orientation\n        return torch.sum(torch.square(self.projected_gravity[:, :2]), dim=1)\n",
+  "interpretation": "The upstream method measures squared projected-gravity XY as a roll/pitch penalty. This is a reference, not a guarantee for this articulated body. A local profile must distinguish upright and inverted poses and define its units, reward scaling, contacts and original evaluation gates before implementation.",
+  "profile_status": "not implemented"
+}

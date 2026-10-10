@@ -1,0 +1,12 @@
+{
+  "command": [
+    "/home/sagan/.cache/bevy-gym-quality-validation/standing-batched-seed17-20261010/droid-standing",
+    "trace",
+    "--checkpoint",
+    "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/docs/progress/standing-seed17-update22940/checkpoint.mpk",
+    "--seed",
+    "0"
+  ],
+  "exit_status": 0,
+  "partition": "selection; not held-out"
+}
