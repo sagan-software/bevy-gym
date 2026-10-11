@@ -1,0 +1,22 @@
+{
+  "seed": 373,
+  "budget_updates": 10001,
+  "parent_sha256": "73b1a1096d2a0dd9cac9d6f5ec6b3e7632ed71ef914a03e2d60ee3aa284006e5",
+  "parent_selection": "Failed research reference ranked by maximum minimum selection episode length, then sum of episode lengths at the measured snapshot. No held-out ranking or qualification.",
+  "reward": "1 - 10*(1-torso_up_y) - ((pelvis_y_m-1m)/0.15m)^2 - 0.1*pelvis_speed_squared/(0.25m/s)^2 - 0.1*horizontal_drift_squared/(0.5m)^2 - 0.1*maximum_segment_angular_speed_squared/(8rad/s)^2 - 0.25*unsupported_foot_count; -1000 once on natural fall.",
+  "training": "retain parent actor, critic and learned exploration; deliberate fresh Adam; fixed per-channel mean-head update scales from original calibration; actor rate0.0003, critic0.001, epochs1, one optimizer step per512 transitions",
+  "physical_model": "Original DroidStanding, unchanged dynamics, body, actions and natural termination. Reward projection only.",
+  "qualification": false,
+  "promotion": "none; original five selection, complete early-motion inspection, 32 held-out and native/WASM gates still required",
+  "tests": 39,
+  "strict_clippy": "passed",
+  "repository_head": "cd96d38b4bc86eaf97cff18b21bd24c5be781b50",
+  "source_sha256": {
+    "src/main.rs": "081cbc3234939d75e048d4541e792aa1ab3128b864f92ffc20fb519751548d90",
+    "src/safety.rs": "5584c1bcfcf877b0110ac895eba28859a22abf0cfb28932cde582a5f757f15b2",
+    "Cargo.toml": "392688524ef952e929224a1f926f5ca02ac94afd29b9b7cb2817155df105b045",
+    "Cargo.lock": "6ec49cbdf142221e3b2a75a1038f49a3a788f16e155ff0ea012a69b78a1b986c",
+    "initial-log-std.json": "4fb1a75112bb0b67137bd37e258b188544b02e8bc9a4162f05e9dd2fb50ae78a",
+    "trainer": "f655dcbebf63f13aac97d53062d2aa112acc3f08580c6f7c7361121a5797cd56"
+  }
+}

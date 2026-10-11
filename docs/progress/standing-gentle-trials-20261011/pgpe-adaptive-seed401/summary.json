@@ -1,0 +1,19 @@
+{
+  "qualification": false,
+  "status": "running",
+  "snapshot_generation": 10,
+  "training_actions": 276280,
+  "initial_baseline_actions": 460,
+  "snapshot_steps": [
+    99,
+    119,
+    158,
+    106,
+    100
+  ],
+  "passing_selection_checkpoints_at_snapshot": 0,
+  "held_out_evaluated": false,
+  "coverage_gaps": "run_trial artifact I/O, calibration rejection, baseline arithmetic rejection, parent hash rejection, worker panic and budget completion lack measured coverage. The complete generation, actual four-worker episodes and budget completion have regression evidence without instrumentation. The dense-posture retained-exploration initialization has no byte-identity regression; its copied test resets exploration.",
+  "raw_run": "/home/sagan/.cache/bevy-gym-quality-validation/standing-pgpe-adaptive-probe-20261011/run",
+  "archive": "Frozen source, launch, tests and running snapshot. All raw checkpoints and executables remain in the cache."
+}

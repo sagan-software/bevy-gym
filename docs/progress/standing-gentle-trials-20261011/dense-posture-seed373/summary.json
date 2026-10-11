@@ -1,0 +1,19 @@
+{
+  "qualification": false,
+  "status": "failed",
+  "completed_budget": 10001,
+  "budget_unit": "PPO updates",
+  "selection_checkpoints": 501,
+  "passing_selection_checkpoints": 0,
+  "final_steps": [
+    88,
+    96,
+    90,
+    97,
+    73
+  ],
+  "held_out_evaluated": false,
+  "training_transitions": 5120512,
+  "raw_run": "/home/sagan/.cache/bevy-gym-quality-validation/standing-dense-posture-probe-20261011/run",
+  "archive": "Complete journals, evaluation reports, source and logs. All raw checkpoints and executables remain in the cache."
+}

@@ -1061,8 +1061,8 @@ The local profile fixes exploration at half each calibrated standard deviation.
 Seed 401 supplies 32 symmetric pairs per generation, with four common training
 roots per pair and a 64-generation budget. Mean updates use rate 0.2 and discounted
 returns bounded above by 201. Training roots exclude selection and held-out roots.
-The [snapshot](progress/standing-gentle-trials-20261011/pgpe-bias-seed401/summary.json)
-records running research without a passing selection checkpoint.
+The [completed trial](progress/standing-gentle-trials-20261011/pgpe-bias-seed401/summary.json)
+failed all 64 selection checkpoints after 1,775,180 training actions.
 
 The [verification record](progress/standing-gentle-trials-20261011/pgpe-bias-seed401/verification.json)
 records 43 experimental tests, strict Clippy and repository native/browser checks.
@@ -1070,3 +1070,33 @@ Six standalone gradient tests hit all 75 measured regions and both outcomes of 1
 branches, including finite-rate overflow. Research artifact I/O, calibration
 rejection, parent-hash rejection, worker panic and budget-exhaustion paths lack
 measured coverage. Neither trial qualifies standing, walking or competition.
+
+## Learned exploration scales
+
+The [one-pass dense-reward trial](progress/standing-gentle-trials-20261011/dense-posture-seed373/summary.json)
+completed 10,001 PPO updates and failed all 501 selection checkpoints. Its final
+five episodes lasted 88, 96, 90, 97 and 73 actions. Complete journals and evaluation
+reports remain archived. No held-out evaluation or promotion occurred.
+
+The [adaptive parameter exploration launch](progress/standing-gentle-trials-20261011/pgpe-adaptive-seed401/launch.json)
+adds the variance update from PGPE Equation 15 to the fixed-exploration profile.
+Mean and variance rates are 0.2 and 0.1 respectively. Exploration scales remain
+between exp(-9f32) and each calibrated standard deviation. Four initial parent
+episodes establish the baseline; each generation updates it with 0.9 times the
+previous baseline plus 0.1 times the batch return. Both initial and paired training
+actions count toward the recorded total.
+
+The harness passes 48 tests, including a complete physical generation that changes
+exploration scales without promoting a policy. Standalone coverage hits all 84
+measured variance-update regions and both outcomes of 17 branches. Strict Clippy,
+repository native/browser checks and personal lints pass. Artifact I/O, calibration
+rejection, baseline-arithmetic rejection, parent-hash rejection and worker-panic
+paths lack measured coverage. Complete-generation and budget-exhaustion behavior
+have regression evidence without instrumentation.
+
+The [running snapshot](progress/standing-gentle-trials-20261011/pgpe-adaptive-seed401/summary.json)
+records no passing selection checkpoint. The one-pass dense harness's copied parent
+test resets exploration, so it does not prove the launch's retained-exploration
+initialization by byte identity. Original body dynamics, direct torque actions,
+selection, early-motion and held-out requirements still control qualification.
+No standing, walking or competitive policy is qualified.
