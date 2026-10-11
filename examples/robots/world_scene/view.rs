@@ -244,7 +244,7 @@ fn header(root: &mut ChildSpawnerCommands<'_>, font: &Handle<Font>) {
     ))
     .with_children(|panel| {
         panel.spawn((
-            Text::new("Shared world trial"),
+            Text::new("Drones versus droids"),
             TextFont {
                 font: font.clone(),
                 font_size: 24.0,

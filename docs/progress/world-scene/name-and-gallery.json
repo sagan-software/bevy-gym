@@ -1,0 +1,151 @@
+{
+  "recorded_utc": "2026-10-11",
+  "source_parent": "ad3e96469d5ee8157cda0d3c33b311ebbda209b3",
+  "scope": "Name the six-policy scene and replace historical public robot routes; refresh its recording and poster.",
+  "source_sha256": {
+    "examples/robots/world_scene/view.rs": "5e0c533e1dc861cf0a408bb2929197c36e567bd2aa100dacc0807708e128d617",
+    "examples/robots/world_scene/view_tests.rs": "b33cae5496f1be35e2fd308ba5fcd776b9311cce078aa6dd170912def6e8989c",
+    "examples/robots/world_scene/viewer.rs": "99cd2bfb010f532b8219a872c61a70bcd7bf09642cb7c1c9eac00894a01edb40",
+    "scripts/build_drone_skills.sh": "357cafc4e175039d1e3d5d73e942494c67833774067f2baa8ae2a359bc91cfd6",
+    ".github/workflows/pages.yml": "c7ffef7c9ddfa875d7b69538d99df5b1dc1e164e5c8ac84380c5a84861b15e58",
+    "tests/test_gallery_contract.py": "e656df65e2710260f903f090591d72ccdb26b8f27b509e1ba46795019dfefb6d"
+  },
+  "policy_evidence": "../robot-world-scene.json",
+  "recording": {
+    "captured_utc": "2026-10-11",
+    "capture_tool": "T3 Code collaborative browser",
+    "viewport_css_px": [
+      1280,
+      800
+    ],
+    "source_url": "http://100.105.254.50:8784/world/",
+    "source_recording_id": "79c88a30-75f5-47c8-a67d-87bc5d76c1fe",
+    "source_sha256": "9417878d2f74a8bc9ec765a9369e6cb0f890ad0c437ffacb500263295909c9f1",
+    "trim_start_seconds": 1,
+    "duration_seconds": 10.0,
+    "frames": 240,
+    "fps": 24,
+    "size_px": [
+      960,
+      600
+    ],
+    "audio": false,
+    "sha256": "89e90b3db137c6b574c8595f4a21cb12b74a01cff069cd27fc8412635e6248df",
+    "poster_sha256": "83ec58b0992788fdb50e40cd71cbe51b62c7ef3dba9b9b4f7598a4810e415c24",
+    "mode": "Frozen-policy inference",
+    "runtime_build": "95d46450f6f6365314c621eb0242f5350df89712b9d071fe93599cff7efbb829",
+    "evidence": "../docs/progress/world-scene/name-and-gallery.json"
+  },
+  "validation": {
+    "native_scene_tests": 54,
+    "native_default_tests": 132,
+    "native_default_ignored": 1,
+    "native_robots_tests": 480,
+    "native_robots_ignored": 3,
+    "wasm_tests": 318,
+    "wasm_suites": 28,
+    "javascript_tests": 39,
+    "gallery_contract_tests": 2,
+    "strict_clippy": "passed",
+    "personal_rust_lint": "passed; no changed-line diagnostics",
+    "shell_lint": "passed",
+    "python_lint": "passed",
+    "release_build": "passed"
+  },
+  "coverage": {
+    "configured_command": "cargo llvm-cov --no-clean --branch --features robots --example droid-standing-scene --test droid_skill_session --test robot_world_view_mode --json --output-path /home/sagan/.cache/bevy-gym-quality-validation/world-name-coverage.json",
+    "configured_result": "passed",
+    "fresh_method": "Run the three current test objects into a new profile directory; merge only those profiles and export against those exact objects.",
+    "fresh_tests": 100,
+    "fresh_export_diagnostics": "",
+    "fresh_export_sha256": "32e0ef2aa0c1c6b6a65a85201f22a8a5b230a23c7a83502f6130948c8b4ea639",
+    "objects": [
+      {
+        "path": "/home/sagan/.cache/bevy-gym-quality-validation/coverage-target/debug/examples/droid_standing_scene-054c2d40a60400e4",
+        "sha256": "7f5b824109353caa265b4f9c47dc5f7a32b5ee88164e3b46b576ef47af0b725a"
+      },
+      {
+        "path": "/home/sagan/.cache/bevy-gym-quality-validation/coverage-target/debug/deps/droid_skill_session-4e14768964021903",
+        "sha256": "42e57da5655c33b5e9fe4f38f65c90b3e740faca90765eef981b877792051e27"
+      },
+      {
+        "path": "/home/sagan/.cache/bevy-gym-quality-validation/coverage-target/debug/deps/robot_world_view_mode-760435d31482d4db",
+        "sha256": "a0c368754ad70ce4e8300e8a87bfd30efd662a732b880b3e34914a948859ff37"
+      }
+    ],
+    "changed_lines": {
+      "view.rs:247": {
+        "maximum_hits": 3,
+        "regions": [
+          [
+            246,
+            21,
+            253,
+            10,
+            3,
+            0,
+            0,
+            0
+          ],
+          [
+            247,
+            13,
+            247,
+            22,
+            3,
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      "viewer.rs:26": {
+        "maximum_hits": 0,
+        "regions": [
+          [
+            24,
+            22,
+            32,
+            18,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            26,
+            32,
+            26,
+            65,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            26,
+            66,
+            26,
+            74,
+            0,
+            0,
+            0,
+            0
+          ]
+        ]
+      }
+    },
+    "gap": "viewer.rs:26 has zero native hits because native tests do not call window creation. The release browser created the renamed window and rendered all six models; no complete native coverage claim."
+  },
+  "browser": {
+    "title": "Drones versus droids | Bevy Gym",
+    "local_pursuit_alias": "http://100.105.254.50:8787/robots/pursuit/",
+    "narrow_css_width": 390,
+    "horizontal_overflow": false,
+    "rendered_robots": 6,
+    "run_control": "advanced frozen PPO inference",
+    "alias_screenshot": "/home/sagan/.t3/userdata/browser-artifacts/browser-screenshot-100-105-254-50-mv3393yl-48a580e9.png",
+    "gallery_playback": "explicit Play previews started the ten-second looping video"
+  },
+  "qualification": "Competitive combat and droid walking remain unfinished. No candidate was promoted."
+}

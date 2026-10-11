@@ -46,7 +46,9 @@ The current example does not meet the policy-only requirement.
 
 Older navigation and PPO experiments remain research evidence. They do not establish
 that the currently loaded pursuit controller is reinforcement-trained.
-The shipped example remains a labelled hybrid baseline until its replacement qualifies.
+The historical hybrid source and recordings remain preserved. Publication replaces
+its pursuit route with the frozen RL shared-world diagnostic. Competitive
+qualification remains unfinished.
 
 ## Control boundary
 
@@ -154,8 +156,8 @@ behaviour cloning alone does not satisfy the requested reinforcement learning ga
 
 ## Delivery checkpoints
 
-1. Commit this audit and revised contract. Preserve the working hybrid demonstration
-   and its recordings without presenting them as policy-only acceptance evidence.
+1. Commit this audit and revised contract. Preserve historical hybrid source
+   and recordings as research evidence.
 2. Implement and test the shared six-agent world and policy action boundary.
    Use explicit test policies for deterministic tests; do not ship them as trained AI.
 3. Implement mixed action distributions and the batched two-team rollout collector.
@@ -176,4 +178,4 @@ and test gates, personal lint, and measured changed-code coverage with explicit 
 Browser changes require rendered desktop/narrow inspection and video evidence.
 Training records must include source/checkpoint hashes, seeds, environment version,
 reward terms, update/sample counts, both teams' metrics, and held-out outcomes.
-No 3v3 training run or trained droid locomotion checkpoint exists from this revision.
+No competitive 3v3 training run or qualified droid locomotion checkpoint exists.

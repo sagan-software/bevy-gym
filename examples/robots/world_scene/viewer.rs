@@ -23,7 +23,7 @@ pub(super) fn run() {
             DefaultPlugins
                 .set(WindowPlugin {
                     primary_window: Some(Window {
-                        title: "Shared world trial | Bevy Gym".to_owned(),
+                        title: "Drones versus droids | Bevy Gym".to_owned(),
                         canvas: Some("#drone-canvas".to_owned()),
                         fit_canvas_to_parent: true,
                         ..default()

@@ -987,7 +987,7 @@ The previous seed-7 damage run failed; do not replace that record with an inferr
 ### Policy-only 3v3 priority, 2026-10-09
 
 The latest request replaces the planned two-versus-two player game with a
-spectator-first three-versus-three match. Follow [Drones vs. Droids](DRONES_VS_DROIDS.md).
+spectator-first three-versus-three match. Follow [Drones versus droids](DRONES_VS_DROIDS.md).
 All navigation, aim, firing requests, alert choices, and living locomotion must come
 from reinforcement-trained policies. Keep physics and weapon limits as environment rules.
 

@@ -106,7 +106,7 @@ separate memory per agent. Update both teams between rollouts; keep policy versi
 fixed while collecting a rollout. Use frozen historical opponents for evaluation.
 
 Retain the typed action, sensor isolation, inference failure, death, and reset checks
-in [Drones vs. Droids](DRONES_VS_DROIDS.md). Centralized critics are training-only.
+in [Drones versus droids](DRONES_VS_DROIDS.md). Centralized critics are training-only.
 Use mixed continuous/categorical action distributions with correct log probabilities.
 Do not replace sampled discrete decisions with undocumented continuous thresholds.
 

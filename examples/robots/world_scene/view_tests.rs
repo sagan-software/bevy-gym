@@ -57,6 +57,11 @@ fn startup_overlay_keeps_identity_controls_and_failures_visible() {
                 .count(),
             6
         );
+        assert!(app
+            .world_mut()
+            .query::<&Text>()
+            .iter(app.world())
+            .any(|text| text.0 == "Drones versus droids"));
         let ready = app.world().resource::<Player>().session().is_ok();
         let readout = app
             .world_mut()

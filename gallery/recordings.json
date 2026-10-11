@@ -1,15 +1,15 @@
 {
   "world": {
-    "captured_utc": "2026-10-10",
+    "captured_utc": "2026-10-11",
     "capture_tool": "T3 Code collaborative browser",
     "viewport_css_px": [
       1280,
       800
     ],
     "source_url": "http://100.105.254.50:8784/world/",
-    "source_recording_id": "8281872e-879a-4066-bf85-07d38e78a052",
-    "source_sha256": "18ef70b3d09dcc07b2f3880a1fe01501ba1a27e09be00fbe5d79b316be3e152c",
-    "trim_start_seconds": 2,
+    "source_recording_id": "79c88a30-75f5-47c8-a67d-87bc5d76c1fe",
+    "source_sha256": "9417878d2f74a8bc9ec765a9369e6cb0f890ad0c437ffacb500263295909c9f1",
+    "trim_start_seconds": 1,
     "duration_seconds": 10.0,
     "frames": 240,
     "fps": 24,
@@ -18,11 +18,11 @@
       600
     ],
     "audio": false,
-    "sha256": "7274d1cf0524d16da799362a66770f25d7889921c9b1c817b68fb2c8d8dfe9c1",
-    "poster_sha256": "b72c38e824d3986b87386ead7c6244e2df47bfc550998bb892321bb4ad4f9cdf",
+    "sha256": "89e90b3db137c6b574c8595f4a21cb12b74a01cff069cd27fc8412635e6248df",
+    "poster_sha256": "83ec58b0992788fdb50e40cd71cbe51b62c7ef3dba9b9b4f7598a4810e415c24",
     "mode": "Frozen-policy inference",
-    "runtime_build": "7dd084b1e9c46ad70270c58ba051909db4a1b3dd438a06f41450d6eb3f377f5d",
-    "evidence": "../docs/progress/robot-world-scene.json"
+    "runtime_build": "95d46450f6f6365314c621eb0242f5350df89712b9d071fe93599cff7efbb829",
+    "evidence": "../docs/progress/world-scene/name-and-gallery.json"
   },
   "hover": {
     "captured_utc": "2026-10-10",

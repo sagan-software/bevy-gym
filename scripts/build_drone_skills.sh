@@ -71,7 +71,7 @@ for lesson in hover recovery travel standing world; do
         guide=DROID_STANDING
         ;;
     world)
-        title='Shared world trial'
+        title='Drones versus droids'
         guide=ROBOT_WORLD
         ;;
     esac

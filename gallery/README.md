@@ -3,7 +3,8 @@
 The deployment copies this directory to `/bevy-gym/examples/`. The robot cards
 open independent frozen-policy viewers. Drones versus droids opens the shared
 six-agent physical scene. Combat rules, competitive training and qualification
-remain unfinished. The standing viewer is an unqualified PPO trial.
+remain unfinished. The standing viewer is an unqualified PPO trial. Existing `/robots/pursuit/` links
+open the same six-policy scene; `/robots/hover/` opens the frozen PPO hover lesson.
 
 The droid curriculum lists standing, recovery, walking and running, low cover,
 jumping, aiming and firing, and evasion. Only standing currently has a scene.
@@ -16,8 +17,8 @@ recording identities, source and output hashes, runtime builds, trim offsets,
 policy evidence and mode. Every MP4 contains 240 frames at 24 fps, at 960 × 600.
 All ten files passed complete decoding and duration checks.
 
-Robot recordings came from the local release build of the published six-agent
-scene revision. Classic Control recordings came from the public browser routes.
+Robot recordings came from local release builds. The world recording includes
+the current Drones versus droids name. Classic Control recordings came from the public browser routes.
 CartPole, both MountainCar tasks and Acrobot use bundled RL policies. Pendulum
 shows PPO training from seed 42 because its bundled checkpoint is unavailable.
 
@@ -31,7 +32,14 @@ playback and pause. When autoplay fails, the button offers an explicit retry.
 
 Eight focused tests cover every production line, branch and function in the two
 preview modules. The full robot browser JavaScript suite passes 39 tests.
-The gallery contract checks routes, playback attributes, unique media and hashes.
+The two gallery contract tests check routes, playback attributes, unique media
+and hashes. The [name and route record](../docs/progress/world-scene/name-and-gallery.json)
+retains current source hashes, runtime identity and fresh native coverage.
+
+The overlay title has three native hits. Window creation at `viewer.rs:26` has
+zero native hits because these tests do not open a window. The release browser
+created that window and rendered all six models. Complete native coverage is
+not claimed.
 
 Desktop and 390-pixel layouts were inspected through the collaborative browser.
 The curriculum and Classic Control sections also passed narrow inspection.

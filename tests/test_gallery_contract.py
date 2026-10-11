@@ -61,6 +61,21 @@ class GalleryContractTests(unittest.TestCase):
         self.assertIn("Walking", html)
         self.assertIn("Not implemented", html)
 
+    def test_published_legacy_routes_open_policy_only_scenes(self):
+        """Existing robot links must open the replacement PPO viewers."""
+        root = Path(__file__).resolve().parents[1]
+        workflow = (root / ".github/workflows/pages.yml").read_text()
+        self.assertNotIn("scripts/build_pursuit_viewer.sh", workflow)
+        self.assertNotIn("scripts/build_drone_viewer.sh", workflow)
+        self.assertIn(
+            "cp -a robot-web/skills-dist-release/world/. site/robots/pursuit/",
+            workflow,
+        )
+        self.assertIn(
+            "cp -a robot-web/skills-dist-release/hover/. site/robots/hover/",
+            workflow,
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

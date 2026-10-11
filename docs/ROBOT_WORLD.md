@@ -14,7 +14,8 @@ nix develop --command scripts/build_drone_skills.sh
 python3 -m http.server 8000 --directory robot-web/skills-dist
 ```
 
-Open <http://localhost:8000/world/>. Three drones and three articulated droids
+Open <http://localhost:8000/world/>. The scene is named Drones versus droids.
+Three drones and three articulated droids
 run frozen PPO inference in one collision solver. The scene starts paused.
 It waits for all six licensed models before advancing any agent.
 Standing remains the executable's default scene when `--scene` is absent.
@@ -216,6 +217,11 @@ The recordings demonstrate frozen RL inference, including failed standing behavi
 They do not establish learned shared-task competence or competitive qualification.
 
 Formatting, native tests, strict Clippy, personal Rust lint, shell lint and
-Markdown lint pass. All 313 WASM tests pass, including startup-error checks.
+Markdown lint pass. All 318 WASM tests pass, including startup-error checks.
 Nix lint reports ten diagnostics in unchanged repository code and ignore rules.
 The scene record preserves their locations and comparison with the base revision.
+
+The [name and gallery record](progress/world-scene/name-and-gallery.json) records
+the current title, ten-second preview, legacy-route replacement and fresh native
+coverage. The public `/robots/pursuit/` route serves this same six-policy scene.
+Competitive combat and droid walking remain unfinished.
