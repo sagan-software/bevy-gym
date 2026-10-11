@@ -1,0 +1,31 @@
+{
+  "qualification": "failed; no held-out evaluation or promotion",
+  "updates": 1001,
+  "transitions": 512512,
+  "final_optimizer_steps": 1474,
+  "evaluations": 51,
+  "passing_evaluations": 0,
+  "best_failed_update": 60,
+  "best_failed_original_mean_return": 920.3362994372844,
+  "best_failed_motion_peaks_rad_s": [
+    19.68444115339705,
+    30.504582191826287,
+    19.144931670519654,
+    22.566558013007022,
+    29.246440910683624
+  ],
+  "files": {
+    "optimization.jsonl.gz": "3fefe500009500be8df911ab652f3c4cd82c4860f0af70644785fc1ff4dbc229",
+    "selection-history.json.gz": "b4cf0ae9fe515f1c5e6c92ed1cf3be7a4490c7f3ffcb2af87ffc63db9cda5b16",
+    "Cargo.toml": "69c5498bf4a0f797926cce21ea9cbc0f21080d955299869440476bc522adbb63",
+    "research.rs": "915d683c793cccd6bcc51854360817e765c725fa7f7ba4e57f35a323ed683767",
+    "run.log.gz": "103249e47d5244965c65f19aa019d42b5245a2cc8b4e563a7bd5c2225b69e3b7",
+    "best-failed.metadata.json": "37fa34f7b73a3dab5a1213bdcf4125177f18e652cea17054c436898b48724505",
+    "candidate-rule.json": "cecf1d85f17238a90384ae77a2ed5bc0fbc7ce6ab060a400760169b94a901d5e",
+    "best-failed.evaluation.json": "fe92591663c97fc966877383bf055937f6683feb44e1c90c1b4046385adb5230",
+    "best-failed.mpk": "1b8b10b8b5fbaacce2482835718a5090c84e3bda6b7014495831531c715fdddd",
+    "Cargo.lock": "0dc21f1cfb302f53517d21448cde2d8c2a8400b5e4f6d7b806d4cf28d092cb81",
+    "launch.json": "204bbd4dff1121be7ed01effe4f5bd80af55c09b19c4aa34923d9c3e6583967d",
+    "initialization.json": "92b300f36fa79e55a19167a48284b5c088d10bd7d36ee1228342400c123a5e2a"
+  }
+}

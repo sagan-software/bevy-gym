@@ -1,0 +1,24 @@
+{
+  "schema": "standing-warm-preserved-head-launch-v1",
+  "source_base": "3bd3656e700eec3ecbbbb3be268a427f9a1cc829",
+  "source_patch_sha256": null,
+  "executable_sha256": "182fa18044aba47f94efd72be14aa13d1de134111edaf1d4cffb7e5ae05d7155",
+  "program_sha256": "915d683c793cccd6bcc51854360817e765c725fa7f7ba4e57f35a323ed683767",
+  "manifest_sha256": "69c5498bf4a0f797926cce21ea9cbc0f21080d955299869440476bc522adbb63",
+  "lock_sha256": "0dc21f1cfb302f53517d21448cde2d8c2a8400b5e4f6d7b806d4cf28d092cb81",
+  "candidate_rule_sha256": "cecf1d85f17238a90384ae77a2ed5bc0fbc7ce6ab060a400760169b94a901d5e",
+  "seed": 139,
+  "budget_updates": 1001,
+  "selection": "five fixed roots only; highest original return among standing and motion passes; held-out does not rank",
+  "parent_sha256": "657f1cbe1fad9cf0782ceac76a51490cdca93b6d51c54366faa26be7ac264b6d",
+  "initialization": {
+    "mean_head_scale": 1.0,
+    "reset_initial_log_std": -7.0,
+    "log_std_min": -9.0,
+    "log_std_max": 1.0,
+    "variance_projection": "after every actor Adam step; parameter identity retained"
+  },
+  "qualification": "research only; budget completion is not promotion",
+  "paired_comparison": "same lower-noise seed139 trial with the parent mean head preserved instead of scaled to 0.01",
+  "checkpoint_format": "research sidecar only; frozen reload uses the exact training configuration; published standing loader cannot accept this format"
+}

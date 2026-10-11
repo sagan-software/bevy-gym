@@ -1,0 +1,24 @@
+{
+  "actor_learning_rate": 0.00003,
+  "budget_updates": 1001,
+  "critic_learning_rate": 0.001,
+  "entropy_coefficient": 0.0,
+  "epochs": 1,
+  "log_std_max": 1.0,
+  "log_std_min": -9.0,
+  "mean_head_scale": 1.0,
+  "parent": {
+    "algorithm": "PPO",
+    "optimizer_steps": 592,
+    "schema": "droid-standing-v1",
+    "seed": 43,
+    "sha256": "657f1cbe1fad9cf0782ceac76a51490cdca93b6d51c54366faa26be7ac264b6d",
+    "transitions": 51200,
+    "update": 100
+  },
+  "qualification": "unqualified research; no promotion",
+  "reset_initial_log_std": -7.0,
+  "reward": "droid-standing-posture-quiet-reward-v1",
+  "schema": "standing-warm-precision-research-v1",
+  "seed": 139
+}
