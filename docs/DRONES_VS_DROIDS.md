@@ -1,8 +1,14 @@
-# Drones vs. Droids
+# Drones versus droids
 
-Updated: 2026-10-09. Status: audited and planned; implementation and training pending.
+Updated: 2026-10-10. Status: shared-world inference implemented; competition unfinished.
 This request supersedes the two-versus-two player-first shooter milestone.
 The target is a spectator-first competitive match with three drones and three droids.
+
+The renewed objective is to finish that match, its continuous skill curriculum, and
+its browser spectator example under the existing reinforcement learning rules.
+The gallery must use current screenshots and ten-second looping example recordings.
+Droid walking must be independently trainable and visible before competition qualifies.
+
 All living agents must choose their actions through reinforcement-trained policies.
 The broader [examples roadmap](EXAMPLE_ROADMAP.md) is deferred.
 

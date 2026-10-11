@@ -1,0 +1,251 @@
+{
+  "world": {
+    "captured_utc": "2026-10-10",
+    "capture_tool": "T3 Code collaborative browser",
+    "viewport_css_px": [
+      1280,
+      800
+    ],
+    "source_url": "http://100.105.254.50:8784/world/",
+    "source_recording_id": "8281872e-879a-4066-bf85-07d38e78a052",
+    "source_sha256": "18ef70b3d09dcc07b2f3880a1fe01501ba1a27e09be00fbe5d79b316be3e152c",
+    "trim_start_seconds": 2,
+    "duration_seconds": 10.0,
+    "frames": 240,
+    "fps": 24,
+    "size_px": [
+      960,
+      600
+    ],
+    "audio": false,
+    "sha256": "7274d1cf0524d16da799362a66770f25d7889921c9b1c817b68fb2c8d8dfe9c1",
+    "poster_sha256": "b72c38e824d3986b87386ead7c6244e2df47bfc550998bb892321bb4ad4f9cdf",
+    "mode": "Frozen-policy inference",
+    "runtime_build": "7dd084b1e9c46ad70270c58ba051909db4a1b3dd438a06f41450d6eb3f377f5d",
+    "evidence": "../docs/progress/robot-world-scene.json"
+  },
+  "hover": {
+    "captured_utc": "2026-10-10",
+    "capture_tool": "T3 Code collaborative browser",
+    "viewport_css_px": [
+      1280,
+      800
+    ],
+    "source_url": "http://100.105.254.50:8784/hover/",
+    "source_recording_id": "22a7ec9a-aa79-46d0-ae8c-46040a78f1aa",
+    "source_sha256": "5bef65beaccdda1819ae8899d4e91e4be856841168a3ada8b5c5948bed6172d7",
+    "trim_start_seconds": 0,
+    "duration_seconds": 10.0,
+    "frames": 240,
+    "fps": 24,
+    "size_px": [
+      960,
+      600
+    ],
+    "audio": false,
+    "sha256": "e45a4cc4e21486f692a2f0f35dcf2c1424bdc9d01078e385b9688e653020ff3a",
+    "poster_sha256": "e8922d3290e3f3a21411c7199a9b4ec43b6d5a99bb6707d82fba1b761d56515f",
+    "mode": "Frozen-policy inference",
+    "runtime_build": "7dd084b1e9c46ad70270c58ba051909db4a1b3dd438a06f41450d6eb3f377f5d",
+    "evidence": "../docs/progress/drone-skill-scenes.json"
+  },
+  "recovery": {
+    "captured_utc": "2026-10-10",
+    "capture_tool": "T3 Code collaborative browser",
+    "viewport_css_px": [
+      1280,
+      800
+    ],
+    "source_url": "http://100.105.254.50:8784/recovery/",
+    "source_recording_id": "ea6ca568-2a60-4786-9f3a-e85e849d15c5",
+    "source_sha256": "e3e94548469be1afa632ec8ee7c9083d26877028371430842433e5595596d595",
+    "trim_start_seconds": 1,
+    "duration_seconds": 10.0,
+    "frames": 240,
+    "fps": 24,
+    "size_px": [
+      960,
+      600
+    ],
+    "audio": false,
+    "sha256": "e6d0e7656e51efd4951c4f5afa8a247efaec2f08b96b9eb2eed23ed90bd70fb3",
+    "poster_sha256": "cc13fb68f2eb9623b42bf8d592b657e614209b39b0b69fc2dad086a4c7974d52",
+    "mode": "Frozen-policy inference",
+    "runtime_build": "7dd084b1e9c46ad70270c58ba051909db4a1b3dd438a06f41450d6eb3f377f5d",
+    "evidence": "../docs/progress/drone-skill-scenes.json"
+  },
+  "travel": {
+    "captured_utc": "2026-10-10",
+    "capture_tool": "T3 Code collaborative browser",
+    "viewport_css_px": [
+      1280,
+      800
+    ],
+    "source_url": "http://100.105.254.50:8784/travel/",
+    "source_recording_id": "26ddcb60-6b6c-4250-91e5-ae4229d6559e",
+    "source_sha256": "c814d5fa2760fa3eef25e316943275760125898b0b1b33f7f67eb2c676c130c4",
+    "trim_start_seconds": 1,
+    "duration_seconds": 10.0,
+    "frames": 240,
+    "fps": 24,
+    "size_px": [
+      960,
+      600
+    ],
+    "audio": false,
+    "sha256": "dc09db321932fd4f4cf8c7f84907ea0d17890e62fa0e99f14208f8b1119d4372",
+    "poster_sha256": "8ad57420b415d02cebbd8adf667cf3e7382adffba99cc6aeb2f76cd60fe3543d",
+    "mode": "Frozen-policy inference",
+    "runtime_build": "7dd084b1e9c46ad70270c58ba051909db4a1b3dd438a06f41450d6eb3f377f5d",
+    "evidence": "../docs/progress/drone-travel-scene.json"
+  },
+  "standing": {
+    "captured_utc": "2026-10-10",
+    "capture_tool": "T3 Code collaborative browser",
+    "viewport_css_px": [
+      1280,
+      800
+    ],
+    "source_url": "http://100.105.254.50:8784/standing/",
+    "source_recording_id": "db64360d-2f9a-4d4e-b2f5-77e62ad9c4d1",
+    "source_sha256": "3320535b2b040ee6438c7578038071b4211b7c5ce15f7238b388192e88a8aed9",
+    "trim_start_seconds": 1,
+    "duration_seconds": 10.0,
+    "frames": 240,
+    "fps": 24,
+    "size_px": [
+      960,
+      600
+    ],
+    "audio": false,
+    "sha256": "957d0fb27f03d5b4cba835ce1c1b66e4799fd520a5404ffb0382aafb75cd081e",
+    "poster_sha256": "100f2f0f2ed12b86337e6005f983ff32cad64a5c6f6cb9686c0788559282f39d",
+    "mode": "Frozen-policy inference",
+    "runtime_build": "7dd084b1e9c46ad70270c58ba051909db4a1b3dd438a06f41450d6eb3f377f5d",
+    "evidence": "../docs/progress/standing-seed17-update7920/browser-evidence.json"
+  },
+  "cartpole": {
+    "captured_utc": "2026-10-10",
+    "capture_tool": "T3 Code collaborative browser",
+    "viewport_css_px": [
+      1280,
+      800
+    ],
+    "source_url": "https://sagan-software.github.io/bevy-gym/?env=cartpole",
+    "source_recording_id": "a8b7f129-03fa-4983-b6c8-ac54be2d69d9",
+    "source_sha256": "6c93b43a7eadae9aba414187af54bb74c447b1875da294697a16f41b6c113ed6",
+    "trim_start_seconds": 1,
+    "duration_seconds": 10.0,
+    "frames": 240,
+    "fps": 24,
+    "size_px": [
+      960,
+      600
+    ],
+    "audio": false,
+    "sha256": "3e9b16362e7c0e0a4d901b0fac6df8e9ae0b7ef6f0262afc7b1960ac89810250",
+    "poster_sha256": "4bdd37e9bfcf7417cf6d2113a51c3fa716f8e6457f8eb627e8560c60c38a9237",
+    "mode": "Frozen-policy inference",
+    "runtime_build": "490a3c697e4bc726dacce11e6d58c368dea5f90f291188f0c9f91b3e036d4bf2",
+    "evidence": "../gymnasium-web/models/cartpole.json"
+  },
+  "mountain-car": {
+    "captured_utc": "2026-10-10",
+    "capture_tool": "T3 Code collaborative browser",
+    "viewport_css_px": [
+      1280,
+      800
+    ],
+    "source_url": "https://sagan-software.github.io/bevy-gym/?env=mountain-car",
+    "source_recording_id": "6031d522-1dfa-480a-a46d-4d75c1b8a3e3",
+    "source_sha256": "132e0b682bbc542511d3ee765fbb4848514a5a0b768fd8114826a0b8a964ae15",
+    "trim_start_seconds": 1,
+    "duration_seconds": 10.0,
+    "frames": 240,
+    "fps": 24,
+    "size_px": [
+      960,
+      600
+    ],
+    "audio": false,
+    "sha256": "31c640af3064b4bf4512bf8a9868c0b7302168e8204f31a242c3c956394ab737",
+    "poster_sha256": "045b91faa80fe6b5eb70bb0eba60afdca9319ed0d64edfaa21b2cbfa599636ca",
+    "mode": "Frozen-policy inference",
+    "runtime_build": "490a3c697e4bc726dacce11e6d58c368dea5f90f291188f0c9f91b3e036d4bf2",
+    "evidence": "../gymnasium-web/models/mountain-car.json"
+  },
+  "mountain-car-continuous": {
+    "captured_utc": "2026-10-10",
+    "capture_tool": "T3 Code collaborative browser",
+    "viewport_css_px": [
+      1280,
+      800
+    ],
+    "source_url": "https://sagan-software.github.io/bevy-gym/?env=mountain-car-continuous",
+    "source_recording_id": "ccab9a8a-15c1-46cf-a38e-0a27b9004827",
+    "source_sha256": "b6d8c75da446028f1d1bf7587f166a81168862719d2861d49808fe81f9c2e7eb",
+    "trim_start_seconds": 1,
+    "duration_seconds": 10.0,
+    "frames": 240,
+    "fps": 24,
+    "size_px": [
+      960,
+      600
+    ],
+    "audio": false,
+    "sha256": "235d8758c3f118aa01163548aab8b3b26638a240b31385ca09b4937b6d546a65",
+    "poster_sha256": "a31a2c3ea3470b104a6fb2618baacae70f4751a10f9accc26d23912a3fe367d4",
+    "mode": "Frozen-policy inference",
+    "runtime_build": "490a3c697e4bc726dacce11e6d58c368dea5f90f291188f0c9f91b3e036d4bf2",
+    "evidence": "../gymnasium-web/models/mountain-car-continuous.json"
+  },
+  "pendulum": {
+    "captured_utc": "2026-10-10",
+    "capture_tool": "T3 Code collaborative browser",
+    "viewport_css_px": [
+      1280,
+      800
+    ],
+    "source_url": "https://sagan-software.github.io/bevy-gym/?env=pendulum",
+    "source_recording_id": "3906f11f-b314-41ca-be3c-490a928ba8f2",
+    "source_sha256": "7fce74fb5978ce10a5d002cbebb52145699992cc9bcb42a6f46fec2e4e2b4ff2",
+    "trim_start_seconds": 1,
+    "duration_seconds": 10.0,
+    "frames": 240,
+    "fps": 24,
+    "size_px": [
+      960,
+      600
+    ],
+    "audio": false,
+    "sha256": "7f2a8d10d8ed613f85af53514b8d0d5a689a587265b520c41769a8bd7a44fd81",
+    "poster_sha256": "69fe4072fa693475063d7cf009da081bf4dc43f1d8c797d903fb9eddcf02609a",
+    "mode": "PPO training from scratch; seed 42; unqualified",
+    "runtime_build": "490a3c697e4bc726dacce11e6d58c368dea5f90f291188f0c9f91b3e036d4bf2"
+  },
+  "acrobot": {
+    "captured_utc": "2026-10-10",
+    "capture_tool": "T3 Code collaborative browser",
+    "viewport_css_px": [
+      1280,
+      800
+    ],
+    "source_url": "https://sagan-software.github.io/bevy-gym/?env=acrobot",
+    "source_recording_id": "53ffd8ae-4a7b-4641-b23f-7e246fc55e65",
+    "source_sha256": "4dfd920495404245501a5a50f064fbe6ffe3d09a23b519fba8c57c1e743188ed",
+    "trim_start_seconds": 1,
+    "duration_seconds": 10.0,
+    "frames": 240,
+    "fps": 24,
+    "size_px": [
+      960,
+      600
+    ],
+    "audio": false,
+    "sha256": "6d4f89d864adceacb7345771f4e9dfd6fd2587b609598038a04ba9ff9d182ab8",
+    "poster_sha256": "b6104bdf4328ee90c42a56c806f6fa7d8509a97ff064e6618e785859327da19a",
+    "mode": "Frozen-policy inference",
+    "runtime_build": "490a3c697e4bc726dacce11e6d58c368dea5f90f291188f0c9f91b3e036d4bf2",
+    "evidence": "../gymnasium-web/models/acrobot.json"
+  }
+}

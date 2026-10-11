@@ -1,5 +1,12 @@
 # Examples execution status
 
+The renewed objective is to finish competitive 3v3 Drones versus droids, with
+independent droid locomotion lessons and a continuous curriculum. The shared-world
+browser scene is deployed. It runs six frozen PPO actors but has no combat rules
+or qualified competitive policies. The gallery update adds ten-second recordings,
+the standing viewer and explicit status for every remaining droid lesson.
+Walking, recovery and competitive training remain unfinished.
+
 A training-only pelvis-height reward is validated. Its
 [20-update smoke trial](progress/standing-posture-height-smoke-seed37/summary.json)
 used 10,240 RL transitions and failed all five selection episodes. It remains

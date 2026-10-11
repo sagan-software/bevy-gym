@@ -14,48 +14,64 @@
       <nav aria-label="Project"><a href="../ecosystem/">Ecosystem demos</a><a href="https://github.com/sagan-software/bevy-gym">GitHub</a></nav>
     </header>
     <main>
-      <h1>Examples</h1>
+      <div class="catalog-heading"><h1>Examples</h1><button id="preview-toggle" type="button" hidden>Pause previews</button></div>
       <div class="catalog">
-        <nav class="categories" aria-label="Categories"><a href="#robots">Robots</a><a href="#classic-control">Classic control</a></nav>
+        <nav class="categories" aria-label="Categories"><a href="#robots">Robots</a><a href="#droids">Droid curriculum</a><a href="#classic-control">Classic control</a></nav>
         <div>
           <section id="robots" aria-labelledby="robots-title">
             <h2 id="robots-title">Robots</h2>
             <div class="examples">
-              <a class="example" href="../robots/pursuit/">
-                <img src="images/pursuit.png" width="1280" height="800" alt="An orange robot beside cover blocks, a windowed house, and an open pipe">
-                <div><h3>Pursuit arena</h3><p>Collect a pistol and aim at drone weak points through a blockout arena.</p><span class="mode">Player combat prototype</span></div>
+              <a class="example" href="../robots/skills/world/">
+                <video data-src="videos/world.mp4" poster="images/world.png" width="960" height="600" muted loop playsinline preload="none" aria-hidden="true"></video>
+                <div><h3>Drones versus droids</h3><p>Three drones and three physical droids driven by PPO policies.</p><span class="mode">Combat training pending</span></div>
               </a>
               <a class="example" href="../robots/skills/hover/">
-                <img src="images/drone.png" width="600" height="400" alt="A four-rotor drone in flight">
+                <video data-src="videos/hover.mp4" poster="images/hover.png" width="960" height="600" muted loop playsinline preload="none" aria-hidden="true"></video>
                 <div><h3>Drone hover</h3><p>Watch a frozen RL policy hold position from a calm start.</p><span class="mode">Frozen-policy inference</span></div>
               </a>
               <a class="example" href="../robots/skills/recovery/">
-                <img src="images/drone.png" width="600" height="400" alt="A four-rotor drone in flight">
+                <video data-src="videos/recovery.mp4" poster="images/recovery.png" width="960" height="600" muted loop playsinline preload="none" aria-hidden="true"></video>
                 <div><h3>Disturbed recovery</h3><p>Watch the curriculum policy recover from initial tilt and velocity.</p><span class="mode">Frozen-policy inference</span></div>
               </a>
               <a class="example" href="../robots/skills/travel/">
-                <img src="images/drone.png" width="600" height="400" alt="A four-rotor drone in flight">
+                <video data-src="videos/travel.mp4" poster="images/travel.png" width="960" height="600" muted loop playsinline preload="none" aria-hidden="true"></video>
                 <div><h3>Drone travel trial</h3><p>Inspect a failed RL checkpoint against a position and heading target.</p><span class="mode">Unqualified frozen-policy inference</span></div>
               </a>
-              <a class="example" href="../robots/hover/">
-                <img src="images/drone.png" width="600" height="400" alt="A four-rotor drone in flight">
-                <div><h3>Historical drone workbench</h3><p>Browser training alongside manual and imitation controls. This mixed-controller viewer is not an RL qualification.</p><span class="mode">Historical workbench</span></div>
+            </div>
+          </section>
+          <section id="droids" aria-labelledby="droids-title">
+            <h2 id="droids-title">Droid curriculum</h2>
+            <div class="examples">
+              <a class="example" href="../robots/skills/standing/">
+                <video data-src="videos/standing.mp4" poster="images/standing.png" width="960" height="600" muted loop playsinline preload="none" aria-hidden="true"></video>
+                <div><h3>Standing trial</h3><p>Inspect learned joint control in the articulated body.</p><span class="mode">Standing qualification pending</span></div>
               </a>
             </div>
+            <ol class="lesson-status" aria-label="Droid lesson prerequisites">
+              <li><span>Standing</span><span>Training; not qualified</span></li>
+              <li><span>Recovery</span><span>Not implemented</span></li>
+              <li><span>Walking and running</span><span>Not implemented</span></li>
+              <li><span>Low cover</span><span>Not implemented</span></li>
+              <li><span>Jumping</span><span>Not implemented</span></li>
+              <li><span>Aim and fire</span><span>Not implemented</span></li>
+              <li><span>Evade</span><span>Not implemented</span></li>
+            </ol>
+            <a href="https://github.com/sagan-software/bevy-gym/blob/main/docs/ROBOT_SKILL_CURRICULUM.md">Curriculum and training guide</a>
           </section>
           <section id="classic-control" aria-labelledby="classic-title">
             <h2 id="classic-title">Classic control</h2>
             <div class="examples">
-              <a class="example" href="../?env=cartpole"><img src="images/cartpole.png" width="600" height="400" alt="A cart with an upright pole" loading="lazy"><div><h3>CartPole</h3><p>Balance a pole by moving its cart.</p><span class="mode">Training and inference</span></div></a>
-              <a class="example" href="../?env=mountain-car"><img src="images/mountain-car.png" width="600" height="400" alt="A car on a sloping track" loading="lazy"><div><h3>MountainCar</h3><p>Build momentum to reach the hilltop.</p><span class="mode">Training and inference</span></div></a>
-              <a class="example" href="../?env=mountain-car-continuous"><img src="images/mountain-car.png" width="600" height="400" alt="A car on a sloping track" loading="lazy"><div><h3>Continuous MountainCar</h3><p>Reach the hilltop with continuous throttle.</p><span class="mode">Training and inference</span></div></a>
-              <a class="example" href="../?env=pendulum"><img src="images/pendulum.png" width="500" height="500" alt="A pendulum suspended from its pivot" loading="lazy"><div><h3>Pendulum</h3><p>Swing a pendulum upright using torque.</p><span class="mode">Training and inference</span></div></a>
-              <a class="example" href="../?env=acrobot"><img src="images/acrobot.png" width="500" height="500" alt="Two connected links below a target line" loading="lazy"><div><h3>Acrobot</h3><p>Swing two links above the target line.</p><span class="mode">Training and inference</span></div></a>
+              <a class="example" href="../?env=cartpole"><video data-src="videos/cartpole.mp4" poster="images/cartpole.png" width="960" height="600" muted loop playsinline preload="none" aria-hidden="true"></video><div><h3>CartPole</h3><p>Balance a pole by moving its cart.</p><span class="mode">Training and inference</span></div></a>
+              <a class="example" href="../?env=mountain-car"><video data-src="videos/mountain-car.mp4" poster="images/mountain-car.png" width="960" height="600" muted loop playsinline preload="none" aria-hidden="true"></video><div><h3>MountainCar</h3><p>Build momentum to reach the hilltop.</p><span class="mode">Training and inference</span></div></a>
+              <a class="example" href="../?env=mountain-car-continuous"><video data-src="videos/mountain-car-continuous.mp4" poster="images/mountain-car-continuous.png" width="960" height="600" muted loop playsinline preload="none" aria-hidden="true"></video><div><h3>Continuous MountainCar</h3><p>Reach the hilltop with continuous throttle.</p><span class="mode">Training and inference</span></div></a>
+              <a class="example" href="../?env=pendulum"><video data-src="videos/pendulum.mp4" poster="images/pendulum.png" width="960" height="600" muted loop playsinline preload="none" aria-hidden="true"></video><div><h3>Pendulum</h3><p>Select Train from scratch to learn upright torque control.</p><span class="mode">PPO training; bundled policy pending</span></div></a>
+              <a class="example" href="../?env=acrobot"><video data-src="videos/acrobot.mp4" poster="images/acrobot.png" width="960" height="600" muted loop playsinline preload="none" aria-hidden="true"></video><div><h3>Acrobot</h3><p>Swing two links above the target line.</p><span class="mode">Training and inference</span></div></a>
             </div>
           </section>
         </div>
       </div>
     </main>
-    <footer>Drone model: <a href="https://poly.pizza/m/DNbUoMtG3H">NateGazzard</a>, <a href="https://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</footer>
+    <footer>Drone model: <a href="https://poly.pizza/m/DNbUoMtG3H">NateGazzard</a>, <a href="https://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>. Droid model: <a href="https://quaternius.com/">Quaternius</a>, <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</footer>
+    <script type="module" src="previews-browser.mjs"></script>
   </body>
 </html>

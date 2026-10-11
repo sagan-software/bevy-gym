@@ -1,11 +1,12 @@
 # Robot skill curriculum
 
 Status: implementation in progress; most lessons are not implemented or trained.
-Updated: 2026-10-09. The user superseded the earlier broad examples goal.
+Updated: 2026-10-10. The user renewed the competitive 3v3 objective.
 
 This curriculum is the current execution objective. The earlier unfinished audit
-and reference ports remain deferred. A new curriculum goal is active in the
-continuation thread. The earlier blocked goal was not marked complete.
+and reference ports remain deferred. The current request continues the curriculum
+and requires the competitive browser scene to be called Drones versus droids.
+The earlier unfinished goal was not marked complete.
 
 Deliver separate drone and droid skill examples, a curriculum walkthrough, and a
 final competitive three-versus-three environment. Every autonomous action must come

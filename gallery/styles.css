@@ -24,7 +24,7 @@ h2 { font-size: 24px; line-height: 1.25; margin: 0 0 20px; }
 .examples { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
 .example { display: flex; flex-direction: column; text-decoration: none; background: #fff; border: 1px solid #dededb; }
 .example:hover { border-color: #9b421e; }
-.example img { display: block; width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: contain; background: #fff; border-bottom: 1px solid #dededb; }
+.example video { display: block; width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: contain; background: #fff; border-bottom: 1px solid #dededb; }
 .example > div { padding: 18px; flex: 1; display: flex; flex-direction: column; align-items: start; }
 h3 { font-size: 18px; line-height: 1.35; margin: 0 0 8px; }
 p { color: #50565b; font-size: 14px; margin: 0 0 18px; }
@@ -40,3 +40,11 @@ footer { border-top: 1px solid #dededb; padding: 20px 24px; text-align: center; 
   .categories { display: flex; flex-wrap: wrap; gap: 16px 24px; }
 }
 @media (max-width: 440px) { .examples { grid-template-columns: minmax(0, 1fr); } }
+
+.catalog-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
+#preview-toggle { font: inherit; padding: 10px 14px; border: 1px solid #dededb; background: #fff; cursor: pointer; }
+#preview-toggle:hover { border-color: #9b421e; }
+.lesson-status { max-width: 620px; margin: 24px 0; padding-left: 24px; }
+.lesson-status li { padding: 8px 0; }
+.lesson-status li span + span { float: right; color: #50565b; margin-left: 16px; }
+@media (max-width: 440px) { .lesson-status li span + span { float: none; display: block; margin-left: 0; } }
