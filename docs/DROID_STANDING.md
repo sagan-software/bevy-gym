@@ -959,3 +959,19 @@ Five measured collections after one warmup had median times of 0.1627 seconds
 serially and 0.0591 seconds concurrently, about 2.75 times faster. Each collection
 contains 512 transitions. This measures collection only, excluding optimization
 and rendering, and qualifies no policy.
+
+## Active motion-cost research
+
+Two frozen native trials start from calibrated seed-211 update-960 parameters.
+Both reset exploration to the measured per-channel scales and retain original
+physics. Neither permits automatic promotion.
+
+The [seed-283 launch](progress/standing-gentle-trials-20261011/active-motion-seed283/launch.json)
+uses an actor learning rate of 0.000003 and the additive motion cost. The
+[seed-307 launch](progress/standing-gentle-trials-20261011/active-motion-seed307/launch.json)
+uses 0.00003 and additionally subtracts 1,000 reward once on a natural fall.
+The fall penalty addresses the incentive to avoid later motion costs by falling
+early. A regression verifies the first penalty and zero reward on later requests.
+
+Each run has a 10,001-update budget. Launch records establish tested configurations
+and frozen executables, not successful standing. Outcomes remain pending.

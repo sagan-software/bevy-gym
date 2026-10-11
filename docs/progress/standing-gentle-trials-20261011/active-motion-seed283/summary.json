@@ -1,0 +1,9 @@
+{
+  "seed": 283,
+  "status": "running",
+  "qualification": false,
+  "tests": 38,
+  "strict_clippy": "passed",
+  "native_executable_frozen": true,
+  "publication": "research launch only; original qualification gates required"
+}

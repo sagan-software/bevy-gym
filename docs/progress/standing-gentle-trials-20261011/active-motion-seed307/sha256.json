@@ -1,0 +1,14 @@
+{
+  "Cargo.lock.gz": "cae360b7b316492e0a2aff621b4a87c0baa094b3266f6620ce6c3b0ed9d0bddb",
+  "Cargo.toml": "533f8a45f0dfbb6ca16df6f9798faa7c1ed87f7bce024e9a27b429c6b1ebd624",
+  "build.log.gz": "24586f134575240561f7d44e091aad8402ade4fbc663deb638e12c7fdceff67d",
+  "clippy-final.log.gz": "b5adcb58683e820bf47827ada38e6e09ee78d29cebe42942bc97fad179f98a4d",
+  "dependency-source-sha256.json": "b4adc5d4d67fd5fe3758707d8558eed1d2cfa24d6ab1ca1938b61492d5c64e6e",
+  "initial-log-std.json": "4fb1a75112bb0b67137bd37e258b188544b02e8bc9a4162f05e9dd2fb50ae78a",
+  "launch.json": "f0773c1ac0c15001684815718a139884d7e6ec1d54dc3a8d1b0c8636354355c6",
+  "src/main.rs": "bce0b3fe50ab9317de6b1cbb15c302541de6f028fecee1ccca3dee172965b59d",
+  "src/safety.rs": "0f784518e176a46eacb368f69bd6c0b594e0527e6f8acc888c17e773233f5e02",
+  "summary.json": "40074e1d8ac6d670c4c78e03874e03196f4974656a4d5b748fbcc09a35bcd6a5",
+  "terminal-red.log.gz": "aaf95c55391c1b438abab3ba6c373584dab130fbb85013f79e529c2ad0c9406b",
+  "tests-final.log.gz": "b882ee3b463c91cb536462df8017a332b1d2382b7f5da475bb1e9f238f550796"
+}

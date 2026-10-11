@@ -1,0 +1,21 @@
+{
+  "seed": 307,
+  "updates": 10001,
+  "parent_sha256": "2be83022bd828e62e66593cf7cb812dcd7e7e65fed0e59aa9865ee6af226df3b",
+  "reward": "posture-height minus 0.1 max segment angular speed squared / (8 rad/s)^2; subtract 1000 once on natural termination; later requests reward zero",
+  "actor_learning_rate": 3e-05,
+  "critic_learning_rate": 0.001,
+  "exploration": "calibrated 26 channel reset",
+  "epochs": 1,
+  "minibatch_sequences": 512,
+  "physics": "unchanged",
+  "qualification": false,
+  "source_sha256": {
+    "src/main.rs": "bce0b3fe50ab9317de6b1cbb15c302541de6f028fecee1ccca3dee172965b59d",
+    "src/safety.rs": "0f784518e176a46eacb368f69bd6c0b594e0527e6f8acc888c17e773233f5e02",
+    "Cargo.toml": "533f8a45f0dfbb6ca16df6f9798faa7c1ed87f7bce024e9a27b429c6b1ebd624",
+    "Cargo.lock": "61f3aeafc021c3d087ec1fb29148df87efdc645b14b511f31ae22a867a1134d2",
+    "initial-log-std.json": "4fb1a75112bb0b67137bd37e258b188544b02e8bc9a4162f05e9dd2fb50ae78a",
+    "trainer": "605de763c1097ca7c8340e2e3e15bebeef6e294f85caa027cd27a9e16ec25aa8"
+  }
+}

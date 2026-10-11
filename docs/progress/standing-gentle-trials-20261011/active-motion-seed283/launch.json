@@ -1,0 +1,23 @@
+{
+  "seed": 283,
+  "budget_updates": 10001,
+  "parent_sha256": "2be83022bd828e62e66593cf7cb812dcd7e7e65fed0e59aa9865ee6af226df3b",
+  "exploration": "reset calibrated 26 per-channel log standard deviations",
+  "actor_learning_rate": 3e-06,
+  "critic_learning_rate": 0.001,
+  "minibatch_sequences": 512,
+  "epochs": 1,
+  "reward": "unchanged posture-height minus 0.1 max segment angular speed squared / (8 rad/s)^2",
+  "physics": "unchanged original body, motors and physical termination",
+  "collector": "eight scoped native lanes; complete serial parity regression passed",
+  "qualification": false,
+  "promotion": "none; original selection, early motion and held-out gates remain required",
+  "source_sha256": {
+    "src/main.rs": "b8ad975d8acd5fb527dd8ef331879ee07153d0ba9d0af3ae28498b2aeef29066",
+    "src/safety.rs": "64c7977dc7681c4217b5347f07a99fcac936024b1a17002a06f6f46f6ceed513",
+    "Cargo.toml": "25442b6d6db114f6c0eafc5191391ba2221fb0e2c188104ae4d1e5f3292f6e04",
+    "Cargo.lock": "14e05b00e9639159426de295cd9d88e082817e115a33740fad12e7d48edb62e6",
+    "initial-log-std.json": "4fb1a75112bb0b67137bd37e258b188544b02e8bc9a4162f05e9dd2fb50ae78a",
+    "trainer": "a51dcb4c1e68bb18e7a4143d9032ad4bcbd9b380544e041be70fade735453c8c"
+  }
+}
