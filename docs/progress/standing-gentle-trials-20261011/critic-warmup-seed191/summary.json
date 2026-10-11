@@ -1,0 +1,18 @@
+{
+  "schema": "standing-critic-warmup-failed-trial-v1",
+  "status": "failed budget without promotion",
+  "seed": 191,
+  "actor_updates": 5001,
+  "actor_transitions": 2560512,
+  "critic_only_warmup_updates": 100,
+  "warmup_transitions": 51200,
+  "total_transitions": 2611712,
+  "selection_checkpoints": 251,
+  "passing_checkpoints": 0,
+  "held_out_evaluated": false,
+  "failed_reference_update": 800,
+  "failed_reference_sha256": "16b432b6670af0f5c96d9882b1e31308304d513011f590e57178ff82ac599284",
+  "failed_reference_mean_original_reward": 919.6607196033001,
+  "archive": "all optimizer, initialization and selection records plus parent and best failed reference weights; remaining weights preserved in the original cache",
+  "qualification": "no standing or limb-motion promotion"
+}

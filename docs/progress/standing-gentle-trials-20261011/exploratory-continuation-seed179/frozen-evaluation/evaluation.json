@@ -1,0 +1,717 @@
+{
+  "checkpoint_sha256": "bbe86ac6ebb4f7df65168c0a3850d7f4cbb7d45f1e7e2bfa05fcefb36a26633e",
+  "held_out": [
+    {
+      "final_distance": 0.10510120540857315,
+      "final_height": 0.9786348342895508,
+      "final_speed": 0.0243613813072443,
+      "final_upright": 0.9996699094772339,
+      "reward": 976.156423330307,
+      "seed": 18446744073709551614,
+      "stable_actions": 993,
+      "steps": 1000,
+      "supported": true,
+      "survived": true
+    },
+    {
+      "final_distance": 1.0022494792938232,
+      "final_height": 0.48924705386161804,
+      "final_speed": 2.5162243843078613,
+      "final_upright": 0.6010251641273499,
+      "reward": 153.71589879319072,
+      "seed": 18446744073709551613,
+      "stable_actions": 0,
+      "steps": 187,
+      "supported": false,
+      "survived": false
+    },
+    {
+      "final_distance": 0.09650037437677383,
+      "final_height": 0.9766340255737305,
+      "final_speed": 0.022231873124837875,
+      "final_upright": 0.9999005794525146,
+      "reward": 976.4614172577858,
+      "seed": 18446744073709551612,
+      "stable_actions": 992,
+      "steps": 1000,
+      "supported": true,
+      "survived": true
+    },
+    {
+      "final_distance": 0.11246307939291,
+      "final_height": 0.9779239892959595,
+      "final_speed": 0.018025506287813187,
+      "final_upright": 0.9994898438453674,
+      "reward": 975.4301726222038,
+      "seed": 18446744073709551611,
+      "stable_actions": 992,
+      "steps": 1000,
+      "supported": true,
+      "survived": true
+    },
+    {
+      "final_distance": 0.09999638795852661,
+      "final_height": 0.9771544933319092,
+      "final_speed": 0.026406433433294296,
+      "final_upright": 0.9986899495124817,
+      "reward": 975.9330159425735,
+      "seed": 18446744073709551610,
+      "stable_actions": 993,
+      "steps": 1000,
+      "supported": true,
+      "survived": true
+    },
+    {
+      "final_distance": 0.11409243196249008,
+      "final_height": 0.9776568412780762,
+      "final_speed": 0.03457668051123619,
+      "final_upright": 0.9992595911026001,
+      "reward": 974.1559714078903,
+      "seed": 18446744073709551609,
+      "stable_actions": 992,
+      "steps": 1000,
+      "supported": true,
+      "survived": true
+    },
+    {
+      "final_distance": 0.10819973796606064,
+      "final_height": 0.9766525030136108,
+      "final_speed": 0.00970226339995861,
+      "final_upright": 0.9995886087417603,
+      "reward": 975.9812157154083,
+      "seed": 18446744073709551608,
+      "stable_actions": 993,
+      "steps": 1000,
+      "supported": true,
+      "survived": true
+    },
+    {
+      "final_distance": 0.12915872037410736,
+      "final_height": 0.979279637336731,
+      "final_speed": 0.037204205989837646,
+      "final_upright": 0.9998766779899597,
+      "reward": 975.7899121642113,
+      "seed": 18446744073709551607,
+      "stable_actions": 993,
+      "steps": 1000,
+      "supported": true,
+      "survived": true
+    },
+    {
+      "final_distance": 0.10595985502004623,
+      "final_height": 0.9770345687866211,
+      "final_speed": 0.05215181037783623,
+      "final_upright": 0.9995676279067993,
+      "reward": 976.0916746258736,
+      "seed": 18446744073709551606,
+      "stable_actions": 993,
+      "steps": 1000,
+      "supported": true,
+      "survived": true
+    },
+    {
+      "final_distance": 0.10309910774230957,
+      "final_height": 0.9779155850410461,
+      "final_speed": 0.026078147813677788,
+      "final_upright": 0.9991296529769897,
+      "reward": 976.363054215908,
+      "seed": 18446744073709551605,
+      "stable_actions": 992,
+      "steps": 1000,
+      "supported": true,
+      "survived": true
+    },
+    {
+      "final_distance": 0.10175451636314392,
+      "final_height": 0.9779945015907288,
+      "final_speed": 0.05847959220409393,
+      "final_upright": 1.0,
+      "reward": 977.0123899579048,
+      "seed": 18446744073709551604,
+      "stable_actions": 992,
+      "steps": 1000,
+      "supported": true,
+      "survived": true
+    },
+    {
+      "final_distance": 0.11085771769285202,
+      "final_height": 0.9775746464729309,
+      "final_speed": 0.027299370616674423,
+      "final_upright": 0.9994523525238037,
+      "reward": 975.0035008788109,
+      "seed": 18446744073709551603,
+      "stable_actions": 993,
+      "steps": 1000,
+      "supported": true,
+      "survived": true
+    },
+    {
+      "final_distance": 0.12527957558631897,
+      "final_height": 0.9810346961021423,
+      "final_speed": 0.014836647547781467,
+      "final_upright": 0.9991355538368225,
+      "reward": 975.6828327178955,
+      "seed": 18446744073709551602,
+      "stable_actions": 992,
+      "steps": 1000,
+      "supported": true,
+      "survived": true
+    },
+    {
+      "final_distance": 0.10041516274213791,
+      "final_height": 0.9766438603401184,
+      "final_speed": 0.04811776429414749,
+      "final_upright": 0.9987878799438477,
+      "reward": 975.6757555007935,
+      "seed": 18446744073709551601,
+      "stable_actions": 992,
+      "steps": 1000,
+      "supported": true,
+      "survived": true
+    },
+    {
+      "final_distance": 0.1106550469994545,
+      "final_height": 0.9745610952377319,
+      "final_speed": 0.01884504221379757,
+      "final_upright": 0.9998902082443237,
+      "reward": 974.9541749954224,
+      "seed": 18446744073709551600,
+      "stable_actions": 993,
+      "steps": 1000,
+      "supported": true,
+      "survived": true
+    },
+    {
+      "final_distance": 1.0517843961715698,
+      "final_height": 0.6049119234085083,
+      "final_speed": 2.192990779876709,
+      "final_upright": 0.531718373298645,
+      "reward": 192.8526847139001,
+      "seed": 18446744073709551599,
+      "stable_actions": 0,
+      "steps": 228,
+      "supported": false,
+      "survived": false
+    },
+    {
+      "final_distance": 0.1079760491847992,
+      "final_height": 0.9779368042945862,
+      "final_speed": 0.049092136323451996,
+      "final_upright": 0.999460756778717,
+      "reward": 975.4479316473007,
+      "seed": 18446744073709551598,
+      "stable_actions": 992,
+      "steps": 1000,
+      "supported": true,
+      "survived": true
+    },
+    {
+      "final_distance": 0.11208535730838776,
+      "final_height": 0.9766185283660889,
+      "final_speed": 0.028993694111704826,
+      "final_upright": 0.9998725652694702,
+      "reward": 975.5217771530151,
+      "seed": 18446744073709551597,
+      "stable_actions": 993,
+      "steps": 1000,
+      "supported": true,
+      "survived": true
+    },
+    {
+      "final_distance": 0.7563135027885437,
+      "final_height": 0.4935787320137024,
+      "final_speed": 2.604137659072876,
+      "final_upright": 0.5442253351211548,
+      "reward": 351.0021855570376,
+      "seed": 18446744073709551596,
+      "stable_actions": 0,
+      "steps": 382,
+      "supported": false,
+      "survived": false
+    },
+    {
+      "final_distance": 0.09859897941350937,
+      "final_height": 0.9755139350891113,
+      "final_speed": 0.05371732637286186,
+      "final_upright": 0.9996307492256165,
+      "reward": 976.487413585186,
+      "seed": 18446744073709551595,
+      "stable_actions": 992,
+      "steps": 1000,
+      "supported": true,
+      "survived": true
+    },
+    {
+      "final_distance": 0.11431806534528732,
+      "final_height": 0.9771003127098083,
+      "final_speed": 0.04350115358829498,
+      "final_upright": 0.9996604919433594,
+      "reward": 976.8962333798409,
+      "seed": 18446744073709551594,
+      "stable_actions": 993,
+      "steps": 1000,
+      "supported": true,
+      "survived": true
+    },
+    {
+      "final_distance": 0.10114612430334091,
+      "final_height": 0.9772842526435852,
+      "final_speed": 0.05289367958903313,
+      "final_upright": 0.9992727041244507,
+      "reward": 976.5081760883331,
+      "seed": 18446744073709551593,
+      "stable_actions": 993,
+      "steps": 1000,
+      "supported": true,
+      "survived": true
+    },
+    {
+      "final_distance": 0.09307841211557388,
+      "final_height": 0.9767580628395081,
+      "final_speed": 0.026249496266245842,
+      "final_upright": 0.9991509318351746,
+      "reward": 977.0365983247757,
+      "seed": 18446744073709551592,
+      "stable_actions": 993,
+      "steps": 1000,
+      "supported": true,
+      "survived": true
+    },
+    {
+      "final_distance": 0.10026630759239197,
+      "final_height": 0.977531373500824,
+      "final_speed": 0.0315791517496109,
+      "final_upright": 0.9995167255401611,
+      "reward": 975.6847159862518,
+      "seed": 18446744073709551591,
+      "stable_actions": 992,
+      "steps": 1000,
+      "supported": true,
+      "survived": true
+    },
+    {
+      "final_distance": 0.10641048848628998,
+      "final_height": 0.9779490828514099,
+      "final_speed": 0.06680432707071304,
+      "final_upright": 0.9988775253295898,
+      "reward": 975.6221122145653,
+      "seed": 18446744073709551590,
+      "stable_actions": 993,
+      "steps": 1000,
+      "supported": true,
+      "survived": true
+    },
+    {
+      "final_distance": 0.09909933060407639,
+      "final_height": 0.9750503301620483,
+      "final_speed": 0.06619662791490555,
+      "final_upright": 0.9994772672653198,
+      "reward": 976.6337856054306,
+      "seed": 18446744073709551589,
+      "stable_actions": 993,
+      "steps": 1000,
+      "supported": true,
+      "survived": true
+    },
+    {
+      "final_distance": 0.09897135943174362,
+      "final_height": 0.9762458205223083,
+      "final_speed": 0.04680568724870682,
+      "final_upright": 0.9993363618850708,
+      "reward": 975.6032334566116,
+      "seed": 18446744073709551588,
+      "stable_actions": 993,
+      "steps": 1000,
+      "supported": true,
+      "survived": true
+    },
+    {
+      "final_distance": 0.09156758338212967,
+      "final_height": 0.9717414379119873,
+      "final_speed": 0.0229506678879261,
+      "final_upright": 0.9994308352470398,
+      "reward": 976.9013798236847,
+      "seed": 18446744073709551587,
+      "stable_actions": 993,
+      "steps": 1000,
+      "supported": true,
+      "survived": true
+    },
+    {
+      "final_distance": 0.08724173903465271,
+      "final_height": 0.9651986956596375,
+      "final_speed": 0.10166565328836441,
+      "final_upright": 0.9978954792022705,
+      "reward": 975.7324917912483,
+      "seed": 18446744073709551586,
+      "stable_actions": 993,
+      "steps": 1000,
+      "supported": true,
+      "survived": true
+    },
+    {
+      "final_distance": 0.10992651432752609,
+      "final_height": 0.9769293069839478,
+      "final_speed": 0.00964751373976469,
+      "final_upright": 0.9999311566352844,
+      "reward": 975.8572402000427,
+      "seed": 18446744073709551585,
+      "stable_actions": 993,
+      "steps": 1000,
+      "supported": true,
+      "survived": true
+    },
+    {
+      "final_distance": 0.8735589385032654,
+      "final_height": 0.4949236512184143,
+      "final_speed": 3.137376308441162,
+      "final_upright": 0.30568408966064453,
+      "reward": 888.3257246352732,
+      "seed": 18446744073709551584,
+      "stable_actions": 0,
+      "steps": 937,
+      "supported": false,
+      "survived": false
+    },
+    {
+      "final_distance": 0.11487087607383728,
+      "final_height": 0.9772967100143433,
+      "final_speed": 0.019323399290442467,
+      "final_upright": 0.9998902678489685,
+      "reward": 974.9531462788582,
+      "seed": 18446744073709551583,
+      "stable_actions": 993,
+      "steps": 1000,
+      "supported": true,
+      "survived": true
+    }
+  ],
+  "held_out_control": [
+    {
+      "checked_actions": 900,
+      "peak_rad_s": 4.096319577689459,
+      "seed": 18446744073709551614,
+      "steps": 1000,
+      "survived": true
+    },
+    {
+      "checked_actions": 87,
+      "peak_rad_s": 88.20247011325792,
+      "seed": 18446744073709551613,
+      "steps": 187,
+      "survived": false
+    },
+    {
+      "checked_actions": 900,
+      "peak_rad_s": 5.422259944697631,
+      "seed": 18446744073709551612,
+      "steps": 1000,
+      "survived": true
+    },
+    {
+      "checked_actions": 900,
+      "peak_rad_s": 5.525920930691333,
+      "seed": 18446744073709551611,
+      "steps": 1000,
+      "survived": true
+    },
+    {
+      "checked_actions": 900,
+      "peak_rad_s": 5.877646495031731,
+      "seed": 18446744073709551610,
+      "steps": 1000,
+      "survived": true
+    },
+    {
+      "checked_actions": 900,
+      "peak_rad_s": 4.245791890635402,
+      "seed": 18446744073709551609,
+      "steps": 1000,
+      "survived": true
+    },
+    {
+      "checked_actions": 900,
+      "peak_rad_s": 5.5246652577266655,
+      "seed": 18446744073709551608,
+      "steps": 1000,
+      "survived": true
+    },
+    {
+      "checked_actions": 900,
+      "peak_rad_s": 4.4184957043974356,
+      "seed": 18446744073709551607,
+      "steps": 1000,
+      "survived": true
+    },
+    {
+      "checked_actions": 900,
+      "peak_rad_s": 4.789846489340146,
+      "seed": 18446744073709551606,
+      "steps": 1000,
+      "survived": true
+    },
+    {
+      "checked_actions": 900,
+      "peak_rad_s": 5.893390939198471,
+      "seed": 18446744073709551605,
+      "steps": 1000,
+      "survived": true
+    },
+    {
+      "checked_actions": 900,
+      "peak_rad_s": 4.5048805176668925,
+      "seed": 18446744073709551604,
+      "steps": 1000,
+      "survived": true
+    },
+    {
+      "checked_actions": 900,
+      "peak_rad_s": 4.642428980818398,
+      "seed": 18446744073709551603,
+      "steps": 1000,
+      "survived": true
+    },
+    {
+      "checked_actions": 900,
+      "peak_rad_s": 5.242400885266756,
+      "seed": 18446744073709551602,
+      "steps": 1000,
+      "survived": true
+    },
+    {
+      "checked_actions": 900,
+      "peak_rad_s": 4.425306785958636,
+      "seed": 18446744073709551601,
+      "steps": 1000,
+      "survived": true
+    },
+    {
+      "checked_actions": 900,
+      "peak_rad_s": 4.972895897029289,
+      "seed": 18446744073709551600,
+      "steps": 1000,
+      "survived": true
+    },
+    {
+      "checked_actions": 128,
+      "peak_rad_s": 52.004621802926486,
+      "seed": 18446744073709551599,
+      "steps": 228,
+      "survived": false
+    },
+    {
+      "checked_actions": 900,
+      "peak_rad_s": 5.342646526030008,
+      "seed": 18446744073709551598,
+      "steps": 1000,
+      "survived": true
+    },
+    {
+      "checked_actions": 900,
+      "peak_rad_s": 4.34000989118736,
+      "seed": 18446744073709551597,
+      "steps": 1000,
+      "survived": true
+    },
+    {
+      "checked_actions": 282,
+      "peak_rad_s": 32.605989849427154,
+      "seed": 18446744073709551596,
+      "steps": 382,
+      "survived": false
+    },
+    {
+      "checked_actions": 900,
+      "peak_rad_s": 4.192320997115006,
+      "seed": 18446744073709551595,
+      "steps": 1000,
+      "survived": true
+    },
+    {
+      "checked_actions": 900,
+      "peak_rad_s": 6.408239026751188,
+      "seed": 18446744073709551594,
+      "steps": 1000,
+      "survived": true
+    },
+    {
+      "checked_actions": 900,
+      "peak_rad_s": 4.809380726997532,
+      "seed": 18446744073709551593,
+      "steps": 1000,
+      "survived": true
+    },
+    {
+      "checked_actions": 900,
+      "peak_rad_s": 5.583417890659732,
+      "seed": 18446744073709551592,
+      "steps": 1000,
+      "survived": true
+    },
+    {
+      "checked_actions": 900,
+      "peak_rad_s": 5.407051449517519,
+      "seed": 18446744073709551591,
+      "steps": 1000,
+      "survived": true
+    },
+    {
+      "checked_actions": 900,
+      "peak_rad_s": 6.1695399044859975,
+      "seed": 18446744073709551590,
+      "steps": 1000,
+      "survived": true
+    },
+    {
+      "checked_actions": 900,
+      "peak_rad_s": 4.19358752409539,
+      "seed": 18446744073709551589,
+      "steps": 1000,
+      "survived": true
+    },
+    {
+      "checked_actions": 900,
+      "peak_rad_s": 5.989418963678112,
+      "seed": 18446744073709551588,
+      "steps": 1000,
+      "survived": true
+    },
+    {
+      "checked_actions": 900,
+      "peak_rad_s": 4.284868784256325,
+      "seed": 18446744073709551587,
+      "steps": 1000,
+      "survived": true
+    },
+    {
+      "checked_actions": 900,
+      "peak_rad_s": 6.156477627176956,
+      "seed": 18446744073709551586,
+      "steps": 1000,
+      "survived": true
+    },
+    {
+      "checked_actions": 900,
+      "peak_rad_s": 5.756663864603976,
+      "seed": 18446744073709551585,
+      "steps": 1000,
+      "survived": true
+    },
+    {
+      "checked_actions": 837,
+      "peak_rad_s": 64.1910388776662,
+      "seed": 18446744073709551584,
+      "steps": 937,
+      "survived": false
+    },
+    {
+      "checked_actions": 900,
+      "peak_rad_s": 3.8707292300126737,
+      "seed": 18446744073709551583,
+      "steps": 1000,
+      "survived": true
+    }
+  ],
+  "passed": false,
+  "qualification": "pending full early-motion and browser inspection; no optimization or held-out ranking",
+  "schema": "standing-selected-frozen-evaluation-v1",
+  "selection": [
+    {
+      "final_distance": 0.10651428252458572,
+      "final_height": 0.9775263667106628,
+      "final_speed": 0.027071503922343254,
+      "final_upright": 0.9995906352996826,
+      "reward": 977.0808566212654,
+      "seed": 0,
+      "stable_actions": 993,
+      "steps": 1000,
+      "supported": true,
+      "survived": true
+    },
+    {
+      "final_distance": 0.1189771443605423,
+      "final_height": 0.9777196049690247,
+      "final_speed": 0.030265232548117638,
+      "final_upright": 0.9991009831428528,
+      "reward": 974.7941121459007,
+      "seed": 1,
+      "stable_actions": 993,
+      "steps": 1000,
+      "supported": true,
+      "survived": true
+    },
+    {
+      "final_distance": 0.1073804721236229,
+      "final_height": 0.9781342148780823,
+      "final_speed": 0.007105572614818811,
+      "final_upright": 0.9999057054519653,
+      "reward": 975.2062261104584,
+      "seed": 2,
+      "stable_actions": 992,
+      "steps": 1000,
+      "supported": true,
+      "survived": true
+    },
+    {
+      "final_distance": 0.1082020029425621,
+      "final_height": 0.9762810468673706,
+      "final_speed": 0.011833366937935352,
+      "final_upright": 0.9989464282989502,
+      "reward": 976.2456202507019,
+      "seed": 42,
+      "stable_actions": 993,
+      "steps": 1000,
+      "supported": true,
+      "survived": true
+    },
+    {
+      "final_distance": 0.13038846850395203,
+      "final_height": 0.9799887537956238,
+      "final_speed": 0.02804209664463997,
+      "final_upright": 0.999086856842041,
+      "reward": 976.9101331830025,
+      "seed": 18446744073709551615,
+      "stable_actions": 993,
+      "steps": 1000,
+      "supported": true,
+      "survived": true
+    }
+  ],
+  "selection_control": [
+    {
+      "checked_actions": 900,
+      "peak_rad_s": 4.737183950208984,
+      "seed": 0,
+      "steps": 1000,
+      "survived": true
+    },
+    {
+      "checked_actions": 900,
+      "peak_rad_s": 6.120712471632349,
+      "seed": 1,
+      "steps": 1000,
+      "survived": true
+    },
+    {
+      "checked_actions": 900,
+      "peak_rad_s": 4.986937187106429,
+      "seed": 2,
+      "steps": 1000,
+      "survived": true
+    },
+    {
+      "checked_actions": 900,
+      "peak_rad_s": 5.149366146423828,
+      "seed": 42,
+      "steps": 1000,
+      "survived": true
+    },
+    {
+      "checked_actions": 900,
+      "peak_rad_s": 5.205698430519747,
+      "seed": 18446744073709551615,
+      "steps": 1000,
+      "survived": true
+    }
+  ]
+}

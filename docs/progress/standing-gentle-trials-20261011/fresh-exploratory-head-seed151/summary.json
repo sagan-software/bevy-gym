@@ -1,0 +1,11 @@
+{
+  "seed": 151,
+  "completed_updates": 2001,
+  "collected_transitions": 1024512,
+  "selection_checkpoints": 101,
+  "passing_checkpoints": 0,
+  "best_failed_mean_original_return": 83.88810385093093,
+  "qualification": "failed selection; no held-out evaluation or promotion",
+  "archive": "complete optimization journal and selection metadata; best failed update1680 weights only; all other weights preserved in the original cache run",
+  "original_run": "/home/sagan/.cache/bevy-gym-quality-validation/standing-fresh-exploratory-head-probe-20261011/run"
+}

@@ -1,0 +1,38 @@
+{
+  "schema": "rl-research-continuation-launch-v1",
+  "source_base": "75ac19189fd11dcaa641b279dd85153a53030610",
+  "seed": 179,
+  "budget_updates": 10001,
+  "parent": {
+    "source_run": "standing-fresh-exploratory-head-probe-20261011",
+    "checkpoint": "standing-1680",
+    "seed": 151,
+    "update": 1680,
+    "transitions": 860160,
+    "sha256": "d7790e5e6623913a5bb36bf131643fd7d258af653968e0a7b87d44922520fc44",
+    "qualification": "failed selection; not promoted"
+  },
+  "initialization": "actor, critic and learned exploration retained; no head scaling or exploration reset; both Adam states deliberately fresh",
+  "config": {
+    "actor_hidden_size": 64,
+    "critic_hidden_sizes": [
+      128,
+      64
+    ],
+    "gamma": 0.995,
+    "gae_lambda": 0.95,
+    "actor_learning_rate": 0.0003,
+    "critic_learning_rate": 0.001,
+    "entropy_coefficient": 0.001,
+    "epochs": 4,
+    "initial_log_std": -2.0,
+    "log_std_min": -5.0,
+    "log_std_max": 1.0
+  },
+  "selection": "five fixed roots only; all original task and control gates; highest original return among passes; earliest update breaks ties; held-out excluded",
+  "qualification": "research only; no promotion on budget exhaustion",
+  "executable_sha256": "957f9033843d2a4b619829256fe26e74953b0107ead77e482f78a97d3ff2098a",
+  "program_sha256": "fc64642b2f6ae31a46639d7faf7bcb0f17a74d520de0fb32ddf1593dcccb5538",
+  "manifest_sha256": "40d9a38e0ac3d4a13ba159f27acb20ac0b8336fabc7344522941e08a34735cec",
+  "lock_sha256": "9ef4a3a7b7ab2e9de11b78eaf1e43fd1f72f3a0e1c6c7ad2b717002b992a83a5"
+}

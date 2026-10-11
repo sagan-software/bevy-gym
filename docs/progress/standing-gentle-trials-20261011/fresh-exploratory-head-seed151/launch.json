@@ -1,0 +1,27 @@
+{
+  "schema": "standing-fresh-exploratory-head-launch-v1",
+  "source_base": "4b8ab70011c6da0b29716a10ea6dffefb9f53242",
+  "seed": 151,
+  "budget_updates": 2001,
+  "initialization": {
+    "kind": "fresh seeded RL network",
+    "mean_head_scale": 0.01,
+    "initial_log_std": -2.0,
+    "log_std_min": -5.0,
+    "log_std_max": 1.0,
+    "actor_learning_rate": 0.0003,
+    "critic_learning_rate": 0.001,
+    "entropy_coefficient": 0.001,
+    "epochs": 4
+  },
+  "reward": "droid-standing-posture-quiet-reward-v1",
+  "selection": "five fixed seeds; require original standing and motion checks; rank highest original return with earliest update tie break; held-out excluded",
+  "qualification": "research only; no promotion on budget exhaustion",
+  "comparison": "Fresh gentle runs used initial log std -5 and actor learning rate 0.00003; this trial tests the original standing noise and optimizer with the reduced fresh mean head.",
+  "executable_sha256": "98fd51f66d3796625f3254b726897e9636fc118516090c046664dc2ce3907949",
+  "program_sha256": "84e529afae7cc7cf117dbfeeb9d508679ecc8285db9b1d9079a12664c48ef585",
+  "manifest_sha256": "15d230744a0c73b22c7970f8dc73c3c713d24cc3eae03f53b17052e3d828b155",
+  "lock_sha256": "95c9a90ae6de2608e2392e049d3f928dffc95201809bd9388f267dc71b51f63d",
+  "source_patch_sha256": "a2faaf9c925d9ab76077c52811399038a3254ff2a654abb53145a85cf78b520e",
+  "candidate_rule_sha256": "cecf1d85f17238a90384ae77a2ed5bc0fbc7ce6ab060a400760169b94a901d5e"
+}

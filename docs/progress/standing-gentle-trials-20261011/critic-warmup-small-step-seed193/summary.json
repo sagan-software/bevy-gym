@@ -1,0 +1,13 @@
+{
+  "schema": "standing-failed-research-v1",
+  "seed": 193,
+  "qualification": false,
+  "budget_updates": 5001,
+  "selection_checkpoints": 251,
+  "passing_selection_updates": [],
+  "reference_update": 4820,
+  "reference_sha256": "0048d6c6e3932f29c48b10ff8701d3c3919d2be9df4b90c846ec31acb6a0d7ba",
+  "reference_mean_original_reward": 921.4122310876846,
+  "held_out_evaluated": false,
+  "archive": "All optimizer, initialization and selection records; reference and parent weights when present. Every original weight and executable remains in the cache."
+}

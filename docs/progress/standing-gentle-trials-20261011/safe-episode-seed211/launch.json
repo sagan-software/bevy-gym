@@ -1,0 +1,33 @@
+{
+  "schema": "standing-safe-episode-launch-v1",
+  "source_base": "37342dda49766f97b31125fb8122124d3de9b741",
+  "seed": 211,
+  "budget_updates": 501,
+  "planned_transitions": 256512,
+  "actor_features": 204,
+  "torque_channels": 26,
+  "body": "original thirteen cuboids, 70 kg, direct bounded torques, four 5 ms substeps per action",
+  "reward": "original posture-height reward minus 0.1 mean squared torque fraction; peak segment speed above 8 rad/s terminates training with reward -1 from the first action",
+  "qualification": "original standing and post-settling control selection gates unchanged; held-out evaluation and early-motion inspection required",
+  "config": {
+    "actor_learning_rate": 0.0003,
+    "critic_learning_rate": 0.001,
+    "epochs": 4,
+    "initial_log_std": -5,
+    "log_std_min": -5,
+    "log_std_max": 1,
+    "mean_head_scale": 0.01,
+    "entropy_coefficient": 0
+  },
+  "tests": "36 tests passed, including added boundary, exact physical-state, freeze and reset cases",
+  "strict_lint": "all-target/all-feature Clippy passed using the existing repository configuration; only imported collector type-complexity follows its owning repository allowance",
+  "sha256": {
+    "Cargo.toml": "55f2b19e561f40bbd44fc1a9d35f11298ea05a7eb83d9eb9d376bb452a683558",
+    "Cargo.lock": "f91096feb2293e484cbfbe1af04ee51ded295954407142c23d6923dd497900be",
+    "src/main.rs": "a66b24b9779ab2b42f80537dae1872894316e290be65221ce00a7d643780cdf4",
+    "src/safety.rs": "813e9ee033540c98945bbf8a38be9ef0310736a632db69c8fc1f643c8121860c",
+    "training-executable": "0e4ea519329b8963350fda52f5cb512ad2f7951b0496fa3c4cb20a5a5571c785",
+    "dependency-source-sha256.json": "5f5d7b146a5422bdb004c89ef79670d4f395bf32dbe9b512ea082c47695bf5d0",
+    "candidate-rule.json": "54c2a4bc569f0041728e84c93ba1044f3fe95b74d4bd04de806ced1c17ce1fe9"
+  }
+}

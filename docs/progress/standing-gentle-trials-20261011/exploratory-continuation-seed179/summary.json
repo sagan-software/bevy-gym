@@ -1,0 +1,19 @@
+{
+  "schema": "standing-failed-research-v1",
+  "seed": 179,
+  "qualification": false,
+  "budget_updates": 10001,
+  "selection_checkpoints": 501,
+  "passing_selection_updates": [
+    8720
+  ],
+  "reference_update": 8720,
+  "reference_sha256": "bbe86ac6ebb4f7df65168c0a3850d7f4cbb7d45f1e7e2bfa05fcefb36a26633e",
+  "reference_mean_original_reward": 976.0473896622658,
+  "held_out_evaluated": true,
+  "archive": "All optimizer, initialization and selection records; reference and parent weights when present. Every original weight and executable remains in the cache.",
+  "held_out_passed": false,
+  "held_out_survived": 28,
+  "held_out_episodes": 32,
+  "rejection": "Four held-out episodes failed; first-action arm speed is about 157 rad/s. No promotion."
+}

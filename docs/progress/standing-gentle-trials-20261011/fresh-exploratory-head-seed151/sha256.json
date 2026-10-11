@@ -1,0 +1,12 @@
+{
+  "Cargo.lock": "95c9a90ae6de2608e2392e049d3f928dffc95201809bd9388f267dc71b51f63d",
+  "Cargo.toml": "15d230744a0c73b22c7970f8dc73c3c713d24cc3eae03f53b17052e3d828b155",
+  "build.sh": "26b0999499b87f3a7ff921713801cece1b9fcfbcb68f46ffb4bb1d1cf277c4a6",
+  "candidate-rule.json": "cecf1d85f17238a90384ae77a2ed5bc0fbc7ce6ab060a400760169b94a901d5e",
+  "launch.json": "d7a99909b2f5ecb7ce3884924b37359b836f982a7eee2a5ad261b025c7c381be",
+  "run.log.gz": "e9a771d4cb268e2c5fb5130756145fa57ee426cb7a21b1d40d1933b7bdad3c40",
+  "run.tar.gz": "ab5b2782263b3991640bd4cc0b5fd4adcb42bd28ef50b45e7ec81811c3631990",
+  "source.patch.gz": "27da53390ba65a78e5daf67c8e3ff00b0d5cb20fc5f35944b18b6d369c8ada0c",
+  "src/main.rs": "84e529afae7cc7cf117dbfeeb9d508679ecc8285db9b1d9079a12664c48ef585",
+  "summary.json": "56779a42001831761eeae58424506ad40ec395812133bada96d405dafff01ba4"
+}

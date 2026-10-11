@@ -856,3 +856,34 @@ personal lints, and fresh coverage of all 16 projection regions. The pinned
 retains identity through `Param::map`; its bytes match the installed dependency.
 This optimizer correction requires new physical evaluation. It does not qualify
 an existing standing, walking or competitive policy.
+
+
+## Full episode and early motion failures
+
+The [fresh seed-151 run](progress/standing-gentle-trials-20261011/fresh-exploratory-head-seed151/summary.json)
+and [critic warm-up seed-191 run](progress/standing-gentle-trials-20261011/critic-warmup-seed191/summary.json)
+failed selection. The [smaller-step seed-193 continuation](progress/standing-gentle-trials-20261011/critic-warmup-small-step-seed193/summary.json)
+completed 5,001 actor updates after 100 critic-only updates. It also failed every
+selection checkpoint. Long survival alone does not establish controlled movement.
+
+The [seed-179 continuation](progress/standing-gentle-trials-20261011/exploratory-continuation-seed179/summary.json)
+completed 10,001 updates. Only update 8,720 passed all five original standing and
+post-settling limb-control selection cases. The predeclared selection rule selected
+that candidate without held-out ranking. Frozen evaluation reproduced selection,
+but only 28 of 32 held-out episodes survived. Its first-action arm speed was about
+157 rad/s. The candidate remains rejected. All selection records, selected bytes,
+frozen evaluator source and full selection motion traces are retained.
+
+The [passive comparison](progress/standing-gentle-trials-20261011/motion-diagnosis/summary.json)
+uses zero torque only as an isolated mechanics fixture. Its first-action segment
+speeds stayed below 0.0002 rad/s across the five selection roots, then the body fell
+within 24–26 actions. This does not establish a qualified controller or a solver defect.
+
+The [seed-211 stronger-motion pilot](progress/standing-gentle-trials-20261011/safe-episode-seed211/summary.json)
+terminates training when any segment exceeds 8 rad/s, including the first action.
+Its training reward subtracts 0.1 times mean squared torque fraction from the original
+posture-height reward; a speed-limit failure returns -1. Original bodies, torque
+bounds, integration and qualification gates remain unchanged. All 501 updates failed
+selection. Short episodes split a 512-transition rollout into many recurrent sequences;
+eight-sequence minibatches and four epochs produced up to 256 optimizer steps per
+update. These research records do not qualify standing, walking or combat.

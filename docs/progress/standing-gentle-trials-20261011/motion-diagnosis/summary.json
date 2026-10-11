@@ -1,0 +1,35 @@
+{
+  "schema": "standing-motion-diagnostic-v1",
+  "qualification": false,
+  "fixture": "zero torque isolated mechanics comparison, not an autonomous agent or training substitute",
+  "original_policy_sha256": "657f1cbe1fad9cf0782ceac76a51490cdca93b6d51c54366faa26be7ac264b6d",
+  "root42_policy_first_action_peak_rad_s": 157.28947762581518,
+  "passive": [
+    {
+      "seed": 0,
+      "first_action_peak_rad_s": 0.0001136275241151452,
+      "final_action": 24
+    },
+    {
+      "seed": 1,
+      "first_action_peak_rad_s": 0.0001885145902633667,
+      "final_action": 26
+    },
+    {
+      "seed": 2,
+      "first_action_peak_rad_s": 8.016916399355978e-05,
+      "final_action": 26
+    },
+    {
+      "seed": 42,
+      "first_action_peak_rad_s": 0.0001306334015680477,
+      "final_action": 24
+    },
+    {
+      "seed": 18446744073709551615,
+      "first_action_peak_rad_s": 7.611297041876242e-05,
+      "final_action": 26
+    }
+  ],
+  "conclusion": "The immediate arm spike is absent under passive zero torque; the passive body subsequently falls. No solver or body change is established."
+}

@@ -1,0 +1,32 @@
+{
+  "schema": "standing-critic-warmup-small-step-launch-v1",
+  "source_base": "75ac19189fd11dcaa641b279dd85153a53030610",
+  "seed": 193,
+  "actor_updates_budget": 5001,
+  "critic_only_warmup_updates": 100,
+  "critic_warmup_root": 197,
+  "warmup_transitions": 51200,
+  "parent_sha256": "657f1cbe1fad9cf0782ceac76a51490cdca93b6d51c54366faa26be7ac264b6d",
+  "initialization": "parent seed43 update100 recurrent actor and mean head retained; fresh critic and Adam; exploration explicitly reset to -7 with [-9,1] bounds",
+  "training_reward": "PostureQuietV1; original physics and standing/control selection gates unchanged",
+  "selection_roots": [
+    0,
+    1,
+    2,
+    42,
+    18446744073709551615
+  ],
+  "qualification": "research only; budget exhaustion never promotes",
+  "hashes": {
+    "src/main.rs": "20cd987f02f966a3e7e739f731c42427f110668310d8d790184e9e1b217beb14",
+    "Cargo.toml": "6358a0b24813f0e1d0f2b21f2bae97152ed1d83d89fb4dce84bc4182f27bc9e2",
+    "Cargo.lock": "5cc90f3a2c391851be4cd6285d805683c891b817f7e8138de2fb2fda113ff71f",
+    "training-executable": "02521f653b823566992f16e9a9d84309f960175c6c14adf15a89e363d09f13e3",
+    "source.patch": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "candidate-rule.json": "cecf1d85f17238a90384ae77a2ed5bc0fbc7ce6ab060a400760169b94a901d5e"
+  },
+  "actor_learning_rate": 1e-06,
+  "critic_learning_rate": 0.001,
+  "entropy_coefficient": 0.0,
+  "epochs": 1
+}
