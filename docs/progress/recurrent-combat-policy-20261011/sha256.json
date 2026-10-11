@@ -1,0 +1,15 @@
+{
+  "0.json.gz": "7a80cc1442809d674bf784fe9309dca997df9ff4bd2711ac8e2826be86c2e0b7",
+  "0.log.gz": "dac8309794a55be8f4e62b7c8f0aafff0ba8d35c4ccbb1404e4a9aa7ccf1ee68",
+  "1.json.gz": "bf4b3c4976226c108c0753a9a15f18d0c5d8288a14267935ebecd6f60e09816f",
+  "1.log.gz": "7c1c142dc5a2a0abe2dbb0304c12f379ff820e2068195534e26514ea3d57c603",
+  "acceptance.json": "4e186d57c1552d5d191eab16dc75f1309b68dc2c1cde8812359cb18bc9a43ecc",
+  "combat-coverage-v7.log.gz": "1d17305f85580f28988353c4b91ec006be4d2a03643bb822d139a96c99f87d06",
+  "combat-native-v8.log.gz": "41cf402c88d12eaa8e7b72776609be93ee0d6878a287d233ec9f03b7d60db974",
+  "combat-personal-v9.log.gz": "ea714905e1cca2eb12b5369f4fd2abc1a37ee5d2884e30be28962fb577abec8d",
+  "combat-public-red.log.gz": "1d560a28861aa11e7cb30de2de22a1ab98e0a65e5eb44c9ec672c9f345b0d32a",
+  "combat-wasm-v8.log.gz": "eaba206f6e7050a6c9a3226dbaf5593177ec0e32f86c3f053f8a60406aa5e4bf",
+  "coverage.json": "68fda33abc6086eefc362ce04b7a61d00fd6d630466a85915058b1f45f6047c4",
+  "primary-sources.json": "d7aec7b6d01bc42689e4d3df525a2335fe89460f591ce6f7d5bc7bad442515c9",
+  "summary.json": "03ac2f8c52906f3a81e7f0419e9a187b2851a4a3a4f544986f654157482af08b"
+}

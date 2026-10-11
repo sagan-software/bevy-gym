@@ -197,3 +197,10 @@ unqualified droid policy. This correction does not
 establish walking, combat, or competitive qualification. The
 [standing experiments](DROID_STANDING.md#recorded-optimizer-and-selection-experiments)
 record the failed candidates and the measured limb-motion problem.
+
+## Joint policy optimizer
+
+The [joint recurrent policy](RECURRENT_COMBAT_POLICY.md) now supports continuous
+commands and categorical trigger-request/alert-state choices with one PPO ratio.
+Its diagnostic learns through actual PPO and reloads the trained weights unchanged.
+The physical combat environment and batched two-team collector remain unfinished.

@@ -1,0 +1,21 @@
+{
+  "schema": "recurrent-combat-policy-verification-v1",
+  "source_base": "37342dda49766f97b31125fb8122124d3de9b741",
+  "behavior": "shared recurrent continuous and categorical actor; one joint log probability and PPO clip; private lane memories and training-only centralized critic",
+  "learning_test": "200 actual PPO updates, 6400 transitions, rewarded categorical probability increases by more than 0.3; trained weights reload with identical probabilities, complete sampled decisions and bytes",
+  "native": "exact format, strict all-target/all-feature Clippy, full default and robots suites passed",
+  "personal": "exact changed-range all-target/all-feature personal workflow passed without changed diagnostics",
+  "wasm": "exact drone-browser-check passed, including all six recurrent_combat tests",
+  "instrumented_suite": "134 library tests and six public combat tests passed",
+  "fresh_coverage_suite": "29 recurrent library tests and six public combat tests passed in separately exported instrumented objects; LLVM export stderr empty",
+  "recorded_branch_sides": "all eight sides of four recorded branches hit; this does not claim every Rust decision is instrumented",
+  "coverage_gaps": {
+    "agent.rs:106,107,108,111": "positive-width error propagation after configuration has already rejected zero dimensions",
+    "policy.rs:103-108": "categorical draw outside normalized finite fixed-column mass cannot arise from the valid sampler",
+    "policy.rs:185-190": "closed CombatSignal indices cannot lie outside the fixed eight columns",
+    "policy.rs:226-228,249-250": "fixed float backend conversion and revalidation failures cannot arise from the validated network shapes and finite bounded LSTM state",
+    "policy.rs:276-282": "fixed in-memory named-record serializer has no externally injectable failure",
+    "policy.rs:331-334": "positive-width error propagation after configuration has already rejected zero dimensions"
+  },
+  "limits": "PPO plumbing only; no physical combat environment, team rollout collector, qualified standing, walking or fighting policy is provided. Gaussian learner and its entropy metrics retain their existing contract."
+}

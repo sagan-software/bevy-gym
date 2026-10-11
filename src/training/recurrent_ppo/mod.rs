@@ -5,6 +5,8 @@
 //! centralized training data unreachable from decentralized execution.
 
 mod checkpoint;
+/// Joint continuous and categorical recurrent policies for combat.
+pub mod combat;
 
 use std::error::Error;
 use std::fmt;

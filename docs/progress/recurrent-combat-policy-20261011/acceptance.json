@@ -1,0 +1,8 @@
+{
+  "states": ["eight closed joint trigger and alert signals", "validated frozen policy", "validated trainable agent", "intact per-agent recurrent trajectory"],
+  "boundaries": ["finite local observations and private memory", "finite separate centralized critic state", "validated dimensions and motor bounds", "one categorical signal per stored joint log probability", "distinct checkpoint record rejects legacy Gaussian bytes"],
+  "derived": ["one shared recurrent update supplies both heads", "joint log probability is Gaussian corrected density plus categorical log probability", "one joint ratio is clipped once", "one intact lane retains its initial memory"],
+  "cost": "Actor minibatches retain O(lanes times maximum unroll length times feature width) tensors. Host actions retain O(action width) storage. Checkpoint serialization is cold.",
+  "gates": ["genuine external missing-API regression", "guide imports with skeletal signatures", "focused public learning and boundary tests", "private joint-ratio, masking and probability tests", "native format/full tests/strict Clippy/personal lints", "WASM learning, checkpoint and action parity", "fresh coverage of reachable production branches", "final prose followed by guide and documentation tests"],
+  "limits": ["bandit learning proves joint PPO plumbing only", "physical standing, walking and competitive fighting require independent qualification"]
+}

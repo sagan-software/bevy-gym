@@ -1,0 +1,297 @@
+{
+  "objects": [
+    {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/coverage-target/debug/deps/recurrent_combat-347d404dcf7d34ba",
+      "sha256": "69db1a06f259ab99c50ae2fc4e5eff6cd7d65e86fa40ee968b4c61dc2d61ba2a"
+    },
+    {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/coverage-target/debug/deps/bevy_gym-9f05a11a7fb84d39",
+      "sha256": "cd54d712834242897bcbed0ba51d2e07b87ea25798b81d96f88c13a79096a4ca"
+    }
+  ],
+  "exports": [
+    "/home/sagan/.cache/bevy-gym-quality-validation/combat-fresh-coverage-v5/0.json",
+    "/home/sagan/.cache/bevy-gym-quality-validation/combat-fresh-coverage-v5/1.json"
+  ],
+  "mod.rs": {
+    "hit": 8,
+    "total": 8,
+    "zero_regions": [],
+    "branches": [],
+    "zero_branch_sides": [],
+    "source_sha256": "f72c327c577993010d27571e9f4499af8825601af266faea4b2b4e885bdd8cac"
+  },
+  "action.rs": {
+    "hit": 0,
+    "total": 0,
+    "zero_regions": [],
+    "branches": [],
+    "zero_branch_sides": [],
+    "source_sha256": "0a4ba70336770c27c719f29d81dd002718d5ca1ba009d64c4624f2940eaabcbc"
+  },
+  "actor.rs": {
+    "hit": 47,
+    "total": 47,
+    "zero_regions": [],
+    "branches": [],
+    "zero_branch_sides": [],
+    "source_sha256": "a54a7aca4a16bfa5582de1c87d44bf8ea5e616318599b10db065ffeefa1c1d45"
+  },
+  "agent.rs": {
+    "hit": 707,
+    "total": 711,
+    "zero_regions": [
+      [
+        106,
+        68,
+        106,
+        69
+      ],
+      [
+        107,
+        70,
+        107,
+        71
+      ],
+      [
+        108,
+        60,
+        108,
+        61
+      ],
+      [
+        111,
+        73,
+        111,
+        74
+      ]
+    ],
+    "branches": [
+      {
+        "range": [
+          145,
+          12,
+          145,
+          32
+        ],
+        "hits": [
+          1,
+          207
+        ]
+      }
+    ],
+    "zero_branch_sides": [],
+    "source_sha256": "44bfe9974d92fce5ea71406f4e3fe4e2e3e2e0bef4f2f3ddc76265d0f1143107"
+  },
+  "policy.rs": {
+    "hit": 337,
+    "total": 359,
+    "zero_regions": [
+      [
+        103,
+        28,
+        103,
+        29
+      ],
+      [
+        104,
+        17,
+        104,
+        50
+      ],
+      [
+        108,
+        13,
+        108,
+        14
+      ],
+      [
+        185,
+        32,
+        185,
+        33
+      ],
+      [
+        186,
+        21,
+        186,
+        54
+      ],
+      [
+        190,
+        17,
+        190,
+        18
+      ],
+      [
+        276,
+        30,
+        276,
+        31
+      ],
+      [
+        277,
+        17,
+        281,
+        19
+      ],
+      [
+        277,
+        47,
+        277,
+        67
+      ],
+      [
+        278,
+        21,
+        278,
+        46
+      ],
+      [
+        282,
+        13,
+        282,
+        14
+      ],
+      [
+        226,
+        49,
+        226,
+        50
+      ],
+      [
+        227,
+        55,
+        227,
+        56
+      ],
+      [
+        228,
+        53,
+        228,
+        54
+      ],
+      [
+        249,
+        58,
+        249,
+        59
+      ],
+      [
+        250,
+        57,
+        250,
+        58
+      ],
+      [
+        108,
+        15,
+        108,
+        16
+      ],
+      [
+        190,
+        19,
+        190,
+        20
+      ],
+      [
+        331,
+        65,
+        331,
+        66
+      ],
+      [
+        332,
+        60,
+        332,
+        61
+      ],
+      [
+        333,
+        55,
+        333,
+        56
+      ],
+      [
+        334,
+        73,
+        334,
+        74
+      ]
+    ],
+    "branches": [
+      {
+        "range": [
+          128,
+          16,
+          128,
+          37
+        ],
+        "hits": [
+          36,
+          60
+        ]
+      },
+      {
+        "range": [
+          142,
+          12,
+          142,
+          43
+        ],
+        "hits": [
+          1,
+          6404
+        ]
+      }
+    ],
+    "zero_branch_sides": [],
+    "source_sha256": "11773183176597f2b1f294d06ebe2fa2080f1582da8ff5d7aed9b3bb9e802cbb"
+  },
+  "sequence.rs": {
+    "hit": 16,
+    "total": 16,
+    "zero_regions": [],
+    "branches": [
+      {
+        "range": [
+          33,
+          12,
+          33,
+          68
+        ],
+        "hits": [
+          1,
+          207
+        ]
+      }
+    ],
+    "zero_branch_sides": [],
+    "source_sha256": "7b5eedd9d12b3bcd0ff4f101713cf33986e40f32b63cbb02fba038400ace247b"
+  },
+  "signal.rs": {
+    "hit": 11,
+    "total": 11,
+    "zero_regions": [],
+    "branches": [],
+    "zero_branch_sides": [],
+    "source_sha256": "83719f307b41a60e0ba7f1ec0c365c5c72dd3a7a402430820030f2f125fb5f7e"
+  },
+  "checkpoint.rs": {
+    "hit": 14,
+    "total": 14,
+    "zero_regions": [],
+    "branches": [],
+    "zero_branch_sides": [],
+    "source_sha256": "fe2d7a84a1256304e89c487f306194e291b1ff68f4140eb1c4fc085197e36401"
+  },
+  "update.rs": {
+    "hit": 0,
+    "total": 0,
+    "zero_regions": [],
+    "branches": [],
+    "zero_branch_sides": [],
+    "source_sha256": "7d7b0701402c4ecd14f8076195da2fb961c21f14d2ee06c8d76abfed2492e0c4"
+  }
+}

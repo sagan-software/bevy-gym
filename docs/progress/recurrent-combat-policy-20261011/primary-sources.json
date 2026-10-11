@@ -1,0 +1,13 @@
+{
+  "burn": {
+    "version": "0.21.0",
+    "url": "https://docs.rs/burn/0.21.0/burn/tensor/activation/fn.log_softmax.html",
+    "sha256": "f69bf1eea621f93a0855f20d574e6e28d6334225dc97eefe0b0cc55b85369a82"
+  },
+  "joint_distribution_reference": {
+    "source": "MAPPO official ACTLayer mixed branch",
+    "url": "https://github.com/marlbenchmark/on-policy/blob/de66d7a4b23fac2513f56f96f73b3f5cb96695ac/onpolicy/algorithms/utils/act.py",
+    "local_reference": "/home/sagan/.cache/bevy-gym-quality-validation/mappo-act-reference.py",
+    "policy": "Gaussian corrected log density and categorical log probability must sum before the single PPO ratio and clip operation"
+  }
+}

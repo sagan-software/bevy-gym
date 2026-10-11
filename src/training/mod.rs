@@ -92,3 +92,10 @@ pub use tensor::{
     ActionSpec, ContinuousActionSpec, DiscreteActionSpec, ObservationSpec, TensorDType,
     TensorizationError,
 };
+
+#[cfg(any(not(target_arch = "wasm32"), feature = "browser-training"))]
+pub use recurrent_ppo::combat::RecurrentCombatAgent;
+pub use recurrent_ppo::combat::{
+    CombatSignal, RecurrentCombatAction, RecurrentCombatPolicy, RecurrentCombatSequence,
+    RecurrentCombatUpdate,
+};

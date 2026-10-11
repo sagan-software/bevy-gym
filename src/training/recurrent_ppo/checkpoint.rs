@@ -18,9 +18,30 @@ pub(super) fn validate(
     actions: usize,
     config: &RecurrentPpoConfig,
 ) -> Result<(), RecurrentPpoError> {
+    validate_parts(
+        &record.actor,
+        &record.critic,
+        observations,
+        global,
+        values,
+        actions,
+        config,
+    )
+}
+
+/// Validate borrowed shared actor and critic tensors for either checkpoint profile.
+pub(super) fn validate_parts(
+    actor: &super::RecurrentActorRecord<InferenceBackend>,
+    critic: &super::CentralCriticRecord<InferenceBackend>,
+    observations: usize,
+    global: usize,
+    values: usize,
+    actions: usize,
+    config: &RecurrentPpoConfig,
+) -> Result<(), RecurrentPpoError> {
     // Validate all four LSTM gates before any tensor reaches a matrix product.
     let hidden = config.actor_hidden_size;
-    let memory = &record.actor.memory;
+    let memory = &actor.memory;
     for gate in [
         &memory.input_gate,
         &memory.forget_gate,
@@ -30,11 +51,11 @@ pub(super) fn validate(
         linear(&gate.input_transform, observations, hidden)?;
         linear(&gate.hidden_transform, hidden, hidden)?;
     }
-    linear(&record.actor.mean_head, hidden, actions)?;
-    parameter(&record.actor.log_std, [actions])?;
+    linear(&actor.mean_head, hidden, actions)?;
+    parameter(&actor.log_std, [actions])?;
 
     // A record must supply exactly one layer for every declared critic edge.
-    if record.critic.layers.len() != config.critic_hidden_sizes.len() + 1 {
+    if critic.layers.len() != config.critic_hidden_sizes.len() + 1 {
         return Err(RecurrentPpoError::invalid_config(
             "checkpoint",
             "critic layer count differs from the declared architecture",
@@ -46,14 +67,14 @@ pub(super) fn validate(
         .iter()
         .copied()
         .chain(std::iter::once(values));
-    for (layer, (input, output)) in record.critic.layers.iter().zip(inputs.zip(outputs)) {
+    for (layer, (input, output)) in critic.layers.iter().zip(inputs.zip(outputs)) {
         linear(layer, input, output)?;
     }
     Ok(())
 }
 
 /// Require a biased affine layer with finite parameters of the declared shape.
-fn linear(
+pub(super) fn linear(
     record: &LinearRecord<InferenceBackend>,
     input: usize,
     output: usize,
