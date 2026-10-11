@@ -643,3 +643,11 @@ actuators, PPO settings, and every near/far/fast gate. Its success is unproven.
 The original trial remains preserved. A separate seed-11 experiment runs under
 `bevy-gym-travel-endurance-seed11-20261009.service`, with artifacts in
 `runs/drone-travel/endurance-seed11-20261009`. Neither trial establishes travel competence.
+
+## Arrival scene test repair
+
+The scene tests now use the fifteen-feature arrival policy and its 500-action
+horizon. The four scene suites pass natively and in WASM.
+[Validation evidence](progress/drone-arrival-ci-repair-20261011/summary.json) records
+the previous CI failure and the repair. This test repair does not qualify droids
+or competitive combat.

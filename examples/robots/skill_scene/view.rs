@@ -435,24 +435,24 @@ mod tests {
     /// Travel playback and telemetry use the same immutable task and episode limits.
     #[test]
     fn travel_controls_preserve_actions_and_show_the_full_horizon() {
-        use super::super::{presentation::SceneSession, travel};
+        use super::super::{arrival, presentation::SceneSession};
         let mut viewer = Viewer {
-            title: "Travel trial",
-            session: travel::load(
-                include_bytes!("../../../docs/progress/drone-travel-trial.mpk").to_vec(),
+            title: "Travel",
+            session: arrival::load(
+                include_bytes!("../../../docs/progress/drone-arrival.mpk").to_vec(),
                 42,
             )
             .map(SceneSession::Travel)
             .map_err(|error| error.to_string()),
-            checkpoint_label: "Unqualified RL trial".to_owned(),
+            checkpoint_label: "Frozen RL arrival".to_owned(),
             playback: Playback::Paused,
         };
-        let session = viewer.session.as_ref().expect("trial loads");
-        assert_eq!(session.horizon(), 1_000);
+        let session = viewer.session.as_ref().expect("arrival loads");
+        assert_eq!(session.horizon(), 500);
         assert!(session.destination().is_some());
         assert!(session.error().is_none());
         let text = telemetry(session, &viewer.playback);
-        assert!(text.starts_with("Paused · 0/1000 actions"));
+        assert!(text.starts_with("Paused · 0/500 actions"));
         assert!(text.contains("Heading error"));
         assert!(text.contains("m/s"));
         apply(Control::Step, &mut viewer);
@@ -469,27 +469,36 @@ mod tests {
             telemetry(viewer.session.as_ref().expect("running"), &viewer.playback)
                 .starts_with("Running")
         );
-        let session = viewer.session.as_mut().expect("valid trial");
+        let session = viewer.session.as_mut().expect("valid arrival");
         while !session.status().is_done() {
             session.step();
         }
-        assert_eq!(session.steps(), 1_000);
+        assert_eq!(session.steps(), 500);
         assert!(telemetry(session, &viewer.playback).starts_with("Episode complete"));
         session.step();
-        assert_eq!(session.steps(), 1_000);
+        assert_eq!(session.steps(), 500);
     }
 
     /// A real failed RL episode must be identified as a crash, never as successful qualification.
     #[test]
     fn failed_trial_is_reported_as_crashed() {
-        use super::super::{presentation::SceneSession, travel};
-        let mut session = SceneSession::Travel(
-            travel::load(
-                include_bytes!("../../../docs/progress/drone-travel-trial.mpk").to_vec(),
-                0,
-            )
-            .expect("recorded trial"),
-        );
+        use super::super::{arrival, presentation::SceneSession};
+        // An isolated untrained policy supplies a genuine failed physical episode.
+        use bevy_gym::training::{RecurrentPpoAgent, SeedConfig};
+        let bytes = RecurrentPpoAgent::new(
+            15,
+            15,
+            1,
+            &[0.0; 4],
+            &[1.0; 4],
+            super::super::model::learning_config(),
+            SeedConfig::from_root(0),
+        )
+        .expect("valid untrained fixture")
+        .policy()
+        .to_bytes()
+        .expect("fixture bytes");
+        let mut session = SceneSession::Travel(arrival::load(bytes, 0).expect("valid fixture"));
         while !session.status().is_done() {
             session.step();
         }

@@ -1,0 +1,14 @@
+{
+  "schema": "drone-arrival-scene-ci-repair-v1",
+  "source_base": "9f5d66c21aea5789a12b6a105c984866e5c1f1d9",
+  "cause": "scene tests still constructed the legacy thirteen-feature travel session after playback changed to fifteen-feature arrival",
+  "changes": "tests use the qualified arrival checkpoint, 500-action horizon and a separate untrained fifteen-feature crash fixture",
+  "native": "exact format, strict all-target/all-feature Clippy, full default and robots tests passed",
+  "scene_command": "cargo test --features robots --example drone-hover-scene --example drone-recovery-scene --example drone-travel-scene --example droid-standing-scene",
+  "scene_tests": "all four scene suites passed; the travel suite has 11 cases",
+  "personal_lints": "exact changed-range all-target/all-feature workflow passed without changed diagnostics",
+  "wasm": "exact drone-browser-check passed, including frozen arrival policy and physical scene suites",
+  "coverage": "test-only repair; no production branch changed",
+  "ci_failure": "https://github.com/sagan-software/bevy-gym/actions/runs/38125655524",
+  "qualification": "arrival profile only; droids and competitive combat remain unfinished"
+}
