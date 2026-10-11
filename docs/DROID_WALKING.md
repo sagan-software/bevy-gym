@@ -72,6 +72,37 @@ selection and held-out partitions plus travel, balance, energy and foot-sliding
 gates. Promotion must retain parent identity and require independent evaluation.
 Failed training or an exhausted budget cannot promote a lesson.
 
+## Actuator work and elapsed time
+
+`DroidWalking::mechanical_work_joules()` returns the accumulated absolute mechanical
+actuator work estimate. `DroidWalking::elapsed()` returns advanced solver time as
+`Duration`. Reset clears both measurements. A fall retains their final values;
+requests after termination change neither value. Failed physics makes work unavailable
+with `None`, including when failure follows a completed substep. Elapsed time includes
+that completed 5 ms substep.
+
+For each actuator, world torque in Nm uses the same parent orientation and bounded
+fraction as the original operator. Relative child-minus-parent angular velocity is
+in rad/s. Their dot product gives actuator power in watts. Each substep estimates
+work in joules as the midpoint of absolute endpoint powers times 0.005 seconds.
+Each actuator contributes separately, so opposing actuator powers cannot cancel.
+Angular components widen to f64 before subtraction and power arithmetic.
+
+[Rapier's force contract](https://rapier.rs/docs/user_guides/rust/rigid_body_forces_and_impulses/)
+retains applied torque through a solver step. The measurement uses that held torque
+at both boundaries. This trapezoidal estimate excludes gravity, contact work and
+electrical losses; it does not establish exact continuous work or battery consumption.
+Reading it exposes no mutable solver or additional actor input. Existing observation,
+action, reward and `Info = DroidWalkingStatus` contracts retain their shapes.
+
+The [work verification record](progress/droid-walking-work.json) records native and
+browser tests, strict Clippy, personal lints, source identity and fresh per-object
+coverage. Public tests cover reset, nonzero actuation, passive falling and terminal
+freezing. Private tests cover both torque signs, opposing powers, finite angular
+extremes and invalid physics before and after a substep. All 58 work regions and
+160 environment regions executed, including both sides of every recorded branch.
+Foot-sliding measurement and walking qualification gates remain unfinished.
+
 ## Verification
 
 External tests retain the reset stream, validate exact command boundaries, prove

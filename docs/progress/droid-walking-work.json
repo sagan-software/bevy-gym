@@ -1,0 +1,250 @@
+{
+  "schema": "droid-walking-work-verification-v1",
+  "source_base": "83cd6d97625b3dc1d5221f603775b5060ce5de11",
+  "source_sha256": {
+    "src/robots/droid/walking/environment.rs": "c247432296b5077cf5b1dc78212648272433559cf521960b25a0e82bd9deaa88",
+    "src/robots/droid/walking/mod.rs": "5f1881372beaf20057636cc70df7cf984c5220f0b0ab15aa8578bbc312916fc9",
+    "src/robots/droid/walking/work.rs": "02ab9f2450355dadc030ac549561d395003ae76e4429f0074e4be02627880a93",
+    "tests/droid_walking.rs": "71c353267fc09e5aca6e7ded0c2f9b1a89264c91ad555959c3258085c97a88e2"
+  },
+  "gate_units": [
+    "bevy-gym-walking-work-native-v3-20261011",
+    "bevy-gym-walking-work-personal-v2-20261011",
+    "bevy-gym-walking-work-wasm-v2-20261011",
+    "bevy-gym-walking-work-coverage-v2-20261011",
+    "bevy-gym-walking-work-fresh-coverage-20261011"
+  ],
+  "external_walking_tests": 7,
+  "fresh_production_coverage": {
+    "objects": [
+      {
+        "path": "/home/sagan/.cache/bevy-gym-quality-validation/coverage-target/debug/deps/bevy_gym-465415eccecbf3cf",
+        "sha256": "3ca668c908a9fa1b4387769fcda3bde2973f5c52e29f0fdca6b7612348b3156e"
+      },
+      {
+        "path": "/home/sagan/.cache/bevy-gym-quality-validation/coverage-target/debug/deps/droid_walking-81c834d7472bd61f",
+        "sha256": "313c982a644484daec2a0819e70f33ea5eb21c4663d98face382d0f0ff096149"
+      }
+    ],
+    "exports": [
+      "/home/sagan/.cache/bevy-gym-quality-validation/walking-work-fresh-coverage-20261011/0.json",
+      "/home/sagan/.cache/bevy-gym-quality-validation/walking-work-fresh-coverage-20261011/1.json"
+    ],
+    "work.rs": {
+      "hit": 58,
+      "total": 58,
+      "zero_regions": [],
+      "branches": [
+        {
+          "range": [
+            26,
+            20,
+            26,
+            30
+          ],
+          "hits": [
+            14924,
+            5740
+          ]
+        }
+      ]
+    },
+    "environment.rs": {
+      "hit": 160,
+      "total": 160,
+      "zero_regions": [],
+      "branches": [
+        {
+          "range": [
+            117,
+            12,
+            117,
+            65
+          ],
+          "hits": [
+            574,
+            1
+          ]
+        },
+        {
+          "range": [
+            127,
+            16,
+            127,
+            44
+          ],
+          "hits": [
+            40,
+            9347
+          ]
+        },
+        {
+          "range": [
+            128,
+            20,
+            128,
+            51
+          ],
+          "hits": [
+            39,
+            9347
+          ]
+        },
+        {
+          "range": [
+            129,
+            20,
+            129,
+            55
+          ],
+          "hits": [
+            41,
+            9347
+          ]
+        },
+        {
+          "range": [
+            130,
+            20,
+            130,
+            56
+          ],
+          "hits": [
+            40,
+            9347
+          ]
+        },
+        {
+          "range": [
+            135,
+            12,
+            135,
+            66
+          ],
+          "hits": [
+            3,
+            717
+          ]
+        },
+        {
+          "range": [
+            142,
+            16,
+            142,
+            39
+          ],
+          "hits": [
+            27,
+            9321
+          ]
+        },
+        {
+          "range": [
+            143,
+            20,
+            143,
+            43
+          ],
+          "hits": [
+            26,
+            9321
+          ]
+        },
+        {
+          "range": [
+            144,
+            20,
+            144,
+            54
+          ],
+          "hits": [
+            25,
+            9321
+          ]
+        },
+        {
+          "range": [
+            152,
+            16,
+            152,
+            36
+          ],
+          "hits": [
+            544,
+            8775
+          ]
+        },
+        {
+          "range": [
+            153,
+            20,
+            153,
+            83
+          ],
+          "hits": [
+            11,
+            542
+          ]
+        },
+        {
+          "range": [
+            193,
+            12,
+            193,
+            54
+          ],
+          "hits": [
+            145,
+            216
+          ]
+        },
+        {
+          "range": [
+            198,
+            20,
+            198,
+            62
+          ],
+          "hits": [
+            2,
+            574
+          ]
+        }
+      ]
+    }
+  },
+  "contract": {
+    "legal_results": {
+      "running": "Some(nonnegative finite sampled mechanical work)",
+      "fallen": "Some(retained work), frozen time",
+      "failed": "None, including a completed invalid substep",
+      "reset": "Some(0), Duration::ZERO"
+    },
+    "units": {
+      "torque": "Nm",
+      "relative_angular_velocity": "rad/s",
+      "power": "W",
+      "solver_interval": "0.005 s",
+      "work": "J"
+    },
+    "ownership": "read-only pre/post snapshots; environment retains work and Duration; no solver exposure or actor features",
+    "cost": "26 actuator evaluations per substep, constant auxiliary storage",
+    "gates": [
+      "public missing-API RED",
+      "public walking GREEN",
+      "worked +/- torque and opposing-power tests",
+      "finite angular extremes",
+      "invalid before/after physics",
+      "cargo fmt --all -- --check",
+      "cargo clippy --all-targets --all-features -- -D warnings",
+      "cargo test",
+      "cargo test --features robots",
+      "personal Rust changed-line diagnostics",
+      "nix run .#drone-browser-check",
+      "fresh production coverage",
+      "final prose-only documentation and doc tests"
+    ],
+    "boundary": "trapezoidal absolute mechanical work estimate; no electrical energy or exact continuous integration claim; no change to Info, physical dynamics, action decoding or rewards"
+  },
+  "qualification": "measurements only; standing, walking and competitive combat remain unqualified"
+}

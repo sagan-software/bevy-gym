@@ -5,6 +5,7 @@ mod environment;
 mod observation;
 mod reward;
 mod status;
+mod work;
 
 pub use command::{DroidVelocityCommand, InvalidDroidVelocityCommand};
 pub use environment::DroidWalking;

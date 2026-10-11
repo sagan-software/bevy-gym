@@ -181,3 +181,32 @@ fn every_walking_actuator_reuses_the_original_physical_operator() {
         }
     }
 }
+
+/// Work measures actual actuator motion; passive gravity does not count as actuator work.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn actuator_work_and_elapsed_time_reset_and_freeze() {
+    let mut walking = DroidWalking::default();
+    walking.reset(Some(42));
+    assert_eq!(walking.mechanical_work_joules(), Some(0.0));
+    assert_eq!(walking.elapsed(), std::time::Duration::ZERO);
+    let mut fractions = [0.0; 26];
+    fractions[DroidActuator::LeftAnkleZ as usize] = 0.01;
+    walking.step(DroidAction::try_from(fractions).expect("isolated torque fixture"));
+    assert_eq!(walking.elapsed(), DroidWalking::POLICY_INTERVAL);
+    assert!(walking.mechanical_work_joules().expect("finite work") > 0.0);
+    walking.reset(Some(42));
+    assert_eq!(walking.mechanical_work_joules(), Some(0.0));
+    assert_eq!(walking.elapsed(), std::time::Duration::ZERO);
+    let passive = DroidAction::try_from([0.0; 26]).expect("isolated passive fixture");
+    loop {
+        if walking.step(passive).is_done() {
+            break;
+        }
+    }
+    assert_eq!(walking.mechanical_work_joules(), Some(0.0));
+    let elapsed = walking.elapsed();
+    walking.step(DroidAction::try_from([1.0; 26]).expect("isolated terminal fixture"));
+    assert_eq!(walking.elapsed(), elapsed);
+    assert_eq!(walking.mechanical_work_joules(), Some(0.0));
+}

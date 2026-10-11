@@ -5,7 +5,8 @@ use super::super::{
     DroidAction, DroidBody, DroidObservation, DroidStanding,
 };
 use super::{
-    reward, DroidVelocityCommand, DroidWalkingFall, DroidWalkingObservation, DroidWalkingStatus,
+    reward, work, DroidVelocityCommand, DroidWalkingFall, DroidWalkingObservation,
+    DroidWalkingStatus,
 };
 use crate::{training::SplitMix64, Env, EpisodeStatus, Reset, Step};
 use rapier3d::prelude::{Rotation, Vector};
@@ -39,6 +40,10 @@ pub struct DroidWalking {
     command: DroidVelocityCommand,
     /// Closed lifecycle; the common episode status is derived from this value.
     status: DroidWalkingStatus,
+    /// Accumulated absolute actuator work estimate in joules; never actor input.
+    mechanical_work_joules: f64,
+    /// Actual solver time, including a terminating substep.
+    elapsed: Duration,
 }
 
 impl DroidWalking {
@@ -49,6 +54,28 @@ impl DroidWalking {
     #[must_use]
     pub fn new(command: DroidVelocityCommand) -> Self {
         Self::from_random(command, SplitMix64::new(0))
+    }
+
+    /// Return absolute mechanical actuator work estimated at solver boundaries, in joules.
+    ///
+    /// Each 5 ms substep integrates absolute actuator power with a trapezoidal rule.
+    /// Torque is the original parent-frame request held throughout that substep.
+    /// This estimate excludes gravity, contact work and electrical losses. It resets
+    /// with the episode and freezes after a fall. Failed physics returns `None`.
+    #[must_use]
+    pub const fn mechanical_work_joules(&self) -> Option<f64> {
+        match self.status {
+            DroidWalkingStatus::Failed(_) => None,
+            DroidWalkingStatus::Running | DroidWalkingStatus::Fallen(_) => {
+                Some(self.mechanical_work_joules)
+            }
+        }
+    }
+
+    /// Return actual advanced solver time; terminal requests do not advance it.
+    #[must_use]
+    pub const fn elapsed(&self) -> Duration {
+        self.elapsed
     }
 
     /// Retain the original pose distribution without choosing any actuator request.
@@ -64,6 +91,8 @@ impl DroidWalking {
             random,
             command,
             status: DroidWalkingStatus::Running,
+            mechanical_work_joules: 0.0,
+            elapsed: Duration::ZERO,
         }
     }
 
@@ -72,6 +101,21 @@ impl DroidWalking {
         DroidWalkingObservation {
             physical: self.articulation.observation(),
             command: self.command,
+        }
+    }
+
+    /// Record one completed solver substep, including physical termination.
+    fn record_substep(
+        &mut self,
+        before: &DroidObservation,
+        after: &DroidObservation,
+        action: DroidAction,
+    ) {
+        self.elapsed += PHYSICS_INTERVAL;
+        self.status = Self::classify(after);
+        // If physics failed, expose unavailable work instead of consuming invalid state.
+        if !matches!(self.status, DroidWalkingStatus::Failed(_)) {
+            self.mechanical_work_joules += work::estimate(before, after, action);
         }
     }
 
@@ -155,9 +199,11 @@ impl Env for DroidWalking {
                     break;
                 }
                 // Only the caller's validated torques enter the original body model.
+                let before = self.articulation.observation();
                 self.articulation.apply(action);
                 self.articulation.world.step();
-                self.status = Self::classify(&self.articulation.observation());
+                let after = self.articulation.observation();
+                self.record_substep(&before, &after, action);
             }
         }
         let observation = self.observation();
@@ -379,6 +425,24 @@ mod tests {
         }
     }
 
+    /// A completed invalid substep retains elapsed time but cannot report valid work.
+    #[test]
+    fn failed_completed_substep_invalidates_work_without_consuming_invalid_floats() {
+        let mut walking = DroidWalking::default();
+        let before = *walking.reset(Some(42)).observation.physical();
+        let mut after = before;
+        body_mut(&mut after, DroidBody::Head).angular_velocity.x = f32::NAN;
+        let action = DroidAction::try_from([1.0; 26]).expect("isolated failure fixture");
+        walking.record_substep(&before, &after, action);
+        assert_eq!(walking.status, DroidWalkingStatus::Failed(DroidBody::Head));
+        assert_eq!(walking.elapsed(), std::time::Duration::from_millis(5));
+        assert_eq!(walking.mechanical_work_joules(), None);
+        assert_eq!(walking.mechanical_work_joules.to_bits(), 0.0_f64.to_bits());
+        walking.reset(Some(42));
+        assert_eq!(walking.mechanical_work_joules(), Some(0.0));
+        assert_eq!(walking.elapsed(), std::time::Duration::ZERO);
+    }
+
     /// Invalid current velocity stops before torque application or solver advancement.
     #[test]
     fn invalid_current_physics_retains_failure_without_actuation_until_reset() {
@@ -397,6 +461,8 @@ mod tests {
         for _ in 0..2 {
             let stopped = walking.step(action);
             assert_eq!(stopped.info, DroidWalkingStatus::Failed(DroidBody::Pelvis));
+            assert_eq!(walking.mechanical_work_joules(), None);
+            assert_eq!(walking.elapsed(), std::time::Duration::ZERO);
             assert_eq!(stopped.status, EpisodeStatus::Terminated);
             assert_eq!(stopped.reward.to_bits(), 0.0_f64.to_bits());
             for identity in DroidBody::ALL {
