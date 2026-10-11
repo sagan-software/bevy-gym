@@ -27,6 +27,14 @@ pub(in crate::robots) struct DroidRig {
 }
 
 impl DroidRig {
+    /// Identify a collision handle without exposing mutable solver access.
+    pub(in crate::robots) fn body_for_collider(&self, handle: ColliderHandle) -> Option<DroidBody> {
+        DroidBody::ALL
+            .into_iter()
+            .zip(self.colliders)
+            .find_map(|(body, collider)| (handle == collider).then_some(body))
+    }
+
     /// Insert the unchanged body and passive joint model into one existing solver.
     pub(in crate::robots) fn insert(
         world: &mut PhysicsWorld,

@@ -85,6 +85,77 @@ impl fmt::Debug for RobotWorld {
     }
 }
 impl RobotWorld {
+    /// Read the nearest actual solid without advancing the world or choosing an action.
+    /// The excluded identity removes all of that robot's colliders, including every droid segment.
+    /// Equal distances use environment, drone slot, then droid slot/body order.
+    /// Direct shape reads include reset poses before Rapier 0.36 updates its query BVH:
+    /// <https://rapier.rs/docs/user_guides/rust/scene_queries/>.
+    /// Scanning N solids with at most 42 robot-owner comparisons costs O(N) time
+    /// for the fixed six-agent roster and O(1) auxiliary space.
+    ///
+    /// # Errors
+    /// Returns the original stopped-world error or rejects nonfinite physical state.
+    pub fn cast_ray(
+        &self,
+        ray: &super::RobotRay,
+        excluded: Option<RobotId>,
+    ) -> Result<Option<super::RobotRayHit>, RobotWorldError> {
+        // Preserve stopped-world and finite-state checks before reading collision geometry.
+        self.snapshot()?;
+        let physical_ray = rapier3d::prelude::Ray::new(
+            Vector::from_array(ray.origin.to_array()),
+            Vector::from_array(ray.direction.to_array()),
+        );
+        let mut nearest: Option<super::RobotRayHit> = None;
+        // Direct shape reads include freshly inserted poses before Rapier's first BVH update.
+        // With 43 fixed colliders, classification and scanning retain O(1) auxiliary space.
+        for (handle, collider) in self.world.colliders.iter() {
+            if collider.is_sensor() {
+                continue;
+            }
+            let target = self.ray_target(handle);
+            if excluded.is_some() && target.owner() == excluded {
+                continue;
+            }
+            if let Some(metres) =
+                collider
+                    .shape()
+                    .cast_ray(collider.position(), &physical_ray, ray.metres, true)
+            {
+                // Canonicalize signed zero before applying the total distance ordering.
+                let metres = metres.abs();
+                let hit = super::RobotRayHit { target, metres };
+                // Rank breaks exact-distance ties; it never changes which closer solid wins.
+                if nearest.is_none_or(|previous| {
+                    metres
+                        .total_cmp(&previous.metres)
+                        .then_with(|| target.rank().cmp(&previous.target.rank()))
+                        .is_lt()
+                }) {
+                    nearest = Some(hit);
+                }
+            }
+        }
+        Ok(nearest)
+    }
+
+    /// Map actual collision ownership into a read-only closed target identity.
+    fn ray_target(&self, handle: rapier3d::prelude::ColliderHandle) -> super::RobotRayTarget {
+        for ((slot, drone), droid) in RobotSlot::ALL
+            .into_iter()
+            .zip(&self.drones)
+            .zip(&self.droids)
+        {
+            if drone.collider == handle {
+                return super::RobotRayTarget::Drone(slot);
+            }
+            if let Some(body) = droid.body_for_collider(handle) {
+                return super::RobotRayTarget::Droid(slot, body);
+            }
+        }
+        super::RobotRayTarget::Environment
+    }
+
     /// Capture all six bodies without changing physics or granting mutable access.
     ///
     /// # Errors
@@ -366,5 +437,94 @@ mod tests {
             world.snapshot().unwrap_err(),
             RobotWorldError::Stopped(cause)
         );
+    }
+}
+
+#[cfg(test)]
+mod ray_tests {
+    use super::super::{RobotRay, RobotRayTarget};
+    use super::*;
+    /// Sensors never occlude and equal-distance solids have stable environment priority.
+    #[test]
+    fn sensor_filter_and_environment_tie_do_not_depend_on_insertion_order() {
+        let mut world = RobotWorld::default();
+        let ray = RobotRay::try_from((Vec3::new(0.0, 2.0, 0.0), Vec3::Y, 10.0)).unwrap();
+        world.world.insert(
+            RigidBodyBuilder::fixed().translation(Vector::new(0.0, 3.0, 0.0)),
+            ColliderBuilder::ball(0.5).sensor(true),
+        );
+        assert!(world.cast_ray(&ray, None).unwrap().is_none());
+        let origin = Vec3::new(-3.0, 2.0, -2.0);
+        let ray = RobotRay::try_from((origin, Vec3::Y, 0.1)).unwrap();
+        let shape = world.world.colliders[world.drones[0].collider]
+            .shared_shape()
+            .clone();
+        world.world.insert(
+            RigidBodyBuilder::fixed().translation(Vector::from_array(origin.to_array())),
+            ColliderBuilder::new(shape),
+        );
+        assert_eq!(
+            world.cast_ray(&ray, None).unwrap().unwrap().target(),
+            RobotRayTarget::Environment
+        );
+        assert_eq!(
+            world
+                .cast_ray(&ray, Some(RobotId::Drone(RobotSlot::First)))
+                .unwrap()
+                .unwrap()
+                .target(),
+            RobotRayTarget::Environment
+        );
+    }
+    /// Overlapping robot fixtures retain the first slot and exclusion reveals the next slot.
+    #[test]
+    fn robot_ties_and_nonfinite_state_use_the_public_query_boundary() {
+        let mut world = RobotWorld::default();
+        let origin = Vec3::new(-3.0, 2.0, -2.0);
+        let second = world.drones[1].collider;
+        world.world.colliders[second].set_translation(Vector::from_array(origin.to_array()));
+        let ray = RobotRay::try_from((origin, Vec3::Y, 0.001)).unwrap();
+        assert_eq!(
+            world.cast_ray(&ray, None).unwrap().unwrap().target(),
+            RobotRayTarget::Drone(RobotSlot::First)
+        );
+        assert_eq!(
+            world
+                .cast_ray(&ray, Some(RobotId::Drone(RobotSlot::First)))
+                .unwrap()
+                .unwrap()
+                .target(),
+            RobotRayTarget::Drone(RobotSlot::Second)
+        );
+        let body = world.drones[0].body;
+        world.world.bodies[body].set_linvel(Vector::new(f32::NAN, 0.0, 0.0), true);
+        assert_eq!(
+            world.cast_ray(&ray, None).unwrap_err(),
+            RobotWorldError::Rejected(RobotWorldFailure::NonFinite(RobotId::Drone(
+                RobotSlot::First
+            )))
+        );
+    }
+
+    /// Exact-distance ties retain the lower robot slot or body rank.
+    #[test]
+    fn equal_distance_priority_is_derived_from_target_identity() {
+        assert!(
+            RobotRayTarget::Environment.rank() < RobotRayTarget::Drone(RobotSlot::First).rank()
+        );
+        let mut previous = 0;
+        for slot in RobotSlot::ALL {
+            let rank = RobotRayTarget::Drone(slot).rank();
+            assert!(rank > previous);
+            previous = rank;
+        }
+        for slot in RobotSlot::ALL {
+            for body in crate::robots::DroidBody::ALL {
+                let target = RobotRayTarget::Droid(slot, body);
+                assert!(target.rank() > previous);
+                previous = target.rank();
+                assert_eq!(target.owner(), Some(RobotId::Droid(slot)));
+            }
+        }
     }
 }

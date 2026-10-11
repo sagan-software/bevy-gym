@@ -17,3 +17,12 @@ pub use simulation::RobotWorld;
 pub use slot::RobotSlot;
 pub use snapshot::RobotSnapshot;
 pub use team::RobotTeam;
+
+mod ray;
+mod ray_error;
+mod ray_hit;
+mod ray_target;
+pub use ray::RobotRay;
+pub use ray_error::InvalidRobotRay;
+pub use ray_hit::RobotRayHit;
+pub use ray_target::RobotRayTarget;

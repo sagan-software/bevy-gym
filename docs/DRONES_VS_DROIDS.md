@@ -1,6 +1,6 @@
 # Drones versus droids
 
-Updated: 2026-10-10. Status: shared-world inference implemented; competition unfinished.
+Updated: 2026-10-11. Status: shared-world inference implemented; competition unfinished.
 This request supersedes the two-versus-two player-first shooter milestone.
 The target is a spectator-first competitive match with three drones and three droids.
 
@@ -49,6 +49,13 @@ that the currently loaded pursuit controller is reinforcement-trained.
 The historical hybrid source and recordings remain preserved. Publication replaces
 its pursuit route with the frozen RL shared-world diagnostic. Competitive
 qualification remains unfinished.
+
+Shared-world [collision queries](ROBOT_RAY_QUERY.md) now identify the actual floor,
+drones and individual droid segments without advancing physics. Native and browser
+tests pass; all 147 new production coverage regions and both outcomes of all 13
+conditional branches execute. Personal Rust lint passes. The Nix lint command
+retains ten findings also present at the previous commit. This sensor foundation
+does not qualify standing, walking or fighting.
 
 ## Control boundary
 

@@ -634,3 +634,8 @@ required-features = ["robots"]
 name = "robot-world-contract"
 path = "examples/robots/world.rs"
 required-features = ["robots"]
+
+[[example]]
+name = "robot-ray-query"
+path = "examples/robots/raycast.rs"
+required-features = ["robots"]

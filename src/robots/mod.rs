@@ -40,6 +40,6 @@ pub use droid::{
 pub use ranges::{DroneRangeDirection, DroneRangeDistance, DroneRanges, InvalidDroneRangeDistance};
 
 pub use world::{
-    RobotActions, RobotFrame, RobotId, RobotSlot, RobotSnapshot, RobotTeam, RobotWorld,
-    RobotWorldError, RobotWorldFailure,
+    InvalidRobotRay, RobotActions, RobotFrame, RobotId, RobotRay, RobotRayHit, RobotRayTarget,
+    RobotSlot, RobotSnapshot, RobotTeam, RobotWorld, RobotWorldError, RobotWorldFailure,
 };
