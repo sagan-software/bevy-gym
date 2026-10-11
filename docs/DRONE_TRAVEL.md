@@ -651,3 +651,8 @@ horizon. The four scene suites pass natively and in WASM.
 [Validation evidence](progress/drone-arrival-ci-repair-20261011/summary.json) records
 the previous CI failure and the repair. This test repair does not qualify droids
 or competitive combat.
+
+The [public browser check](progress/drone-arrival-public-20261011/summary.json)
+completed all 500 actions on root 42. It ended 0.13 m from the target with 11.7-degree
+heading error and 0.01 m/s speed. Desktop and narrow views were inspected. The public
+poster and ten-second looping video match the recorded files.

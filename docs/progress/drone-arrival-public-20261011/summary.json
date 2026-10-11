@@ -1,0 +1,35 @@
+{
+  "schema": "drone-arrival-public-browser-v1",
+  "deployed_source": "9f5d66c21aea5789a12b6a105c984866e5c1f1d9",
+  "deployment": "https://github.com/sagan-software/bevy-gym/actions/runs/38125655538",
+  "ci_test_repair": "37342dda49766f97b31125fb8122124d3de9b741",
+  "repair_ci": "https://github.com/sagan-software/bevy-gym/actions/runs/38128983587",
+  "repair_ci_result": "success",
+  "url": "https://sagan-software.github.io/bevy-gym/robots/skills/travel/",
+  "asset_bundle": "45ebed5e92b7f4857e31b3b72dca4925db7eef16860d45e585d608ed6c1e3435",
+  "wasm_sha256": "4593a19d075b73d4163fdfaa22113efe096e535f118c1473ebdbd49c1f1778d9",
+  "decoded_wasm_bytes": 78430791,
+  "policy_sha256": "3e6964d0f1475081b2572387f2193e070fd396800023639074ca073e69b54c88",
+  "root": 42,
+  "actions": 500,
+  "final_distance_m": 0.13,
+  "final_heading_error_degrees": 11.7,
+  "final_speed_m_s": 0.01,
+  "desktop_css_pixels": [
+    1280,
+    800
+  ],
+  "narrow_css_pixels": [
+    390,
+    844
+  ],
+  "overflow": false,
+  "physical_mobile_tested": false,
+  "browser_surface": "T3 collaborative browser, real WebGL renderer; tool visibility false despite open request",
+  "gallery_video_seconds": 10,
+  "gallery_video_sha256": "a01de75d69c722a71e5200d387e7d34c08631dade6be03936c6ad22126d7e3a0",
+  "gallery_poster_sha256": "c288a2b820783831e4dbf54aceb8d5e36fb1c243dc20586c15d49b6d00e88c4f",
+  "gallery_preview_verified": "public HTTP 200, matching hashes, readyState 4, loop true, muted true, paused false",
+  "raw_recording": "/home/sagan/.t3/userdata/attachments/41cd14c3-ecda-4844-8b4a-ca574c8ab017-a9441ed3-e214-4420-b478-d86ff7705b57-mp4.mp4",
+  "limits": "Arrival only; droids, walking and fighting remain unqualified. Recording includes idle verification time and does not measure browser performance."
+}
