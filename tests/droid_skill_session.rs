@@ -244,3 +244,64 @@ fn assert_policy_actions(bytes: &[u8], record: &[u8], expected: &[serde_json::Va
         }
     }
 }
+
+/// Quiet reward projection cannot change torques, physical observations or terminal results.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn quiet_training_preserves_physics_and_terminal_rewards() {
+    use bevy_gym::robots::{DroidAction, DroidActuator};
+    use standing::reward::{Recipe, TrainingTask};
+    let mut base = TrainingTask::posture_height();
+    let mut quiet = Recipe::PostureQuietV1.factory()();
+    assert_eq!(
+        base.reset(Some(42)).observation,
+        quiet.reset(Some(42)).observation
+    );
+    let mut fractions = [0.0; 26];
+    fractions[DroidActuator::LeftAnkleZ as usize] = 0.01;
+    let action = DroidAction::try_from(fractions).expect("bounded fixture torque");
+    let mut saw_penalty = false;
+    let mut terminated = false;
+    for _ in 0..1_000 {
+        let expected = base.step(action);
+        let observed = quiet.step(action);
+        assert_eq!(observed.observation, expected.observation);
+        assert_eq!(observed.status, expected.status);
+        assert!(observed.reward.is_finite() && observed.reward <= expected.reward);
+        if observed.status.is_done() {
+            assert_eq!(observed.reward.to_bits(), expected.reward.to_bits());
+            assert_eq!(quiet.step(action), base.step(action));
+            terminated = true;
+            break;
+        }
+        saw_penalty |= observed.reward < expected.reward;
+    }
+    assert!(saw_penalty && terminated);
+}
+
+/// Empty suites cannot pass; incompatible actors stop before any valid torque request exists.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn control_evaluation_rejects_incompatible_inference() {
+    use bevy_gym::training::{RecurrentPpoAgent, RecurrentPpoConfig, SeedConfig};
+    for (features, actions) in [(2, 26), (204, 1)] {
+        let agent = RecurrentPpoAgent::new(
+            features,
+            features,
+            1,
+            &vec![-1.0; actions],
+            &vec![1.0; actions],
+            RecurrentPpoConfig {
+                actor_hidden_size: 4,
+                critic_hidden_sizes: vec![4],
+                ..Default::default()
+            },
+            SeedConfig::from_root(7),
+        )
+        .expect("isolated incompatible actor fixture");
+        let scores = standing::control::evaluate(&agent.policy(), &[]).expect("empty suite");
+        assert!(scores.is_empty());
+        assert!(!standing::control::passes(&scores, &[]));
+        standing::control::evaluate(&agent.policy(), &[42]).expect_err("incompatible actor");
+    }
+}

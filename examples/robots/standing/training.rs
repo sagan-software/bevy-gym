@@ -3,9 +3,9 @@
 use super::{
     batch_with_recipe,
     checkpoint::{from_bytes, Record},
-    evaluation, model,
+    control, evaluation, model,
     optimization::OptimizerProfile,
-    reward::{Recipe, HEIGHT_SCALE_M, HEIGHT_TARGET_M, POSTURE_SCALE},
+    reward::{Recipe, ANGULAR_SPEED_SCALE_RAD_S, HEIGHT_SCALE_M, HEIGHT_TARGET_M, POSTURE_SCALE},
     selection::{Candidate, Selection, SelectionPolicy},
 };
 use bevy_gym::training::{RecurrentPpoAgent, RecurrentPpoUpdate};
@@ -172,8 +172,15 @@ async fn train_from(
         if !update.get().is_multiple_of(20) && update != updates {
             continue;
         }
-        let candidate =
-            save_and_evaluate(output, seed, update, &metrics, agent.policy().to_bytes()?).await?;
+        let candidate = save_and_evaluate(
+            output,
+            seed,
+            update,
+            &metrics,
+            agent.policy().to_bytes()?,
+            recipe,
+        )
+        .await?;
         if selection.observe(candidate) {
             return Ok(());
         }
@@ -282,6 +289,13 @@ async fn record_reward_profile(
             "posture_up_projection_scale":POSTURE_SCALE, "contact_both":1.0,
             "contact_one":0.5, "contact_none":0.25, "evaluation":"original-standing-v1",
             "pelvis_height_target_m":HEIGHT_TARGET_M, "pelvis_height_scale_m":HEIGHT_SCALE_M}),
+        Recipe::PostureQuietV1 => serde_json::json!({"schema":recipe, "seed":seed,
+            "posture_up_projection_scale":POSTURE_SCALE, "contact_both":1.0,
+            "contact_one":0.5, "contact_none":0.25, "evaluation":"original-standing-v1",
+            "pelvis_height_target_m":HEIGHT_TARGET_M, "pelvis_height_scale_m":HEIGHT_SCALE_M,
+            "angular_speed_scale_rad_s":ANGULAR_SPEED_SCALE_RAD_S,
+            "angular_speed_measure":"maximum squared segment angular speed",
+            "angular_speed_weight":"inverse quadratic"}),
     };
     fs::write(output.join("training-reward.json"), record.to_string()).await?;
     Ok(())
@@ -309,6 +323,7 @@ async fn save_and_evaluate(
     update: NonZeroU32,
     metrics: &RecurrentPpoUpdate,
     bytes: Vec<u8>,
+    recipe: Recipe,
 ) -> Result<Option<Candidate>, Box<dyn Error>> {
     let steps =
         NonZeroU64::new(metrics.optimizer_steps).ok_or("PPO reported zero optimizer steps")?;
@@ -319,25 +334,54 @@ async fn save_and_evaluate(
     fs::write(&checkpoint, &bytes).await?;
     fs::write(checkpoint.with_extension("json"), &metadata).await?;
     let (policy, _) = from_bytes(bytes, &metadata)?;
-    let episodes = evaluation::evaluate(&policy, &evaluation::SELECTION_SEEDS)?;
-    let passed = evaluation::passes(&episodes, &evaluation::SELECTION_SEEDS);
-    let report = serde_json::json!({"mode":"selection", "provenance":record,
-        "episodes":episodes, "passed":passed, "qualification":"requires held-out evaluation and independent run evidence"});
+    let (report, candidate) = evaluate_selection(&policy, record, recipe)?;
     fs::write(
         output.join(format!("standing-{number}.evaluation.json")),
         report.to_string(),
     )
     .await?;
     println!("{report}");
+    Ok(candidate)
+}
+
+/// Measure fixed selection cases; quiet candidates must pass balance and limb motion.
+fn evaluate_selection(
+    policy: &bevy_gym::training::RecurrentPpoPolicy,
+    record: Record,
+    recipe: Recipe,
+) -> Result<(serde_json::Value, Option<Candidate>), Box<dyn Error>> {
+    let episodes = evaluation::evaluate(policy, &evaluation::SELECTION_SEEDS)?;
+    let control_episodes = if recipe == Recipe::PostureQuietV1 {
+        Some(control::evaluate(policy, &evaluation::SELECTION_SEEDS)?)
+    } else {
+        None
+    };
+    let control_passed = control_episodes
+        .as_ref()
+        .is_none_or(|scores| control::passes(scores, &evaluation::SELECTION_SEEDS));
+    let passed = evaluation::passes(&episodes, &evaluation::SELECTION_SEEDS) && control_passed;
+    let mut report = serde_json::json!({"mode":"selection", "provenance":record,
+        "episodes":episodes, "passed":passed, "qualification":"requires held-out evaluation and independent run evidence"});
+    // If quiet training is selected, record its additional gate without changing old profile artifacts.
+    if let Some(scores) = control_episodes {
+        let fields = report
+            .as_object_mut()
+            .ok_or("selection report must be an object")?;
+        fields.insert("control_episodes".into(), serde_json::to_value(scores)?);
+        fields.insert("control_passed".into(), serde_json::json!(control_passed));
+    }
     if passed {
         let mean_return =
             episodes.iter().map(|score| score.reward).sum::<f64>() / episodes.len() as f64;
-        Ok(Some(Candidate {
-            checkpoint: record,
-            mean_return,
-        }))
+        Ok((
+            report,
+            Some(Candidate {
+                checkpoint: record,
+                mean_return,
+            }),
+        ))
     } else {
-        Ok(None)
+        Ok((report, None))
     }
 }
 

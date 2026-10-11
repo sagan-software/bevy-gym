@@ -51,13 +51,71 @@ class StandingCliTests(unittest.TestCase):
                 result = self.run_command(mode, option, "unknown")
                 self.assertEqual(result.returncode, 2, result.stderr)
                 self.assertIn("invalid value", result.stderr)
-            for mode in ["evaluate", "trace"]:
+            for mode in ["evaluate", "trace", "evaluate-control"]:
                 result = self.run_command(
                     mode, "--checkpoint", str(self.checkpoint),
                     option, "original",
                 )
                 self.assertEqual(result.returncode, 2, result.stderr)
                 self.assertIn("unexpected argument", result.stderr)
+
+    def test_quiet_reward_is_recorded_after_real_ppo(self) -> None:
+        """Record limb-motion weighting after actual PPO without promotion."""
+        output = self.root / "quiet-reward"
+        result = self.run_command(
+            "train", "--reward-profile", "posture-quiet-v1", "--updates", "1",
+            "--optimizer-profile", "low-noise-v1", "--output", str(output),
+        )
+        self.assertEqual(result.returncode, 1, result.stderr)
+        self.assertIn("exhausted its update budget", result.stderr)
+        record = json.loads((output / "training-reward.json").read_text())
+        self.assertEqual(
+            record["schema"], "droid-standing-posture-quiet-reward-v1"
+        )
+        self.assertEqual(record["angular_speed_scale_rad_s"], 4.0)
+        self.assertEqual(record["angular_speed_measure"],
+                         "maximum squared segment angular speed")
+        row = json.loads((output / "optimization.jsonl").read_text())
+        self.assertEqual(row["valid_samples"], 512)
+        self.assertGreater(row["optimizer_updates"], 0)
+        self.assertIn("not qualified", result.stderr)
+        report = json.loads(result.stdout)
+        self.assertEqual(len(report["control_episodes"]), 5)
+        self.assertFalse(report["control_passed"])
+
+    def test_control_evaluation_rejects_flailing_without_changing_weights(
+        self,
+    ) -> None:
+        """Inspect frozen limbs separately from the unchanged standing gate."""
+        parent = (Path.cwd() / "docs/progress/standing-seed43-update100"
+                  / "checkpoint.mpk")
+        before = parent.read_bytes()
+        result = self.run_command(
+            "evaluate-control", "--checkpoint", str(parent), "--seed", "42"
+        )
+        self.assertEqual(result.returncode, 1, result.stderr)
+        report = json.loads(result.stdout)
+        self.assertEqual(report["suite"], "single-episode")
+        self.assertTrue(report["standing_passed"])
+        self.assertFalse(report["control_passed"])
+        self.assertFalse(report["passed"])
+        score = report["control_episodes"][0]
+        self.assertEqual(score["checked_actions"], 900)
+        self.assertGreater(score["peak_rad_s"], 8.0)
+        self.assertEqual(parent.read_bytes(), before)
+
+    def test_control_evaluation_uses_all_fixed_held_out_seeds(self) -> None:
+        """Omitting a seed checks the independent suite without promotion."""
+        result = self.run_command(
+            "evaluate-control", "--checkpoint", str(self.checkpoint)
+        )
+        self.assertEqual(result.returncode, 1, result.stderr)
+        report = json.loads(result.stdout)
+        self.assertEqual(report["suite"], "held-out")
+        self.assertFalse(report["passed"])
+        expected = [(2**64 - 2 - index) for index in range(32)]
+        for key in ["episodes", "control_episodes"]:
+            self.assertEqual([row["seed"] for row in report[key]], expected)
 
     def test_low_noise_optimizer_runs_real_ppo_without_promotion(self) -> None:
         """Record changed exploration and retain a failed PPO candidate."""
@@ -618,10 +676,11 @@ class StandingCliTests(unittest.TestCase):
         wrong_model.write_bytes(b"not a network")
         record["sha256"] = hashlib.sha256(wrong_model.read_bytes()).hexdigest()
         wrong_model.with_suffix(".json").write_text(json.dumps(record))
-        for path in [missing, no_record, wrong_digest, wrong_model]:
-            result = self.run_command("trace", "--checkpoint", str(path))
-            self.assertEqual(result.returncode, 1)
-            self.assertEqual(result.stdout, "")
+        for mode in ["trace", "evaluate-control"]:
+            for path in [missing, no_record, wrong_digest, wrong_model]:
+                result = self.run_command(mode, "--checkpoint", str(path))
+                self.assertEqual(result.returncode, 1)
+                self.assertEqual(result.stdout, "")
         self.assertEqual(self.run_command("trace").returncode, 2)
         self.assertEqual(self.run_command(
             "trace", "--checkpoint", str(self.checkpoint), "--seed", "-1"

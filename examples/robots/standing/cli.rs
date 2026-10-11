@@ -1,7 +1,7 @@
 //! Separate standing training and frozen evaluation commands.
 
 use super::{
-    checkpoint, evaluation, optimization::OptimizerProfile, reward::Recipe,
+    checkpoint, control, evaluation, optimization::OptimizerProfile, reward::Recipe,
     selection::SelectionPolicy, trace, training,
 };
 use clap::{Parser, Subcommand};
@@ -76,6 +76,15 @@ enum Command {
         #[arg(long, default_value = "runs/droid-standing/checkpoint-start-seed13")]
         output: PathBuf,
     },
+    /// Evaluate original balance and additional limb motion without training or writing files.
+    EvaluateControl {
+        /// Weight file accompanied by its required .json PPO provenance record.
+        #[arg(long)]
+        checkpoint: PathBuf,
+        /// Inspect one seed; omission runs all 32 fixed held-out cases.
+        #[arg(long)]
+        seed: Option<u64>,
+    },
     /// Evaluate frozen weights without training or writing files.
     Evaluate {
         /// Weight file accompanied by its required .json PPO provenance record.
@@ -142,6 +151,7 @@ async fn execute(command: Command) -> Result<(), Box<dyn Error>> {
             ))
             .await
         }
+        Command::EvaluateControl { checkpoint, seed } => evaluate_control(&checkpoint, seed).await,
         Command::Evaluate { checkpoint, seed } => evaluate_checkpoint(&checkpoint, seed).await,
     }
 }
@@ -175,7 +185,7 @@ async fn train_selected(
         (Recipe::Original, Some(checkpoint)) => {
             Box::pin(training::warm_start(seed, updates, output, checkpoint)).await
         }
-        (Recipe::PostureV1 | Recipe::PostureHeightV1, checkpoint) => {
+        (Recipe::PostureV1 | Recipe::PostureHeightV1 | Recipe::PostureQuietV1, checkpoint) => {
             Box::pin(training::train_profiled(
                 seed, updates, output, checkpoint, recipe,
             ))
@@ -210,5 +220,38 @@ async fn evaluate_checkpoint(checkpoint: &Path, seed: Option<u64>) -> Result<(),
         Ok(())
     } else {
         Err("Standing evaluation failed; checkpoint is not qualified.".into())
+    }
+}
+
+/// Check both independent physical gates; a single passing episode never qualifies a lesson.
+async fn evaluate_control(checkpoint: &Path, seed: Option<u64>) -> Result<(), Box<dyn Error>> {
+    // Validate the same owned bytes and metadata before creating either frozen episode suite.
+    let bytes = tokio::fs::read(checkpoint).await?;
+    let metadata = tokio::fs::read(checkpoint.with_extension("json")).await?;
+    let (policy, record) = checkpoint::from_bytes(bytes, &metadata)?;
+    let held_out = evaluation::held_out_seeds();
+    let seeds = seed
+        .as_ref()
+        .map_or(held_out.as_slice(), std::slice::from_ref);
+    let episodes = evaluation::evaluate(&policy, seeds)?;
+    let control_episodes = control::evaluate(&policy, seeds)?;
+    let standing_passed = evaluation::passes(&episodes, seeds);
+    let control_passed = control::passes(&control_episodes, seeds);
+    let passed = standing_passed && control_passed;
+    let suite = if seed.is_some() {
+        "single-episode"
+    } else {
+        "held-out"
+    };
+    let report = serde_json::json!({"mode":"frozen-control-inference", "suite":suite,
+        "checkpoint":checkpoint, "provenance":record, "standing_passed":standing_passed,
+        "control_passed":control_passed, "passed":passed, "episodes":episodes,
+        "control_episodes":control_episodes,
+        "qualification":"requires independent run evidence; a single episode cannot qualify"});
+    println!("{report}");
+    if passed {
+        Ok(())
+    } else {
+        Err("Standing control evaluation failed; checkpoint is not qualified.".into())
     }
 }

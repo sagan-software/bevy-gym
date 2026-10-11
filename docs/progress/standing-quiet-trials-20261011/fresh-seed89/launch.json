@@ -1,0 +1,27 @@
+{
+  "started_utc": "2026-10-11T04:31:51.776478+00:00",
+  "command": [
+    "/home/sagan/.cache/bevy-gym-quality-validation/standing-quiet-fresh-seed89-20261011/droid-standing",
+    "train",
+    "--optimizer-profile",
+    "low-noise-v1",
+    "--selection-policy",
+    "best-passing-budget",
+    "--reward-profile",
+    "posture-quiet-v1",
+    "--seed",
+    "89",
+    "--updates",
+    "5001",
+    "--output",
+    "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/runs/droid-standing/standing-quiet-fresh-seed89-20261011"
+  ],
+  "unit": "bevy-gym-standing-quiet-fresh-seed89-20261011",
+  "source_base": "ad6a78d98721ee0b4de23b02b6b343bb1f9b6ac1",
+  "source_patch_sha256": "1536539c8607ecc58695d319a052869fb711f10bdd025f9e798de9de0a5be00b",
+  "executable_sha256": "edd54756f446e20c998c6ce93c0266b9f6dd3271b0e76ee2dd0a5579b5726086",
+  "candidate_rule_sha256": "cecf1d85f17238a90384ae77a2ed5bc0fbc7ce6ab060a400760169b94a901d5e",
+  "budget_updates": 5001,
+  "qualification": "experimental PPO; no selection or budget promotion",
+  "held_out": "excluded from checkpoint ranking"
+}

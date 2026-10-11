@@ -1,0 +1,152 @@
+{
+  "schema": "droid-standing-quiet-control-selection-v1",
+  "rule_sha256": "cecf1d85f17238a90384ae77a2ed5bc0fbc7ce6ab060a400760169b94a901d5e",
+  "candidates": [
+    {
+      "update": 180,
+      "checkpoint_sha256": "5b614ac0fd85a2959b854d556085fd5f7a7bb75346d99989d4f1899195d31e5a",
+      "mean_original_return": 917.3432315111161,
+      "episodes": [
+        {
+          "seed": 0,
+          "steps": 1000,
+          "checked_actions": 900,
+          "peak_rad_s": 157.2897281528765,
+          "checked_peak_rad_s": 21.23372626734224,
+          "passed": false
+        },
+        {
+          "seed": 1,
+          "steps": 1000,
+          "checked_actions": 900,
+          "peak_rad_s": 157.29002758218974,
+          "checked_peak_rad_s": 36.497003326252276,
+          "passed": false
+        },
+        {
+          "seed": 2,
+          "steps": 1000,
+          "checked_actions": 900,
+          "peak_rad_s": 157.2899616176621,
+          "checked_peak_rad_s": 15.650618129383485,
+          "passed": false
+        },
+        {
+          "seed": 42,
+          "steps": 1000,
+          "checked_actions": 900,
+          "peak_rad_s": 157.2897645641762,
+          "checked_peak_rad_s": 17.586443480608864,
+          "passed": false
+        },
+        {
+          "seed": 18446744073709551615,
+          "steps": 1000,
+          "checked_actions": 900,
+          "peak_rad_s": 157.28992968609413,
+          "checked_peak_rad_s": 21.725365163923968,
+          "passed": false
+        }
+      ],
+      "passed": false
+    },
+    {
+      "update": 200,
+      "checkpoint_sha256": "6f16858387127ca7f63f29b0bd025cb0871cf0fa8cb897cde31f212bad13df14",
+      "mean_original_return": 916.2789969742298,
+      "episodes": [
+        {
+          "seed": 0,
+          "steps": 1000,
+          "checked_actions": 900,
+          "peak_rad_s": 157.29000523700557,
+          "checked_peak_rad_s": 24.824797820240807,
+          "passed": false
+        },
+        {
+          "seed": 1,
+          "steps": 1000,
+          "checked_actions": 900,
+          "peak_rad_s": 157.29021061833186,
+          "checked_peak_rad_s": 24.582010016662856,
+          "passed": false
+        },
+        {
+          "seed": 2,
+          "steps": 1000,
+          "checked_actions": 900,
+          "peak_rad_s": 157.29021104238234,
+          "checked_peak_rad_s": 20.598283309483495,
+          "passed": false
+        },
+        {
+          "seed": 42,
+          "steps": 1000,
+          "checked_actions": 900,
+          "peak_rad_s": 157.29001071007963,
+          "checked_peak_rad_s": 19.018977563783917,
+          "passed": false
+        },
+        {
+          "seed": 18446744073709551615,
+          "steps": 1000,
+          "checked_actions": 900,
+          "peak_rad_s": 157.29007777788223,
+          "checked_peak_rad_s": 30.402713154346422,
+          "passed": false
+        }
+      ],
+      "passed": false
+    },
+    {
+      "update": 240,
+      "checkpoint_sha256": "662d2d9c716e2a072854f796a0ab1d59e9ec363958e88f289d087e869a54305c",
+      "mean_original_return": 916.9272424519062,
+      "episodes": [
+        {
+          "seed": 0,
+          "steps": 1000,
+          "checked_actions": 900,
+          "peak_rad_s": 157.29013195128672,
+          "checked_peak_rad_s": 18.286136747707,
+          "passed": false
+        },
+        {
+          "seed": 1,
+          "steps": 1000,
+          "checked_actions": 900,
+          "peak_rad_s": 157.2904416982188,
+          "checked_peak_rad_s": 41.775296759283755,
+          "passed": false
+        },
+        {
+          "seed": 2,
+          "steps": 1000,
+          "checked_actions": 900,
+          "peak_rad_s": 157.29041875965407,
+          "checked_peak_rad_s": 16.88888857483562,
+          "passed": false
+        },
+        {
+          "seed": 42,
+          "steps": 1000,
+          "checked_actions": 900,
+          "peak_rad_s": 157.29005785170114,
+          "checked_peak_rad_s": 18.82753951776623,
+          "passed": false
+        },
+        {
+          "seed": 18446744073709551615,
+          "steps": 1000,
+          "checked_actions": 900,
+          "peak_rad_s": 157.2903133136473,
+          "checked_peak_rad_s": 26.261028512859887,
+          "passed": false
+        }
+      ],
+      "passed": false
+    }
+  ],
+  "selected": null,
+  "qualification": "not qualified; no promotion"
+}

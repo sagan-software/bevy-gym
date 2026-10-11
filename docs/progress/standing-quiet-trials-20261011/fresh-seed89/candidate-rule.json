@@ -1,0 +1,20 @@
+{
+  "schema": "droid-standing-quiet-candidate-rule-v1",
+  "standing_gate": "unchanged original fixed selection gate",
+  "selection_seeds": [
+    0,
+    1,
+    2,
+    42,
+    18446744073709551615
+  ],
+  "horizon_actions": 1000,
+  "policy_interval_ms": 20,
+  "settling_actions": 100,
+  "checked_actions": 900,
+  "maximum_segment_angular_speed_rad_s": 8.0,
+  "motion_measure": "maximum Euclidean world angular speed across all thirteen segments at each post-action boundary",
+  "selection_rule": "highest mean original selection return among checkpoints passing standing and motion selection; earliest update wins ties",
+  "held_out": "never used for checkpoint ranking; original standing and motion gates must both pass all 32 held-out seeds",
+  "qualification": "no promotion from budget completion or selection"
+}

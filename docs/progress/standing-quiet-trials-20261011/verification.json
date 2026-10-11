@@ -1,0 +1,45 @@
+{
+  "objects": [
+    {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/coverage-target/debug/deps/bevy_gym-465415eccecbf3cf",
+      "sha256": "7ce2e5c78b0075e1e059189cab2a7e6aa02163eef24802da62a2c32f6cc7b0cd"
+    },
+    {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/coverage-target/debug/deps/droid_skill_session-4e14768964021903",
+      "sha256": "ed691bb7830f0aa69697cb9edb268a6d82809dc0485bd5069c482db7a9357f71"
+    },
+    {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/coverage-target/debug/deps/recurrent_ppo_bytes-49006fa5e2dd3017",
+      "sha256": "da44b01b4d046bca3d71222d4849e89402155124833e33bf648e3d78f023733c"
+    },
+    {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/coverage-target/debug/examples/droid-standing",
+      "sha256": "52c4735ead3d8b79762450b8e1c1be6e8412b9e5291fc97b915f3a835d9baaaa"
+    }
+  ],
+  "exports": [
+    "/home/sagan/.cache/bevy-gym-quality-validation/standing-quiet-control-fresh-coverage-20261011/0.json",
+    "/home/sagan/.cache/bevy-gym-quality-validation/standing-quiet-control-fresh-coverage-20261011/1.json",
+    "/home/sagan/.cache/bevy-gym-quality-validation/standing-quiet-control-fresh-coverage-20261011/2.json",
+    "/home/sagan/.cache/bevy-gym-quality-validation/standing-quiet-control-fresh-coverage-20261011/3.json"
+  ],
+  "schema": "droid-standing-quiet-verification-v1",
+  "native_unit": "bevy-gym-standing-quiet-control-native-v3-20261011",
+  "personal_unit": "bevy-gym-standing-quiet-control-personal-v2-20261011",
+  "wasm_unit": "bevy-gym-standing-quiet-control-wasm-v2-20261011",
+  "native_session_tests": 53,
+  "cli_tests": 23,
+  "qualification": "not qualified; tests verify mechanics and rejection, not learned standing",
+  "coverage_gaps": [
+    {
+      "file": "examples/robots/standing/control.rs",
+      "line": 58,
+      "reason": "TimeLimit constructor error cannot occur for the fixed positive 1000-action horizon"
+    },
+    {
+      "file": "examples/robots/standing/cli.rs",
+      "line": 253,
+      "reason": "Successful combined control evaluation requires an actually qualified policy; all preserved policy candidates fail"
+    }
+  ]
+}

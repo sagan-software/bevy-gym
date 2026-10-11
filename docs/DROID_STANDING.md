@@ -745,3 +745,54 @@ speed was 154.30 rad/s; seed 59's selected policy reached 157.29 rad/s.
 Lower exploration noise did not fix frozen-policy flailing. Standing, walking and
 competitive combat remain unqualified. The portable source patch passed
 `git apply --check` against its recorded base commit.
+
+## Quiet reward and motion selection
+
+`--reward-profile posture-quiet-v1` multiplies the posture-height training reward
+by `1 / (1 + M / S²)`. `M` is the largest squared angular speed among all thirteen
+segments, in rad²/s². `S` is 4 rad/s. The weight is dimensionless. Components convert
+to f64 before squaring. Terminal rewards, body dynamics and torque bounds retain
+the original standing contract.
+
+The reward record uses schema `droid-standing-posture-quiet-reward-v1`. It retains
+the posture-height members and adds `angular_speed_scale_rad_s: 4.0`,
+`angular_speed_measure: "maximum squared segment angular speed"` and
+`angular_speed_weight: "inverse quadratic"`. The record is written before collection.
+
+Quiet selection requires the original standing gates and an additional motion gate.
+After 100 settling actions, every segment must remain at or below 8 rad/s at all
+900 remaining post-action boundaries. The five ordered selection roots remain
+`0`, `1`, `2`, `42` and `18446744073709551615`. Selection ranks passing checkpoints
+by mean original standing return; held-out cases never rank checkpoints.
+
+Quiet selection reports add `control_episodes` and `control_passed`. Each control
+score contains `seed`, `steps`, `checked_actions`, `peak_rad_s` and `survived`.
+`peak_rad_s` is null before any post-settling boundary was checked. Otherwise, it
+is the largest measured segment speed in rad/s. Missing measurements, incomplete
+episodes and physical termination fail the gate. Other reward profiles retain
+their previous selection reports.
+
+Run the separate frozen checker without changing weights:
+
+```sh
+cargo run --no-default-features --features robots --example droid-standing -- \
+  evaluate-control --checkpoint path/to/checkpoint.mpk
+```
+
+Omitting `--seed` checks all 32 fixed held-out roots. Adding `--seed 42` inspects one
+episode. The report includes both standing and control scores, separate pass flags,
+and their combined result. Invalid checkpoint identity stops before evaluation.
+Neither a passing episode nor budget completion promotes a lesson. The motion gate
+excludes the first two seconds; visual review must include that initial motion.
+
+The [seed-83 record](progress/standing-quiet-trials-20261011/seed83/summary.json)
+retains 1,001 actual PPO updates and 512,512 transitions. Three checkpoints passed
+original standing selection; all three failed motion selection. No checkpoint was
+selected for held-out evaluation. This immutable trial predates fused arithmetic
+and integrated motion selection; its recorded motion rule was applied separately
+to every standing candidate. Fresh runs with seeds 89 and 97 retain their
+[launch records](progress/standing-quiet-trials-20261011/). They remain experimental.
+
+The [verification record](progress/standing-quiet-trials-20261011/verification.json)
+identifies native, browser, CLI and coverage evidence. These checks establish
+mechanics and rejection behavior. No quiet standing policy is qualified.

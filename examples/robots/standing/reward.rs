@@ -24,6 +24,9 @@ pub(crate) enum Recipe {
     /// Posture, contact and pelvis-height weighting for a separate training experiment.
     #[serde(rename = "droid-standing-posture-height-reward-v1")]
     PostureHeightV1,
+    /// Posture-height weighting with an additional physical limb-motion penalty.
+    #[serde(rename = "droid-standing-posture-quiet-reward-v1")]
+    PostureQuietV1,
 }
 
 impl Recipe {
@@ -33,6 +36,7 @@ impl Recipe {
             Self::Original => TrainingTask::default,
             Self::PostureV1 => TrainingTask::posture,
             Self::PostureHeightV1 => TrainingTask::posture_height,
+            Self::PostureQuietV1 => TrainingTask::posture_quiet,
         }
     }
 }
@@ -43,6 +47,9 @@ pub(crate) const POSTURE_SCALE: f64 = 1.0 - 0.965_925_8_f32 as f64;
 pub(crate) const HEIGHT_TARGET_M: f64 = (MIN_HEIGHT_M as f64).midpoint(MAX_HEIGHT_M as f64);
 /// Height-error scale in metres, equal to half the original accepted height span.
 pub(crate) const HEIGHT_SCALE_M: f64 = (MAX_HEIGHT_M as f64 - MIN_HEIGHT_M as f64) / 2.0;
+
+/// Angular-speed normalization in radians/second for the local quiet reward.
+pub(crate) const ANGULAR_SPEED_SCALE_RAD_S: f64 = 4.0;
 
 /// One authoritative physical episode with a training reward projection.
 pub(crate) struct TrainingTask {
@@ -77,6 +84,13 @@ impl TrainingTask {
             recipe: Recipe::PostureHeightV1,
         }
     }
+    /// Create the original body with posture-height and observed limb-motion weighting.
+    pub(crate) fn posture_quiet() -> Self {
+        Self {
+            environment: DroidStanding::default(),
+            recipe: Recipe::PostureQuietV1,
+        }
+    }
 }
 
 impl Env for TrainingTask {
@@ -104,8 +118,15 @@ impl Env for TrainingTask {
             observation.body(DroidBody::RightFoot).floor_contact(),
         );
         // If height weighting is selected, measure the same authoritative post-action pelvis.
-        if self.recipe == Recipe::PostureHeightV1 {
+        if matches!(
+            self.recipe,
+            Recipe::PostureHeightV1 | Recipe::PostureQuietV1
+        ) {
             step.reward *= height_multiplier(observation.body(DroidBody::Pelvis).position().y);
+        }
+        // If quiet weighting is selected, derive it from the same resulting body snapshot.
+        if self.recipe == Recipe::PostureQuietV1 {
+            step.reward *= motion_multiplier(&observation);
         }
         step
     }
@@ -142,9 +163,49 @@ fn height_multiplier(pelvis_height_m: f32) -> f64 {
     (-normalized_error * normalized_error).exp()
 }
 
+/// Penalize the fastest segment without choosing a posture or actuator request.
+///
+/// Legged Gym uses squared joint-speed penalties at commit 8fa29acc6fd1910c3d9659eef6310bdd301cde0a:
+/// <https://github.com/leggedrobotics/legged_gym/blob/8fa29acc6fd1910c3d9659eef6310bdd301cde0a/legged_gym/envs/base/legged_robot.py#L766>.
+/// This local projection measures all thirteen world-frame segment angular speeds.
+fn motion_multiplier(observation: &DroidObservation) -> f64 {
+    // Each component is radians/second; square in f64 so every finite f32 input stays finite.
+    let maximum_squared_rad2_s2 = DroidBody::ALL
+        .into_iter()
+        .map(|body| {
+            let [x, y, z] = observation
+                .body(body)
+                .angular_velocity()
+                .to_array()
+                .map(f64::from);
+            z.mul_add(z, y.mul_add(y, x * x))
+        })
+        .fold(0.0, f64::max);
+    motion_kernel(maximum_squared_rad2_s2)
+}
+
+/// Divide squared angular speed by squared scale; the inverse quadratic is dimensionless.
+fn motion_kernel(maximum_squared_rad2_s2: f64) -> f64 {
+    let scale_squared_rad2_s2 = ANGULAR_SPEED_SCALE_RAD_S * ANGULAR_SPEED_SCALE_RAD_S;
+    1.0 / (1.0 + maximum_squared_rad2_s2 / scale_squared_rad2_s2)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// Known inverse-quadratic weights cover rest, scale, twice-scale and finite f32 extremes.
+    #[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+    #[cfg_attr(not(target_arch = "wasm32"), test)]
+    fn motion_kernel_has_fixed_weights_without_finite_f32_overflow() {
+        assert_eq!(motion_kernel(0.0).to_bits(), 1.0_f64.to_bits());
+        assert_eq!(motion_kernel(16.0).to_bits(), 0.5_f64.to_bits());
+        assert!((motion_kernel(64.0) - 0.2).abs() < f64::EPSILON);
+        let component_rad_s = f64::from(f32::MAX);
+        let maximum_squared_rad2_s2 = 3.0 * component_rad_s * component_rad_s;
+        let weight = motion_kernel(maximum_squared_rad2_s2);
+        assert!(weight.is_finite() && weight > 0.0 && weight < 1e-75);
+    }
 
     /// The fixed kernel peaks at the target and gives exp(-1) at both frozen height bounds.
     #[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]

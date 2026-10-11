@@ -3,6 +3,8 @@
 pub(crate) mod checkpoint;
 #[cfg(not(target_arch = "wasm32"))]
 mod cli;
+/// Additional frozen motion gates for quiet training candidates.
+pub(crate) mod control;
 pub(crate) mod encoding;
 pub(crate) mod evaluation;
 pub(crate) mod model;
