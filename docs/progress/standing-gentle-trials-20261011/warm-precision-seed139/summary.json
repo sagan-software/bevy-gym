@@ -1,0 +1,33 @@
+{
+  "qualification": "failed; no held-out evaluation or promotion",
+  "updates": 1001,
+  "transitions": 512512,
+  "final_optimizer_steps": 3781,
+  "evaluations": 51,
+  "passing_evaluations": 0,
+  "best_failed_update": 1001,
+  "best_failed_original_mean_return": 15.382674624025821,
+  "parent": {
+    "algorithm": "PPO",
+    "optimizer_steps": 592,
+    "schema": "droid-standing-v1",
+    "seed": 43,
+    "sha256": "657f1cbe1fad9cf0782ceac76a51490cdca93b6d51c54366faa26be7ac264b6d",
+    "transitions": 51200,
+    "update": 100
+  },
+  "files": {
+    "optimization.jsonl.gz": "06e8d0be4f4f29ac1657d0e47bd970edf4827e6c760c2721f666d0a6ff23829b",
+    "selection-history.json.gz": "6b8cd840ec7c4a320b7ba0a3ea78be024cc9924e1ef1dafd3e7df0a726032a4b",
+    "Cargo.toml": "fca76954e17308430785773b240256cab84fa4896aa59c88ff41c681b3dc4aa0",
+    "research.rs": "fc19aa83a6f925584c6a50e816b7ab0f1c7535133ece927e72980d018c69a4d9",
+    "run.log.gz": "e3142d09b634feeecdb92c811a540acd745fd9c292f7a35f00a44e4d5d3d4f1c",
+    "best-failed.metadata.json": "47e649b50eddf33fd4b9f5d3ef1c4d62b6d18c3c5ab77e2a52ad996068d62abe",
+    "best-failed.evaluation.json": "d9e87567a66a139e9435ce0d17b26b1438c311b0c875027ba972715b9b2368db",
+    "best-failed.mpk": "d586cc226e8b0973db8ac3ff75c809e47314bb4df2fbfe28185a78da75ae8ee9",
+    "Cargo.lock": "243fc91308a18a8d9aaa035bc12de835009ee8a76dc2ce82ccc19adfdc605e57",
+    "source.patch.gz": "2da9b27508a9bfde36da6de5c6485f4516a8d8438a031bd565ecef839c3ccaf5",
+    "launch.json": "9253733772f8a18ffa215862792d6bdfd92984973ea876159213726fd703e7f5",
+    "initialization.json": "34d70bf9fcb142771aacf91e33d6ffbd50933dd1c8f08e0c0cbd2f910cda65ca"
+  }
+}

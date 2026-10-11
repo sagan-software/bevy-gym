@@ -1,0 +1,20 @@
+[package]
+name = "standing-warm-small-head-probe"
+version = "0.0.0"
+edition = "2021"
+[features]
+browser-training = []
+[dependencies]
+bevy-gym = { path = "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality", default-features = false, features = ["robots"] }
+bevy = { version = "0.18", default-features = false, features = ["bevy_log", "multi_threaded"] }
+clap = { version = "4.5.54", features = ["derive"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10.9"
+tokio = { version = "1", features = ["fs", "io-util", "process", "rt"] }
+[profile.dev]
+opt-level = 1
+[profile.dev.package."*"]
+opt-level = 3
+[profile.dev.package.bevy-gym]
+opt-level = 1

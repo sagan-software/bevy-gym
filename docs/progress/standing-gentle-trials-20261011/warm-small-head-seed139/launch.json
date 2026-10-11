@@ -1,0 +1,22 @@
+{
+  "schema": "standing-warm-small-head-launch-v1",
+  "source_base": "0e3db45ae9bd133162859d81419c4bc1e2eecad6",
+  "source_patch_sha256": "44128aa444526db3793cc60dc361619ee9899fcd9c8c15602be13569db068530",
+  "executable_sha256": "be684a05b0ff99abf92d2d0afac287fcb20ef594a53a52ecc09bc8e3bd3eed33",
+  "program_sha256": "a92a3a6de11fc1cd30b565759108b39da2f0f458bb9d9fbd961b6f9621c5c73c",
+  "manifest_sha256": "e45af12cca43003e9f1c0c0ebb195e455233a19d82ee278c4584f83b9bee02d8",
+  "lock_sha256": "2cfca9a6d0c3e33eadf231fe771c549bb839be3da8424cd79bdb47dec925921f",
+  "candidate_rule_sha256": "cecf1d85f17238a90384ae77a2ed5bc0fbc7ce6ab060a400760169b94a901d5e",
+  "seed": 139,
+  "budget_updates": 1001,
+  "selection": "five fixed roots only; highest original return among standing and motion passes; held-out does not rank",
+  "parent_sha256": "657f1cbe1fad9cf0782ceac76a51490cdca93b6d51c54366faa26be7ac264b6d",
+  "initialization": {
+    "mean_head_scale": 0.01,
+    "reset_initial_log_std": -5.0,
+    "log_std_min": -5.0,
+    "log_std_max": 1.0,
+    "variance_projection": "after every actor Adam step; parameter identity retained"
+  },
+  "qualification": "research only; budget completion is not promotion"
+}

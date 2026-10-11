@@ -1,0 +1,15 @@
+{
+  "actor_features": 204,
+  "algorithm": "PPO",
+  "critic_features": 204,
+  "log_std_max": 1.0,
+  "log_std_min": -9.0,
+  "optimizer_steps": 3781,
+  "qualification": "unqualified research; not accepted by the published standing loader",
+  "schema": "droid-standing-precision-research-v1",
+  "seed": 139,
+  "sha256": "d586cc226e8b0973db8ac3ff75c809e47314bb4df2fbfe28185a78da75ae8ee9",
+  "torque_channels": 26,
+  "transitions": 512512,
+  "update": 1001
+}

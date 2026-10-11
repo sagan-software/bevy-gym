@@ -1,0 +1,33 @@
+{
+  "qualification": "failed; no held-out evaluation or promotion",
+  "updates": 1001,
+  "transitions": 512512,
+  "final_optimizer_steps": 3368,
+  "evaluations": 51,
+  "passing_evaluations": 0,
+  "best_failed_update": 660,
+  "best_failed_original_mean_return": 32.060669977962974,
+  "parent": {
+    "algorithm": "PPO",
+    "optimizer_steps": 592,
+    "schema": "droid-standing-v1",
+    "seed": 43,
+    "sha256": "657f1cbe1fad9cf0782ceac76a51490cdca93b6d51c54366faa26be7ac264b6d",
+    "transitions": 51200,
+    "update": 100
+  },
+  "files": {
+    "optimization.jsonl.gz": "4ad70c01b296a457f9de039b3cc3c28ac840de0383eae6169b44382a8454d709",
+    "selection-history.json.gz": "3db874c28237f155ced5b49aaba86eea8ae40abe3572179a1d998a6ec45e8d39",
+    "Cargo.toml": "e45af12cca43003e9f1c0c0ebb195e455233a19d82ee278c4584f83b9bee02d8",
+    "research.rs": "a92a3a6de11fc1cd30b565759108b39da2f0f458bb9d9fbd961b6f9621c5c73c",
+    "run.log.gz": "e813bfb6316d8c44eeb1bde2e2bbfc793b16a366e47d150c479aab4e5cb4f246",
+    "best-failed.metadata.json": "a016df3982def1b48a5130e579e2b78a50966bd305831879937e19a22beaaf34",
+    "best-failed.evaluation.json": "3391fa6231ac11f7b3b27491e589bea89ffd2bb8e54676fa91a169eabcc01867",
+    "best-failed.mpk": "a31a698fadf5d6a330608926ad3decf89e4b2f38540482944f6a50632acd7051",
+    "Cargo.lock": "2cfca9a6d0c3e33eadf231fe771c549bb839be3da8424cd79bdb47dec925921f",
+    "source.patch.gz": "2da9b27508a9bfde36da6de5c6485f4516a8d8438a031bd565ecef839c3ccaf5",
+    "launch.json": "79fe4cfbfcd2507342d1abce12044744bd4624c26dde1fde6a1b42fd8b994214",
+    "initialization.json": "108023426fb4a6acf8d70ae394fafcd0f04358b1525eddbe4efe2acfa27b3896"
+  }
+}

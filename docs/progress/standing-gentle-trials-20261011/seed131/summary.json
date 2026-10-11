@@ -1,0 +1,25 @@
+{
+  "seed": 131,
+  "updates": 10001,
+  "transitions": 5120512,
+  "evaluation_count": 501,
+  "passing_evaluations": 0,
+  "best_failed_update": 6900,
+  "best_failed_original_mean_return": 52.77586800102144,
+  "qualification": "failed; no held-out evaluation or promotion",
+  "learner": "predates the variance-bound projection fix",
+  "files": {
+    "selection-budget.json": "0c1121c9a96fa9078c44b5c5633f72be857f04f5668c92148b36a8cb2264d01f",
+    "optimization.jsonl.gz": "4a64c07882aac64aaaadb4c6132ec300cb390c5b4be82af2680e7f60a923eec1",
+    "selection-history.json.gz": "6392f6bd460bb5b04224afbafc66fee5b65692dbc36f1f5fb172bd9a919fb91d",
+    "run.log.gz": "4cfa58f5bdbbb83732cb14efbaeed7081e208e59c22107a17054baa92731ed0e",
+    "training-reward.json": "fa5ef57d6dc41d4f3c3571a5a410970e2143d9f426e7b57bce8a5857e6c2a881",
+    "training-optimizer.json": "2dd0cb3251a9426c8c40eb0a6843b4f8dc5d106decaa1ec0efb85a1b3602f31e",
+    "candidate-rule.json": "cecf1d85f17238a90384ae77a2ed5bc0fbc7ce6ab060a400760169b94a901d5e",
+    "best-failed.evaluation.json": "ba34ceac0e624ec93e179f367e6c80a398c113ce5a6eea04b6c6fd5d5447bc4c",
+    "best-failed.mpk": "dd40d1ae7cce38d3accd6929b2b65585f158150a01471d1aba2b69bf3641077e",
+    "source.patch.gz": "ff9f5a535495848c38b9e48bfa1ccf720f2bcfe188534ff27cf907a150be6ce9",
+    "launch.json": "77519118da7ed98ac524589f31fa29d97dfeecefff61ef7d8ca54abd36afdd9c",
+    "best-failed.json": "3fc9bebff333f4259153ccec8b235713fc6142269434a8d73176c0d9810087e6"
+  }
+}
