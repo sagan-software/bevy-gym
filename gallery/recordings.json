@@ -75,16 +75,16 @@
     "evidence": "../docs/progress/drone-skill-scenes.json"
   },
   "travel": {
-    "captured_utc": "2026-10-10",
+    "captured_utc": "2026-10-11",
     "capture_tool": "T3 Code collaborative browser",
     "viewport_css_px": [
       1280,
       800
     ],
-    "source_url": "http://100.105.254.50:8784/travel/",
-    "source_recording_id": "26ddcb60-6b6c-4250-91e5-ae4229d6559e",
-    "source_sha256": "c814d5fa2760fa3eef25e316943275760125898b0b1b33f7f67eb2c676c130c4",
-    "trim_start_seconds": 1,
+    "source_url": "http://100.105.254.50:8086/travel/",
+    "source_recording_id": "41cd14c3-ecda-4844-8b4a-ca574c8ab017-4cfef3c6-43a5-4fbc-8236-1dbedc3210f6-mp4",
+    "source_sha256": "9d0188f60b9958eae10f533d49d7cedc1ec2dec5b942efb1285f0f30e5ac3e52",
+    "trim_start_seconds": 0,
     "duration_seconds": 10.0,
     "frames": 240,
     "fps": 24,
@@ -93,11 +93,11 @@
       600
     ],
     "audio": false,
-    "sha256": "dc09db321932fd4f4cf8c7f84907ea0d17890e62fa0e99f14208f8b1119d4372",
-    "poster_sha256": "8ad57420b415d02cebbd8adf667cf3e7382adffba99cc6aeb2f76cd60fe3543d",
+    "sha256": "a01de75d69c722a71e5200d387e7d34c08631dade6be03936c6ad22126d7e3a0",
+    "poster_sha256": "c288a2b820783831e4dbf54aceb8d5e36fb1c243dc20586c15d49b6d00e88c4f",
     "mode": "Frozen-policy inference",
-    "runtime_build": "7dd084b1e9c46ad70270c58ba051909db4a1b3dd438a06f41450d6eb3f377f5d",
-    "evidence": "../docs/progress/drone-travel-scene.json"
+    "runtime_build": "2826cc783bcb21b754d78a63b56602f2f7894aa3bccccdf0ae937f58347801d6",
+    "evidence": "../docs/progress/drone-arrival.json"
   },
   "standing": {
     "captured_utc": "2026-10-10",

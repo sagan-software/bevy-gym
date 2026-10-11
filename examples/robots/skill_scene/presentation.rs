@@ -4,7 +4,7 @@ use bevy::math::Vec3;
 use bevy_gym::robots::{DroneAction, DroneDestination, DroneObservation};
 use bevy_gym::EpisodeStatus;
 
-use super::{session::Session, travel};
+use super::{arrival, session::Session, travel};
 
 /// Keep physical task observations typed until the renderer reads their common body state.
 pub(super) enum SceneSession {
@@ -16,7 +16,7 @@ pub(super) enum SceneSession {
     /// Goal-conditioned travel episode using the shared PPO task.
     Travel(
         /// Frozen travel policy and its independently sampled task.
-        Session<travel::environment::TravelTask, 13>,
+        Session<arrival::TravelTask, 15>,
     ),
 }
 

@@ -17,6 +17,11 @@ recording identities, source and output hashes, runtime builds, trim offsets,
 policy evidence and mode. Every MP4 contains 240 frames at 24 fps, at 960 × 600.
 All ten files passed complete decoding and duration checks.
 
+The travel recording now uses the qualified fifteen-feature arrival actor. Its
+[qualification record](../docs/progress/drone-arrival.json) retains the 32-episode
+native and WASM held-out gates and fresh coverage gaps. The older travel
+progression, droid standing and competitive combat remain unfinished.
+
 Robot recordings came from local release builds. The world recording includes
 the current Drones versus droids name. Classic Control recordings came from the public browser routes.
 CartPole, both MountainCar tasks and Acrobot use bundled RL policies. Pendulum

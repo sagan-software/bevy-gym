@@ -1,0 +1,331 @@
+{
+  "checkpoint_sha256": "3e6964d0f1475081b2572387f2193e070fd396800023639074ca073e69b54c88",
+  "episodes": [
+    {
+      "final_distance_m": 0.12923602759838104,
+      "final_heading_alignment": 0.976063072681427,
+      "final_speed_m_s": 0.007666919846087694,
+      "passed": true,
+      "reward": 239.6555619079436,
+      "seed": 18446744073709551614,
+      "stable_tail_actions": 100,
+      "steps": 500
+    },
+    {
+      "final_distance_m": 0.12744823098182678,
+      "final_heading_alignment": 0.9790204167366028,
+      "final_speed_m_s": 0.003984836861491203,
+      "passed": true,
+      "reward": 394.4815992191434,
+      "seed": 18446744073709551613,
+      "stable_tail_actions": 100,
+      "steps": 500
+    },
+    {
+      "final_distance_m": 0.1272915154695511,
+      "final_heading_alignment": 0.9790324568748474,
+      "final_speed_m_s": 0.0018186068627983332,
+      "passed": true,
+      "reward": 381.4566079750657,
+      "seed": 18446744073709551612,
+      "stable_tail_actions": 100,
+      "steps": 500
+    },
+    {
+      "final_distance_m": 0.12866000831127167,
+      "final_heading_alignment": 0.9790059328079224,
+      "final_speed_m_s": 0.002927814843133092,
+      "passed": true,
+      "reward": 405.52004758268595,
+      "seed": 18446744073709551611,
+      "stable_tail_actions": 100,
+      "steps": 500
+    },
+    {
+      "final_distance_m": 0.1275823414325714,
+      "final_heading_alignment": 0.9790936708450317,
+      "final_speed_m_s": 0.0011305315420031548,
+      "passed": true,
+      "reward": 394.0212854295969,
+      "seed": 18446744073709551610,
+      "stable_tail_actions": 100,
+      "steps": 500
+    },
+    {
+      "final_distance_m": 0.1290755271911621,
+      "final_heading_alignment": 0.9788983464241028,
+      "final_speed_m_s": 0.006059805862605572,
+      "passed": true,
+      "reward": 349.36098777130246,
+      "seed": 18446744073709551609,
+      "stable_tail_actions": 100,
+      "steps": 500
+    },
+    {
+      "final_distance_m": 0.1280009001493454,
+      "final_heading_alignment": 0.979030430316925,
+      "final_speed_m_s": 0.0009655261528678238,
+      "passed": true,
+      "reward": 421.81120786070824,
+      "seed": 18446744073709551608,
+      "stable_tail_actions": 100,
+      "steps": 500
+    },
+    {
+      "final_distance_m": 0.1288784146308899,
+      "final_heading_alignment": 0.9789074659347534,
+      "final_speed_m_s": 0.004301351960748434,
+      "passed": true,
+      "reward": 415.2687914967537,
+      "seed": 18446744073709551607,
+      "stable_tail_actions": 100,
+      "steps": 500
+    },
+    {
+      "final_distance_m": 0.1283901482820511,
+      "final_heading_alignment": 0.9790530800819397,
+      "final_speed_m_s": 0.002275975188240409,
+      "passed": true,
+      "reward": 430.712858825922,
+      "seed": 18446744073709551606,
+      "stable_tail_actions": 100,
+      "steps": 500
+    },
+    {
+      "final_distance_m": 0.12822912633419037,
+      "final_heading_alignment": 0.9790198802947998,
+      "final_speed_m_s": 0.0011804904788732529,
+      "passed": true,
+      "reward": 411.045178309083,
+      "seed": 18446744073709551605,
+      "stable_tail_actions": 100,
+      "steps": 500
+    },
+    {
+      "final_distance_m": 0.12760771811008453,
+      "final_heading_alignment": 0.9789367318153381,
+      "final_speed_m_s": 0.007069146726280451,
+      "passed": true,
+      "reward": 414.2079858034849,
+      "seed": 18446744073709551604,
+      "stable_tail_actions": 100,
+      "steps": 500
+    },
+    {
+      "final_distance_m": 0.13345666229724884,
+      "final_heading_alignment": 0.9780494570732117,
+      "final_speed_m_s": 0.03894563391804695,
+      "passed": true,
+      "reward": 299.9629217777401,
+      "seed": 18446744073709551603,
+      "stable_tail_actions": 100,
+      "steps": 500
+    },
+    {
+      "final_distance_m": 0.1269051730632782,
+      "final_heading_alignment": 0.9790610074996948,
+      "final_speed_m_s": 0.004567581694573164,
+      "passed": true,
+      "reward": 429.1967130303383,
+      "seed": 18446744073709551602,
+      "stable_tail_actions": 100,
+      "steps": 500
+    },
+    {
+      "final_distance_m": 0.13047656416893005,
+      "final_heading_alignment": 0.9788079261779785,
+      "final_speed_m_s": 0.006008436903357506,
+      "passed": true,
+      "reward": 360.082666905364,
+      "seed": 18446744073709551601,
+      "stable_tail_actions": 100,
+      "steps": 500
+    },
+    {
+      "final_distance_m": 0.12944763898849487,
+      "final_heading_alignment": 0.9788978695869446,
+      "final_speed_m_s": 0.002899989951401949,
+      "passed": true,
+      "reward": 392.00432896986604,
+      "seed": 18446744073709551600,
+      "stable_tail_actions": 100,
+      "steps": 500
+    },
+    {
+      "final_distance_m": 0.12806689739227295,
+      "final_heading_alignment": 0.979004442691803,
+      "final_speed_m_s": 0.003300132229924202,
+      "passed": true,
+      "reward": 421.35939814150333,
+      "seed": 18446744073709551599,
+      "stable_tail_actions": 100,
+      "steps": 500
+    },
+    {
+      "final_distance_m": 0.12835495173931122,
+      "final_heading_alignment": 0.9789916276931763,
+      "final_speed_m_s": 0.001918243826366961,
+      "passed": true,
+      "reward": 458.95187270641327,
+      "seed": 18446744073709551598,
+      "stable_tail_actions": 100,
+      "steps": 500
+    },
+    {
+      "final_distance_m": 0.12705442309379578,
+      "final_heading_alignment": 0.9789249300956726,
+      "final_speed_m_s": 0.0030385104473680258,
+      "passed": true,
+      "reward": 353.2034862227738,
+      "seed": 18446744073709551597,
+      "stable_tail_actions": 100,
+      "steps": 500
+    },
+    {
+      "final_distance_m": 0.12805292010307312,
+      "final_heading_alignment": 0.9790471792221069,
+      "final_speed_m_s": 0.000870241376105696,
+      "passed": true,
+      "reward": 439.81708109378815,
+      "seed": 18446744073709551596,
+      "stable_tail_actions": 100,
+      "steps": 500
+    },
+    {
+      "final_distance_m": 0.12771889567375183,
+      "final_heading_alignment": 0.979129433631897,
+      "final_speed_m_s": 0.0035368609242141247,
+      "passed": true,
+      "reward": 387.36157220229506,
+      "seed": 18446744073709551595,
+      "stable_tail_actions": 100,
+      "steps": 500
+    },
+    {
+      "final_distance_m": 0.12829861044883728,
+      "final_heading_alignment": 0.9790455102920532,
+      "final_speed_m_s": 0.0007542222738265991,
+      "passed": true,
+      "reward": 443.6351512372494,
+      "seed": 18446744073709551594,
+      "stable_tail_actions": 100,
+      "steps": 500
+    },
+    {
+      "final_distance_m": 0.12790770828723907,
+      "final_heading_alignment": 0.9787939786911011,
+      "final_speed_m_s": 0.0031784435268491507,
+      "passed": true,
+      "reward": 339.18586352746934,
+      "seed": 18446744073709551593,
+      "stable_tail_actions": 100,
+      "steps": 500
+    },
+    {
+      "final_distance_m": 0.12751701474189758,
+      "final_heading_alignment": 0.9790529012680054,
+      "final_speed_m_s": 0.003414622973650694,
+      "passed": true,
+      "reward": 412.49138067290187,
+      "seed": 18446744073709551592,
+      "stable_tail_actions": 100,
+      "steps": 500
+    },
+    {
+      "final_distance_m": 0.1284494698047638,
+      "final_heading_alignment": 0.979049563407898,
+      "final_speed_m_s": 0.0021187197417020798,
+      "passed": true,
+      "reward": 412.0744302198291,
+      "seed": 18446744073709551591,
+      "stable_tail_actions": 100,
+      "steps": 500
+    },
+    {
+      "final_distance_m": 0.1273786872625351,
+      "final_heading_alignment": 0.9788898825645447,
+      "final_speed_m_s": 0.007710086181759834,
+      "passed": true,
+      "reward": 403.210682310164,
+      "seed": 18446744073709551590,
+      "stable_tail_actions": 100,
+      "steps": 500
+    },
+    {
+      "final_distance_m": 0.12702028453350067,
+      "final_heading_alignment": 0.9783642292022705,
+      "final_speed_m_s": 0.007456440478563309,
+      "passed": true,
+      "reward": 269.78271704125655,
+      "seed": 18446744073709551589,
+      "stable_tail_actions": 100,
+      "steps": 500
+    },
+    {
+      "final_distance_m": 0.12908853590488434,
+      "final_heading_alignment": 0.9789740443229675,
+      "final_speed_m_s": 0.0025261281989514828,
+      "passed": true,
+      "reward": 434.83190205693245,
+      "seed": 18446744073709551588,
+      "stable_tail_actions": 100,
+      "steps": 500
+    },
+    {
+      "final_distance_m": 0.12728974223136902,
+      "final_heading_alignment": 0.9790381193161011,
+      "final_speed_m_s": 0.0036853926721960306,
+      "passed": true,
+      "reward": 379.92371607013047,
+      "seed": 18446744073709551587,
+      "stable_tail_actions": 100,
+      "steps": 500
+    },
+    {
+      "final_distance_m": 0.12819163501262665,
+      "final_heading_alignment": 0.9789918661117554,
+      "final_speed_m_s": 0.002025401219725609,
+      "passed": true,
+      "reward": 436.07774506509304,
+      "seed": 18446744073709551586,
+      "stable_tail_actions": 100,
+      "steps": 500
+    },
+    {
+      "final_distance_m": 0.12862910330295563,
+      "final_heading_alignment": 0.9790425896644592,
+      "final_speed_m_s": 0.0014611569931730628,
+      "passed": true,
+      "reward": 406.10660626739264,
+      "seed": 18446744073709551585,
+      "stable_tail_actions": 100,
+      "steps": 500
+    },
+    {
+      "final_distance_m": 0.12864558398723602,
+      "final_heading_alignment": 0.9789825081825256,
+      "final_speed_m_s": 0.0010889479890465736,
+      "passed": true,
+      "reward": 425.3401923775673,
+      "seed": 18446744073709551584,
+      "stable_tail_actions": 100,
+      "steps": 500
+    },
+    {
+      "final_distance_m": 0.12767381966114044,
+      "final_heading_alignment": 0.9789436459541321,
+      "final_speed_m_s": 0.0048508490435779095,
+      "passed": true,
+      "reward": 405.78679022192955,
+      "seed": 18446744073709551583,
+      "stable_tail_actions": 100,
+      "steps": 500
+    }
+  ],
+  "model_selection": "highest original return among the two passing selection checkpoints: update440; held-out results do not choose weights",
+  "parameter_bytes_unchanged": true,
+  "passed": true,
+  "qualification": "native held-out only; browser and inference scene still required",
+  "schema": "drone-travel-held-out-research-v1",
+  "seed_partition": "existing robot convention: MAX-1 through MAX-32; all high-bit roots excluded from training; selection MAX excluded"
+}

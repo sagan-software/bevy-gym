@@ -1,0 +1,3 @@
+set -eu
+cd /home/sagan/Code/github.com/sagan-software/bevy-gym-quality
+nix develop --command env -u CFLAGS CARGO_TARGET_DIR=/home/sagan/.cache/bevy-gym-quality-validation/target CARGO_BUILD_BUILD_DIR=/home/sagan/.cache/bevy-gym-quality-validation/build CARGO_PROFILE_DEV_DEBUG=0 CARGO_INCREMENTAL=0 CARGO_BUILD_JOBS=2 cargo build --offline --manifest-path /home/sagan/.cache/bevy-gym-quality-validation/drone-travel-transfer-research-20261011/Cargo.toml

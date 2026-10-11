@@ -1,0 +1,43 @@
+{
+  "schema": "drone-travel-transfer-research-launch-v1",
+  "source_base": "75ac19189fd11dcaa641b279dd85153a53030610",
+  "seed": 163,
+  "budget_updates": 1001,
+  "actor_features": 15,
+  "critic_features": 15,
+  "motor_actions": 4,
+  "initialization": "PPO recovery actor retained; three appended zero-weight heading features; fresh critic/Adam and exploration reset to -2; mean head unchanged",
+  "config": {
+    "actor_hidden_size": 32,
+    "critic_hidden_sizes": [
+      64,
+      64
+    ],
+    "gamma": 0.995,
+    "gae_lambda": 0.95,
+    "actor_learning_rate": 0.0003,
+    "critic_learning_rate": 0.001,
+    "entropy_coefficient": 0.001,
+    "epochs": 4,
+    "minibatch_sequences": 8,
+    "initial_log_std": -2.0,
+    "log_std_min": -5.0,
+    "log_std_max": 1.0
+  },
+  "preflight_tests": "seven native research tests pass; actual complete-action migration equality also checked before collecting the first rollout",
+  "selection_roots": [
+    0,
+    1,
+    2,
+    42,
+    18446744073709551615
+  ],
+  "gate": "500 actions, every final 100: distance <=0.3m, speed <=0.3m/s, up-Y >=0.95, angular speed <=0.5rad/s, heading error <=15deg",
+  "selection": "highest original return among all-five passing evaluations; earliest update breaks ties; held-out excluded",
+  "qualification": "research only; no budget promotion; published 12-input flight loader cannot accept this 15-input checkpoint",
+  "executable_sha256": "c7e7c4a0e14d1af9e3f4bc325732d003ed61b1c4fe576218d175fa457bfca419",
+  "program_sha256": "9a4a2912f0ed75cdde7654e47bc8e64acfae98a21d30988a0ea21e2462de8c01",
+  "manifest_sha256": "83fb4e21544be5f0fce74c170b601c42ef431c140289c24c1865a0509de9a5c9",
+  "lock_sha256": "00559e1e2bf1322542a218089937015a8fb0d5a036321e972b245bd6403e76c6",
+  "parent_sha256": "bb0bef6e7412fd79ea097fa95036d428d22962af3b259c52c82b38c894df9b76"
+}

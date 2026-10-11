@@ -1,5 +1,12 @@
 //! Read-only scene projection of a frozen RL lesson with explicit playback controls.
 
+#[expect(
+    dead_code,
+    unused_imports,
+    reason = "Frozen playback shares its task and evaluation contract with the qualification tests."
+)]
+#[path = "../arrival/mod.rs"]
+mod arrival;
 #[path = "../drone_model.rs"]
 mod drone_model;
 #[path = "../learning/encoding.rs"]
@@ -53,16 +60,16 @@ pub(super) fn run(title: &'static str, factory: fn() -> DroneHover) {
     );
 }
 
-/// Show the recorded failed RL travel candidate without claiming qualification.
+/// Show the selected goal-conditioned actor through the independently evaluated travel task.
 pub(super) fn run_travel() {
-    let bytes = include_bytes!("../../../docs/progress/drone-travel-trial.mpk");
-    let session = travel::load(bytes.to_vec(), 42)
+    let bytes = include_bytes!("../../../docs/progress/drone-arrival.mpk");
+    let session = arrival::load(bytes.to_vec(), 42)
         .map(SceneSession::Travel)
         .map_err(|error| error.to_string());
     start(
-        "Travel trial",
+        "Travel",
         session,
-        checkpoint_label(bytes, "Unqualified RL · trial"),
+        checkpoint_label(bytes, "Frozen RL · arrival"),
     );
 }
 

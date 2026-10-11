@@ -1,0 +1,38 @@
+{
+  "invariants": {
+    "states": [
+      "existing frozen session Ready or sticky Failed",
+      "environment Continuing, Terminated or Truncated"
+    ],
+    "boundaries": [
+      "exact 15 actor and critic features, four continuous motors in [0,1]",
+      "checkpoint loading and motor decoding reject incompatible or non-finite values before physics"
+    ],
+    "derived": [
+      "goal and body features come from one authoritative observation",
+      "visible identity derives from embedded bytes",
+      "no independently mutable pose, goal, command or step counter"
+    ],
+    "complexity": "encoder and per-action task adapters use fixed-size storage; physics and recurrent inference retain their existing costs"
+  },
+  "checks": [
+    "genuine missing-session regression before implementation",
+    "32 reserved seeds pass same 500-action final-100 fixed gates on native and WASM",
+    "500-action scene/direct-policy parity, terminal freeze and recurrent reset",
+    "untrained fixture fails, old feature profiles and invalid actuator scaling fail",
+    "cargo fmt --all -- --check",
+    "cargo test",
+    "cargo test --features robots",
+    "cargo clippy --all-targets --all-features -- -D warnings",
+    "personal Rust lint workflow, including new tracked intent-to-add files",
+    "nix run .#drone-browser-check",
+    "fresh measured production coverage with separate object export and empty LLVM stderr",
+    "rendered desktop and mobile check through T3 preview",
+    "actual ten-second video and refreshed gallery screenshot",
+    "final separate prose edit followed by documentation tests"
+  ],
+  "unfinished": [
+    "droid standing and walking competence",
+    "RL-only competitive 3v3 combat"
+  ]
+}

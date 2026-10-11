@@ -6,6 +6,11 @@ browser scene is deployed. It runs six frozen PPO actors but has no combat rules
 or qualified competitive policies. The gallery update adds ten-second recordings,
 the standing viewer and explicit status for every remaining droid lesson.
 
+The independent [drone arrival lesson](DRONE_TRAVEL.md#frozen-arrival-lesson) now
+passes all five selection roots and 32 frozen held-out roots on native and WASM.
+Its gallery card uses a fresh ten-second release-browser recording and poster.
+The broader travel progression and competitive combat remain unfinished.
+
 The [walking task](DROID_WALKING.md) now has independently validated physical
 mechanics. Its PPO runner, learned policy and browser lesson remain unfinished.
 Recovery and competitive training also remain unfinished.
@@ -59,7 +64,7 @@ stable streak zero. The [record](progress/standing-seed17-update22940/summary.js
 retains the ranking, frozen checkpoint, full evaluation and selection traces.
 No droid standing policy is qualified.
 
-Updated: 2026-10-10. Current work: RL-only drone/droid curriculum.
+Updated: 2026-10-11. Current work: RL-only drone/droid curriculum.
 
 ## Resume here
 

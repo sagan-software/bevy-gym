@@ -1,0 +1,66 @@
+{
+  "actor_features": 15,
+  "algorithm": "PPO",
+  "critic_features": 15,
+  "episodes": [
+    {
+      "final_distance_m": 0.12792262434959412,
+      "final_heading_alignment": 0.9788975119590759,
+      "final_speed_m_s": 0.01621410809457302,
+      "passed": true,
+      "reward": 286.5930971677881,
+      "seed": 0,
+      "stable_tail_actions": 100,
+      "steps": 500
+    },
+    {
+      "final_distance_m": 0.12736515700817108,
+      "final_heading_alignment": 0.979082465171814,
+      "final_speed_m_s": 0.003665889846161008,
+      "passed": true,
+      "reward": 440.4243088066578,
+      "seed": 1,
+      "stable_tail_actions": 100,
+      "steps": 500
+    },
+    {
+      "final_distance_m": 0.12872284650802612,
+      "final_heading_alignment": 0.979026198387146,
+      "final_speed_m_s": 0.0021159888710826635,
+      "passed": true,
+      "reward": 422.39028841257095,
+      "seed": 2,
+      "stable_tail_actions": 100,
+      "steps": 500
+    },
+    {
+      "final_distance_m": 0.1262684017419815,
+      "final_heading_alignment": 0.9792035222053528,
+      "final_speed_m_s": 0.006133128888905048,
+      "passed": true,
+      "reward": 389.18607280030847,
+      "seed": 42,
+      "stable_tail_actions": 100,
+      "steps": 500
+    },
+    {
+      "final_distance_m": 0.1293329894542694,
+      "final_heading_alignment": 0.9789798855781555,
+      "final_speed_m_s": 0.0024752842728048563,
+      "passed": true,
+      "reward": 377.8513476252556,
+      "seed": 18446744073709551615,
+      "stable_tail_actions": 100,
+      "steps": 500
+    }
+  ],
+  "motors": 4,
+  "optimizer_steps": 1972,
+  "passed": true,
+  "qualification": "unqualified research; requires disjoint held-out tests and browser validation",
+  "schema": "drone-travel-continuation-research-checkpoint-v1",
+  "seed": 173,
+  "sha256": "3e6964d0f1475081b2572387f2193e070fd396800023639074ca073e69b54c88",
+  "transitions": 225280,
+  "update": 440
+}

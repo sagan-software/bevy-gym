@@ -1,0 +1,13 @@
+{
+  "completed_updates": 1001,
+  "selection_checkpoints": 51,
+  "passing_updates": [
+    440,
+    460
+  ],
+  "selected_update": 440,
+  "selected_mean_original_return": 383.2890229625162,
+  "selection_passed": true,
+  "selected_checkpoint_sha256": "3e6964d0f1475081b2572387f2193e070fd396800023639074ca073e69b54c88",
+  "budget_exit": "failed research budget; candidate selection is recorded separately; budget does not promote"
+}

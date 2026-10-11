@@ -1,0 +1,161 @@
+{
+  "schema": "drone-arrival-qualification-v1",
+  "updated_utc": "2026-10-11",
+  "status": "qualified for the sampled arrival profile only",
+  "source_base": "75ac19189fd11dcaa641b279dd85153a53030610",
+  "checkpoint": {
+    "file": "drone-arrival.mpk",
+    "sha256": "3e6964d0f1475081b2572387f2193e070fd396800023639074ca073e69b54c88",
+    "parent_file": "drone-arrival-parent.mpk",
+    "parent_sha256": "8b4aed76f48e9d853bab69f7b8968d3aef58f3e84ee004e11f1801ed46f5cf12"
+  },
+  "algorithm": "recurrent PPO with a Gaussian four-motor actor; no scripted autonomous decisions",
+  "profile": {
+    "actor_features": 15,
+    "critic_features": 15,
+    "value_slots": 1,
+    "hidden": 32,
+    "critic_hidden": [
+      64,
+      64
+    ],
+    "motors": 4,
+    "motor_bounds": [
+      0,
+      1
+    ],
+    "feature_order": [
+      "body-frame goal displacement / 2 metres XYZ",
+      "body-frame world up XYZ",
+      "body-frame linear velocity / 2 metres per second XYZ",
+      "body-frame angular velocity / 2 radians per second XYZ",
+      "body-frame desired unit heading XYZ"
+    ],
+    "dynamics": "original DroneTravel body, integration, disturbances and reward",
+    "goal_sampler": {
+      "rng": "SplitMix64(root XOR 0x74726176656c0001)",
+      "draw_order": [
+        "azimuth uniform [-pi,pi) radians",
+        "radius uniform [1,3) metres",
+        "independent heading uniform [-pi,pi) radians"
+      ],
+      "height_m": 2,
+      "reset_none": "retain destination and delegate original physical reset"
+    },
+    "horizon_actions": 500,
+    "action_period_s": 0.02
+  },
+  "training": {
+    "fresh_root": 157,
+    "fresh_parent_update": 820,
+    "continuation_root": 173,
+    "continuation_update": 440,
+    "lineage_updates": 1260,
+    "lineage_transitions": 645120,
+    "fresh_trial_executed_updates": 1001,
+    "continuation_trial_executed_updates": 1001,
+    "total_executed_transitions": 1025024,
+    "actor_learning_rate": 0.0003,
+    "critic_learning_rate": 0.001,
+    "entropy_coefficient": 0.001,
+    "gamma": 0.995,
+    "gae_lambda": 0.95,
+    "epochs": 4,
+    "initial_log_std": -2,
+    "log_std_bounds": [
+      -5,
+      1
+    ],
+    "lanes": 8,
+    "actions_per_lane": 64,
+    "parent_import": "retain actor, critic and learned scales; fresh Adam",
+    "training_roots": "lower 63 bits; selection roots excluded; lane derivation retained in archived source",
+    "fresh_mean_head_scale": 0.01,
+    "selection_tie_break": "earliest update"
+  },
+  "selection": {
+    "roots": [
+      0,
+      1,
+      2,
+      42,
+      18446744073709551615
+    ],
+    "passing_continuation_updates": [
+      440,
+      460
+    ],
+    "ranking": "highest mean reward among fixed-gate selection passes; held-out episodes excluded",
+    "selected_mean_return": 383.2890229625162,
+    "record": "drone-arrival-20261011/selected.research.json"
+  },
+  "gate": {
+    "survive_actions": 500,
+    "consecutive_final_actions": 100,
+    "each_final_action": {
+      "maximum_distance_m": 0.3,
+      "maximum_speed_m_s": 0.3,
+      "minimum_up_y": 0.95,
+      "maximum_angular_speed_rad_s": 0.5,
+      "minimum_heading_alignment": "cos(15 degrees)"
+    }
+  },
+  "held_out": {
+    "roots": "u64::MAX-1 through u64::MAX-32",
+    "episodes": 32,
+    "native_passed": 32,
+    "wasm_passed": 32,
+    "frozen_parameters_unchanged": true,
+    "record": "drone-arrival-20261011/native-held-out.json"
+  },
+  "verification": {
+    "native": "exact format, full default and robots tests, strict all-target all-feature Clippy passed",
+    "personal_lints": "exact changed-range all-target all-feature workflow passed without changed diagnostics",
+    "wasm": "nix run .#drone-browser-check passed after final test edit",
+    "focused_tests": 11,
+    "coverage": "all reachable recorded branch sides hit; module20/20, environment47/47, encoder34/34, evaluator109/110 regions",
+    "coverage_gap": "evaluation.rs:31:65..66 constructor error propagation is unreachable because the horizon is the fixed positive 500; scene startup lacks native LLVM coverage but executes in browser",
+    "release_build": "scripts/build_drone_skills.sh --release passed",
+    "browser": {
+      "runtime_sha256": "2826cc783bcb21b754d78a63b56602f2f7894aa3bccccdf0ae937f58347801d6",
+      "seed": 42,
+      "completed_actions": 500,
+      "distance_m": 0.13,
+      "heading_error_degrees": 11.7,
+      "speed_m_s": 0.01,
+      "desktop_css_px": [
+        1280,
+        800
+      ],
+      "mobile_css_px": [
+        390,
+        844
+      ],
+      "page_visibility": "visible",
+      "preview_tool_visible": false,
+      "physical_mobile_verified": false
+    },
+    "documentation": "changed Markdown lint, native example guide check and final documentation tests passed: 21 pass, 1 ignored",
+    "gallery": "39 JavaScript tests and two gallery contracts passed; desktop/mobile inspected; actual muted loop plays"
+  },
+  "media": {
+    "record": "drone-arrival-20261011/recording.json",
+    "complete_decode": "passed",
+    "duration_s": 10,
+    "frames": 240,
+    "fps": 24,
+    "size_px": [
+      960,
+      600
+    ],
+    "motion": "actual approach and settling from reset after graphics loaded",
+    "qualification": "video itself is not qualification evidence"
+  },
+  "unfinished": [
+    "historical 13-feature endurance/near/far/fast curriculum progression",
+    "clearance and combat qualification",
+    "droid standing, walking and continuous curriculum",
+    "RL-only 3v3 drones versus droids competition"
+  ],
+  "archive": "drone-arrival-20261011/sha256.json"
+}

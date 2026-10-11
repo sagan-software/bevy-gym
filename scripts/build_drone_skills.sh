@@ -63,7 +63,7 @@ for lesson in hover recovery travel standing world; do
         guide=DRONE_RECOVERY
         ;;
     travel)
-        title='Travel trial'
+        title=Travel
         guide=DRONE_TRAVEL
         ;;
     standing)

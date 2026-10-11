@@ -1,0 +1,160 @@
+{
+  "objects": [
+    {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/coverage-target/debug/deps/drone_arrival_session-bf63bf79da1701ed",
+      "sha256": "318695b53998bdd47c1b4056fdac48a77db6ced726275a34b231cd99039f8827"
+    }
+  ],
+  "exports": [
+    "/home/sagan/.cache/bevy-gym-quality-validation/arrival-fresh-coverage-v2/0.json"
+  ],
+  "mod.rs": {
+    "hit": 20,
+    "total": 20,
+    "zero_regions": [],
+    "branches": [],
+    "zero_branch_sides": [],
+    "source_sha256": "571d6672e3846f15e7aa1cc2ef4d726e559535433f679c5b16bd4e529aad6c51"
+  },
+  "environment.rs": {
+    "hit": 47,
+    "total": 47,
+    "zero_regions": [],
+    "branches": [
+      {
+        "range": [
+          41,
+          16,
+          41,
+          26
+        ],
+        "hits": [
+          45,
+          4
+        ]
+      }
+    ],
+    "zero_branch_sides": [],
+    "source_sha256": "b922ce858c2c128d204179b8bc3c1011afe96e1f476461f7282539829eec642e"
+  },
+  "encoding.rs": {
+    "hit": 34,
+    "total": 34,
+    "zero_regions": [],
+    "branches": [],
+    "zero_branch_sides": [],
+    "source_sha256": "ae184ae09f4681e39a2ebfd4992c47672e2ecb1756ff8545f50b4170c809610c"
+  },
+  "evaluation.rs": {
+    "hit": 109,
+    "total": 110,
+    "zero_regions": [
+      [
+        31,
+        65,
+        31,
+        66
+      ]
+    ],
+    "branches": [
+      {
+        "range": [
+          83,
+          5,
+          83,
+          22
+        ],
+        "hits": [
+          3309,
+          2
+        ]
+      },
+      {
+        "range": [
+          84,
+          12,
+          84,
+          28
+        ],
+        "hits": [
+          3307,
+          2
+        ]
+      },
+      {
+        "range": [
+          85,
+          12,
+          85,
+          24
+        ],
+        "hits": [
+          3305,
+          2
+        ]
+      },
+      {
+        "range": [
+          86,
+          12,
+          86,
+          32
+        ],
+        "hits": [
+          3303,
+          2
+        ]
+      },
+      {
+        "range": [
+          50,
+          12,
+          50,
+          31
+        ],
+        "hits": [
+          3300,
+          13249
+        ]
+      },
+      {
+        "range": [
+          51,
+          16,
+          57,
+          15
+        ],
+        "hits": [
+          3248,
+          52
+        ]
+      },
+      {
+        "range": [
+          61,
+          12,
+          61,
+          35
+        ],
+        "hits": [
+          34,
+          16515
+        ]
+      },
+      {
+        "range": [
+          77,
+          17,
+          77,
+          29
+        ],
+        "hits": [
+          33,
+          1
+        ]
+      }
+    ],
+    "zero_branch_sides": [],
+    "source_sha256": "c47120de3d4a64b502dff4f85fd3854970bb85bf978bfbbe1081b23890cb5928"
+  }
+}

@@ -45,7 +45,9 @@ With one corner motor absent, zero roll and pitch torque require its opposite
 motor to produce zero thrust. The two remaining motors have the same reaction
 sign. Positive lift therefore cannot also produce zero yaw torque in static hover.
 This follows from the checked-in motor offsets and force model, not from an RL
-training failure. Damaged flight must allow yaw rotation or use a changed actuator
+training failure.
+
+Damaged flight must allow yaw rotation or use a changed actuator
 model. Do not promise stationary four-axis hover after losing one rotor.
 
 ## Current evidence
@@ -132,6 +134,7 @@ non-null members. `event` is the string `checkpoint-transfer`; `source` is
 record, not of an arbitrary alternate serialization. `source_training` is
 `PPO, seed 7, hover update 280`; `destination` is `recovery`; `optimizer` is `fresh`.
 `optimizer_steps` is the integer zero; `seed` is the supplied unsigned 64-bit integer.
+
 Member order is not promised. No optional members or null values are emitted.
 
 The [transfer evidence](progress/drone-checkpoint-transfer.json) records the source,
@@ -139,7 +142,9 @@ selection evaluations, held-out episodes, hashes, validation, and coverage gaps.
 The source passed 32/32 held-out hover episodes natively and in WASM. Seed 11
 passed recovery selection after 20 updates and 10,240 new transitions. The saved
 `docs/progress/drone-recovery-transfer.mpk` passed 32/32 recovery episodes and
-32/32 hover replay episodes natively and in WASM. Native mean returns were
+32/32 hover replay episodes natively and in WASM.
+
+Native mean returns were
 441.3443 and 461.1305, respectively. These transitions exclude prerequisite training.
 This single trial does not establish a training efficiency advantage.
 
@@ -157,6 +162,8 @@ the original curriculum checkpoint, not these new transferred weights.
 [travel guide](DRONE_TRAVEL.md). It transfers the qualified recovery actor into
 13-input observations with a zero-weight heading feature and a fresh critic and
 optimizer. Frozen inference uses `--evaluate-checkpoint` and the same environment.
-No travel candidate is qualified yet. The default hover/recovery sequence and its
+This thirteen-feature progression remains unqualified. The separate
+[fifteen-feature arrival lesson](DRONE_TRAVEL.md#frozen-arrival-lesson) passes its
+native and WASM held-out gates. The default hover/recovery sequence and its
 qualification evidence are unchanged; combined progression through qualified travel
 remains unfinished.

@@ -1,4 +1,4 @@
-//! Inspect a frozen RL travel trial whose promotion gates remain unmet.
+//! Inspect frozen reinforcement-trained arrival through the original travel physics.
 #[expect(
     dead_code,
     reason = "Each standalone binary uses one entry point from the shared scene module."

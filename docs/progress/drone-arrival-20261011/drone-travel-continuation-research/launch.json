@@ -1,0 +1,38 @@
+{
+  "schema": "rl-research-continuation-launch-v1",
+  "source_base": "75ac19189fd11dcaa641b279dd85153a53030610",
+  "seed": 173,
+  "budget_updates": 1001,
+  "parent": {
+    "source_run": "drone-travel-research-20261011",
+    "checkpoint": "travel-820",
+    "seed": 157,
+    "update": 820,
+    "transitions": 419840,
+    "sha256": "8b4aed76f48e9d853bab69f7b8968d3aef58f3e84ee004e11f1801ed46f5cf12",
+    "qualification": "failed selection; not promoted"
+  },
+  "initialization": "actor, critic and learned exploration retained; no head scaling or exploration reset; both Adam states deliberately fresh",
+  "config": {
+    "actor_hidden_size": 32,
+    "critic_hidden_sizes": [
+      64,
+      64
+    ],
+    "gamma": 0.995,
+    "gae_lambda": 0.95,
+    "actor_learning_rate": 0.0003,
+    "critic_learning_rate": 0.001,
+    "entropy_coefficient": 0.001,
+    "epochs": 4,
+    "initial_log_std": -2.0,
+    "log_std_min": -5.0,
+    "log_std_max": 1.0
+  },
+  "selection": "five fixed roots only; all original task and control gates; highest original return among passes; earliest update breaks ties; held-out excluded",
+  "qualification": "research only; no promotion on budget exhaustion",
+  "executable_sha256": "be84495bf31333652f64ae7d077423f606ad56202c38430a5d6bff21c2e803b8",
+  "program_sha256": "8dcdc5ee822f053c11f5919ad5b956628f97152c40f245f5b99f38a74fb7b855",
+  "manifest_sha256": "1d798e56476b2cba5e0601bf0d1915edadbe6a80e88d582386986ebbaf5affbc",
+  "lock_sha256": "3142efde77aa9b3fa533071f95cdcdc39a62420d5c533f7146e1596cbc5f0856"
+}

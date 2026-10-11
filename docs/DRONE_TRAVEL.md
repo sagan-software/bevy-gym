@@ -1,8 +1,43 @@
 # Drone travel lesson
 
 Status: reusable environment, PPO training, and frozen inference implemented.
-The standalone scene displays an unqualified RL trial. No travel checkpoint is qualified.
+The standalone scene uses a qualified fifteen-feature arrival policy.
+The historical thirteen-feature endurance/near/far/fast progression remains unfinished.
 Historical tracking weights are imitation-trained and do not qualify this lesson.
+
+## Frozen arrival lesson
+
+Open `/robots/skills/travel/` to watch the policy reach a sampled position and heading.
+Run the same independent lesson locally:
+
+```sh
+nix develop --command cargo run --no-default-features --features robots,render \
+  --example drone-travel-scene
+```
+
+The [qualification record](progress/drone-arrival.json) identifies the checkpoint,
+training source, sample counts, selection, held-out evaluation and verification gaps.
+Fresh PPO seed 157 produced the parent at update 820. Continuation seed 173 retained
+the actor, critic and learned exploration scales, then trained with fresh Adam.
+Update 440 had the highest return among the two selection passes. Its lineage
+contains 645,120 RL transitions. Held-out episodes did not choose the checkpoint.
+
+The original `DroneTravel` dynamics, disturbances, four motor actions and reward
+remain authoritative. Reset samples a horizontal goal radius between one and
+three metres, at two metres high, and an independent heading. Fifteen observations
+retain twelve body-frame flight features and append the desired unit heading's
+three body-frame components. The actor chooses every motor action.
+
+All five selection roots and 32 disjoint held-out roots survive 500 actions.
+Every final 100 actions stay within 0.3 metres of the goal, at no more than
+0.3 m/s, with up-Y at least 0.95, angular speed at most 0.5 rad/s and heading
+error at most 15 degrees. Native and WASM frozen tests pass the held-out suite.
+The browser completes seed 42 and displays the checkpoint identity.
+
+The ten-second gallery loop shows actual inference from reset. Its poster comes
+from the first frame. Desktop and 390-pixel layouts were inspected. Physical
+mobile devices remain unverified. This arrival profile does not promote the older
+curriculum, clearance, droid locomotion or competitive combat.
 
 ## Training task rehearsal
 
@@ -87,7 +122,8 @@ The [completion record](progress/drone-travel-recovery-final.json) and
 [complete held-out suite](progress/drone-travel-recovery-final-held-out.json) preserve
 checkpoint and executable hashes, terminal state and all 128 episodes. Near, far and
 fast results measure untrained transfer; those stages were never reached in training.
-The seed-23 batched trial continues independently. No travel checkpoint is qualified.
+The seed-23 batched trial continues independently. Its thirteen-feature travel
+profile remains unqualified.
 
 ## Batched training trial
 
@@ -445,6 +481,7 @@ one stage does not skip later stages. No optimizer or exploration sampler is cre
 The evaluator reads the checkpoint once and hashes the exact bytes moved into
 validated loading. It uses [sha2 0.10.9](https://docs.rs/sha2/0.10.9/sha2/), already
 present in the lockfile and now a direct development dependency for this example.
+
 The command writes JSON to stdout and creates no files itself. The shell command
 above saves stdout. A failed behavioral gate still emits the complete report and
 returns exit status 1; all gates passing returns 0. Load or inference errors fail
@@ -470,7 +507,7 @@ The report establishes behavioral results for exact bytes. It cannot establish h
 those bytes were trained. Qualification also requires the recorded RL training
 source, source checkpoint, run manifest, and checkpoint chain. Use these final roots
 for independent evaluation after selection; do not feed their episodes into training
-or tune promotion thresholds against them. No current travel candidate is qualified.
+or tune promotion thresholds against them. No candidate in this thirteen-feature curriculum is qualified.
 
 ### Optimizer records
 
@@ -520,6 +557,7 @@ The actor and critic each receive 13 dimensionless features. In order, these are
 body-frame destination displacement XYZ divided by 2 m, body-frame world-up XYZ,
 body-frame linear velocity XYZ divided by 2 m/s, body-frame angular velocity XYZ
 divided by 2 rad/s, and signed heading error divided by pi radians.
+
 Heading error is `atan2((forward × desired).y, forward · desired)`; positive values
 rotate around world +Y. The last feature lies in `[-1, 1]`. An exactly vertical
 forward vector has undefined horizontal heading and explicitly encodes positive zero.
@@ -535,9 +573,11 @@ Stream 1 draws radius, azimuth, height, and heading in that order. Azimuth and h
 use the sampler's float range from minus pi to pi. Position is
 `(radius × cos(azimuth), height, radius × sin(azimuth))`; heading is
 `(cos(heading), sin(heading))` in world X/Z for near, far, and fast travel.
+
 Endurance instead fixes position `(0, 2, 0)` metres and derives heading once from
 the seeded initial body's forward vector projected onto world X/Z. The destination
 then remains immutable; it does not follow the body or choose motor actions.
+
 This reset uses one additional temporary physics world, with constant time and space
 relative to episode length. The original travel sampling streams are unchanged.
 
@@ -574,7 +614,7 @@ serialize as JSON null. Inference adds `mode`, `checkpoint`, `stage`, and an hon
 `qualification` message; it does not update the checkpoint.
 
 [Training implementation evidence](progress/drone-travel-policy.json) records native,
-WASM, CLI, lint, and measured coverage results. No travel policy has qualified.
+WASM, CLI, lint, and measured coverage results. This thirteen-feature curriculum remains unqualified.
 The seed-11 trial and failed selection records remain under
 `runs/drone-travel/seed11-20261009`; its immutable binary and source manifest preserve
 the exact launch version. See [current status](EXAMPLE_STATUS.md) before restarting.
@@ -599,6 +639,7 @@ terminated on all five. These observations do not isolate every cause of PPO fai
 the measured episode endings and source identity. The added endurance prerequisite
 trains the longer horizon before goal changes. It retains the existing reward,
 actuators, PPO settings, and every near/far/fast gate. Its success is unproven.
+
 The original trial remains preserved. A separate seed-11 experiment runs under
 `bevy-gym-travel-endurance-seed11-20261009.service`, with artifacts in
 `runs/drone-travel/endurance-seed11-20261009`. Neither trial establishes travel competence.
