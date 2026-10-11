@@ -1,0 +1,27 @@
+{
+  "seed": 347,
+  "budget_updates": 20001,
+  "actor_learning_rate": 0.0003,
+  "critic_learning_rate": 0.001,
+  "mean_head_updates": "Adam increment multiplied per channel by exp(initial calibrated log_std) / maximum exp(initial calibrated log_std); unit channels retain exact Adam results",
+  "exploration": "reset calibrated 26 channels; remains trainable",
+  "recurrent_and_log_std_updates": "original Adam, without channel step scaling",
+  "reward": "posture-height minus 0.1 * (maximum segment angular speed / (8 rad/s))^4, minus 1000 once on natural fall; later requests freeze frame with reward zero",
+  "optimizer_initialization": "fresh seed347 actor and critic, fresh Adam, fresh mean head reduced once by 0.01; no prior policy",
+  "physical_model": "unchanged original 13 cuboids, 70 kg, 26 bounded torques, four 5 ms substeps per action",
+  "qualification": false,
+  "promotion": "none; original selection, full early-motion inspection, held-out and native/WASM gates required",
+  "tests": 41,
+  "strict_clippy": "passed",
+  "source_sha256": {
+    "src/main.rs": "c946c2dd978c545ee84424b441245afa63329916cba686209d019e4e059e76c2",
+    "src/safety.rs": "784ad5b3cba08d6f49cae6f9956aaafc8223e9845757de800250c9ba3421f616",
+    "Cargo.toml": "9c2554dbf35bfb4f10bfc4e9288df8a5aef433347937ff969864dcbae2873d40",
+    "Cargo.lock": "aec5bcf3e706471701210771d62fb5d46fe9abd14b8e96477f629717cab1dfaa",
+    "initial-log-std.json": "4fb1a75112bb0b67137bd37e258b188544b02e8bc9a4162f05e9dd2fb50ae78a",
+    "trainer": "3081493d5d021b319fa8ebda74965dd699e35665376e4a70146d3990b9fcbcfd"
+  },
+  "comparison": "Fresh calibrated small-mean initialization versus the retained-parent quartic trial; same original physics and frozen qualification gates. Budget 20001 updates.",
+  "repository_head": "f24cf968bc8ddfc7caa65e452df2bfdc3c12f3e1",
+  "failed_initialization_premise": "The attempted <=8 rad/s through action20 check failed: pelvis speed11.394882266157593. The archived passive comparison also exceeds8 before20 and naturally falls within26 actions. The final test verifies only first-action speed <=0.5; this is not standing or early-motion qualification."
+}

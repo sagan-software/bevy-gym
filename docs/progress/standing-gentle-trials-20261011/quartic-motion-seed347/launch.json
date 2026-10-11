@@ -1,0 +1,27 @@
+{
+  "seed": 347,
+  "budget_updates": 100001,
+  "parent_sha256": "2be83022bd828e62e66593cf7cb812dcd7e7e65fed0e59aa9865ee6af226df3b",
+  "actor_learning_rate": 0.0003,
+  "critic_learning_rate": 0.001,
+  "mean_head_updates": "Adam increment multiplied per channel by exp(initial calibrated log_std) / maximum exp(initial calibrated log_std); unit channels retain exact Adam results",
+  "exploration": "reset calibrated 26 channels; remains trainable",
+  "recurrent_and_log_std_updates": "original Adam, without channel step scaling",
+  "reward": "posture-height minus 0.1 * (maximum segment angular speed / (8 rad/s))^4, minus 1000 once on natural fall; later requests freeze frame with reward zero",
+  "optimizer_initialization": "deliberate fresh Adam states; retained actor and critic weights",
+  "physical_model": "unchanged original 13 cuboids, 70 kg, 26 bounded torques, four 5 ms substeps per action",
+  "qualification": false,
+  "promotion": "none; original selection, full early-motion inspection, held-out and native/WASM gates required",
+  "tests": 39,
+  "strict_clippy": "passed",
+  "source_sha256": {
+    "src/main.rs": "e2cce876c2b67da725a95fba7dc566043ba3383f6c0e516c40e31e44fca26493",
+    "src/safety.rs": "784ad5b3cba08d6f49cae6f9956aaafc8223e9845757de800250c9ba3421f616",
+    "Cargo.toml": "d42f6fe20d0ad465a19e49883882c8d45574d3adb33c5a73c6c6f37fa1b250ed",
+    "Cargo.lock": "630d0d3c4560a54f22e29b7d6125cf7602154ba907435d5c81066c514c571ee7",
+    "initial-log-std.json": "4fb1a75112bb0b67137bd37e258b188544b02e8bc9a4162f05e9dd2fb50ae78a",
+    "trainer": "cbd0d939ad5f1f0d3aa695644b9b560a2cbb105b62c3f1939f82fb2ca71988d7"
+  },
+  "comparison": "Only the motion cost changes from quadratic to quartic relative to frozen head-scaled-motion seed347; same root, initial policy, exploration, optimizer and budget.",
+  "repository_head": "f24cf968bc8ddfc7caa65e452df2bfdc3c12f3e1"
+}

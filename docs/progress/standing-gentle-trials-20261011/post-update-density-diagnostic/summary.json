@@ -1,0 +1,37 @@
+{
+  "qualification": false,
+  "execution": "test-only; copied run() not invoked",
+  "tests": 40,
+  "strict_clippy": "passed",
+  "metric": "Sample mean of stored behavior log density minus the current density, calculated before the diagnostic copy optimizer step. May be negative; not analytic KL or an acceptance bound.",
+  "live_state_verified": "policy record bytes unchanged across diagnostic; no claim about future global RNG interleavings",
+  "rows": [
+    {
+      "actor_learning_rate": 3e-06,
+      "qualification": false,
+      "reconstructed_before_update": 9.5367431640625e-07,
+      "reported_pre_step_kl": 9.5367431640625e-07,
+      "sampled_density_shift_after_update": 0.00013843923807144165
+    },
+    {
+      "actor_learning_rate": 3e-05,
+      "qualification": false,
+      "reconstructed_before_update": 9.5367431640625e-07,
+      "reported_pre_step_kl": 9.5367431640625e-07,
+      "sampled_density_shift_after_update": 0.0014958381652832031
+    },
+    {
+      "actor_learning_rate": 0.0003,
+      "qualification": false,
+      "reconstructed_before_update": 9.5367431640625e-07,
+      "reported_pre_step_kl": 9.5367431640625e-07,
+      "sampled_density_shift_after_update": 0.026734448969364166
+    }
+  ],
+  "repository_gates": {
+    "native": "passed",
+    "personal": "passed; no candidate diagnostics",
+    "wasm": "passed"
+  },
+  "coverage_gap": "Archived research run() artifact I/O and budget exhaustion branches were not instrumented for changed-line coverage. The density probe runs only its focused test; its copied training run() was never invoked. No compiled production source changed."
+}

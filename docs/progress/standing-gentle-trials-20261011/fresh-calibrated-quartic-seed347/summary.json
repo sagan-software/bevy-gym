@@ -1,0 +1,16 @@
+{
+  "qualification": false,
+  "status": "running",
+  "snapshot_update": 580,
+  "snapshot_steps": [
+    32,
+    32,
+    32,
+    34,
+    30
+  ],
+  "passing_selection_checkpoints_at_snapshot": 0,
+  "held_out_evaluated": false,
+  "raw_run": "/home/sagan/.cache/bevy-gym-quality-validation/standing-fresh-calibrated-quartic-probe-20261011/run",
+  "archive": "Frozen launch/source and a progress snapshot only. Executable, all journals and all checkpoints remain in the cache. Full completion archive pending."
+}

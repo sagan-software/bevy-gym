@@ -1,0 +1,11 @@
+{
+  "Cargo.lock.gz": "f99d83035f88c48f202a94aca07530e3f79a590f9937a67ae5b6373339f03db3",
+  "Cargo.toml": "d42f6fe20d0ad465a19e49883882c8d45574d3adb33c5a73c6c6f37fa1b250ed",
+  "initial-log-std.json": "4fb1a75112bb0b67137bd37e258b188544b02e8bc9a4162f05e9dd2fb50ae78a",
+  "latest-snapshot.evaluation.json": "6bc75467650cf477d0a4fc2f4c74af3826eb1288705b2f352c877d2bbbe86922",
+  "launch.json": "3ea8b54a2c34e6f0002dfe310d4e0b5095a1798781cae77f4b9921d0013400f5",
+  "quartic-red.log.gz": "dd9370cab9012f933c6d595ef008ac93cfb621e64256d26b606137822843b1cc",
+  "src/main.rs": "e2cce876c2b67da725a95fba7dc566043ba3383f6c0e516c40e31e44fca26493",
+  "src/safety.rs": "784ad5b3cba08d6f49cae6f9956aaafc8223e9845757de800250c9ba3421f616",
+  "summary.json": "4a358f921fa85b826673d3e1944fec5bd589f6b9fc7fe7b1d25777f487fb234b"
+}

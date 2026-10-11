@@ -997,3 +997,46 @@ applies the motion cost and one-time fall penalty. Its frozen executable has a
 100,001-update budget. The launch establishes a tested configuration, not standing
 success. Original selection, early-motion, held-out and native/browser gates still
 control qualification; no automatic promotion is permitted.
+
+## Post-update density and quartic-cost trials
+
+The [density diagnostic](progress/standing-gentle-trials-20261011/post-update-density-diagnostic/summary.json)
+compares stored behavior log densities with a disposable copy of the updated policy.
+The existing PPO metric is measured before each optimizer step. In this one-step
+fixture, learning rates 0.000003, 0.00003 and 0.0003 produce sampled post-step shifts
+of 0.0001384, 0.0014958 and 0.0267344 respectively. The pre-step value is 0.0000010.
+This sampled difference can be negative; it is not analytic KL or a qualification
+bound. The diagnostic leaves the live policy record unchanged.
+
+The [quartic seed-347 launch](progress/standing-gentle-trials-20261011/quartic-motion-seed347/launch.json)
+changes only the motion cost relative to the quadratic seed-347 trial. It subtracts
+0.1 × (maximum segment angular speed / (8 rad/s))⁴ from posture-height reward.
+The one-time natural-fall penalty, initial weights, calibrated exploration,
+mean-head update scales, original physics and 100,001-update budget remain unchanged.
+The [progress snapshot](progress/standing-gentle-trials-20261011/quartic-motion-seed347/summary.json)
+is running research, with no passing selection checkpoint at the recorded snapshot.
+
+The [fresh initialization trial](progress/standing-gentle-trials-20261011/fresh-calibrated-quartic-seed347/launch.json)
+uses the quartic cost with a fresh seed-347 actor and critic. It reduces the fresh
+mean head once by 0.01, resets calibrated exploration, and starts fresh Adam states.
+Its budget is 20,001 updates. First-action speeds stay below 0.42 rad/s across the
+five selection roots, but the initial policy falls within 25 actions.
+
+An attempted initialization check through action 20 failed. The
+[passive comparison](progress/standing-gentle-trials-20261011/fresh-calibrated-quartic-seed347/opening-comparison.jsonl)
+shows that zero torques also exceed 8 rad/s before action 20 and fall within 26
+actions. The final initialization test checks only the first action. It establishes
+no standing skill and does not replace the complete early-motion acceptance check.
+
+The density diagnostic passes 40 tests; the quartic harness passes 39; the fresh
+harness passes 41. Strict Clippy, repository native/browser checks and personal
+lints pass. Archived research artifact I/O and budget-exhaustion branches lack
+measured changed-line coverage. The density harness's copied training loop was
+never invoked.
+
+These artifacts do not change compiled production source, the
+published policy or any qualification gate. All raw checkpoints and executables
+remain in the cache. Dependency lockfiles are archived as lossless `Cargo.lock.gz`
+files; decompress them before reproducing a harness. Raw validation logs are
+archived as lossless `.log.gz` files. No standing, walking or
+competitive policy is qualified.
