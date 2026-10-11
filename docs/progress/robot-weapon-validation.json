@@ -1,0 +1,48 @@
+{
+  "date": "2026-10-11",
+  "source_parent": "986ef686f6d4f75a45f79eae6679d29b26237202",
+  "scope": "Mechanical policy-request weapon timing only; physical combat remains unfinished",
+  "qualification": false,
+  "new_public_tests": 9,
+  "private_tests": 2,
+  "native_commands": [
+    "cargo fmt --all -- --check",
+    "cargo clippy --all-targets --all-features -- -D warnings",
+    "cargo test --no-default-features --features robots --test droid_skill_session",
+    "cargo test",
+    "cargo test --features robots"
+  ],
+  "native_status": "passed",
+  "wasm_command": "nix run .#drone-browser-check",
+  "wasm_status": "passed; nine robot_weapon cases executed",
+  "personal_status": "passed without changed-line diagnostics",
+  "coverage": {
+    "production_regions_hit": 151,
+    "production_regions_total": 151,
+    "conditions_both_outcomes": 6,
+    "conditions_total": 6,
+    "production_gaps": []
+  },
+  "nix_status": "Ten existing findings; exact check name, description, normalized path and line match preserved0621baseline",
+  "source_sha256": {
+    "src/robots/weapon/simulation.rs": "2f989c245cc4052b130458972f7cee8c5bee63d2cc35eefa457fe8d45aed563b",
+    "src/robots/weapon/mod.rs": "ece91f7902767bd430cf5dcae390148b18cc6dbfaabef121eb1ea96398d6e637",
+    "src/robots/weapon/magazine.rs": "14c4c552fdb00339b453962d72dd61ffb44087747428c1aefeceb67f0a673cab",
+    "src/robots/weapon/rounds.rs": "bb128f2b4ca52d5bd9aa36016edcdefb14058fafc498bc1944a55e6a657ba95a",
+    "src/robots/weapon/delay.rs": "bbacd173cae3ef04e07027de9d107a241e5f85dae760b6049cd1919735866f9a",
+    "src/robots/weapon/phase.rs": "c69a990c44ca81cc3331f4fcc54142eac1d5b4a14ee2c825f9bf5290c9a7838c",
+    "src/robots/weapon/outcome.rs": "6474826e135ecc62cbc5fcfd4cd801b719ea8f9eedd72cd77de60c9198691039",
+    "src/robots/mod.rs": "d02ec3fe102c36cf8e6c65a3e2f6e1266867b96868bae96962d93e2524df2228",
+    "tests/robot_weapon.rs": "ef5b010b8841c7be46d5715453ae7561da93e4220c4bd18700e42c2b6091a9b2",
+    "examples/robots/weapon.rs": "ddd6784978bf5ce65ddb2244cb24c00648eac4dec9457c47ba1354862f5bf9f5",
+    "Cargo.toml": "a2aaf17ff165850287c7ded178305a8c1fc7af180e79545da9f05cbcb7cd4acf",
+    "flake.nix": "e25ceb4816b9f43f8997b13b6dd35d7072fa79aad97429a6b3f3ccff5de36411"
+  },
+  "logs": {
+    "native": "/home/sagan/.cache/bevy-gym-quality-validation/robot-weapon-native-v2.log",
+    "wasm": "/home/sagan/.cache/bevy-gym-quality-validation/robot-weapon-wasm.log",
+    "personal": "/home/sagan/.cache/bevy-gym-quality-validation/robot-weapon-personal-v2.log",
+    "coverage": "/home/sagan/.cache/bevy-gym-quality-validation/robot-weapon-coverage-v2.log",
+    "nix": "/home/sagan/.cache/bevy-gym-quality-validation/robot-weapon-nix.log"
+  }
+}

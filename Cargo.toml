@@ -639,3 +639,8 @@ required-features = ["robots"]
 name = "robot-ray-query"
 path = "examples/robots/raycast.rs"
 required-features = ["robots"]
+
+[[example]]
+name = "robot-weapon-timing"
+path = "examples/robots/weapon.rs"
+required-features = ["robots"]

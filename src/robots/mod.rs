@@ -15,6 +15,7 @@ mod obstacle;
 mod ranges;
 mod travel;
 mod travel_observation;
+mod weapon;
 mod world;
 
 pub use action::{DroneAction, InvalidDroneAction};
@@ -43,3 +44,5 @@ pub use world::{
     InvalidRobotRay, RobotActions, RobotFrame, RobotId, RobotRay, RobotRayHit, RobotRayTarget,
     RobotSlot, RobotSnapshot, RobotTeam, RobotWorld, RobotWorldError, RobotWorldFailure,
 };
+
+pub use weapon::{RobotVolleyRounds, RobotWeapon, RobotWeaponOutcome, RobotWeaponPhase};

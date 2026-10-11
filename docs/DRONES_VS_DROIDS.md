@@ -215,3 +215,7 @@ The physical combat environment and batched two-team collector remain unfinished
 ## Actual policy-update measurement
 
 The [conditional policy diagnostic](CONDITIONAL_POLICY_KL.md) measures actor divergence after an optimizer step without changing the existing PPO metric or update behavior. Native and browser tests and personal Rust lint pass. A same-rollout standing comparison measured substantially smaller changes at actor learning rate 0.0001 than 0.0003; neither candidate qualified. The smaller-rate bounded-reward trial remains research. Standing, walking and competitive fighting remain unfinished.
+
+## Policy-request weapon timing
+
+The [weapon timing rules](ROBOT_WEAPON_TIMING.md) now constrain current policy trigger requests through drone charge, volley and recovery, and droid ammunition and pistol cooldown. Sensors cannot supply trigger requests through this API. Native and browser tests and personal Rust lint pass; all 151 new production regions and both outcomes of six conditional branches execute. Shared-world projectiles, health, death and trained competitive fighting remain unfinished.
