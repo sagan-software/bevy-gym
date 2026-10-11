@@ -1,0 +1,95 @@
+{
+  "qualification": false,
+  "focused_tests": 43,
+  "native_gates": "passed",
+  "personal_lints": "passed",
+  "wasm_gates": "passed",
+  "coverage": {
+    "objects": [
+      {
+        "path": "/home/sagan/.cache/bevy-gym-quality-validation/coverage-target/debug/deps/droid_parallel_rollout-75fa3117f56ac134",
+        "sha256": "c224e1297c9a40fc71ba8e67e5fce37f45d210c30e87de9d3cb49e021237d4fa"
+      },
+      {
+        "path": "/home/sagan/.cache/bevy-gym-quality-validation/coverage-target/debug/examples/droid-standing",
+        "sha256": "9ef7e7f0482bda47cdb98f03ee3233020971d13ed20c3f5bf74974b08f8385bd"
+      }
+    ],
+    "examples/robots/learning/rollout.rs": {
+      "hit": 160,
+      "total": 160,
+      "zero_regions": [],
+      "branches": [
+        {
+          "range": [
+            276,
+            12,
+            276,
+            35
+          ],
+          "hits": [
+            512,
+            2999
+          ]
+        },
+        {
+          "range": [
+            276,
+            39,
+            276,
+            49
+          ],
+          "hits": [
+            45,
+            2954
+          ]
+        },
+        {
+          "range": [
+            278,
+            16,
+            278,
+            39
+          ],
+          "hits": [
+            512,
+            45
+          ]
+        }
+      ],
+      "source_sha256": "b9b06480c8d036e993119dc9385aeabcce7d2209fa43e630f9594e665dfecadb"
+    },
+    "examples/robots/standing/mod.rs": {
+      "hit": 14,
+      "total": 14,
+      "zero_regions": [],
+      "branches": [],
+      "source_sha256": "752d4c4f62526de9920321b085055175af9ac941fc7b642589c4d1b5b0377428"
+    },
+    "examples/robots/standing/parallel_rollout.rs": {
+      "hit": 62,
+      "total": 62,
+      "zero_regions": [],
+      "branches": [],
+      "source_sha256": "6327ecf0fe1a39df6c015b23fa3cf0c1e7b97beb64e2ae7540f4552a98081fbf"
+    }
+  },
+  "coverage_gap": "Existing trainer collection/update error propagation was not fault-injected through the actual CLI. Collector error and panic behavior has direct regression evidence. Standard-library thread-spawn resource failure is outside this instrumentation.",
+  "benchmark": {
+    "warmup_rounds_excluded": 1,
+    "measured_rounds": 5,
+    "serial_median_seconds": 0.162669162,
+    "parallel_median_seconds": 0.059077191,
+    "collection_speedup": 2.753501973375816,
+    "samples_per_collection": 512,
+    "complete_sequence_debug_equality": true,
+    "scope": "Collection only; excludes optimizer and rendering; dev opt-level 1, dependencies 3, 8 CPUs."
+  },
+  "cli_smoke": {
+    "updates": 1,
+    "transitions": 512,
+    "optimizer_steps": 4,
+    "expected_exit": 1,
+    "qualified": false
+  }
+}

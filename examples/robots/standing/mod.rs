@@ -11,6 +11,9 @@ pub(crate) mod model;
 /// Explicit native training optimizer recipes.
 #[cfg(not(target_arch = "wasm32"))]
 mod optimization;
+/// Native scoped collection over independent standing lanes.
+#[cfg(not(target_arch = "wasm32"))]
+pub(crate) mod parallel_rollout;
 pub(crate) mod reward;
 /// Fixed native selection policies and return ranking.
 #[cfg(not(target_arch = "wasm32"))]
@@ -56,6 +59,23 @@ pub(crate) fn batch_with_recipe(
         encoding::encode,
         |values| Ok(encoding::decode(values)?),
         NonZeroU16::new(1_000).expect("positive standing horizon"),
+    )
+}
+
+/// Collect native standing rollouts over eight scoped, independent workers.
+#[cfg(not(target_arch = "wasm32"))]
+pub(crate) fn parallel_batch_with_recipe(
+    seed: u64,
+    policy: &RecurrentPpoPolicy,
+    recipe: reward::Recipe,
+) -> parallel_rollout::ParallelRecoveryBatch<reward::TrainingTask, 204> {
+    parallel_rollout::ParallelRecoveryBatch::with_parallel_actions(
+        seed,
+        policy,
+        recipe.factory(),
+        encoding::encode,
+        |values| Ok(encoding::decode(values)?),
+        NonZeroU16::new(1000).expect("positive standing horizon"),
     )
 }
 

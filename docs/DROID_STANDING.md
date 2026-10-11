@@ -925,14 +925,37 @@ completed 1,001 updates and failed all 51 selection checkpoints. Frozen update-5
 show first-action speeds near 4.17 rad/s but later speeds of 33–46 rad/s before
 falling. This remains failed standing.
 
-The [seed-227 continuation](progress/standing-gentle-trials-20261011/calibrated-continuation-seed227/launch.json)
-has a 10,001-update budget and retains seed-211 update-960 parameters with fresh
-Adam states. The [seed-229 additive-cost trial](progress/standing-gentle-trials-20261011/additive-motion-seed229/launch.json)
-retains seed-179 update-8,720 actor and critic parameters, then resets exploration
-to the calibrated channel scales. Its 1,001-update budget uses posture-height
-reward minus 0.1 times maximum segment angular speed squared divided by (8 rad/s)².
+The [seed-227 continuation](progress/standing-gentle-trials-20261011/calibrated-continuation-seed227/summary.json)
+completed 10,001 updates with no passing selection checkpoint. The
+[larger-step seed-227 trial](progress/standing-gentle-trials-20261011/calibrated-larger-step-seed227/summary.json)
+completed 1,001 updates and also failed every selection checkpoint.
 
-The additive cost preserves physical dynamics and natural termination. Later
-requests freeze the terminal frame with zero reward. Original selection gates,
-held-out partitions and full first-two-second inspection remain required. Launch
-records report pending outcomes; they establish no qualified policy.
+The [seed-229 additive-cost trial](progress/standing-gentle-trials-20261011/additive-motion-seed229/summary.json)
+completed 1,001 updates. It retains seed-179 update-8,720 actor and critic parameters,
+then resets exploration to calibrated channel scales. Its training reward subtracts
+0.1 times maximum segment angular speed squared divided by (8 rad/s)² from
+posture-height reward. Physical dynamics and natural termination remain unchanged.
+
+Twenty-five of 51 checkpoints passed the post-settling selection checks. The
+predeclared selection rule chose update 60. Its first action reaches 157.42 rad/s
+across the five selection resets. It fails early-motion acceptance and received no
+held-out evaluation. No standing policy is qualified.
+
+## Parallel native collection
+
+The native trainer collects eight independent physical lanes concurrently, then
+joins every worker before returning results or the first lane error. Lane ordering,
+reset seeds, recurrent memory, decoding and trajectory boundaries remain unchanged.
+The browser collector remains serial.
+
+The [verification record](progress/parallel-droid-rollouts-20261011/verification.json)
+records 43 passing tests, native and browser checks, personal lints, and fresh
+coverage. The extracted collector, native adapter and standing factory hit all
+236 recorded regions. Tests cover concurrency, typed errors, worker panics and
+complete serial/parallel trajectory equality. Existing trainer error propagation
+was not fault-injected through the CLI; collector failures have direct tests.
+
+Five measured collections after one warmup had median times of 0.1627 seconds
+serially and 0.0591 seconds concurrently, about 2.75 times faster. Each collection
+contains 512 transitions. This measures collection only, excluding optimization
+and rendering, and qualifies no policy.

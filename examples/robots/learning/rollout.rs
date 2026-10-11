@@ -4,14 +4,15 @@ use std::{error::Error, num::NonZeroU16};
 
 use bevy_gym::robots::{DroneAction, DroneHover};
 use bevy_gym::training::{
-    RecurrentMemory, RecurrentPpoPolicy, RecurrentPpoSequence, RecurrentSampler, SeedConfig,
+    RecurrentMemory, RecurrentPpoError, RecurrentPpoPolicy, RecurrentPpoSequence, RecurrentSampler,
+    SeedConfig,
 };
 use bevy_gym::{Env, EpisodeStatus, TimeLimit};
 
 use super::{decode_action, encode, GAE_LAMBDA, GAMMA};
 
 /// Eight independent training lanes, each contributing 64 actions per update.
-pub(crate) struct RecoveryBatch<E = DroneHover, const N: usize = 12>
+pub(crate) struct RecoveryBatch<E = DroneHover, const N: usize = 12, Failure = Box<dyn Error>>
 where
     E: Env,
 {
@@ -22,7 +23,7 @@ where
     /// Fixed-width task encoder shared by policy and value observations.
     encode: fn(&E::Observation) -> [f32; N],
     /// Validate complete policy outputs before they can advance physics.
-    decode: fn(&[f32]) -> Result<E::Action, Box<dyn Error>>,
+    decode: fn(&[f32]) -> Result<E::Action, Failure>,
 }
 
 /// One continuing episode and its independent policy-sampling stream.
@@ -120,6 +121,24 @@ where
         decode: fn(&[f32]) -> Result<E::Action, Box<dyn Error>>,
         limit: NonZeroU16,
     ) -> Self {
+        Self::with_decoder(seed, policy, make_environment, encode, decode, limit)
+    }
+}
+
+impl<E, const N: usize, Failure> RecoveryBatch<E, N, Failure>
+where
+    E: Env,
+    E::Observation: Copy,
+{
+    /// Initialize lanes with the caller's owned decoder error contract.
+    pub(crate) fn with_decoder(
+        seed: u64,
+        policy: &RecurrentPpoPolicy,
+        make_environment: fn() -> E,
+        encode: fn(&E::Observation) -> [f32; N],
+        decode: fn(&[f32]) -> Result<E::Action, Failure>,
+        limit: NonZeroU16,
+    ) -> Self {
         let seeds = SeedConfig::from_root(seed);
         let lanes = std::array::from_fn(|index| {
             let mut environment = TimeLimit::new(make_environment(), usize::from(limit.get()))
@@ -142,51 +161,132 @@ where
             decode,
         }
     }
+}
 
+impl<E, const N: usize, Failure> RecoveryBatch<E, N, Failure>
+where
+    E: Env,
+    E::Observation: Copy,
+    Failure: From<RecurrentPpoError>,
+{
     /// Collect exactly 512 transitions, splitting sequences at episode boundaries.
     pub(crate) fn collect(
         &mut self,
         policy: &RecurrentPpoPolicy,
-    ) -> Result<Vec<RecurrentPpoSequence>, Box<dyn Error>> {
+    ) -> Result<Vec<RecurrentPpoSequence>, Failure> {
         let mut sequences = Vec::with_capacity(self.lanes.len());
-        for (index, lane) in self.lanes.iter_mut().enumerate() {
-            let mut initial_memory = lane.memory.clone();
-            let mut transitions = Vec::with_capacity(64);
-            for step in 0..64 {
-                let observation = (self.encode)(&lane.observation);
-                let action = policy.sample_action(&observation, &lane.memory, &mut lane.sampler)?;
-                let value = policy.value(&observation, 0)?;
-                let result = lane.environment.step((self.decode)(&action.action)?);
-                // Read the final state's value before a reset can replace that state.
-                let next_value = policy.value(&(self.encode)(&result.observation), 0)?;
-                lane.memory = action.next_memory;
-                lane.observation = result.observation;
-                transitions.push(Transition {
-                    observation,
-                    pre_tanh_action: action.pre_tanh_action,
-                    log_probability: action.log_probability,
-                    value,
-                    reward: result.reward as f32,
-                    next_value,
-                    status: result.status,
-                });
-
-                if result.status.is_done() || step == 63 {
-                    sequences.push(finish(std::mem::take(&mut transitions), initial_memory));
-                    if result.status.is_done() {
-                        lane.episode = lane.episode.wrapping_add(1);
-                        lane.observation = lane
-                            .environment
-                            .reset(Some(training_seed(self.seeds, index, lane.episode)))
-                            .observation;
-                        lane.memory = policy.initial_memory();
-                    }
-                    initial_memory = lane.memory.clone();
-                }
-            }
+        for collector in self.collectors(policy) {
+            collector.collect_into(&mut sequences)?;
         }
         Ok(sequences)
     }
+}
+
+/// One exclusively borrowed lane and its immutable inference context.
+pub(crate) struct LaneCollector<'a, E: Env, const N: usize, Failure> {
+    /// Lane order selects reset streams and final result order.
+    index: usize,
+    /// Physics and recurrent state belong only to this lane.
+    lane: &'a mut Lane<E>,
+    /// All lanes borrow the same frozen learned parameters.
+    policy: &'a RecurrentPpoPolicy,
+    /// Independent episode streams retain the original root.
+    seeds: SeedConfig,
+    /// Borrow each own-body observation before policy inference.
+    encode: fn(&E::Observation) -> [f32; N],
+    /// Preserve the caller's concrete boxed decoder error contract.
+    decode: fn(&[f32]) -> Result<E::Action, Failure>,
+}
+impl<E: Env, const N: usize, Failure: From<RecurrentPpoError>> LaneCollector<'_, E, N, Failure> {
+    /// Consume one borrowed lane and move its sequences into the caller's buffer.
+    pub(crate) fn collect_into(
+        self,
+        sequences: &mut Vec<RecurrentPpoSequence>,
+    ) -> Result<(), Failure> {
+        collect_lane(
+            self.index,
+            self.lane,
+            self.policy,
+            self.seeds,
+            self.encode,
+            self.decode,
+            sequences,
+        )
+    }
+}
+impl<E: Env, const N: usize, Failure> RecoveryBatch<E, N, Failure>
+where
+    E::Observation: Copy,
+{
+    /// Borrow all eight disjoint lanes as a fixed array in original lane order.
+    pub(crate) fn collectors<'a>(
+        &'a mut self,
+        policy: &'a RecurrentPpoPolicy,
+    ) -> [LaneCollector<'a, E, N, Failure>; 8] {
+        let seeds = self.seeds;
+        let encode = self.encode;
+        let decode = self.decode;
+        let mut index = 0;
+        self.lanes.each_mut().map(|lane| {
+            let lane_index = index;
+            index += 1;
+            LaneCollector {
+                index: lane_index,
+                lane,
+                policy,
+                seeds,
+                encode,
+                decode,
+            }
+        })
+    }
+}
+
+/// Collect one isolated lane without changing its reset, memory or bootstrap boundaries.
+fn collect_lane<E: Env, const N: usize, Failure: From<RecurrentPpoError>>(
+    index: usize,
+    lane: &mut Lane<E>,
+    policy: &RecurrentPpoPolicy,
+    seeds: SeedConfig,
+    encode: fn(&E::Observation) -> [f32; N],
+    decode: fn(&[f32]) -> Result<E::Action, Failure>,
+    sequences: &mut Vec<RecurrentPpoSequence>,
+) -> Result<(), Failure> {
+    let mut initial_memory = lane.memory.clone();
+    let mut transitions = Vec::with_capacity(64);
+    for step in 0..64 {
+        let observation = (encode)(&lane.observation);
+        let action = policy.sample_action(&observation, &lane.memory, &mut lane.sampler)?;
+        let value = policy.value(&observation, 0)?;
+        let result = lane.environment.step((decode)(&action.action)?);
+        // Read the final state's value before a reset can replace that state.
+        let next_value = policy.value(&(encode)(&result.observation), 0)?;
+        lane.memory = action.next_memory;
+        lane.observation = result.observation;
+        transitions.push(Transition {
+            observation,
+            pre_tanh_action: action.pre_tanh_action,
+            log_probability: action.log_probability,
+            value,
+            reward: result.reward as f32,
+            next_value,
+            status: result.status,
+        });
+
+        if result.status.is_done() || step == 63 {
+            sequences.push(finish(std::mem::take(&mut transitions), initial_memory));
+            if result.status.is_done() {
+                lane.episode = lane.episode.wrapping_add(1);
+                lane.observation = lane
+                    .environment
+                    .reset(Some(training_seed(seeds, index, lane.episode)))
+                    .observation;
+                lane.memory = policy.initial_memory();
+            }
+            initial_memory = lane.memory.clone();
+        }
+    }
+    Ok(())
 }
 
 /// Keep training below the high-bit evaluation partition and exclude small demo seeds.

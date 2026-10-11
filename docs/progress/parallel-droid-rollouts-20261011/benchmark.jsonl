@@ -1,0 +1,6 @@
+{"complete_sequence_debug_equality":true,"parallel_seconds":0.063996047,"qualification":false,"round":0,"samples":512,"serial_seconds":0.162628055}
+{"complete_sequence_debug_equality":true,"parallel_seconds":0.058150626,"qualification":false,"round":1,"samples":512,"serial_seconds":0.162669162}
+{"complete_sequence_debug_equality":true,"parallel_seconds":0.058985401,"qualification":false,"round":2,"samples":512,"serial_seconds":0.160319672}
+{"complete_sequence_debug_equality":true,"parallel_seconds":0.059077191,"qualification":false,"round":3,"samples":512,"serial_seconds":0.162936529}
+{"complete_sequence_debug_equality":true,"parallel_seconds":0.062898123,"qualification":false,"round":4,"samples":512,"serial_seconds":0.163189793}
+{"complete_sequence_debug_equality":true,"parallel_seconds":0.061053045,"qualification":false,"round":5,"samples":512,"serial_seconds":0.161460392}

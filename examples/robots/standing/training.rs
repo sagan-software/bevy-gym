@@ -1,10 +1,10 @@
 //! Bounded on-policy standing training with explicit budget failure.
 
 use super::{
-    batch_with_recipe,
     checkpoint::{from_bytes, Record},
     control, evaluation, model,
     optimization::OptimizerProfile,
+    parallel_batch_with_recipe,
     reward::{Recipe, ANGULAR_SPEED_SCALE_RAD_S, HEIGHT_SCALE_M, HEIGHT_TARGET_M, POSTURE_SCALE},
     selection::{Candidate, Selection, SelectionPolicy},
 };
@@ -159,10 +159,10 @@ async fn train_from(
     let mut progress = fs::File::create(output.join("optimization.jsonl")).await?;
     let mut row = Vec::with_capacity(512);
     let mut selection = Selection::new(selection_policy);
-    let mut rollout = batch_with_recipe(seed, &agent.policy(), recipe);
+    let mut rollout = parallel_batch_with_recipe(seed, &agent.policy(), recipe);
     for update in 1..=updates.get() {
         // One immutable policy snapshot supplies all eight lanes before either optimizer changes.
-        let sequences = rollout.collect(&agent.policy())?;
+        let sequences = rollout.collect_parallel(&agent.policy())?;
         let metrics = agent.update(&sequences)?;
         let update = NonZeroU32::new(update).expect("positive update loop");
         row.clear();

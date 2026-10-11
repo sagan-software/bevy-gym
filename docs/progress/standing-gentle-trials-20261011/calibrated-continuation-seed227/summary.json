@@ -1,10 +1,13 @@
 {
-  "schema": "standing-launched-research-v1",
-  "qualification": false,
-  "status": "Launch validated; outcome pending",
+  "schema": "standing-failed-research-v1",
   "seed": 227,
+  "qualification": false,
   "budget_updates": 10001,
-  "parent_qualified": false,
-  "held_out": "Only after fixed selection and early-motion acceptance; never used for ranking",
-  "archive": "Immutable source, launch and validation. Live records and all weights remain in cache."
+  "selection_checkpoints": 501,
+  "passing_selection_updates": [],
+  "reference_update": 720,
+  "reference_sha256": "66838c88725501b50b99b52f36089a53c43bc59fe5214c97fd4dbc6dd6993243",
+  "reference_mean_original_reward": 36.650993964076044,
+  "held_out_evaluated": false,
+  "archive": "All optimizer, initialization and selection records; reference and parent weights when present. Every original weight and executable remains in the cache."
 }

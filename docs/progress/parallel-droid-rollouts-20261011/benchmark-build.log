@@ -1,0 +1,4 @@
+warning: Git tree '/home/sagan/Code/github.com/sagan-software/bevy-gym-quality' is dirty
+   Compiling standing-parallel-collection-probe v0.0.0 (/home/sagan/.cache/bevy-gym-quality-validation/standing-parallel-collection-probe-20261011)
+    Finished `dev` profile [optimized] target(s) in 2.42s
+     Running `/home/sagan/.cache/bevy-gym-quality-validation/target/debug/standing-parallel-collection-probe`
