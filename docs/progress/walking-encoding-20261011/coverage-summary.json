@@ -1,0 +1,45 @@
+{
+  "objects": [
+    {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/coverage-target/debug/deps/droid_walking-81c834d7472bd61f",
+      "sha256": "cded8f178c178732c8fe6db6bfaf422985075ec059e39a2d07c2fbe93dc01aff"
+    },
+    {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/coverage-target/debug/deps/bevy_gym-465415eccecbf3cf",
+      "sha256": "2b39723e33e2aceee6dce8cb6e56807912ab9cd0d093014cf28c35fdf00d3cb9"
+    },
+    {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/coverage-target/debug/examples/droid-walking-contract",
+      "sha256": "fbd1e49147c106922bedd76d71ec155dc27bebaa9aa9fde9bd5428e650a21f7d"
+    }
+  ],
+  "exports": [
+    "/home/sagan/.cache/bevy-gym-quality-validation/walking-encoding-fresh-coverage-v3/0.json",
+    "/home/sagan/.cache/bevy-gym-quality-validation/walking-encoding-fresh-coverage-v3/1.json",
+    "/home/sagan/.cache/bevy-gym-quality-validation/walking-encoding-fresh-coverage-v3/2.json"
+  ],
+  "encoding.rs": {
+    "hit": 110,
+    "total": 110,
+    "zero_regions": [],
+    "branches": [],
+    "zero_branch_sides": [],
+    "source_sha256": "ad45fc00448d8b6937b23b27b664ba0562c73a435b2801f444fd2205a5c104fb"
+  },
+  "observation.rs": {
+    "hit": 10,
+    "total": 10,
+    "zero_regions": [],
+    "branches": [],
+    "zero_branch_sides": [],
+    "source_sha256": "f73b7c6b0fefe576f4cb9e14df889a1bc789060aa665bc4f1a9c40a8d5c99ecf"
+  },
+  "guide.rs": {
+    "hit": 25,
+    "total": 25,
+    "zero_regions": [],
+    "branches": [],
+    "zero_branch_sides": [],
+    "source_sha256": "39068686e70dcb76cf670e71c096c8d98f8820aaf4edd9fcaa75b32636f9e178"
+  }
+}

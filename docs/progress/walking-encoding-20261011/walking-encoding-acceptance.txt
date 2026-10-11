@@ -1,0 +1,12 @@
+Legal input: immutable own-body DroidWalkingObservation plus validated fixed episode command.
+Derived: 207 actor features, no separately stored encoder state; 204 physical features plus 3 command axes.
+Root target: inverse pelvis rotation times (0, 0.99m - pelvis height, 0); no horizontal origin target.
+Root world-up, linear velocity /2m/s, angular velocity /4rad/s, XYZ.
+Twelve segments: relative position /1m, local up and forward, relative linear velocity /2m/s, relative angular velocity /4rad/s, contact 0/1 in DroidBody::ALL order excluding pelvis.
+Command: world (X,0,Z) m/s rotated into pelvis frame, /1m/s, XYZ including tilt-induced Y.
+No reward, work, foot sliding, other robot or critic state, solver mutation, tensor allocation, action selection, normalization or clamping.
+Expected cost: O(13) time and fixed stack output, no heap collection.
+Tests: real seeded physical resets; command changes only suffix; exact all fields/scales/contacts; horizontal translation invariance; quaternion sign invariance; nonfinite input propagated for policy rejection.
+Preserve existing 204 standing encoder and checkpoint contract.
+Gates: genuine public RED; public GREEN; distinct private invariant tests; fmt all exact; strict all targets/all features Clippy; cargo test and cargo test --features robots; exact browser gate; personal Rust lint diagnostics; fresh per-object coverage; final prose edit then example/docs and Markdown last.
+No qualification claim. Walking PPO runner, policy and browser lesson remain unfinished.

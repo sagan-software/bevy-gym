@@ -1,6 +1,7 @@
 //! Commanded walking mechanics over the existing articulated droid body.
 
 mod command;
+mod encoding;
 mod environment;
 mod observation;
 mod reward;

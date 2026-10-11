@@ -258,3 +258,57 @@ fn foot_contact_sliding_is_measured_without_selecting_actions() {
         Some([0.0; 2])
     );
 }
+
+/// Walking actors receive only their own body and a pelvis-frame velocity command.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn actor_features_preserve_body_state_and_command_coordinates() {
+    use bevy::math::Vec3;
+    for seed in [0, 1, 2, 42, u64::MAX] {
+        for velocity in [Vec2::ZERO, Vec2::new(0.5, 0.25), Vec2::new(-0.5, -0.25)] {
+            let command = DroidVelocityCommand::try_from(velocity).unwrap();
+            let observation = DroidWalking::new(command).reset(Some(seed)).observation;
+            let features: [f32; 207] = observation.actor_features();
+            assert!(features.iter().all(|value| value.is_finite()));
+            let pelvis = observation.physical().body(DroidBody::Pelvis);
+            let inverse = pelvis.orientation().inverse();
+            let height = inverse * Vec3::new(0.0, 0.99 - pelvis.position().y, 0.0);
+            let requested = inverse * Vec3::new(velocity.x, 0.0, velocity.y);
+            assert_eq!(&features[..3], &height.to_array());
+            assert_eq!(&features[204..], &requested.to_array());
+            assert_eq!(&features[3..6], &(inverse * Vec3::Y).to_array());
+            for (identity, chunk) in DroidBody::ALL
+                .into_iter()
+                .skip(1)
+                .zip(features[12..204].chunks_exact(16))
+            {
+                let body = observation.physical().body(identity);
+                assert_eq!(
+                    &chunk[..3],
+                    &(inverse * (body.position() - pelvis.position())).to_array()
+                );
+                assert_eq!(
+                    chunk[15].to_bits(),
+                    f32::from(body.floor_contact()).to_bits()
+                );
+            }
+        }
+    }
+}
+
+/// Changing a lesson command cannot change the measured physical prefix or choose torques.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn changing_command_changes_only_three_actor_features() {
+    let zero = DroidWalking::new(DroidVelocityCommand::try_from(Vec2::ZERO).unwrap())
+        .reset(Some(42))
+        .observation;
+    let moving = DroidWalking::default().reset(Some(42)).observation;
+    assert_eq!(zero.physical(), moving.physical());
+    assert_eq!(
+        &zero.actor_features()[..204],
+        &moving.actor_features()[..204]
+    );
+    assert_eq!(&zero.actor_features()[204..], &[0.0; 3]);
+    assert_ne!(&moving.actor_features()[204..], &[0.0; 3]);
+}

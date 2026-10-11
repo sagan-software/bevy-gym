@@ -144,3 +144,32 @@ branch sides execute. Fixtures cover rotation, vertical velocity, finite angular
 extremes, both collider orders, reset, accumulation, terminal freezing and failed
 physics. These measurements supply future walking evaluation; they do not qualify
 a walking policy.
+
+## Walking actor inputs
+
+`DroidWalkingObservation::actor_features()` returns 207 values from one immutable
+snapshot. The first 204 describe the body's physical state. The last three describe
+the requested velocity in the pelvis frame. A tilted pelvis requires three command
+axes even though the world command has only X/Z components.
+
+The root groups are height-only displacement toward 0.99 m, world up, linear velocity
+divided by 2 m/s and angular velocity divided by 4 rad/s, each ordered XYZ.
+The height target has no horizontal return-to-origin displacement.
+
+Twelve other segments follow `DroidBody::ALL` excluding pelvis. Each contributes relative position
+in metres, local up, local forward, relative linear velocity divided by 2 m/s,
+relative angular velocity divided by 4 rad/s and contact as 0 or 1. All vectors use
+the pelvis frame. The final command is world `(X, 0, Z)` velocity divided by 1 m/s,
+then rotated into that frame. Rotation preserves equivalent quaternion signs.
+
+The encoder excludes reward, actuator work, foot sliding, other robots and critic
+state. Nonfinite measurements remain nonfinite for policy rejection. The reset-only
+guide now prints the feature count and command suffix without selecting an action.
+The existing standing encoder and its 204-input checkpoint contract remain unchanged;
+a standing checkpoint cannot silently supply a compatible walking policy.
+
+The [verification record](progress/walking-encoding-20261011/summary.json) retains
+public regression failures, ten public tests, four private encoder tests, native and
+browser gates, personal lints and fresh coverage. Tests check every physical group,
+command isolation, translation, quaternion signs and nonfinite measurements.
+A walking trainer, qualified policy and browser lesson remain unfinished.

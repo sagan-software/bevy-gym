@@ -1,0 +1,28 @@
+{
+  "schema": "walking-actor-input-verification-v1",
+  "qualified_walking_policy": false,
+  "actor_features": 207,
+  "standing_encoder_unchanged": true,
+  "public_tests_passed": 10,
+  "private_encoder_tests_passed": 4,
+  "native_library_tests_passed": 138,
+  "gates": {
+    "native": "walking-encoding-native-v3.log.gz",
+    "strict": "walking-encoding-strict-final.log.gz",
+    "format": "walking-encoding-format-final.log.gz",
+    "personal": "walking-encoding-personal-v3.log.gz",
+    "browser": "walking-encoding-wasm-v3.log.gz",
+    "coverage": "coverage-summary.json",
+    "guide": "walking-encoding-guide-final.log.gz",
+    "documentation": "walking-encoding-docs-final.log.gz",
+    "markdown": "docs/DROID_WALKING.md passed Liamc Markdown lints"
+  },
+  "production_coverage": {
+    "encoding_regions": "110/110",
+    "observation_regions": "10/10",
+    "guide_regions": "25/25",
+    "uncovered_regions": [],
+    "branch_instrumentation": "LLVM reported no branches for these files; this is not a claim that every Rust decision has branch instrumentation."
+  },
+  "remaining": "Walking PPO runner, trained policy, physical qualification and browser lesson remain unfinished."
+}
