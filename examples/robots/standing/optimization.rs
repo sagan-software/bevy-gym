@@ -1,4 +1,4 @@
-//! Explicit optimizer recipes; architecture and frozen mean actions remain unchanged.
+//! Recorded native optimization and fresh parameter recipes.
 
 use bevy_gym::training::RecurrentPpoConfig;
 use clap::ValueEnum;
@@ -14,19 +14,23 @@ pub(crate) enum OptimizerProfile {
     ConservativeV1,
     /// Conservative optimization with freshly reduced Gaussian exploration.
     LowNoiseV1,
+    /// Fresh small mean-head parameters with exploration at the original minimum scale.
+    GentleV1,
 }
 
 impl OptimizerProfile {
-    /// Configure learning and exploration; shapes, action bounds and mean inference stay identical.
+    /// Configure learning and exploration; shapes, action bounds and decoding stay identical.
     pub(crate) const fn configure(self, mut config: RecurrentPpoConfig) -> RecurrentPpoConfig {
         match self {
             Self::Original => config,
-            Self::ConservativeV1 | Self::LowNoiseV1 => {
+            Self::ConservativeV1 | Self::LowNoiseV1 | Self::GentleV1 => {
                 config.actor_learning_rate = 0.00003;
                 config.entropy_coefficient = 0.0;
                 config.epochs = 1;
                 if matches!(self, Self::LowNoiseV1) {
                     config.initial_log_std = -3.5;
+                } else if matches!(self, Self::GentleV1) {
+                    config.initial_log_std = -5.0;
                 }
                 config
             }
@@ -44,6 +48,7 @@ impl OptimizerProfile {
                 entropy_coefficient: 0.0,
                 epochs: 1,
                 reset_initial_log_std: None,
+                mean_head_scale: None,
             }),
             Self::LowNoiseV1 => Some(OptimizerRecord {
                 schema: OptimizerSchema::LowNoiseV1,
@@ -52,6 +57,16 @@ impl OptimizerProfile {
                 entropy_coefficient: 0.0,
                 epochs: 1,
                 reset_initial_log_std: Some(-3.5),
+                mean_head_scale: None,
+            }),
+            Self::GentleV1 => Some(OptimizerRecord {
+                schema: OptimizerSchema::GentleV1,
+                actor_learning_rate: 0.00003,
+                critic_learning_rate: 0.001,
+                entropy_coefficient: 0.0,
+                epochs: 1,
+                reset_initial_log_std: Some(-5.0),
+                mean_head_scale: Some(0.01),
             }),
         }
     }
@@ -66,6 +81,9 @@ enum OptimizerSchema {
     /// The low-noise optimizer's first version.
     #[serde(rename = "droid-standing-low-noise-optimizer-v1")]
     LowNoiseV1,
+    /// Fresh-only small action-mean initialization and reduced exploration.
+    #[serde(rename = "droid-standing-gentle-optimizer-v1")]
+    GentleV1,
 }
 
 /// Complete optimization metadata written before collecting transitions.
@@ -84,6 +102,9 @@ pub(crate) struct OptimizerRecord {
     /// Natural logarithm of dimensionless pre-tanh Gaussian standard deviation.
     #[serde(skip_serializing_if = "Option::is_none")]
     reset_initial_log_std: Option<f32>,
+    /// Dimensionless fresh mean-head parameter multiplier, applied before collection only.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    mean_head_scale: Option<f32>,
 }
 
 #[cfg(test)]
@@ -101,6 +122,7 @@ mod tests {
             OptimizerProfile::Original,
             OptimizerProfile::ConservativeV1,
             OptimizerProfile::LowNoiseV1,
+            OptimizerProfile::GentleV1,
         ] {
             let config = profile.configure(base.clone());
             assert_eq!(config.actor_hidden_size, base.actor_hidden_size);
@@ -109,10 +131,11 @@ mod tests {
             assert_eq!(config.gae_lambda.to_bits(), base.gae_lambda.to_bits());
             assert_eq!(
                 config.initial_log_std.to_bits(),
-                if profile == OptimizerProfile::LowNoiseV1 {
-                    (-3.5_f32).to_bits()
-                } else {
-                    base.initial_log_std.to_bits()
+                match profile {
+                    OptimizerProfile::LowNoiseV1 => (-3.5_f32).to_bits(),
+                    OptimizerProfile::GentleV1 => (-5.0_f32).to_bits(),
+                    OptimizerProfile::Original | OptimizerProfile::ConservativeV1 =>
+                        base.initial_log_std.to_bits(),
                 }
             );
             assert_eq!(config.log_std_min.to_bits(), base.log_std_min.to_bits());
@@ -125,7 +148,9 @@ mod tests {
                     assert_eq!(config.epochs, 4);
                     assert!(profile.record().is_none());
                 }
-                OptimizerProfile::ConservativeV1 | OptimizerProfile::LowNoiseV1 => {
+                OptimizerProfile::ConservativeV1
+                | OptimizerProfile::LowNoiseV1
+                | OptimizerProfile::GentleV1 => {
                     assert_eq!(config.actor_learning_rate.to_bits(), 0.00003_f64.to_bits());
                     assert_eq!(config.entropy_coefficient.to_bits(), 0.0_f32.to_bits());
                     assert_eq!(config.epochs, 1);
@@ -136,5 +161,17 @@ mod tests {
                 }
             }
         }
+    }
+
+    /// The fresh-only recipe records its complete parameter and optimizer contract.
+    #[test]
+    fn gentle_recipe_has_exact_metadata() {
+        let record = OptimizerProfile::GentleV1
+            .record()
+            .expect("explicit recipe");
+        assert_eq!(
+            serde_json::to_string(&record).expect("finite fields"),
+            r#"{"schema":"droid-standing-gentle-optimizer-v1","actor_learning_rate":0.00003,"critic_learning_rate":0.001,"entropy_coefficient":0.0,"epochs":1,"reset_initial_log_std":-5.0,"mean_head_scale":0.01}"#
+        );
     }
 }

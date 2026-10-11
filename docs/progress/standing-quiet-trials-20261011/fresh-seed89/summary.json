@@ -1,0 +1,27 @@
+{
+  "schema": "droid-standing-quiet-fresh-result-v1",
+  "seed": 89,
+  "actual_updates": 5001,
+  "actual_transitions": 2560512,
+  "selection_reports": 251,
+  "passing_checkpoints": 0,
+  "selected": null,
+  "diagnostic_best_failed_update": 3980,
+  "diagnostic_best_failed_mean_return": 69.30518730506301,
+  "held_out": "not run because no standing candidate passed selection",
+  "qualification": "failed; no promotion",
+  "files": {
+    "selection-budget.json": "eb76108960f5422b96814de16c58a837add8286e119b1a8cecf40d7406d217a5",
+    "optimization.jsonl.gz": "f19d47d57357f144cf9c0e8d9adc5a3b761461c50908552e6146b5e7b9cc653b",
+    "selection-history.json.gz": "f8a57edd097b61c56c4159220b6288991cffd93e93616ebab563cdd6ef950c14",
+    "run.log.gz": "1db767f679fa7adaf91408b153a2526d93bdfc1c43d9210559e611b264a4979e",
+    "training-reward.json": "5c824d34cf5d9a2fb4ec3f52980aa07c20b92e7c2b4de3dee028ca962ac4eedc",
+    "training-optimizer.json": "029d0cb28e90593eb7e6937c9f7519e15a3cca9e4885a0d3212070011c2ade9a",
+    "candidate-rule.json": "cecf1d85f17238a90384ae77a2ed5bc0fbc7ce6ab060a400760169b94a901d5e",
+    "source.patch.gz": "230d720c5e8744614c72cb26fd51e1e4085550d69e17d3ddc8f26f7c440c7bd1",
+    "launch.json": "c734b5107cfb6892ec33211e5115e37849f8bc3a4b38fb4258db7415939680a2",
+    "best-failed/checkpoint.evaluation.json": "9f0ee3a861bcb3c45060e5e12c7c2bff19710ba54a59d2a5c0ea405124124b0f",
+    "best-failed/checkpoint.json": "ac35099562d57e3d4f4cfa9d7574752ce8afdcb4fbf84ad78e4f5a497654ecde",
+    "best-failed/checkpoint.mpk": "0e2af982ca42362b966f35f966edc0ea30bad7d8a08b2dec831afdcef74ff4a8"
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "objects": [
+    {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/coverage-target/debug/deps/bevy_gym-465415eccecbf3cf",
+      "sha256": "a63f1be3cc545b0bf5916ed5d4c4e79babf65932dfba3abddf9e49a5efef9a15"
+    },
+    {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/coverage-target/debug/deps/droid_skill_session-4e14768964021903",
+      "sha256": "b6027531813f3b67faf3777eb5ab1c927513ca285b72fe8d4d0cd58faedaf72d"
+    },
+    {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/coverage-target/debug/deps/recurrent_ppo_bytes-49006fa5e2dd3017",
+      "sha256": "7db8726e478cee2c3574f5c50bd3b8fca9a85773cbc92e8be4f32c99407382c0"
+    },
+    {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/coverage-target/debug/examples/droid-standing",
+      "sha256": "dff2f9cf980633e3fb6afd8982a040573ec634e785a95d72620787622e37d3ed"
+    }
+  ],
+  "exports": [
+    "/home/sagan/.cache/bevy-gym-quality-validation/standing-gentle-fresh-coverage-20261011/0.json",
+    "/home/sagan/.cache/bevy-gym-quality-validation/standing-gentle-fresh-coverage-20261011/1.json",
+    "/home/sagan/.cache/bevy-gym-quality-validation/standing-gentle-fresh-coverage-20261011/2.json",
+    "/home/sagan/.cache/bevy-gym-quality-validation/standing-gentle-fresh-coverage-20261011/3.json"
+  ],
+  "schema": "droid-standing-gentle-verification-v1",
+  "native_unit": "bevy-gym-standing-gentle-native-20261011",
+  "personal_unit": "bevy-gym-standing-gentle-personal-20261011",
+  "wasm_unit": "bevy-gym-standing-gentle-wasm-20261011",
+  "cli_tests": 25,
+  "native_session_tests": 54,
+  "recurrent_byte_tests": 9,
+  "production_regions": {
+    "reduce_action_mean_head": {
+      "hit": 22,
+      "total": 22
+    },
+    "optimizer_configuration": {
+      "hit": 15,
+      "total": 15
+    },
+    "optimizer_record": {
+      "hit": 10,
+      "total": 10
+    },
+    "configured_warm_start": {
+      "hit": 21,
+      "total": 21
+    }
+  },
+  "coverage_gaps": [
+    {
+      "file": "examples/robots/standing/model.rs",
+      "line": 83,
+      "reason": "Fixed valid fresh configuration cannot fail agent construction"
+    }
+  ],
+  "qualification": "checks verify initialization, PPO updates, byte reload and rejection; no standing policy is qualified"
+}

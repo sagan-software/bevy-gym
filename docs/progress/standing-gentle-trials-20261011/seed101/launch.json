@@ -1,0 +1,27 @@
+{
+  "started_utc": "2026-10-11T04:54:34.527769+00:00",
+  "command": [
+    "/home/sagan/.cache/bevy-gym-quality-validation/standing-gentle-smoke-seed101-20261011/droid-standing",
+    "train",
+    "--optimizer-profile",
+    "gentle-v1",
+    "--selection-policy",
+    "best-passing-budget",
+    "--reward-profile",
+    "posture-quiet-v1",
+    "--seed",
+    "101",
+    "--updates",
+    "21",
+    "--output",
+    "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/runs/droid-standing/standing-gentle-smoke-seed101-20261011"
+  ],
+  "unit": "bevy-gym-standing-gentle-smoke-seed101-20261011",
+  "source_base": "bcad9b464b8112262272878fe8c3f79d9e68fdc9",
+  "source_patch_sha256": "69f3584caac04e5d9c01218f1fc45823f1dc767e84e9b26bef20c03ae0a6eba5",
+  "executable_sha256": "db7d1acf6a42507eb684821aa02fa4ce4e419938b487a7fecd9efb4335edb2be",
+  "candidate_rule_sha256": "cecf1d85f17238a90384ae77a2ed5bc0fbc7ce6ab060a400760169b94a901d5e",
+  "budget_updates": 21,
+  "qualification": "experimental PPO; no budget or selection promotion",
+  "held_out": "excluded from checkpoint ranking"
+}

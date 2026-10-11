@@ -117,6 +117,57 @@ class StandingCliTests(unittest.TestCase):
         for key in ["episodes", "control_episodes"]:
             self.assertEqual([row["seed"] for row in report[key]], expected)
 
+    def test_configured_warm_start_rejects_matching_digest_invalid_model(
+        self,
+    ) -> None:
+        """A matching byte digest cannot activate an undecodable model."""
+        checkpoint = self.root / "configured-invalid-model.mpk"
+        checkpoint.write_bytes(b"invalid native model")
+        record = json.loads(self.checkpoint.with_suffix(".json").read_text())
+        record["sha256"] = hashlib.sha256(checkpoint.read_bytes()).hexdigest()
+        checkpoint.with_suffix(".json").write_text(json.dumps(record))
+        for profile in ["conservative-v1", "low-noise-v1"]:
+            output = self.root / ("invalid-model-" + profile)
+            rejected = self.run_command(
+                "warm-start", "--optimizer-profile", profile,
+                "--checkpoint", str(checkpoint), "--updates", "1",
+                "--output", str(output),
+            )
+            self.assertEqual(rejected.returncode, 1, rejected.stderr)
+            self.assertEqual(rejected.stdout, "")
+            self.assertFalse(output.exists())
+
+    def test_gentle_initialization_runs_real_ppo_and_rejects_warm_start(
+        self,
+    ) -> None:
+        """Record fresh scaling without modifying a learned parent."""
+        output = self.root / "gentle-fresh"
+        result = self.run_command(
+            "train", "--optimizer-profile", "gentle-v1", "--updates", "1",
+            "--reward-profile", "posture-quiet-v1", "--output", str(output),
+        )
+        self.assertEqual(result.returncode, 1, result.stderr)
+        record = json.loads((output / "training-optimizer.json").read_text())
+        self.assertEqual(
+            record["schema"], "droid-standing-gentle-optimizer-v1"
+        )
+        self.assertEqual(record["reset_initial_log_std"], -5.0)
+        self.assertEqual(record["mean_head_scale"], 0.01)
+        row = json.loads((output / "optimization.jsonl").read_text())
+        self.assertEqual(row["valid_samples"], 512)
+        self.assertGreater(row["optimizer_updates"], 0)
+        invalid = self.root / "gentle-warm"
+        parent = self.checkpoint.read_bytes()
+        rejected = self.run_command(
+            "warm-start", "--optimizer-profile", "gentle-v1",
+            "--checkpoint", str(self.checkpoint), "--updates", "1",
+            "--output", str(invalid),
+        )
+        self.assertEqual(rejected.returncode, 1, rejected.stderr)
+        self.assertIn("requires fresh initialization", rejected.stderr)
+        self.assertFalse(invalid.exists())
+        self.assertEqual(self.checkpoint.read_bytes(), parent)
+
     def test_low_noise_optimizer_runs_real_ppo_without_promotion(self) -> None:
         """Record changed exploration and retain a failed PPO candidate."""
         for mode in ["train", "warm-start"]:

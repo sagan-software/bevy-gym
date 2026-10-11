@@ -790,9 +790,48 @@ retains 1,001 actual PPO updates and 512,512 transitions. Three checkpoints pass
 original standing selection; all three failed motion selection. No checkpoint was
 selected for held-out evaluation. This immutable trial predates fused arithmetic
 and integrated motion selection; its recorded motion rule was applied separately
-to every standing candidate. Fresh runs with seeds 89 and 97 retain their
-[launch records](progress/standing-quiet-trials-20261011/). They remain experimental.
+to every standing candidate. Fresh runs with seeds 89 and 97 each completed
+5,001 PPO updates and 2,560,512 transitions. Neither produced an original standing
+selection pass.
+
+Their [records](progress/standing-quiet-trials-20261011/) retain
+failed checkpoints for diagnosis; neither run reached held-out evaluation.
 
 The [verification record](progress/standing-quiet-trials-20261011/verification.json)
 identifies native, browser, CLI and coverage evidence. These checks establish
 mechanics and rejection behavior. No quiet standing policy is qualified.
+
+## Small initial action head
+
+`--optimizer-profile gentle-v1` requires fresh initialization. It multiplies the
+fresh action-mean head weights and bias by 0.01 before collecting transitions.
+It retains recurrent parameters, the critic, all 26 full torque bounds and the
+original action decoder. This changes initial policy parameters, not actuator limits.
+Imported checkpoints reject this profile before optimization or output creation.
+
+The profile uses actor learning rate 0.00003, critic learning rate 0.001, zero entropy
+coefficient, one epoch and initial log standard deviation -5.0. Its optimizer record
+uses schema `droid-standing-gentle-optimizer-v1` and adds
+`reset_initial_log_std: -5.0` and `mean_head_scale: 0.01` to the five conservative
+members. Older profiles retain their previous record shapes.
+
+[Stable Baselines3's pinned initialization](https://github.com/DLR-RM/stable-baselines3/blob/7cfb4dd6055e74b5caa4ed4d6777492209946e26/stable_baselines3/common/policies.py#L557)
+uses an action-head orthogonal gain of 0.01. This local profile multiplies existing
+Burn parameters by 0.01; it does not reproduce that orthogonal initialization.
+
+The operation detaches scaled tensors before tracking gradients and resets actor
+Adam. Tests verify recurrent and critic preservation, retained Gaussian exploration,
+actual PPO updates and exact byte reload.
+
+The [seed-101 pilot](progress/standing-gentle-trials-20261011/seed101/summary.json)
+completed 21 actual PPO updates and 10,752 transitions. No checkpoint passed.
+Frozen update-21 inference on root 42 terminated after 25 actions. Its first maximum
+torque fraction was 0.00335, and its peak segment speed reached 24.00 rad/s.
+
+Three independent runs with roots 107, 113 and 131 have recorded budgets of 10,001
+updates each. Their launch records remain diagnostic until fixed selection and
+independent held-out evaluation pass. No gentle standing policy is qualified.
+
+The [verification record](progress/standing-gentle-trials-20261011/verification.json)
+records 25 CLI tests, native and browser checks, and per-object coverage. The fixed
+valid fresh configuration cannot exercise its construction-error propagation path.

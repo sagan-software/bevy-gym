@@ -215,9 +215,9 @@ async fn initialize(
         Start::Random => Ok(Initialization {
             agent: match profile {
                 OptimizerProfile::Original => model::new_agent(seed)?,
-                OptimizerProfile::ConservativeV1 | OptimizerProfile::LowNoiseV1 => {
-                    model::new_agent_configured(seed, profile)?
-                }
+                OptimizerProfile::ConservativeV1
+                | OptimizerProfile::LowNoiseV1
+                | OptimizerProfile::GentleV1 => model::new_agent_configured(seed, profile)?,
             },
             initial: None,
         }),
@@ -228,7 +228,9 @@ async fn initialize(
             // One cold copy retains exact source evidence while Burn consumes its decoder input.
             let agent = match profile {
                 OptimizerProfile::Original => model::warm_start(seed, bytes.clone())?,
-                OptimizerProfile::ConservativeV1 | OptimizerProfile::LowNoiseV1 => {
+                OptimizerProfile::ConservativeV1
+                | OptimizerProfile::LowNoiseV1
+                | OptimizerProfile::GentleV1 => {
                     model::warm_start_configured(seed, bytes.clone(), profile)?
                 }
             };

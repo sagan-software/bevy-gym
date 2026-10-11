@@ -573,3 +573,114 @@ fn imported_agent_with_reduced_exploration() -> (RecurrentPpoAgent, RecurrentPpo
     .expect("load");
     (agent, target)
 }
+
+/// Retain the seeded reference before the explicit mean-head initialization experiment.
+fn reduced_mean_agent() -> (RecurrentPpoAgent, RecurrentPpoPolicy) {
+    let mut agent = RecurrentPpoAgent::new(
+        2,
+        2,
+        1,
+        &[-1.0],
+        &[1.0],
+        config(),
+        SeedConfig::from_root(101),
+    )
+    .expect("seeded learner fixture");
+    let before = agent.policy();
+    agent.reduce_action_mean_head();
+    (agent, before)
+}
+
+/// Parameter scaling changes only action means; it cannot change memory or critic state.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn reduced_mean_head_preserves_recurrent_memory_and_critic() {
+    let (agent, before) = reduced_mean_agent();
+    let after = agent.policy();
+    let mut previous_memory = before.initial_memory();
+    let mut reduced_memory = after.initial_memory();
+    for observation in [[0.3, -0.2], [-0.8, 0.4], [0.0, 0.0]] {
+        let previous = before
+            .mean_action(&observation, &previous_memory)
+            .expect("original mean");
+        let reduced = after
+            .mean_action(&observation, &reduced_memory)
+            .expect("reduced mean");
+        let previous_mean = previous.action.first().expect("one action").atanh();
+        let expected = (previous_mean * 0.01).tanh();
+        assert!((reduced.action.first().expect("one action") - expected).abs() < 1e-6);
+        assert_eq!(previous.next_memory, reduced.next_memory);
+        assert_eq!(
+            before
+                .value(&observation, 0)
+                .expect("original critic")
+                .to_bits(),
+            after
+                .value(&observation, 0)
+                .expect("retained critic")
+                .to_bits()
+        );
+        previous_memory = previous.next_memory;
+        reduced_memory = reduced.next_memory;
+    }
+}
+
+/// Reduced parameters remain trainable and survive an inference-only byte reload.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn reduced_mean_head_learns_with_actual_ppo_and_reloads() {
+    let (mut agent, _) = reduced_mean_agent();
+    let observation = [0.3, -0.2];
+    let before = agent.policy();
+    let sequence = sampled_sequence(&before, &observation);
+    let metrics = agent.update(&[sequence]).expect("actual PPO update");
+    assert_eq!(metrics.valid_samples, 2);
+    assert_eq!(metrics.optimizer_updates, 1);
+    let trained = agent.policy();
+    let expected = trained
+        .mean_action(&observation, &trained.initial_memory())
+        .expect("learned mean");
+    assert_ne!(
+        expected.action,
+        before
+            .mean_action(&observation, &before.initial_memory())
+            .expect("initial mean")
+            .action
+    );
+    let loaded = RecurrentPpoPolicy::load_bytes(
+        trained.to_bytes().expect("record"),
+        2,
+        2,
+        1,
+        &[-1.0],
+        &[1.0],
+        &config(),
+    )
+    .expect("inference reload");
+    assert_eq!(
+        loaded
+            .mean_action(&observation, &loaded.initial_memory())
+            .expect("reloaded mean"),
+        expected
+    );
+}
+
+/// Compare equal seeded Gaussian draws after subtracting each policy's own mean.
+fn sampled_noise(policy: &RecurrentPpoPolicy) -> f32 {
+    let observation = [0.3, -0.2];
+    let memory = policy.initial_memory();
+    let mean = policy.mean_action(&observation, &memory).expect("mean");
+    let sample = policy
+        .sample_action(&observation, &memory, &mut RecurrentSampler::new(43))
+        .expect("sample");
+    sample.pre_tanh_action.first().expect("one sample")
+        - mean.action.first().expect("one mean").atanh()
+}
+
+/// Parameter scaling cannot silently replace the separately learned exploration distribution.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn reduced_mean_head_retains_gaussian_exploration() {
+    let (agent, before) = reduced_mean_agent();
+    assert!((sampled_noise(&before) - sampled_noise(&agent.policy())).abs() < 1e-6);
+}

@@ -72,7 +72,7 @@ pub(super) fn new_agent_configured(
     seed: u64,
     profile: super::optimization::OptimizerProfile,
 ) -> Result<RecurrentPpoAgent, RecurrentPpoError> {
-    RecurrentPpoAgent::new(
+    let mut agent = RecurrentPpoAgent::new(
         FEATURES,
         FEATURES,
         1,
@@ -80,7 +80,12 @@ pub(super) fn new_agent_configured(
         &[1.0; 26],
         profile.configure(configuration()),
         SeedConfig::from_root(seed),
-    )
+    )?;
+    // If gentle initialization is selected, change fresh parameters before collecting any actions.
+    if profile == super::optimization::OptimizerProfile::GentleV1 {
+        agent.reduce_action_mean_head();
+    }
+    Ok(agent)
 }
 
 /// Import mean/critic weights with fresh Adam and the explicitly selected exploration recipe.
@@ -90,6 +95,13 @@ pub(super) fn warm_start_configured(
     bytes: Vec<u8>,
     profile: super::optimization::OptimizerProfile,
 ) -> Result<RecurrentPpoAgent, RecurrentPpoError> {
+    // Reject fresh-only initialization before loading or changing any learned parameters.
+    if profile == super::optimization::OptimizerProfile::GentleV1 {
+        return Err(RecurrentPpoError::InvalidConfig {
+            field: "optimizer_profile",
+            reason: "gentle-v1 requires fresh initialization",
+        });
+    }
     let mut agent = RecurrentPpoAgent::load_bytes(
         bytes,
         FEATURES,

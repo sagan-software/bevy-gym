@@ -1,0 +1,1 @@
+{"schema":"droid-standing-low-noise-optimizer-v1","actor_learning_rate":0.00003,"critic_learning_rate":0.001,"entropy_coefficient":0.0,"epochs":1,"reset_initial_log_std":-3.5}

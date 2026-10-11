@@ -1,0 +1,30 @@
+{
+  "schema": "droid-standing-gentle-pilot-v1",
+  "seed": 101,
+  "actual_updates": 21,
+  "actual_transitions": 10752,
+  "selected": null,
+  "qualification": "failed; no promotion",
+  "held_out": "not run because no candidate passed selection",
+  "seed42_update21_diagnostic": {
+    "steps": 25,
+    "first_max_torque_fraction": 0.003345125,
+    "peak_segment_angular_speed_rad_s": 23.996616895716002
+  },
+  "files": {
+    "selection-budget.json": "b136feda0f71b8575d3762410043514a5b79eb16de2c66c2d7de0795028b3565",
+    "optimization.jsonl.gz": "fa954a70455d91899e9847660a8818e2ff150bdb2b3e005c7024e2813af7c198",
+    "run.log.gz": "545db2b0c5415d589c12a995c850c0803112c0de2e606f0192b97427a1e51a78",
+    "training-reward.json": "c873f4fe93383f28d57bfe7efd63b788bf6f944c36170b141bf8a11771f126fb",
+    "training-optimizer.json": "2dd0cb3251a9426c8c40eb0a6843b4f8dc5d106decaa1ec0efb85a1b3602f31e",
+    "candidate-rule.json": "cecf1d85f17238a90384ae77a2ed5bc0fbc7ce6ab060a400760169b94a901d5e",
+    "source.patch.gz": "ff9f5a535495848c38b9e48bfa1ccf720f2bcfe188534ff27cf907a150be6ce9",
+    "launch.json": "1ceeef2564c7e111cd9905767d19053338d00d7f1f4ca507d668daac1094012d",
+    "update21/checkpoint.evaluation.json": "b876cbee1f94bebee349fcfdc25c00545350fc2ee35e44a8a3f897b41fb13ece",
+    "update21/checkpoint.json": "81ffeb2145be7556f042c58b5fa6beef0bbb75c057f9702017b73b63022c643b",
+    "update21/checkpoint.mpk": "ba45183bcfae7740143326b02c147e30ffac424f2eca1db9e68b5619ebdc99f6",
+    "update20/checkpoint.evaluation.json": "27ac9aaa03c6cfba98d373b298fcb1f2fc1b0a302684cf593aef131866281e02",
+    "update20/checkpoint.json": "08ccd94ab07d49a1b936622e0c510690086bd29a4babb1d56fbf4531d95765fa",
+    "update20/checkpoint.mpk": "88e55233d05910e138b41b0652614700c3fc67fe2aa434ae8bad2a7c2a9ea740"
+  }
+}

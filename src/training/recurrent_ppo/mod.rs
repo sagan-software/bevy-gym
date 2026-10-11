@@ -1461,6 +1461,33 @@ impl RecurrentPpoAgent {
             .init();
     }
 
+    /// Multiply current action-mean head weights and biases by 0.01.
+    ///
+    /// Call once on a fresh learner before collecting a small-mean initialization
+    /// experiment. This changes parameters, not actuator bounds or inference decoding.
+    /// Recurrent weights, exploration parameters, critic parameters and critic Adam
+    /// moments remain unchanged. Actor Adam starts fresh; update counters remain intact.
+    /// The resulting head remains differentiable and must learn through actual PPO.
+    pub fn reduce_action_mean_head(&mut self) {
+        // Scale only the linear projection, then start fresh gradient leaves for its parameters.
+        self.actor.mean_head.weight = self
+            .actor
+            .mean_head
+            .weight
+            .clone()
+            .map(|tensor| (tensor * 0.01).detach().require_grad());
+        self.actor.mean_head.bias = self
+            .actor
+            .mean_head
+            .bias
+            .take()
+            .map(|bias| bias.map(|tensor| (tensor * 0.01).detach().require_grad()));
+        // Previous actor moments describe different parameters; retain the separate critic optimizer.
+        self.actor_optimizer = AdamConfig::new()
+            .with_epsilon(self.config.optimizer_epsilon)
+            .init();
+    }
+
     /// Read one complete network record into this agent's architecture.
     fn load_networks(
         &self,
@@ -3192,5 +3219,45 @@ mod tests {
         assert_eq!(update.optimizer_updates, 1);
         assert_eq!(update.valid_samples, 4);
         ACTOR_FORWARD_CALLS.with(|calls| assert_eq!(calls.get(), 1));
+    }
+
+    /// An absent optional bias remains absent; scaling cannot reset unrelated state.
+    #[test]
+    fn reduced_mean_head_handles_absent_bias_and_retains_counters() {
+        let mut agent = RecurrentPpoAgent::new(
+            2,
+            2,
+            1,
+            &[-1.0],
+            &[1.0],
+            RecurrentPpoConfig {
+                actor_hidden_size: 4,
+                critic_hidden_sizes: vec![4],
+                ..Default::default()
+            },
+            SeedConfig::from_root(101),
+        )
+        .expect("small learner fixture");
+        agent.actor.mean_head.bias = None;
+        agent.optimizer_steps = 17;
+        let value = agent
+            .policy()
+            .value(&[0.3, -0.2], 0)
+            .expect("critic before");
+        agent.reduce_action_mean_head();
+        assert!(agent.actor.mean_head.bias.is_none());
+        assert_eq!(agent.optimizer_steps, 17);
+        assert_eq!(
+            agent
+                .policy()
+                .value(&[0.3, -0.2], 0)
+                .expect("critic after")
+                .to_bits(),
+            value.to_bits()
+        );
+        agent
+            .policy()
+            .mean_action(&[0.3, -0.2], &agent.policy().initial_memory())
+            .expect("bias-free scaled actor");
     }
 }
