@@ -1,0 +1,88 @@
+{
+  "qualification": false,
+  "checkpoint_sha256": "bddc0fe3647d5ca31417878c12523d7bdcb439c0305acc0b30c925e29f98e976",
+  "rerun": "Final async read source reproduced original trace bytes exactly.",
+  "episodes": [
+    {
+      "label": "trained-update540",
+      "seed": 0,
+      "steps": 39,
+      "first_peak_rad_s": 4.171969890594482,
+      "peak_rad_s": 39.36209487915039,
+      "first_max_absolute_torque_fraction": 0.03858153149485588
+    },
+    {
+      "label": "trained-update540",
+      "seed": 1,
+      "steps": 44,
+      "first_peak_rad_s": 4.170766353607178,
+      "peak_rad_s": 36.41177749633789,
+      "first_max_absolute_torque_fraction": 0.03857095167040825
+    },
+    {
+      "label": "trained-update540",
+      "seed": 2,
+      "steps": 42,
+      "first_peak_rad_s": 4.171485900878906,
+      "peak_rad_s": 45.76298141479492,
+      "first_max_absolute_torque_fraction": 0.03857673332095146
+    },
+    {
+      "label": "trained-update540",
+      "seed": 42,
+      "steps": 40,
+      "first_peak_rad_s": 4.171154022216797,
+      "peak_rad_s": 33.23311233520508,
+      "first_max_absolute_torque_fraction": 0.03857477009296417
+    },
+    {
+      "label": "trained-update540",
+      "seed": 18446744073709551615,
+      "steps": 42,
+      "first_peak_rad_s": 4.172501087188721,
+      "peak_rad_s": 42.17844009399414,
+      "first_max_absolute_torque_fraction": 0.038584060966968536
+    },
+    {
+      "label": "untrained-initialization-fixture",
+      "seed": 0,
+      "steps": 23,
+      "first_peak_rad_s": 0.7332218885421753,
+      "peak_rad_s": 18.308879852294922,
+      "first_max_absolute_torque_fraction": 0.0017503954004496336
+    },
+    {
+      "label": "untrained-initialization-fixture",
+      "seed": 1,
+      "steps": 23,
+      "first_peak_rad_s": 0.7349804639816284,
+      "peak_rad_s": 12.893088340759277,
+      "first_max_absolute_torque_fraction": 0.0017478488152846694
+    },
+    {
+      "label": "untrained-initialization-fixture",
+      "seed": 2,
+      "steps": 23,
+      "first_peak_rad_s": 0.7345029711723328,
+      "peak_rad_s": 13.772168159484863,
+      "first_max_absolute_torque_fraction": 0.0017479046946391463
+    },
+    {
+      "label": "untrained-initialization-fixture",
+      "seed": 42,
+      "steps": 23,
+      "first_peak_rad_s": 0.7326294779777527,
+      "peak_rad_s": 13.637298583984375,
+      "first_max_absolute_torque_fraction": 0.0017523911083117127
+    },
+    {
+      "label": "untrained-initialization-fixture",
+      "seed": 18446744073709551615,
+      "steps": 24,
+      "first_peak_rad_s": 0.7346041798591614,
+      "peak_rad_s": 15.101363182067871,
+      "first_max_absolute_torque_fraction": 0.0017467457801103592
+    }
+  ],
+  "limitation": "Untrained network rows are isolated initialization diagnostics, never autonomous example agents or qualification. The trained checkpoint failed original standing selection."
+}

@@ -1,0 +1,40 @@
+{
+  "schema": "standing-calibrated-continuation-launch-v1",
+  "source_base": "05c5cd138b2da64963c2e815aa463ec66cb4b6dc",
+  "seed": 227,
+  "budget_updates": 10001,
+  "planned_transitions": 5120512,
+  "parent_seed": 211,
+  "parent_update": 960,
+  "parent_sha256": "2be83022bd828e62e66593cf7cb812dcd7e7e65fed0e59aa9865ee6af226df3b",
+  "parent_qualified": false,
+  "initialization": "Retain parent actor, critic and learned per-channel exploration. Fresh Adam states and root227 sampler.",
+  "qualification": false,
+  "body": "Original thirteen cuboids, 70 kg, 26 bounded direct torques, four 5 ms substeps per action",
+  "training_reward": "Posture-height minus 0.1 mean squared torque fraction; any segment speed above 8 rad/s terminates training with reward -1 from first action",
+  "config": {
+    "actor_learning_rate": 3e-05,
+    "critic_learning_rate": 0.001,
+    "epochs": 1,
+    "minibatch_sequences": 512,
+    "entropy_coefficient": 0,
+    "log_std_min": -9,
+    "log_std_max": 1
+  },
+  "validation": "38 tests including actual parent reload and one full PPO update; strict Clippy and explicit nightly formatting passed. Original selection, held-out and early-motion gates unchanged.",
+  "sha256": {
+    "Cargo.lock": "43f4b83a52f846b39066fb74c1697d954d98e10d87b41e19d6a1bce2a5d90fb8",
+    "Cargo.toml": "43dc066f740e6f57e4d5ff73dfa79180846ebffc60639abc6a60633361ea0538",
+    "build.log": "880724916152f8c64f3e49b87b46973526d1c43fc5533eb8769469249d215c06",
+    "candidate-rule.json": "648e660e943281d0ad1a5408217f95056fc79ad0ddf973faa9847ba1e6ac8ebc",
+    "clippy-final.log": "8b9c74830340a870f7cb96aafddeeb61febe0258625d196aabaf6900656912aa",
+    "clippy.log": "04a03bb9c0e14439373cb7710502098ccf2156210c62c193aca59afdc04ffdd4",
+    "dependency-source-sha256.json": "b2fbdda1e0047d62c709bf22b5085046819c7ecf4778ed1f88a0b7cd5cdd7011",
+    "src/main.rs": "440956933b08accb4f1b54474dc1391f558bdec163c492786b2e7c111a79f482",
+    "src/safety.rs": "813e9ee033540c98945bbf8a38be9ef0310736a632db69c8fc1f643c8121860c",
+    "tests-final.log": "c8feee16997ad9036941bce0fc6931f8cb9c331c48c2a29ae34aae24adb06fe0",
+    "tests-v3.log": "4657aea6ce0ee8978f3a79eb567bda4ce13f1cfbacf8854dae784e8c18319d88",
+    "tests.log": "306cdb858ff8d4cba99bf78ebc41782d71c058eeafd0d3ea08b2320d9fd1526c",
+    "training-executable": "92357dd40d0c109778d2a826999b2c231498aef41217c08d069b1e1ea65c006e"
+  }
+}

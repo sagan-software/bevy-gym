@@ -1,0 +1,17 @@
+{
+  "Cargo.lock": "5af31fc0cf97a56618efd95ff06acc21bd0b9225b2e85e9dead0e4f8c06248bf",
+  "Cargo.toml": "988b787bd7e926c279c4e371e1da9d507481dd4fc2ae6f9c06f8c01db070d9af",
+  "build.log.gz": "9e4c6bef745a384c40d9336b51bb5ea849ebfc41e8619f68fb2726f569dbf011",
+  "candidate-rule.json": "3398e73853ce39813d80fdc192e01635727b5ad5ac3f12706ac124ae29e26e74",
+  "clippy.log.gz": "8481315fe227cd5b5785a5b0fa6a36471c46d617a8a22deed04fa0f0426043fa",
+  "dependency-source-sha256.json": "b2fbdda1e0047d62c709bf22b5085046819c7ecf4778ed1f88a0b7cd5cdd7011",
+  "initial-log-std.json": "4fb1a75112bb0b67137bd37e258b188544b02e8bc9a4162f05e9dd2fb50ae78a",
+  "launch.json": "928073145d7cf4028242b2726e0e8cf1ca23e8e251224d4f8d4c0b4b66c5b675",
+  "src/main.rs": "46a593d9137aa27553119b64a963dded2d4194a974d2255a17314d1625210b96",
+  "src/safety.rs": "64c7977dc7681c4217b5347f07a99fcac936024b1a17002a06f6f46f6ceed513",
+  "summary.json": "36e5b919d64c48fb8bcdeb162ff7e2533a7e27ce957f26c5386b3f49e87198a0",
+  "terminal-red-v2.log.gz": "f9043496748ab43e87f7cde7e26e8c8b449185fe30a7b52d221f7adeecebc662",
+  "terminal-red.log.gz": "9cffc889a6d4b993811b9b9709c18db998afe5a467d97b7d6e8c3e5c0a2b42fd",
+  "tests-final.log.gz": "fc61ddfef08fa37c61b9679668232bff7d1ab0fc65e0f3706f1bbbe1e1165c66",
+  "tests.log.gz": "406d6fb6e61851b6ccaf2ce6dc9a57816a78c6e22ca7e13057c5f509d75cb5b6"
+}

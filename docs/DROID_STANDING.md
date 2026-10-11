@@ -909,3 +909,30 @@ completed 1,001 updates with one optimizer step per 512 transitions. Its
 completed 10,001 updates. A [larger-step seed-223 trial](progress/standing-gentle-trials-20261011/safe-full-batch-larger-step-seed223/summary.json)
 changed only the actor learning rate from 0.00003 to 0.0003 and completed
 1,001 updates. Every selection checkpoint failed. None reached held-out evaluation.
+
+## Calibrated exploration trials
+
+The [actuator response diagnostic](progress/standing-gentle-trials-20261011/actuator-response/summary.json)
+uses 260 isolated signed torque fixtures over five reset roots. First-action
+angular-speed response spans about 279-fold across channels. The initializer
+scales Gaussian exploration by measured response, with standard deviation capped
+at 0.2 and floored at exp(-9). These parameters remain trainable. The diagnostic
+is neither an autonomous example nor a guarantee for simultaneous or later actions.
+
+The [calibrated seed-211 pilot](progress/standing-gentle-trials-20261011/calibrated-exploration-seed211/summary.json)
+completed 1,001 updates and failed all 51 selection checkpoints. Frozen update-540
+[motion traces](progress/standing-gentle-trials-20261011/calibrated-motion/summary.json)
+show first-action speeds near 4.17 rad/s but later speeds of 33–46 rad/s before
+falling. This remains failed standing.
+
+The [seed-227 continuation](progress/standing-gentle-trials-20261011/calibrated-continuation-seed227/launch.json)
+has a 10,001-update budget and retains seed-211 update-960 parameters with fresh
+Adam states. The [seed-229 additive-cost trial](progress/standing-gentle-trials-20261011/additive-motion-seed229/launch.json)
+retains seed-179 update-8,720 actor and critic parameters, then resets exploration
+to the calibrated channel scales. Its 1,001-update budget uses posture-height
+reward minus 0.1 times maximum segment angular speed squared divided by (8 rad/s)².
+
+The additive cost preserves physical dynamics and natural termination. Later
+requests freeze the terminal frame with zero reward. Original selection gates,
+held-out partitions and full first-two-second inspection remain required. Launch
+records report pending outcomes; they establish no qualified policy.

@@ -1,0 +1,10 @@
+{
+  "schema": "standing-launched-research-v1",
+  "qualification": false,
+  "status": "Launch validated; outcome pending",
+  "seed": 229,
+  "budget_updates": 1001,
+  "parent_qualified": false,
+  "held_out": "Only after fixed selection and early-motion acceptance; never used for ranking",
+  "archive": "Immutable source, launch and validation. Live records and all weights remain in cache."
+}
