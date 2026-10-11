@@ -835,3 +835,24 @@ independent held-out evaluation pass. No gentle standing policy is qualified.
 The [verification record](progress/standing-gentle-trials-20261011/verification.json)
 records 25 CLI tests, native and browser checks, and per-object coverage. The fixed
 valid fresh configuration cannot exercise its construction-error propagation path.
+
+## Exploration bound recovery
+
+The PPO learner projects stored log standard deviations into the configured bounds
+after every actor Adam step. Forward-only clamping previously let parameters move
+outside those bounds, where gradients could not restore exploration. In a public
+regression, reversing variance preferences for 100 updates left both bounds unchanged.
+The corrected learner recovers inward from both bounds.
+
+Projection retains the parameter ID and actor Adam state. It detaches the projected
+tensor before tracking the next gradient. Private tests verify exact lower, interior
+and upper values, gradient tracking, and unchanged mean, memory and critic values.
+Frozen inference retains its existing clamp and checkpoint format.
+
+The [verification record](progress/ppo-variance-boundary-20261011/verification.json)
+retains the failing public test, passing public tests, native and browser gates,
+personal lints, and fresh coverage of all 16 projection regions. The pinned
+[Burn 0.21 parameter implementation](https://github.com/tracel-ai/burn/blob/v0.21.0/crates/burn-core/src/module/param/base.rs)
+retains identity through `Param::map`; its bytes match the installed dependency.
+This optimizer correction requires new physical evaluation. It does not qualify
+an existing standing, walking or competitive policy.

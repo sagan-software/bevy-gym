@@ -1,0 +1,23 @@
+warning: Git tree '/home/sagan/Code/github.com/sagan-software/bevy-gym-quality' is dirty
+   Compiling bevy-gym v0.3.3 (/home/sagan/Code/github.com/sagan-software/bevy-gym-quality)
+    Finished `test` profile [optimized] target(s) in 22.73s
+     Running tests/recurrent_ppo_bytes.rs (/home/sagan/.cache/bevy-gym-quality-validation/build/debug/deps/recurrent_ppo_bytes-d4ba12d8cbc0477a)
+
+running 1 test
+test bounded_exploration_recovers_after_variance_preferences_reverse ... FAILED
+
+failures:
+
+---- bounded_exploration_recovers_after_variance_preferences_reverse stdout ----
+
+thread 'bounded_exploration_recovers_after_variance_preferences_reverse' (2004195) panicked at tests/recurrent_ppo_bytes.rs:755:9:
+initial log std -5: entropy -3.581062078475952 remained at -3.581062078475952
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    bounded_exploration_recovers_after_variance_preferences_reverse
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 9 filtered out; finished in 1.49s
+
+error: test failed, to rerun pass `--test recurrent_ppo_bytes`

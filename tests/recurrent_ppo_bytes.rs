@@ -684,3 +684,85 @@ fn reduced_mean_head_retains_gaussian_exploration() {
     let (agent, before) = reduced_mean_agent();
     assert!((sampled_noise(&before) - sampled_noise(&agent.policy())).abs() < 1e-6);
 }
+
+/// Sample real behavior probabilities while rewarding larger or smaller Gaussian residuals.
+fn variance_preference_sequence(
+    policy: &RecurrentPpoPolicy,
+    preference: f32,
+    seed: u64,
+) -> RecurrentPpoSequence {
+    let initial_memory = policy.initial_memory();
+    let mut memory = initial_memory.clone();
+    let mut sampler = RecurrentSampler::new(seed);
+    let observation = [0.3, -0.2];
+    let mut actions = Vec::with_capacity(32);
+    let mut probabilities = Vec::with_capacity(32);
+    let mut advantages = Vec::with_capacity(32);
+    for _ in 0..32 {
+        let mean = policy
+            .mean_action(&observation, &memory)
+            .expect("valid mean");
+        let sample = policy
+            .sample_action(&observation, &memory, &mut sampler)
+            .expect("valid sample");
+        let residual = sample.pre_tanh_action.first().expect("one action")
+            - mean.pre_tanh_action.first().expect("one mean");
+        advantages.push(preference * residual * residual);
+        actions.push(sample.pre_tanh_action);
+        probabilities.push(sample.log_probability);
+        memory = sample.next_memory;
+    }
+    RecurrentPpoSequence {
+        observations: vec![observation.to_vec(); 32],
+        global_states: vec![observation.to_vec(); 32],
+        pre_tanh_actions: actions,
+        old_log_probabilities: probabilities,
+        advantages,
+        returns: vec![0.0; 32],
+        value_index: 0,
+        initial_memory,
+    }
+}
+
+/// Boundaries constrain variance without permanently preventing inward learning.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn bounded_exploration_recovers_after_variance_preferences_reverse() {
+    for (initial, outward, inward) in [(-5.0, -1.0, 1.0), (1.0, 1.0, -1.0)] {
+        let mut configuration = config();
+        configuration.initial_log_std = initial;
+        configuration.entropy_coefficient = 0.0;
+        let mut agent = RecurrentPpoAgent::new(
+            2,
+            2,
+            1,
+            &[-1.0],
+            &[1.0],
+            configuration,
+            SeedConfig::from_root(42),
+        )
+        .expect("valid bounded learner");
+        let first = agent
+            .update(&[variance_preference_sequence(&agent.policy(), outward, 43)])
+            .expect("outward preference update");
+        assert_eq!(first.optimizer_updates, 1);
+        assert_eq!(first.valid_samples, 32);
+        let first_entropy = first.entropy;
+        let mut last_entropy = first_entropy;
+        for seed in 100..200 {
+            let update = agent
+                .update(&[variance_preference_sequence(&agent.policy(), inward, seed)])
+                .expect("inward preference update");
+            last_entropy = update.entropy;
+        }
+        let recovered = if initial < 0.0 {
+            last_entropy > first_entropy + 0.00001
+        } else {
+            last_entropy < first_entropy - 0.00001
+        };
+        assert!(
+            recovered,
+            "initial log std {initial}: entropy {first_entropy} remained at {last_entropy}"
+        );
+    }
+}

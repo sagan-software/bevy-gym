@@ -1718,6 +1718,21 @@ impl RecurrentPpoAgent {
         Ok(())
     }
 
+    /// Project Gaussian scales after Adam without replacing parameter identity or optimizer state.
+    ///
+    /// Burn 0.21 `Param::map` retains its ID:
+    /// <https://github.com/tracel-ai/burn/blob/v0.21.0/crates/burn-core/src/module/param/base.rs>.
+    /// The detached result is a fresh gradient leaf; inference retains its existing bounds.
+    fn project_exploration(&mut self) {
+        let minimum = self.config.log_std_min;
+        let maximum = self.config.log_std_max;
+        self.actor.log_std = self
+            .actor
+            .log_std
+            .clone()
+            .map(|tensor| tensor.clamp(minimum, maximum).detach().require_grad());
+    }
+
     /// Apply clipped PPO actor updates and centralized critic regression.
     ///
     /// Every input sequence must be contiguous and must not cross an episode
@@ -1808,6 +1823,8 @@ impl RecurrentPpoAgent {
                     self.actor.clone(),
                     actor_gradients,
                 );
+                // Keep trainable scales on the boundary, where inward gradients remain available.
+                self.project_exploration();
                 let critic_gradients =
                     GradientsParams::from_grads(critic_loss.backward(), &self.critic);
                 self.critic = self.critic_optimizer.step(
@@ -3259,5 +3276,56 @@ mod tests {
             .policy()
             .mean_action(&[0.3, -0.2], &agent.policy().initial_memory())
             .expect("bias-free scaled actor");
+    }
+
+    /// Projection retains parameter identity, tracked leaves and every non-scale network value.
+    #[test]
+    fn exploration_projection_keeps_identity_and_exact_boundaries() {
+        let mut agent = RecurrentPpoAgent::new(
+            2,
+            2,
+            1,
+            &[-1.0; 4],
+            &[1.0; 4],
+            RecurrentPpoConfig {
+                actor_hidden_size: 4,
+                critic_hidden_sizes: vec![4],
+                ..Default::default()
+            },
+            SeedConfig::from_root(149),
+        )
+        .expect("small bounded learner");
+        agent.actor.log_std = Param::from_tensor(Tensor::from_floats(
+            [-6.0, -5.0, 0.25, 2.0].as_slice(),
+            &agent.device,
+        ));
+        let identity = agent.actor.log_std.id;
+        let policy = agent.policy();
+        let memory = policy.initial_memory();
+        let observation = [0.3, -0.2];
+        let mean = policy
+            .mean_action(&observation, &memory)
+            .expect("before mean");
+        let value = policy.value(&observation, 0).expect("before critic");
+        agent.project_exploration();
+        assert_eq!(agent.actor.log_std.id, identity);
+        assert!(agent.actor.log_std.val().is_require_grad());
+        let projected = tensor_vec(agent.actor.log_std.val()).expect("projected scales");
+        assert_eq!(projected, vec![-5.0, -5.0, 0.25, 1.0]);
+        assert_eq!(
+            agent
+                .policy()
+                .mean_action(&observation, &memory)
+                .expect("after mean"),
+            mean
+        );
+        assert_eq!(
+            agent
+                .policy()
+                .value(&observation, 0)
+                .expect("after critic")
+                .to_bits(),
+            value.to_bits()
+        );
     }
 }

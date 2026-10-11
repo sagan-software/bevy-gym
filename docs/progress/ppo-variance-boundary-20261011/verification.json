@@ -1,0 +1,41 @@
+{
+  "schema": "ppo-variance-boundary-verification-v1",
+  "source_base": "0e3db45ae9bd133162859d81419c4bc1e2eecad6",
+  "sources": {
+    "src/training/recurrent_ppo/mod.rs": "59f51dc6df42a8fd0e05774b35da83007fe77107ba5d81783a3b22ee04fcc35e",
+    "tests/recurrent_ppo_bytes.rs": "5be6a4f3ebc048c1b53df584272ee39ef7172fce0416debe0ec5894760a86b9a"
+  },
+  "gate_units": [
+    "bevy-gym-variance-boundary-native-20261011",
+    "bevy-gym-variance-boundary-personal-20261011",
+    "bevy-gym-variance-boundary-wasm-20261011",
+    "bevy-gym-variance-boundary-coverage-20261011",
+    "bevy-gym-variance-boundary-fresh-coverage-20261011"
+  ],
+  "recurrent_byte_tests": 10,
+  "private_invariant": "[-6,-5,0.25,2] projects to [-5,-5,0.25,1] with the same parameter ID, tracked leaf, mean, memory and critic",
+  "fresh_coverage": {
+    "objects": [
+      {
+        "path": "/home/sagan/.cache/bevy-gym-quality-validation/coverage-target/debug/deps/bevy_gym-465415eccecbf3cf",
+        "sha256": "b0fa535b1019bbc70eace7916077dbbbf50eefb692f891e9ed48580d05d5d808"
+      },
+      {
+        "path": "/home/sagan/.cache/bevy-gym-quality-validation/coverage-target/debug/deps/recurrent_ppo_bytes-49006fa5e2dd3017",
+        "sha256": "2a1cd8bd12e0f0ccb2152e76ead2a5fc707458c07d8549858e3b7fdf924b8a2a"
+      }
+    ],
+    "exports": [
+      "/home/sagan/.cache/bevy-gym-quality-validation/variance-boundary-fresh-coverage-20261011/0.json",
+      "/home/sagan/.cache/bevy-gym-quality-validation/variance-boundary-fresh-coverage-20261011/1.json"
+    ],
+    "project_exploration": {
+      "hit": 16,
+      "total": 16,
+      "zero_regions": []
+    }
+  },
+  "burn_version": "0.21.0",
+  "burn_param_source_sha256": "a70e60fcbf16c2388940267b4f39559f8449a89356af3674124e4ac94c4a7967",
+  "qualification": "optimizer regression fixed; physical standing, walking and competitive combat remain unqualified"
+}

@@ -1,0 +1,19 @@
+warning: Git tree '/home/sagan/Code/github.com/sagan-software/bevy-gym-quality' is dirty
+   Compiling bevy-gym v0.3.3 (/home/sagan/Code/github.com/sagan-software/bevy-gym-quality)
+    Finished `test` profile [optimized] target(s) in 22.28s
+     Running tests/recurrent_ppo_bytes.rs (/home/sagan/.cache/bevy-gym-quality-validation/build/debug/deps/recurrent_ppo_bytes-d4ba12d8cbc0477a)
+
+running 10 tests
+test reduced_mean_head_preserves_recurrent_memory_and_critic ... ok
+test optimizer_update_and_byte_round_trip_preserve_actor_and_critic ... ok
+test reduced_mean_head_retains_gaussian_exploration ... ok
+test byte_loading_rejects_corruption_and_each_architecture_mismatch ... ok
+test byte_loaded_agent_preserves_weights_and_restarts_optimizer ... ok
+test reduced_mean_head_learns_with_actual_ppo_and_reloads ... ok
+test padding_is_excluded_before_probability_ratios ... ok
+test reset_exploration_preserves_learned_mean_and_scales_sample_noise ... ok
+test mixed_length_minibatch_matches_retained_scalar_optimizer ... ok
+test bounded_exploration_recovers_after_variance_preferences_reverse ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.92s
+
