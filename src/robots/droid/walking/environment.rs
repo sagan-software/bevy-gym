@@ -44,6 +44,8 @@ pub struct DroidWalking {
     mechanical_work_joules: f64,
     /// Actual solver time, including a terminating substep.
     elapsed: Duration,
+    /// Integrated maximum foot solver-contact sliding estimates in metres, left then right.
+    foot_contact_sliding_distance_metres: [f64; 2],
 }
 
 impl DroidWalking {
@@ -72,6 +74,23 @@ impl DroidWalking {
         }
     }
 
+    /// Return cumulative foot solver-contact sliding estimates in metres, left then right.
+    ///
+    /// Each completed 5 ms substep adds its maximum horizontal contact-point speed
+    /// multiplied by 0.005 s. Rotation contributes to point velocity. No contact adds
+    /// zero. Predictive solver contacts count; this estimate does not identify loaded
+    /// contact or exact continuous slip. Reset clears it, a fall freezes it, and failed
+    /// physics returns `None`. It never enters observations, rewards or actuation.
+    #[must_use]
+    pub const fn foot_contact_sliding_distance_metres(&self) -> Option<[f64; 2]> {
+        match self.status {
+            DroidWalkingStatus::Failed(_) => None,
+            DroidWalkingStatus::Running | DroidWalkingStatus::Fallen(_) => {
+                Some(self.foot_contact_sliding_distance_metres)
+            }
+        }
+    }
+
     /// Return actual advanced solver time; terminal requests do not advance it.
     #[must_use]
     pub const fn elapsed(&self) -> Duration {
@@ -93,6 +112,7 @@ impl DroidWalking {
             status: DroidWalkingStatus::Running,
             mechanical_work_joules: 0.0,
             elapsed: Duration::ZERO,
+            foot_contact_sliding_distance_metres: [0.0; 2],
         }
     }
 
@@ -116,6 +136,14 @@ impl DroidWalking {
         // If physics failed, expose unavailable work instead of consuming invalid state.
         if !matches!(self.status, DroidWalkingStatus::Failed(_)) {
             self.mechanical_work_joules += work::estimate(before, after, action);
+            // Speed in m/s times the completed solver interval in seconds gives metres.
+            for (distance_m, speed_m_s) in self
+                .foot_contact_sliding_distance_metres
+                .iter_mut()
+                .zip(self.articulation.foot_contact_speeds())
+            {
+                *distance_m = speed_m_s.mul_add(PHYSICS_INTERVAL.as_secs_f64(), *distance_m);
+            }
         }
     }
 
@@ -437,6 +465,7 @@ mod tests {
         assert_eq!(walking.status, DroidWalkingStatus::Failed(DroidBody::Head));
         assert_eq!(walking.elapsed(), std::time::Duration::from_millis(5));
         assert_eq!(walking.mechanical_work_joules(), None);
+        assert_eq!(walking.foot_contact_sliding_distance_metres(), None);
         assert_eq!(walking.mechanical_work_joules.to_bits(), 0.0_f64.to_bits());
         walking.reset(Some(42));
         assert_eq!(walking.mechanical_work_joules(), Some(0.0));
@@ -462,6 +491,7 @@ mod tests {
             let stopped = walking.step(action);
             assert_eq!(stopped.info, DroidWalkingStatus::Failed(DroidBody::Pelvis));
             assert_eq!(walking.mechanical_work_joules(), None);
+            assert_eq!(walking.foot_contact_sliding_distance_metres(), None);
             assert_eq!(walking.elapsed(), std::time::Duration::ZERO);
             assert_eq!(stopped.status, EpisodeStatus::Terminated);
             assert_eq!(stopped.reward.to_bits(), 0.0_f64.to_bits());

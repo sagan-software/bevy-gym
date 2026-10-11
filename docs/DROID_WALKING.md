@@ -115,3 +115,32 @@ The [foundation record](progress/droid-walking-foundation.json) retains source h
 commands, native/browser outcomes and fresh production coverage. The task is custom
 Rapier mechanics over the project's mannequin; it is not a Gymnasium Humanoid port.
 The [curriculum](ROBOT_SKILL_CURRICULUM.md) records the remaining browser and training work.
+
+## Foot-contact sliding
+
+`DroidWalking::foot_contact_sliding_distance_metres()` returns the cumulative
+sliding estimate in metres as `Some([left, right])`. Reset clears both values.
+A fall retains the final values, and terminal requests freeze them. Failed
+physics returns `None`.
+
+For each completed 5 ms substep, the measurement resolves each foot's solver
+contact points through the current body poses. Point velocity includes linear
+velocity and rotation about the body's centre of mass. Horizontal X/Z speed
+in m/s widens to f64 before arithmetic. Each foot adds its maximum contact-point
+speed times 0.005 seconds. When a foot has no solver contacts, it adds zero.
+The floor is stationary.
+
+The measure includes predictive solver constraints and uses discrete substep
+boundaries. It does not identify loaded contact or integrate exact continuous
+slip. It never enters actor observations, rewards or actuator requests.
+[Rapier 0.36's contact resolver](https://docs.rs/rapier3d/0.36.0/rapier3d/geometry/struct.ContactManifoldData.html#method.solver_contact_world_points)
+controls the conversion from stored contact anchors to world points.
+
+The [sliding verification record](progress/droid-walking-slip-20261011/verification.json)
+records eight public walking tests, native and browser gates, strict Clippy and
+personal lints. Fresh per-object coverage records 30/30 point-velocity regions,
+48/48 contact-query regions and 177/177 walking-environment regions. All recorded
+branch sides execute. Fixtures cover rotation, vertical velocity, finite angular
+extremes, both collider orders, reset, accumulation, terminal freezing and failed
+physics. These measurements supply future walking evaluation; they do not qualify
+a walking policy.

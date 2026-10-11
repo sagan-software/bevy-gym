@@ -191,7 +191,9 @@ fn actuator_work_and_elapsed_time_reset_and_freeze() {
     assert_eq!(walking.mechanical_work_joules(), Some(0.0));
     assert_eq!(walking.elapsed(), std::time::Duration::ZERO);
     let mut fractions = [0.0; 26];
-    fractions[DroidActuator::LeftAnkleZ as usize] = 0.01;
+    *fractions
+        .get_mut(DroidActuator::LeftAnkleZ as usize)
+        .expect("closed actuator index") = 0.01;
     walking.step(DroidAction::try_from(fractions).expect("isolated torque fixture"));
     assert_eq!(walking.elapsed(), DroidWalking::POLICY_INTERVAL);
     assert!(walking.mechanical_work_joules().expect("finite work") > 0.0);
@@ -209,4 +211,50 @@ fn actuator_work_and_elapsed_time_reset_and_freeze() {
     walking.step(DroidAction::try_from([1.0; 26]).expect("isolated terminal fixture"));
     assert_eq!(walking.elapsed(), elapsed);
     assert_eq!(walking.mechanical_work_joules(), Some(0.0));
+}
+
+/// Foot-contact sliding estimates reset, accumulate through actual contacts and freeze after a fall.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn foot_contact_sliding_is_measured_without_selecting_actions() {
+    let mut walking = DroidWalking::default();
+    walking.reset(Some(42));
+    assert_eq!(
+        walking.foot_contact_sliding_distance_metres(),
+        Some([0.0; 2])
+    );
+    let mut fractions = [0.0; 26];
+    *fractions
+        .get_mut(DroidActuator::LeftAnkleZ as usize)
+        .expect("closed actuator index") = 0.01;
+    let fixture = DroidAction::try_from(fractions).expect("isolated physical fixture");
+    let mut previous = [0.0; 2];
+    let mut terminated = false;
+    for _ in 0..1_000 {
+        let result = walking.step(fixture);
+        let current = walking
+            .foot_contact_sliding_distance_metres()
+            .expect("finite physics");
+        assert!(current
+            .iter()
+            .zip(previous)
+            .all(|(current, previous)| current.is_finite() && *current >= previous));
+        previous = current;
+        if result.is_done() {
+            terminated = true;
+            break;
+        }
+    }
+    assert!(terminated);
+    assert!(previous.iter().any(|distance| *distance > 0.0));
+    walking.step(DroidAction::try_from([1.0; 26]).expect("terminal fixture"));
+    assert_eq!(
+        walking.foot_contact_sliding_distance_metres(),
+        Some(previous)
+    );
+    walking.reset(Some(42));
+    assert_eq!(
+        walking.foot_contact_sliding_distance_metres(),
+        Some([0.0; 2])
+    );
 }

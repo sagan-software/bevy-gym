@@ -5,10 +5,11 @@
 //! <https://rapier.rs/docs/user_guides/rust/rigid_body_forces_and_impulses/>.
 
 use super::{geometry, DroidAction, DroidBody, DroidBodyState, DroidObservation};
-use bevy::math::{Quat, Vec3};
+use bevy::math::{DVec3, Quat, Vec3};
 use rapier3d::prelude::{
     ColliderBuilder, ColliderHandle, ContactPair, GenericJointBuilder, IntegrationParameters,
-    JointAxesMask, JointAxis, PhysicsWorld, RigidBodyBuilder, RigidBodyHandle, Rotation, Vector,
+    JointAxesMask, JointAxis, PhysicsWorld, RigidBody, RigidBodyBuilder, RigidBodyHandle, Rotation,
+    Vector,
 };
 use std::time::Duration;
 
@@ -164,6 +165,20 @@ impl DroidRig {
     }
 }
 
+/// Compute horizontal contact-point speed in m/s with widened rigid-body arithmetic.
+///
+/// Rapier 0.36 point velocity is linear velocity plus angular velocity crossed with
+/// the offset from world centre of mass. Widen before subtraction and multiplication so finite
+/// f32 state cannot overflow in intermediate arithmetic. The floor is stationary.
+fn contact_horizontal_speed(body: &RigidBody, point: Vector) -> f64 {
+    let point_m = DVec3::from_array(point.to_array().map(f64::from));
+    let centre_m = DVec3::from_array(body.center_of_mass().to_array().map(f64::from));
+    let linear_m_s = DVec3::from_array(body.linvel().to_array().map(f64::from));
+    let angular_rad_s = DVec3::from_array(body.angvel().to_array().map(f64::from));
+    let velocity_m_s = linear_m_s + angular_rad_s.cross(point_m - centre_m);
+    velocity_m_s.x.hypot(velocity_m_s.z)
+}
+
 /// Standalone lesson owner; its rig uses the same component as the shared robot world.
 pub(super) struct Articulation {
     /// The lesson's sole integration and collision owner.
@@ -214,6 +229,46 @@ impl Articulation {
         self.rig.apply(&mut self.world, action);
     }
 
+    /// Measure each foot's maximum horizontal solver-contact speed in m/s, left then right.
+    ///
+    /// Rapier 0.36 resolves CoM-local anchors through current body poses:
+    /// <https://docs.rs/rapier3d/0.36.0/rapier3d/geometry/struct.ContactManifoldData.html#method.solver_contact_world_points>.
+    /// Solver contacts include predictive constraints; this is not a loaded-contact classification.
+    pub(super) fn foot_contact_speeds(&self) -> [f64; 2] {
+        [DroidBody::LeftFoot, DroidBody::RightFoot].map(|foot| {
+            let collider = *self
+                .rig
+                .colliders
+                .get(foot as usize)
+                .expect("closed foot index");
+            let handle = *self
+                .rig
+                .bodies
+                .get(foot as usize)
+                .expect("closed foot index");
+            let body = self.world.bodies.get(handle).expect("private foot");
+            let Some(pair) = self.world.contact_pair(collider, self.rig.floor) else {
+                return 0.0;
+            };
+            // Bound memory while examining every actual solver contact once.
+            let mut maximum_m_s = 0.0_f64;
+            for manifold in pair.solver_manifolds() {
+                for contact in &manifold.data.solver_contacts {
+                    let (first, second) = manifold
+                        .data
+                        .solver_contact_world_points(contact, &self.world.bodies);
+                    let point = if manifold.data.rigid_body1 == Some(handle) {
+                        first
+                    } else {
+                        second
+                    };
+                    maximum_m_s = maximum_m_s.max(contact_horizontal_speed(body, point));
+                }
+            }
+            maximum_m_s
+        })
+    }
+
     /// Read the unchanged physical observation profile.
     pub(super) fn observation(&self) -> DroidObservation {
         self.rig.observation(&self.world)
@@ -224,6 +279,70 @@ impl Articulation {
 mod tests {
     use super::super::DroidActuator;
     use super::*;
+
+    /// Point velocity includes rotation, excludes vertical speed and widens finite extremes.
+    #[test]
+    fn horizontal_contact_speed_uses_the_contact_point() {
+        let mut body = RigidBodyBuilder::dynamic().build();
+        body.set_linvel(Vector::new(8.0, 7.0, 0.0), false);
+        body.set_angvel(Vector::new(0.0, 2.0, 0.0), false);
+        assert_eq!(
+            contact_horizontal_speed(&body, Vector::new(3.0, 0.0, 0.0)).to_bits(),
+            10.0_f64.to_bits()
+        );
+        body.set_angvel(Vector::new(0.0, -2.0, 0.0), false);
+        assert_eq!(
+            contact_horizontal_speed(&body, Vector::new(3.0, 0.0, 0.0)).to_bits(),
+            10.0_f64.to_bits()
+        );
+        body.set_linvel(Vector::Y * 7.0, false);
+        body.set_angvel(Vector::ZERO, false);
+        assert_eq!(
+            contact_horizontal_speed(&body, Vector::X).to_bits(),
+            0.0_f64.to_bits()
+        );
+        body.set_linvel(Vector::X * f32::MAX, false);
+        body.set_angvel(Vector::Y * f32::MAX, false);
+        assert!(contact_horizontal_speed(&body, Vector::X * 3.0).is_finite());
+    }
+
+    /// A later-inserted floor resolves the foot's first surface anchor instead of the floor's.
+    #[test]
+    fn foot_contact_speed_handles_both_collider_orders() {
+        let mut articulation = Articulation::new(Rotation::IDENTITY, Vector::Y * 0.03);
+        articulation
+            .world
+            .colliders
+            .get_mut(articulation.rig.floor)
+            .expect("private floor")
+            .set_translation(Vector::NEG_Y * 100.0);
+        let (_, floor) = articulation.world.insert(
+            RigidBodyBuilder::fixed().translation(Vector::new(0.0, -0.1, 0.0)),
+            ColliderBuilder::cuboid(10.0, 0.1, 10.0).friction(0.8),
+        );
+        articulation.rig.floor = floor;
+        for _ in 0..20 {
+            articulation.world.step();
+        }
+        for foot in [DroidBody::LeftFoot, DroidBody::RightFoot] {
+            let handle = *articulation
+                .rig
+                .bodies
+                .get(foot as usize)
+                .expect("closed foot index");
+            let body = articulation
+                .world
+                .bodies
+                .get_mut(handle)
+                .expect("private foot");
+            body.set_linvel(Vector::X, false);
+            body.set_angvel(Vector::ZERO, false);
+        }
+        assert_eq!(
+            articulation.foot_contact_speeds().map(f64::to_bits),
+            [1.0_f64.to_bits(); 2]
+        );
+    }
 
     /// All bodies have physical mass and inertia.
     #[test]

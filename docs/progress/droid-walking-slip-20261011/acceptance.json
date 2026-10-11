@@ -1,0 +1,31 @@
+{
+  "schema": "walking-contact-slide-acceptance-v1",
+  "legal_states": [
+    "Running",
+    "Fallen",
+    "Failed"
+  ],
+  "boundary": "no new actor input, action, reward, Info type or mutable physics access",
+  "measure": "post-substep maximum horizontal solver contact-point speed per foot times actual 0.005 s; left then right; metres; predictive contacts count; estimate only",
+  "failure": "Failed returns None; finite physical fall retains measurement; terminal requests freeze; reset zero",
+  "complexity": "O(number of foot-floor solver contacts) time, O(1) auxiliary space per substep",
+  "public_red": "E0599 missing foot_contact_sliding_distance_metres in focused droid_walking public regression",
+  "public_green": "eight public walking tests pass before internal expansion",
+  "internal_checks": [
+    "rotating point: linvel (8,7,0) m/s + angular (0,+/-2,0) rad/s at (3,0,0) m => 10 m/s",
+    "pure vertical velocity => zero horizontal speed",
+    "finite f32 maximum linear/angular values => finite widened result",
+    "failed completed substep => None; actual 5 ms elapsed retained"
+  ],
+  "gates": [
+    "exact fmt",
+    "exact cargo test",
+    "cargo test --features robots",
+    "strict all-targets all-features Clippy",
+    "personal lints",
+    "full drone-browser-check",
+    "fresh per-object changed-region coverage",
+    "guide and doc tests after final separate prose-only edit"
+  ],
+  "controlling_implementation": "installed rapier3d 0.36.0 ContactManifoldData::solver_contact_world_points, ContactPair::solver_manifolds and RigidBody::velocity_at_point/center_of_mass inspected"
+}

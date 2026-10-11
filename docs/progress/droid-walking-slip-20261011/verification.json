@@ -1,0 +1,253 @@
+{
+  "schema": "walking-contact-slide-verification-v1",
+  "source_base": "4b8ab70011c6da0b29716a10ea6dffefb9f53242",
+  "sources": {
+    "src/robots/droid/physics.rs": "1fe325c101abf1c469040466c83b817b61a25cd65d76ddb20de15f1afa039e3e",
+    "src/robots/droid/walking/environment.rs": "d71637c093f524dd0551959cd2de366c51e5c78efe30776fab2dcd31807ffec2",
+    "tests/droid_walking.rs": "b44ddebc9b898a9a1bb946b0ab5ae240a188da488357949ebf859de61076e721"
+  },
+  "gate_units": [
+    "bevy-gym-walking-slip-native-v3-20261011",
+    "bevy-gym-walking-slip-personal-v3-20261011",
+    "bevy-gym-walking-slip-wasm-v3-20261011",
+    "bevy-gym-walking-slip-coverage-v3-20261011",
+    "bevy-gym-walking-slip-fresh-coverage-v3-20261011"
+  ],
+  "public_walking_tests": 8,
+  "fresh_coverage": {
+    "objects": [
+      {
+        "path": "/home/sagan/.cache/bevy-gym-quality-validation/coverage-target/debug/deps/bevy_gym-465415eccecbf3cf",
+        "sha256": "8cc4f01aa235f151fcb5760be9d2afb32d6f81dd15914e36ff851684666f75ba"
+      },
+      {
+        "path": "/home/sagan/.cache/bevy-gym-quality-validation/coverage-target/debug/deps/droid_walking-81c834d7472bd61f",
+        "sha256": "e258d0eea23d63e65aa112002eff6279d698b5186b1db9ad8745632542272cd9"
+      }
+    ],
+    "exports": [
+      "/home/sagan/.cache/bevy-gym-quality-validation/walking-slip-fresh-coverage-v3-20261011/0.json",
+      "/home/sagan/.cache/bevy-gym-quality-validation/walking-slip-fresh-coverage-v3-20261011/1.json"
+    ],
+    "work.rs": {
+      "hit": 58,
+      "total": 58,
+      "zero_regions": [],
+      "branches": [
+        {
+          "range": [
+            26,
+            20,
+            26,
+            30
+          ],
+          "hits": [
+            17316,
+            6660
+          ]
+        }
+      ]
+    },
+    "environment.rs": {
+      "hit": 177,
+      "total": 177,
+      "zero_regions": [],
+      "branches": [
+        {
+          "range": [
+            137,
+            12,
+            137,
+            65
+          ],
+          "hits": [
+            666,
+            1
+          ]
+        },
+        {
+          "range": [
+            155,
+            16,
+            155,
+            44
+          ],
+          "hits": [
+            40,
+            10842
+          ]
+        },
+        {
+          "range": [
+            156,
+            20,
+            156,
+            51
+          ],
+          "hits": [
+            39,
+            10842
+          ]
+        },
+        {
+          "range": [
+            157,
+            20,
+            157,
+            55
+          ],
+          "hits": [
+            41,
+            10842
+          ]
+        },
+        {
+          "range": [
+            158,
+            20,
+            158,
+            56
+          ],
+          "hits": [
+            40,
+            10842
+          ]
+        },
+        {
+          "range": [
+            163,
+            12,
+            163,
+            66
+          ],
+          "hits": [
+            3,
+            831
+          ]
+        },
+        {
+          "range": [
+            170,
+            16,
+            170,
+            39
+          ],
+          "hits": [
+            27,
+            10803
+          ]
+        },
+        {
+          "range": [
+            171,
+            20,
+            171,
+            43
+          ],
+          "hits": [
+            26,
+            10803
+          ]
+        },
+        {
+          "range": [
+            172,
+            20,
+            172,
+            54
+          ],
+          "hits": [
+            25,
+            10803
+          ]
+        },
+        {
+          "range": [
+            180,
+            16,
+            180,
+            36
+          ],
+          "hits": [
+            710,
+            10091
+          ]
+        },
+        {
+          "range": [
+            181,
+            20,
+            181,
+            83
+          ],
+          "hits": [
+            11,
+            708
+          ]
+        },
+        {
+          "range": [
+            221,
+            12,
+            221,
+            54
+          ],
+          "hits": [
+            168,
+            217
+          ]
+        },
+        {
+          "range": [
+            226,
+            20,
+            226,
+            62
+          ],
+          "hits": [
+            2,
+            666
+          ]
+        }
+      ]
+    },
+    "contact_horizontal_speed": {
+      "hit": 30,
+      "total": 30,
+      "zero_regions": [],
+      "branches": []
+    },
+    "foot_contact_speeds": {
+      "hit": 48,
+      "total": 48,
+      "zero_regions": [],
+      "branches": [
+        {
+          "range": [
+            250,
+            17,
+            250,
+            27
+          ],
+          "hits": [
+            1096,
+            236
+          ]
+        },
+        {
+          "range": [
+            260,
+            36,
+            260,
+            77
+          ],
+          "hits": [
+            8,
+            1518
+          ]
+        }
+      ]
+    }
+  },
+  "qualification": "measurement only; no walking policy, training runner, browser walking scene or qualified lesson"
+}
