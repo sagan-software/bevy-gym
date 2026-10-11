@@ -1,0 +1,9 @@
+{
+  "seed": 347,
+  "status": "running",
+  "budget_updates": 100001,
+  "qualification": false,
+  "tests": 39,
+  "strict_clippy": "passed",
+  "promotion": "none; original gates still required"
+}

@@ -960,18 +960,40 @@ serially and 0.0591 seconds concurrently, about 2.75 times faster. Each collecti
 contains 512 transitions. This measures collection only, excluding optimization
 and rendering, and qualifies no policy.
 
-## Active motion-cost research
+## Completed motion-cost research
 
-Two frozen native trials start from calibrated seed-211 update-960 parameters.
-Both reset exploration to the measured per-channel scales and retain original
-physics. Neither permits automatic promotion.
+The [seed-283 trial](progress/standing-gentle-trials-20261011/active-motion-seed283/summary.json)
+and [seed-307 trial](progress/standing-gentle-trials-20261011/active-motion-seed307/summary.json)
+each completed 10,001 updates and failed all 501 selection checkpoints. Both retain
+calibrated seed-211 update-960 actor and critic weights with fresh Adam states and
+reset calibrated exploration. Original physics remains unchanged.
 
-The [seed-283 launch](progress/standing-gentle-trials-20261011/active-motion-seed283/launch.json)
-uses an actor learning rate of 0.000003 and the additive motion cost. The
-[seed-307 launch](progress/standing-gentle-trials-20261011/active-motion-seed307/launch.json)
-uses 0.00003 and additionally subtracts 1,000 reward once on a natural fall.
-The fall penalty addresses the incentive to avoid later motion costs by falling
-early. A regression verifies the first penalty and zero reward on later requests.
+Seed 283 uses actor learning rate 0.000003 and the additive motion cost. Seed 307
+uses 0.00003 and subtracts 1,000 reward once on a natural fall. Its best failed
+reference lasts 110, 76, 78, 105 and 76 actions across the five selection roots.
+Neither trial reached held-out evaluation or produced qualified standing.
 
-Each run has a 10,001-update budget. Launch records establish tested configurations
-and frozen executables, not successful standing. Outcomes remain pending.
+## Mean-head update scales
+
+`RecurrentPpoAgent::set_action_mean_update_scales` configures dimensionless factors
+in `(0, 1]` for future PPO mean-head Adam increments. Unit factors preserve the exact
+Adam result. All-unit factors restore the default update path. Setting factors
+preserves current weights, moments, counters, inference and actuator bounds.
+Recurrent, exploration and critic updates retain their configured rates.
+
+The [verification record](progress/mean-head-update-scales-20261011/verification.json)
+records three public regressions, one private invariant test, native checks, browser
+checks and personal lints. Fresh coverage hits all 123 measured regions and both
+outcomes of seven recorded branches in the setter, projection and changed update
+hook. Constructor initialization has no separate LLVM region; default behavior has
+regression evidence. Frozen records retain their existing format and resulting
+learned weights. Loading does not restore these training factors.
+
+The [seed-347 launch](progress/standing-gentle-trials-20261011/head-scaled-motion-seed347/launch.json)
+uses actor learning rate 0.0003 and scales each mean-head increment by its initial
+calibrated Gaussian standard deviation divided by the largest channel deviation.
+It retains calibrated seed-211 update-960 weights, uses fresh Adam states, and
+applies the motion cost and one-time fall penalty. Its frozen executable has a
+100,001-update budget. The launch establishes a tested configuration, not standing
+success. Original selection, early-motion, held-out and native/browser gates still
+control qualification; no automatic promotion is permitted.

@@ -1,0 +1,17 @@
+{
+  "fresh-coverage.py": "87188743bcd3376b58336f4c1fb570d6c4a7a528283bffcb1efdbfb83d7f74b3",
+  "mean-head-update-scales-focused.log.gz": "a51d6069e2cdbc16b64d6edbe125c5630d8a69b9ccbd2a4bbc3466c3489ed1bd",
+  "mean-head-update-scales-native-v3.log.gz": "3ef4035b39c55fb49f26e47cdbd69cfbae19fdb09c46c51fb700a33991900539",
+  "mean-head-update-scales-personal-v3.log.gz": "627b00e06a7c39d6b940819d31fc5900b10459ab839402a5d62f4695e70332e7",
+  "mean-head-update-scales-red-final.log.gz": "c58871bb4295b10210d898cc5065de58a36acb54e3051ea51c69ecf1fdb65c6d",
+  "mean-head-update-scales-strict-v3.log.gz": "aad1bd980c4fffcc42871ff37089dcfdc2a6f6faac20539af41a6b6a1be26185",
+  "mean-head-update-scales-wasm-v3.log.gz": "9b6b9fee07c28a1964a658f83e2dda8dfb95a8bb0e730da7193de4fa060a3faf",
+  "private.json.gz": "b5334a6da2f820b1ee3afd739845eeb220a8705773cd1d5e7767a7d797ed1a4f",
+  "private.log.gz": "0b6d60ac8d5169f4d7b31515c2bc7d9ecbd20658c169d728141a4c1eaf136164",
+  "private.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "public.json.gz": "48311f321926a9ebab982b57759b08dd105af9a0fa5faeb6c2f767a77e4bd7d9",
+  "public.log.gz": "2db2c692be0de9b1eea81de0cb5d088715ade2b6d6aa33a5574ec181ddab42e0",
+  "public.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "summary.json": "5825f198390ea49b6ef920f51745bb01f82519483e46d434036e00a178efb3e6",
+  "verification.json": "4642e243a129e7fb753df947d9367ab4d528d0a8b53d2d5f3c97d5da5926bba2"
+}

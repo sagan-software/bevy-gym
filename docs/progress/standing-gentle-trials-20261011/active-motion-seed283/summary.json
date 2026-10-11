@@ -1,9 +1,23 @@
 {
   "seed": 283,
-  "status": "running",
+  "status": "completed; update budget exhausted",
+  "updates": 10001,
+  "transitions": 5120512,
+  "optimizer_steps": 10001,
+  "selection_checkpoints": 501,
+  "passing_selection_updates": [],
   "qualification": false,
-  "tests": 38,
-  "strict_clippy": "passed",
-  "native_executable_frozen": true,
-  "publication": "research launch only; original qualification gates required"
+  "held_out_evaluated": false,
+  "reference_update": 20,
+  "reference_sha256": "58f3226118956ce665ce8fce82d982f831835b05737e589f883658da6e78988f",
+  "reference_mean_original_reward": 31.198260877281427,
+  "reference_steps": [
+    46,
+    49,
+    53,
+    39,
+    61
+  ],
+  "expected_exit": 1,
+  "archive": "All raw checkpoints and the frozen executable remain in the cache. This archive includes every optimizer and selection record, and reference and parent weights."
 }

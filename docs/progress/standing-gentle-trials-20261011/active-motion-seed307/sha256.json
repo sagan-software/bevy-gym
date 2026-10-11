@@ -6,9 +6,11 @@
   "dependency-source-sha256.json": "b4adc5d4d67fd5fe3758707d8558eed1d2cfa24d6ab1ca1938b61492d5c64e6e",
   "initial-log-std.json": "4fb1a75112bb0b67137bd37e258b188544b02e8bc9a4162f05e9dd2fb50ae78a",
   "launch.json": "f0773c1ac0c15001684815718a139884d7e6ec1d54dc3a8d1b0c8636354355c6",
+  "run.log.gz": "c5b23371ebfd681a58a87ec54d282e9f842e3a953df4842464649a03d2c5c4b8",
+  "run.tar.gz": "ef8ca039b526084305b24c28473548d85b6de4dd2265a232d9d362e1f83f3c1b",
   "src/main.rs": "bce0b3fe50ab9317de6b1cbb15c302541de6f028fecee1ccca3dee172965b59d",
   "src/safety.rs": "0f784518e176a46eacb368f69bd6c0b594e0527e6f8acc888c17e773233f5e02",
-  "summary.json": "40074e1d8ac6d670c4c78e03874e03196f4974656a4d5b748fbcc09a35bcd6a5",
+  "summary.json": "7633a10794fa987ea324fd6d0f5539859298de96cdbe39ea70f0c90c07d5f966",
   "terminal-red.log.gz": "aaf95c55391c1b438abab3ba6c373584dab130fbb85013f79e529c2ad0c9406b",
   "tests-final.log.gz": "b882ee3b463c91cb536462df8017a332b1d2382b7f5da475bb1e9f238f550796"
 }

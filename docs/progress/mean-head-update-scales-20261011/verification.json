@@ -1,0 +1,133 @@
+{
+  "qualification": false,
+  "focused_tests": {
+    "public": 3,
+    "private": 1
+  },
+  "native_gates": "passed",
+  "personal_lints": "passed; no changed-line diagnostics",
+  "wasm_gates": "passed",
+  "coverage": {
+    "source_sha256": "1b91a8f9dea8c53d2f62351b85e21db2d56aae72c9ee335f251272cc9a7d2ce2",
+    "objects": [
+      {
+        "path": "/home/sagan/.cache/bevy-gym-quality-validation/coverage-target/debug/deps/bevy_gym-9f05a11a7fb84d39",
+        "sha256": "5b27eec895a8eae301863f257c14c1da332b4dd2708482bada23e05eee377d81"
+      },
+      {
+        "path": "/home/sagan/.cache/bevy-gym-quality-validation/coverage-target/debug/deps/recurrent_ppo_bytes-9dca842586700b70",
+        "sha256": "0ed35624449fe3d9488a5ed783581440803ccef499d13c87e62b78fabbcaf57a"
+      }
+    ],
+    "groups": {
+      "scale_action_mean_step": {
+        "hit": 62,
+        "total": 62,
+        "zero_regions": [],
+        "branches": [
+          {
+            "range": [
+              1630,
+              16,
+              1630,
+              43
+            ],
+            "hits": [
+              3,
+              1
+            ]
+          }
+        ]
+      },
+      "set_action_mean_update_scales": {
+        "hit": 37,
+        "total": 37,
+        "zero_regions": [],
+        "branches": [
+          {
+            "range": [
+              1589,
+              38,
+              1589,
+              51
+            ],
+            "hits": [
+              9,
+              33
+            ]
+          },
+          {
+            "range": [
+              1574,
+              12,
+              1574,
+              36
+            ],
+            "hits": [
+              3,
+              29
+            ]
+          },
+          {
+            "range": [
+              1582,
+              16,
+              1582,
+              34
+            ],
+            "hits": [
+              11,
+              65
+            ]
+          },
+          {
+            "range": [
+              1589,
+              12,
+              1589,
+              68
+            ],
+            "hits": [
+              12,
+              6
+            ]
+          },
+          {
+            "range": [
+              1596,
+              45,
+              1598,
+              63
+            ],
+            "hits": [
+              1,
+              5
+            ]
+          }
+        ]
+      },
+      "update_hook": {
+        "hit": 24,
+        "total": 24,
+        "zero_regions": [],
+        "branches": [
+          {
+            "range": [
+              2009,
+              24,
+              2009,
+              48
+            ],
+            "hits": [
+              3,
+              5
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "coverage_scope": "New setter, mean-head step projection, and changed PPO update hook. Constructor default initialization has no standalone LLVM region; default path and reconfiguration have behavioral regressions. Standard-library/backend allocation failures are outside this instrumentation.",
+  "checkpoint_format": "unchanged; training step factors are absent from frozen records",
+  "research_trial": "../standing-gentle-trials-20261011/head-scaled-motion-seed347/launch.json"
+}

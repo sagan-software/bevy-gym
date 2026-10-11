@@ -987,3 +987,141 @@ fn per_action_exploration_preserves_optimizer_history_at_its_boundaries() {
         critic_value_bits(&reference.policy(), &observation)
     );
 }
+
+/// Mean-head update scaling preserves inference until an actual PPO update.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn action_mean_update_scales_preserve_frozen_policy_and_unscaled_channels() {
+    let settings = config();
+    let mut baseline = three_action_agent(313, settings.clone());
+    let mut scaled = three_action_agent(313, settings.clone());
+    let before = scaled.policy().to_bytes().expect("initial record");
+    scaled
+        .set_action_mean_update_scales(&[1.0, 0.5, 0.25])
+        .expect("validated update factors");
+    assert_eq!(
+        scaled.policy().to_bytes().expect("unchanged inference"),
+        before
+    );
+    let observation = [0.3, -0.2];
+    let sequences = [sampled_sequence(&baseline.policy(), &observation)];
+    let reference = baseline.update(&sequences).expect("baseline PPO");
+    let actual = scaled.update(&sequences).expect("scaled PPO");
+    assert_eq!(actual, reference);
+    let decision = |agent: &RecurrentPpoAgent| {
+        let policy = agent.policy();
+        policy
+            .mean_action(&observation, &policy.initial_memory())
+            .expect("trained inference")
+    };
+    let full = decision(&baseline);
+    let partial = decision(&scaled);
+    assert_eq!(full.next_memory, partial.next_memory);
+    assert_eq!(full.action[0].to_bits(), partial.action[0].to_bits());
+    assert_ne!(full.action[1].to_bits(), partial.action[1].to_bits());
+    assert_ne!(full.action[2].to_bits(), partial.action[2].to_bits());
+    assert_eq!(
+        critic_value_bits(&baseline.policy(), &observation),
+        critic_value_bits(&scaled.policy(), &observation)
+    );
+    assert_three_action_reload(&scaled.policy(), &observation, &settings);
+}
+
+/// Width, nonfinite and range errors cannot mutate parameters or optimizer history.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn action_mean_update_scales_validate_before_mutation() {
+    use bevy_gym::training::RecurrentPpoError;
+    let mut agent = three_action_agent(317, config());
+    let before = agent.policy().to_bytes().expect("record");
+    for values in [vec![], vec![f32::NAN; 2], vec![1.0; 4]] {
+        assert_eq!(
+            agent.set_action_mean_update_scales(&values),
+            Err(RecurrentPpoError::DimensionMismatch {
+                field: "action_mean_update_scales",
+                expected: 3,
+                actual: values.len()
+            })
+        );
+    }
+    for dimension in 0..3 {
+        for invalid in [f32::NAN, f32::INFINITY, f32::NEG_INFINITY] {
+            let mut values = [1.0; 3];
+            values[dimension] = invalid;
+            assert_eq!(
+                agent.set_action_mean_update_scales(&values),
+                Err(RecurrentPpoError::NonFiniteValue {
+                    field: "action_mean_update_scales",
+                    dimension
+                })
+            );
+        }
+        for invalid in [0.0, -0.0, -0.1, 1.000_001] {
+            let mut values = [1.0; 3];
+            values[dimension] = invalid;
+            assert_eq!(
+                agent.set_action_mean_update_scales(&values),
+                Err(RecurrentPpoError::InvalidConfig {
+                    field: "action_mean_update_scales",
+                    reason: "values must be greater than zero and at most one"
+                })
+            );
+        }
+    }
+    assert_eq!(
+        agent.set_action_mean_update_scales(&[0.0, f32::NAN, 1.0]),
+        Err(RecurrentPpoError::NonFiniteValue {
+            field: "action_mean_update_scales",
+            dimension: 1
+        })
+    );
+    assert_eq!(agent.policy().to_bytes().expect("unchanged record"), before);
+    agent
+        .set_action_mean_update_scales(&[f32::MIN_POSITIVE, 1.0, 0.5])
+        .expect("inclusive unit endpoint and smallest positive normal");
+}
+
+/// Reconfiguration and rejection retain Adam history, counters and minibatch order.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn action_mean_update_scales_retain_optimizer_history_and_restore_default() {
+    let mut reference = three_action_agent(331, config());
+    let mut candidate = three_action_agent(331, config());
+    let observation = [0.3, -0.2];
+    for turn in 0..3 {
+        if turn == 1 {
+            candidate
+                .set_action_mean_update_scales(&[0.25, 0.5, 1.0])
+                .expect("enable factors");
+            candidate
+                .set_action_mean_update_scales(&[1.0; 3])
+                .expect("restore exact default");
+        }
+        if turn == 2 {
+            for agent in [&mut reference, &mut candidate] {
+                agent
+                    .set_action_mean_update_scales(&[1.0, 0.5, 0.25])
+                    .expect("matching factors");
+            }
+            assert!(candidate
+                .set_action_mean_update_scales(&[1.0, f32::NAN, 0.25])
+                .is_err());
+        }
+        let sequences = [sampled_sequence(&reference.policy(), &observation)];
+        assert_eq!(
+            candidate.update(&sequences).expect("candidate step"),
+            reference.update(&sequences).expect("reference step")
+        );
+        let mean = |agent: &RecurrentPpoAgent| {
+            let policy = agent.policy();
+            policy
+                .mean_action(&observation, &policy.initial_memory())
+                .expect("mean")
+        };
+        assert_eq!(mean(&candidate), mean(&reference));
+        assert_eq!(
+            critic_value_bits(&candidate.policy(), &observation),
+            critic_value_bits(&reference.policy(), &observation)
+        );
+    }
+}

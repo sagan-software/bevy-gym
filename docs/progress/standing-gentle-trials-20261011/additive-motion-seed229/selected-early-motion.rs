@@ -12,6 +12,10 @@
 mod learning;
 
 #[path = "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/examples/robots/standing/mod.rs"]
+#[expect(
+    clippy::type_complexity,
+    reason = "The imported standing collector retains its owning repository allowed function-pointer contract."
+)]
 mod standing;
 
 use std::{

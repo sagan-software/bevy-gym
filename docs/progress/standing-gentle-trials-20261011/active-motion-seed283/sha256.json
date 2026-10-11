@@ -6,8 +6,10 @@
   "dependency-source-sha256.json": "b4adc5d4d67fd5fe3758707d8558eed1d2cfa24d6ab1ca1938b61492d5c64e6e",
   "initial-log-std.json": "4fb1a75112bb0b67137bd37e258b188544b02e8bc9a4162f05e9dd2fb50ae78a",
   "launch.json": "9b00fdd0d3c3e9057ae71e1aa4c5f3e215ad6b636230a409963ffb419f3a58d5",
+  "run.log.gz": "90fa33a179a7faa9cc5807e881022eadf936cd10fec352d943def3f52bc877a6",
+  "run.tar.gz": "c49b5f493136f0fbca424d6d93162874432707ec36fe282b21e6d17679533434",
   "src/main.rs": "b8ad975d8acd5fb527dd8ef331879ee07153d0ba9d0af3ae28498b2aeef29066",
   "src/safety.rs": "64c7977dc7681c4217b5347f07a99fcac936024b1a17002a06f6f46f6ceed513",
-  "summary.json": "f2a6c8ecc726632851f4cbeb92c3e16cf0c53a29a1bd6d98495c548a3f803881",
+  "summary.json": "fe00c2925f5b2fd29a54df49ac79e206042c14237e42abc0efad34b42c756a3c",
   "tests-final.log.gz": "98310ef2c3f3516025c3b8fc42812bf2dc307cf3cb486ad2861eba10e84626dc"
 }

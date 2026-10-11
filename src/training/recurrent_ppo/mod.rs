@@ -1012,6 +1012,10 @@ pub struct RecurrentPpoAgent {
     /// Actor Adam state.
     actor_optimizer: OptimizerAdaptor<Adam, RecurrentActor<TrainingBackend>, TrainingBackend>,
 
+    /// Validated action-width factors for optional PPO mean-head step scaling.
+    /// This training setting is absent from frozen policy records.
+    action_mean_update_scales: Option<Tensor<TrainingBackend, 1>>,
+
     /// Critic Adam state.
     critic_optimizer: OptimizerAdaptor<Adam, CentralCritic<TrainingBackend>, TrainingBackend>,
 
@@ -1160,6 +1164,7 @@ impl RecurrentPpoAgent {
             actor,
             critic,
             actor_optimizer,
+            action_mean_update_scales: None,
             critic_optimizer,
             device,
             observation_dim,
@@ -1532,6 +1537,108 @@ impl RecurrentPpoAgent {
         Ok(())
     }
 
+    /// Scale future PPO mean-head Adam increments independently by action channel.
+    ///
+    /// Each dimensionless factor must be in `(0, 1]`. A factor of one retains the
+    /// exact Adam result. All-one factors restore the default update path. This
+    /// setting changes no current parameter, optimizer moment, counter, action
+    /// bound or inference operation. It applies only to [`Self::update`], not
+    /// behavior cloning. Recurrent, exploration and critic updates retain their
+    /// configured rates. Frozen policy records contain the resulting learned
+    /// weights, not this training setting; loading starts with the default path.
+    ///
+    /// Width validation precedes finite-value validation and range validation.
+    /// Initialization owns one action-width tensor. Each enabled update uses
+    /// O(hidden width * action width) work and temporary tensor storage.
+    ///
+    /// # Example
+    /// ```
+    /// # use bevy_gym::training::{RecurrentPpoAgent, RecurrentPpoConfig, RecurrentPpoError, SeedConfig};
+    /// let mut learner = RecurrentPpoAgent::new(
+    ///     2, 2, 1, &[-1.0; 3], &[1.0; 3],
+    ///     RecurrentPpoConfig::default(), SeedConfig::from_root(0),
+    /// )?;
+    /// learner.set_action_mean_update_scales(&[1.0, 0.5, 0.25])?;
+    /// # Ok::<(), RecurrentPpoError>(())
+    /// ```
+    ///
+    /// # Errors
+    /// Returns the original dimension, nonfinite-value or configuration category
+    /// before changing any training state.
+    pub fn set_action_mean_update_scales(
+        &mut self,
+        values: &[f32],
+    ) -> Result<(), RecurrentPpoError> {
+        let expected = self.action_low.len();
+        // Validate the complete vector before constructing its persistent tensor.
+        if values.len() != expected {
+            return Err(RecurrentPpoError::DimensionMismatch {
+                field: "action_mean_update_scales",
+                expected,
+                actual: values.len(),
+            });
+        }
+        for (dimension, value) in values.iter().enumerate() {
+            if !value.is_finite() {
+                return Err(RecurrentPpoError::NonFiniteValue {
+                    field: "action_mean_update_scales",
+                    dimension,
+                });
+            }
+        }
+        if values.iter().any(|value| *value <= 0.0 || *value > 1.0) {
+            return Err(RecurrentPpoError::invalid_config(
+                "action_mean_update_scales",
+                "values must be greater than zero and at most one",
+            ));
+        }
+        // Unit factors use the unchanged default path without retaining another tensor.
+        self.action_mean_update_scales = if values
+            .iter()
+            .all(|value| value.to_bits() == 1.0_f32.to_bits())
+        {
+            None
+        } else {
+            Some(Tensor::from_data(
+                burn::tensor::TensorData::new(values.to_vec(), [expected]),
+                &self.device,
+            ))
+        };
+        Ok(())
+    }
+
+    /// Apply channel factors to one completed Adam head step while retaining parameter IDs.
+    fn scale_action_mean_step(
+        &mut self,
+        previous: Linear<TrainingBackend>,
+        scales: Tensor<TrainingBackend, 1>,
+    ) {
+        let [hidden_width, action_width] = self.actor.mean_head.weight.val().dims();
+        let weight_scales = scales
+            .clone()
+            .reshape([1, action_width])
+            .repeat_dim(0, hidden_width);
+        let unit_weights = weight_scales.clone().equal_elem(1.0);
+        let old_weights = previous.weight.val();
+        // Select original unit-factor values before detaching fresh gradient leaves.
+        self.actor.mean_head.weight = self.actor.mean_head.weight.clone().map(|updated| {
+            (old_weights.clone() + (updated.clone() - old_weights) * weight_scales)
+                .mask_where(unit_weights, updated)
+                .detach()
+                .require_grad()
+        });
+        if let Some((bias, previous_bias)) = self.actor.mean_head.bias.as_mut().zip(previous.bias) {
+            let old_bias = previous_bias.val();
+            let unit_bias = scales.clone().equal_elem(1.0);
+            *bias = bias.clone().map(|updated| {
+                (old_bias.clone() + (updated.clone() - old_bias) * scales)
+                    .mask_where(unit_bias, updated)
+                    .detach()
+                    .require_grad()
+            });
+        }
+    }
+
     /// Multiply current action-mean head weights and biases by 0.01.
     ///
     /// Call once on a fresh learner before collecting a small-mean initialization
@@ -1889,11 +1996,19 @@ impl RecurrentPpoAgent {
                 let critic_loss = critic_loss / divisor;
                 let actor_gradients =
                     GradientsParams::from_grads(actor_loss.backward(), &self.actor);
+                // Retain the prior head only for an explicitly configured channel update.
+                let previous_head = self
+                    .action_mean_update_scales
+                    .as_ref()
+                    .map(|scales| (self.actor.mean_head.clone(), scales.clone()));
                 self.actor = self.actor_optimizer.step(
                     self.config.actor_learning_rate,
                     self.actor.clone(),
                     actor_gradients,
                 );
+                if let Some((previous, scales)) = previous_head {
+                    self.scale_action_mean_step(previous, scales);
+                }
                 // Keep trainable scales on the boundary, where inward gradients remain available.
                 self.project_exploration();
                 let critic_gradients =
@@ -3398,6 +3513,75 @@ mod tests {
                 .to_bits(),
             value.to_bits()
         );
+    }
+
+    /// A zero two-channel head isolates update increments in either linear bias mode.
+    fn zero_mean_step_head(device: TrainingDevice, bias_enabled: bool) -> Linear<TrainingBackend> {
+        let mut head = LinearConfig::new(2, 2)
+            .with_bias(bias_enabled)
+            .init(&device);
+        head.weight = head
+            .weight
+            .map(|_old| Tensor::zeros([2, 2], &device).require_grad());
+        head.bias = head
+            .bias
+            .map(|bias| bias.map(|_old| Tensor::zeros([2], &device).require_grad()));
+        head
+    }
+
+    /// Channel projection retains IDs and gradients with both supported linear bias modes.
+    #[test]
+    fn action_mean_step_scaling_retains_parameter_identity_and_optional_bias() {
+        let mut agent = RecurrentPpoAgent::new(
+            2,
+            2,
+            1,
+            &[-1.0; 2],
+            &[1.0; 2],
+            RecurrentPpoConfig {
+                actor_hidden_size: 2,
+                critic_hidden_sizes: vec![2],
+                ..Default::default()
+            },
+            SeedConfig::from_root(337),
+        )
+        .expect("small learner");
+        for bias_enabled in [true, false] {
+            let previous = zero_mean_step_head(agent.device, bias_enabled);
+            agent.actor.mean_head = previous.clone();
+            agent.actor.mean_head.weight = agent.actor.mean_head.weight.clone().map(|_old| {
+                Tensor::from_data(
+                    burn::tensor::TensorData::new(vec![1.0, 2.0, 3.0, 4.0], [2, 2]),
+                    &agent.device,
+                )
+                .require_grad()
+            });
+            agent.actor.mean_head.bias = agent.actor.mean_head.bias.take().map(|bias| {
+                bias.map(|_old| {
+                    Tensor::from_floats([2.0, 4.0].as_slice(), &agent.device).require_grad()
+                })
+            });
+            let identity = agent.actor.mean_head.weight.id;
+            let bias_identity = agent.actor.mean_head.bias.as_ref().map(|bias| bias.id);
+            agent.scale_action_mean_step(
+                previous,
+                Tensor::from_floats([1.0, 0.5].as_slice(), &agent.device),
+            );
+            assert_eq!(agent.actor.mean_head.weight.id, identity);
+            assert!(agent.actor.mean_head.weight.val().is_require_grad());
+            assert_eq!(
+                tensor_vec(agent.actor.mean_head.weight.val()).expect("weights"),
+                vec![1.0, 1.0, 3.0, 2.0]
+            );
+            assert_eq!(
+                agent.actor.mean_head.bias.as_ref().map(|bias| bias.id),
+                bias_identity
+            );
+            if let Some(bias) = &agent.actor.mean_head.bias {
+                assert!(bias.val().is_require_grad());
+                assert_eq!(tensor_vec(bias.val()).expect("bias"), vec![2.0, 2.0]);
+            }
+        }
     }
 
     /// Scale initialization preserves record identity, gradient leaves, counters and shuffle state.
