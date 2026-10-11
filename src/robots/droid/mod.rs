@@ -8,6 +8,7 @@ mod geometry;
 mod observation;
 mod physics;
 mod standing;
+mod walking;
 
 pub use action::{DroidAction, InvalidDroidAction};
 pub use actuator::DroidActuator;
@@ -15,5 +16,9 @@ pub use body::DroidBody;
 pub use body_state::DroidBodyState;
 pub use observation::DroidObservation;
 pub use standing::DroidStanding;
+pub use walking::{
+    DroidVelocityCommand, DroidWalking, DroidWalkingFall, DroidWalkingObservation,
+    DroidWalkingStatus, InvalidDroidVelocityCommand,
+};
 
 pub(super) use physics::DroidRig;

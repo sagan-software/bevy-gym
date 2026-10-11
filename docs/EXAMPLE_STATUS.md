@@ -5,7 +5,10 @@ independent droid locomotion lessons and a continuous curriculum. The shared-wor
 browser scene is deployed. It runs six frozen PPO actors but has no combat rules
 or qualified competitive policies. The gallery update adds ten-second recordings,
 the standing viewer and explicit status for every remaining droid lesson.
-Walking, recovery and competitive training remain unfinished.
+
+The [walking task](DROID_WALKING.md) now has independently validated physical
+mechanics. Its PPO runner, learned policy and browser lesson remain unfinished.
+Recovery and competitive training also remain unfinished.
 
 A training-only pelvis-height reward is validated. Its
 [20-update smoke trial](progress/standing-posture-height-smoke-seed37/summary.json)
@@ -16,7 +19,7 @@ checks pass. Nix lint retains ten baseline findings outside this change.
 The [24,000-update height trial](progress/droid-standing-posture-height-seed37.json)
 is running from the recorded seed-23 PPO checkpoint with fresh Adam and seed 37.
 Its first 20 optimizer records reproduce the smoke trial. The qualification gates
-remain unchanged. The seed-31 posture trial continues independently.
+remain unchanged. The seed-31 posture trial completed; its held-out qualification failed.
 
 A training-only droid posture reward is implemented and validated. Its 20-update
 smoke trial used 10,240 RL transitions and failed selection; it is unqualified.
@@ -37,7 +40,10 @@ passes two of five selection cases and one of 32 held-out cases.
 Twelve held-out episodes survive the horizon. Standing remains unqualified.
 
 The [next bounded run](progress/droid-standing-posture-seed31.json) uses that checkpoint,
-seed 31 and fresh Adam. Completion and qualification remain pending.
+seed 31 and fresh Adam. Its first passing selection report occurred at update 21,180.
+The [frozen checkpoint](progress/standing-seed31-update21180/summary.json) failed
+held-out qualification: 29 of 32 episodes survived and 27 finished with at least
+100 stable actions. It remains unqualified and was not promoted.
 
 The completed droid run’s strongest selection candidate, update 22,940, failed
 held-out qualification. Five of 32 episodes survived the horizon, with every final

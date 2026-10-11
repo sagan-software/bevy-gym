@@ -1,0 +1,12 @@
+//! Commanded walking mechanics over the existing articulated droid body.
+
+mod command;
+mod environment;
+mod observation;
+mod reward;
+mod status;
+
+pub use command::{DroidVelocityCommand, InvalidDroidVelocityCommand};
+pub use environment::DroidWalking;
+pub use observation::DroidWalkingObservation;
+pub use status::{DroidWalkingFall, DroidWalkingStatus};

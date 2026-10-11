@@ -87,6 +87,11 @@ The retained seed-7 trial uses fixed gates; its first selection failed. Qualific
 remains unfinished. The physical mannequin scene runs frozen inference with an
 unqualified candidate.
 
+The [walking task](DROID_WALKING.md) now supplies the original physical body,
+bounded X/Z velocity commands, tracking reward and stopped-state diagnostics.
+Its reset guide and mechanics tests run independently. PPO training, a walking
+policy, the browser walking scene and lesson qualification remain unfinished.
+
 ## Shared competition
 
 Start with one learned drone and one learned droid after their prerequisites pass.

@@ -172,9 +172,23 @@ pub(super) struct Articulation {
     rig: DroidRig,
 }
 
+/// Fixed floor profiles; the articulated body remains identical in both tasks.
+#[derive(Debug, Clone, Copy)]
+pub(super) enum Floor {
+    /// Preserve the original standalone floor with 10 m half-width.
+    Standing,
+    /// Use the shared world's 30 m half-width for commanded walking.
+    Walking,
+}
+
 impl Articulation {
     /// Rebuild the original standalone floor and body without changing insertion order.
     pub(super) fn new(rotation: Rotation, offset: Vector) -> Self {
+        Self::new_for_floor(rotation, offset, Floor::Standing)
+    }
+
+    /// Choose only the floor extent; retain body geometry and insertion order.
+    pub(super) fn new_for_floor(rotation: Rotation, offset: Vector, floor: Floor) -> Self {
         let mut world = PhysicsWorld {
             gravity: Vector::NEG_Y * 9.81,
             integration_parameters: IntegrationParameters {
@@ -183,9 +197,13 @@ impl Articulation {
             },
             ..Default::default()
         };
+        let half_width_m = match floor {
+            Floor::Standing => 10.0,
+            Floor::Walking => 30.0,
+        };
         let (_, floor) = world.insert(
             RigidBodyBuilder::fixed().translation(Vector::new(0.0, -0.1, 0.0)),
-            ColliderBuilder::cuboid(10.0, 0.1, 10.0).friction(0.8),
+            ColliderBuilder::cuboid(half_width_m, 0.1, half_width_m).friction(0.8),
         );
         let rig = DroidRig::insert(&mut world, floor, rotation, offset);
         Self { world, rig }

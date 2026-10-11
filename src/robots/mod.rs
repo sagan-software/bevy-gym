@@ -33,7 +33,8 @@ pub use travel_observation::DroneTravelObservation;
 
 pub use droid::{
     DroidAction, DroidActuator, DroidBody, DroidBodyState, DroidObservation, DroidStanding,
-    InvalidDroidAction,
+    DroidVelocityCommand, DroidWalking, DroidWalkingFall, DroidWalkingObservation,
+    DroidWalkingStatus, InvalidDroidAction, InvalidDroidVelocityCommand,
 };
 
 pub use ranges::{DroneRangeDirection, DroneRangeDistance, DroneRanges, InvalidDroneRangeDistance};

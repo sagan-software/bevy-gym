@@ -606,6 +606,11 @@ path = "examples/robots/standing_contract.rs"
 required-features = ["robots"]
 
 [[example]]
+name = "droid-walking-contract"
+path = "examples/robots/walking_contract.rs"
+required-features = ["robots"]
+
+[[example]]
 name = "droid-standing"
 path = "examples/robots/standing_train.rs"
 required-features = ["robots"]

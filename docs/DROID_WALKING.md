@@ -1,0 +1,86 @@
+# Droid walking
+
+`DroidWalking` provides the native and browser-compatible physical task for commanded
+walking. No walking policy, PPO runner, browser walking scene or qualified walking
+lesson is supplied yet. The continuous curriculum and competitive 3v3 remain unfinished.
+
+## Quick start
+
+Inspect the seeded body and command without advancing physics or choosing actions:
+
+```sh
+nix develop --command cargo run --no-default-features --features robots \
+  --example droid-walking-contract
+```
+
+Run the external mechanics checks:
+
+```sh
+nix develop --command cargo test --no-default-features --features robots \
+  --test droid_walking
+```
+
+The reset-only guide is not an autonomous agent demonstration. Deterministic actuator
+fixtures exist only in isolated tests. A future example must use validated RL policy
+inference for every torque request. If inference fails, the example must stop visibly.
+
+## Physical task
+
+The task retains the [standing body](DROID_STANDING.md): thirteen physical segments,
+70 kg total mass and twenty-six bounded torque channels. Joint geometry, limits,
+friction, gravity and the original reset pose distribution remain unchanged. Its
+standalone floor has 30 m half-width; the original standing floor retains 10 m.
+Each action advances at most four 5 ms substeps, or 20 ms.
+
+`DroidVelocityCommand::try_from(Vec2)` accepts finite X/Z velocity with represented
+speed at most 1 m/s. `Vec2.x` means world X velocity; `Vec2.y` means world Z velocity.
+Validation preserves f32 components and signed zeros without normalization.
+For example, represented `(0.6, 0.8)` exceeds the exact speed limit and is rejected.
+The default command is `(0.5, 0)` m/s.
+
+The command stays fixed for the environment's lifetime, including resets. It is
+lesson setup and never selects an actuator request. Observations contain only the
+original own-body snapshot and that command. Public access exposes neither mutable
+physics nor unchecked command construction.
+
+## Lifecycle and reward
+
+Validation checks every segment's finite position, orientation, linear velocity and
+angular velocity before any torque application. It then checks pelvis height below
+0.5 m, all segment bounds, and non-foot floor contacts, in that order. Allowed centres
+are X/Z in inclusive [-29, 29] m and Y in inclusive [0, 3] m. Only feet may contact the
+floor. `DroidBody::ALL` order selects the first segment within each failure category.
+
+`DroidWalkingStatus` is `Running`, `Fallen(reason)` or `Failed(segment)`. The task
+checks physics after each substep and stops immediately on either terminal outcome.
+Both outcomes return `EpisodeStatus::Terminated` and zero reward; subsequent requests
+retain the stopped state until reset. A failed snapshot can contain nonfinite values.
+Partially advanced failed physics is not rolled back.
+
+When the task is running, reward multiplies foot support, torso uprightness, pelvis height
+fraction and horizontal velocity tracking. If either foot contacts
+the floor, support is 1. Otherwise, support is 0.
+
+Uprightness is torso up-Y clamped to [0, 1]; height fraction is
+pelvis height divided by its 0.99 m bind height, also clamped to [0, 1]. Tracking is
+`exp(-(error_x² + error_z²) / 0.25)`, with squared velocity error and scale in m²/s².
+Both velocity components convert to f64 before subtraction and squaring.
+
+Use `TimeLimit` with 1,000 actions for a nominal 20-second episode. Reward measures
+this physical task; it does not establish learned walking. Before training, freeze
+selection and held-out partitions plus travel, balance, energy and foot-sliding
+gates. Promotion must retain parent identity and require independent evaluation.
+Failed training or an exhausted budget cannot promote a lesson.
+
+## Verification
+
+External tests retain the reset stream, validate exact command boundaries, prove
+commands cannot change actuation, compare all twenty-six signed actuator requests
+with the original standing operator, and freeze terminal physics. Private tests
+cover diagnostic order, every nonfinite measured quantity, coordinate/contact
+boundaries, stopping before actuation, and worked reward values.
+
+The [foundation record](progress/droid-walking-foundation.json) retains source hashes,
+commands, native/browser outcomes and fresh production coverage. The task is custom
+Rapier mechanics over the project's mannequin; it is not a Gymnasium Humanoid port.
+The [curriculum](ROBOT_SKILL_CURRICULUM.md) records the remaining browser and training work.

@@ -1,0 +1,128 @@
+{
+  "schema": "droid-walking-foundation-v1",
+  "parent_commit": "0b05e7d62dc8e481194101c5276dbca789ba7287",
+  "status": "physical mechanics implemented; walking policy, PPO runner, browser lesson and qualification unfinished",
+  "source_sha256": {
+    "Cargo.toml": "7a4a27b28a115c64074d293a124f88a5812d4fe21a1ee4b3da3c10cc4c013a4d",
+    "examples/robots/walking_contract.rs": "3695ed26cfd4f629057cb054e29257fb3903a353df8b69875f08e6805f2c6b56",
+    "flake.nix": "0a577b9ee970f11e2f07dbc0f2761e4e193ef0ea0da898533e085acfea1f09b0",
+    "src/robots/droid/mod.rs": "cb9fc5a29defc35134f60c0b17d934d58a776c532b942def776a1532fc05a144",
+    "src/robots/droid/physics.rs": "f9abe17a67e1188c0e0a9bb1e7dba4ef785b9b75f8efb41c98bfd315d28d6676",
+    "src/robots/droid/walking/command.rs": "7a23910337f4596dfe75531cc8c0c569de0591ee78fbe45c73375ac43a799825",
+    "src/robots/droid/walking/environment.rs": "22b0ba6821eb1783f7495b4b67160adbd93720cf53c01483373e2deaaa26adf8",
+    "src/robots/droid/walking/mod.rs": "430f608afd7fff4e62023edb8dc501370abdc7015ad02ad27d0dc86474278eef",
+    "src/robots/droid/walking/observation.rs": "2e40f85e2e7cb072118d8ecaa7422cb15ee71f1c9a9e0392365d67f5495942b3",
+    "src/robots/droid/walking/reward.rs": "ae95123f6727309336eabd5da58207d4d538f80df1f7a0c987c5682df862f62d",
+    "src/robots/droid/walking/status.rs": "ba6ec1e5487edcd66a250a055c0c0f23b9faa00f1b71a58c441b76372825122f",
+    "src/robots/mod.rs": "20dc8f87b1149365d697b4bcc8e982c276b2973cc85f904881b17fd55ebf5ecf",
+    "tests/droid_walking.rs": "96f86e88f934e48b29002b0361b6f77d3c143589a1479aa63383e0676168e0f3"
+  },
+  "native": {
+    "focused walking": {
+      "passed": 6,
+      "failed": 0,
+      "ignored": 0,
+      "suites": 1
+    },
+    "default": {
+      "passed": 132,
+      "failed": 0,
+      "ignored": 1,
+      "suites": 39
+    },
+    "robots": {
+      "passed": 497,
+      "failed": 0,
+      "ignored": 3,
+      "suites": 39
+    }
+  },
+  "strict_clippy": {
+    "command": "cargo clippy --all-targets --all-features -- -D warnings",
+    "passed": true
+  },
+  "format": {
+    "command": "cargo fmt --all -- --check",
+    "passed": true
+  },
+  "browser": {
+    "command": "nix run .#drone-browser-check",
+    "passed": 324,
+    "failed": 0,
+    "suites": 29
+  },
+  "personal_rust": {
+    "scope": "all-targets/all-features/no-deps; changed-range HEAD",
+    "candidate_diagnostics": []
+  },
+  "nix_lint": {
+    "baseline_findings": 10,
+    "candidate_findings": 0,
+    "unchanged_finding_lines": [
+      ".envrc:1",
+      "Cargo.toml:1",
+      "ai/skills/bmad-story-automator/pyproject.toml:1",
+      "flake.nix:119",
+      "flake.nix:200",
+      "vendor/bevy-ragdoll-rapier3d/Cargo.toml:1",
+      "vendor/bevy-ragdoll/Cargo.toml:1"
+    ]
+  },
+  "coverage": {
+    "command": "cargo llvm-cov --no-clean --branch --features robots --lib --test droid_walking --test droid_standing --test droid_skill_session --json --output-path /home/sagan/.cache/bevy-gym-quality-validation/walking-coverage.json",
+    "configured_gate_passed": true,
+    "fresh": {
+      "method": "coordinate-level union of separately exported fresh current objects; test modules excluded",
+      "production_regions": 229,
+      "covered_production_regions": 229,
+      "production_branch_outcomes": 34,
+      "covered_production_branch_outcomes": 34,
+      "uncovered_regions": [],
+      "uncovered_branches": []
+    },
+    "objects": [
+      {
+        "path": "/home/sagan/.cache/bevy-gym-quality-validation/coverage-target/debug/deps/bevy_gym-465415eccecbf3cf",
+        "sha256": "584d0dbfa380b5c1be5d9180a9bd7497d50694e838dd3eede890123e47bee04f"
+      },
+      {
+        "path": "/home/sagan/.cache/bevy-gym-quality-validation/coverage-target/debug/deps/droid_skill_session-4e14768964021903",
+        "sha256": "a58fe5e43d0d8a1b72b0a392a8ad460a06131523210fce6c27fe83edf8530060"
+      },
+      {
+        "path": "/home/sagan/.cache/bevy-gym-quality-validation/coverage-target/debug/deps/droid_standing-c8bb2c41439fb6c8",
+        "sha256": "a6b266ae5d0823adb4b1da32e1e7a6b70de4d6e6f6a7c808833b38b029fe511c"
+      },
+      {
+        "path": "/home/sagan/.cache/bevy-gym-quality-validation/coverage-target/debug/deps/droid_walking-81c834d7472bd61f",
+        "sha256": "f909ce53fe0dfccf6f238cad76355367c93e90ac1db198e249e22b134c127296"
+      }
+    ],
+    "individual_export_diagnostics": [],
+    "cross_object_export_rejected": "warning: 2 functions have mismatched data",
+    "gap": "The reset-only guide main is outside this configured coverage scope; cargo run validates it separately. No full-repository coverage claim."
+  },
+  "regressions": {
+    "reset_missing_api": {
+      "log": "walking-reset-red.log",
+      "exit": 101
+    },
+    "step_missing_behavior": {
+      "log": "walking-step-red.log",
+      "exit": 101
+    },
+    "failure_priority": {
+      "log": "walking-priority-red.log",
+      "exit": 101,
+      "actual": "Fallen(NonFootContact(Torso))",
+      "expected": "Fallen(OutsideBounds(Head))"
+    }
+  },
+  "logs": {
+    "walking-native-gates-v3.log": "704e96e979d32df0c8425798535aa290e5b07788e0f7942b52883f7aad95cb57",
+    "walking-wasm-gates-v3.log": "6a2952cf8fe423fa05302c3517041ad970e4a3b94e000b1c49c1aca57e6f051c",
+    "walking-coverage-gates-v3.log": "40956a4c314f71145938e51fc543401ac97bc6712fc2960841b56a383e9eb534",
+    "walking-personal-gates-v3.log": "8c019b9f6c31be4c1cb2ef3d36859ea46380908e276e19ebbe6afc722b95894b"
+  },
+  "qualification": "none; deterministic test actions are not autonomous example agents"
+}

@@ -653,3 +653,15 @@ The coverage record lists unchanged error propagation from runtime construction,
 models, action decoding, optimizers, serialization and file operations. It also
 lists unhit qualification success returns. Nix lint still fails on the ten recorded
 baseline findings outside this change.
+
+## Seed-31 selection and held-out result
+
+The posture trial stopped at update 21,180 after its first passing fixed selection
+report. All five selection cases passed; the prior 1,058 reports failed.
+This selection rule chose the checkpoint before held-out evaluation.
+
+Frozen inference failed the unchanged 32-case held-out gate. Twenty-nine episodes
+survived 1,000 actions and twenty-seven finished with at least 100 stable actions.
+Standing remains unqualified; the checkpoint was not promoted into the curriculum.
+The [record](progress/standing-seed31-update21180/summary.json) retains checkpoint
+identity, warm-start lineage, optimizer journal, selection history and every held-out case.

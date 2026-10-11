@@ -1,0 +1,59 @@
+{
+  "schema": "droid-standing-selection-and-held-out-v1",
+  "selection_rule": "first passing fixed selection report; no held-out results used for selection",
+  "qualification": "failed; not promoted",
+  "checkpoint": {
+    "schema": "droid-standing-v1",
+    "algorithm": "PPO",
+    "seed": 31,
+    "update": 21180,
+    "transitions": 10844160,
+    "optimizer_steps": 151436,
+    "sha256": "115df33afac72a689ac5139ba7c19699b0089dd7b0dcc1fc4614ae5ee077d02c"
+  },
+  "selection": {
+    "passed": true,
+    "episodes": 5,
+    "reports_before_selection": 1058
+  },
+  "held_out": {
+    "passed": false,
+    "episodes": 32,
+    "survived": 29,
+    "stable_final_100": 27
+  },
+  "training": {
+    "service": "bevy-gym-standing-posture-seed31-20261010.service",
+    "budget": 24000,
+    "stopped_at_first_selection_pass": true,
+    "optimizer_state": "fresh Adam initialized from seed-23 actor/critic weights; not optimizer resumption",
+    "journal_records": 21180,
+    "journal_raw_sha256": "2bbf02c581603c771850839e1b76937afef8ca58cfd8f304d30e63613b896b36",
+    "binary": "/home/sagan/.cache/bevy-gym-quality-validation/standing-posture-seed23-retry-20261010/droid-standing",
+    "binary_sha256": "702115bbf3fb11a1396f9091464cf1d7a22471ea942f8f4c8b794f0845cc253a",
+    "binary_source_record": "../standing-posture-storage-restart/restart-launch.json"
+  },
+  "evaluation": {
+    "command": [
+      "nix",
+      "develop",
+      "--command",
+      "/home/sagan/.cache/bevy-gym-quality-validation/standing-posture-seed23-retry-20261010/droid-standing",
+      "evaluate",
+      "--checkpoint",
+      "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/runs/droid-standing/posture-seed31-20261010/standing-21180.mpk"
+    ],
+    "service": "bevy-gym-standing-seed31-held-out-20261011.service",
+    "expected_exit": 1
+  },
+  "files": {
+    "checkpoint.json": "9b835c05a9cf380136c91c86634c1b6b4aa166ea3e9b648d1d2672bf2d1582e7",
+    "checkpoint.mpk": "115df33afac72a689ac5139ba7c19699b0089dd7b0dcc1fc4614ae5ee077d02c",
+    "held-out.json": "4fd50dcb964ae42e2f16d1a1558f9768fe9c1b46a24f4d7b1f8d784b5c4420be",
+    "optimization.jsonl.gz": "ba5d320766241b789e0e86dd6161a3c1ab3875dd93d0e4b9b8e7e5fa46f28f4b",
+    "selection-history.jsonl.gz": "75f85e4efccd02ce10881d7b78b6e211bb9894f3015f16f5beb303037b123fc1",
+    "selection.json": "afae027c7f9d2380d69fac9b5e5a32c80e52a288dadd609170d826e70c1807ab",
+    "training-reward.json": "f9600f62d94fae9dc12e97ca8665dceca83babd0e1d90936a950e95be8b43704",
+    "warm-start.json": "21452f5c678eafbaa6ed83210c0fc68609acedb39412b86078810d8ba923586a"
+  }
+}
