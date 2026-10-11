@@ -7,6 +7,7 @@
 mod checkpoint;
 /// Joint continuous and categorical recurrent policies for combat.
 pub mod combat;
+mod kl;
 
 use std::error::Error;
 use std::fmt;

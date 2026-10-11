@@ -24,8 +24,8 @@ use shakmaty as _;
 use tokio as _;
 
 use bevy_gym::training::{
-    RecurrentPpoAgent, RecurrentPpoConfig, RecurrentPpoPolicy, RecurrentPpoSequence,
-    RecurrentSampler, SeedConfig,
+    RecurrentPpoAgent, RecurrentPpoConfig, RecurrentPpoError, RecurrentPpoPolicy,
+    RecurrentPpoSequence, RecurrentSampler, SeedConfig,
 };
 
 /// Small architecture keeps the external recorder and update contracts focused.
@@ -1124,4 +1124,375 @@ fn action_mean_update_scales_retain_optimizer_history_and_restore_default() {
             critic_value_bits(&reference.policy(), &observation)
         );
     }
+}
+
+/// A policy's conditional pre-tanh Gaussian has zero divergence from itself.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn conditional_gaussian_kl_is_read_only_and_zero_for_identical_policies() {
+    let agent = RecurrentPpoAgent::new(
+        1,
+        1,
+        1,
+        &[-1.0],
+        &[1.0],
+        config(),
+        SeedConfig::from_root(71),
+    )
+    .unwrap();
+    let policy = agent.policy();
+    let memory = policy.initial_memory();
+    let before = memory.clone();
+    let value = policy
+        .pre_tanh_kl_from(&policy, &[0.25], &memory, &memory)
+        .unwrap();
+    assert_eq!(value.to_bits(), 0.0_f64.to_bits());
+    assert_eq!(memory, before);
+}
+
+/// Mean and scale changes have directional analytic Gaussian divergence.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn conditional_gaussian_kl_matches_mean_and_variance_changes() {
+    let settings = config();
+    let mut agent = RecurrentPpoAgent::new(
+        1,
+        1,
+        1,
+        &[-1.0],
+        &[1.0],
+        settings.clone(),
+        SeedConfig::from_root(71),
+    )
+    .unwrap();
+    let previous = agent.policy();
+    let previous_memory = previous.initial_memory();
+    agent.shift_actor_mean_bias(0, 0.25).unwrap();
+    let current = agent.policy();
+    let memory = current.initial_memory();
+    let old = previous.mean_action(&[0.25], &previous_memory).unwrap();
+    let new = current.mean_action(&[0.25], &memory).unwrap();
+    let difference = f64::from(old.pre_tanh_action[0]) - f64::from(new.pre_tanh_action[0]);
+    let expected = 0.5 * difference.powi(2) * (-2.0 * f64::from(settings.initial_log_std)).exp();
+    let actual = current
+        .pre_tanh_kl_from(&previous, &[0.25], &previous_memory, &memory)
+        .unwrap();
+    assert!((actual - expected).abs() < 1e-10);
+}
+
+/// Gaussian variance changes retain both divergence directions.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn conditional_gaussian_kl_matches_variance_changes() {
+    let settings = config();
+    let previous = RecurrentPpoAgent::new(
+        1,
+        1,
+        1,
+        &[-1.0],
+        &[1.0],
+        settings.clone(),
+        SeedConfig::from_root(71),
+    )
+    .unwrap()
+    .policy();
+    let previous_memory = previous.initial_memory();
+    let mut scaled = RecurrentPpoAgent::load_bytes(
+        previous.to_bytes().unwrap(),
+        1,
+        1,
+        1,
+        &[-1.0],
+        &[1.0],
+        settings.clone(),
+        SeedConfig::from_root(71),
+    )
+    .unwrap();
+    scaled
+        .reset_exploration_with_log_std(&[settings.initial_log_std - 1.0])
+        .unwrap();
+    let scaled = scaled.policy();
+    let scaled_memory = scaled.initial_memory();
+    let forward = scaled
+        .pre_tanh_kl_from(&previous, &[0.25], &previous_memory, &scaled_memory)
+        .unwrap();
+    let reverse = previous
+        .pre_tanh_kl_from(&scaled, &[0.25], &scaled_memory, &previous_memory)
+        .unwrap();
+    assert!((forward - (2.0_f64.exp_m1().mul_add(0.5, -1.0))).abs() < 1e-12);
+    assert!((reverse - ((-2.0_f64).exp_m1().mul_add(0.5, 1.0))).abs() < 1e-12);
+}
+
+/// Action scaling does not alter the latent Gaussian distribution.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn conditional_gaussian_kl_ignores_action_scaling() {
+    let settings = config();
+    let previous = RecurrentPpoAgent::new(
+        1,
+        1,
+        1,
+        &[-1.0],
+        &[1.0],
+        settings.clone(),
+        SeedConfig::from_root(71),
+    )
+    .unwrap()
+    .policy();
+    let previous_memory = previous.initial_memory();
+    let differently_scaled = RecurrentPpoPolicy::load_bytes(
+        previous.to_bytes().unwrap(),
+        1,
+        1,
+        1,
+        &[-2.0],
+        &[2.0],
+        &settings,
+    )
+    .unwrap();
+    assert_eq!(
+        differently_scaled
+            .pre_tanh_kl_from(
+                &previous,
+                &[0.25],
+                &previous_memory,
+                &differently_scaled.initial_memory()
+            )
+            .unwrap()
+            .to_bits(),
+        0_f64.to_bits()
+    );
+}
+
+/// Profile width mismatches precede observation validation.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn conditional_gaussian_kl_rejects_invalid_profiles_and_inputs() {
+    let policy = RecurrentPpoAgent::new(
+        1,
+        1,
+        1,
+        &[-1.0],
+        &[1.0],
+        config(),
+        SeedConfig::from_root(71),
+    )
+    .unwrap()
+    .policy();
+    let memory = policy.initial_memory();
+    let wider_observation = RecurrentPpoAgent::new(
+        2,
+        1,
+        1,
+        &[-1.0],
+        &[1.0],
+        config(),
+        SeedConfig::from_root(71),
+    )
+    .unwrap()
+    .policy();
+    assert!(matches!(
+        wider_observation.pre_tanh_kl_from(&policy, &[f32::NAN], &memory, &memory),
+        Err(RecurrentPpoError::DimensionMismatch {
+            field: "KL observation",
+            expected: 1,
+            actual: 2
+        })
+    ));
+    let wider_action = RecurrentPpoAgent::new(
+        1,
+        1,
+        1,
+        &[-1.0; 2],
+        &[1.0; 2],
+        config(),
+        SeedConfig::from_root(71),
+    )
+    .unwrap()
+    .policy();
+    assert!(matches!(
+        wider_action.pre_tanh_kl_from(&policy, &[f32::NAN], &memory, &memory),
+        Err(RecurrentPpoError::DimensionMismatch {
+            field: "KL action",
+            expected: 1,
+            actual: 2
+        })
+    ));
+}
+
+/// Observation validation precedes recurrent-memory validation.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn conditional_gaussian_kl_rejects_invalid_observations() {
+    let policy = RecurrentPpoAgent::new(
+        1,
+        1,
+        1,
+        &[-1.0],
+        &[1.0],
+        config(),
+        SeedConfig::from_root(71),
+    )
+    .unwrap()
+    .policy();
+    let memory = policy.initial_memory();
+    assert!(matches!(
+        policy.pre_tanh_kl_from(&policy, &[], &memory, &memory),
+        Err(RecurrentPpoError::DimensionMismatch {
+            field: "observation",
+            expected: 1,
+            actual: 0
+        })
+    ));
+    for invalid in [f32::NAN, f32::INFINITY, f32::NEG_INFINITY] {
+        assert!(matches!(
+            policy.pre_tanh_kl_from(&policy, &[invalid], &memory, &memory),
+            Err(RecurrentPpoError::NonFiniteValue {
+                field: "observation",
+                dimension: 0
+            })
+        ));
+    }
+}
+
+/// Both policies reject invalid recurrent memories.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn conditional_gaussian_kl_rejects_invalid_memories() {
+    let policy = RecurrentPpoAgent::new(
+        1,
+        1,
+        1,
+        &[-1.0],
+        &[1.0],
+        config(),
+        SeedConfig::from_root(71),
+    )
+    .unwrap()
+    .policy();
+    let memory = policy.initial_memory();
+    let mut bad = memory.clone();
+    bad.cell.clear();
+    assert!(matches!(
+        policy.pre_tanh_kl_from(&policy, &[0.25], &bad, &memory),
+        Err(RecurrentPpoError::DimensionMismatch {
+            field: "memory cell",
+            expected: 4,
+            actual: 0
+        })
+    ));
+    assert!(matches!(
+        policy.pre_tanh_kl_from(&policy, &[0.25], &memory, &bad),
+        Err(RecurrentPpoError::DimensionMismatch {
+            field: "memory cell",
+            expected: 4,
+            actual: 0
+        })
+    ));
+    bad = memory.clone();
+    bad.hidden[0] = f32::NAN;
+    assert!(matches!(
+        policy.pre_tanh_kl_from(&policy, &[0.25], &bad, &memory),
+        Err(RecurrentPpoError::NonFiniteValue {
+            field: "memory hidden",
+            dimension: 0
+        })
+    ));
+    assert!(matches!(
+        policy.pre_tanh_kl_from(&policy, &[0.25], &memory, &bad),
+        Err(RecurrentPpoError::NonFiniteValue {
+            field: "memory hidden",
+            dimension: 0
+        })
+    ));
+}
+
+/// Each policy uses its own recurrent architecture and history during comparison.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn conditional_gaussian_kl_accepts_independent_recurrent_histories() {
+    let settings = config();
+    let previous = RecurrentPpoAgent::new(
+        1,
+        1,
+        1,
+        &[-1.0],
+        &[1.0],
+        settings.clone(),
+        SeedConfig::from_root(71),
+    )
+    .unwrap()
+    .policy();
+    let different = RecurrentPpoConfig {
+        actor_hidden_size: 8,
+        ..settings.clone()
+    };
+    let current = RecurrentPpoAgent::new(
+        1,
+        1,
+        1,
+        &[-1.0],
+        &[1.0],
+        different,
+        SeedConfig::from_root(72),
+    )
+    .unwrap()
+    .policy();
+    let old_memory = previous
+        .mean_action(&[0.25], &previous.initial_memory())
+        .unwrap()
+        .next_memory;
+    let memory = current
+        .mean_action(&[-0.25], &current.initial_memory())
+        .unwrap()
+        .next_memory;
+    let old_before = old_memory.clone();
+    let before = memory.clone();
+    let old = previous.mean_action(&[0.5], &old_memory).unwrap();
+    let new = current.mean_action(&[0.5], &memory).unwrap();
+    let old_mean = f64::from(*old.pre_tanh_action.first().unwrap());
+    let mean = f64::from(*new.pre_tanh_action.first().unwrap());
+    let expected =
+        0.5 * (old_mean - mean).powi(2) * (-2.0 * f64::from(settings.initial_log_std)).exp();
+    let actual = current
+        .pre_tanh_kl_from(&previous, &[0.5], &old_memory, &memory)
+        .unwrap();
+    assert!((actual - expected).abs() < 1e-10);
+    assert_eq!(old_memory, old_before);
+    assert_eq!(memory, before);
+}
+
+/// Nonfinite inferred means cannot become a reported finite policy divergence.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn conditional_gaussian_kl_rejects_nonfinite_inferred_means() {
+    let mut agent = RecurrentPpoAgent::new(
+        1,
+        1,
+        1,
+        &[-1.0],
+        &[1.0],
+        config(),
+        SeedConfig::from_root(71),
+    )
+    .unwrap();
+    let valid = agent.policy();
+    agent.shift_actor_mean_bias(0, f32::MAX).unwrap();
+    agent.shift_actor_mean_bias(0, f32::MAX).unwrap();
+    let invalid = agent.policy();
+    let memory = valid.initial_memory();
+    assert!(matches!(
+        valid.pre_tanh_kl_from(&invalid, &[0.25], &memory, &memory),
+        Err(RecurrentPpoError::NonFiniteValue {
+            field: "previous Gaussian mean",
+            dimension: 0
+        })
+    ));
+    assert!(matches!(
+        invalid.pre_tanh_kl_from(&valid, &[0.25], &memory, &memory),
+        Err(RecurrentPpoError::NonFiniteValue {
+            field: "Gaussian mean",
+            dimension: 0
+        })
+    ));
 }

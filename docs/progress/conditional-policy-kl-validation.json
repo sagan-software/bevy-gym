@@ -1,0 +1,49 @@
+{
+  "date": "2026-10-11",
+  "qualification": false,
+  "held_out_evaluations": 0,
+  "source_parent": "712493bbb7e8f8fb97d54dad0d745e66afbb35f0",
+  "method": "Read-only conditional KL(previous || current) of pre-tanh diagonal Gaussian in f64",
+  "public_tests": 25,
+  "new_public_tests": 9,
+  "private_tests": 3,
+  "native_commands": [
+    "cargo fmt --all -- --check",
+    "cargo clippy --all-targets --all-features -- -D warnings",
+    "cargo test --no-default-features --features robots --test droid_skill_session",
+    "cargo test",
+    "cargo test --features robots"
+  ],
+  "native_status": "passed",
+  "wasm_command": "nix run .#drone-browser-check",
+  "wasm_status": "passed",
+  "personal_status": "passed without diagnostics on changed lines",
+  "production_coverage": {
+    "regions_hit": 139,
+    "regions_total": 141,
+    "conditional_branches_both_outcomes": 5,
+    "conditional_branches_total": 5,
+    "gap": "Two distribution backend-error propagation regions in pre_tanh_kl_from are not injected. Validated public inputs do not produce these backend errors; the existing error sources remain propagated."
+  },
+  "source_sha256": {
+    "src/training/recurrent_ppo/kl.rs": "b8e3929728d6c00c82a8446a86616439a5d2c14245ce5e2e36b51f9c7b99d6dd",
+    "src/training/recurrent_ppo/mod.rs": "dbbe4a72eb599251a84556c0e386440ae5ef4aa09f393544ec228ab4a7ea4cab",
+    "tests/recurrent_ppo_bytes.rs": "1153310c94183e1ac3319c40067673e1bde798747d5143e14bcca33cea50909f"
+  },
+  "logs": {
+    "native": "/home/sagan/.cache/bevy-gym-quality-validation/policy-kl-release-native-v3.log",
+    "personal": "/home/sagan/.cache/bevy-gym-quality-validation/policy-kl-release-personal-v3.log",
+    "wasm": "/home/sagan/.cache/bevy-gym-quality-validation/policy-kl-release-wasm-v2.log",
+    "coverage": "/home/sagan/.cache/bevy-gym-quality-validation/policy-kl-coverage-v3.log"
+  },
+  "small_step_trial": {
+    "actor_learning_rate": 0.0001,
+    "parent_sha256": "73b1a1096d2a0dd9cac9d6f5ec6b3e7632ed71ef914a03e2d60ee3aa284006e5",
+    "seed": 373,
+    "budget_updates": 10001,
+    "tests": 43,
+    "strict_clippy_and_build": "passed",
+    "status": "running, unqualified",
+    "does_enforce_kl_bound": false
+  }
+}
