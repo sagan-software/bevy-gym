@@ -1,0 +1,119 @@
+{
+  "control_episodes": [
+    {
+      "checked_actions": 0,
+      "peak_rad_s": null,
+      "seed": 0,
+      "steps": 92,
+      "survived": false
+    },
+    {
+      "checked_actions": 0,
+      "peak_rad_s": null,
+      "seed": 1,
+      "steps": 88,
+      "survived": false
+    },
+    {
+      "checked_actions": 17,
+      "peak_rad_s": 23.854707873440127,
+      "seed": 2,
+      "steps": 117,
+      "survived": false
+    },
+    {
+      "checked_actions": 0,
+      "peak_rad_s": null,
+      "seed": 42,
+      "steps": 94,
+      "survived": false
+    },
+    {
+      "checked_actions": 0,
+      "peak_rad_s": null,
+      "seed": 18446744073709551615,
+      "steps": 88,
+      "survived": false
+    }
+  ],
+  "episodes": [
+    {
+      "final_distance": 0.7019749879837036,
+      "final_height": 0.6786530613899231,
+      "final_speed": 1.7856898307800293,
+      "final_upright": 0.6946540474891663,
+      "reward": 53.9171541929245,
+      "seed": 0,
+      "stable_actions": 0,
+      "steps": 92,
+      "supported": true,
+      "survived": false
+    },
+    {
+      "final_distance": 0.8771803975105286,
+      "final_height": 0.5596565008163452,
+      "final_speed": 2.803173542022705,
+      "final_upright": -0.28944700956344604,
+      "reward": 50.60005375556648,
+      "seed": 1,
+      "stable_actions": 0,
+      "steps": 88,
+      "supported": false,
+      "survived": false
+    },
+    {
+      "final_distance": 0.7016286253929138,
+      "final_height": 0.6056509017944336,
+      "final_speed": 1.8802980184555054,
+      "final_upright": 0.981697678565979,
+      "reward": 80.80847235023975,
+      "seed": 2,
+      "stable_actions": 0,
+      "steps": 117,
+      "supported": true,
+      "survived": false
+    },
+    {
+      "final_distance": 0.8717516660690308,
+      "final_height": 0.49587294459342957,
+      "final_speed": 2.4602534770965576,
+      "final_upright": 0.7238907814025879,
+      "reward": 57.69408694282174,
+      "seed": 42,
+      "stable_actions": 0,
+      "steps": 94,
+      "supported": true,
+      "survived": false
+    },
+    {
+      "final_distance": 0.6584864854812622,
+      "final_height": 0.7008619904518127,
+      "final_speed": 1.7736170291900635,
+      "final_upright": 0.8391751050949097,
+      "reward": 59.756873190402985,
+      "seed": 18446744073709551615,
+      "stable_actions": 0,
+      "steps": 88,
+      "supported": true,
+      "survived": false
+    }
+  ],
+  "mode": "selection",
+  "passed": false,
+  "provenance": {
+    "actor_features": 204,
+    "algorithm": "PPO",
+    "critic_features": 204,
+    "log_std_max": 1.0,
+    "log_std_min": -9.0,
+    "optimizer_steps": 3120,
+    "qualification": "unqualified research; not accepted by the published standing loader",
+    "schema": "droid-standing-dense-four-pass-research-v1",
+    "seed": 373,
+    "sha256": "627c6c4d7c410382534a025096ac29af82ed16ba3b436078cd4a90c8f5491ad4",
+    "torque_channels": 26,
+    "transitions": 399360,
+    "update": 780
+  },
+  "qualification": "not qualified; requires held-out evaluation"
+}

@@ -1040,3 +1040,33 @@ remain in the cache. Dependency lockfiles are archived as lossless `Cargo.lock.g
 files; decompress them before reproducing a harness. Raw validation logs are
 archived as lossless `.log.gz` files. No standing, walking or
 competitive policy is qualified.
+
+## Paired parameter exploration research
+
+The [four-pass dense-reward pilot](progress/standing-gentle-trials-20261011/dense-four-pass-seed373/summary.json)
+completed 1,001 PPO updates and failed all 51 selection checkpoints. It retains the
+failed seed-347 update-23,480 reference and learned exploration, with fresh Adam
+states. Four optimizer passes replace one; original physics and qualification stay
+unchanged. No held-out evaluation or promotion occurred.
+
+The [parameter exploration launch](progress/standing-gentle-trials-20261011/pgpe-bias-seed401/launch.json)
+uses the same failed reference with a restricted
+[PGPE](https://www.ias.informatik.tu-darmstadt.de/uploads/Publications/Publications/Neural-Networks-2010-Sehnke.pdf)
+mean update from Equation 15. Only the 26 neural mean-head biases vary; recurrent
+weights remain fixed. Each sampled neural policy supplies every torque through
+state-dependent inference throughout its episode. This is reinforcement learning
+research, with no programmed actuator requests.
+
+The local profile fixes exploration at half each calibrated standard deviation.
+Seed 401 supplies 32 symmetric pairs per generation, with four common training
+roots per pair and a 64-generation budget. Mean updates use rate 0.2 and discounted
+returns bounded above by 201. Training roots exclude selection and held-out roots.
+The [snapshot](progress/standing-gentle-trials-20261011/pgpe-bias-seed401/summary.json)
+records running research without a passing selection checkpoint.
+
+The [verification record](progress/standing-gentle-trials-20261011/pgpe-bias-seed401/verification.json)
+records 43 experimental tests, strict Clippy and repository native/browser checks.
+Six standalone gradient tests hit all 75 measured regions and both outcomes of 15
+branches, including finite-rate overflow. Research artifact I/O, calibration
+rejection, parent-hash rejection, worker panic and budget-exhaustion paths lack
+measured coverage. Neither trial qualifies standing, walking or competition.

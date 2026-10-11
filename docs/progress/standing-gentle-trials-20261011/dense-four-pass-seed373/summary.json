@@ -1,0 +1,18 @@
+{
+  "qualification": false,
+  "status": "failed",
+  "snapshot_update": 1001,
+  "snapshot_steps": [
+    101,
+    93,
+    100,
+    107,
+    81
+  ],
+  "passing_selection_checkpoints_at_snapshot": 0,
+  "held_out_evaluated": false,
+  "raw_run": "/home/sagan/.cache/bevy-gym-quality-validation/standing-dense-four-pass-probe-20261011/run",
+  "archive": "Frozen source and validation logs. All raw checkpoints and executables remain in the cache.",
+  "budget_updates": 1001,
+  "selection_checkpoints": 51
+}

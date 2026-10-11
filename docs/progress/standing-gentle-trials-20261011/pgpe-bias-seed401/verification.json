@@ -1,0 +1,19 @@
+{
+  "experimental_tests": 43,
+  "strict_clippy": "passed",
+  "gradient_coverage_tests": 6,
+  "gradient_regions": {
+    "hit": 75,
+    "total": 75
+  },
+  "gradient_branches": {
+    "both_outcomes": 15,
+    "total": 15
+  },
+  "coverage_source_sha256": "ccdd8d7a1a65f21f9f9d2a9b00931089cba88c4fbe4998bc8ad76db2c408f75a",
+  "coverage_gaps": "Research run() artifact I/O, calibration rejection, source hash mismatch, worker panic and final budget-exhaustion branches are not instrumented. The existing-runtime parent load and actual four-worker rollout have regression evidence without measured coverage. No qualification claim.",
+  "native": "passed",
+  "personal": "passed; no changed-line diagnostics",
+  "wasm": "passed",
+  "qualification": false
+}

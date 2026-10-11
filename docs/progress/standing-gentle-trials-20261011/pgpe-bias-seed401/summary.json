@@ -1,0 +1,16 @@
+{
+  "qualification": false,
+  "status": "running",
+  "snapshot_update": 10,
+  "snapshot_steps": [
+    136,
+    122,
+    154,
+    107,
+    98
+  ],
+  "passing_selection_checkpoints_at_snapshot": 0,
+  "held_out_evaluated": false,
+  "raw_run": "/home/sagan/.cache/bevy-gym-quality-validation/standing-pgpe-bias-probe-20261011/run",
+  "archive": "Frozen source and validation logs. All raw checkpoints and executables remain in the cache."
+}

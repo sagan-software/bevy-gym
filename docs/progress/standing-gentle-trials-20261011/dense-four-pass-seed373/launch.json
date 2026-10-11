@@ -1,0 +1,24 @@
+{
+  "seed": 373,
+  "budget_updates": 1001,
+  "parent_sha256": "73b1a1096d2a0dd9cac9d6f5ec6b3e7632ed71ef914a03e2d60ee3aa284006e5",
+  "parent_selection": "Failed research reference ranked by maximum minimum selection episode length, then sum of episode lengths at the measured snapshot. No held-out ranking or qualification.",
+  "reward": "1 - 10*(1-torso_up_y) - ((pelvis_y_m-1m)/0.15m)^2 - 0.1*pelvis_speed_squared/(0.25m/s)^2 - 0.1*horizontal_drift_squared/(0.5m)^2 - 0.1*maximum_segment_angular_speed_squared/(8rad/s)^2 - 0.25*unsupported_foot_count; -1000 once on natural fall.",
+  "training": "retain parent actor, critic and learned exploration; deliberate fresh Adam; fixed per-channel mean-head update scales from original calibration; actor rate0.0003, critic0.001, epochs4, four optimizer steps per512 transitions",
+  "physical_model": "Original DroidStanding, unchanged dynamics, body, actions and natural termination. Reward projection only.",
+  "qualification": false,
+  "promotion": "none; original five selection, complete early-motion inspection, 32 held-out and native/WASM gates still required",
+  "tests": 39,
+  "strict_clippy": "passed",
+  "repository_head": "cd96d38b4bc86eaf97cff18b21bd24c5be781b50",
+  "source_sha256": {
+    "src/main.rs": "9e462d1f6994050ff1b240ccf3aa0d182b78e3033cd14e05e11f4cef60ffa987",
+    "src/safety.rs": "5584c1bcfcf877b0110ac895eba28859a22abf0cfb28932cde582a5f757f15b2",
+    "Cargo.toml": "031ea98039b45b7cf46b9503d1cfaffeab8e38072c6babc8edd23b1ae62b5065",
+    "Cargo.lock": "df9a056ad036f894f9fd293415edc06c74c80c35669e4ebc6c17080d537d84cd",
+    "initial-log-std.json": "4fb1a75112bb0b67137bd37e258b188544b02e8bc9a4162f05e9dd2fb50ae78a",
+    "trainer": "268f02e42e691895ae5d7defc9861f86a3d843f473e8001f30ea9f6f57aded97"
+  },
+  "comparison": "Same parent, root373, retained weights and exploration, mean-head scales, dense reward, body and dynamics as dense-posture373; four epochs instead of one; smaller1001-update pilot budget.",
+  "parent_record_test": "Every frozen parent record byte remains identical before the actual four-pass PPO update; tests verify512 samples and4 optimizer steps."
+}

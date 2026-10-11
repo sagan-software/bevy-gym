@@ -1,0 +1,313 @@
+//! Bounded research trial; no published example or qualification claim.
+#![expect(
+    dead_code,
+    unused_imports,
+    reason = "The research harness reuses shared modules without their CLI and viewer entry points."
+)]
+#[path = "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/examples/robots/learning/mod.rs"]
+#[expect(
+    clippy::type_complexity,
+    reason = "The imported collector retains its owning repository's allowed function-pointer contract."
+)]
+mod learning;
+mod safety;
+#[path = "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/examples/robots/standing/mod.rs"]
+#[expect(
+    clippy::type_complexity,
+    reason = "The imported standing collector retains its owning repository allowed function-pointer contract."
+)]
+mod standing;
+
+use std::{
+    error::Error,
+    fs,
+    io::Write,
+    num::{NonZeroU32, NonZeroU64},
+    path::Path,
+};
+
+use bevy_gym::training::{RecurrentPpoAgent, RecurrentPpoConfig, RecurrentPpoPolicy, SeedConfig};
+use sha2::{Digest, Sha256};
+
+/// Execute the bounded research task without publishing a candidate.
+fn main() -> Result<(), Box<dyn Error>> {
+    tokio::runtime::Builder::new_current_thread()
+        .build()?
+        .block_on(run())
+}
+
+/// Keep physical rollout and PPO boundaries intact between awaited artifact writes.
+async fn run() -> Result<(), Box<dyn Error>> {
+    let output = Path::new(
+        "/home/sagan/.cache/bevy-gym-quality-validation/standing-dense-four-pass-probe-20261011/run",
+    );
+    let config = RecurrentPpoConfig {
+        gamma: learning::GAMMA,
+        gae_lambda: learning::GAE_LAMBDA,
+        actor_learning_rate: 0.0003,
+        critic_learning_rate: 0.001,
+        initial_log_std: -5.0,
+        log_std_min: -9.0,
+        entropy_coefficient: 0.0,
+        epochs: 4,
+        minibatch_sequences: 512,
+        ..RecurrentPpoConfig::default()
+    };
+    let parent = tokio::fs::read("/home/sagan/.cache/bevy-gym-quality-validation/standing-head-scaled-motion-probe-20261011/run/standing-23480.mpk").await?;
+    let digest = Sha256::digest(&parent);
+    if format!("{digest:x}") != "73b1a1096d2a0dd9cac9d6f5ec6b3e7632ed71ef914a03e2d60ee3aa284006e5" {
+        return Err("standing parent hash mismatch".into());
+    }
+    let mut agent = RecurrentPpoAgent::load_bytes(
+        parent.clone(),
+        204,
+        204,
+        1,
+        &[-1.0; 26],
+        &[1.0; 26],
+        config.clone(),
+        SeedConfig::from_root(373),
+    )?;
+    let scales: Vec<f32> = serde_json::from_slice(include_bytes!("../initial-log-std.json"))?;
+    let mean_step_scales = head_update_scales(&scales);
+    agent.set_action_mean_update_scales(&mean_step_scales)?;
+    tokio::fs::create_dir(output).await?;
+    tokio::fs::write(output.join("parent.mpk"), parent).await?;
+    tokio::fs::write(
+        output.join("initialization.json"),
+        serde_json::to_vec_pretty(&serde_json::json!({
+            "schema":"standing-dense-four-pass-research-v1", "seed":373, "budget_updates":1001,
+            "initialization":"retain head-scaled seed347 update23480 actor, critic and learned exploration; fresh Adam states", "mean_head_scale":1.0, "exploration":"retain learned checkpoint exploration", "log_std_min":-9.0, "log_std_max":1.0,
+            "mean_head_step_scales":mean_step_scales, "actor_learning_rate":0.0003, "critic_learning_rate":0.001, "entropy_coefficient":0.0, "epochs":4, "minibatch_sequences":512,
+            "reward":"1 minus 10 times torso up error, squared normalized height error around 1m with 0.15m scale, 0.1 times squared speed/(0.25m/s)^2, 0.1 times squared horizontal drift/(0.5m)^2, 0.1 times maximum squared segment angular speed/(8rad/s)^2, and 0.25 per unsupported foot; subtract1000 once on natural fall; original physics and selection gates unchanged", "qualification":"unqualified research; no promotion"
+        }))?,
+    ).await?;
+    let mut journal = fs::File::create(output.join("optimization.jsonl"))?;
+    let mut batch = safe_batch(373, &agent.policy());
+    for update in 1_u32..=1001 {
+        let sequences = batch.collect_parallel(&agent.policy())?;
+        let metrics = agent.update(&sequences)?;
+        assert_eq!(metrics.valid_samples, 512);
+        assert_eq!(metrics.optimizer_updates, 4);
+        let optimization = serde_json::json!({"update":update,"valid_samples":metrics.valid_samples,"optimizer_updates":metrics.optimizer_updates,"optimizer_steps":metrics.optimizer_steps,"actor_loss":metrics.actor_loss,"critic_loss":metrics.critic_loss,"approximate_kl":metrics.approximate_kl,"entropy":metrics.entropy});
+        writeln!(journal, "{optimization}")?;
+        journal.flush()?;
+        if update % 20 != 0 && update != 1001 {
+            continue;
+        }
+        let bytes = agent.policy().to_bytes()?;
+        let digest = Sha256::digest(&bytes);
+        let record = serde_json::json!({
+            "schema":"droid-standing-dense-four-pass-research-v1", "algorithm":"PPO", "seed":373,
+            "update":update, "transitions":512_u64*u64::from(update), "optimizer_steps":metrics.optimizer_steps,
+            "sha256":format!("{digest:x}"), "actor_features":204, "critic_features":204,
+            "torque_channels":26, "log_std_min":-9.0, "log_std_max":1.0,
+            "qualification":"unqualified research; not accepted by the published standing loader"
+        });
+        let metadata = serde_json::to_vec_pretty(&record)?;
+        let policy = RecurrentPpoPolicy::load_bytes(
+            bytes.clone(),
+            204,
+            204,
+            1,
+            &[-1.0; 26],
+            &[1.0; 26],
+            &config,
+        )?;
+        let seeds = &standing::evaluation::SELECTION_SEEDS;
+        let standing = standing::evaluation::evaluate(&policy, seeds)?;
+        let control = standing::control::evaluate(&policy, seeds)?;
+        let passed = standing::evaluation::passes(&standing, seeds)
+            && standing::control::passes(&control, seeds);
+        let report = serde_json::json!({"provenance":record,"mode":"selection","episodes":standing,"control_episodes":control,"passed":passed,"qualification":"not qualified; requires held-out evaluation"});
+        tokio::fs::write(output.join(format!("standing-{update}.mpk")), bytes).await?;
+        tokio::fs::write(
+            output.join(format!("standing-{update}.research.json")),
+            metadata,
+        )
+        .await?;
+        tokio::fs::write(
+            output.join(format!("standing-{update}.evaluation.json")),
+            serde_json::to_vec_pretty(&report)?,
+        )
+        .await?;
+        println!("{report}");
+    }
+    Err("Research budget finished without policy promotion".into())
+}
+
+/// Normalize accepted profile log-standard deviations by their largest Gaussian deviation.
+/// The fixed profile bounds [-9, 1] keep every derived factor finite and positive.
+fn head_update_scales(log_std: &[f32]) -> Vec<f32> {
+    let largest = log_std
+        .iter()
+        .copied()
+        .map(f32::exp)
+        .fold(0.0_f32, f32::max);
+    log_std.iter().map(|value| value.exp() / largest).collect()
+}
+
+fn safe_batch(
+    seed: u64,
+    policy: &RecurrentPpoPolicy,
+) -> standing::parallel_rollout::ParallelRecoveryBatch<safety::ControlTask, 204> {
+    standing::parallel_rollout::ParallelRecoveryBatch::with_parallel_actions(
+        seed,
+        policy,
+        safety::ControlTask::default,
+        standing::encoding::encode,
+        |values| Ok(standing::encoding::decode(values)?),
+        std::num::NonZeroU16::new(1000).expect("fixed standing horizon"),
+    )
+}
+
+#[cfg(test)]
+mod batching_tests {
+    use super::*;
+    /// Gaussian channel scales produce finite relative step factors and an exact unit maximum.
+    #[test]
+    fn head_update_factors_follow_calibrated_exploration() {
+        let logs = [-9.0_f32, -2.0, -1.609_438];
+        let factors = head_update_scales(&logs);
+        assert_eq!(factors.len(), 3);
+        assert!(factors
+            .iter()
+            .all(|factor| factor.is_finite() && *factor > 0.0 && *factor <= 1.0));
+        assert_eq!(factors[2].to_bits(), 1.0_f32.to_bits());
+        assert_eq!(
+            factors[0].to_bits(),
+            (logs[0].exp() / logs[2].exp()).to_bits()
+        );
+        assert_eq!(
+            factors[1].to_bits(),
+            (logs[1].exp() / logs[2].exp()).to_bits()
+        );
+    }
+    /// Optimizer grouping cannot change the first physical rollout.
+    #[test]
+    fn rollout_is_identical_but_one_update_covers_all_sequences() {
+        let old = RecurrentPpoConfig {
+            gamma: learning::GAMMA,
+            gae_lambda: learning::GAE_LAMBDA,
+            actor_learning_rate: 0.0003,
+            critic_learning_rate: 0.001,
+            initial_log_std: -5.0,
+            log_std_min: -9.0,
+            entropy_coefficient: 0.0,
+            epochs: 4,
+            ..Default::default()
+        };
+        let new = RecurrentPpoConfig {
+            actor_learning_rate: 0.0003,
+            epochs: 4,
+            minibatch_sequences: 512,
+            ..old.clone()
+        };
+        let create = |config| {
+            let mut a = RecurrentPpoAgent::new(
+                204,
+                204,
+                1,
+                &[-1.0; 26],
+                &[1.0; 26],
+                config,
+                SeedConfig::from_root(211),
+            )
+            .expect("valid research actor");
+            a.reduce_action_mean_head();
+            a.reset_exploration();
+            a
+        };
+        let a = create(old);
+        let mut b = create(new);
+        let bytes = b.policy().to_bytes().expect("initial record");
+        let first = safe_batch(211, &a.policy())
+            .collect_parallel(&a.policy())
+            .expect("first physical rollout");
+        let second = safe_batch(211, &b.policy())
+            .collect_parallel(&b.policy())
+            .expect("same physical rollout");
+        assert_eq!(format!("{first:?}"), format!("{second:?}"));
+        let update = b.update(&second).expect("four full-batch PPO passes");
+        assert_eq!(update.valid_samples, 512);
+        assert_eq!(update.optimizer_updates, 4);
+        assert_eq!(update.optimizer_steps, 4);
+        assert_ne!(bytes, b.policy().to_bytes().expect("updated record"));
+    }
+    /// Retain every parent weight and learned exploration, then run four actual PPO passes.
+    #[test]
+    fn actual_parent_reloads_and_continues_one_full_batch() {
+        let bytes=tokio::runtime::Builder::new_current_thread().build().expect("test runtime").block_on(tokio::fs::read("/home/sagan/.cache/bevy-gym-quality-validation/standing-head-scaled-motion-probe-20261011/run/standing-23480.mpk")).expect("frozen research parent");
+        let config = RecurrentPpoConfig {
+            gamma: learning::GAMMA,
+            gae_lambda: learning::GAE_LAMBDA,
+            actor_learning_rate: 0.0003,
+            critic_learning_rate: 0.001,
+            initial_log_std: -5.0,
+            log_std_min: -9.0,
+            entropy_coefficient: 0.0,
+            epochs: 4,
+            minibatch_sequences: 512,
+            ..Default::default()
+        };
+        let reference = RecurrentPpoPolicy::load_bytes(
+            bytes.clone(),
+            204,
+            204,
+            1,
+            &[-1.0; 26],
+            &[1.0; 26],
+            &config,
+        )
+        .expect("frozen reference");
+        let mut agent = RecurrentPpoAgent::load_bytes(
+            bytes,
+            204,
+            204,
+            1,
+            &[-1.0; 26],
+            &[1.0; 26],
+            config,
+            SeedConfig::from_root(373),
+        )
+        .expect("continuation");
+        let logs: Vec<f32> = serde_json::from_slice(include_bytes!("../initial-log-std.json"))
+            .expect("calibrated scales");
+        agent
+            .set_action_mean_update_scales(&head_update_scales(&logs))
+            .expect("relative head increments");
+        assert_eq!(
+            reference.to_bytes().expect("parent record"),
+            agent
+                .policy()
+                .to_bytes()
+                .expect("retained weights and exploration")
+        );
+        let mut environment = bevy_gym::robots::DroidStanding::default();
+        let observation = bevy_gym::Env::reset(&mut environment, Some(42)).observation;
+        let features = standing::encoding::encode(&observation);
+        let memory = reference.initial_memory();
+        let before = reference
+            .mean_action(&features, &memory)
+            .expect("reference decision");
+        let restored = agent
+            .policy()
+            .mean_action(&features, &memory)
+            .expect("retained decision");
+        assert_eq!(before.action, restored.action);
+        assert_eq!(before.next_memory, restored.next_memory);
+
+        let rollout = safe_batch(373, &agent.policy())
+            .collect_parallel(&agent.policy())
+            .expect("actual parent rollout");
+        let metrics = agent.update(&rollout).expect("actual PPO update");
+        assert_eq!(metrics.valid_samples, 512);
+        assert_eq!(metrics.optimizer_updates, 4);
+        assert_eq!(metrics.optimizer_steps, 4);
+        let after = agent
+            .policy()
+            .mean_action(&features, &memory)
+            .expect("trained decision");
+        assert_ne!(before.action, after.action);
+    }
+}
