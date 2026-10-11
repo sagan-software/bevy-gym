@@ -1,0 +1,47 @@
+{
+  "date": "2026-10-11",
+  "source_parent": "bacb7c538da44316cd8e8b0df6dcddbc0d7cf56b",
+  "scope": "Shared damage and life rules only; world integration and learned fighting remain unfinished",
+  "qualification": false,
+  "new_public_tests": 7,
+  "private_tests": 2,
+  "native_commands": [
+    "cargo fmt --all -- --check",
+    "cargo clippy --all-targets --all-features -- -D warnings",
+    "cargo test --no-default-features --features robots --test droid_skill_session",
+    "cargo test",
+    "cargo test --features robots"
+  ],
+  "native_status": "passed",
+  "personal_status": "passed without changed-line diagnostics",
+  "wasm_command": "nix run .#drone-browser-check",
+  "wasm_status": "passed; all seven robot_health cases executed",
+  "coverage": {
+    "production_regions_hit": 154,
+    "production_regions_total": 154,
+    "instrumented_conditional_branches": 0,
+    "production_gaps": []
+  },
+  "nix_status": "Ten existing findings; exact check name, description, normalized path and line match preserved0621baseline",
+  "source_sha256": {
+    "Cargo.toml": "f41434b09bda2827cc3b8cef3b6d8b7c27c126d32734069804aa2f3ccd278c55",
+    "examples/robots/health/main.rs": "cd12c16669fcd2e2e0b0bfa1d7db43562a60028b685559d350c240be0e32a390",
+    "flake.nix": "2a2f100cb76534a9fa9ef3aeac89e2aa0b24f4ad428a0fdef19c17afea93c113",
+    "src/robots/health/damage.rs": "4c5683f8f52667c791d3f8027cce6934818aa20fe68fa05b7b5f3e66d3514e7e",
+    "src/robots/health/error.rs": "c977a6d26b21c534ce20c9aa7efe19e7b4448782d6f5b87d661e824753b74e5c",
+    "src/robots/health/hits.rs": "579f9fc51fbfe8f5735178979c764f2ca3f31b01edc35a1bab00560e2455851b",
+    "src/robots/health/hull.rs": "318d6ec1e70e7c129c99baf0515fdeccdabfce1b60accc778659788a25c39bb4",
+    "src/robots/health/mod.rs": "9cc477cba5557d5d4321f1e6b4accbc2625d4ade57dfd195f65c9142d0a718f3",
+    "src/robots/health/rotor.rs": "0ebc09f5115ffe714cb9b1d60b3a85f9ae8c3ca13221bdb00c5ed22fdbce9b63",
+    "src/robots/health/simulation.rs": "70208aabb5945e569bdf8bf47c631875ce666546a84308fdfeb36a1e7ea75179",
+    "src/robots/mod.rs": "21045c9c8f002b7e8b62ebd96b770f0d1a481154d4b6cb081d899b787d7b0997",
+    "tests/robot_health.rs": "2b02bbfcf263d3e139289d06f284eeef76be7be14899bb2c13168031b069d755"
+  },
+  "logs": {
+    "native": "/home/sagan/.cache/bevy-gym-quality-validation/robot-health-native-v4.log",
+    "personal": "/home/sagan/.cache/bevy-gym-quality-validation/robot-health-personal-v4.log",
+    "wasm": "/home/sagan/.cache/bevy-gym-quality-validation/robot-health-wasm.log",
+    "coverage": "/home/sagan/.cache/bevy-gym-quality-validation/robot-health-coverage-v2.log",
+    "nix": "/home/sagan/.cache/bevy-gym-quality-validation/robot-health-nix.log"
+  }
+}

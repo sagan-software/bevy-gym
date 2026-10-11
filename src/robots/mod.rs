@@ -6,6 +6,7 @@ mod destination;
 mod droid;
 mod drone;
 mod episode_ended;
+mod health;
 mod hover;
 mod impulse;
 mod motor;
@@ -46,3 +47,7 @@ pub use world::{
 };
 
 pub use weapon::{RobotVolleyRounds, RobotWeapon, RobotWeaponOutcome, RobotWeaponPhase};
+
+pub use health::{
+    RobotDamage, RobotHealth, RobotHitCount, RobotRotorHealth, RobotRotorHitRejected,
+};
