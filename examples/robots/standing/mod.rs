@@ -6,7 +6,13 @@ mod cli;
 pub(crate) mod encoding;
 pub(crate) mod evaluation;
 pub(crate) mod model;
+/// Explicit native training optimizer recipes.
+#[cfg(not(target_arch = "wasm32"))]
+mod optimization;
 pub(crate) mod reward;
+/// Fixed native selection policies and return ranking.
+#[cfg(not(target_arch = "wasm32"))]
+mod selection;
 /// Frozen execution shared by physical inspection and rendered playback.
 #[path = "../standing_scene/session.rs"]
 pub(crate) mod session;

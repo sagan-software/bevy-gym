@@ -8,8 +8,8 @@ use bevy_gym::robots::{
 use sha2::Digest;
 use std::time::Duration;
 
-/// Qualified standalone hover weights; shared-world qualification remains separate.
-const DRONE: &[u8] = include_bytes!("../../docs/progress/drone-hover.mpk");
+/// Qualified standalone recovery weights; shared-world qualification remains separate.
+const DRONE: &[u8] = include_bytes!("../../assets/robots/recovery.mpk");
 /// Highest original standing selection candidate; held-out standing failed.
 const DROID: &[u8] =
     include_bytes!("../../docs/progress/standing-seed17-update22940/checkpoint.mpk");
@@ -165,7 +165,7 @@ fn checkpoint_identity_and_architecture_precede_playback() {
             .expect("hover identity mismatch");
         assert_eq!(
             error.to_string(),
-            "shared-world drone weights must match the recorded PPO hover reference"
+            "shared-world drone weights must match the recorded PPO recovery reference"
         );
     }
     for metadata in [b"".as_slice(), b"{}", b"null"] {
@@ -200,4 +200,42 @@ fn checkpoint_identity_and_architecture_precede_playback() {
     let actual = serde_json::to_value(scene.droid_record()).expect("validated record");
     let expected: serde_json::Value = serde_json::from_slice(RECORD).expect("source record");
     assert_eq!(actual, expected);
+}
+
+/// The published drone actors must hold all three lanes without sustained spinning or crashing.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn arena_drones_hold_twenty_seconds_without_sustained_spinning() {
+    let mut scene = standing::world_session::Session::load(DRONE.to_vec(), DROID.to_vec(), RECORD)
+        .expect("retained RL checkpoints");
+    for step in 1..=1_000 {
+        scene.step();
+        assert!(
+            scene.error().is_none(),
+            "all six inference calls remain valid"
+        );
+        for slot in RobotSlot::ALL {
+            let drone = scene.snapshot().drone(slot);
+            let height = drone.position().y;
+            assert!(
+                height > 1.0,
+                "{slot:?} crashed at action {step}: height {height} m"
+            );
+            if step >= 250 {
+                let angular_speed = drone.angular_velocity().length();
+                assert!(
+                    angular_speed <= 0.5,
+                    "{slot:?} spins at action {step}: {angular_speed} rad/s"
+                );
+            }
+        }
+    }
+    for slot in RobotSlot::ALL {
+        let drone = scene.snapshot().drone(slot);
+        let distance = drone.position().distance(Vec3::new(-3.0, 2.0, lane(slot)));
+        assert!(
+            distance <= 0.5,
+            "{slot:?} misses its hover lane by {distance} m"
+        );
+    }
 }

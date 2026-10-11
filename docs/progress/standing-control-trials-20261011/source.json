@@ -1,0 +1,18 @@
+{
+  "schema": "droid-standing-control-source-v1",
+  "source_base": "eb95378743a1305bb15560afaf22ae22f72f05dc",
+  "archives": [
+    {
+      "file": "source.patch.gz",
+      "compression": "gzip",
+      "sha256": "de5268552af318c75fbd9d785efa10fdcc4d7b83afc6003b3667961dedec8c76",
+      "uncompressed_sha256": "317d7eb3a22c87a4ae6dddcbc6ea0f034508fa78f4848bff4951f8cf2284001c"
+    },
+    {
+      "file": "source-original.patch.gz",
+      "compression": "gzip",
+      "sha256": "96aa7fad458283ce15a90bd1abcf4153707c5bc1e91eaa67b69495b3d12d6137",
+      "uncompressed_sha256": "c32f10e4c135b2d22606c2450d1b20c198dead1e1bdb7df6c1e4854a0d45445e"
+    }
+  ]
+}

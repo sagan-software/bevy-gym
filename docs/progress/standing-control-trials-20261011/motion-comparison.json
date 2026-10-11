@@ -1,0 +1,22 @@
+[
+  {
+    "name": "published",
+    "seed": 42,
+    "checkpoint_sha256": "9c9e4c5bc8f7734da9835161476997e6d39d2aba28b24439e932a1f9949a2fdb",
+    "steps": 1000,
+    "maximum_segment_angular_speed_rad_s": 154.2958654543138,
+    "final_100_actions_maximum_segment_angular_speed_rad_s": 14.037950977098266,
+    "final_100_actions_mean_maximum_segment_angular_speed_rad_s": 2.1104612150477884,
+    "qualification": "diagnostic only; no lesson promotion"
+  },
+  {
+    "name": "low_noise_selection",
+    "seed": 42,
+    "checkpoint_sha256": "1329f91c2d767a3c5287c1dcb64747d71d58d48a9216706aab0165f0d6db5792",
+    "steps": 1000,
+    "maximum_segment_angular_speed_rad_s": 157.2895790069111,
+    "final_100_actions_maximum_segment_angular_speed_rad_s": 15.054426342695287,
+    "final_100_actions_mean_maximum_segment_angular_speed_rad_s": 3.0590193816635742,
+    "qualification": "diagnostic only; no lesson promotion"
+  }
+]

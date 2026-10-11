@@ -1,6 +1,9 @@
 //! Separate standing training and frozen evaluation commands.
 
-use super::{checkpoint, evaluation, reward::Recipe, trace, training};
+use super::{
+    checkpoint, evaluation, optimization::OptimizerProfile, reward::Recipe,
+    selection::SelectionPolicy, trace, training,
+};
 use clap::{Parser, Subcommand};
 use std::{
     error::Error,
@@ -30,6 +33,12 @@ enum Command {
     },
     /// Train with PPO; a failed budget returns an error and retains its candidate.
     Train {
+        /// Fixed selection rule; completing a budget never qualifies the lesson.
+        #[arg(long, value_enum, default_value_t = SelectionPolicy::FirstPassing)]
+        selection_policy: SelectionPolicy,
+        /// Training-only optimizer; frozen inference retains its original architecture.
+        #[arg(long, value_enum, default_value_t = OptimizerProfile::Original)]
+        optimizer_profile: OptimizerProfile,
         /// Training-only reward; frozen evaluation always retains the original profile.
         #[arg(long, value_enum, default_value_t = Recipe::Original)]
         reward_profile: Recipe,
@@ -48,6 +57,12 @@ enum Command {
         /// Valid standing checkpoint and its required seven-member provenance sidecar.
         #[arg(long)]
         checkpoint: PathBuf,
+        /// Fixed selection rule; completing a budget never qualifies the lesson.
+        #[arg(long, value_enum, default_value_t = SelectionPolicy::FirstPassing)]
+        selection_policy: SelectionPolicy,
+        /// Training-only optimizer; frozen inference retains its original architecture.
+        #[arg(long, value_enum, default_value_t = OptimizerProfile::Original)]
+        optimizer_profile: OptimizerProfile,
         /// Training-only reward; frozen evaluation always retains the original profile.
         #[arg(long, value_enum, default_value_t = Recipe::Original)]
         reward_profile: Recipe,
@@ -89,12 +104,27 @@ async fn execute(command: Command) -> Result<(), Box<dyn Error>> {
             trace::write(bytes, &metadata, seed, &mut std::io::stdout().lock())
         }
         Command::Train {
+            selection_policy,
+            optimizer_profile,
             reward_profile,
             updates,
             seed,
             output,
-        } => Box::pin(train_selected(seed, updates, &output, None, reward_profile)).await,
+        } => {
+            Box::pin(train_selected(
+                seed,
+                updates,
+                &output,
+                None,
+                reward_profile,
+                optimizer_profile,
+                selection_policy,
+            ))
+            .await
+        }
         Command::WarmStart {
+            selection_policy,
+            optimizer_profile,
             reward_profile,
             checkpoint,
             updates,
@@ -107,6 +137,8 @@ async fn execute(command: Command) -> Result<(), Box<dyn Error>> {
                 &output,
                 Some(&checkpoint),
                 reward_profile,
+                optimizer_profile,
+                selection_policy,
             ))
             .await
         }
@@ -121,7 +153,23 @@ async fn train_selected(
     output: &Path,
     checkpoint: Option<&Path>,
     recipe: Recipe,
+    profile: OptimizerProfile,
+    selection_policy: SelectionPolicy,
 ) -> Result<(), Box<dyn Error>> {
+    if profile != OptimizerProfile::Original
+        || selection_policy == SelectionPolicy::BestPassingBudget
+    {
+        return Box::pin(training::train_configured(
+            seed,
+            updates,
+            output,
+            checkpoint,
+            recipe,
+            profile,
+            selection_policy,
+        ))
+        .await;
+    }
     match (recipe, checkpoint) {
         (Recipe::Original, None) => Box::pin(training::train(seed, updates, output)).await,
         (Recipe::Original, Some(checkpoint)) => {

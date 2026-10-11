@@ -1,0 +1,42 @@
+{
+  "schema": "droid-standing-control-trial-v1",
+  "qualification": "failed; not promoted",
+  "budget_updates": 101,
+  "updates_collected": 101,
+  "selected": {
+    "checkpoint": {
+      "algorithm": "PPO",
+      "optimizer_steps": 25,
+      "schema": "droid-standing-v1",
+      "seed": 59,
+      "sha256": "1329f91c2d767a3c5287c1dcb64747d71d58d48a9216706aab0165f0d6db5792",
+      "transitions": 10240,
+      "update": 20
+    },
+    "mean_return": 918.076184618473
+  },
+  "held_out": {
+    "passed": false,
+    "episodes": 32,
+    "survived": 24,
+    "stable_final_100": 24
+  },
+  "selection_rule": "highest mean fixed selection return among passing checkpoints; earliest update wins ties",
+  "source_base": "eb95378743a1305bb15560afaf22ae22f72f05dc",
+  "source_original_patch_sha256": "c32f10e4c135b2d22606c2450d1b20c198dead1e1bdb7df6c1e4854a0d45445e",
+  "source_portable_patch_sha256": "317d7eb3a22c87a4ae6dddcbc6ea0f034508fa78f4848bff4951f8cf2284001c",
+  "journal_raw_sha256": "22d12cb380930108637b6c07e1abb28564703f0c7b1ab699c09f2025cabd4272",
+  "files": {
+    "checkpoint.json": "46457f946bcd6bc0d9a89bda772010e712271ffb47ba65db1e027326867d4f3f",
+    "checkpoint.mpk": "1329f91c2d767a3c5287c1dcb64747d71d58d48a9216706aab0165f0d6db5792",
+    "held-out.json": "35a2ddac13bcd41797362923d2b364141c7a3118082f59bebea126e1c3fd77e3",
+    "launch.json": "d523f711f35e350b2a3a45817c42a48e68d0d3a173a22adb2761c8f497993b99",
+    "optimization.jsonl.gz": "b1f88e33587fbe88af21987fdf1b98bbbd5b6f820ad953335edc0d1e819b2710",
+    "selection-budget.json": "1034c911fafb1e6c899df3734254926584b69aedb0e82d33e509cf9a6e1a4319",
+    "selection-history.jsonl.gz": "270662f61609ccab6770a55844b23f590f72039819843e8987da14bbb4e1fdb9",
+    "selection.json": "d815dd4f63be29adf9c83117bb963640eaecd5289b9a7def76f87f59f7080c33",
+    "training-optimizer.json": "029d0cb28e90593eb7e6937c9f7519e15a3cca9e4885a0d3212070011c2ade9a",
+    "training-reward.json": "d5bf036c563f7baae03dea84f44da3b312847b1882835b66ec52c949df75ec34",
+    "warm-start.json": "90b5768cbfae4be4a055e6a66b2cb311f8d7af40dbe0187914f1bf8178726856"
+  }
+}

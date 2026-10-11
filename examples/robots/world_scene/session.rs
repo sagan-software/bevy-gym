@@ -52,8 +52,8 @@ struct Applied {
     droids: [DroidAction; 3],
 }
 
-/// Retained RL hover reference; a different file cannot borrow this provenance.
-const DRONE_REFERENCE: &[u8] = include_bytes!("../../../docs/progress/drone-hover.mpk");
+/// Retained RL recovery reference; a different file cannot borrow this provenance.
+const DRONE_REFERENCE: &[u8] = include_bytes!("../../../assets/robots/recovery.mpk");
 /// Diagnostic clip limit; completion derives from physical elapsed time.
 const HORIZON: Duration = Duration::from_secs(20);
 
@@ -67,7 +67,7 @@ impl Session {
         // Both byte identities and model architectures precede any physical construction.
         if drone_bytes.as_slice() != DRONE_REFERENCE {
             return Err(
-                "shared-world drone weights must match the recorded PPO hover reference".into(),
+                "shared-world drone weights must match the recorded PPO recovery reference".into(),
             );
         }
         let drone_digest = Sha256::digest(&drone_bytes);

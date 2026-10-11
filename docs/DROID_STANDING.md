@@ -683,3 +683,65 @@ Held-out results were excluded from that ranking. It passed selection at update
 finished with at least 100 stable actions. The
 [result](progress/standing-seed43-update100/summary.json) retains the checkpoint
 and evaluation. No lesson has been promoted.
+
+## Recorded optimizer and selection experiments
+
+Choose a new output directory for each run. This command continues the recorded
+seed-43 RL weights; it does not qualify or promote a lesson:
+
+```sh
+cargo run --no-default-features --features robots --example droid-standing -- \
+  warm-start --checkpoint docs/progress/standing-seed43-update100/checkpoint.mpk \
+  --seed 73 --updates 1001 --reward-profile posture-height-v1 \
+  --optimizer-profile low-noise-v1 --selection-policy best-passing-budget \
+  --output runs/droid-standing/low-noise-next
+```
+
+`--optimizer-profile original` preserves the historical recipe and artifact set.
+`conservative-v1` uses actor learning rate 0.00003, critic learning rate 0.001,
+zero entropy bonus and one epoch. `low-noise-v1` also starts Gaussian exploration
+at log standard deviation -3.5, approximately 0.0302 before `tanh`. Random
+initialization uses that scale. Warm starts replace only the exploration scales;
+learned mean parameters and critic parameters remain unchanged. Both warm-start
+optimizers start fresh.
+
+ Observation width, torque bounds, physics and frozen
+standing gates remain unchanged.
+
+A selected recipe writes `training-optimizer.json` before collecting transitions.
+The conservative record has exactly `schema`, `actor_learning_rate`,
+`critic_learning_rate`, `entropy_coefficient` and `epochs`. Its schema is
+`droid-standing-conservative-optimizer-v1`. The low-noise record uses schema
+`droid-standing-low-noise-optimizer-v1` and adds `reset_initial_log_std: -3.5`.
+The original recipe writes no optimizer-profile artifact.
+
+`--selection-policy first-passing` preserves the original stop at the first passing
+fixed selection report. Its zero exit status establishes selection only.
+`best-passing-budget` collects the complete budget and retains the passing checkpoint
+with the highest mean unscaled selection return. Equal returns retain the earliest
+observed update. Held-out cases never rank checkpoints.
+
+`selection-budget.json`
+records the budget, rule and selected checkpoint, or null when none passed.
+Budget completion returns a nonzero exit status even when a candidate passed.
+Neither stopping policy promotes a lesson or establishes held-out qualification.
+
+The [archived experiments](progress/standing-control-trials-20261011/) retain source
+patches compressed with gzip, launch records, optimizer journals, selection histories
+and checkpoint identity:
+
+- Seed 59 collected 101 updates and selected update 20. Held-out evaluation failed:
+  24 of 32 episodes survived and finished with at least 100 stable actions.
+- Seed 61 collected 101 updates and selected update 20. Held-out evaluation failed:
+  21 episodes survived and 20 finished with at least 100 stable actions.
+- Seed 67 collected 101 updates. No checkpoint passed selection; none was evaluated
+  on held-out cases.
+- Seed 71 collected 1,001 updates and selected update 60. Held-out evaluation failed:
+  28 episodes survived and 27 finished with at least 100 stable actions.
+
+The [motion comparison](progress/standing-control-trials-20261011/motion-comparison.json)
+measures frozen inference on seed 42. The published policy's peak segment angular
+speed was 154.30 rad/s; seed 59's selected policy reached 157.29 rad/s.
+Lower exploration noise did not fix frozen-policy flailing. Standing, walking and
+competitive combat remain unqualified. The portable source patch passed
+`git apply --check` against its recorded base commit.

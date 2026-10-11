@@ -1,0 +1,42 @@
+{
+  "schema": "droid-standing-control-trial-v1",
+  "qualification": "failed; not promoted",
+  "budget_updates": 1001,
+  "updates_collected": 1001,
+  "selected": {
+    "checkpoint": {
+      "algorithm": "PPO",
+      "optimizer_steps": 78,
+      "schema": "droid-standing-v1",
+      "seed": 71,
+      "sha256": "fa7f03bf45cb0197b6c996603e494f50401754da07e3199cd530ca576c20cab0",
+      "transitions": 30720,
+      "update": 60
+    },
+    "mean_return": 918.6248444080353
+  },
+  "held_out": {
+    "passed": false,
+    "episodes": 32,
+    "survived": 28,
+    "stable_final_100": 27
+  },
+  "selection_rule": "highest mean fixed selection return among passing checkpoints; earliest update wins ties",
+  "source_base": "eb95378743a1305bb15560afaf22ae22f72f05dc",
+  "source_original_patch_sha256": "c32f10e4c135b2d22606c2450d1b20c198dead1e1bdb7df6c1e4854a0d45445e",
+  "source_portable_patch_sha256": "317d7eb3a22c87a4ae6dddcbc6ea0f034508fa78f4848bff4951f8cf2284001c",
+  "journal_raw_sha256": "59e49d154b89946fdf7196d2f5b1cae97dd5c97be525c21fe3b57277bd8a20cf",
+  "files": {
+    "checkpoint.json": "83f7c0f3b402bb57d24dcc08aafffe5801eba68b71ba393ba5b7aa0082835bd5",
+    "checkpoint.mpk": "fa7f03bf45cb0197b6c996603e494f50401754da07e3199cd530ca576c20cab0",
+    "held-out.json": "1ad9bfc06d3919e6646f9bd9a333a45d78be67e4c298a92839106bed59090217",
+    "launch.json": "c90238e22154aab096982e80ea76bee617fd8281a5b29ca627cafa1d2015599f",
+    "optimization.jsonl.gz": "409b3c22ecd5af8fafe65a5f1c74f5cd6f3fb945f7bdf9306a38302ac71e581b",
+    "selection-budget.json": "a4664d4ecd48804a07810e9b83be88721095605b22e50ff443529fb1644d7b82",
+    "selection-history.jsonl.gz": "34790f3aaeda024ff22a44a49520fd37c234989563205b70dd95a50880b7f2b6",
+    "selection.json": "a2bd4d0ea0a8325cf499fc527ad75020aa12b25cec82275301bd64a31870c756",
+    "training-optimizer.json": "029d0cb28e90593eb7e6937c9f7519e15a3cca9e4885a0d3212070011c2ade9a",
+    "training-reward.json": "1efe6a43cd9ec63507b79824055c06c7623e650e3d927e0dc4980dbfe6007497",
+    "warm-start.json": "7361a5173346820ac708393e3c4b82c79587b2f4607a00f58a1de757218b92e9"
+  }
+}

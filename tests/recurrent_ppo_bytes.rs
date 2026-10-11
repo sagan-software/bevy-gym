@@ -490,3 +490,86 @@ fn padding_is_excluded_before_probability_ratios() {
     assert!(update.entropy.is_finite());
     assert!(update.approximate_kl.is_finite());
 }
+
+/// Reset exploration after loading without changing learned mean actions or values.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn reset_exploration_preserves_learned_mean_and_scales_sample_noise() {
+    let (mut agent, target) = imported_agent_with_reduced_exploration();
+    let before = agent.policy();
+    let observation = [0.2, -0.1];
+    let memory = before.initial_memory();
+    let mean = before.mean_action(&observation, &memory).expect("mean");
+    let value = before.value(&observation, 0).expect("value");
+    let old_sample = before
+        .sample_action(&observation, &memory, &mut RecurrentSampler::new(7))
+        .expect("sample");
+    agent.reset_exploration();
+    let after = agent.policy();
+    assert_eq!(
+        after
+            .mean_action(&observation, &memory)
+            .expect("mean")
+            .action,
+        mean.action
+    );
+    assert_eq!(
+        after.value(&observation, 0).expect("value").to_bits(),
+        value.to_bits()
+    );
+    let sample = after
+        .sample_action(&observation, &memory, &mut RecurrentSampler::new(7))
+        .expect("sample");
+    let ratio = (sample.pre_tanh_action[0] - mean.pre_tanh_action[0])
+        / (old_sample.pre_tanh_action[0] - mean.pre_tanh_action[0]);
+    assert!(
+        (ratio - 0.082_085).abs() < 1e-6,
+        "exp(-3.5 - -1) noise ratio: {ratio}"
+    );
+    let reloaded = RecurrentPpoPolicy::load_bytes(
+        after.to_bytes().expect("record"),
+        2,
+        2,
+        1,
+        &[-1.0],
+        &[1.0],
+        &target,
+    )
+    .expect("reload");
+    assert_eq!(
+        reloaded
+            .sample_action(&observation, &memory, &mut RecurrentSampler::new(7))
+            .expect("sample")
+            .pre_tanh_action,
+        sample.pre_tanh_action
+    );
+}
+
+/// Import original parameters under a lower configured exploration scale.
+fn imported_agent_with_reduced_exploration() -> (RecurrentPpoAgent, RecurrentPpoConfig) {
+    let original = RecurrentPpoAgent::new(
+        2,
+        2,
+        1,
+        &[-1.0],
+        &[1.0],
+        config(),
+        SeedConfig::from_root(19),
+    )
+    .expect("agent");
+    let bytes = original.policy().to_bytes().expect("record");
+    let mut target = config();
+    target.initial_log_std = -3.5;
+    let agent = RecurrentPpoAgent::load_bytes(
+        bytes,
+        2,
+        2,
+        1,
+        &[-1.0],
+        &[1.0],
+        target.clone(),
+        SeedConfig::from_root(23),
+    )
+    .expect("load");
+    (agent, target)
+}

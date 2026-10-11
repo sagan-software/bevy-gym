@@ -264,7 +264,7 @@ fn labels_project_own_physical_positions_and_hide_unavailable_views() {
 /// Load the recorded checkpoint pair used by the shipping shared-world view.
 fn load() -> Session {
     Session::load(
-        include_bytes!("../../../docs/progress/drone-hover.mpk").to_vec(),
+        include_bytes!("../../../assets/robots/recovery.mpk").to_vec(),
         include_bytes!("../../../docs/progress/standing-seed17-update22940/checkpoint.mpk")
             .to_vec(),
         include_bytes!("../../../docs/progress/standing-seed17-update22940/checkpoint.json"),
@@ -283,7 +283,7 @@ fn provenance_and_telemetry_preserve_checkpoint_identity_and_clip_state() {
     );
     assert_eq!(
         identities.0,
-        "Drones · PPO 280 · 5aa47c6941b1\nDroids · PPO 22940 · 9c9e4c5bc8f7"
+        "Drones · PPO 260 · bb0bef6e7412\nDroids · PPO 22940 · 9c9e4c5bc8f7"
     );
     assert_eq!(
         Identities::new(&Err("invalid checkpoint".to_owned()), &[]).0,

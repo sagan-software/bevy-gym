@@ -1,0 +1,29 @@
+{
+  "started_utc": "2026-10-11T03:25:40.831089+00:00",
+  "command": [
+    "/home/sagan/.cache/bevy-gym-quality-validation/standing-low-noise-smoke-seed59-20261011/droid-standing",
+    "warm-start",
+    "--checkpoint",
+    "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/docs/progress/standing-seed43-update100/checkpoint.mpk",
+    "--optimizer-profile",
+    "low-noise-v1",
+    "--selection-policy",
+    "best-passing-budget",
+    "--reward-profile",
+    "posture-height-v1",
+    "--seed",
+    "59",
+    "--updates",
+    "101",
+    "--output",
+    "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/runs/droid-standing/low-noise-smoke-seed59-20261011"
+  ],
+  "unit": "bevy-gym-standing-low-noise-smoke-seed59-20261011",
+  "source_base": "eb95378743a1305bb15560afaf22ae22f72f05dc",
+  "source_patch_sha256": "c32f10e4c135b2d22606c2450d1b20c198dead1e1bdb7df6c1e4854a0d45445e",
+  "executable_sha256": "8da53c78a8c60ac885e80e8083a690a503ce9a4af3a5119d346cadd2e4bf9570",
+  "parent_sha256": "657f1cbe1fad9cf0782ceac76a51490cdca93b6d51c54366faa26be7ac264b6d",
+  "qualification": "exploratory PPO smoke; no lesson promotion",
+  "held_out": "not used for selection",
+  "budget_updates": 101
+}

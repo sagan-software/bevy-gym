@@ -25,7 +25,7 @@ const ROTOR_NAMES: [&str; 4] = ["Rotor_FL", "Rotor_FR", "Rotor_BR", "Rotor_BL"];
 /// Retained PPO policies provide every applied request, including these display tests.
 fn load() -> crate::standing::world_session::Session {
     crate::standing::world_session::Session::load(
-        include_bytes!("../../../docs/progress/drone-hover.mpk").to_vec(),
+        include_bytes!("../../../assets/robots/recovery.mpk").to_vec(),
         include_bytes!("../../../docs/progress/standing-seed17-update22940/checkpoint.mpk")
             .to_vec(),
         include_bytes!("../../../docs/progress/standing-seed17-update22940/checkpoint.json"),

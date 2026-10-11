@@ -65,3 +65,43 @@ pub(crate) fn load_policy(bytes: Vec<u8>) -> Result<RecurrentPpoPolicy, Recurren
         &configuration(),
     )
 }
+
+/// Initialize the original architecture with an explicitly recorded native optimizer recipe.
+#[cfg(not(target_arch = "wasm32"))]
+pub(super) fn new_agent_configured(
+    seed: u64,
+    profile: super::optimization::OptimizerProfile,
+) -> Result<RecurrentPpoAgent, RecurrentPpoError> {
+    RecurrentPpoAgent::new(
+        FEATURES,
+        FEATURES,
+        1,
+        &[-1.0; 26],
+        &[1.0; 26],
+        profile.configure(configuration()),
+        SeedConfig::from_root(seed),
+    )
+}
+
+/// Import mean/critic weights with fresh Adam and the explicitly selected exploration recipe.
+#[cfg(not(target_arch = "wasm32"))]
+pub(super) fn warm_start_configured(
+    seed: u64,
+    bytes: Vec<u8>,
+    profile: super::optimization::OptimizerProfile,
+) -> Result<RecurrentPpoAgent, RecurrentPpoError> {
+    let mut agent = RecurrentPpoAgent::load_bytes(
+        bytes,
+        FEATURES,
+        FEATURES,
+        1,
+        &[-1.0; 26],
+        &[1.0; 26],
+        profile.configure(configuration()),
+        SeedConfig::from_root(seed),
+    )?;
+    if matches!(profile, super::optimization::OptimizerProfile::LowNoiseV1) {
+        agent.reset_exploration();
+    }
+    Ok(agent)
+}

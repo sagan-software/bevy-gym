@@ -179,3 +179,21 @@ Browser changes require rendered desktop/narrow inspection and video evidence.
 Training records must include source/checkpoint hashes, seeds, environment version,
 reward terms, update/sample counts, both teams' metrics, and held-out outcomes.
 No competitive 3v3 training run or qualified droid locomotion checkpoint exists.
+
+## Drone control correction
+
+The shared diagnostic now uses the recorded seed-7 PPO recovery checkpoint at update
+260, SHA-256 `bb0bef6e7412fd79ea097fa95036d428d22962af3b259c52c82b38c894df9b76`.
+The previous hover checkpoint failed the sustained-spin regression at action 250.
+The replacement passes 1,000 shared-world actions: all three drones remain above
+1 m, angular speed stays at most 0.5 rad/s after action 250, and final distance
+from each drone's lane is at most 0.5 m.
+
+The [browser evidence](progress/world-scene/control-correction.json) binds the
+updated ten-second gallery video and poster to the actual runtime and policy bytes.
+The [narrow view](progress/world-scene/control-narrow.png) shows all six models and
+working spectator controls after one policy step. The diagnostic still uses an
+unqualified droid policy. This correction does not
+establish walking, combat, or competitive qualification. The
+[standing experiments](DROID_STANDING.md#recorded-optimizer-and-selection-experiments)
+record the failed candidates and the measured limb-motion problem.

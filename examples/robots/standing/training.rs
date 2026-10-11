@@ -4,7 +4,9 @@ use super::{
     batch_with_recipe,
     checkpoint::{from_bytes, Record},
     evaluation, model,
+    optimization::OptimizerProfile,
     reward::{Recipe, HEIGHT_SCALE_M, HEIGHT_TARGET_M, POSTURE_SCALE},
+    selection::{Candidate, Selection, SelectionPolicy},
 };
 use bevy_gym::training::{RecurrentPpoAgent, RecurrentPpoUpdate};
 use serde::Serialize;
@@ -55,6 +57,8 @@ pub(crate) async fn train(
         output,
         Start::Random,
         Recipe::Original,
+        OptimizerProfile::Original,
+        SelectionPolicy::FirstPassing,
     ))
     .await
 }
@@ -72,6 +76,8 @@ pub(crate) async fn warm_start(
         output,
         Start::Checkpoint(checkpoint),
         Recipe::Original,
+        OptimizerProfile::Original,
+        SelectionPolicy::FirstPassing,
     ))
     .await
 }
@@ -85,7 +91,39 @@ pub(crate) async fn train_profiled(
     recipe: Recipe,
 ) -> Result<(), Box<dyn Error>> {
     let start = checkpoint.map_or(Start::Random, Start::Checkpoint);
-    Box::pin(train_from(seed, updates, output, start, recipe)).await
+    Box::pin(train_from(
+        seed,
+        updates,
+        output,
+        start,
+        recipe,
+        OptimizerProfile::Original,
+        SelectionPolicy::FirstPassing,
+    ))
+    .await
+}
+
+/// Select a native optimizer recipe without changing architecture or frozen qualification.
+pub(super) async fn train_configured(
+    seed: u64,
+    updates: NonZeroU32,
+    output: &Path,
+    checkpoint: Option<&Path>,
+    recipe: Recipe,
+    profile: OptimizerProfile,
+    selection_policy: SelectionPolicy,
+) -> Result<(), Box<dyn Error>> {
+    let start = checkpoint.map_or(Start::Random, Start::Checkpoint);
+    Box::pin(train_from(
+        seed,
+        updates,
+        output,
+        start,
+        recipe,
+        profile,
+        selection_policy,
+    ))
+    .await
 }
 
 /// Validated import bytes and their source identity, retained before optimization.
@@ -111,12 +149,16 @@ async fn train_from(
     output: &Path,
     start: Start<'_>,
     recipe: Recipe,
+    profile: OptimizerProfile,
+    selection_policy: SelectionPolicy,
 ) -> Result<(), Box<dyn Error>> {
-    let Initialization { mut agent, initial } = initialize(seed, start).await?;
+    let Initialization { mut agent, initial } = initialize(seed, start, profile).await?;
     create_output(output, seed, initial).await?;
     record_reward_profile(output, seed, recipe).await?;
+    record_optimizer_profile(output, profile).await?;
     let mut progress = fs::File::create(output.join("optimization.jsonl")).await?;
     let mut row = Vec::with_capacity(512);
+    let mut selection = Selection::new(selection_policy);
     let mut rollout = batch_with_recipe(seed, &agent.policy(), recipe);
     for update in 1..=updates.get() {
         // One immutable policy snapshot supplies all eight lanes before either optimizer changes.
@@ -130,18 +172,46 @@ async fn train_from(
         if !update.get().is_multiple_of(20) && update != updates {
             continue;
         }
-        if save_and_evaluate(output, seed, update, &metrics, agent.policy().to_bytes()?).await? {
+        let candidate =
+            save_and_evaluate(output, seed, update, &metrics, agent.policy().to_bytes()?).await?;
+        if selection.observe(candidate) {
             return Ok(());
+        }
+    }
+    if selection_policy == SelectionPolicy::BestPassingBudget {
+        let record = serde_json::json!({
+            "schema":"droid-standing-selection-budget-v1", "budget_updates":updates,
+            "rule":"highest mean fixed selection return among passing checkpoints; earliest update wins ties",
+            "selected":selection.best(), "qualification":"not qualified; requires held-out evaluation"
+        });
+        fs::write(
+            output.join("selection-budget.json"),
+            serde_json::to_vec(&record)?,
+        )
+        .await?;
+        if selection.best().is_some() {
+            return Err(
+                "Standing selection budget completed; selected checkpoint is not qualified.".into(),
+            );
         }
     }
     Err("Standing exhausted its update budget without passing; checkpoint is not qualified.".into())
 }
 
 /// Validate the original checkpoint shape before a new output directory exists.
-async fn initialize(seed: u64, start: Start<'_>) -> Result<Initialization, Box<dyn Error>> {
+async fn initialize(
+    seed: u64,
+    start: Start<'_>,
+    profile: OptimizerProfile,
+) -> Result<Initialization, Box<dyn Error>> {
     match start {
         Start::Random => Ok(Initialization {
-            agent: model::new_agent(seed)?,
+            agent: match profile {
+                OptimizerProfile::Original => model::new_agent(seed)?,
+                OptimizerProfile::ConservativeV1 | OptimizerProfile::LowNoiseV1 => {
+                    model::new_agent_configured(seed, profile)?
+                }
+            },
             initial: None,
         }),
         Start::Checkpoint(path) => {
@@ -149,7 +219,12 @@ async fn initialize(seed: u64, start: Start<'_>) -> Result<Initialization, Box<d
             let metadata = fs::read(path.with_extension("json")).await?;
             let record = Record::for_bytes(&bytes, &metadata)?;
             // One cold copy retains exact source evidence while Burn consumes its decoder input.
-            let agent = model::warm_start(seed, bytes.clone())?;
+            let agent = match profile {
+                OptimizerProfile::Original => model::warm_start(seed, bytes.clone())?,
+                OptimizerProfile::ConservativeV1 | OptimizerProfile::LowNoiseV1 => {
+                    model::warm_start_configured(seed, bytes.clone(), profile)?
+                }
+            };
             Ok(Initialization {
                 agent,
                 initial: Some(InitialCheckpoint { bytes, record }),
@@ -212,6 +287,21 @@ async fn record_reward_profile(
     Ok(())
 }
 
+/// Record selected optimization before sampling; preserve the default artifact set.
+async fn record_optimizer_profile(
+    output: &Path,
+    profile: OptimizerProfile,
+) -> Result<(), Box<dyn Error>> {
+    if let Some(record) = profile.record() {
+        fs::write(
+            output.join("training-optimizer.json"),
+            serde_json::to_vec(&record)?,
+        )
+        .await?;
+    }
+    Ok(())
+}
+
 /// Preserve exact weights and provenance before reporting independent selection outcomes.
 async fn save_and_evaluate(
     output: &Path,
@@ -219,7 +309,7 @@ async fn save_and_evaluate(
     update: NonZeroU32,
     metrics: &RecurrentPpoUpdate,
     bytes: Vec<u8>,
-) -> Result<bool, Box<dyn Error>> {
+) -> Result<Option<Candidate>, Box<dyn Error>> {
     let steps =
         NonZeroU64::new(metrics.optimizer_steps).ok_or("PPO reported zero optimizer steps")?;
     let record = Record::new(seed, update, steps, &bytes);
@@ -239,7 +329,16 @@ async fn save_and_evaluate(
     )
     .await?;
     println!("{report}");
-    Ok(passed)
+    if passed {
+        let mean_return =
+            episodes.iter().map(|score| score.reward).sum::<f64>() / episodes.len() as f64;
+        Ok(Some(Candidate {
+            checkpoint: record,
+            mean_return,
+        }))
+    } else {
+        Ok(None)
+    }
 }
 
 /// Reject non-finite measurements before JSON could silently replace them with null.
@@ -299,6 +398,19 @@ mod tests {
                     .await
                     .expect_err("profile cannot replace a directory");
             }
+            let optimizer_artifact = directory.join("training-optimizer.json");
+            fs::create_dir(&optimizer_artifact)
+                .await
+                .expect("blocked optimizer artifact");
+            record_optimizer_profile(&directory, OptimizerProfile::Original)
+                .await
+                .expect("default emits no optimizer profile");
+            record_optimizer_profile(&directory, OptimizerProfile::ConservativeV1)
+                .await
+                .expect_err("optimizer profile cannot replace a directory");
+            fs::remove_dir(&optimizer_artifact)
+                .await
+                .expect("remove test artifact");
             assert!(!directory.join("optimization.jsonl").exists());
             fs::remove_dir(&artifact)
                 .await

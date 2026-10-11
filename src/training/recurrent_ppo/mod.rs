@@ -1441,6 +1441,26 @@ impl RecurrentPpoAgent {
         Ok(())
     }
 
+    /// Reset every action's exploration scale to the validated configured initial value.
+    ///
+    /// Learned mean actions and critic parameters remain unchanged. This starts
+    /// fresh actor Adam moments; critic Adam moments and update counters remain.
+    /// Call this before collecting a new rollout because previous samples have
+    /// different behavior probabilities.
+    pub fn reset_exploration(&mut self) {
+        // Replace only the scale parameter and retain its identity for recording.
+        let initial = self.config.initial_log_std;
+        self.actor.log_std = self
+            .actor
+            .log_std
+            .clone()
+            .map(|tensor| Tensor::full(tensor.dims(), initial, &self.device).require_grad());
+        // Previous actor moments describe a different exploration distribution.
+        self.actor_optimizer = AdamConfig::new()
+            .with_epsilon(self.config.optimizer_epsilon)
+            .init();
+    }
+
     /// Read one complete network record into this agent's architecture.
     fn load_networks(
         &self,

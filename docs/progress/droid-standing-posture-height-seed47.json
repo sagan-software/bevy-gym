@@ -1,0 +1,24 @@
+{
+  "started_utc": "2026-10-11T02:47:07.234294+00:00",
+  "command": [
+    "/home/sagan/.cache/bevy-gym-quality-validation/standing-posture-height-smoke-seed37-20261010/droid-standing",
+    "warm-start",
+    "--checkpoint",
+    "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/docs/progress/standing-seed43-update100/checkpoint.mpk",
+    "--reward-profile",
+    "posture-height-v1",
+    "--seed",
+    "47",
+    "--updates",
+    "24000",
+    "--output",
+    "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/runs/droid-standing/posture-height-seed47-20261011"
+  ],
+  "unit": "bevy-gym-standing-posture-height-seed47-20261011",
+  "executable_sha256": "cf3546fc11a80968e45d5bf4dddb7834771ed9dbc55262c0b43fd08b50e95210",
+  "parent_sha256": "657f1cbe1fad9cf0782ceac76a51490cdca93b6d51c54366faa26be7ac264b6d",
+  "parent_selection_rule": "highest mean fixed selection return among first-passing seed31, seed37 and seed43 candidates; held-out results excluded",
+  "optimizer_state": "fresh Adam; imported PPO actor and critic",
+  "qualification": "unqualified exploration; no lesson promotion",
+  "budget_updates": 24000
+}

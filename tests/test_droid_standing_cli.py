@@ -44,6 +44,140 @@ class StandingCliTests(unittest.TestCase):
             timeout=60,
         )
 
+    def test_recipe_flags_reject_invalid_and_inference_use(self) -> None:
+        """Reject unknown recipes and keep inference immutable."""
+        for option in ["--optimizer-profile", "--selection-policy"]:
+            for mode in ["train", "warm-start"]:
+                result = self.run_command(mode, option, "unknown")
+                self.assertEqual(result.returncode, 2, result.stderr)
+                self.assertIn("invalid value", result.stderr)
+            for mode in ["evaluate", "trace"]:
+                result = self.run_command(
+                    mode, "--checkpoint", str(self.checkpoint),
+                    option, "original",
+                )
+                self.assertEqual(result.returncode, 2, result.stderr)
+                self.assertIn("unexpected argument", result.stderr)
+
+    def test_low_noise_optimizer_runs_real_ppo_without_promotion(self) -> None:
+        """Record changed exploration and retain a failed PPO candidate."""
+        for mode in ["train", "warm-start"]:
+            output = self.root / ("low-noise-" + mode)
+            arguments = [mode]
+            if mode == "warm-start":
+                arguments += ["--checkpoint", str(self.checkpoint)]
+            result = self.run_command(
+                *arguments,
+                "--optimizer-profile", "low-noise-v1", "--updates", "1",
+                "--output", str(output),
+            )
+            self.assertEqual(result.returncode, 1, result.stderr)
+            self.assertIn("exhausted its update budget", result.stderr)
+            record = json.loads(
+                (output / "training-optimizer.json").read_text()
+            )
+            self.assertEqual(
+                record["schema"], "droid-standing-low-noise-optimizer-v1"
+            )
+            self.assertEqual(record["reset_initial_log_std"], -3.5)
+            rows = [json.loads(row) for row in
+                    (output / "optimization.jsonl").read_text().splitlines()]
+            self.assertEqual(rows[0]["valid_samples"], 512)
+            self.assertGreater(rows[0]["optimizer_updates"], 0)
+            self.assertIn("not qualified", result.stderr)
+
+    def test_passing_selection_requires_held_out_qualification(self) -> None:
+        """Retain real passing PPO weights under both stopping policies."""
+        parent = (Path(__file__).resolve().parents[1]
+                  / "docs/progress/standing-seed43-update100/checkpoint.mpk")
+        for policy, exit_status in [("first-passing", 0),
+                                    ("best-passing-budget", 1)]:
+            output = self.root / ("passing-" + policy)
+            result = self.run_command(
+                "warm-start", "--checkpoint", str(parent), "--seed", "59",
+                "--updates", "20", "--optimizer-profile", "low-noise-v1",
+                "--reward-profile", "posture-height-v1",
+                "--selection-policy", policy, "--output", str(output),
+            )
+            self.assertEqual(result.returncode, exit_status, result.stderr)
+            report = json.loads(
+                (output / "standing-20.evaluation.json").read_text()
+            )
+            self.assertTrue(report["passed"])
+            self.assertEqual(
+                report["qualification"],
+                "requires held-out evaluation and independent run evidence",
+            )
+            if policy == "best-passing-budget":
+                summary = json.loads(
+                    (output / "selection-budget.json").read_text()
+                )
+                self.assertEqual(
+                    summary["selected"]["checkpoint"]["update"], 20
+                )
+                self.assertIn("not qualified", summary["qualification"])
+            else:
+                self.assertFalse((output / "selection-budget.json").exists())
+
+    def test_complete_selection_budget_retains_failed_trials(self) -> None:
+        """Complete collection without promoting an exhausted candidate."""
+        output = self.root / "selection-budget"
+        result = self.run_command(
+            "train", "--optimizer-profile", "conservative-v1",
+            "--selection-policy", "best-passing-budget", "--updates", "2",
+            "--output", str(output),
+        )
+        self.assertEqual(result.returncode, 1, result.stderr)
+        self.assertIn("exhausted its update budget", result.stderr)
+        rows = [json.loads(row) for row in
+                (output / "optimization.jsonl").read_text().splitlines()]
+        self.assertEqual([row["update"] for row in rows], [1, 2])
+        selection = json.loads((output / "selection-budget.json").read_text())
+        self.assertEqual(
+            selection["schema"], "droid-standing-selection-budget-v1"
+        )
+        self.assertEqual(selection["budget_updates"], 2)
+        self.assertIsNone(selection["selected"])
+        self.assertEqual(
+            selection["qualification"],
+            "not qualified; requires held-out evaluation",
+        )
+
+    def test_conservative_optimizer_is_recorded_after_real_ppo(self) -> None:
+        """Use smaller actor steps and preserve frozen inference."""
+        for mode in ["train", "warm-start"]:
+            output = self.root / ("conservative-" + mode)
+            arguments = [mode, "--optimizer-profile", "conservative-v1"]
+            if mode == "warm-start":
+                arguments += ["--checkpoint", str(self.checkpoint)]
+            result = self.run_command(
+                *arguments, "--updates", "1", "--output", str(output)
+            )
+            self.assertEqual(result.returncode, 1, result.stderr)
+            self.assertIn("exhausted its update budget", result.stderr)
+            record = json.loads(
+                (output / "training-optimizer.json").read_text()
+            )
+            self.assertEqual(record, {
+                "schema": "droid-standing-conservative-optimizer-v1",
+                "actor_learning_rate": 0.00003,
+                "critic_learning_rate": 0.001,
+                "entropy_coefficient": 0.0,
+                "epochs": 1,
+            })
+            journal = json.loads((output / "optimization.jsonl").read_text())
+            self.assertEqual(journal["actor_learning_rate"], 0.00003)
+            self.assertGreater(journal["optimizer_updates"], 0)
+            self.assertEqual(journal["valid_samples"], 512)
+            checkpoint = output / "standing-1.mpk"
+            evaluated = self.run_command(
+                "evaluate", "--checkpoint", str(checkpoint), "--seed", "42"
+            )
+            self.assertEqual(
+                json.loads(evaluated.stdout)["suite"], "single-episode"
+            )
+        self.assertFalse((self.output / "training-optimizer.json").exists())
+
     def test_posture_profile_is_training_only_and_records_its_contract(
         self,
     ) -> None:

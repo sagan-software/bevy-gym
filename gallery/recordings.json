@@ -7,8 +7,8 @@
       800
     ],
     "source_url": "http://100.105.254.50:8784/world/",
-    "source_recording_id": "79c88a30-75f5-47c8-a67d-87bc5d76c1fe",
-    "source_sha256": "9417878d2f74a8bc9ec765a9369e6cb0f890ad0c437ffacb500263295909c9f1",
+    "source_recording_id": "41cd14c3-ecda-4844-8b4a-ca574c8ab017-04b8fbf0-d07c-48cf-86dd-8cfde0ac49bd-mp4",
+    "source_sha256": "67b21eb9d539be8bccfb108244a55e56765de39c157a046302dbb79e5f270c8a",
     "trim_start_seconds": 1,
     "duration_seconds": 10.0,
     "frames": 240,
@@ -18,11 +18,11 @@
       600
     ],
     "audio": false,
-    "sha256": "89e90b3db137c6b574c8595f4a21cb12b74a01cff069cd27fc8412635e6248df",
-    "poster_sha256": "83ec58b0992788fdb50e40cd71cbe51b62c7ef3dba9b9b4f7598a4810e415c24",
+    "sha256": "bb103dfb5ca7d162b6208ece93fc1491a761814b1b95554f6cf900002146632c",
+    "poster_sha256": "569bd7095acc42c3e7ef8990d790686a5b67c5476768aa11f06fe23f170a01d0",
     "mode": "Frozen-policy inference",
-    "runtime_build": "95d46450f6f6365314c621eb0242f5350df89712b9d071fe93599cff7efbb829",
-    "evidence": "../docs/progress/world-scene/name-and-gallery.json"
+    "runtime_build": "f3e024a03cc64aa249008585d29af4dedba47ed56689f7a6598eafbabf6df2f4",
+    "evidence": "../docs/progress/world-scene/control-correction.json"
   },
   "hover": {
     "captured_utc": "2026-10-10",

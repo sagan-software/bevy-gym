@@ -1,0 +1,95 @@
+{
+  "schema": "robot-world-control-correction-v1",
+  "source_base": "eb95378743a1305bb15560afaf22ae22f72f05dc",
+  "runtime_sources_at_build": {
+    "examples/robots/world_scene/selector.rs": "626d675c08653b008cd4040a0defa5cf7aab7ec13d255ae73e7810aeeade5ada",
+    "examples/robots/world_scene/encoding.rs": "52aa5b40490418bee7500b5b7b7b21409a052dfd89ba825318f55df490f30164",
+    "examples/robots/world_scene/view_tests.rs": "b56043600eb47823e1fe5b1e6edbf821a96224150eaa79ea8c8ebd778038c661",
+    "examples/robots/world_scene/failure.rs": "2b483f4a12700973461d03e973aacb2982bf686626e3a5ef425d1cc8078f0186",
+    "examples/robots/world_scene/session_tests.rs": "fe3d238bcd9d960d43152d42da71b1ee880813079c6454b75c0062bca8b6fc80",
+    "examples/robots/world_scene/viewer.rs": "2f6eaba8cd3e6b0647f3aa243898c71cdac3121a56bd11217729cc733c689226",
+    "examples/robots/world_scene/rig.rs": "ddc7a6c673fe8ec322ca721cc5c8397650480d9e5bfcc60c18073aacb4a06552",
+    "examples/robots/world_scene/controllers.rs": "b1f2f9d85179dec279f2c918bb0e4674b9fd4629109ea7191b81a437aafd221d",
+    "examples/robots/world_scene/controllers_tests.rs": "de9838d32e4c435787ef323d359bda713a662f9f1f07540f154db30b2b750cbc",
+    "examples/robots/world_scene/rig_tests.rs": "e2b2d74e645b746e6de436d47c4656b4687ae58597e6e77f53f9e12c88d5bcde",
+    "examples/robots/world_scene/player.rs": "96f36275c79a6226e9d6b5d4672c16e2a36c1ff65546406664b800243abdb606",
+    "examples/robots/world_scene/view.rs": "61aba510a0ffaa993423b790a1af2f97a9d7c0739d4d55c4d8fd953acebc6aee",
+    "examples/robots/world_scene/mode.rs": "c5ae4489b2e5e5e14b911b73e05a78793581d34a0a07049958949bb8c74ab0e7",
+    "examples/robots/world_scene/camera.rs": "c9557a7b8cc13dcced14d2f0884a0807b6c67c103a4a4676561c4f4b305a443c",
+    "examples/robots/world_scene/session.rs": "eddbbc2acc91b2870bc389f42494a69df61ec5adce89c05e71b0e5bdea2cd88d",
+    "examples/robots/standing/encoding.rs": "c16b70bc912bb1aed6a38e775fa689c182d6cdbb2760989f4cfe153384948338",
+    "examples/robots/standing/checkpoint.rs": "52906347d788941be774011213554baae2568926e4fa9ffee8377dfb264b3fd8",
+    "examples/robots/standing/evaluation.rs": "617b28f01af54d5b369aa4c42c66184500e9a44dcfdb7018a081d167133db7e2",
+    "examples/robots/standing/trace.rs": "5e7a63f7fd35a3bcddf550ffa59ca0f0d2c268dfff0fe72a62b765e9daf9c010",
+    "examples/robots/standing/model.rs": "94440079321007689f379462ca9ad3a46bd8de64f5b04f9c8e156e0a247c9970",
+    "examples/robots/standing/cli.rs": "981daa06fa1f9eb1fe2e106eb61954014e1d34f9dbc8ffb25deacacaed56c668",
+    "examples/robots/standing/training.rs": "3942a35af3562dc495642a4c44564fa5aaa109eae639bbe74418c99229b08ac8",
+    "examples/robots/standing/mod.rs": "660c0798d927b7af287995eb8575737dfd081ef7d246b7ac8c6d5157dd7787f7",
+    "examples/robots/standing/reward.rs": "325115eec184960dc77d9b45da5508c1647b2debea06a77054ea523b4cdf7b39"
+  },
+  "runtime_build": "f3e024a03cc64aa249008585d29af4dedba47ed56689f7a6598eafbabf6df2f4",
+  "wasm_sha256": "abe66b205f964cc1a424616b4e53bb685e2bf78af27dc45c0ae98d2662665e17",
+  "drone": {
+    "checkpoint_sha256": "bb0bef6e7412fd79ea097fa95036d428d22962af3b259c52c82b38c894df9b76",
+    "algorithm": "PPO",
+    "seed": 7,
+    "update": 260,
+    "transitions": 133120,
+    "prior_policy_regression": "First spins at action 250: 1.2406234 rad/s",
+    "regression": "all three drones survive 1000 actions; after action 250 angular speed <= 0.5 rad/s; final lane distance <= 0.5 m",
+    "regression_passed": true
+  },
+  "droid": {
+    "checkpoint_sha256": "9c9e4c5bc8f7734da9835161476997e6d39d2aba28b24439e932a1f9949a2fdb",
+    "qualification": "unqualified; preserved diagnostic policy"
+  },
+  "browser": {
+    "tool": "T3 Code collaborative browser",
+    "desktop_css_px": [
+      1280,
+      800
+    ],
+    "narrow_css_px": [
+      390,
+      844
+    ],
+    "loaded_six_models": true,
+    "controls_exercised": [
+      "Run",
+      "Pause",
+      "Reset",
+      "Step"
+    ],
+    "recording": {
+      "captured_utc": "2026-10-11",
+      "capture_tool": "T3 Code collaborative browser",
+      "viewport_css_px": [
+        1280,
+        800
+      ],
+      "source_url": "http://100.105.254.50:8784/world/",
+      "source_recording_id": "41cd14c3-ecda-4844-8b4a-ca574c8ab017-04b8fbf0-d07c-48cf-86dd-8cfde0ac49bd-mp4",
+      "source_sha256": "67b21eb9d539be8bccfb108244a55e56765de39c157a046302dbb79e5f270c8a",
+      "trim_start_seconds": 1,
+      "duration_seconds": 10.0,
+      "frames": 240,
+      "fps": 24,
+      "size_px": [
+        960,
+        600
+      ],
+      "audio": false,
+      "sha256": "bb103dfb5ca7d162b6208ece93fc1491a761814b1b95554f6cf900002146632c",
+      "poster_sha256": "569bd7095acc42c3e7ef8990d790686a5b67c5476768aa11f06fe23f170a01d0",
+      "mode": "Frozen-policy inference",
+      "runtime_build": "f3e024a03cc64aa249008585d29af4dedba47ed56689f7a6598eafbabf6df2f4",
+      "evidence": "../docs/progress/world-scene/control-correction.json"
+    },
+    "narrow_image": {
+      "file": "control-narrow.png",
+      "sha256": "78d642a7ab8359c646be46caa38d5d7ab6c13f80f708e95a4d14650a1cfa8069",
+      "state": "paused after one policy step"
+    }
+  },
+  "qualification": "drone control correction only; droid standing, walking and competitive combat remain unqualified"
+}

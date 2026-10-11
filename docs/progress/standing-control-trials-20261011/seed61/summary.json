@@ -1,0 +1,42 @@
+{
+  "schema": "droid-standing-control-trial-v1",
+  "qualification": "failed; not promoted",
+  "budget_updates": 101,
+  "updates_collected": 101,
+  "selected": {
+    "checkpoint": {
+      "algorithm": "PPO",
+      "optimizer_steps": 22,
+      "schema": "droid-standing-v1",
+      "seed": 61,
+      "sha256": "1cad9f51f2d47ee57c8417ccb500775feca9d58c9932063154fad98f6f01f6aa",
+      "transitions": 10240,
+      "update": 20
+    },
+    "mean_return": 918.7721278011799
+  },
+  "held_out": {
+    "passed": false,
+    "episodes": 32,
+    "survived": 21,
+    "stable_final_100": 20
+  },
+  "selection_rule": "highest mean fixed selection return among passing checkpoints; earliest update wins ties",
+  "source_base": "eb95378743a1305bb15560afaf22ae22f72f05dc",
+  "source_original_patch_sha256": "c32f10e4c135b2d22606c2450d1b20c198dead1e1bdb7df6c1e4854a0d45445e",
+  "source_portable_patch_sha256": "317d7eb3a22c87a4ae6dddcbc6ea0f034508fa78f4848bff4951f8cf2284001c",
+  "journal_raw_sha256": "42457d3ee98dfac09fce8d6baba32d9ed7bf67632d87b3575611ba90e6db7afc",
+  "files": {
+    "checkpoint.json": "7ab32d18b984bc051daf0981c199f5e26ecc47427c1dd6595d24724320974ad6",
+    "checkpoint.mpk": "1cad9f51f2d47ee57c8417ccb500775feca9d58c9932063154fad98f6f01f6aa",
+    "held-out.json": "30f367c4569af093868e3f9c5d621b2b97774698c3e53770b523d172276d2d3e",
+    "launch.json": "fa694f0b1eccd90a82900b8d3a1dd52fa481f45c606c00f65404a6c0bc3c1e6d",
+    "optimization.jsonl.gz": "be95bfb586b04b53d089af3a0a08a99594ea7b2f3efa88856abbc4c03013a756",
+    "selection-budget.json": "5cd853ceae9a75fd5ac5e5d7b172a49fbe193646dd45db5b5dc6e0fbfaf167b3",
+    "selection-history.jsonl.gz": "6094331f3d56f922efbf6998a1197b46d08e6ac8ff7032a98ae2efc6762a6644",
+    "selection.json": "e5cec1995b5c9500fafe292a038e25d7a4490d70c00c8567d8f64e1d13329f53",
+    "training-optimizer.json": "029d0cb28e90593eb7e6937c9f7519e15a3cca9e4885a0d3212070011c2ade9a",
+    "training-reward.json": "c657a155376dadb500791bc850f69e4b77d668d4877c61752792339f3ffc22c0",
+    "warm-start.json": "05b06145dee10467811c7229ebac261293038c2894a493a2f727bd05ac6ed53b"
+  }
+}

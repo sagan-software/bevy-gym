@@ -10,7 +10,7 @@ use bevy_gym::robots::{DroidBody, RobotId, RobotSlot};
 /// Retained RL policies provide the same snapshot seam used by browser playback.
 fn load() -> Session {
     Session::load(
-        include_bytes!("../../docs/progress/drone-hover.mpk").to_vec(),
+        include_bytes!("../../assets/robots/recovery.mpk").to_vec(),
         include_bytes!("../../docs/progress/standing-seed17-update22940/checkpoint.mpk").to_vec(),
         include_bytes!("../../docs/progress/standing-seed17-update22940/checkpoint.json"),
     )

@@ -38,7 +38,7 @@ impl Identities {
                 let drone = format!("{drone:x}");
                 let droid = format!("{droid:x}");
                 let update = session.droid_record().update();
-                format!("Drones · PPO 280 · {drone:.12}\nDroids · PPO {update} · {droid:.12}")
+                format!("Drones · PPO 260 · {drone:.12}\nDroids · PPO {update} · {droid:.12}")
             },
         ))
     }

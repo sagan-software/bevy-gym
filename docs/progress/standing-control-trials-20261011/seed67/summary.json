@@ -1,0 +1,22 @@
+{
+  "schema": "droid-standing-control-trial-v1",
+  "qualification": "failed; not promoted",
+  "budget_updates": 101,
+  "updates_collected": 101,
+  "selected": null,
+  "held_out": null,
+  "selection_rule": "highest mean fixed selection return among passing checkpoints; earliest update wins ties",
+  "source_base": "eb95378743a1305bb15560afaf22ae22f72f05dc",
+  "source_original_patch_sha256": "c32f10e4c135b2d22606c2450d1b20c198dead1e1bdb7df6c1e4854a0d45445e",
+  "source_portable_patch_sha256": "317d7eb3a22c87a4ae6dddcbc6ea0f034508fa78f4848bff4951f8cf2284001c",
+  "journal_raw_sha256": "dd36908d50010b107540da08005d2d76650425bb3cedf7212e05af1ce29da5f4",
+  "files": {
+    "launch.json": "30994654add1827b16751fe085f3f97d4114e894e7f900bdc7f5f6bb1e67afc8",
+    "optimization.jsonl.gz": "06b45a503d93c4ac40ee30cdee5c24896a25666346e8b8df079b10ca07026a90",
+    "selection-budget.json": "16b80ea1d9d9f4bbc742acb25eadcf097fd0512c107ac47f85198f23ce465fae",
+    "selection-history.jsonl.gz": "9f4f959a7b35dbe6bd824a0e13e97ab67bcd65ea478e40478aff7f234ad22987",
+    "training-optimizer.json": "029d0cb28e90593eb7e6937c9f7519e15a3cca9e4885a0d3212070011c2ade9a",
+    "training-reward.json": "3cf963f69b885dc7b480913afd4725611b640bf259075938398f63298489a564",
+    "warm-start.json": "303fe1963e1a6e260e3f84a9f29aa483f2a4d1b4c6322b1c3fa4d49b1ae4cf1d"
+  }
+}
