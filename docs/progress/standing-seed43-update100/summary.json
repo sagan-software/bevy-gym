@@ -1,0 +1,51 @@
+{
+  "schema": "droid-standing-selection-and-held-out-v1",
+  "selection_rule": "first passing fixed selection report; no held-out results used for selection",
+  "qualification": "failed; not promoted",
+  "checkpoint": {
+    "schema": "droid-standing-v1",
+    "algorithm": "PPO",
+    "seed": 43,
+    "update": 100,
+    "transitions": 51200,
+    "optimizer_steps": 592,
+    "sha256": "657f1cbe1fad9cf0782ceac76a51490cdca93b6d51c54366faa26be7ac264b6d"
+  },
+  "selection": {
+    "passed": true,
+    "episodes": 5,
+    "reports_before_selection": 4
+  },
+  "held_out": {
+    "passed": false,
+    "episodes": 32,
+    "survived": 26,
+    "stable_final_100": 25
+  },
+  "training": {
+    "launch_record": "../droid-standing-posture-height-seed43.json",
+    "budget": 24000,
+    "stopped_at_first_selection_pass": true,
+    "journal_records": 100,
+    "journal_raw_sha256": "f38e7fbaf35f45a06166609a3025c0f2d3a1c97d61ca76c4e5cb6e9f58d24799"
+  },
+  "evaluation": {
+    "command": [
+      "/home/sagan/.cache/bevy-gym-quality-validation/standing-posture-height-smoke-seed37-20261010/droid-standing",
+      "evaluate",
+      "--checkpoint",
+      "runs/droid-standing/posture-height-seed43-20261010/standing-100.mpk"
+    ],
+    "exit": 1
+  },
+  "files": {
+    "checkpoint.json": "3edb535680de2f4efb1a2ab2674b3da2006405224ffa42922025e1383e6a566c",
+    "checkpoint.mpk": "657f1cbe1fad9cf0782ceac76a51490cdca93b6d51c54366faa26be7ac264b6d",
+    "held-out.json": "c702f7dc6662185cbc229f6346e5fa3694d6d987b2d10b710a41a5fd99921752",
+    "optimization.jsonl.gz": "317b3aad7884c3722c87c71cb65127145bc8e85acddcfb32c15abd8bef0a8db1",
+    "selection-history.jsonl.gz": "17e147cb20c6ca1c9e8818e4aa0a3a4bc7d9d57c0c7dab59b2e1895cf98b0ea8",
+    "selection.json": "f6c997059af345897fac14499c8ed9f21d153a56c4fd78c94a154158cc556281",
+    "training-reward.json": "afcf884d53a9865cb18fc482133cc9c0f3d1a7adaeadd60e5aaa59d9a213080a",
+    "warm-start.json": "2e71b31295dd2bfd6535718472bb47315a7625b7e37f12b85a2727c59425502d"
+  }
+}

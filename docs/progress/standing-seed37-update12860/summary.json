@@ -1,0 +1,52 @@
+{
+  "schema": "droid-standing-selection-and-held-out-v1",
+  "selection_rule": "first passing fixed selection report; no held-out results used for selection",
+  "qualification": "failed; not promoted",
+  "checkpoint": {
+    "schema": "droid-standing-v1",
+    "algorithm": "PPO",
+    "seed": 37,
+    "update": 12860,
+    "transitions": 6584320,
+    "optimizer_steps": 91632,
+    "sha256": "1de3f7a8d6f87ad104826294ab93963c167878cc1c7b8d7fa793739d12343884"
+  },
+  "selection": {
+    "passed": true,
+    "episodes": 5,
+    "reports_before_selection": 642
+  },
+  "held_out": {
+    "passed": false,
+    "episodes": 32,
+    "survived": 24,
+    "stable_final_100": 23
+  },
+  "training": {
+    "launch_record": "../droid-standing-posture-height-seed37.json",
+    "budget": 24000,
+    "stopped_at_first_selection_pass": true,
+    "journal_records": 12860,
+    "journal_raw_sha256": "ed0f00448cc47a6555851e3a5b09fc522db072b0c4736e0bfd35492604f3b09b",
+    "binary_sha256": "cf3546fc11a80968e45d5bf4dddb7834771ed9dbc55262c0b43fd08b50e95210"
+  },
+  "evaluation": {
+    "command": [
+      "/home/sagan/.cache/bevy-gym-quality-validation/standing-posture-height-smoke-seed37-20261010/droid-standing",
+      "evaluate",
+      "--checkpoint",
+      "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/runs/droid-standing/posture-height-seed37-20261010/standing-12860.mpk"
+    ],
+    "exit": 1
+  },
+  "files": {
+    "checkpoint.json": "ed9ed919025a7d2573b5f39a39cfd4ae7a5def4af9a534eca943df448678d4d8",
+    "checkpoint.mpk": "1de3f7a8d6f87ad104826294ab93963c167878cc1c7b8d7fa793739d12343884",
+    "held-out.json": "db96a1a64108b6b428130508eafd0dbe60100df8c8ed33a2ef2500c512e829c9",
+    "optimization.jsonl.gz": "d261e850eb0f728a24c7d62f9a5f3f0d639285d8fc1a837796fd69659b241c93",
+    "selection-history.jsonl.gz": "bcde13ec4c9f8fcc8795f1fb1c3e5ead724e43aaee03a035b5674da6424373a9",
+    "selection.json": "dff05ddcfbd1b715d4c9dc647ece26f5a454eaceb63c54247ba746867ec01ec6",
+    "training-reward.json": "2535f85f94537f0bb8e099fa03e2aced39aced9d53d4a128ff9c51ba2bae45fb",
+    "warm-start.json": "b2c8d1eff83aa7b9f970d3012f18a2da3a89cb6dba0d3614abf85ff1fa71a65c"
+  }
+}

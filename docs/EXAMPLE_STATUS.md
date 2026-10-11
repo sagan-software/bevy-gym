@@ -17,9 +17,17 @@ unqualified; held-out cases were not evaluated. Native, WASM, CLI and personal l
 checks pass. Nix lint retains ten baseline findings outside this change.
 
 The [24,000-update height trial](progress/droid-standing-posture-height-seed37.json)
-is running from the recorded seed-23 PPO checkpoint with fresh Adam and seed 37.
-Its first 20 optimizer records reproduce the smoke trial. The qualification gates
-remain unchanged. The seed-31 posture trial completed; its held-out qualification failed.
+stopped at update 12,860 after passing selection. Its first 20 optimizer records
+reproduce the smoke trial. Frozen held-out qualification failed: 24 of 32 episodes
+survived. The [result](progress/standing-seed37-update12860/summary.json) remains
+unqualified. Seed 31 also failed held-out qualification.
+
+The [seed-43 continuation](progress/droid-standing-posture-height-seed43.json)
+passed selection at update 100. Its parent was chosen using selection returns only.
+Frozen held-out qualification failed: 26 of 32 episodes survived and 25 finished
+with at least 100 stable actions. The
+[result](progress/standing-seed43-update100/summary.json) remains unqualified;
+no lesson has been promoted.
 
 A training-only droid posture reward is implemented and validated. Its 20-update
 smoke trial used 10,240 RL transitions and failed selection; it is unqualified.

@@ -642,7 +642,8 @@ were not evaluated.
 
 The [24,000-update trial](progress/droid-standing-posture-height-seed37.json)
 uses the same immutable executable, parent and seed. Its first 20 optimizer records
-match the smoke trial exactly. Completion and independent qualification remain pending.
+match the smoke trial exactly. It stopped at update 12,860 after its first passing
+selection report. Frozen held-out qualification failed; the checkpoint was not promoted.
 
 Validation passes 132 default native tests, 480 robot native tests, 318 WASM tests
 and 15 CLI tests. Strict Clippy and personal Rust/Python lint pass. All 43 changed
@@ -665,3 +666,20 @@ survived 1,000 actions and twenty-seven finished with at least 100 stable action
 Standing remains unqualified; the checkpoint was not promoted into the curriculum.
 The [record](progress/standing-seed31-update21180/summary.json) retains checkpoint
 identity, warm-start lineage, optimizer journal, selection history and every held-out case.
+
+## Seed-37 selection and held-out result
+
+The height trial passed all five selection cases at update 12,860 after 642 failed
+reports. Frozen inference failed the unchanged 32-case held-out gate. Twenty-four
+episodes survived 1,000 actions and twenty-three finished with at least 100 stable
+actions. The [record](progress/standing-seed37-update12860/summary.json) retains
+checkpoint identity, optimizer journal, selection history and every held-out case.
+
+The [seed-43 continuation](progress/droid-standing-posture-height-seed43.json)
+imports this unqualified checkpoint with fresh Adam. Its parent was chosen by mean
+fixed selection return among the first-passing seed-31 and seed-37 candidates.
+Held-out results were excluded from that ranking. It passed selection at update
+100. Frozen held-out qualification failed: 26 of 32 episodes survived and 25
+finished with at least 100 stable actions. The
+[result](progress/standing-seed43-update100/summary.json) retains the checkpoint
+and evaluation. No lesson has been promoted.

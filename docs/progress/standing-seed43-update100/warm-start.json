@@ -1,0 +1,13 @@
+{
+  "schema": "droid-standing-warm-start-v1",
+  "seed": 43,
+  "source": {
+    "schema": "droid-standing-v1",
+    "algorithm": "PPO",
+    "seed": 37,
+    "update": 12860,
+    "transitions": 6584320,
+    "optimizer_steps": 91632,
+    "sha256": "1de3f7a8d6f87ad104826294ab93963c167878cc1c7b8d7fa793739d12343884"
+  }
+}

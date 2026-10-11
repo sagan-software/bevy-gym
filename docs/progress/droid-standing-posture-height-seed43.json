@@ -1,0 +1,26 @@
+{
+  "started_utc": "2026-10-11T02:36:32.477067+00:00",
+  "source_record": "droid-standing-posture-height-seed37.json",
+  "executable_sha256": "cf3546fc11a80968e45d5bf4dddb7834771ed9dbc55262c0b43fd08b50e95210",
+  "command": [
+    "/home/sagan/.cache/bevy-gym-quality-validation/standing-posture-height-smoke-seed37-20261010/droid-standing",
+    "warm-start",
+    "--checkpoint",
+    "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/docs/progress/standing-seed37-update12860/checkpoint.mpk",
+    "--reward-profile",
+    "posture-height-v1",
+    "--seed",
+    "43",
+    "--updates",
+    "24000",
+    "--output",
+    "/home/sagan/Code/github.com/sagan-software/bevy-gym-quality/runs/droid-standing/posture-height-seed43-20261010"
+  ],
+  "unit": "bevy-gym-standing-posture-height-seed43-20261010.service",
+  "parent_sha256": "1de3f7a8d6f87ad104826294ab93963c167878cc1c7b8d7fa793739d12343884",
+  "parent_selection_mean_return": 908.8899261832237,
+  "parent_selection_rule": "highest mean fixed selection return among the first-passing seed-31 and seed-37 candidates; held-out results are excluded from ranking",
+  "optimizer_state": "fresh Adam; actor and critic weights imported from the selected PPO parent",
+  "qualification": "exploratory standing continuation; parent is unqualified; no lesson promotion",
+  "budget_updates": 24000
+}
