@@ -1,0 +1,15 @@
+{
+  "selection_roots": [
+    0,
+    1,
+    2,
+    42,
+    18446744073709551615
+  ],
+  "selection_every_updates": 20,
+  "final_selection_update": 1001,
+  "select": "highest original selection mean among candidates passing all original standing and limb-control gates; earliest update breaks ties",
+  "held_out": "32 fixed original roots only after selection; never used for ranking",
+  "early_motion": "inspect the full first two seconds before accepting a standing example",
+  "budget_exhaustion": "never promotes"
+}

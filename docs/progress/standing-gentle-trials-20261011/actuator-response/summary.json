@@ -1,0 +1,139 @@
+{
+  "schema": "standing-isolated-first-action-responses-v1",
+  "fixture_count": 260,
+  "qualification": false,
+  "torque_fraction_magnitude": 0.01,
+  "responses": [
+    {
+      "index": 0,
+      "actuator": "SpineX",
+      "peak_speed_per_fraction_rad_s": 18.55621188879013
+    },
+    {
+      "index": 1,
+      "actuator": "SpineY",
+      "peak_speed_per_fraction_rad_s": 13.57097327709198
+    },
+    {
+      "index": 2,
+      "actuator": "SpineZ",
+      "peak_speed_per_fraction_rad_s": 5.955095961689949
+    },
+    {
+      "index": 3,
+      "actuator": "NeckX",
+      "peak_speed_per_fraction_rad_s": 3.375105559825897
+    },
+    {
+      "index": 4,
+      "actuator": "NeckY",
+      "peak_speed_per_fraction_rad_s": 7.9329706728458405
+    },
+    {
+      "index": 5,
+      "actuator": "NeckZ",
+      "peak_speed_per_fraction_rad_s": 3.081587515771389
+    },
+    {
+      "index": 6,
+      "actuator": "LeftShoulderX",
+      "peak_speed_per_fraction_rad_s": 178.39215993881226
+    },
+    {
+      "index": 7,
+      "actuator": "LeftShoulderY",
+      "peak_speed_per_fraction_rad_s": 12.296979874372482
+    },
+    {
+      "index": 8,
+      "actuator": "LeftShoulderZ",
+      "peak_speed_per_fraction_rad_s": 2.2012069821357727
+    },
+    {
+      "index": 9,
+      "actuator": "LeftElbowY",
+      "peak_speed_per_fraction_rad_s": 19.07772272825241
+    },
+    {
+      "index": 10,
+      "actuator": "RightShoulderX",
+      "peak_speed_per_fraction_rad_s": 178.39213609695435
+    },
+    {
+      "index": 11,
+      "actuator": "RightShoulderY",
+      "peak_speed_per_fraction_rad_s": 12.297330051660538
+    },
+    {
+      "index": 12,
+      "actuator": "RightShoulderZ",
+      "peak_speed_per_fraction_rad_s": 2.204911969602108
+    },
+    {
+      "index": 13,
+      "actuator": "RightElbowY",
+      "peak_speed_per_fraction_rad_s": 19.078801572322845
+    },
+    {
+      "index": 14,
+      "actuator": "LeftHipX",
+      "peak_speed_per_fraction_rad_s": 30.04392981529236
+    },
+    {
+      "index": 15,
+      "actuator": "LeftHipY",
+      "peak_speed_per_fraction_rad_s": 125.01790523529053
+    },
+    {
+      "index": 16,
+      "actuator": "LeftHipZ",
+      "peak_speed_per_fraction_rad_s": 20.98216712474823
+    },
+    {
+      "index": 17,
+      "actuator": "LeftKneeX",
+      "peak_speed_per_fraction_rad_s": 19.063052535057068
+    },
+    {
+      "index": 18,
+      "actuator": "LeftAnkleX",
+      "peak_speed_per_fraction_rad_s": 134.5632553100586
+    },
+    {
+      "index": 19,
+      "actuator": "LeftAnkleZ",
+      "peak_speed_per_fraction_rad_s": 613.4293556213379
+    },
+    {
+      "index": 20,
+      "actuator": "RightHipX",
+      "peak_speed_per_fraction_rad_s": 30.043715238571167
+    },
+    {
+      "index": 21,
+      "actuator": "RightHipY",
+      "peak_speed_per_fraction_rad_s": 125.0180721282959
+    },
+    {
+      "index": 22,
+      "actuator": "RightHipZ",
+      "peak_speed_per_fraction_rad_s": 20.98129093647003
+    },
+    {
+      "index": 23,
+      "actuator": "RightKneeX",
+      "peak_speed_per_fraction_rad_s": 19.0618097782135
+    },
+    {
+      "index": 24,
+      "actuator": "RightAnkleX",
+      "peak_speed_per_fraction_rad_s": 134.57785844802856
+    },
+    {
+      "index": 25,
+      "actuator": "RightAnkleZ",
+      "peak_speed_per_fraction_rad_s": 613.4284496307373
+    }
+  ],
+  "boundary": "One 20 ms action under five original reset roots and both torque signs. These responses do not establish later dynamics or simultaneous-channel response."
+}

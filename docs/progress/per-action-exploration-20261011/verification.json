@@ -1,0 +1,62 @@
+{
+  "schema": "per-action-exploration-verification-v1",
+  "behavior": "Validate width, all finite values, then inclusive configured bounds before any mutation. Success resets actor Adam and exploration scales only. Critic Adam, mean, memory, counters and minibatch state remain unchanged.",
+  "red": "Missing public method produced a compiler failure.",
+  "passed": [
+    "cargo fmt --all -- --check",
+    "cargo clippy --all-targets --all-features -- -D warnings",
+    "cargo test",
+    "cargo test --features robots",
+    "cargo test --no-default-features --features robots --test droid_skill_session",
+    "nix run .#drone-browser-check",
+    "Personal Rust lints with all targets and features; no changed-line diagnostics",
+    "cargo test --doc --features robots: 22 passed, 1 ignored; standing CLI help passed"
+  ],
+  "coverage": {
+    "hit": 43,
+    "total": 43,
+    "zero_regions": [],
+    "branches": [
+      {
+        "range": [
+          1496,
+          12,
+          1496,
+          36
+        ],
+        "hits": [
+          3,
+          19
+        ]
+      },
+      {
+        "range": [
+          1504,
+          16,
+          1504,
+          34
+        ],
+        "hits": [
+          11,
+          35
+        ]
+      },
+      {
+        "range": [
+          1511,
+          12,
+          1513,
+          95
+        ],
+        "hits": [
+          6,
+          2
+        ]
+      }
+    ],
+    "zero_branch_sides": [],
+    "source_sha256": "3aa67cec5eb737ba14865cfb9ff6d2045c45d1d3928d839d708d742cb506b5a3"
+  },
+  "tests": "Three public regressions cover exact custom inclusive bounds, seeded per-channel noise, unchanged mean/memory/critic, real PPO learning and full record reload, every invalid value position, validation order, no mutation on errors, retained actor history on rejection and retained critic Adam on success. Private regression checks scale parameter identity, gradient tracking, counters and minibatch state.",
+  "limitations": "No physical standing, walking or combat qualification follows from this initialization API."
+}

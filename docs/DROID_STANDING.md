@@ -857,7 +857,6 @@ retains identity through `Param::map`; its bytes match the installed dependency.
 This optimizer correction requires new physical evaluation. It does not qualify
 an existing standing, walking or competitive policy.
 
-
 ## Full episode and early motion failures
 
 The [fresh seed-151 run](progress/standing-gentle-trials-20261011/fresh-exploratory-head-seed151/summary.json)
@@ -871,7 +870,9 @@ completed 10,001 updates. Only update 8,720 passed all five original standing an
 post-settling limb-control selection cases. The predeclared selection rule selected
 that candidate without held-out ranking. Frozen evaluation reproduced selection,
 but only 28 of 32 held-out episodes survived. Its first-action arm speed was about
-157 rad/s. The candidate remains rejected. All selection records, selected bytes,
+157 rad/s. The candidate remains rejected.
+
+All selection records, selected bytes,
 frozen evaluator source and full selection motion traces are retained.
 
 The [passive comparison](progress/standing-gentle-trials-20261011/motion-diagnosis/summary.json)
@@ -887,3 +888,24 @@ bounds, integration and qualification gates remain unchanged. All 501 updates fa
 selection. Short episodes split a 512-transition rollout into many recurrent sequences;
 eight-sequence minibatches and four epochs produced up to 256 optimizer steps per
 update. These research records do not qualify standing, walking or combat.
+
+## Per-channel exploration initialization
+
+The learner can reset exploration with one log standard deviation per torque
+channel. It validates width, all finite values and inclusive configured bounds
+before changing parameters or optimizer state. Success retains learned means,
+recurrent and critic parameters, critic Adam, counters and minibatch state. Actor
+Adam starts fresh. Collect a new rollout after resetting exploration.
+
+The [verification record](progress/per-action-exploration-20261011/verification.json)
+retains the missing-API regression, public and private tests, native and browser
+gates, personal lints, and fresh per-object coverage. All 43 recorded method regions
+and both outcomes of its three recorded branches were hit. This API initializes
+trainable exploration parameters; it supplies no mean action and qualifies no policy.
+
+The full-batch [seed-211 pilot](progress/standing-gentle-trials-20261011/safe-full-batch-seed211/summary.json)
+completed 1,001 updates with one optimizer step per 512 transitions. Its
+[seed-223 continuation](progress/standing-gentle-trials-20261011/safe-full-batch-continuation-seed223/summary.json)
+completed 10,001 updates. A [larger-step seed-223 trial](progress/standing-gentle-trials-20261011/safe-full-batch-larger-step-seed223/summary.json)
+changed only the actor learning rate from 0.00003 to 0.0003 and completed
+1,001 updates. Every selection checkpoint failed. None reached held-out evaluation.

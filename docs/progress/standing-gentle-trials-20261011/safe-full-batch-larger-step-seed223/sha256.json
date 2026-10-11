@@ -1,0 +1,16 @@
+{
+  "Cargo.lock": "e413ff7dfa5eac0a9128d4df5142bab64cf2120de5a7ae0f34488412f4cce31d",
+  "Cargo.toml": "1fb43cf490aa88853037ebd13d08566cf23d9f9c342dfcb20cc6f5a137b400a2",
+  "build.log.gz": "c711fe69d6a13b2a033c8dcf011f7239c67cdb732e6b071959cd82de71d8010c",
+  "candidate-rule.json": "3398e73853ce39813d80fdc192e01635727b5ad5ac3f12706ac124ae29e26e74",
+  "clippy.log.gz": "f09adb9c3b1f1ad88a06a0575ad9f7daae6a8c05a1afa1f5eacea7f1cb6e831f",
+  "dependency-source-sha256.json": "3ca356e259dd5e12e786cc021cbab6e477262661015f65e914258914d3c1a4fa",
+  "launch.json": "f6c3d2d9c4b23f1cc0611f38a005a1868d15cabb03ac19cca8b38db9550166b5",
+  "run.log.gz": "8eda36c7681f8a9bcd4c7c76a4f3e1817c61e2c0046d58dfafa430d5df25fa1a",
+  "run.tar.gz": "287bd7099dc1df3cdc1e54c2891af6e7c82754871ddc1da62f03a0b66bfa2bd3",
+  "src/main.rs": "9cf991411791ef5c405601eb23e58e39e486ac9aded48f7c73a74743673feaad",
+  "src/safety.rs": "813e9ee033540c98945bbf8a38be9ef0310736a632db69c8fc1f643c8121860c",
+  "summary.json": "1490744d783fa4a48778d1b4f8885c6edbc85a1c9a2ddbd46ce0772511cef286",
+  "tests.log.gz": "5d0740420ce4be3db56e69f7eada81abf67b4c6ea6e79fedf107c1c01ed41e72",
+  "workspace.patch.gz": "34e88dcfbfd536b12753d771925f7362ea45e03ba978b0dbdd2dcfa2d2dde68a"
+}

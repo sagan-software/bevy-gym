@@ -1,0 +1,11 @@
+{
+  "schema": "standing-calibrated-exploration-rule-v1",
+  "target_first_action_speed_rad_s": 1.0,
+  "standard_deviation_floor": 0.00012340980408667956,
+  "standard_deviation_cap": 0.2,
+  "formula": "log_std_j = f32(ln(min(0.2, max(exp(-9), (1 rad/s) / response_j))))",
+  "response_units": "rad/s per dimensionless torque fraction; observed maximum speed divided by 0.01 fraction, without baseline subtraction",
+  "response_profile": "five fixed selection reset roots, both isolated 0.01 torque signs, one original 20 ms action",
+  "limitation": "Not a derivative or a guarantee for later or simultaneous-channel dynamics. These are initial Gaussian parameters, not mean actions. All parameters remain trainable.",
+  "qualification": false
+}

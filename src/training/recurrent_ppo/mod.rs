@@ -1463,6 +1463,75 @@ impl RecurrentPpoAgent {
             .init();
     }
 
+    /// Reset exploration to one log standard deviation per action channel.
+    ///
+    /// Values must be finite and within the inclusive configured log standard
+    /// deviation bounds. Validation checks width, then all finite values, then
+    /// bounds before changing parameters or optimizer state.
+    ///
+    /// Success retains learned means, recurrent and critic parameters, scale
+    /// parameter identity, critic Adam, counters and minibatch state. Actor Adam
+    /// starts fresh and the replacement scale tensor tracks gradients. Call before
+    /// collecting a new rollout because previous behavior probabilities differ.
+    /// This changes exploration parameters and never supplies a mean action.
+    ///
+    /// ```
+    /// use bevy_gym::training::{RecurrentPpoAgent, RecurrentPpoConfig, SeedConfig};
+    /// let mut learner = RecurrentPpoAgent::new(
+    ///     2, 2, 1, &[-1.0; 3], &[1.0; 3],
+    ///     RecurrentPpoConfig::default(), SeedConfig::from_root(1),
+    /// )?;
+    /// learner.reset_exploration_with_log_std(&[-5.0, -2.0, 1.0])?;
+    /// # Ok::<(), Box<dyn std::error::Error>>(())
+    /// ```
+    ///
+    /// # Errors
+    /// Returns width, nonfinite-value or configuration errors for invalid scales.
+    pub fn reset_exploration_with_log_std(
+        &mut self,
+        values: &[f32],
+    ) -> Result<(), RecurrentPpoError> {
+        // Reject malformed vectors before allocating a tensor or resetting either optimizer.
+        let expected = self.action_low.len();
+        if values.len() != expected {
+            return Err(RecurrentPpoError::DimensionMismatch {
+                field: "initial_action_log_std",
+                expected,
+                actual: values.len(),
+            });
+        }
+        for (dimension, value) in values.iter().enumerate() {
+            if !value.is_finite() {
+                return Err(RecurrentPpoError::NonFiniteValue {
+                    field: "initial_action_log_std",
+                    dimension,
+                });
+            }
+        }
+        if values
+            .iter()
+            .any(|value| !(self.config.log_std_min..=self.config.log_std_max).contains(value))
+        {
+            return Err(RecurrentPpoError::invalid_config(
+                "initial_action_log_std",
+                "values must be within configured log_std bounds",
+            ));
+        }
+        // A cold initialization copies exactly one action-width vector into its owned tensor.
+        self.actor.log_std = self.actor.log_std.clone().map(|_previous| {
+            Tensor::from_data(
+                burn::tensor::TensorData::new(values.to_vec(), [expected]),
+                &self.device,
+            )
+            .require_grad()
+        });
+        // Actor moments belong to the previous distribution; the critic and counters stay intact.
+        self.actor_optimizer = AdamConfig::new()
+            .with_epsilon(self.config.optimizer_epsilon)
+            .init();
+        Ok(())
+    }
+
     /// Multiply current action-mean head weights and biases by 0.01.
     ///
     /// Call once on a fresh learner before collecting a small-mean initialization
@@ -3329,5 +3398,38 @@ mod tests {
                 .to_bits(),
             value.to_bits()
         );
+    }
+
+    /// Scale initialization preserves record identity, gradient leaves, counters and shuffle state.
+    #[test]
+    fn per_action_scale_reset_retains_private_training_invariants() {
+        let mut agent = RecurrentPpoAgent::new(
+            2,
+            2,
+            1,
+            &[-1.0; 3],
+            &[1.0; 3],
+            RecurrentPpoConfig {
+                actor_hidden_size: 4,
+                critic_hidden_sizes: vec![4],
+                ..Default::default()
+            },
+            SeedConfig::from_root(239),
+        )
+        .expect("small learner");
+        agent.optimizer_steps = 17;
+        let stream = agent.minibatch_rng;
+        let identity = agent.actor.log_std.id;
+        agent
+            .reset_exploration_with_log_std(&[-5.0, -2.0, 1.0])
+            .expect("valid scales");
+        assert_eq!(agent.actor.log_std.id, identity);
+        assert!(agent.actor.log_std.val().is_require_grad());
+        assert_eq!(
+            tensor_vec(agent.actor.log_std.val()).expect("stored scales"),
+            vec![-5.0, -2.0, 1.0]
+        );
+        assert_eq!(agent.optimizer_steps, 17);
+        assert_eq!(agent.minibatch_rng, stream);
     }
 }

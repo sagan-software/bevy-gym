@@ -1,0 +1,61 @@
+{
+  "objects": [
+    {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/coverage-target/debug/deps/recurrent_ppo_bytes-d4ba12d8cbc0477a",
+      "sha256": "44a530f8caecd7910ae0555ba11201664786c92900e17c4a8c91d5559926f415"
+    },
+    {
+      "path": "/home/sagan/.cache/bevy-gym-quality-validation/coverage-target/debug/deps/bevy_gym-d37cb3f4e2aa094c",
+      "sha256": "a5da00c34883574de741313734d44a8fdab4b1cc1cc517f54c9df012733cb90c"
+    }
+  ],
+  "exports": [
+    "/home/sagan/.cache/bevy-gym-quality-validation/per-action-exploration-fresh-coverage-v2/0.json",
+    "/home/sagan/.cache/bevy-gym-quality-validation/per-action-exploration-fresh-coverage-v2/1.json"
+  ],
+  "mod.rs": {
+    "hit": 43,
+    "total": 43,
+    "zero_regions": [],
+    "branches": [
+      {
+        "range": [
+          1496,
+          12,
+          1496,
+          36
+        ],
+        "hits": [
+          3,
+          19
+        ]
+      },
+      {
+        "range": [
+          1504,
+          16,
+          1504,
+          34
+        ],
+        "hits": [
+          11,
+          35
+        ]
+      },
+      {
+        "range": [
+          1511,
+          12,
+          1513,
+          95
+        ],
+        "hits": [
+          6,
+          2
+        ]
+      }
+    ],
+    "zero_branch_sides": [],
+    "source_sha256": "3aa67cec5eb737ba14865cfb9ff6d2045c45d1d3928d839d708d742cb506b5a3"
+  }
+}

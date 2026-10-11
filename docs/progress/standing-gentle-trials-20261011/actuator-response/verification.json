@@ -1,0 +1,7 @@
+{
+  "fixtures": 260,
+  "rerun": "Final named-format source reproduced the original response bytes exactly.",
+  "qualification": false,
+  "use": "Initial trainable Gaussian exploration scales only; no mean actions or physics changes.",
+  "limitations": "Measured isolated first-action response without baseline subtraction. No guarantee for later or simultaneous channel dynamics."
+}

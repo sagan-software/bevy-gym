@@ -766,3 +766,224 @@ fn bounded_exploration_recovers_after_variance_preferences_reverse() {
         );
     }
 }
+
+/// Build the shared three-action architecture for exploration regressions.
+fn three_action_agent(seed: u64, config: RecurrentPpoConfig) -> RecurrentPpoAgent {
+    RecurrentPpoAgent::new(
+        2,
+        2,
+        1,
+        &[-1.0; 3],
+        &[1.0; 3],
+        config,
+        SeedConfig::from_root(seed),
+    )
+    .expect("three-action learner")
+}
+
+/// Compare trained bytes and the complete seeded decision after reloading.
+fn assert_three_action_reload(
+    policy: &RecurrentPpoPolicy,
+    observation: &[f32],
+    config: &RecurrentPpoConfig,
+) {
+    let bytes = policy.to_bytes().expect("trained record");
+    let restored =
+        RecurrentPpoPolicy::load_bytes(bytes.clone(), 2, 2, 1, &[-1.0; 3], &[1.0; 3], config)
+            .expect("exact reload");
+    assert_eq!(restored.to_bytes().expect("unchanged record"), bytes);
+    let memory = policy.initial_memory();
+    assert_eq!(
+        restored
+            .sample_action(observation, &memory, &mut RecurrentSampler::new(7))
+            .expect("restored sample"),
+        policy
+            .sample_action(observation, &memory, &mut RecurrentSampler::new(7))
+            .expect("trained sample")
+    );
+}
+
+/// Preserve the complete f32 critic representation in comparisons.
+fn critic_value_bits(policy: &RecurrentPpoPolicy, observation: &[f32]) -> u32 {
+    policy
+        .value(observation, 0)
+        .expect("critic value")
+        .to_bits()
+}
+
+/// Check dimensionless Gaussian noise ratios under the same seeded draws.
+fn assert_noise_ratios(before: &[f32], after: &[f32], mean: &[f32], log_std_differences: [f64; 3]) {
+    assert_eq!(before.len(), 3);
+    assert_eq!(after.len(), 3);
+    assert_eq!(mean.len(), 3);
+    for (index, (((before, after), mean), difference)) in before
+        .iter()
+        .zip(after)
+        .zip(mean)
+        .zip(log_std_differences)
+        .enumerate()
+    {
+        let ratio = f64::from(*after - *mean) / f64::from(*before - *mean);
+        assert!(
+            (ratio - difference.exp()).abs() < 1e-5,
+            "channel {index}: {ratio}"
+        );
+    }
+}
+
+/// Per-channel exploration changes noise without changing learned mean, memory or value.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn per_action_exploration_preserves_mean_and_learns_after_reset() {
+    let config = RecurrentPpoConfig {
+        log_std_min: -9.0,
+        log_std_max: 0.0,
+        ..config()
+    };
+    let mut agent = three_action_agent(227, config.clone());
+    let before = agent.policy();
+    let observation = [0.2, -0.1];
+    let memory = before.initial_memory();
+    let mean = before.mean_action(&observation, &memory).expect("mean");
+    let value = before.value(&observation, 0).expect("value");
+    let old = before
+        .sample_action(&observation, &memory, &mut RecurrentSampler::new(7))
+        .expect("old sample");
+    agent
+        .reset_exploration_with_log_std(&[-9.0, -2.0, 0.0])
+        .expect("inclusive boundaries and interior");
+    let policy = agent.policy();
+    let after = policy
+        .mean_action(&observation, &memory)
+        .expect("same mean");
+    assert_eq!(after.action, mean.action);
+    assert_eq!(after.next_memory, mean.next_memory);
+    assert_eq!(
+        policy.value(&observation, 0).expect("same value").to_bits(),
+        value.to_bits()
+    );
+    let sample = policy
+        .sample_action(&observation, &memory, &mut RecurrentSampler::new(7))
+        .expect("new sample");
+    assert_noise_ratios(
+        &old.pre_tanh_action,
+        &sample.pre_tanh_action,
+        &mean.pre_tanh_action,
+        [-8.0, -1.0, 1.0],
+    );
+    let sequences = [sampled_sequence(&policy, &observation)];
+    let metrics = agent.update(&sequences).expect("actual PPO after reset");
+    assert_eq!(metrics.optimizer_updates, 1);
+    assert_eq!(metrics.valid_samples, 2);
+    let trained = agent.policy();
+    let trained_mean = trained
+        .mean_action(&observation, &memory)
+        .expect("trained mean");
+    assert!(trained_mean
+        .action
+        .iter()
+        .zip(&after.action)
+        .any(|(a, b)| a.to_bits() != b.to_bits()));
+    assert_three_action_reload(&trained, &observation, &config);
+}
+
+/// Width, finiteness and bounds reject before parameters or optimizer state can change.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn per_action_exploration_rejects_invalid_values_before_mutation() {
+    use bevy_gym::training::RecurrentPpoError;
+    let mut agent = three_action_agent(229, config());
+    let before = agent.policy().to_bytes().expect("record");
+    for values in [vec![], vec![f32::NAN; 2], vec![0.0; 4]] {
+        assert_eq!(
+            agent.reset_exploration_with_log_std(&values),
+            Err(RecurrentPpoError::DimensionMismatch {
+                field: "initial_action_log_std",
+                expected: 3,
+                actual: values.len()
+            })
+        );
+    }
+    for dimension in 0..3 {
+        for invalid in [f32::NAN, f32::INFINITY, f32::NEG_INFINITY] {
+            let mut values = [0.0; 3];
+            values[dimension] = invalid;
+            assert_eq!(
+                agent.reset_exploration_with_log_std(&values),
+                Err(RecurrentPpoError::NonFiniteValue {
+                    field: "initial_action_log_std",
+                    dimension
+                })
+            );
+        }
+        for invalid in [-5.000_001, 1.000_001] {
+            let mut values = [0.0; 3];
+            values[dimension] = invalid;
+            assert!(matches!(
+                agent.reset_exploration_with_log_std(&values),
+                Err(RecurrentPpoError::InvalidConfig {
+                    field: "initial_action_log_std",
+                    ..
+                })
+            ));
+        }
+    }
+    assert_eq!(
+        agent.reset_exploration_with_log_std(&[-6.0, f32::NAN, 0.0]),
+        Err(RecurrentPpoError::NonFiniteValue {
+            field: "initial_action_log_std",
+            dimension: 1
+        })
+    );
+    assert_eq!(agent.policy().to_bytes().expect("unchanged record"), before);
+}
+
+/// Invalid scales retain trained Adam moments; a valid reset retains critic Adam and counters.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn per_action_exploration_preserves_optimizer_history_at_its_boundaries() {
+    let make = || {
+        three_action_agent(
+            233,
+            RecurrentPpoConfig {
+                entropy_coefficient: 0.0,
+                ..config()
+            },
+        )
+    };
+    let mut reference = make();
+    let mut candidate = make();
+    let observation = [0.2, -0.1];
+    let first = [sampled_sequence(&reference.policy(), &observation)];
+    reference.update(&first).expect("reference first update");
+    candidate.update(&first).expect("candidate first update");
+    candidate
+        .reset_exploration_with_log_std(&[0.0, f32::NAN, 0.0])
+        .expect_err("invalid reset");
+    let second = [sampled_sequence(&reference.policy(), &observation)];
+    let a = reference.update(&second).expect("reference second update");
+    let b = candidate.update(&second).expect("candidate second update");
+    assert_eq!(a.optimizer_steps, b.optimizer_steps);
+    let policy = reference.policy();
+    let expected = policy
+        .mean_action(&observation, &policy.initial_memory())
+        .expect("reference decision");
+    let policy = candidate.policy();
+    assert_eq!(
+        policy
+            .mean_action(&observation, &policy.initial_memory())
+            .expect("retained actor moments"),
+        expected
+    );
+    candidate
+        .reset_exploration_with_log_std(&[-2.0; 3])
+        .expect("valid reset");
+    let third = [sampled_sequence(&reference.policy(), &observation)];
+    let a = reference.update(&third).expect("reference third update");
+    let b = candidate.update(&third).expect("candidate third update");
+    assert_eq!(a.optimizer_steps, b.optimizer_steps);
+    assert_eq!(
+        critic_value_bits(&candidate.policy(), &observation),
+        critic_value_bits(&reference.policy(), &observation)
+    );
+}
