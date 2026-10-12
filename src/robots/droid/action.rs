@@ -8,12 +8,13 @@ use std::{error::Error, fmt};
 /// Order is [`DroidActuator::ALL`]. Zero requests no actuator torque.
 /// Positive values torque the child along the parent's positive axis and the
 /// parent oppositely. Passive joint constraints and contacts remain active.
+/// The default requests zero torque on every actuator.
 ///
 /// ```compile_fail
 /// use bevy_gym::robots::DroidAction;
 /// let unchecked = DroidAction([f32::NAN; 26]);
 /// ```
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Default, Clone, Copy, PartialEq)]
 pub struct DroidAction([f32; 26]);
 
 impl DroidAction {

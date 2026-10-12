@@ -1,16 +1,21 @@
 //! Shared six-agent physics and validated actuator-frame boundary.
 
 mod actions;
+mod battle;
+mod battle_snapshot;
 mod error;
 mod frame;
 mod identity;
 mod muzzle;
+mod projectile;
 mod simulation;
 mod slot;
 mod snapshot;
 mod team;
 
 pub use actions::RobotActions;
+pub use battle::RobotBattle;
+pub use battle_snapshot::RobotBattleSnapshot;
 pub use error::{RobotWorldError, RobotWorldFailure};
 pub use frame::RobotFrame;
 pub use identity::RobotId;

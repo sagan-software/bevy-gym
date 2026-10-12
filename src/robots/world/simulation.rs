@@ -85,6 +85,32 @@ impl fmt::Debug for RobotWorld {
     }
 }
 impl RobotWorld {
+    /// Place an isolated collision fixture; this mutation is absent from production builds.
+    #[cfg(test)]
+    pub(super) fn place_drone_fixture(&mut self, slot: RobotSlot, position: Vec3) {
+        let body = self
+            .drones
+            .get(slot.index())
+            .expect("closed fixture slot")
+            .body;
+        self.world
+            .bodies
+            .get_mut(body)
+            .expect("fixture drone body")
+            .set_translation(Vector::from_array(position.to_array()), true);
+        // Direct ray queries read collider poses before the next solver propagation.
+        let collider = self
+            .drones
+            .get(slot.index())
+            .expect("closed fixture slot")
+            .collider;
+        self.world
+            .colliders
+            .get_mut(collider)
+            .expect("fixture drone collider")
+            .set_translation(Vector::from_array(position.to_array()));
+    }
+
     /// Trace current physical muzzle geometry, excluding all of its owner's colliders.
     /// Invalid queries leave the world unchanged. Physical validity precedes frame validation.
     ///
@@ -234,6 +260,18 @@ impl RobotWorld {
     /// Panics only if private model arrays disagree with the closed robot slots.
     /// Construction preserves their matching lengths.
     pub fn advance(&mut self, actions: RobotActions) -> Result<RobotSnapshot, RobotWorldError> {
+        self.advance_with_health(
+            actions,
+            &[crate::robots::RobotHealth::from(super::RobotTeam::Drones); 3],
+            &[crate::robots::RobotHealth::from(super::RobotTeam::Droids); 3],
+        )
+    }
+
+    /// Validate a complete source boundary before combat can consume timing or ammunition.
+    pub(super) fn check_actions(
+        &mut self,
+        actions: &RobotActions,
+    ) -> Result<RobotFrame, RobotWorldError> {
         if let State::Stopped(cause) = self.state {
             return Err(RobotWorldError::Stopped(cause));
         }
@@ -248,6 +286,18 @@ impl RobotWorld {
             Err(cause) => return Err(self.stop(cause)),
         };
         self.validate()?;
+        Ok(next)
+    }
+
+    /// Apply current damage constraints without choosing or replacing living policy actions.
+    pub(super) fn advance_with_health(
+        &mut self,
+        actions: RobotActions,
+        drones: &[crate::robots::RobotHealth; 3],
+        droids: &[crate::robots::RobotHealth; 3],
+    ) -> Result<RobotSnapshot, RobotWorldError> {
+        let next = self.check_actions(&actions)?;
+        let no_torque = crate::robots::DroidAction::default();
         for _ in 0..4 {
             // All six requests precede one common 5 ms integration and collision step.
             for slot in RobotSlot::ALL {
@@ -255,11 +305,21 @@ impl RobotWorld {
                 self.drones.get(index).expect("closed robot slot").apply(
                     &mut self.world,
                     *actions.drones.get(index).expect("complete robot actions"),
-                    [DroneMotorState::Working; 4],
+                    crate::robots::DroneMotor::ALL.map(|motor| {
+                        drones
+                            .get(index)
+                            .expect("complete drone health")
+                            .motor_state(motor)
+                            .expect("drone health belongs to a drone")
+                    }),
                 );
                 self.droids.get(index).expect("closed robot slot").apply(
                     &mut self.world,
-                    *actions.droids.get(index).expect("complete robot actions"),
+                    if droids.get(index).expect("complete droid health").is_alive() {
+                        *actions.droids.get(index).expect("complete robot actions")
+                    } else {
+                        no_torque
+                    },
                 );
             }
             self.world.step();

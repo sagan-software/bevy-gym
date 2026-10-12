@@ -654,3 +654,8 @@ required-features = ["robots"]
 name = "robot-muzzle"
 path = "examples/robots/muzzle.rs"
 required-features = ["robots"]
+
+[[example]]
+name = "robot-battle"
+path = "examples/robots/battle.rs"
+required-features = ["robots"]
