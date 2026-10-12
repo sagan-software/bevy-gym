@@ -6,7 +6,7 @@ use bevy_gym::robots::{
 use sha2::{digest::Output, Digest, Sha256};
 use std::{error::Error, time::Duration};
 
-use crate::{learning, standing::checkpoint};
+use crate::standing::checkpoint;
 use controllers::{Batch, Controllers};
 use encoding::{element, Anchors};
 use failure::Failure;
@@ -17,6 +17,8 @@ mod controllers;
 mod encoding;
 /// Typed failures with the original causes.
 mod failure;
+/// Frozen arrival network architecture shared by all three flight controllers.
+mod flight;
 
 /// Shared-world diagnostic; retained controllers do not establish competition qualification.
 pub(crate) struct Session {
@@ -30,7 +32,7 @@ pub(crate) struct Session {
     inference: Inference,
     /// Requests from the last successfully integrated frame, for read-only inspection.
     last_action: Option<Applied>,
-    /// Identity of the exact recorded hover bytes accepted by construction.
+    /// Identity of the exact recorded arrival bytes accepted by construction.
     drone_digest: Output<Sha256>,
     /// Validated standing checkpoint identity and claimed PPO counters.
     droid_record: checkpoint::Record,
@@ -39,7 +41,7 @@ pub(crate) struct Session {
 /// Advancement requires both team policies and all six separately owned memories.
 enum Inference {
     /// Frozen policies may stage bounded actuator requests.
-    Ready(Controllers),
+    Ready(Box<Controllers>),
     /// The original failure remains visible; policies are dropped and cannot act.
     Failed(Failure),
 }
@@ -52,8 +54,8 @@ struct Applied {
     droids: [DroidAction; 3],
 }
 
-/// Retained RL recovery reference; a different file cannot borrow this provenance.
-const DRONE_REFERENCE: &[u8] = include_bytes!("../../../assets/robots/recovery.mpk");
+/// Qualified RL arrival reference; a different file cannot borrow this provenance.
+const DRONE_REFERENCE: &[u8] = include_bytes!("../../../docs/progress/drone-arrival.mpk");
 /// Diagnostic clip limit; completion derives from physical elapsed time.
 const HORIZON: Duration = Duration::from_secs(20);
 
@@ -67,12 +69,12 @@ impl Session {
         // Both byte identities and model architectures precede any physical construction.
         if drone_bytes.as_slice() != DRONE_REFERENCE {
             return Err(
-                "shared-world drone weights must match the recorded PPO recovery reference".into(),
+                "shared-world drone weights must match the recorded PPO arrival reference".into(),
             );
         }
         let drone_digest = Sha256::digest(&drone_bytes);
         let (droid_policy, droid_record) = checkpoint::from_bytes(droid_bytes, metadata)?;
-        let drone_policy = learning::load_policy(drone_bytes)?;
+        let drone_policy = flight::load_policy(drone_bytes)?;
         let controllers = Controllers::new(drone_policy, droid_policy);
         let world = RobotWorld::default();
         let snapshot = world.snapshot()?;
@@ -81,7 +83,7 @@ impl Session {
             world,
             snapshot,
             anchors,
-            inference: Inference::Ready(controllers),
+            inference: Inference::Ready(Box::new(controllers)),
             last_action: None,
             drone_digest,
             droid_record,
@@ -169,7 +171,7 @@ impl Session {
         }
     }
 
-    /// Borrow the actual hover identity; this does not qualify the shared task.
+    /// Borrow the actual arrival identity; this does not qualify fighting.
     pub(crate) const fn drone_digest(&self) -> &Output<Sha256> {
         &self.drone_digest
     }

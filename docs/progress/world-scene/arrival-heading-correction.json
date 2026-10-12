@@ -1,0 +1,135 @@
+{
+  "status": "Drone heading corrected; standing and competitive fighting remain unqualified",
+  "date": "2026-10-12",
+  "drone_checkpoint_sha256": "3e6964d0f1475081b2572387f2193e070fd396800023639074ca073e69b54c88",
+  "drone_observations": 15,
+  "drone_ppo_updates": 1260,
+  "droid_ppo_updates": 22940,
+  "regression": {
+    "before": "First heading drift at action 901",
+    "after": "All three drones pass 1000 shared-world frames; final 100 frames satisfy distance <= 0.3 m, speed <= 0.3 m/s, up >= 0.95 and heading error <= 15 degrees. Angular speed <= 0.5 rad/s after action 250."
+  },
+  "validation": {
+    "native_public_cases": 56,
+    "native_viewer_cases": 63,
+    "browser_viewer_cases": 44,
+    "native_wasm_parity_frames": 128,
+    "format": "passed",
+    "strict_clippy": "passed",
+    "personal_lints": "passed",
+    "release_build": "passed"
+  },
+  "coverage": {
+    "scope": "All non-test functions in flight.rs, encoding.rs, session.rs and view.rs. Two current executable identities, fresh profiles only.",
+    "executable_sha256": {
+      "/home/sagan/.cache/bevy-gym-quality-validation/coverage-build/llvm-cov-target/debug/deps/droid_skill_session-4e14768964021903": "6b06fe3bfd88269f4e057ae9973d285d834aa44e0e26af57f39ff6cfa174ba20",
+      "/home/sagan/.cache/bevy-gym-quality-validation/coverage-build/llvm-cov-target/debug/examples/droid_standing_scene-054c2d40a60400e4": "1dc994e6ad994d90e04e1e7f66c912f4ed463c14822981ccfb8fc8c8eb5dd832"
+    },
+    "regions_hit": 823,
+    "regions_total": 828,
+    "conditions_both": 30,
+    "conditions_total": 30,
+    "unhit_regions": [
+      [
+        "examples/robots/world_scene/session.rs",
+        77,
+        60,
+        77,
+        61
+      ],
+      [
+        "examples/robots/world_scene/session.rs",
+        80,
+        40,
+        80,
+        41
+      ],
+      [
+        "examples/robots/world_scene/session.rs",
+        170,
+        17,
+        170,
+        22
+      ],
+      [
+        "examples/robots/world_scene/session.rs",
+        170,
+        27,
+        170,
+        84
+      ],
+      [
+        "examples/robots/world_scene/view.rs",
+        580,
+        29,
+        580,
+        36
+      ]
+    ],
+    "unhit_conditions": []
+  },
+  "coverage_boundary": "The five unhit regions are existing defensive error propagation and failure display. Browser window creation is not exercised by native coverage; the rendered release browser exercises checkpoint loading. Complete native coverage is not claimed.",
+  "recording": {
+    "captured_utc": "2026-10-12",
+    "capture_tool": "T3 Code collaborative browser",
+    "viewport_css_px": [
+      1280,
+      800
+    ],
+    "source_url": "http://100.105.254.50:8105/world/",
+    "source_recording_id": "41cd14c3-ecda-4844-8b4a-ca574c8ab017-c5159729-aa6b-48b3-b513-2cc22a1f2756-mp4",
+    "source_sha256": "876a413523697aad9263a449a76bc321dacebd6a3dabb6d366e17ac132219c9b",
+    "trim_start_seconds": 1,
+    "duration_seconds": 10.0,
+    "frames": 240,
+    "fps": 24,
+    "size_px": [
+      960,
+      600
+    ],
+    "audio": false,
+    "sha256": "a8cb1b2723fab642ca698fc8c83dffc4aab5bb0febfd249484f7a20b0a803672",
+    "poster_sha256": "00bc24d7bb9e28e3a1901563a6ddd784c913ccf8c654d06666f3d707d8c3826f",
+    "mode": "Frozen-policy inference",
+    "runtime_build": "7722db01d65f822eb53b8eb61982e34acf7f8e744d678195fad02990c13dc4d1",
+    "evidence": "../docs/progress/world-scene/arrival-heading-correction.json"
+  },
+  "browser_checks": {
+    "desktop_css_px": [
+      1280,
+      800
+    ],
+    "mobile_css_px": [
+      390,
+      844
+    ],
+    "all_six_models_rendered": true,
+    "physical_mobile_device": "not verified",
+    "preview_panel_visible": false
+  },
+  "source_sha256": {
+    "examples/robots/world_scene/camera.rs": "c9557a7b8cc13dcced14d2f0884a0807b6c67c103a4a4676561c4f4b305a443c",
+    "examples/robots/world_scene/controllers.rs": "d62341fc794d69429362fc508f53c644f99df5cc0c95ad9b93c26a071ac2caa3",
+    "examples/robots/world_scene/controllers_tests.rs": "c744b0b343e2805ca6c9f987525b21c0d48ffdbc4722b65910296ca91a537607",
+    "examples/robots/world_scene/encoding.rs": "fc31a3e64318a4fb54f1808e52ae1d1ede5170cc13f1220a5d974d6259778886",
+    "examples/robots/world_scene/failure.rs": "2b483f4a12700973461d03e973aacb2982bf686626e3a5ef425d1cc8078f0186",
+    "examples/robots/world_scene/flight.rs": "ee31a4b0921a11236c6d10cc009e5e445a5cdbf92d24fb6e21eff5b291cfc408",
+    "examples/robots/world_scene/mode.rs": "c5ae4489b2e5e5e14b911b73e05a78793581d34a0a07049958949bb8c74ab0e7",
+    "examples/robots/world_scene/player.rs": "96f36275c79a6226e9d6b5d4672c16e2a36c1ff65546406664b800243abdb606",
+    "examples/robots/world_scene/rig.rs": "ddc7a6c673fe8ec322ca721cc5c8397650480d9e5bfcc60c18073aacb4a06552",
+    "examples/robots/world_scene/rig_tests.rs": "bad4795c94e350fded517a60029aef5d5b88aedf19a1fb707e9f66160862c9ce",
+    "examples/robots/world_scene/selector.rs": "626d675c08653b008cd4040a0defa5cf7aab7ec13d255ae73e7810aeeade5ada",
+    "examples/robots/world_scene/session.rs": "d67d8279109275f38a46eb546788ea53021692c34030e18d0e78b00ae4bd3691",
+    "examples/robots/world_scene/session_tests.rs": "7123c7a5712983e4d751efbcea3fa91961be788c6dba99ea4c01c1e58d888313",
+    "examples/robots/world_scene/view.rs": "119aa731e285aba6776318ba86d92bd82cfccae863ba57f6147c3d6ae96af967",
+    "examples/robots/world_scene/view_tests.rs": "bfae5d468c5afac49ce3fac32d59fef4b604a6de77064553617ecc7bc76ab3d7",
+    "examples/robots/world_scene/viewer.rs": "f3357e003ee741f0b91e608791e4f1b0cc947d4b80771a95f700650d6cdd9244"
+  },
+  "qualification": {
+    "standing": false,
+    "walking": false,
+    "competitive_fighting": false,
+    "combat_sensors_in_viewer": false,
+    "weapons_in_viewer": false
+  }
+}

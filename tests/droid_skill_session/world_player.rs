@@ -9,7 +9,7 @@ use std::time::Duration;
 /// Load the recorded policies without a renderer or mutable actuator interface.
 fn load() -> Session {
     Session::load(
-        include_bytes!("../../assets/robots/recovery.mpk").to_vec(),
+        include_bytes!("../../docs/progress/drone-arrival.mpk").to_vec(),
         include_bytes!("../../docs/progress/standing-seed17-update22940/checkpoint.mpk").to_vec(),
         include_bytes!("../../docs/progress/standing-seed17-update22940/checkpoint.json"),
     )

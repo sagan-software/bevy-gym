@@ -11,7 +11,7 @@ use player::Player;
 
 /// Load both recorded policy identities and render the common twenty-second diagnostic.
 pub(super) fn run() {
-    let drone = include_bytes!("../../../assets/robots/recovery.mpk");
+    let drone = include_bytes!("../../../docs/progress/drone-arrival.mpk");
     let droid = include_bytes!("../../../docs/progress/standing-seed17-update22940/checkpoint.mpk");
     let metadata =
         include_bytes!("../../../docs/progress/standing-seed17-update22940/checkpoint.json");

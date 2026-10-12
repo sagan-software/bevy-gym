@@ -9,7 +9,8 @@ use bevy_gym::{
 /// Load the retained RL policies without constructing a session or committing memory.
 fn controllers() -> Controllers {
     Controllers::new(
-        learning::load_policy(super::super::DRONE_REFERENCE.to_vec()).expect("hover RL"),
+        super::super::flight::load_policy(super::super::DRONE_REFERENCE.to_vec())
+            .expect("arrival RL"),
         standing::model::load_policy(
             include_bytes!("../../../docs/progress/standing-seed17-update22940/checkpoint.mpk")
                 .to_vec(),
@@ -130,20 +131,7 @@ fn malformed_actor_actions_preserve_decoder_causes() {
         (false, 25, -1.0, 1.0),
         (false, 26, 2.0, 3.0),
     ] {
-        let mut controllers = controllers();
-        let inputs = if drone {
-            12
-        } else {
-            standing::encoding::FEATURES
-        };
-        let policy = fixture(inputs, outputs, low, high);
-        if drone {
-            controllers.drone_memory = RobotSlot::ALL.map(|_| policy.initial_memory());
-            *controllers.drone_policy = policy;
-        } else {
-            controllers.droid_memory = RobotSlot::ALL.map(|_| policy.initial_memory());
-            *controllers.droid_policy = policy;
-        }
+        let controllers = malformed_controllers(drone, outputs, low, high);
         let failure = controllers
             .infer(&snapshot, &anchors)
             .err()
@@ -176,4 +164,23 @@ fn malformed_actor_actions_preserve_decoder_causes() {
                 .is_some());
         }
     }
+}
+
+/// Replace exactly one team actor with an isolated malformed-output fixture.
+fn malformed_controllers(drone: bool, outputs: usize, low: f32, high: f32) -> Controllers {
+    let mut controllers = controllers();
+    let inputs = if drone {
+        15
+    } else {
+        standing::encoding::FEATURES
+    };
+    let policy = fixture(inputs, outputs, low, high);
+    if drone {
+        controllers.drone_memory = RobotSlot::ALL.map(|_| policy.initial_memory());
+        *controllers.drone_policy = policy;
+    } else {
+        controllers.droid_memory = RobotSlot::ALL.map(|_| policy.initial_memory());
+        *controllers.droid_policy = policy;
+    }
+    controllers
 }

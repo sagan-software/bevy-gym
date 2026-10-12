@@ -24,9 +24,16 @@ impl Anchors {
         Self { drones, droids }
     }
 
-    /// Encode only this drone's body and passive hover target with the original scales.
-    pub(super) fn drone(&self, snapshot: &RobotSnapshot, slot: RobotSlot) -> [f32; 12] {
-        learning::encoding::encode_target(snapshot.drone(slot), *element(&self.drones, slot))
+    /// Preserve flight scales and append the fixed world-minus-Z task heading in body XYZ.
+    pub(super) fn drone(&self, snapshot: &RobotSnapshot, slot: RobotSlot) -> [f32; 15] {
+        let body = snapshot.drone(slot);
+        let flight = learning::encoding::encode_target(body, *element(&self.drones, slot));
+        let heading = body.orientation().inverse() * -Vec3::Z;
+        let mut features = [0.0; 15];
+        let (flight_features, heading_features) = features.split_at_mut(12);
+        flight_features.copy_from_slice(&flight);
+        heading_features.copy_from_slice(&heading.to_array());
+        features
     }
 
     /// Retain all original standing features while expressing the task origin in this lane.
@@ -61,6 +68,24 @@ pub(super) const fn element<T>(values: &[T; 3], slot: RobotSlot) -> &T {
 mod tests {
     use super::*;
     use bevy_gym::robots::{DroidAction, DroneAction, RobotActions, RobotWorld};
+
+    /// The appended heading preserves the original twelve scaled flight features.
+    #[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+    #[cfg_attr(not(target_arch = "wasm32"), test)]
+    fn arrival_heading_preserves_the_flight_profile() {
+        let snapshot = RobotWorld::default().snapshot().expect("shared reset");
+        let anchors = Anchors::new(&snapshot);
+        for slot in RobotSlot::ALL {
+            let features = anchors.drone(&snapshot, slot);
+            let (flight, heading) = features.split_at(12);
+            let body = snapshot.drone(slot);
+            assert_eq!(
+                flight,
+                learning::encoding::encode_target(body, body.position())
+            );
+            assert_eq!(heading, [0.0, 0.0, -1.0]);
+        }
+    }
 
     /// Moving other robots changes hidden state without changing either focal actor input.
     #[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]

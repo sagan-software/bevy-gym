@@ -1,14 +1,14 @@
 //! Identical-input native/WASM action parity for all six retained recurrent actors.
 
 use super::{DROID, DRONE, RECORD};
-use crate::{learning, standing};
+use crate::standing;
 use bevy_gym::robots::RobotSlot;
 use serde::{Deserialize, Serialize};
 
 /// Native inputs and corresponding requests at one common physical boundary.
 #[derive(Deserialize, Serialize)]
 struct Frame {
-    /// Twelve own-body hover inputs per drone, in closed slot order.
+    /// Fifteen own-body arrival inputs per drone, in closed slot order.
     drone_inputs: [Vec<f32>; 3],
     /// Two hundred and four own-body standing inputs per droid.
     droid_inputs: [Vec<f32>; 3],
@@ -21,7 +21,7 @@ struct Frame {
 /// Read the complete native fixture without relying on platform-specific physical drift.
 fn reference() -> Vec<Frame> {
     let frames: Vec<Frame> = serde_json::from_str(include_str!(
-        "../../docs/progress/robot-world-native-actions.json"
+        "../../docs/progress/robot-world-arrival-native-actions.json"
     ))
     .expect("recorded finite native trace");
     assert_eq!(frames.len(), 128, "2.56 s native recurrent sequence");
@@ -32,7 +32,7 @@ fn reference() -> Vec<Frame> {
 #[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
 #[cfg_attr(not(target_arch = "wasm32"), test)]
 fn all_six_actors_match_native_actions_on_identical_inputs() {
-    let drone = learning::load_policy(DRONE.to_vec()).expect("same hover bytes");
+    let drone = super::arrival_policy();
     let (droid, _) =
         standing::checkpoint::from_bytes(DROID.to_vec(), RECORD).expect("same standing bytes");
     let mut drone_memory = RobotSlot::ALL.map(|_| drone.initial_memory());

@@ -12,7 +12,7 @@ use bevy_gym::{
 
 /// Weights are shared within each team; every robot owns distinct recurrent state.
 pub(super) struct Controllers {
-    /// Immutable hover actor and critic weights; inference uses only the actor.
+    /// Immutable arrival actor and critic weights; inference uses only the actor.
     drone_policy: Box<RecurrentPpoPolicy>,
     /// Immutable standing actor and critic weights; inference uses only the actor.
     droid_policy: Box<RecurrentPpoPolicy>,

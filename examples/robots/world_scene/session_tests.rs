@@ -38,7 +38,7 @@ fn inference_failure_revokes_all_six_controllers() {
             .to_vec(),
     )
     .expect("standing candidate");
-    session.inference = Inference::Ready(Controllers::new(wrong, droid));
+    session.inference = Inference::Ready(Box::new(Controllers::new(wrong, droid)));
     let before = session.snapshot().clone();
     session.step();
     assert_eq!(session.snapshot().frame(), before.frame());

@@ -133,16 +133,17 @@ while requests and next memories are staged. Successful common advancement commi
 all six next memories together. Inference or actuator validation failure stops
 every controller before physics; a world failure retains the last published frame.
 
-Each drone uses the retained seed-7 hover update 280. Each droid uses seed-17
-standing update 22,940. The [hover transfer evidence](progress/drone-checkpoint-transfer.json)
-establishes standalone hover qualification. The
+Each drone uses the qualified arrival PPO actor with 1,260 total updates. Each droid uses seed-17
+standing update 22,940. The [arrival evidence](progress/drone-arrival.json)
+establishes standalone arrival qualification. The
 [standing evidence](progress/standing-seed17-update22940/summary.json) records failed
 standing qualification. Neither checkpoint qualifies a shared competitive task.
 
-Loading requires the exact recorded hover bytes and a digest-bound standing record.
+Loading requires the exact recorded arrival bytes and a digest-bound standing record.
 Missing, changed or incompatible weights cannot activate playback or a fallback.
 
-Drone actors receive twelve own-body hover features. Droid actors receive the
+Drone actors receive fifteen arrival features: twelve own-body target features
+and the fixed world heading expressed in the drone body frame. Droid actors receive the
 original 204 standing features, with target displacement relative to their lane.
 Targets are passive reset setup: drone centres at `(-3, 2, lane)` m and droid
 standing targets at `(3, 0.99, lane)` m. Other robots' state, reward and critic
@@ -156,7 +157,7 @@ with six direct recurrent-policy replays and verify hidden-state isolation.
 Native/WASM parity replays 128 recorded frames with identical inputs and separate
 memories, using a fixed action-fraction tolerance of 0.00001.
 
-The [inference evidence](progress/robot-world-inference.json) records hashes,
+The historical [inference evidence](progress/robot-world-inference.json) records hashes,
 validation and coverage. Every recorded production branch outcome is covered.
 Three defensive production
 paths remain unhit: loading the known-valid embedded hover reference, rejecting
@@ -201,7 +202,7 @@ The [narrow recording](progress/world-scene/mobile.mp4) includes all six follow 
 and free camera checks. The [control recording](progress/world-scene/mobile-controls.mp4)
 records pointer controls and completion at increased playback rates.
 
-The release [desktop capture](progress/world-scene/release-desktop.png) and
+The historical release [desktop capture](progress/world-scene/release-desktop.png) and
 [narrow capture](progress/world-scene/release-mobile.png) show the final runtime.
 The release [narrow recording](progress/world-scene/release-mobile.mp4) reaches
 the complete clip at sixteen frames per tick and decodes without errors.
@@ -225,3 +226,17 @@ The [name and gallery record](progress/world-scene/name-and-gallery.json) record
 the current title, ten-second preview, legacy-route replacement and fresh native
 coverage. The public `/robots/pursuit/` route serves this same six-policy scene.
 Competitive combat and droid walking remain unfinished.
+
+## Arrival heading correction
+
+The current [heading record](progress/world-scene/arrival-heading-correction.json)
+records the arrival checkpoint, current validation and coverage gaps.
+The shared-world regression checks all three drones for 20 seconds.
+Its final two seconds enforce position, speed, upright posture and heading limits.
+Native and WASM replay the same 128 recorded action frames.
+
+The [current poster](../gallery/images/world.png) and
+[ten-second loop](../gallery/videos/world.mp4) show the current release runtime.
+Desktop and 390-pixel browser views rendered all six models.
+The droids still fail standing qualification. Walking and competitive fighting
+remain unfinished. The viewer does not yet run combat sensors or weapons.

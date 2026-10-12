@@ -8,8 +8,8 @@ use bevy_gym::robots::{
 use sha2::Digest;
 use std::time::Duration;
 
-/// Qualified standalone recovery weights; shared-world qualification remains separate.
-const DRONE: &[u8] = include_bytes!("../../assets/robots/recovery.mpk");
+/// Qualified standalone arrival weights; shared-world qualification remains separate.
+const DRONE: &[u8] = include_bytes!("../../docs/progress/drone-arrival.mpk");
 /// Highest original standing selection candidate; held-out standing failed.
 const DROID: &[u8] =
     include_bytes!("../../docs/progress/standing-seed17-update22940/checkpoint.mpk");
@@ -48,7 +48,7 @@ fn six_frozen_controllers_advance_one_common_frame() {
 fn complete_clip_matches_six_direct_recurrent_policies_and_resets() {
     let mut scene = standing::world_session::Session::load(DRONE.to_vec(), DROID.to_vec(), RECORD)
         .expect("retained RL checkpoints");
-    let drone = learning::load_policy(DRONE.to_vec()).expect("hover actor");
+    let drone = arrival_policy();
     let (droid, _) =
         standing::checkpoint::from_bytes(DROID.to_vec(), RECORD).expect("standing actor");
     let mut drone_memory = RobotSlot::ALL.map(|_| drone.initial_memory());
@@ -137,10 +137,17 @@ const fn lane(slot: RobotSlot) -> f32 {
     }
 }
 
-/// Independently project the original hover task into this lane's passive target.
-fn drone_input(snapshot: &RobotSnapshot, slot: RobotSlot) -> [f32; 12] {
+/// Independently project the recorded arrival profile into the fixed arena task.
+fn drone_input(snapshot: &RobotSnapshot, slot: RobotSlot) -> [f32; 15] {
     let target = Vec3::new(-3.0, 2.0, lane(slot));
-    learning::encoding::encode_target(snapshot.drone(slot), target)
+    let body = snapshot.drone(slot);
+    let original = learning::encoding::encode_target(body, target);
+    let heading = body.orientation().inverse() * -Vec3::Z;
+    let mut features = [0.0; 15];
+    let (flight, desired_heading) = features.split_at_mut(12);
+    flight.copy_from_slice(&original);
+    desired_heading.copy_from_slice(&heading.to_array());
+    features
 }
 
 /// Preserve original standing inputs with the specified translated task origin.
@@ -162,10 +169,10 @@ fn checkpoint_identity_and_architecture_precede_playback() {
     for bytes in [Vec::new(), vec![0, 1, 2], DROID.to_vec()] {
         let error = standing::world_session::Session::load(bytes, DROID.to_vec(), RECORD)
             .err()
-            .expect("hover identity mismatch");
+            .expect("arrival identity mismatch");
         assert_eq!(
             error.to_string(),
-            "shared-world drone weights must match the recorded PPO recovery reference"
+            "shared-world drone weights must match the recorded PPO arrival reference"
         );
     }
     for metadata in [b"".as_slice(), b"{}", b"null"] {
@@ -221,6 +228,16 @@ fn arena_drones_hold_twenty_seconds_without_sustained_spinning() {
                 height > 1.0,
                 "{slot:?} crashed at action {step}: height {height} m"
             );
+            if step > 900 {
+                assert!(drone.position().distance(Vec3::new(-3.0, 2.0, lane(slot))) <= 0.3);
+                assert!(drone.linear_velocity().length() <= 0.3);
+                assert!((drone.orientation() * Vec3::Y).y >= 0.95);
+                let forward = drone.orientation() * -Vec3::Z;
+                assert!(
+                    forward.dot(-Vec3::Z) >= 15.0_f32.to_radians().cos(),
+                    "{slot:?} heading drift at action {step}"
+                );
+            }
             if step >= 250 {
                 let angular_speed = drone.angular_velocity().length();
                 assert!(
@@ -238,4 +255,18 @@ fn arena_drones_hold_twenty_seconds_without_sustained_spinning() {
             "{slot:?} misses its hover lane by {distance} m"
         );
     }
+}
+
+/// Load the recorded arrival architecture independently of the scene controller.
+fn arrival_policy() -> bevy_gym::training::RecurrentPpoPolicy {
+    bevy_gym::training::RecurrentPpoPolicy::load_bytes(
+        DRONE.to_vec(),
+        15,
+        15,
+        1,
+        &[0.0; 4],
+        &[1.0; 4],
+        &learning::learning_config(),
+    )
+    .expect("arrival actor")
 }

@@ -23,7 +23,13 @@ native and WASM held-out gates and fresh coverage gaps. The older travel
 progression, droid standing and competitive combat remain unfinished.
 
 Robot recordings came from local release builds. The world recording includes
-the current Drones versus droids name. Classic Control recordings came from the public browser routes.
+the current arrival actor and Drones versus droids name.
+The [heading record](../docs/progress/world-scene/arrival-heading-correction.json)
+records the 20-second shared-world heading regression and native/WASM parity.
+The current world poster and ten-second loop show this runtime.
+The droids still fail standing qualification; the viewer has no combat sensors or weapons.
+
+Classic Control recordings came from the public browser routes.
 CartPole, both MountainCar tasks and Acrobot use bundled RL policies. Pendulum
 shows PPO training from seed 42 because its bundled checkpoint is unavailable.
 
