@@ -1,0 +1,37 @@
+{
+  "feature": "frame-bound physical muzzle geometry",
+  "policy_qualification": false,
+  "public_tests": 4,
+  "private_tests": 2,
+  "coverage": {
+    "production_regions": 65,
+    "hit_regions": 65,
+    "conditional_branches": 1,
+    "both_outcomes": 1
+  },
+  "native_gate_log": "/home/sagan/.cache/bevy-gym-quality-validation/robot-muzzle-native-v3.log",
+  "personal_gate_log": "/home/sagan/.cache/bevy-gym-quality-validation/robot-muzzle-personal-v2.log",
+  "wasm_gate_log": "/home/sagan/.cache/bevy-gym-quality-validation/robot-muzzle-wasm.log",
+  "coverage_report": "/home/sagan/.cache/bevy-gym-quality-validation/robot-muzzle-coverage-v2.json",
+  "nix_findings": {
+    "current": 10,
+    "baseline": 10,
+    "same_rules_locations_and_descriptions": true
+  },
+  "source_sha256": {
+    "src/robots/world/muzzle.rs": "20771163801ee3043ccc643ac7d33df7bbd9b490883a10f594eb28baaf9a5f0c",
+    "src/robots/world/simulation.rs": "5aec34ab1749f60f872bf904a5f710da31cfadaeb5285c32760a9128dabf19d3",
+    "tests/robot_muzzle.rs": "cd49238bd7cda131f9d2d2b333ec702625fe02331f20970a26548dc7ecfed7ec"
+  },
+  "unfinished": [
+    "projectile travel",
+    "ammunition integration",
+    "recoil",
+    "damage integration",
+    "actuator shutdown",
+    "standing qualification",
+    "walking qualification",
+    "competitive policies"
+  ],
+  "visual_verification": "No UI change; no new screenshot or recording."
+}

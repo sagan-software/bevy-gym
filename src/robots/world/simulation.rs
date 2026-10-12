@@ -85,6 +85,23 @@ impl fmt::Debug for RobotWorld {
     }
 }
 impl RobotWorld {
+    /// Trace current physical muzzle geometry, excluding all of its owner's colliders.
+    /// Invalid queries leave the world unchanged. Physical validity precedes frame validation.
+    ///
+    /// # Errors
+    /// Returns the original world error or rejects a stale, reset, or foreign muzzle frame.
+    pub fn cast_muzzle(
+        &self,
+        muzzle: &super::RobotMuzzle,
+    ) -> Result<Option<super::RobotRayHit>, RobotWorldError> {
+        // Validate the current world before comparing opaque source boundaries.
+        let snapshot = self.snapshot()?;
+        if snapshot.frame() != muzzle.frame() {
+            return Err(RobotWorldError::Rejected(RobotWorldFailure::WrongFrame));
+        }
+        self.cast_ray(&muzzle.ray, Some(muzzle.owner()))
+    }
+
     /// Read the nearest actual solid without advancing the world or choosing an action.
     /// The excluded identity removes all of that robot's colliders, including every droid segment.
     /// Equal distances use environment, drone slot, then droid slot/body order.
