@@ -16,6 +16,6 @@ Run the configuration example:
 nix develop --command cargo run --no-default-features --features robots --example robot-health
 ```
 
-The example prints initial hit limits without supplying autonomous actions. The [shared combat mechanics](ROBOT_BATTLE.md) now connect body collisions, motor force suppression and droid torque shutdown. Rotor impacts, fatal-contact rules and competitive rollout integration remain unfinished. These mechanics tests do not establish working fighting or qualify a policy.
+The example prints initial hit limits without supplying autonomous actions. The [shared combat mechanics](ROBOT_BATTLE.md) now connect body collisions, motor force suppression and droid torque shutdown. Fatal contacts now shut down actuators at each solver substep. Rotor impacts and competitive rollout integration remain unfinished. These mechanics tests do not establish working fighting or qualify a policy.
 
 Seven public tests pass on native and WASM. Two private tests cover physical rotor storage order and default rotor integrity. Native format, strict Clippy, full tests and personal Rust lint pass. Coverage hits all 154 production regions; this module has no instrumented conditional branches. Nix lint retains ten findings matching the preserved baseline. The [validation record](progress/robot-health-validation.json) identifies the source and commands.

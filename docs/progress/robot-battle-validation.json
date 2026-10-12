@@ -1,138 +1,49 @@
 {
-  "feature": "shared policy-request combat mechanics",
+  "feature": "shared combat mechanics with fatal substep contacts",
   "qualified_competition": false,
-  "public_tests_native_and_wasm": 6,
-  "native_log": "/home/sagan/.cache/bevy-gym-quality-validation/robot-battle-native-v5.log",
-  "personal_log": "/home/sagan/.cache/bevy-gym-quality-validation/robot-battle-personal-v4.log",
-  "wasm_log": "/home/sagan/.cache/bevy-gym-quality-validation/robot-battle-wasm.log",
+  "public_tests_native_and_wasm": 8,
+  "native_log": "/home/sagan/.cache/bevy-gym-quality-validation/robot-battle-contact-native.log",
+  "personal_log": "/home/sagan/.cache/bevy-gym-quality-validation/robot-battle-contact-personal.log",
+  "wasm_log": "/home/sagan/.cache/bevy-gym-quality-validation/robot-battle-contact-wasm.log",
   "coverage": {
-    "report": "/home/sagan/.cache/bevy-gym-quality-validation/robot-battle-coverage-v2.json",
-    "regions": 390,
-    "hit_regions": 373,
-    "conditional_branches": 12,
-    "both_outcomes": 12,
+    "report": "/home/sagan/.cache/bevy-gym-quality-validation/fatal-contact-current-profiles-20261012/coverage.json",
+    "scope": "Actuation methods and closures, DroidObservation::fatal_contact and closure, RobotWorld::{fatal_contact,advance_frame,advance_with_health}; current unit and integration executables only",
+    "regions": 162,
+    "hit_regions": 158,
+    "conditional_branches": 6,
+    "both_outcomes": 6,
     "unhit_regions": [
       {
-        "path": "src/robots/world/battle.rs",
-        "start_line": 141,
-        "start_column": 90,
-        "end_line": 141,
-        "end_column": 91
-      },
-      {
-        "path": "src/robots/world/battle.rs",
-        "start_line": 142,
-        "start_column": 25,
-        "end_line": 142,
-        "end_column": 87
-      },
-      {
-        "path": "src/robots/world/battle.rs",
-        "start_line": 143,
-        "start_column": 21,
-        "end_line": 143,
-        "end_column": 22
-      },
-      {
-        "path": "src/robots/world/battle.rs",
-        "start_line": 154,
-        "start_column": 90,
-        "end_line": 154,
-        "end_column": 91
-      },
-      {
-        "path": "src/robots/world/battle.rs",
-        "start_line": 155,
-        "start_column": 25,
-        "end_line": 155,
-        "end_column": 87
-      },
-      {
-        "path": "src/robots/world/battle.rs",
-        "start_line": 156,
-        "start_column": 21,
-        "end_line": 156,
-        "end_column": 22
-      },
-      {
-        "path": "src/robots/world/projectile.rs",
-        "start_line": 46,
-        "start_column": 66,
-        "end_line": 46,
-        "end_column": 67
-      },
-      {
-        "path": "src/robots/world/battle.rs",
-        "start_line": 143,
-        "start_column": 23,
-        "end_line": 143,
-        "end_column": 24
-      },
-      {
-        "path": "src/robots/world/battle.rs",
-        "start_line": 156,
-        "start_column": 23,
-        "end_line": 156,
-        "end_column": 24
-      },
-      {
-        "path": "src/robots/world/battle.rs",
-        "start_line": 157,
-        "start_column": 67,
-        "end_line": 157,
-        "end_column": 68
-      },
-      {
-        "path": "src/robots/world/battle.rs",
-        "start_line": 171,
-        "start_column": 54,
-        "end_line": 171,
-        "end_column": 55
-      },
-      {
-        "path": "src/robots/world/battle.rs",
-        "start_line": 173,
-        "start_column": 59,
-        "end_line": 173,
-        "end_column": 61
-      },
-      {
-        "path": "src/robots/world/battle.rs",
-        "start_line": 84,
-        "start_column": 45,
-        "end_line": 84,
-        "end_column": 46
-      },
-      {
-        "path": "src/robots/world/battle.rs",
-        "start_line": 86,
-        "start_column": 62,
-        "end_line": 86,
-        "end_column": 63
-      },
-      {
-        "path": "src/robots/world/battle.rs",
-        "start_line": 88,
-        "start_column": 70,
-        "end_line": 88,
-        "end_column": 71
-      },
-      {
-        "path": "src/robots/world/battle.rs",
-        "start_line": 89,
-        "start_column": 30,
-        "end_line": 89,
-        "end_column": 31
+        "path": "src/robots/world/actuation.rs",
+        "start_line": 66,
+        "start_column": 71,
+        "end_line": 66,
+        "end_column": 72
       },
       {
         "path": "src/robots/world/simulation.rs",
-        "start_line": 326,
+        "start_line": 352,
         "start_column": 28,
-        "end_line": 326,
+        "end_line": 352,
         "end_column": 29
+      },
+      {
+        "path": "src/robots/world/simulation.rs",
+        "start_line": 354,
+        "start_column": 37,
+        "end_line": 354,
+        "end_column": 38
+      },
+      {
+        "path": "src/robots/world/simulation.rs",
+        "start_line": 96,
+        "start_column": 39,
+        "end_line": 96,
+        "end_column": 40
       }
     ],
-    "gap_reason": "Geometry-error closures and intermediate error propagation were not induced at validated public boundaries; these paths remain unverified."
+    "gap_reason": "Snapshot validation and substep error propagation were not induced in these internal paths. Native and browser boundary tests do not prove these paths.",
+    "supersedes": "Prior cached multi-executable region totals were unreliable and are withdrawn."
   },
   "nix_findings": {
     "current": 10,
@@ -140,18 +51,17 @@
     "same_checks_descriptions_paths_and_lines": true
   },
   "source_sha256": {
-    "src/robots/world/battle.rs": "ab3ad6d8019dce066b97d30e7dd2d197dd399e4ed70f979d3bdec3cb095025e6",
-    "src/robots/world/battle_snapshot.rs": "ef779d27da802a3239ca4a3af906156d945f5107026e190d971b93273a1e8fc4",
-    "src/robots/world/projectile.rs": "eb9a17e9d9294fd83e28a720c85b23c4696237d13d6d613314230630703eb19f",
-    "src/robots/world/simulation.rs": "1711ea1ce6d23977667fc30dba04c6cf90cc0614becdf586febf18435c939103",
-    "src/robots/droid/action.rs": "00d20286ff6d9ab83eace5872f642c2c8a4bc3a06cbc23744ef4f7a1fcdfd09b",
-    "tests/robot_battle.rs": "dc0463e189df6f19497f0b793752a0feb2f04ed8c7972dd5764231dc85349f4d"
+    "src/robots/world/actuation.rs": "2f20273001966b869312d18e4c0c20bd07b07aef4df4b91fba8956b2b3638abc",
+    "src/robots/world/simulation.rs": "e53d09b49829801ee4bec7681fb02c1e9829e86d82985e180d4432e402769ce6",
+    "src/robots/world/battle.rs": "a92620700eb3a773eaecd7d43c4da7af6e9ce02b204d98549f4719bcf153e34d",
+    "src/robots/droid/observation.rs": "7bf87352a51d7b0e46495ae482d714164f7bcd0c74abe7ad9c1306317e65ca67",
+    "src/robots/droid/standing.rs": "87bb09f5ce48926659cd3a44e186b9a8c68c53af53122996eff65740263e4a20",
+    "tests/robot_battle.rs": "1269891ac9bf44c1dcc3cd0f98170128a3f5665e9aa08aff5edec91bc8e41e01"
   },
   "collision_profile": "Drone rounds sweep 0.36 m against endpoint-frame collider poses every20ms, not continuous moving-target collision.",
   "unfinished": [
     "rotor collision surfaces",
     "weapon mass and recoil",
-    "fatal-contact rules",
     "match termination",
     "combat sensors",
     "competitive rollout collection",
@@ -160,5 +70,9 @@
     "competitive policies",
     "published combat viewer"
   ],
-  "visual_verification": "No UI change or new screenshot or recording."
+  "visual_verification": "No UI change or new screenshot or recording.",
+  "coverage_executables_sha256": {
+    "/home/sagan/.cache/bevy-gym-quality-validation/coverage-target/debug/deps/bevy_gym-9f05a11a7fb84d39": "af2ef880ba4243accf4b04ff9a3d3674ce70d7cfa857e16de2e7e52ebdb1f9ad",
+    "/home/sagan/.cache/bevy-gym-quality-validation/coverage-target/debug/deps/robot_battle-710e02f067a022c3": "52fd999e5500569c636d1d5b88a3b3d958a92f5506590f30a6411ca8e82c9de3"
+  }
 }

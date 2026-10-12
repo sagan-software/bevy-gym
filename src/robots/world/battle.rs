@@ -85,7 +85,7 @@ impl RobotBattle {
         let (drone_fired, droid_fired) = self.advance_triggers(drone_signals, droid_signals);
         self.fire_rounds(&physical, drone_fired, droid_fired)?;
         self.world
-            .advance_with_health(actions, &self.drones, &self.droids)?;
+            .advance_with_health(actions, &mut self.drones, &mut self.droids)?;
         self.advance_rounds()?;
         self.disable_destroyed();
         self.snapshot()

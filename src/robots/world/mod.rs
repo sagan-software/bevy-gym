@@ -1,6 +1,7 @@
 //! Shared six-agent physics and validated actuator-frame boundary.
 
 mod actions;
+mod actuation;
 mod battle;
 mod battle_snapshot;
 mod error;

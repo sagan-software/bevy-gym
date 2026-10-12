@@ -12,6 +12,16 @@ pub struct DroidObservation {
     pub(super) bodies: [DroidBodyState; 13],
 }
 impl DroidObservation {
+    /// Read shared fall conditions; callers separately validate finiteness and lesson bounds.
+    /// Pelvis height below 0.5 m or non-foot floor contact is fatal; foot support is permitted.
+    pub(in crate::robots) fn fatal_contact(&self) -> bool {
+        self.body(DroidBody::Pelvis).position().y < 0.5
+            || DroidBody::ALL.into_iter().any(|identity| {
+                self.body(identity).floor_contact()
+                    && !matches!(identity, DroidBody::LeftFoot | DroidBody::RightFoot)
+            })
+    }
+
     /// Return one segment's physical state.
     ///
     /// # Panics

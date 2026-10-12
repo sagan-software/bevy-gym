@@ -195,3 +195,64 @@ fn default_droid_action_requests_zero_on_every_actuator() {
         assert_eq!(zero.fraction(actuator).to_bits(), 0.0_f32.to_bits());
     }
 }
+
+/// Shared fatal-contact sensors read actual collisions without changing the physical boundary.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn fatal_contacts_follow_solver_contacts_without_advancing_queries() {
+    let mut world = RobotWorld::default();
+    let before = world.snapshot().unwrap();
+    for slot in RobotSlot::ALL {
+        assert!(!world.fatal_contact(RobotId::Drone(slot)).unwrap());
+        assert!(!world.fatal_contact(RobotId::Droid(slot)).unwrap());
+    }
+    assert_eq!(world.snapshot().unwrap().frame(), before.frame());
+    for _ in 0..100 {
+        let snapshot = world.snapshot().unwrap();
+        let actions = RobotActions::new(
+            &snapshot,
+            [DroneAction::try_from([0.0; 4]).unwrap(); 3],
+            [DroidAction::default(); 3],
+        );
+        world.advance(actions).unwrap();
+    }
+    let after = world.snapshot().unwrap();
+    for slot in RobotSlot::ALL {
+        assert!(world.fatal_contact(RobotId::Drone(slot)).unwrap());
+    }
+    assert_eq!(world.snapshot().unwrap().frame(), after.frame());
+}
+
+/// Physical crashes destroy drone health and disable later motor and trigger requests.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn physical_crashes_destroy_health_and_disable_weapons() {
+    let mut battle = RobotBattle::default();
+    for _ in 0..100 {
+        let snapshot = battle.snapshot().unwrap();
+        let actions = RobotActions::new(
+            snapshot.physical(),
+            [DroneAction::try_from([0.0; 4]).unwrap(); 3],
+            [DroidAction::default(); 3],
+        );
+        battle
+            .advance(
+                actions,
+                [CombatSignal::IdleReleased; 3],
+                [CombatSignal::IdleReleased; 3],
+            )
+            .unwrap();
+    }
+    let snapshot = battle.snapshot().unwrap();
+    for slot in RobotSlot::ALL {
+        let owner = RobotId::Drone(slot);
+        assert!(!snapshot.health(owner).is_alive());
+        assert_eq!(snapshot.weapon_phase(owner), RobotWeaponPhase::Disabled);
+        for motor in bevy_gym::robots::DroneMotor::ALL {
+            assert_eq!(
+                snapshot.physical().drone(slot).motor_state(motor),
+                bevy_gym::robots::DroneMotorState::Failed
+            );
+        }
+    }
+}

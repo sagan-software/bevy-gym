@@ -69,7 +69,7 @@ impl DroidStanding {
 
     /// Reject invalid physical states and standing-task failures at each substep.
     fn fallen(observation: &DroidObservation) -> bool {
-        observation.body(DroidBody::Pelvis).position().y < 0.5
+        observation.fatal_contact()
             || DroidBody::ALL.into_iter().any(|identity| {
                 let body = observation.body(identity);
                 let position = body.position();
@@ -80,8 +80,6 @@ impl DroidStanding {
                     || position.x.abs() > 5.0
                     || position.z.abs() > 5.0
                     || !(0.0..=3.0).contains(&position.y)
-                    || (body.floor_contact()
-                        && !matches!(identity, DroidBody::LeftFoot | DroidBody::RightFoot))
             })
     }
 

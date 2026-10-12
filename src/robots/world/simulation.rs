@@ -85,6 +85,32 @@ impl fmt::Debug for RobotWorld {
     }
 }
 impl RobotWorld {
+    /// Read fatal physical contact without advancing physics or choosing an action.
+    /// Drone contact with any solid is fatal. A droid falls when its pelvis is below
+    /// 0.5 m or a non-foot segment contacts the floor. Foot support alone is permitted.
+    /// Competition movement does not inherit standalone lesson boundary limits.
+    ///
+    /// # Errors
+    /// Returns the original stopped-world error or rejects nonfinite physical state.
+    pub fn fatal_contact(&self, owner: RobotId) -> Result<bool, RobotWorldError> {
+        let snapshot = self.snapshot()?;
+        match owner {
+            RobotId::Drone(slot) => {
+                let [first, second, third] = &self.drones;
+                let drone = match slot {
+                    RobotSlot::First => first,
+                    RobotSlot::Second => second,
+                    RobotSlot::Third => third,
+                };
+                Ok(self
+                    .world
+                    .contact_pairs_with(drone.collider)
+                    .any(rapier3d::prelude::ContactPair::has_any_active_contact))
+            }
+            RobotId::Droid(slot) => Ok(snapshot.droid(slot).fatal_contact()),
+        }
+    }
+
     /// Place an isolated collision fixture; this mutation is absent from production builds.
     #[cfg(test)]
     pub(super) fn place_drone_fixture(&mut self, slot: RobotSlot, position: Vec3) {
@@ -260,11 +286,7 @@ impl RobotWorld {
     /// Panics only if private model arrays disagree with the closed robot slots.
     /// Construction preserves their matching lengths.
     pub fn advance(&mut self, actions: RobotActions) -> Result<RobotSnapshot, RobotWorldError> {
-        self.advance_with_health(
-            actions,
-            &[crate::robots::RobotHealth::from(super::RobotTeam::Drones); 3],
-            &[crate::robots::RobotHealth::from(super::RobotTeam::Droids); 3],
-        )
+        self.advance_frame(actions, super::actuation::Actuation::Unrestricted)
     }
 
     /// Validate a complete source boundary before combat can consume timing or ammunition.
@@ -293,11 +315,22 @@ impl RobotWorld {
     pub(super) fn advance_with_health(
         &mut self,
         actions: RobotActions,
-        drones: &[crate::robots::RobotHealth; 3],
-        droids: &[crate::robots::RobotHealth; 3],
+        drones: &mut [crate::robots::RobotHealth; 3],
+        droids: &mut [crate::robots::RobotHealth; 3],
+    ) -> Result<RobotSnapshot, RobotWorldError> {
+        self.advance_frame(
+            actions,
+            super::actuation::Actuation::Combat { drones, droids },
+        )
+    }
+
+    /// Integrate one common frame under its explicit actuator and contact mechanics.
+    fn advance_frame(
+        &mut self,
+        actions: RobotActions,
+        mut actuation: super::actuation::Actuation<'_>,
     ) -> Result<RobotSnapshot, RobotWorldError> {
         let next = self.check_actions(&actions)?;
-        let no_torque = crate::robots::DroidAction::default();
         for _ in 0..4 {
             // All six requests precede one common 5 ms integration and collision step.
             for slot in RobotSlot::ALL {
@@ -305,25 +338,20 @@ impl RobotWorld {
                 self.drones.get(index).expect("closed robot slot").apply(
                     &mut self.world,
                     *actions.drones.get(index).expect("complete robot actions"),
-                    crate::robots::DroneMotor::ALL.map(|motor| {
-                        drones
-                            .get(index)
-                            .expect("complete drone health")
-                            .motor_state(motor)
-                            .expect("drone health belongs to a drone")
-                    }),
+                    actuation.motors(slot),
                 );
                 self.droids.get(index).expect("closed robot slot").apply(
                     &mut self.world,
-                    if droids.get(index).expect("complete droid health").is_alive() {
-                        *actions.droids.get(index).expect("complete robot actions")
-                    } else {
-                        no_torque
-                    },
+                    actuation.droid_action(
+                        slot,
+                        *actions.droids.get(index).expect("complete robot actions"),
+                    ),
                 );
             }
             self.world.step();
             self.validate()?;
+            // Revoke force immediately after a fatal substep, before the next actuator application.
+            actuation.contacts(self)?;
         }
         // Publish time only after all four substeps have completed successfully.
         self.frame = next;
@@ -394,6 +422,62 @@ mod tests {
             [DroneAction::try_from([0.5; 4]).unwrap(); 3],
             [DroidAction::try_from([0.0; 26]).unwrap(); 3],
         )
+    }
+
+    /// Replay one isolated solver substep with explicit third-drone motor availability.
+    fn fixture_substep(world: &mut RobotWorld, third: [DroneMotorState; 4]) {
+        for ((slot, drone), droid) in RobotSlot::ALL
+            .into_iter()
+            .zip(&world.drones)
+            .zip(&world.droids)
+        {
+            let motors = if slot == RobotSlot::Third {
+                third
+            } else {
+                [DroneMotorState::Working; 4]
+            };
+            drone.apply(
+                &mut world.world,
+                DroneAction::try_from([1.0; 4]).unwrap(),
+                motors,
+            );
+            droid.apply(&mut world.world, DroidAction::default());
+        }
+        world.world.step();
+    }
+
+    /// The first fatal 5 ms contact suppresses thrust during the remaining three substeps.
+    #[test]
+    fn fatal_substep_removes_force_before_the_next_substep() {
+        let mut actual = RobotWorld::default();
+        let mut reference = RobotWorld::default();
+        for world in [&mut actual, &mut reference] {
+            world.place_drone_fixture(RobotSlot::Third, Vec3::new(-3.0, 0.1, 2.0));
+        }
+        fixture_substep(&mut reference, [DroneMotorState::Working; 4]);
+        assert!(reference
+            .fatal_contact(RobotId::Drone(RobotSlot::Third))
+            .unwrap());
+        for _ in 0..3 {
+            fixture_substep(&mut reference, [DroneMotorState::Failed; 4]);
+        }
+        let snapshot = actual.snapshot().unwrap();
+        let actions = RobotActions::new(
+            &snapshot,
+            [DroneAction::try_from([1.0; 4]).unwrap(); 3],
+            [DroidAction::default(); 3],
+        );
+        let mut drones = [crate::robots::RobotHealth::from(super::super::RobotTeam::Drones); 3];
+        let mut droids = [crate::robots::RobotHealth::from(super::super::RobotTeam::Droids); 3];
+        let after = actual
+            .advance_with_health(actions, &mut drones, &mut droids)
+            .unwrap();
+        let [_, _, health] = drones;
+        assert!(!health.is_alive());
+        assert_eq!(
+            after.drone(RobotSlot::Third),
+            reference.snapshot().unwrap().drone(RobotSlot::Third)
+        );
     }
 
     /// One solver owns all 42 dynamic bodies, the floor and 36 passive joints.
