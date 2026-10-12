@@ -84,6 +84,26 @@ impl RobotMatch {
             Lifecycle::Failed(error) => Err(RobotMatchError::Failed(*error)),
         }
     }
+    /// Read a running match's physical solids without advancing any controller or mechanic.
+    /// Excluding an owner and equal-distance ordering match `RobotWorld::cast_ray`.
+    /// # Errors
+    /// Returns the terminal result or preserved failure after solver retirement.
+    /// A running solver query retains its original physical error.
+    pub fn cast_ray(
+        &self,
+        ray: &super::RobotRay,
+        excluded: Option<super::RobotId>,
+    ) -> Result<Option<super::RobotRayHit>, RobotMatchError> {
+        // Only the running state owns a solver; terminal snapshots grant no query capability.
+        match &self.lifecycle {
+            Lifecycle::Running { battle, .. } => battle
+                .cast_ray(ray, excluded)
+                .map_err(RobotMatchError::Failed),
+            Lifecycle::Finished { result, .. } => Err(RobotMatchError::Finished(*result)),
+            Lifecycle::Failed(error) => Err(RobotMatchError::Failed(*error)),
+        }
+    }
+
     /// Advance living policy requests until settled elimination or configured timeout.
     /// # Errors
     /// Rejects terminal requests without side effects and preserves physical failures.

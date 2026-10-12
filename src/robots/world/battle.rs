@@ -69,6 +69,20 @@ impl RobotBattle {
     pub(super) fn rounds_pending(&self) -> bool {
         self.projectiles.iter().any(Option::is_some)
     }
+    /// Read the nearest physical solid without changing actions, weapons, health or time.
+    /// Excluding an owner removes all its colliders. Tie order matches `RobotWorld::cast_ray`.
+    /// The fixed roster requires O(N) time for N solids and O(1) auxiliary space.
+    /// # Errors
+    /// Returns the original stopped-world error or rejects nonfinite physical state.
+    pub fn cast_ray(
+        &self,
+        ray: &super::RobotRay,
+        excluded: Option<RobotId>,
+    ) -> Result<Option<super::RobotRayHit>, RobotWorldError> {
+        // Delegate measurement to the private solver without exposing mutable capability.
+        self.world.cast_ray(ray, excluded)
+    }
+
     /// Advance complete motor, torque and trigger requests from one source boundary.
     ///
     /// # Errors

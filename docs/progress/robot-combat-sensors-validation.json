@@ -1,0 +1,47 @@
+{
+  "date": "2026-10-12",
+  "status": "Read-only combat measurements implemented; standing, walking and competitive fighting remain unqualified",
+  "regression": "Test compilation failed because RobotBattle and RobotMatch lacked cast_ray. Initial test API mistakes were corrected before implementation; the second red log contains only missing-method errors.",
+  "source_sha256": {
+    "src/robots/world/battle.rs": "eb4c0133cf61e260dcce90c49e08e8051a25edf220241e6722dd885d276cfccd",
+    "src/robots/world/competition.rs": "9fc1ae49d79d7c739aac3451624929c94fdf886fbb55114298c143e9e4df6695",
+    "tests/robot_combat_sensors.rs": "e8ff7df1e88579169bef5152465b65b832db4b1d84cadfb9e595caee4d3ae503",
+    "flake.nix": "de52afcbf6b45faea4c3a4fa6ea8cde82c0f426a5d44e29532ca1f6d45edd58e"
+  },
+  "validation": {
+    "new_public_cases": 3,
+    "native": "passed",
+    "wasm": "passed after final test edit",
+    "format": "passed",
+    "strict_clippy": "passed",
+    "full_tests": "passed",
+    "personal_lints": "passed; no changed-line diagnostics",
+    "nix_lint": "Ten unchanged baseline findings; no new finding in the changed test selection."
+  },
+  "coverage": {
+    "scope": "The two added combat cast_ray methods only. One current executable; fresh profiles only.",
+    "executable_sha256": {
+      "/home/sagan/.cache/bevy-gym-quality-validation/coverage-build/llvm-cov-target/debug/deps/robot_combat_sensors-78a510a20f4dc102": "493e4f9980f15ac804881dc7a543439de11c92448d4aaaeece4390c7872b11ec"
+    },
+    "regions_hit": 19,
+    "regions_total": 19,
+    "conditions_both": 0,
+    "conditions_total": 0,
+    "unhit_regions": [],
+    "unhit_conditions": []
+  },
+  "commands": [
+    "cargo fmt --all -- --check",
+    "cargo test",
+    "cargo test --features robots",
+    "cargo clippy --all-targets --all-features -- -D warnings",
+    "cargo test --no-default-features --features robots --test robot_combat_sensors",
+    "nix run .#drone-browser-check"
+  ],
+  "qualification": {
+    "standing": false,
+    "walking": false,
+    "fighting": false
+  },
+  "browser_presentation": "The diagnostic viewer still uses RobotWorld. These query methods do not change its presentation or policy competence."
+}

@@ -25,3 +25,15 @@ This integration does not implement rotor collision surfaces, weapon mass or rec
 Thirteen public cases pass on native and WASM. A private test compares actual substep physics and confirms that fatal contact removes force before the next substep. Native format, strict Clippy, full tests and personal Rust lint pass.
 
 Fresh coverage records 158 of 162 regions in the contact and actuation scope, with both outcomes of all 6 conditional branches. Four error-propagation regions remain untested; the [validation record](progress/robot-battle-validation.json) lists their locations. Earlier cached coverage totals were unreliable and are withdrawn. Nix lint retains ten findings matching the preserved baseline.
+
+## Read-only combat queries
+
+`RobotBattle::cast_ray` returns the nearest physical solid through the private shared solver.
+It preserves the common decision boundary, health and weapon phases.
+Owner exclusion removes all of that robot's colliders.
+Distance and tie ordering follow [the world ray contract](ROBOT_RAY_QUERY.md).
+Stopped-world errors retain their original cause. Queries cannot choose an action or expose the mutable solver.
+
+The [query validation record](progress/robot-combat-sensors-validation.json) records three native and WASM cases.
+Fresh coverage hits all 19 production regions in the two new query methods.
+This provides measurements for future combat observations. Actor sensor encoding and competitive training remain unfinished.

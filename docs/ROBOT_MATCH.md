@@ -17,3 +17,16 @@ Terminal advancement returns `Finished(result)` or `Failed(error)` before consum
 Thirteen combat cases pass on native and WASM, including five match cases. They cover exact duration boundaries, timeout, sticky failure, reset and physical elimination. Private cases cover all elimination outcomes, pending-round exclusion, the exact maximum duration and diagnostic sources. Native format, strict Clippy, full tests and personal Rust lint pass. Fresh coverage hits all 134 reported production regions in the match lifecycle scope and both outcomes of three conditional branches. The [validation record](progress/robot-match-validation.json) records source and executable hashes.
 
 These tests use isolated mechanics fixtures. They do not qualify standing, walking or fighting. The published diagnostic still uses `RobotWorld`; the competitive viewer, sensors, rollout collection and trained competitive policies remain unfinished. No new screenshot or recording accompanies this mechanics change.
+
+## Match query capability
+
+`RobotMatch::cast_ray` permits read-only collision queries while the match is running.
+It delegates owner exclusion, range and tie ordering to the shared world.
+Finished queries return `RobotMatchError::Finished(result)`.
+Failed queries return `RobotMatchError::Failed(error)` with the preserved diagnostic.
+A running query retains its original physical error through `RobotMatchError::Failed`.
+
+Neither terminal state retains a query-capable solver. Reset restores query capability.
+
+The [query validation record](progress/robot-combat-sensors-validation.json) records source hashes, native/WASM checks and fresh coverage.
+The queries preserve time, health and weapon state. They do not implement actor perception or choose aim and firing.
