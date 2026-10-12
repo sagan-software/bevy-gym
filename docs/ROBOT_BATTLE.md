@@ -18,8 +18,10 @@ After every 5 ms solver substep, any solid contact destroys a drone. A droid fal
 
 Drone observations report the same motor failures that constrain physical thrust. A failed rotor contributes the same force as a valid zero request for that rotor. Destroyed droids receive zero torque through `DroidAction::default`; every default actuator fraction is zero. This is mechanical shutdown, not an autonomous controller.
 
-This integration does not implement rotor collision surfaces, weapon mass or recoil, match termination, combat sensors, competitive rollout collection or trained competitive policies. Projectile collision uses endpoint-frame poses at 20 ms boundaries; it does not provide continuous collision against moving targets between those boundaries. The published shared-world diagnostic still uses `RobotWorld`. Qualified standing, walking and fighting remain unfinished.
+The [match lifecycle](ROBOT_MATCH.md) now freezes finished and failed matches, with separate elimination and timeout results.
 
-Eight public cases pass on native and WASM. A private test compares actual substep physics and confirms that fatal contact removes force before the next substep. Native format, strict Clippy, full tests and personal Rust lint pass.
+This integration does not implement rotor collision surfaces, weapon mass or recoil, combat sensors, competitive rollout collection or trained competitive policies. Projectile collision uses endpoint-frame poses at 20 ms boundaries; it does not provide continuous collision against moving targets between those boundaries. The published shared-world diagnostic still uses `RobotWorld`. Qualified standing, walking and fighting remain unfinished.
+
+Thirteen public cases pass on native and WASM. A private test compares actual substep physics and confirms that fatal contact removes force before the next substep. Native format, strict Clippy, full tests and personal Rust lint pass.
 
 Fresh coverage records 158 of 162 regions in the contact and actuation scope, with both outcomes of all 6 conditional branches. Four error-propagation regions remain untested; the [validation record](progress/robot-battle-validation.json) lists their locations. Earlier cached coverage totals were unreliable and are withdrawn. Nix lint retains ten findings matching the preserved baseline.

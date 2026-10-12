@@ -256,3 +256,205 @@ fn physical_crashes_destroy_health_and_disable_weapons() {
         }
     }
 }
+
+/// Match duration accepts only positive complete 20 ms physical frames.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn match_duration_rejects_partial_and_zero_frames() {
+    use bevy_gym::robots::{RobotMatch, RobotMatchError};
+    use std::time::Duration;
+    for duration in [
+        Duration::ZERO,
+        Duration::from_millis(1),
+        Duration::from_millis(21),
+        Duration::MAX,
+    ] {
+        assert_eq!(
+            RobotMatch::try_from(duration).unwrap_err(),
+            RobotMatchError::InvalidDuration
+        );
+    }
+    for duration in [Duration::from_millis(20), Duration::from_millis(40)] {
+        RobotMatch::try_from(duration).unwrap();
+    }
+}
+
+/// Timeout freezes physical state and reset creates a fresh scope.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn match_timeout_is_terminal_and_reset_restores_running() {
+    use bevy_gym::robots::{RobotMatch, RobotMatchError, RobotMatchResult, RobotMatchStatus};
+    let mut game = RobotMatch::try_from(std::time::Duration::from_millis(20)).unwrap();
+    assert_eq!(game.status(), RobotMatchStatus::Running);
+    let before = game.snapshot().unwrap();
+    let actions = RobotActions::new(
+        before.physical(),
+        [DroneAction::try_from([0.5; 4]).unwrap(); 3],
+        [DroidAction::default(); 3],
+    );
+    let finished = game
+        .advance(
+            actions.clone(),
+            [CombatSignal::IdleReleased; 3],
+            [CombatSignal::IdleReleased; 3],
+        )
+        .unwrap();
+    assert_eq!(
+        game.status(),
+        RobotMatchStatus::Finished(RobotMatchResult::Timeout)
+    );
+    assert_eq!(
+        game.advance(
+            actions,
+            [CombatSignal::PursuitRequested; 3],
+            [CombatSignal::PursuitRequested; 3]
+        )
+        .unwrap_err(),
+        RobotMatchError::Finished(RobotMatchResult::Timeout)
+    );
+    assert_eq!(
+        game.snapshot().unwrap().physical().frame(),
+        finished.physical().frame()
+    );
+    game.reset();
+    assert_eq!(game.status(), RobotMatchStatus::Running);
+    assert_ne!(
+        game.snapshot().unwrap().physical().frame(),
+        before.physical().frame()
+    );
+}
+
+/// Source rejection retires the combat backend and preserves one sticky diagnostic.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn match_failure_preserves_cause_until_reset() {
+    use bevy_gym::robots::{RobotMatch, RobotMatchError, RobotMatchStatus};
+    let mut game = RobotMatch::try_from(std::time::Duration::from_millis(40)).unwrap();
+    let foreign = RobotWorld::default().snapshot().unwrap();
+    let actions = RobotActions::new(
+        &foreign,
+        [DroneAction::try_from([0.5; 4]).unwrap(); 3],
+        [DroidAction::default(); 3],
+    );
+    let cause = RobotWorldError::Rejected(RobotWorldFailure::WrongFrame);
+    let error = game
+        .advance(
+            actions.clone(),
+            [CombatSignal::PursuitRequested; 3],
+            [CombatSignal::PursuitRequested; 3],
+        )
+        .unwrap_err();
+    assert_eq!(error, RobotMatchError::Failed(cause));
+    assert!(std::error::Error::source(&error).is_some());
+    assert_eq!(game.status(), RobotMatchStatus::Failed(cause));
+    assert_eq!(game.snapshot().unwrap_err(), error);
+    assert_eq!(
+        game.advance(
+            actions,
+            [CombatSignal::IdleReleased; 3],
+            [CombatSignal::IdleReleased; 3]
+        )
+        .unwrap_err(),
+        error
+    );
+    game.reset();
+    assert_eq!(game.status(), RobotMatchStatus::Running);
+    game.snapshot().unwrap();
+}
+
+/// The last complete frame ends a match; earlier boundaries retain running capabilities.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn match_consumes_exact_complete_duration() {
+    use bevy_gym::robots::{RobotMatch, RobotMatchResult, RobotMatchStatus};
+    let mut game = RobotMatch::try_from(std::time::Duration::from_millis(40)).unwrap();
+    for expected in [
+        RobotMatchStatus::Running,
+        RobotMatchStatus::Finished(RobotMatchResult::Timeout),
+    ] {
+        let snapshot = game.snapshot().unwrap();
+        let actions = RobotActions::new(
+            snapshot.physical(),
+            [DroneAction::try_from([0.5; 4]).unwrap(); 3],
+            [DroidAction::default(); 3],
+        );
+        let after = game
+            .advance(
+                actions,
+                [CombatSignal::IdleReleased; 3],
+                [CombatSignal::IdleReleased; 3],
+            )
+            .unwrap();
+        assert_ne!(after.physical().frame(), snapshot.physical().frame());
+        assert_eq!(game.status(), expected);
+    }
+}
+
+/// Actual fatal contacts finish elimination before timeout and retain a frozen final boundary.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn match_elimination_follows_actual_physical_deaths() {
+    use bevy_gym::robots::{RobotMatch, RobotMatchError, RobotMatchStatus};
+    let mut game = RobotMatch::try_from(std::time::Duration::from_secs(10)).unwrap();
+    for _ in 0..100 {
+        if !matches!(game.status(), RobotMatchStatus::Running) {
+            break;
+        }
+        let snapshot = game.snapshot().unwrap();
+        let actions = RobotActions::new(
+            snapshot.physical(),
+            [DroneAction::try_from([0.0; 4]).unwrap(); 3],
+            [DroidAction::default(); 3],
+        );
+        game.advance(
+            actions,
+            [CombatSignal::IdleReleased; 3],
+            [CombatSignal::IdleReleased; 3],
+        )
+        .unwrap();
+    }
+    let RobotMatchStatus::Finished(result) = game.status() else {
+        panic!("physical deaths did not finish the match");
+    };
+    let snapshot = game.snapshot().unwrap();
+    assert_elimination_result(&snapshot, result);
+    let actions = RobotActions::new(
+        snapshot.physical(),
+        [DroneAction::try_from([1.0; 4]).unwrap(); 3],
+        [DroidAction::try_from([1.0; 26]).unwrap(); 3],
+    );
+    assert_eq!(
+        game.advance(
+            actions,
+            [CombatSignal::PursuitRequested; 3],
+            [CombatSignal::PursuitRequested; 3]
+        )
+        .unwrap_err(),
+        RobotMatchError::Finished(result)
+    );
+    assert_eq!(
+        game.snapshot().unwrap().physical().frame(),
+        snapshot.physical().frame()
+    );
+}
+
+/// Compare the final result with independently measured living team health.
+fn assert_elimination_result(
+    snapshot: &bevy_gym::robots::RobotBattleSnapshot,
+    result: bevy_gym::robots::RobotMatchResult,
+) {
+    use bevy_gym::robots::RobotMatchResult;
+    let drones_alive = RobotSlot::ALL
+        .into_iter()
+        .any(|slot| snapshot.health(RobotId::Drone(slot)).is_alive());
+    let droids_alive = RobotSlot::ALL
+        .into_iter()
+        .any(|slot| snapshot.health(RobotId::Droid(slot)).is_alive());
+    assert_ne!(
+        result,
+        RobotMatchResult::Timeout,
+        "100 frames cannot exhaust the 500-frame duration"
+    );
+    assert_eq!(drones_alive, result == RobotMatchResult::DronesWin);
+    assert_eq!(droids_alive, result == RobotMatchResult::DroidsWin);
+}

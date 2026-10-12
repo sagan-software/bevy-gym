@@ -1,0 +1,47 @@
+{
+  "feature": "shared match lifecycle",
+  "qualified_competition": false,
+  "public_combat_tests_native_and_wasm": 13,
+  "public_match_tests_native_and_wasm": 5,
+  "native_log": "/home/sagan/.cache/bevy-gym-quality-validation/robot-match-native-v6.log",
+  "personal_log": "/home/sagan/.cache/bevy-gym-quality-validation/robot-match-personal-v5.log",
+  "wasm_log": "/home/sagan/.cache/bevy-gym-quality-validation/robot-match-wasm-v3.log",
+  "coverage": {
+    "regions": 134,
+    "hit_regions": 134,
+    "conditional_branches": 3,
+    "both_outcomes": 3,
+    "unhit_regions": [],
+    "executable_sha256": {
+      "/home/sagan/.cache/bevy-gym-quality-validation/coverage-build/llvm-cov-target/debug/deps/bevy_gym-9f05a11a7fb84d39": "1d95c07bda64304f5d7c4f389b7c56abee07b010047c440b23dcb117ce5799f0",
+      "/home/sagan/.cache/bevy-gym-quality-validation/coverage-build/llvm-cov-target/debug/deps/robot_battle-710e02f067a022c3": "8fba1b34caabfa461be3e92fdea5115cf9b39b8895181d4e7931a3c63343df2a"
+    },
+    "report": "/home/sagan/.cache/bevy-gym-quality-validation/robot-match-final-v5-profiles-20261012/coverage.json",
+    "scope": "RobotMatch implementation and helpers, RobotMatchError Display/source and RobotBattle::rounds_pending; current unit and integration executables only"
+  },
+  "source_sha256": {
+    "src/robots/world/competition.rs": "14db975dac11ec7d0b17f20f2f3c00549b538b7892f5ca4c9be8bdef98d63670",
+    "src/robots/world/match_error.rs": "6d8dc36c13120553c5b7f69be651aba4d267955cc35f234d85dddd97aa30f8d1",
+    "src/robots/world/match_result.rs": "b76dd1f642cf2b14f5899f8c7aba24b6977056c1505d1729318ccd1ad27cde16",
+    "src/robots/world/match_status.rs": "b7ea8be1da8f962a5e2c496fecdfeb94f770f46bcd3e81ba883178bdb3428dff",
+    "src/robots/world/battle.rs": "b91c3c8556470267ac5abb4604cfbecbd736b4a07e07ffaea5e9a8b0a463e11c",
+    "src/robots/world/mod.rs": "46b30a560e0be65249fcf8676a507bed7289c966345d1efd67aa5eb3bc59cd16",
+    "src/robots/mod.rs": "d0f22a267b202589cf1f21eb654f2665c5144e61336a72a224751ffa466ea648",
+    "tests/robot_battle.rs": "3a310bbee2f347a931c485184ccf7b65d3f7a6750c06dc38f86859f4ba00f2e8",
+    "examples/robots/battle.rs": "8149a0c9dcdfe87d4be2718ec5302ad59749ddcc75f737352cbf6e4210ce140b"
+  },
+  "duration_profile": "Positive exact20ms multiples, at mostu32::MAX frames; constructor accepts Duration and has no default timeout.",
+  "termination_profile": "Elimination waits for pending rounds; settled elimination precedes simultaneous timeout; timeout retires pending rounds.",
+  "controller_memory": "Controller layer owns and resets recurrent memories; this mechanics layer owns none.",
+  "unfinished": [
+    "rotor collision surfaces",
+    "weapon mass and recoil",
+    "combat sensors",
+    "competitive rollout collection",
+    "standing qualification",
+    "walking qualification",
+    "competitive policies",
+    "published combat viewer"
+  ],
+  "visual_verification": "Actual Chrome WASM tests passed; no UI change, rendered visual inspection, screenshot or recording."
+}

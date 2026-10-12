@@ -65,6 +65,10 @@ impl RobotBattle {
             droid_weapons: self.droid_weapons.map(|weapon| weapon.phase()),
         })
     }
+    /// Report pending mechanical rounds to the owning match lifecycle only.
+    pub(super) fn rounds_pending(&self) -> bool {
+        self.projectiles.iter().any(Option::is_some)
+    }
     /// Advance complete motor, torque and trigger requests from one source boundary.
     ///
     /// # Errors
