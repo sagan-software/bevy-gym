@@ -67,7 +67,7 @@
 
 #[cfg(feature = "bevy-mcp")]
 use bevy_brp_extras as _;
-#[cfg(test)]
+#[cfg(all(test, not(target_arch = "wasm32")))]
 use clap as _;
 // Ecosystem examples own these serialization dependencies. Keep library builds
 // free of false unused-dependency diagnostics.

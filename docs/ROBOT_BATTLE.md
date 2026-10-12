@@ -20,7 +20,7 @@ Drone observations report the same motor failures that constrain physical thrust
 
 The [match lifecycle](ROBOT_MATCH.md) now freezes finished and failed matches, with separate elimination and timeout results.
 
-This integration does not implement rotor collision surfaces, weapon mass or recoil, combat sensors, competitive rollout collection or trained competitive policies. Projectile collision uses endpoint-frame poses at 20 ms boundaries; it does not provide continuous collision against moving targets between those boundaries. The published shared-world diagnostic still uses `RobotWorld`. Qualified standing, walking and fighting remain unfinished.
+This integration does not implement rotor collision surfaces, weapon mass or recoil, hearing, competitive rollout collection or trained competitive policies. Projectile collision uses endpoint-frame poses at 20 ms boundaries; it does not provide continuous collision against moving targets between those boundaries. The published shared-world diagnostic still uses `RobotWorld`. Qualified standing, walking and fighting remain unfinished.
 
 Thirteen public cases pass on native and WASM. A private test compares actual substep physics and confirms that fatal contact removes force before the next substep. Native format, strict Clippy, full tests and personal Rust lint pass.
 
@@ -37,3 +37,11 @@ Stopped-world errors retain their original cause. Queries cannot choose an actio
 The [query validation record](progress/robot-combat-sensors-validation.json) records three native and WASM cases.
 Fresh coverage hits all 19 production regions in the two new query methods.
 This provides measurements for future combat observations. Actor sensor encoding and competitive training remain unfinished.
+
+## Body-mounted images
+
+[Collision-proxy RGB images](ROBOT_IMAGE.md) now provide fixed, occlusion-limited
+observations for all six owners. Running matches retain image capability; terminal
+matches reject capture until reset. Images choose no autonomous actions.
+Actor encoding, hearing, rollout collection and trained competitive fighting remain
+unfinished.

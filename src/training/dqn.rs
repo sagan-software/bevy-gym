@@ -1449,6 +1449,7 @@ pub struct DqnReport {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[cfg(not(target_arch = "wasm32"))]
     use crate::training::config::{AlgorithmKind, RunId};
 
     #[test]
@@ -1561,6 +1562,7 @@ mod tests {
         clippy::disallowed_methods,
         reason = "bounded synchronous filesystem setup keeps the recorder round-trip test dependency-free"
     )]
+    #[cfg(not(target_arch = "wasm32"))]
     fn policy_checkpoint_round_trip_preserves_q_values() {
         let config = DqnConfig {
             hidden_sizes: vec![8],

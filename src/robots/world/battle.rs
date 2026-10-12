@@ -43,6 +43,14 @@ impl Default for RobotBattle {
     }
 }
 impl RobotBattle {
+    /// Render the owner's fixed body-mounted collision-proxy RGB image.
+    /// Capture neither advances physics nor selects movement, aim, shots or alert state.
+    /// # Errors
+    /// Retains stopped-world failures and rejects nonfinite physical camera geometry.
+    pub fn image(&self, owner: RobotId) -> Result<super::RobotImage, RobotWorldError> {
+        super::RobotImage::capture(&self.world, owner)
+    }
+
     /// Read one common physical and mechanical boundary.
     ///
     /// # Errors

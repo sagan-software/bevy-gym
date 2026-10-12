@@ -53,6 +53,12 @@ fn finished_matches_retire_sensor_queries_until_reset() {
     let mut game = RobotMatch::try_from(Duration::from_millis(20)).unwrap();
     let ray = RobotRay::try_from((Vec3::new(-3.0, 2.0, 5.0), Vec3::NEG_Z, 10.0)).unwrap();
     assert!(game.cast_ray(&ray, None).unwrap().is_some());
+    assert_eq!(
+        game.image(RobotId::Drone(RobotSlot::First))
+            .unwrap()
+            .owner(),
+        RobotId::Drone(RobotSlot::First)
+    );
     let before = game.snapshot().unwrap();
     let actions = RobotActions::new(
         before.physical(),
@@ -69,8 +75,18 @@ fn finished_matches_retire_sensor_queries_until_reset() {
         game.cast_ray(&ray, None),
         Err(RobotMatchError::Finished(RobotMatchResult::Timeout))
     );
+    assert_eq!(
+        game.image(RobotId::Drone(RobotSlot::First)),
+        Err(RobotMatchError::Finished(RobotMatchResult::Timeout))
+    );
     game.reset();
     assert!(game.cast_ray(&ray, None).unwrap().is_some());
+    assert_eq!(
+        game.image(RobotId::Drone(RobotSlot::First))
+            .unwrap()
+            .owner(),
+        RobotId::Drone(RobotSlot::First)
+    );
 }
 
 /// Failed combat cannot expose a mutable or query-capable retired backend.
@@ -100,6 +116,10 @@ fn failed_combat_sensor_queries_retain_the_original_failure() {
         battle.cast_ray(&ray, None),
         Err(RobotWorldError::Stopped(RobotWorldFailure::WrongFrame))
     );
+    assert_eq!(
+        battle.image(RobotId::Droid(RobotSlot::First)),
+        Err(RobotWorldError::Stopped(RobotWorldFailure::WrongFrame))
+    );
     let mut game = RobotMatch::try_from(Duration::from_secs(1)).unwrap();
     assert_eq!(
         game.advance(
@@ -115,5 +135,57 @@ fn failed_combat_sensor_queries_retain_the_original_failure() {
         Err(RobotMatchError::Failed(RobotWorldError::Rejected(
             RobotWorldFailure::WrongFrame
         )))
+    );
+    assert_eq!(
+        game.image(RobotId::Droid(RobotSlot::First)),
+        Err(RobotMatchError::Failed(RobotWorldError::Rejected(
+            RobotWorldFailure::WrongFrame
+        )))
+    );
+}
+
+/// Images contain only body-mounted visible pixels and preserve the physical boundary.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn combat_image_uses_the_owner_camera_without_advancing_the_world() {
+    let battle = RobotBattle::default();
+    let before = battle.snapshot().unwrap();
+    let owner = RobotId::Drone(RobotSlot::Third);
+    let image = battle.image(owner).unwrap();
+    assert_eq!(image.owner(), owner);
+    assert_eq!(image.frame(), before.physical().frame());
+    assert_eq!(image.pixels().len(), 13);
+    assert_eq!(image.pixels()[0].len(), 17);
+    // The second drone is directly ahead; the upper corner sees empty space.
+    assert_eq!(image.pixels()[6][8], [32, 176, 208]);
+    assert_eq!(image.pixels()[0][0], [16, 24, 40]);
+    assert_eq!(image.pixels()[12][8], [96, 104, 112]);
+    let droid = battle.image(RobotId::Droid(RobotSlot::Third)).unwrap();
+    assert_eq!(droid.pixels()[6][8], [224, 160, 48]);
+    let after = battle.snapshot().unwrap();
+    assert_eq!(after.physical().frame(), before.physical().frame());
+    assert_eq!(after.physical().elapsed(), before.physical().elapsed());
+    for slot in RobotSlot::ALL {
+        assert_eq!(after.physical().drone(slot), before.physical().drone(slot));
+        assert_eq!(after.physical().droid(slot), before.physical().droid(slot));
+    }
+}
+
+/// All six body-mounted images belong to one unchanged common decision boundary.
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), test)]
+fn all_combat_images_share_one_physical_frame() {
+    let battle = RobotBattle::default();
+    let before = battle.snapshot().unwrap();
+    for slot in RobotSlot::ALL {
+        for owner in [RobotId::Drone(slot), RobotId::Droid(slot)] {
+            let image = battle.image(owner).unwrap();
+            assert_eq!(image.frame(), before.physical().frame());
+            assert_eq!(image.owner(), owner);
+        }
+    }
+    assert_eq!(
+        battle.snapshot().unwrap().physical().frame(),
+        before.physical().frame()
     );
 }

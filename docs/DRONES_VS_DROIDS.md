@@ -1,6 +1,6 @@
 # Drones versus droids
 
-Updated: 2026-10-11. Status: shared-world inference implemented; competition unfinished.
+Updated: 2026-10-12. Status: shared-world inference implemented; competition unfinished.
 This request supersedes the two-versus-two player-first shooter milestone.
 The target is a spectator-first competitive match with three drones and three droids.
 
@@ -189,19 +189,15 @@ No competitive 3v3 training run or qualified droid locomotion checkpoint exists.
 
 ## Drone control correction
 
-The shared diagnostic now uses the recorded seed-7 PPO recovery checkpoint at update
-260, SHA-256 `bb0bef6e7412fd79ea097fa95036d428d22962af3b259c52c82b38c894df9b76`.
-The previous hover checkpoint failed the sustained-spin regression at action 250.
-The replacement passes 1,000 shared-world actions: all three drones remain above
-1 m, angular speed stays at most 0.5 rad/s after action 250, and final distance
-from each drone's lane is at most 0.5 m.
+The shared diagnostic now uses the recorded PPO arrival checkpoint at 1,260 total
+updates. The [shared-world guide](ROBOT_WORLD.md#arrival-heading-correction) records
+its identity and the twenty-second heading regression. The
+[current recording evidence](progress/world-scene/arrival-heading-correction.json)
+binds the ten-second video and poster to the actual policy and runtime bytes.
+The earlier recovery recording remains historical evidence.
 
-The [browser evidence](progress/world-scene/control-correction.json) binds the
-updated ten-second gallery video and poster to the actual runtime and policy bytes.
-The [narrow view](progress/world-scene/control-narrow.png) shows all six models and
-working spectator controls after one policy step. The diagnostic still uses an
-unqualified droid policy. This correction does not
-establish walking, combat, or competitive qualification. The
+The droid policy remains unqualified. Standing, walking and trained competitive
+fighting remain unfinished. The
 [standing experiments](DROID_STANDING.md#recorded-optimizer-and-selection-experiments)
 record the failed candidates and the measured limb-motion problem.
 
@@ -225,3 +221,11 @@ The [weapon timing rules](ROBOT_WEAPON_TIMING.md) now constrain current policy t
 The [shared damage rules](ROBOT_HEALTH.md) now record six-hit drone bodies, three-hit droid bodies and two-hit drone rotors, with one-time destruction and absorbing death. Named rotor access follows physical actuator order without unchecked indexing. Seven public cases pass on native and WASM; coverage hits all 154 new production regions. Body collisions and actuator suppression now connect through [shared combat mechanics](ROBOT_BATTLE.md).
 
 The [match lifecycle](ROBOT_MATCH.md) now freezes elimination, timeout and failure. Rotor impacts and competitive rollouts remain unfinished. Standing and walking still require qualified policies.
+
+## Body-mounted collision images
+
+The [RGB image contract](ROBOT_IMAGE.md) defines fixed body-mounted cameras over
+physical collision proxies. Native and browser checks verify occlusion, camera
+rotation, range, source validation and terminal rejection. Images expose no hidden
+enemy coordinates and select no actions. Hearing, actor encoding, the batched
+two-team collector and trained fighting remain unfinished.

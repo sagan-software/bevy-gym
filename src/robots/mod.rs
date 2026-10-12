@@ -43,9 +43,9 @@ pub use ranges::{DroneRangeDirection, DroneRangeDistance, DroneRanges, InvalidDr
 
 pub use world::{
     InvalidRobotRay, RobotActions, RobotBattle, RobotBattleSnapshot, RobotFrame, RobotId,
-    RobotMatch, RobotMatchError, RobotMatchResult, RobotMatchStatus, RobotMuzzle, RobotRay,
-    RobotRayHit, RobotRayTarget, RobotSlot, RobotSnapshot, RobotTeam, RobotWorld, RobotWorldError,
-    RobotWorldFailure,
+    RobotImage, RobotMatch, RobotMatchError, RobotMatchResult, RobotMatchStatus, RobotMuzzle,
+    RobotRay, RobotRayHit, RobotRayTarget, RobotSlot, RobotSnapshot, RobotTeam, RobotWorld,
+    RobotWorldError, RobotWorldFailure,
 };
 
 pub use weapon::{RobotVolleyRounds, RobotWeapon, RobotWeaponOutcome, RobotWeaponPhase};

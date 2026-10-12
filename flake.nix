@@ -335,6 +335,8 @@
                 }
               )
             }"
+            cargo test --locked --no-default-features --features robots,browser,browser-training \
+              --target wasm32-unknown-unknown --lib camera_images "$@"
             cargo test --locked --no-default-features --features robots,browser \
               --target wasm32-unknown-unknown --test robot_world --test robot_battle --test robot_combat_sensors --test robot_ray --test robot_muzzle --test robot_weapon --test robot_health --test robot_world_view_mode --test pursuit_arena --test pursuit_combat --test pursuit_shots --test pursuit_sight --test pursuit_hearing --test pursuit_return_fire --test pursuit_navigation --test drone_hover --test drone_obstacles --test drone_damage --test drone_impulse --test drone_damage_baseline --test drone_recovery --test drone_travel --test droid_standing --test droid_walking --test droid_projection --test drone_tracking --test drone_parity "$@"
             cargo test --locked --no-default-features --features robots,browser,browser-training \

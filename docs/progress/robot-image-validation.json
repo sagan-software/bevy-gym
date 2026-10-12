@@ -1,0 +1,84 @@
+{
+  "scope": "Handwritten RobotImage methods and the two combat image methods. Two current executables; fresh profiles only. Compiler-derived traits excluded.",
+  "executable_sha256": {
+    "/home/sagan/.cache/bevy-gym-quality-validation/coverage-build/llvm-cov-target/debug/deps/bevy_gym-9f05a11a7fb84d39": "12a32f2395eb5923db297b209f0e35f309c642ca72d2da7b226aea729c3173ed",
+    "/home/sagan/.cache/bevy-gym-quality-validation/coverage-build/llvm-cov-target/debug/deps/robot_combat_sensors-78a510a20f4dc102": "ea9078b79b759ed27a09b1fb6177c634c6eb000670fb48e905e0d7b2f53e53d6"
+  },
+  "regions_hit": 94,
+  "regions_total": 99,
+  "conditions_both": 0,
+  "conditions_total": 0,
+  "unhit_regions": [
+    [
+      "src/robots/world/image.rs",
+      71,
+      95,
+      71,
+      96
+    ],
+    [
+      "src/robots/world/image.rs",
+      72,
+      25,
+      72,
+      87
+    ],
+    [
+      "src/robots/world/image.rs",
+      73,
+      21,
+      73,
+      22
+    ],
+    [
+      "src/robots/world/image.rs",
+      73,
+      23,
+      73,
+      24
+    ],
+    [
+      "src/robots/world/image.rs",
+      76,
+      49,
+      76,
+      50
+    ]
+  ],
+  "unhit_conditions": [],
+  "date_utc": "2026-10-12T06:36:38.334535+00:00",
+  "source_sha256": {
+    "src/robots/world/image.rs": "2ac71f46905d0ae841c22726d6e71848d0bde6dec9f882e1c59b80e5298d97bd",
+    "src/robots/world/battle.rs": "0faf251dc9245ef18c54d836d6db08e11edbee726f42ac343af027bcf1a3a156",
+    "src/robots/world/competition.rs": "26119ac24ffc3549313f7445dd8d1aa070556a4fd11cb7f41c7748bca2c5be54",
+    "src/robots/world/simulation.rs": "b76944928a98cc9cf04b76752570c3253b8d6915ddc0eba45dbee96345dd0f33",
+    "tests/robot_combat_sensors.rs": "98b574f6e3d35cb2163635d78387267f959b4fae9387d1306757564a2d5730bc",
+    "src/lib.rs": "5392be043a5ffc580535293e562139e9e26be5d82297f2dcf6c9a4e3cfd69371",
+    "src/training/dqn.rs": "d32a15e5a2ca9e7f43a408801315a18408920d1bff50e0cede30736614d41769",
+    "flake.nix": "f207eb9880c933d1afb1172338d970bd46988b5b63b4a047a930aaadd9fa451f"
+  },
+  "red_tests": [
+    "RobotBattle::image missing before implementation",
+    "RobotMatch::image missing before lifecycle integration"
+  ],
+  "native_gates": [
+    "cargo fmt --all -- --check",
+    "cargo clippy --all-targets --all-features -- -D warnings",
+    "cargo test",
+    "cargo test --features robots",
+    "personal Rust lint: all targets and features, changed range HEAD"
+  ],
+  "browser_gate": "nix run .#drone-browser-check; four camera library cases, five combat sensor public cases, complete existing suites and 44 viewer cases passed",
+  "browser_warning": "Existing unused TrainingBackend import in unmodified tests/droid_skill_session.rs. No candidate-local lint findings.",
+  "qualification": false,
+  "unfinished": [
+    "standing",
+    "walking",
+    "hearing",
+    "actor sensor encoding",
+    "batched competitive rollout collection",
+    "trained fighting"
+  ],
+  "full_pixel_native_wasm_parity": "Not separately established beyond the asserted literal pixels and behavioral cases.",
+  "coverage_gaps_reason": "Defensive ray errors after validated immutable source state; no such corrupted geometry is constructible through the public image API."
+}

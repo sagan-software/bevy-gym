@@ -412,8 +412,107 @@ fn finite(
 
 #[cfg(test)]
 mod tests {
+    #[cfg(target_arch = "wasm32")]
+    wasm_bindgen_test::wasm_bindgen_test_configure!(run_in_browser);
     use super::*;
     use crate::robots::{DroidAction, DroneAction};
+
+    /// A fully occluded enemy can move without changing any actor image byte.
+    #[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+    #[cfg_attr(not(target_arch = "wasm32"), test)]
+    fn camera_images_hide_enemy_motion_behind_solid_cover() {
+        let mut world = RobotWorld::default();
+        let owner = RobotId::Drone(RobotSlot::Third);
+        world.world.insert(
+            RigidBodyBuilder::fixed().translation(Vector::new(-3.0, 2.0, 1.0)),
+            ColliderBuilder::cuboid(5.0, 5.0, 0.1),
+        );
+        let before = super::super::RobotImage::capture(&world, owner).unwrap();
+        assert!(before
+            .pixels()
+            .iter()
+            .flatten()
+            .all(|pixel| *pixel == [96, 104, 112]));
+        let original = world.snapshot().unwrap().droid(RobotSlot::First);
+        let [rig, _, _] = &world.droids;
+        let segments = world
+            .world
+            .colliders
+            .iter()
+            .filter_map(|(handle, collider)| {
+                rig.body_for_collider(handle)
+                    .map(|_| (handle, collider.parent().unwrap()))
+            })
+            .collect::<Vec<_>>();
+        assert_eq!(segments.len(), 13);
+        for (collider, body) in segments {
+            let offset = Vector::new(-2.0, 0.0, -1.0);
+            let position = world.world.bodies[body].translation();
+            world.world.bodies[body].set_translation(position + offset, true);
+            let position = world.world.colliders[collider].translation();
+            world.world.colliders[collider].set_translation(position + offset);
+        }
+        let changed = world.snapshot().unwrap().droid(RobotSlot::First);
+        assert_ne!(original, changed);
+        let after = super::super::RobotImage::capture(&world, owner).unwrap();
+        assert_eq!(before, after);
+    }
+
+    /// The camera follows body rotation rather than retaining a spectator or target direction.
+    #[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+    #[cfg_attr(not(target_arch = "wasm32"), test)]
+    fn camera_images_follow_the_physical_body_rotation() {
+        let mut world = RobotWorld::default();
+        let owner = RobotId::Drone(RobotSlot::Third);
+        let before = super::super::RobotImage::capture(&world, owner).unwrap();
+        assert_eq!(before.pixels()[6][8], [32, 176, 208]);
+        let [_, _, drone] = &world.drones;
+        let rotation = Rotation::from_rotation_y(std::f32::consts::FRAC_PI_2);
+        world.world.bodies[drone.body].set_rotation(rotation, true);
+        world.world.colliders[drone.collider].set_rotation(rotation);
+        let after = super::super::RobotImage::capture(&world, owner).unwrap();
+        assert_eq!(after.pixels()[6][8], [16, 24, 40]);
+        assert_eq!(before.frame(), after.frame());
+    }
+
+    /// The fixed 20 m image range cannot expose a farther collider or hidden identity.
+    #[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+    #[cfg_attr(not(target_arch = "wasm32"), test)]
+    fn camera_images_limit_visibility_to_the_fixed_range() {
+        let mut world = RobotWorld::default();
+        let owner = RobotId::Drone(RobotSlot::Third);
+        world.place_drone_fixture(RobotSlot::First, Vec3::new(20.0, 2.0, 20.0));
+        let origin = Vec3::new(-3.0, 2.0, 2.0 - 0.317);
+        world.place_drone_fixture(RobotSlot::Second, origin + Vec3::NEG_Z * 19.0);
+        assert_eq!(
+            super::super::RobotImage::capture(&world, owner)
+                .unwrap()
+                .pixels()[6][8],
+            [32, 176, 208]
+        );
+        world.place_drone_fixture(RobotSlot::Second, origin + Vec3::NEG_Z * 21.0);
+        assert_eq!(
+            super::super::RobotImage::capture(&world, owner)
+                .unwrap()
+                .pixels()[6][8],
+            [16, 24, 40]
+        );
+    }
+
+    /// Invalid physical state fails before an image can conceal it with invented pixels.
+    #[cfg_attr(target_arch = "wasm32", wasm_bindgen_test::wasm_bindgen_test)]
+    #[cfg_attr(not(target_arch = "wasm32"), test)]
+    fn camera_images_reject_nonfinite_physical_state() {
+        let mut world = RobotWorld::default();
+        let owner = RobotId::Drone(RobotSlot::Third);
+        world.place_drone_fixture(RobotSlot::First, Vec3::splat(f32::NAN));
+        assert_eq!(
+            super::super::RobotImage::capture(&world, owner),
+            Err(RobotWorldError::Rejected(RobotWorldFailure::NonFinite(
+                RobotId::Drone(RobotSlot::First)
+            )))
+        );
+    }
 
     /// Complete fixture requests probe mechanics without acting as a game controller.
     fn requests(snapshot: &RobotSnapshot) -> RobotActions {

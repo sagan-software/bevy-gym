@@ -104,6 +104,20 @@ impl RobotMatch {
         }
     }
 
+    /// Render a running owner's body-mounted collision-proxy RGB image.
+    /// # Errors
+    /// Terminal matches retain their result or original failure without a solver.
+    pub fn image(&self, owner: super::RobotId) -> Result<super::RobotImage, RobotMatchError> {
+        // Image rendering requires the same running solver capability as collision queries.
+        match &self.lifecycle {
+            Lifecycle::Running { battle, .. } => {
+                battle.image(owner).map_err(RobotMatchError::Failed)
+            }
+            Lifecycle::Finished { result, .. } => Err(RobotMatchError::Finished(*result)),
+            Lifecycle::Failed(error) => Err(RobotMatchError::Failed(*error)),
+        }
+    }
+
     /// Advance living policy requests until settled elimination or configured timeout.
     /// # Errors
     /// Rejects terminal requests without side effects and preserves physical failures.
